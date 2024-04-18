@@ -6,8 +6,6 @@ local table_util = require("table_util")
 local NoteChart = require("ncdk.NoteChart")
 local NoteData = require("ncdk.NoteData")
 
-local rhythmModel = {}
-
 local visualTimeInfo = {
 	rate = 1,
 	time = 0,
@@ -16,19 +14,11 @@ local visualTimeInfo = {
 local logicEngine = LogicEngine()
 local graphicEngine = GraphicEngine(visualTimeInfo, logicEngine)
 
-rhythmModel.logicEngine = logicEngine
-rhythmModel.graphicEngine = graphicEngine
-
-logicEngine.rhythmModel = rhythmModel
-graphicEngine.rhythmModel = rhythmModel
-
 logicEngine.eventTime = 0
 logicEngine.timeRate = 1
 logicEngine.inputOffset = 0
 
 graphicEngine.range = {-2, 2}
-
-rhythmModel.timeEngine = logicEngine  -- use logic engine as time engine (timeRate)
 
 logicEngine.timings = {
 	ShortNote = {
@@ -207,8 +197,8 @@ local function test(notes, events, states, graphicStates)
 		return
 	end
 
-	print(require("inspect")(graphicStates))
-	print(require("inspect")(newGraphicStates))
+	-- print(require("inspect")(graphicStates))
+	-- print(require("inspect")(newGraphicStates))
 
 	assert(table_util.deepequal(graphicStates, newGraphicStates))
 end
