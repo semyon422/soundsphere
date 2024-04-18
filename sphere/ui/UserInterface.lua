@@ -23,7 +23,7 @@ function UserInterface:new(persistence, game)
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
 	self.previewModel = PreviewModel(persistence.configModel)
-	self.chartPreviewModel = ChartPreviewModel(persistence.configModel)
+	self.chartPreviewModel = ChartPreviewModel(persistence.configModel, self.previewModel, game)
 	self.themeModel = ThemeModel()
 
 	self.gameView = GameView(game)
@@ -50,6 +50,7 @@ end
 function UserInterface:update(dt)
 	self.notificationModel:update()
 	self.backgroundModel:update()
+	self.chartPreviewModel:update()
 
 	self.gameView:update(dt)
 end

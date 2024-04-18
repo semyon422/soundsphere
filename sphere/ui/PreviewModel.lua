@@ -72,6 +72,13 @@ function PreviewModel:setRate(rate)
 	self.target_rate = rate
 end
 
+function PreviewModel:getTime()
+	if not self.audio then
+		return 0
+	end
+	return self.audio:getPosition()
+end
+
 function PreviewModel:loadPreviewDebounce()
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
