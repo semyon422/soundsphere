@@ -1,6 +1,30 @@
 local class = require("class")
 local NoteChartFactory = require("notechart.NoteChartFactory")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
+local NoteChartExporter = require("sph.NoteChartExporter")
+local NoteChartImporter = require("sph.NoteChartImporter")
+local SphPreview = require("sph.SphPreview")
+
+local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
+local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
+local NoteChart = require("ncdk.NoteChart")
+
+local function to_interval(noteChart)
+	local ld = noteChart:getLayerData(1)
+
+	if ld.mode == "absolute" then
+		ld = ConvertAbsoluteToInterval(ld)
+	elseif ld.mode == "measure" then
+		ld = ConvertMeasureToInterval(ld)
+	end
+
+	local nc = NoteChart()
+	ld.noteChart = nc
+	nc.layerDatas[1] = ld
+	nc.chartmeta = noteChart.chartmeta
+	nc.inputMode = noteChart.inputMode
+	return nc
+end
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -34,6 +58,18 @@ function ChartPreviewModel:setChartview(chartview)
 		content,
 		chartview.index
 	))
+	noteChart = to_interval(noteChart)
+
+	local exp = NoteChartExporter()
+	exp.noteChart = noteChart
+	local sph_chart = exp:export()
+
+	local sph_preview = SphPreview:encodeSphLines(exp.sph.sphLines, 1)
+	exp.sph.sphLines = SphPreview:decodeSphLines(sph_preview, noteChart.inputMode:getColumns())
+
+	local imp = NoteChartImporter()
+	imp:importFromSph(exp.sph)
+	noteChart = imp.noteCharts[1]
 
 	local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()
