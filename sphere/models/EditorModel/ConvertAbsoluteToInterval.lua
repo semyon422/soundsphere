@@ -3,7 +3,18 @@ local Fraction = require("ncdk.Fraction")
 
 local timingMatchWindow = 0.005  -- 0.005s for 60 bpm, 0.0025 for 120 bpm, etc
 
-return function(layerData)
+--[[
+osu rounds time down
+in this case approximate fraction should be >= absolute time
+because rounded time may be closer to incorrect fraction
+use fraction_mode = "closest_gte"
+]]
+
+return function(layerData, fraction_mode)
+	if not fraction_mode then
+		fraction_mode = false
+	end
+
 	local newLayerData = LayerData()
 	newLayerData:setTimeMode("interval")
 
@@ -41,7 +52,7 @@ return function(layerData)
 			local next_td = next_interval.tempoData
 			local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
 			local beats = idt / td:getBeatDuration()
-			local next_td_time = Fraction(beats, 16, false)
+			local next_td_time = Fraction(beats, 16, fraction_mode)
 			local idt_new = next_td_time:floor() * td:getBeatDuration()
 			local _time = next_td_time - Fraction(1, 16)
 			_interval.beats = next_td_time:floor()
@@ -52,7 +63,7 @@ return function(layerData)
 			end
 			for j, tp in ipairs(interval) do
 				local dt = tp.absoluteTime - td.timePoint.absoluteTime
-				local time = Fraction(dt / td:getBeatDuration(), 16, false)
+				local time = Fraction(dt / td:getBeatDuration(), 16, fraction_mode)
 				if time == next_td_time and time[1] ~= 0 then
 					table.insert(next_interval, tp)
 				else
@@ -73,14 +84,14 @@ return function(layerData)
 		for j, tp in ipairs(interval) do
 			local dt = tp.absoluteTime - td.timePoint.absoluteTime
 			local beatDuraion = td:getBeatDuration()
-			local time = Fraction(dt / beatDuraion, 16, false)
+			local time = Fraction(dt / beatDuraion, 16, fraction_mode)
 
 			if #interval > 1 and dt > 0 and i < #intervals and j == #interval then
 				local next_interval = intervals[i + 1]
 				local next_td = next_interval.tempoData
 				local idt = next_td.timePoint.absoluteTime - td.timePoint.absoluteTime
 				local beats = idt / beatDuraion
-				local next_td_time = Fraction(beats, 16, false)
+				local next_td_time = Fraction(beats, 16, fraction_mode)
 				local idt_new = next_td_time:floor() * beatDuraion
 				local _time = next_td_time - Fraction(1, 16)
 				local t = td.timePoint.absoluteTime + _time:tonumber() * beatDuraion

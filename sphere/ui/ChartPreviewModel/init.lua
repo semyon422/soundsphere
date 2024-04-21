@@ -4,6 +4,10 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local NoteChartExporter = require("sph.NoteChartExporter")
 local NoteChartImporter = require("sph.NoteChartImporter")
 local SphPreview = require("sph.SphPreview")
+local SphLines = require("sph.SphLines")
+local TextLines = require("sph.lines.TextLines")
+local LinesCleaner = require("sph.lines.LinesCleaner")
+local stbl = require("stbl")
 
 local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
 local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
@@ -13,7 +17,7 @@ local function to_interval(noteChart)
 	local ld = noteChart:getLayerData(1)
 
 	if ld.mode == "absolute" then
-		ld = ConvertAbsoluteToInterval(ld)
+		ld = ConvertAbsoluteToInterval(ld, "closest_gte")
 	elseif ld.mode == "measure" then
 		ld = ConvertMeasureToInterval(ld)
 	end
@@ -64,12 +68,33 @@ function ChartPreviewModel:setChartview(chartview)
 	exp.noteChart = noteChart
 	local sph_chart = exp:export()
 
-	local sph_preview = SphPreview:encodeSphLines(exp.sph.sphLines, 1)
-	exp.sph.sphLines = SphPreview:decodeSphLines(sph_preview, noteChart.inputMode:getColumns())
+	local tl = TextLines()
+	tl.lines = exp.sph.sphLines:encode()
+	tl.columns = noteChart.inputMode:getColumns()
+	local sph_lines_str = tl:encode()
+
+	local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(exp.sph.sphLines:encode()), 1)
+	exp.sph.sphLines = SphLines()
+	exp.sph.sphLines:decode(SphPreview:decodeLines(sph_preview))
+
+	local tl = TextLines()
+	tl.lines = exp.sph.sphLines:encode()
+	tl.columns = noteChart.inputMode:getColumns()
+	local sph_lines_str2 = tl:encode()
 
 	local imp = NoteChartImporter()
 	imp:importFromSph(exp.sph)
 	noteChart = imp.noteCharts[1]
+
+	local f = assert(io.open("sph_preview.bin", "wb"))
+	f:write(sph_preview)
+	f:close()
+	local f = assert(io.open("sph_lines_str.sph", "w"))
+	f:write(sph_lines_str)
+	f:close()
+	f = assert(io.open("sph_lines_str2.sph", "w"))
+	f:write(sph_lines_str2)
+	f:close()
 
 	local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()

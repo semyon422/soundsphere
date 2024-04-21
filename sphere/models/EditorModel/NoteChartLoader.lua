@@ -13,7 +13,7 @@ function NoteChartLoader:load()
 	local ld = self.editorModel.noteChart:getLayerData(1)
 
 	if ld.mode == "absolute" then
-		ld = ConvertAbsoluteToInterval(ld)
+		ld = ConvertAbsoluteToInterval(ld, "closest_gte")
 	elseif ld.mode == "measure" then
 		ld = ConvertMeasureToInterval(ld)
 	end

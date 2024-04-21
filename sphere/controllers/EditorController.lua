@@ -130,10 +130,10 @@ function EditorController:saveToNanoChart()
 	exp.noteChart = editorModel.noteChart
 	local sph_chart = exp:export()
 
-	local content, lines = SphPreview:encodeSphLines(exp.sph.sphLines)
+	local content = SphPreview:encodeLines(exp.sph.sphLines:encode())
 	local compressedContent = zlib.compress_s(content)
 
-	local content1, lines = SphPreview:encodeSphLines(exp.sph.sphLines, 1)
+	local content1 = SphPreview:encodeLines(exp.sph.sphLines:encode(), 1)
 	local compressedContent1 = zlib.compress_s(content1)
 
 	local f = assert(io.open(path .. ".preview0_compressed", "w"))
