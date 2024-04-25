@@ -58,8 +58,8 @@ function FileFinder:getFileListRecursive(path, list, prefix)
 	prefix = prefix or ""
 	local files = love.filesystem.getDirectoryItems(path)
 	for i = 1, #files do
-		local info = love.filesystem.getInfo(path .. "/" .. files[i])
-		if info.type == "directory" then
+		local info = love.filesystem.getInfo(path .. "/" .. files[i], "directory")
+		if info then
 			self:getFileListRecursive(path .. "/" .. files[i], list, prefix .. files[i] .. "/")
 		else
 			table.insert(list, prefix .. files[i])
