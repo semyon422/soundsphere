@@ -62,7 +62,6 @@ end
 
 MultiplayerController.findNotechart = remote.wrap(function(self)
 	local mpModel = self.multiplayerModel
-	local selectModel = self.selectModel
 
 	local hash = mpModel.room.notechart.hash or ""
 	local index = mpModel.room.notechart.index or 0
@@ -72,29 +71,7 @@ MultiplayerController.findNotechart = remote.wrap(function(self)
 	self.hash = hash
 	self.index = index
 
-	print("find", hash, index)
-	selectModel:findNotechart(hash, index)
-	local items = selectModel.noteChartSetLibrary.items
-
-	selectModel:setLock(false)
-
-	mpModel.downloadingBeatmap = nil
-	local chartview = items[1]
-	if chartview then
-		mpModel.chartview = chartview
-		selectModel:setConfig(chartview)
-		selectModel:pullNoteChartSet(true)
-		mpModel.peer.setNotechartFound(true)
-		return
-	end
-	selectModel:setConfig({
-		chartfile_set_id = 0,
-		chartfile_id = 0,
-		chartmeta_id = 0,
-	})
-	mpModel.chartview = nil
-	selectModel:pullNoteChartSet(true)
-	mpModel.peer.setNotechartFound(false)
+	self.multiplayerModel:findNotechartAsync()
 end)
 
 function MultiplayerController:beginUnload()

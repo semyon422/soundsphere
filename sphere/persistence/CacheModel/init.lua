@@ -89,6 +89,7 @@ end
 function CacheModel:startUpdateAsync(path, location_id)
 	local c = coroutine.running()
 	table.insert(self.tasks, {
+		type = "update_cache",
 		path = path,
 		location_id = location_id,
 		callback = function()
@@ -136,12 +137,15 @@ function CacheModel:process()
 	local tasks = self.tasks
 	local task = table.remove(tasks, 1)
 	while task do
+		local callback = task.callback
+		task.callback = nil
+
 		self.gdb:unload()
 		runTaskAsync(task)
 		self.gdb:load()
 
-		if task.callback then
-			task.callback()
+		if callback then
+			callback()
 		end
 
 		task = table.remove(tasks, 1)

@@ -10,13 +10,15 @@ remote.set_coder(require("string.buffer"))
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
 
+---@param cacheModel sphere.CacheModel
 ---@param rhythmModel sphere.RhythmModel
 ---@param configModel sphere.ConfigModel
 ---@param selectModel sphere.SelectModel
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param playContext sphere.PlayContext
-function MultiplayerModel:new(rhythmModel, configModel, selectModel, onlineModel, osudirectModel, playContext)
+function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel, onlineModel, osudirectModel, playContext)
+	self.cacheModel = cacheModel
 	self.rhythmModel = rhythmModel
 	self.configModel = configModel
 	self.selectModel = selectModel
@@ -304,6 +306,37 @@ function MultiplayerModel:update()
 	remote.update()
 end
 
+function MultiplayerModel:findNotechartAsync()
+	local selectModel = self.selectModel
+
+	local hash = self.room.notechart.hash or ""
+	local index = self.room.notechart.index or 0
+
+	print("find", hash, index)
+	selectModel:findNotechart(hash, index)
+	local items = selectModel.noteChartSetLibrary.items
+
+	selectModel:setLock(false)
+
+	self.downloadingBeatmap = nil
+	local chartview = items[1]
+	if chartview then
+		self.chartview = chartview
+		selectModel:setConfig(chartview)
+		selectModel:pullNoteChartSet(true)
+		self.peer.setNotechartFound(true)
+		return
+	end
+	selectModel:setConfig({
+		chartfile_set_id = 0,
+		chartfile_id = 0,
+		chartmeta_id = 0,
+	})
+	self.chartview = nil
+	selectModel:pullNoteChartSet(true)
+	self.peer.setNotechartFound(false)
+end
+
 MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
 	local setId = self.room.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
@@ -317,6 +350,9 @@ MultiplayerModel.downloadNoteChart = remote.wrap(function(self)
 	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
 	self.downloadingBeatmap.status = "done"
 	self.peer.setNotechartFound(false)
+
+	self.cacheModel:startUpdateAsync("downloads", 1)
+	self:findNotechartAsync()
 end)
 
 return MultiplayerModel

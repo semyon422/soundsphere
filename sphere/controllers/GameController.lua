@@ -76,6 +76,7 @@ function GameController:new()
 		self.playContext
 	)
 	self.multiplayerModel = MultiplayerModel(
+		self.persistence.cacheModel,
 		self.rhythmModel,
 		self.persistence.configModel,
 		self.selectModel,
