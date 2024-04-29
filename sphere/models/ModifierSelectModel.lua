@@ -115,6 +115,7 @@ end
 ---@param modifier string
 function ModifierSelectModel:add(modifier)
 	local minimalModifierIndex = self:getMinimalModifierIndex(modifier)
+	self.modifierIndex = math.min(self.modifierIndex, #self.playContext.modifiers)
 	local index = math.max(self.modifierIndex, minimalModifierIndex)
 	if self:isOneUse(modifier) then
 		if self.addedModifiers[modifier] > 0 then
