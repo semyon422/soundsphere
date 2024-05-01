@@ -22,10 +22,12 @@ pkg.add("tree/share/lua/5.1")
 
 require("aqua.string")
 
+local luacov_runner
 if arg[2] == "test" then
 	local ok, err = pcall(require, "luacov.runner")
 	if ok then
-		err.init()
+		luacov_runner = err
+		luacov_runner.init()
 	end
 end
 
@@ -135,6 +137,21 @@ if arg[2] == "test" then
 	testing.get_time = love.timer.getTime
 
 	testing.test()
+
+	if luacov_runner then
+		local configuration = {
+			reporter = "lcov",
+			reportfile = "lcov.info",
+			exclude = {
+				"main$",
+			},
+			include = {},
+		}
+		debug.sethook(nil)
+		luacov_runner.save_stats()
+		luacov_runner.run_report(configuration)
+	end
+
 	os.exit()
 end
 
