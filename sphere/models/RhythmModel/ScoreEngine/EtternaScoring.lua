@@ -17,15 +17,15 @@ EtternaScoring.metadata = {
 }
 
 local judgeTimingWindows = {
-	{ 33.75,  67.5,  135,   202.5,  270 },
+	{ 33.75, 67.5, 135, 202.5, 270 },
 	{ 29.925, 59.85, 119.7, 179.55, 239.4 },
-	{ 26.1,   52.2,  104.4, 156.6,  208.8 },
-	{ 22.5,   45,    90,    135,    180 },
-	{ 18.9,   37.8,  75.6,  113.4,  180 },
-	{ 14.85,  29.7,  59.4,  89.1,   180 },
-	{ 11.25,  22.5,  45,    67.5,   180 },
-	{ 7.425,  14.85, 29.7,  44.55,  180 },
-	{ 4.5,    9,     18,    27,     180 },
+	{ 26.1, 52.2, 104.4, 156.6, 208.8 },
+	{ 22.5, 45, 90, 135, 180 },
+	{ 18.9, 37.8, 75.6, 113.4, 180 },
+	{ 14.85, 29.7, 59.4, 89.1, 180 },
+	{ 11.25, 22.5, 45, 67.5, 180 },
+	{ 7.425, 14.85, 29.7, 44.55, 180 },
+	{ 4.5, 9, 18, 27, 180 },
 }
 
 local judgeDifficulty = { 0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20 }
@@ -114,7 +114,7 @@ end
 function Judge:hit(event)
 	local delta_time = event.deltaTime
 
-	if delta_time > self.lateHitWindow then
+	if delta_time < self.earlyHitWindow or delta_time > self.lateHitWindow then
 		self:addCounter("miss", event.currentTime)
 		return
 	end

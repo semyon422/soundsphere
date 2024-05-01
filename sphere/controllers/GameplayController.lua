@@ -172,7 +172,7 @@ end
 function GameplayController:getImporterSettings()
 	local config = self.configModel.configs.settings
 	return {
-		midiConstantVolume = config.audio.midi.constantVolume
+		midiConstantVolume = config.audio.midi.constantVolume,
 	}
 end
 
@@ -212,12 +212,8 @@ function GameplayController:discordPlay()
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
-		details = ("%s - %s [%s]"):format(
-			chartview.artist,
-			chartview.title,
-			chartview.name
-		),
-		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate)
+		details = ("%s - %s [%s]"):format(chartview.artist, chartview.title, chartview.name),
+		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate),
 	})
 end
 
@@ -225,11 +221,7 @@ function GameplayController:discordPause()
 	local chartview = self.selectModel.chartview
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
-		details = ("%s - %s [%s]"):format(
-			chartview.artist,
-			chartview.title,
-			chartview.name
-		)
+		details = ("%s - %s [%s]"):format(chartview.artist, chartview.title, chartview.name),
 	})
 end
 
@@ -306,13 +298,10 @@ function GameplayController:saveScore()
 
 	local chartview = self.selectModel.chartview
 
-	local replayHash = self.replayModel:saveReplay(
-		self.playContext.chartdiff,
-		playContext
-	)
+	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
 
 	local chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(self.playContext.chartdiff)
-	local judge = scoreSystem.soundsphere.judges["Soundsphere"]
+	local judge = scoreSystem.soundsphere.judges["soundsphere"]
 	local score = {
 		hash = chartdiff.hash,
 		index = chartdiff.index,

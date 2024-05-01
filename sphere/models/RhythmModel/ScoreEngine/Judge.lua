@@ -24,8 +24,6 @@ Judge.earlyMissWindow = 160
 Judge.lateMissWindow = 160
 Judge.windowReleaseMultiplier = 1.5
 
-function Judge:calculateAccuracy() end
-
 ---@param key string
 ---@param currentTime number
 function Judge:addCounter(key, currentTime)
@@ -36,7 +34,39 @@ function Judge:addCounter(key, currentTime)
 end
 
 ---@param event table
-function Judge:processEvent(event) end
+function Judge:processEvent(event)
+	local is_release = event.newState == "endPassed" or event.newState == "endMissedPassed"
+
+	local delta_time = event.deltaTime
+	delta_time = is_release and delta_time / self.windowReleaseMultiplier or delta_time
+
+	if delta_time < self.earlyHitWindow or delta_time > self.lateHitWindow then
+		self:addCounter("miss", event.currentTime)
+		return
+	end
+
+	delta_time = math.abs(delta_time)
+
+	for _, key in ipairs(self.orderedCounters) do
+		local window = self.windows[key]
+
+		if delta_time < window then
+			self:addCounter(key, event.currentTime)
+			return
+		end
+	end
+end
+
+function Judge:calculateAccuracy()
+	local maxScore = self.notes * self.weights[self.orderedCounters[1]]
+	local score = 0
+
+	for key, count in pairs(self.counters) do
+		score = score + (self.weights[key] * count)
+	end
+
+	self.accuracy = math.max(0, maxScore > 0 and score / maxScore or 1)
+end
 
 ---@return table
 function Judge:getTimings()

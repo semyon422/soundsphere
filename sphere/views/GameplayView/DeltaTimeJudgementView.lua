@@ -14,7 +14,7 @@ end
 
 function DeltaTimeJudgementView:update()
 	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
-	local judge = scoreSystem.soundsphere.judges["Soundsphere"]
+	local judge = scoreSystem.soundsphere.judges["soundsphere"]
 
 	if judge.notes == self.judgementCounter then
 		return

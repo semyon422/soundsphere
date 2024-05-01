@@ -61,41 +61,6 @@ function Judge:new(od)
 	self.windowReleaseMultiplier = 1.5
 end
 
----@param event table
-function Judge:processEvent(event)
-	local isRelease = event.newState == "endPassed" or event.newState == "endMissedPassed"
-
-	local deltaTime = event.deltaTime
-	deltaTime = isRelease and deltaTime / self.windowReleaseMultiplier or deltaTime
-
-	if deltaTime > self.lateHitWindow then
-		self:addCounter("miss", event.currentTime)
-		return
-	end
-
-	deltaTime = math.abs(deltaTime)
-
-	for _, key in ipairs(self.orderedCounters) do
-		local window = self.windows[key]
-
-		if deltaTime < window then
-			self:addCounter(key, event.currentTime)
-			return
-		end
-	end
-end
-
-function Judge:calculateAccuracy()
-	local maxScore = self.notes * self.weights.perfect
-	local score = 0
-
-	for key, count in pairs(self.counters) do
-		score = score + (self.weights[key] * count)
-	end
-
-	self.accuracy = maxScore > 0 and score / maxScore or 1
-end
-
 function OsuManiaScoring:load()
 	self.judges = {}
 

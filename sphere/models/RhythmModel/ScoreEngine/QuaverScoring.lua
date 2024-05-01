@@ -47,37 +47,6 @@ function Judge:new(windows)
 	self.windowReleaseMultiplier = 1.5
 end
 
----@param event table
-function Judge:setCounter(event)
-	local deltaTime = math.abs(event.deltaTime)
-
-	if deltaTime > self.lateHitWindow then
-		self:addCounter("miss", event.currentTime)
-		return
-	end
-
-	deltaTime = event.newState == "endPassed" and deltaTime / self.windowReleaseMultiplier or deltaTime
-
-	for _, key in ipairs(self.orderedCounters) do
-		local window = self.windows[key]
-
-		if deltaTime < window then
-			self:addCounter(key, event.currentTime)
-			return
-		end
-	end
-end
-
-function Judge:calculateAccuracy()
-	local score = 0
-
-	for key, value in pairs(self.counters) do
-		score = score + (value * self.weights[key])
-	end
-
-	self.accuracy = math.max(score / (self.notes * self.weights.marvelous), 0)
-end
-
 function Judge:getTimings()
 	local early_hit = self.earlyHitWindow
 	local late_hit = self.lateHitWindow
@@ -119,7 +88,7 @@ end
 ---@param event table
 function QuaverScoring:hit(event)
 	for _, judge in pairs(self.judges) do
-		judge:setCounter(event)
+		judge:processEvent(event)
 		judge:calculateAccuracy()
 	end
 end
