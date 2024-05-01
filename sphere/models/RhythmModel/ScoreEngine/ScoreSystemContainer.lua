@@ -1,4 +1,5 @@
 local class = require("class")
+local table_util = require("table_util")
 
 local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.BaseScoreSystem"),
@@ -9,7 +10,7 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.OsuManiaScoring"),
 	require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring"),
 	require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring"),
-	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
+	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 }
 
 ---@class sphere.ScoreSystemContainer
@@ -19,6 +20,7 @@ local ScoreSystemContainer = class()
 function ScoreSystemContainer:load()
 	self.scoreSystems = {}
 	self.sequence = {}
+	self.judgements = {}
 
 	local scoreSystems = self.scoreSystems
 	for _, ScoreSystem in ipairs(ScoreSystems) do
@@ -30,6 +32,12 @@ function ScoreSystemContainer:load()
 		self[ScoreSystem.name] = scoreSystem
 
 		scoreSystem:load()
+
+		local judges = scoreSystem.judges
+
+		if judges then
+			table_util.copy(judges, self.judgements)
+		end
 	end
 end
 

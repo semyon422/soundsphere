@@ -41,6 +41,7 @@ function JudgementScoreSystem:load()
 		end
 
 		local judge = self.judges[name]
+		judge.scoreSystemName = JudgementScoreSystem.name
 		judge.counters = counters
 		judge.windows = judgements
 		judge.accuracy = 0
