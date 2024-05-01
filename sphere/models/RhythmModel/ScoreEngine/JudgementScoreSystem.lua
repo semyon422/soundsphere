@@ -19,11 +19,11 @@ function JudgementScoreSystem:load()
 	for _, judge in ipairs(_j.judgementSelectors) do
 		local name = judge[1]
 		self.judges[name] = {}
-		table.insert(self.judgementList, {name = name})
+		table.insert(self.judgementList, { name = name })
 	end
 
 	for name, judge in pairs(_j.judgementLists) do
-		self.judges[name].orderedCounterNames = judge
+		self.judges[name].orderedCounters = judge
 	end
 
 	for name, judgements in pairs(_j.judgements) do
@@ -46,9 +46,6 @@ function JudgementScoreSystem:load()
 		judge.accuracy = 0
 		judge.notes = 0
 		judge.accuracyFunc = judgements.accuracy
-		judge.getOrderedCounterNames = function ()
-			return judge.orderedCounterNames
-		end
 	end
 end
 

@@ -289,9 +289,6 @@ local function Judgements(self)
 	local judge = self.judgements[judgeName]
 
 	local judgementLists = judge.orderedCounters
-	if judge.getOrderedCounterNames then
-		judgementLists = judge:getOrderedCounterNames()
-	end
 	local counters = judge.counters
 
 	local perfect = show and counters.perfect or scoreItem.perfect or 0
