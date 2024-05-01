@@ -11,7 +11,7 @@ local opts = {
 			out = out:gsub("\n%s+", ""):gsub(",", ", ")
 		end
 		return tag .. out
-	end
+	end,
 }
 
 local timings = {}
@@ -24,9 +24,9 @@ local timings = {}
 local function get(a, b, c, d)
 	return {
 		nearest = false,
-		ShortNote = {hit = {b, c}, miss = {a, d}},
-		LongNoteStart = {hit = {b, c}, miss = {a, d}},
-		LongNoteEnd = {hit = {b, c}, miss = {a, d}},
+		ShortNote = { hit = { b, c }, miss = { a, d } },
+		LongNoteStart = { hit = { b, c }, miss = { a, d } },
+		LongNoteEnd = { hit = { b, c }, miss = { a, d } },
 	}
 end
 
@@ -39,18 +39,7 @@ local etterna = require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring")
 local quaver = require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring")
 
 timings.quaver = quaver:getTimings()
-
-local cachedEtterna = {}
-
----@param judge number
----@return table
-function timings.etterna(judge)
-	if cachedEtterna[judge] then
-		return cachedEtterna[judge]
-	end
-	cachedEtterna[judge] = etterna:getTimings()
-	return cachedEtterna[judge]
-end
+timings.etterna = etterna:getTimings()
 
 local cachedOsu = {}
 
@@ -79,16 +68,16 @@ function timings.getName(t)
 	elseif s == ser(timings.lr2) then
 		return "LR2"
 	elseif s == ser(timings.quaver) then
-		return "quaver"
+		return "Quaver"
 	end
 	for od = 0, 10 do
 		if s == ser(timings.osu(od)) then
-			return "osu OD" .. od
+			return "osu!mania OD" .. od
 		end
 	end
-	for judge = 1, #etterna do
-		if s == ser(timings.etterna(judge)) then
-			return "Etterna Judgement " .. judge
+	for judge = 4, 9 do
+		if s == ser(timings.etterna) then
+			return "Etterna"
 		end
 	end
 	return "custom"

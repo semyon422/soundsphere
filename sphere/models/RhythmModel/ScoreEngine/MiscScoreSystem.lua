@@ -21,7 +21,7 @@ function MiscScoreSystem:hit(event)
 		self.maxDeltaTime = deltaTime
 	end
 
-	local soundsphereJudge = self.container.soundsphere.judges["Soundsphere"]
+	local soundsphereJudge = self.container.soundsphere.judges["soundsphere"]
 	local earlyLate = soundsphereJudge.earlyLate
 	local counters = soundsphereJudge.counters
 	local notes = soundsphereJudge.notes

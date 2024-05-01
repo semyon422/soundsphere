@@ -92,13 +92,13 @@ end
 local _ComboGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
-	backgroundColor = {0, 0, 0, 0.2},
+	backgroundColor = { 0, 0, 0, 0.2 },
 	backgroundRadius = 4,
 	point = function(self, point)
 		local y = 1 - point.base.combo / point.base.notesCount
 		return y, 1, 1, 0.25, 1
 	end,
-	show = showLoadedScore
+	show = showLoadedScore,
 })
 
 ---@param self table
@@ -110,7 +110,7 @@ end
 local _EarlyHitGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 4,
-	backgroundColor = {1, 1, 1, 1},
+	backgroundColor = { 1, 1, 1, 1 },
 	backgroundRadius = 6,
 	point = function(self, point)
 		if not point.base.isEarlyHit then
@@ -119,7 +119,7 @@ local _EarlyHitGraph = PointGraphView({
 		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
 		return y, 0.4, 0.35, 0.8, 1
 	end,
-	show = showLoadedScore
+	show = showLoadedScore,
 })
 
 ---@param self table
@@ -128,12 +128,12 @@ local function EarlyHitGraph(self)
 	_EarlyHitGraph:draw()
 end
 
-local perfectColor = {1, 1, 1, 1}
-local notPerfectColor = {1, 0.6, 0.4, 1}
+local perfectColor = { 1, 1, 1, 1 }
+local notPerfectColor = { 1, 0.6, 0.4, 1 }
 local _HitGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
-	backgroundColor = {0, 0, 0, 0.2},
+	backgroundColor = { 0, 0, 0, 0.2 },
 	backgroundRadius = 6,
 	point = function(self, point)
 		if point.base.isMiss then
@@ -147,7 +147,7 @@ local _HitGraph = PointGraphView({
 		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
 		return y, unpack(color)
 	end,
-	show = showLoadedScore
+	show = showLoadedScore,
 })
 
 ---@param self table
@@ -159,7 +159,7 @@ end
 local _MissGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 4,
-	backgroundColor = {1, 1, 1, 1},
+	backgroundColor = { 1, 1, 1, 1 },
 	backgroundRadius = 6,
 	point = function(self, point)
 		if not point.base.isMiss then
@@ -168,7 +168,7 @@ local _MissGraph = PointGraphView({
 		local y = point.misc.deltaTime / 0.16 / 2 + 0.5
 		return y, 1, 0.2, 0.2, 1
 	end,
-	show = showLoadedScore
+	show = showLoadedScore,
 })
 
 ---@param self table
@@ -180,7 +180,7 @@ end
 local _HpGraph = PointGraphView({
 	draw = drawGraph,
 	radius = 2,
-	backgroundColor = {0, 0, 0, 0.2},
+	backgroundColor = { 0, 0, 0, 0.2 },
 	backgroundRadius = 4,
 	point = function(self, point)
 		local value = 0
@@ -195,7 +195,7 @@ local _HpGraph = PointGraphView({
 
 		return 1 - value, 0.25, 1, 0.5, 1
 	end,
-	show = showLoadedScore
+	show = showLoadedScore,
 })
 
 ---@param self table
@@ -222,12 +222,15 @@ local function ScoreList(self)
 	love.graphics.setColor(1, 1, 1, 0.8)
 	h = h / ScoreListView.rows
 	local c = math.floor(ScoreListView.rows / 2)
-	love.graphics.polygon("fill",
-		0, h * (c + 0.2) + (72 - h) / 2,
-		h / 2 * 0.6, h * (c + 0.5) + (72 - h) / 2,
-		0, h * (c + 0.8) + (72 - h) / 2
+	love.graphics.polygon(
+		"fill",
+		0,
+		h * (c + 0.2) + (72 - h) / 2,
+		h / 2 * 0.6,
+		h * (c + 0.5) + (72 - h) / 2,
+		0,
+		h * (c + 0.8) + (72 - h) / 2
 	)
-
 
 	w, h = Layout:move("column3row2")
 	love.graphics.translate(w - 16, 0)
@@ -284,7 +287,11 @@ local function Judgements(self)
 
 	local judgeName = self.game.configModel.configs.select.judgements
 	local judge = self.judgements[judgeName]
-	local judgementLists = judge:getOrderedCounterNames()
+
+	local judgementLists = judge.orderedCounters
+	if judge.getOrderedCounterNames then
+		judgementLists = judge:getOrderedCounterNames()
+	end
 	local counters = judge.counters
 
 	local perfect = show and counters.perfect or scoreItem.perfect or 0
@@ -455,16 +462,24 @@ local function NotechartInfo(self)
 
 	TextCellImView(w * (1 - wr), 55, "right", "notes", chartview.notes_count)
 	just.sameline()
-	TextCellImView(w * wr, 55, "right", "duration",
-		length == baseLength and time_util.format(baseLength) or
-		("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
+	TextCellImView(
+		w * wr,
+		55,
+		"right",
+		"duration",
+		length == baseLength and time_util.format(baseLength)
+			or ("%s→%s"):format(time_util.format(baseLength), time_util.format(length))
 	)
 
 	TextCellImView(w * (1 - wr), 55, "right", "level", chartview.level)
 	just.sameline()
-	TextCellImView(w * wr, 55, "right", "bpm",
-		bpm == baseBpm and math.floor(baseBpm + 0.5) or
-		("%d→%d"):format(math.floor(baseBpm + 0.5), math.floor(bpm + 0.5))
+	TextCellImView(
+		w * wr,
+		55,
+		"right",
+		"bpm",
+		bpm == baseBpm and math.floor(baseBpm + 0.5)
+			or ("%d→%d"):format(math.floor(baseBpm + 0.5), math.floor(bpm + 0.5))
 	)
 
 	w, h = Layout:move("title_sub")
@@ -511,8 +526,8 @@ local function NotechartInfo(self)
 	RoundedRectangle("fill", 0, 0, w, 72, 36, false, false, 2)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local score = not show and scoreItem.score or
-		erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
+	local score = not show and scoreItem.score
+		or erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 	if score ~= score then
 		score = 0
 	end
@@ -626,10 +641,10 @@ local function NotechartInfo(self)
 	font:setFallbacks(spherefonts.get("Noto Sans", 40))
 	love.graphics.setFont(font)
 
-	local textInputMode = inputMode == baseInputMode and Format.inputMode(baseInputMode) or
-		("%s→%s"):format(Format.inputMode(baseInputMode), Format.inputMode(inputMode))
-	local textDifficulty = difficulty == baseDifficulty and Format.difficulty(baseDifficulty) or
-		("%s→%s"):format(Format.difficulty(baseDifficulty), Format.difficulty(difficulty))
+	local textInputMode = inputMode == baseInputMode and Format.inputMode(baseInputMode)
+		or ("%s→%s"):format(Format.inputMode(baseInputMode), Format.inputMode(inputMode))
+	local textDifficulty = difficulty == baseDifficulty and Format.difficulty(baseDifficulty)
+		or ("%s→%s"):format(Format.difficulty(baseDifficulty), Format.difficulty(difficulty))
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	just.text("input mode")
@@ -649,7 +664,7 @@ local function NotechartInfo(self)
 
 	w, h = Layout:move("graphs_sup_left")
 	love.graphics.setColor(0, 0, 0, 0.8)
-	RoundedRectangle("fill", 0, 0, w, h, {36, h / 2, 36, h / 2}, false, true)
+	RoundedRectangle("fill", 0, 0, w, h, { 36, h / 2, 36, h / 2 }, false, true)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.translate(22, 0)
 
@@ -716,7 +731,7 @@ local function BottomScreenMenu(self)
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)
-	RoundedRectangle("fill", 0, 0, w, h, {h / 2, 36, h / 2, 36}, true, false)
+	RoundedRectangle("fill", 0, 0, w, h, { h / 2, 36, h / 2, 36 }, true, false)
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.translate(55, 0)
 
@@ -729,10 +744,7 @@ local function BottomScreenMenu(self)
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
-			self.game.onlineModel.onlineScoreManager:submit(
-				self.game.selectModel.chartview,
-				scoreItem.replay_hash
-			)
+			self.game.onlineModel.onlineScoreManager:submit(self.game.selectModel.chartview, scoreItem.replay_hash)
 		end
 	end
 	just.row()
