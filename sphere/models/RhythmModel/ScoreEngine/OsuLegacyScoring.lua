@@ -1,3 +1,5 @@
+local math_util = require("math_util")
+
 local BaseJudge = require("sphere.models.RhythmModel.ScoreEngine.Judge")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
@@ -18,12 +20,41 @@ local Judge = BaseJudge + {}
 
 Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
+local totalNotes = 0
+
 local counterIndex = {
 	perfect = 1,
 	great = 2,
 	good = 3,
 	ok = 4,
 	meh = 5,
+}
+
+local hitBonus = {
+	perfect = 2,
+	great = 1,
+	good = -8,
+	ok = -24,
+	meh = -44,
+	miss = -100,
+}
+
+local hitValue = {
+	perfect = 320,
+	great = 300,
+	good = 200,
+	ok = 100,
+	meh = 50,
+	miss = 0,
+}
+
+local hitBonusValue = {
+	perfect = 32,
+	great = 32,
+	good = 16,
+	ok = 8,
+	meh = 4,
+	miss = 0,
 }
 
 ---@param od number
@@ -88,6 +119,33 @@ function Judge:new(od)
 	self.lateMissWindow = self.windows.ok
 
 	self.windowReleaseMultiplier = 2.4
+
+	self.baseScore = 0
+	self.bonusScore = 0
+	self.score = 0
+
+	self.bonus = 100
+	self.hitValue = 0
+	self.totalBonus = 0
+end
+
+---@param key string
+---@param currentTime number
+function Judge:addCounter(key, currentTime)
+	self.notes = self.notes + 1
+	self.counters[key] = self.counters[key] + 1
+	self.lastCounter = key
+	self.lastUpdateTime = currentTime
+
+	self.hitValue = self.hitValue + hitValue[key]
+	self.bonus = math_util.clamp(self.bonus + hitBonus[key], 0, 100)
+
+	self.totalBonus = self.totalBonus + (hitBonusValue[key] * math.sqrt(self.bonus) / 320)
+
+	self.baseScore = (500000 / totalNotes) * (self.hitValue / 320)
+	self.bonusScore = (500000 / totalNotes) * self.totalBonus
+
+	self.score = self.baseScore + self.bonusScore
 end
 
 ---@param self sphere.OsuLegacyJudge
@@ -219,6 +277,8 @@ function OsuLegacyScoring:load()
 	for od = range[1], range[2], 1 do
 		self.judges[name:format(od)] = Judge(od)
 	end
+
+	totalNotes = self.scoreEngine.noteChart.chartmeta.notes_count
 end
 
 OsuLegacyScoring.notes = {
