@@ -40,7 +40,7 @@ function Judge:new(od)
 		great = (64 - od3) / 1000,
 		good = (97 - od3) / 1000,
 		ok = (127 - od3) / 1000,
-		meh = (157 - od3) / 1000,
+		meh = (151 - od3) / 1000,
 		miss = (188 - od3) / 1000,
 	}
 
