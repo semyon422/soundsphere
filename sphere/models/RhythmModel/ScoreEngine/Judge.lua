@@ -11,7 +11,7 @@ Judge.notes = 0
 
 ---@type string?
 Judge.lastCounter = nil
-Judge.lastUpdateTime = 0
+Judge.lastUpdateTime = 0 -- useful for skins elements and animations
 
 Judge.orderedCounters = {}
 Judge.weights = {}
@@ -33,6 +33,25 @@ function Judge:addCounter(key, currentTime)
 	self.lastUpdateTime = currentTime
 end
 
+function Judge:addMiss(event)
+	self:addCounter("miss", event.currentTime)
+end
+
+---@param delta_time number
+---@param windows table
+---@return string?
+function Judge:getCounter(delta_time, windows)
+	delta_time = math.abs(delta_time)
+
+	for _, key in ipairs(self.orderedCounters) do
+		local window = windows[key]
+
+		if delta_time < window then
+			return key
+		end
+	end
+end
+
 ---@param event table
 function Judge:processEvent(event)
 	local is_release = event.newState == "endPassed" or event.newState == "endMissedPassed"
@@ -45,16 +64,8 @@ function Judge:processEvent(event)
 		return
 	end
 
-	delta_time = math.abs(delta_time)
-
-	for _, key in ipairs(self.orderedCounters) do
-		local window = self.windows[key]
-
-		if delta_time < window then
-			self:addCounter(key, event.currentTime)
-			return
-		end
-	end
+	local counter = self:getCounter(delta_time, self.windows) or "miss"
+	self:addCounter(counter, event.currentTime)
 end
 
 function Judge:calculateAccuracy()

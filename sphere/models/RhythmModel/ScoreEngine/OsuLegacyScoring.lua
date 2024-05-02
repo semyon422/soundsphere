@@ -52,7 +52,7 @@ function Judge:new(od)
 
 	local w = self.windows
 
-	self.headWindow = {
+	self.headWindows = {
 		perfect = w.perfect * 1.2,
 		great = w.great * 1.1,
 		good = w.good,
@@ -61,7 +61,7 @@ function Judge:new(od)
 		miss = w.miss,
 	}
 
-	self.tailWindow = {
+	self.tailWindows = {
 		perfect = w.perfect * 2.4,
 		great = w.great * 2.2,
 		good = w.good * 2,
@@ -70,7 +70,8 @@ function Judge:new(od)
 		miss = w.miss,
 	}
 
-	self.downLongNotes = {}
+	-- stores note indexes for each column separately
+	self.pressedLongNotes = {}
 
 	self.counters = {
 		perfect = 0,
@@ -90,121 +91,123 @@ function Judge:new(od)
 end
 
 ---@param self sphere.OsuLegacyJudge
----@param delta_time number
----@param windows table
-local function getCounter(self, delta_time, windows)
-	for _, key in ipairs(self.orderedCounters) do
-		local window = windows[key]
-
-		if delta_time < window then
-			return key
-		end
-	end
-end
-
----@param self sphere.OsuLegacyJudge
 ---@return string?
 local function getStartCounter(self, event)
-	local input = self.downLongNotes[event.inputIndex]
+	local column = self.pressedLongNotes[event.inputIndex]
 
-	if input then
-		return input[event.noteIndex]
+	if column then
+		return column[event.noteIndex]
 	end
 end
 
 ---@param self sphere.OsuLegacyJudge
 local function setStartCounter(self, event, counter_name)
-	local input = self.downLongNotes[event.inputIndex] or {}
-	input[event.noteIndex] = counter_name
+	local columns = self.pressedLongNotes
 
-	self.downLongNotes[event.inputIndex] = input
+	if not columns[event.inputIndex] then
+		columns[event.inputIndex] = {}
+	end
+
+	columns[event.inputIndex][event.noteIndex] = counter_name
 end
 
----@param event table
-function Judge:processEvent(event)
-	local is_release = event.newState == "endPassed" or event.newState == "endMissedPassed"
-	local is_long_note = event.noteType == "LongNote"
-
+function Judge:shortNoteHit(event)
 	local delta_time = event.deltaTime
 
-	local late_hit_window = is_release and self.lateHitWindow * self.windowReleaseMultiplier or self.lateHitWindow
-
-	if delta_time < self.earlyHitWindow or delta_time > late_hit_window then
-		self:addCounter("miss", event.currentTime)
+	if delta_time < self.earlyHitWindow or delta_time > self.lateHitWindow then
+		self:addMiss(event)
 		return
 	end
 
-	delta_time = math.abs(delta_time)
-
-	local counter_name
-
-	if is_release then
-		local tail = getCounter(self, delta_time, self.tailWindow)
-		local start = getStartCounter(self, event)
-
-		if not start then
-			self:addCounter("meh", event.currentTime)
-			return
-		end
-
-		local tail_index = counterIndex[tail]
-		local start_index = counterIndex[start]
-
-		counter_name = self.orderedCounters[math.max(start_index, tail_index)]
-		self:addCounter(counter_name, event.currentTime)
-	elseif not is_release and is_long_note then
-		counter_name = getCounter(self, delta_time, self.headWindow)
-		setStartCounter(self, event, counter_name)
-	else
-		counter_name = getCounter(self, delta_time, self.windows)
-		self:addCounter(counter_name, event.currentTime)
-	end
+	local counter_name = self:getCounter(delta_time, self.windows) or "miss"
+	self:addCounter(counter_name, event.currentTime)
 end
 
 ---@param event table
-function Judge:processMiss(event)
-	if event.noteType == "ShortNote" then
-		self:addCounter("miss", event.currentTime)
+function Judge:longNoteStartHit(event)
+	local delta_time = event.deltaTime
+
+	local early_hit_window = -self.headWindows.meh
+	local late_hit_window = self.headWindows.ok
+
+	if delta_time < early_hit_window or delta_time > late_hit_window then
+		self:addMiss(event)
 		return
 	end
 
-	local old = event.oldState
-	local new = event.newState
+	local counter_name = self:getCounter(delta_time, self.headWindows)
 
-	if old == "startMissed" and new == "endMissed" then
-		self:addCounter("miss", event.currentTime)
+	setStartCounter(self, event, counter_name)
+end
+
+---@param event table
+function Judge:didntReleased(event)
+	local counter = getStartCounter(self, event) or "meh"
+	local counter_index = math.min(counterIndex[counter] + 2, 5)
+	self:addCounter(self.orderedCounters[counter_index], event.currentTime)
+end
+
+function Judge:longNoteFail(event)
+	setStartCounter(self, event, "meh")
+end
+
+function Judge:longNoteRelease(event)
+	local delta_time = event.deltaTime
+
+	local late_hit_window = self.lateHitWindow * self.windowReleaseMultiplier
+	local early_hit_winwow = self.earlyHitWindow * self.windowReleaseMultiplier
+
+	if delta_time < early_hit_winwow or delta_time > late_hit_window then
+		self:addMiss(event)
 		return
 	end
 
-	-- Mashing near the tail but not hitting it should give miss instead of nothing
-	if old == "startMissedPressed" and new == "endMissed" then
-		self:addCounter("miss", event.currentTime)
+	local tail = self:getCounter(delta_time, self.tailWindows) or "meh"
+	local start = getStartCounter(self, event)
+
+	if not start then
+		self:addCounter("meh", event.currentTime)
 		return
 	end
 
-	if old == "startPassedPressed" and new == "endMissed" then
-		local counter = getStartCounter(self, event) or "meh"
-		local counter_index = math.min(counterIndex[counter] + 2, 5)
-		self:addCounter(self.orderedCounters[counter_index], event.currentTime)
-		return
-	end
+	local tail_index = counterIndex[tail]
+	local start_index = counterIndex[start]
 
-	if old == "startPassedPressed" and new == "startMissed" then
-		setStartCounter(self, event, "meh")
-		return
-	end
+	local counter_name = self.orderedCounters[math.max(start_index, tail_index)]
+	self:addCounter(counter_name, event.currentTime)
+end
 
-	-- Pressed out of hit window. Still counts as hit
-	if old == "clear" and new == "startMissedPressed" then
-		setStartCounter(self, event, "meh")
-		return
+---@param func_name string
+---@param event table
+function OsuLegacyScoring:forEachJudge(func_name, event)
+	for _, judge in pairs(self.judges) do
+		judge[func_name](judge, event)
+		judge:calculateAccuracy()
 	end
+end
 
-	--- Pressing on body several times
-	if old == "startMissed" and new == "startMissedPressed" then
-		setStartCounter(self, event, "meh")
-		return
-	end
+function OsuLegacyScoring:shortNoteHit(event)
+	self:forEachJudge("shortNoteHit", event)
+end
+
+function OsuLegacyScoring:miss(event)
+	self:forEachJudge("addMiss", event)
+end
+
+function OsuLegacyScoring:longNoteStartHit(event)
+	self:forEachJudge("longNoteStartHit", event)
+end
+
+function OsuLegacyScoring:longNoteFail(event)
+	self:forEachJudge("longNoteFail", event)
+end
+
+function OsuLegacyScoring:longNoteRelease(event)
+	self:forEachJudge("longNoteRelease", event)
+end
+
+function OsuLegacyScoring:didntReleased(event)
+	self:forEachJudge("didntReleased", event)
 end
 
 function OsuLegacyScoring:load()
@@ -218,49 +221,33 @@ function OsuLegacyScoring:load()
 	end
 end
 
----@param event table
-function OsuLegacyScoring:hit(event)
-	for _, judge in pairs(self.judges) do
-		judge:processEvent(event)
-		judge:calculateAccuracy()
-	end
-end
-
----@param event table
-function OsuLegacyScoring:miss(event)
-	for _, judge in pairs(self.judges) do
-		judge:processMiss(event)
-		judge:calculateAccuracy()
-	end
-end
-
 OsuLegacyScoring.notes = {
 	ShortNote = {
 		clear = {
-			passed = "hit",
+			passed = "shortNoteHit",
 			missed = "miss",
 			clear = nil,
 		},
 	},
 	LongNote = {
 		clear = {
-			startPassedPressed = "hit",
-			startMissed = "miss",
-			startMissedPressed = "miss",
+			startPassedPressed = "longNoteStartHit",
+			startMissed = "longNoteFail",
+			startMissedPressed = "longNoteFail",
 			clear = nil,
 		},
 		startPassedPressed = {
-			startMissed = "miss", -- !!! 50
-			endMissed = "miss", -- !!! - 50
-			endPassed = "hit", -- !!! - any
+			startMissed = "longNoteFail",
+			endMissed = "didntReleased",
+			endPassed = "longNoteRelease",
 		},
 		startMissedPressed = {
-			endMissedPassed = "hit", -- !!! 50
-			startMissed = nil,
-			endMissed = "miss",
+			endMissedPassed = "longNoteRelease",
+			startMissed = "longNoteFail",
+			endMissed = "didntReleased",
 		},
 		startMissed = {
-			startMissedPressed = "miss",
+			startMissedPressed = "longNoteFail",
 			endMissed = "miss",
 		},
 	},

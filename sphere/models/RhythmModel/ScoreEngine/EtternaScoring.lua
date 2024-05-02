@@ -122,14 +122,8 @@ function Judge:hit(event)
 	delta_time = math.abs(delta_time * 1000.0)
 	self.points = self.points + self:getPoints(delta_time)
 
-	for _, key in ipairs(Judge.orderedCounters) do
-		local window = self.windows[key]
-
-		if delta_time < window then
-			self:addCounter(key, event.currentTime)
-			return
-		end
-	end
+	local counter_name = self:getCounter(delta_time, self.windows) or "miss"
+	self:addCounter(counter_name, event.currentTime)
 end
 
 function Judge:calculateAccuracy()
