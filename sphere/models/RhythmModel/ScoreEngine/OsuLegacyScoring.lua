@@ -118,7 +118,7 @@ function Judge:new(od)
 	self.earlyMissWindow = -self.windows.miss
 	self.lateMissWindow = self.windows.ok
 
-	self.windowReleaseMultiplier = 2.4
+	self.windowReleaseMultiplier = 1
 
 	self.baseScore = 0
 	self.bonusScore = 0
@@ -279,6 +279,13 @@ function OsuLegacyScoring:load()
 	end
 
 	totalNotes = self.scoreEngine.noteChart.chartmeta.notes_count
+end
+
+function OsuLegacyScoring:getTimings(od)
+	local judge = Judge(od)
+	local timings = judge:getTimings()
+	timings.nearest = false
+	return timings
 end
 
 OsuLegacyScoring.notes = {

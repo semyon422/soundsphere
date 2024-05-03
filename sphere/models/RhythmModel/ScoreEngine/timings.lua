@@ -35,22 +35,35 @@ timings.soundsphere = get(-0.16, -0.12, 0.12, 0.16)
 timings.lr2 = get(-1, -0.2, 0.2, 0.2)
 
 local osuMania = require("sphere.models.RhythmModel.ScoreEngine.OsuManiaScoring")
+local osuLegacy = require("sphere.models.RhythmModel.ScoreEngine.OsuLegacyScoring")
 local etterna = require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring")
 local quaver = require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring")
 
 timings.quaver = quaver:getTimings()
 timings.etterna = etterna:getTimings()
 
-local cachedOsu = {}
+local cachedOsuMania = {}
 
 ---@param od number
 ---@return table
-function timings.osu(od)
-	if cachedOsu[od] then
-		return cachedOsu[od]
+function timings.osuMania(od)
+	if cachedOsuMania[od] then
+		return cachedOsuMania[od]
 	end
-	cachedOsu[od] = osuMania:getTimings(od)
-	return cachedOsu[od]
+	cachedOsuMania[od] = osuMania:getTimings(od)
+	return cachedOsuMania[od]
+end
+
+local cachedOsuLegacy = {}
+
+---@param od number
+---@return table
+function timings.osuLegacy(od)
+	if cachedOsuLegacy[od] then
+		return cachedOsuLegacy[od]
+	end
+	cachedOsuLegacy[od] = osuLegacy:getTimings(od)
+	return cachedOsuLegacy[od]
 end
 
 ---@param t table
@@ -71,8 +84,13 @@ function timings.getName(t)
 		return "Quaver"
 	end
 	for od = 0, 10 do
-		if s == ser(timings.osu(od)) then
+		if s == ser(timings.osuMania(od)) then
 			return "osu!mania OD" .. od
+		end
+	end
+	for od = 0, 10 do
+		if s == ser(timings.osuLegacy(od)) then
+			return "osu!legacy OD" .. od
 		end
 	end
 	for judge = 4, 9 do

@@ -75,6 +75,7 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 end
 
 local osuOD = 0
+local osuLegacyOD = 0
 local etternaJudgement = 1
 
 return ModalImView(function(self, quit)
@@ -116,9 +117,13 @@ return ModalImView(function(self, quit)
 	if imgui.TextButton("lr2 timings", "LR2", 100, _h2) then
 		playContext.timings = table_util.deepcopy(_timings.lr2)
 	end
-	if imgui.TextButton("osu timings", "osu!mania OD" .. osuOD, 220, _h2) then
-		playContext.timings = table_util.deepcopy(_timings.osu(osuOD))
+	if imgui.TextButton("osuMania timings", "osu!mania OD" .. osuOD, 220, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.osuMania(osuOD))
 		osuOD = (osuOD + 1) % 11
+	end
+	if imgui.TextButton("osuLegacy timings", "osu!legacy OD" .. osuLegacyOD, 220, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.osuLegacy(osuLegacyOD))
+		osuLegacyOD = (osuLegacyOD + 1) % 11
 	end
 	if imgui.TextButton("etterna timings", "Etterna", 150, _h2) then
 		playContext.timings = table_util.deepcopy(_timings.etterna)
