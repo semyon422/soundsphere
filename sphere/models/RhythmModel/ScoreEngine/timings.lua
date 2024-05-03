@@ -32,15 +32,15 @@ end
 
 timings.soundsphere = get(-0.16, -0.12, 0.12, 0.16)
 
-timings.lr2 = get(-1, -0.2, 0.2, 0.2)
-
 local osuMania = require("sphere.models.RhythmModel.ScoreEngine.OsuManiaScoring")
 local osuLegacy = require("sphere.models.RhythmModel.ScoreEngine.OsuLegacyScoring")
 local etterna = require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring")
 local quaver = require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring")
+local lr2 = require("sphere.models.RhythmModel.ScoreEngine.LunaticRaveScoring")
 
 timings.quaver = quaver:getTimings()
 timings.etterna = etterna:getTimings()
+timings.lr2 = lr2:getTimings()
 
 local cachedOsuMania = {}
 

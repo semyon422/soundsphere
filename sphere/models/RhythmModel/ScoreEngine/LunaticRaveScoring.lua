@@ -128,6 +128,13 @@ function LunaticRaveScoring:mash(event)
 	end
 end
 
+---@return table
+function LunaticRaveScoring:getTimings()
+	local timings = Judge(windows["Easy"]):getTimings()
+	timings.nearest = false
+	return timings
+end
+
 LunaticRaveScoring.notes = {
 	ShortNote = {
 		clear = {
