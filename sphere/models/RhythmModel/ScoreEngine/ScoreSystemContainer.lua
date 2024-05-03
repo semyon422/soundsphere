@@ -11,6 +11,7 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.OsuLegacyScoring"),
 	require("sphere.models.RhythmModel.ScoreEngine.QuaverScoring"),
 	require("sphere.models.RhythmModel.ScoreEngine.EtternaScoring"),
+	require("sphere.models.RhythmModel.ScoreEngine.LunaticRaveScoring"),
 	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 }
 

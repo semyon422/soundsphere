@@ -6,6 +6,7 @@ local Judge = class()
 
 Judge.scoreSystemName = ""
 
+---@type number
 Judge.accuracy = 1
 Judge.notes = 0
 

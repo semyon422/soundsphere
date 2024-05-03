@@ -294,7 +294,14 @@ local function Judgements(self)
 	local perfect = show and counters.perfect or scoreItem.perfect or 0
 	local notPerfect = show and counters["not perfect"] or scoreItem.not_perfect or 0
 	local miss = show and judge.counters.miss or scoreItem.miss or 0
-	local notes = show and judge.notes or perfect + notPerfect + miss
+
+	local notes = perfect + notPerfect + miss
+
+	if show then -- LR2 mash can be higher than total count of notes
+		for _, counter in ipairs(judge.counters) do
+			notes = notes + counter
+		end
+	end
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
@@ -336,10 +343,17 @@ local function JudgementSelector(item, w, h)
 
 	local text = name:format(selectorState[name])
 
+	if item.rangeValueAlias then
+		text = name:format(item.rangeValueAlias[v])
+	end
+
 	local ret
 	just.row(true)
 	if imgui.TextOnlyButton(name .. "judgement", text, w - h * 2, h, "center") then
 		ret = text
+		if item.rangeValueAlias then
+			ret = name:format(item.rangeValueAlias[v])
+		end
 	end
 	if imgui.TextOnlyButton(name .. "judgement<", "<", h, h, "center") and v > item.range[1] then
 		selectorState[name] = v - 1
