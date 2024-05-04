@@ -298,6 +298,7 @@ local function Judgements(self)
 	local notes = perfect + notPerfect + miss
 
 	if show then -- LR2 mash can be higher than total count of notes
+		notes = 0
 		for _, counter in pairs(judge.counters) do
 			notes = notes + counter
 		end
