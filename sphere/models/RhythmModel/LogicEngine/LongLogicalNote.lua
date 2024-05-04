@@ -4,7 +4,6 @@ local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 ---@operator call: sphere.LongLogicalNote
 local LongLogicalNote = LogicalNote + {}
 
-
 ---@param noteData ncdk.NoteData
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
@@ -184,6 +183,7 @@ function LongLogicalNote:switchState(newState, reachableNote)
 	end
 
 	scoreEvent.noteIndex = self.index
+	scoreEvent.noteIndexType = self.index .. self.input -- required for osu!legacy LN's to track their state
 	scoreEvent.currentTime = currentTime
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.timeRate = timeRate

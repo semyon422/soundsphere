@@ -40,7 +40,9 @@ function ResultView:updateJudgements()
 		scoreSystems["soundsphere"].metadata,
 		scoreSystems["quaver"].metadata,
 		scoreSystems["osuMania"].metadata,
-		scoreSystems["etterna"].metadata
+		scoreSystems["osuLegacy"].metadata,
+		scoreSystems["etterna"].metadata,
+		scoreSystems["lr2"].metadata,
 	}
 
 	self.judgements = {}
@@ -60,10 +62,14 @@ function ResultView:draw()
 	just.container("screen container", true)
 
 	local kp = just.keypressed
-	if kp("up") then self.game.selectModel:scrollScore(-1)
-	elseif kp("down") then self.game.selectModel:scrollScore(1)
-	elseif kp("escape") then self:quit()
-	elseif kp("return") then self:loadScore()
+	if kp("up") then
+		self.game.selectModel:scrollScore(-1)
+	elseif kp("down") then
+		self.game.selectModel:scrollScore(1)
+	elseif kp("escape") then
+		self:quit()
+	elseif kp("return") then
+		self:loadScore()
 	end
 
 	Layout:draw()

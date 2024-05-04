@@ -7,7 +7,7 @@ local table_util = require("table_util")
 
 local _timings = require("sphere.models.RhythmModel.ScoreEngine.timings")
 
-local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
+local transform = { { 1 / 2, -16 / 9 / 2 }, 0, 0, { 0, 1 / 1080 }, { 0, 1 / 1080 }, 0, 0, 0, 0 }
 
 ---@param id any
 ---@param v number
@@ -18,14 +18,26 @@ local function intButtons(id, v, w, h)
 	local _v = v
 	local mod = love.keyboard.isScancodeDown("lshift", "rshift")
 	if not mod then
-		if imgui.TextButton(id .. "-1", "-1", w / 4, h) then v = v - 1 end
-		if imgui.TextButton(id .. "+1", "+1", w / 4, h) then v = v + 1 end
+		if imgui.TextButton(id .. "-1", "-1", w / 4, h) then
+			v = v - 1
+		end
+		if imgui.TextButton(id .. "+1", "+1", w / 4, h) then
+			v = v + 1
+		end
 	end
-	if imgui.TextButton(id .. "-10", "-10", w / 4, h) then v = v - 10 end
-	if imgui.TextButton(id .. "+10", "+10", w / 4, h) then v = v + 10 end
+	if imgui.TextButton(id .. "-10", "-10", w / 4, h) then
+		v = v - 10
+	end
+	if imgui.TextButton(id .. "+10", "+10", w / 4, h) then
+		v = v + 10
+	end
 	if mod then
-		if imgui.TextButton(id .. "-100", "-100", w / 4, h) then v = v - 100 end
-		if imgui.TextButton(id .. "+100", "+100", w / 4, h) then v = v + 100 end
+		if imgui.TextButton(id .. "-100", "-100", w / 4, h) then
+			v = v - 100
+		end
+		if imgui.TextButton(id .. "+100", "+100", w / 4, h) then
+			v = v + 100
+		end
 	end
 	if v ~= _v then
 		return math.floor(v)
@@ -63,6 +75,7 @@ local function drawTimings(t, name, id, norm, mins, w, h)
 end
 
 local osuOD = 0
+local osuLegacyOD = 0
 local etternaJudgement = 1
 
 return ModalImView(function(self, quit)
@@ -104,15 +117,18 @@ return ModalImView(function(self, quit)
 	if imgui.TextButton("lr2 timings", "LR2", 100, _h2) then
 		playContext.timings = table_util.deepcopy(_timings.lr2)
 	end
-	if imgui.TextButton("osu timings", "osu OD" .. osuOD, 150, _h2) then
-		playContext.timings = table_util.deepcopy(_timings.osu(osuOD))
+	if imgui.TextButton("osuMania timings", "osu!mania OD" .. osuOD, 220, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.osuMania(osuOD))
 		osuOD = (osuOD + 1) % 11
 	end
-	if imgui.TextButton("etterna timings", "J" .. etternaJudgement, 150, _h2) then
-		playContext.timings = table_util.deepcopy(_timings.etterna(etternaJudgement))
-		etternaJudgement = etternaJudgement % 9 + 1
+	if imgui.TextButton("osuLegacy timings", "osu!legacy OD" .. osuLegacyOD, 220, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.osuLegacy(osuLegacyOD))
+		osuLegacyOD = (osuLegacyOD + 1) % 11
 	end
-	if imgui.TextButton("quaver timings", "quaver", 150, _h2) then
+	if imgui.TextButton("etterna timings", "Etterna", 150, _h2) then
+		playContext.timings = table_util.deepcopy(_timings.etterna)
+	end
+	if imgui.TextButton("quaver timings", "Quaver", 150, _h2) then
 		playContext.timings = table_util.deepcopy(_timings.quaver)
 	end
 	just.row()
