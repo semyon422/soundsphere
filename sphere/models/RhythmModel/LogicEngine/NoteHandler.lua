@@ -24,6 +24,7 @@ function NoteHandler:load()
 		if note then
 			hnote.note = note
 			note.logicEngine = logicEngine
+			note.input = hnote.input
 			table.insert(notes, hnote)
 			logicEngine.sharedLogicalNotes[noteData] = note
 		end

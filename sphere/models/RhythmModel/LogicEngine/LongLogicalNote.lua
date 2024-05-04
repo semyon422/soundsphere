@@ -182,8 +182,8 @@ function LongLogicalNote:switchState(newState, reachableNote)
 		deltaTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
 	end
 
-	scoreEvent.noteIndex = self.index -- required for osu LN's to track their state
-	scoreEvent.inputIndex = self.startNoteData.inputIndex -- same for this
+	scoreEvent.noteIndex = self.index
+	scoreEvent.noteIndexType = self.index .. self.input -- required for osu!legacy LN's to track their state
 	scoreEvent.currentTime = currentTime
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.timeRate = timeRate

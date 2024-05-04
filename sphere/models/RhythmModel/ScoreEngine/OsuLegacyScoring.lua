@@ -103,7 +103,6 @@ function Judge:new(od)
 		miss = w.miss,
 	}
 
-	-- stores note indexes for each column separately
 	self.pressedLongNotes = {}
 
 	self.counters = {
@@ -153,24 +152,24 @@ end
 ---@param self sphere.OsuLegacyJudge
 ---@return string?
 local function getStartCounter(self, event)
-	local column = self.pressedLongNotes[event.inputIndex]
-
-	if column then
-		return column[event.noteIndex]
-	end
+	return self.pressedLongNotes[event.noteIndexType]
 end
 
 ---@param self sphere.OsuLegacyJudge
 local function setStartCounter(self, event, counter_name)
-	local columns = self.pressedLongNotes
-
-	if not columns[event.inputIndex] then
-		columns[event.inputIndex] = {}
-	end
-
-	columns[event.inputIndex][event.noteIndex] = counter_name
+	self.pressedLongNotes[event.noteIndexType] = counter_name
 end
 
+---@param event table
+function Judge:addMiss(event)
+	self:addCounter("miss", event.currentTime)
+
+	if event.noteType == "LongNote" then
+		setStartCounter(self, event, nil)
+	end
+end
+
+---@param event table
 function Judge:shortNoteHit(event)
 	local delta_time = event.deltaTime
 
@@ -205,6 +204,8 @@ function Judge:didntReleased(event)
 	local counter = getStartCounter(self, event) or "meh"
 	local counter_index = math.min(counterIndex[counter] + 2, 5)
 	self:addCounter(self.orderedCounters[counter_index], event.currentTime)
+
+	setStartCounter(self, event, nil)
 end
 
 function Judge:longNoteFail(event)
@@ -235,6 +236,8 @@ function Judge:longNoteRelease(event)
 
 	local counter_name = self.orderedCounters[math.max(start_index, tail_index)]
 	self:addCounter(counter_name, event.currentTime)
+
+	setStartCounter(self, event, nil)
 end
 
 ---@param func_name string
