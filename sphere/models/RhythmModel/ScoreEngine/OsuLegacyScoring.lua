@@ -1,3 +1,5 @@
+-- SOURCE: https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu!mania
+
 local math_util = require("math_util")
 
 local BaseJudge = require("sphere.models.RhythmModel.ScoreEngine.Judge")

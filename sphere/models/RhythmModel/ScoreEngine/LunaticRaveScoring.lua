@@ -1,3 +1,5 @@
+-- SOURCE: https://hitkey.nekokan.dyndns.info/diary1501.php#D150119
+
 local BaseJudge = require("sphere.models.RhythmModel.ScoreEngine.Judge")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")

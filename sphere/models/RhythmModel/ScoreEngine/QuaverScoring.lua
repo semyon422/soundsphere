@@ -1,3 +1,5 @@
+-- SOURCE: https://github.com/Quaver/Quaver.API/blob/43e800efb079e9c099315c4b365490e357e2380c/Quaver.API/Maps/Processors/Scoring/ScoreProcessorKeys.cs
+
 local BaseJudge = require("sphere.models.RhythmModel.ScoreEngine.Judge")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
