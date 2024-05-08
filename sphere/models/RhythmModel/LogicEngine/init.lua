@@ -55,7 +55,7 @@ function LogicEngine:load()
 	for _, noteHandler in pairs(self.noteHandlers) do
 		noteHandler:load()
 		for _, note in ipairs(noteHandler.notes) do
-			if note.isScorable then
+			if note.note.isScorable then
 				notesCount = notesCount + 1
 			end
 		end
