@@ -46,4 +46,8 @@
     "Lua.diagnostics.neededFileStatus": {
         "no-unknown": "None"
     },
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/tree/**": true,
+    },
 }
