@@ -5,7 +5,7 @@ local table_util = require("table_util")
 
 local Chart = require("ncdk2.Chart")
 local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
-local Note = require("ncdk2.notes.Note")
+local Note = require("notechart.Note")
 
 local visualTimeInfo = {
 	rate = 1,
@@ -64,38 +64,41 @@ local function test(notes, events, states, graphicStates)
 			if isAuto then
 				time = time[1]
 			end
-			local timePoint = layerData:getTimePoint(time, -1)
+			local p = layer:getPoint(time)
+			local vp = layer:newVisualPoint(p)
 
-			local noteData = Note(timePoint)
+			local note = Note(vp)
 
-			noteData.noteType = "ShortNote"
+			note.noteType = "ShortNote"
 			if isAuto then
-				noteData.noteType = "SoundNote"
+				note.noteType = "SoundNote"
 			end
 
-			layerData:addNoteData(noteData, "key", 1)
+			layer.notes:insert(note, 1)
 		elseif type(time) == "table" then
-			local timePoint = layerData:getTimePoint(time[1], -1)
+			local p = layer:getPoint(time[1])
+			local vp = layer:newVisualPoint(p)
 
-			local startNoteData = Note(timePoint)
-			startNoteData.noteType = "LongNoteStart"
-			layerData:addNoteData(startNoteData, "key", 1)
+			local startNote = Note(vp)
+			startNote.noteType = "LongNoteStart"
+			layer.notes:insert(startNote, 1)
 
-			timePoint = layerData:getTimePoint(time[2], -1)
+			p = layer:getPoint(time[2])
+			vp = layer:newVisualPoint(p)
 
-			local endNoteData = Note(timePoint)
+			local endNoteData = Note(vp)
 			endNoteData.noteType = "LongNoteEnd"
-			layerData:addNoteData(endNoteData, "key", 1)
+			layer.notes:insert(endNoteData, 1)
 
-			startNoteData.endNoteData = endNoteData
-			endNoteData.startNoteData = startNoteData
+			startNote.endNote = endNoteData
+			endNoteData.startNote = startNote
 		end
 	end
 
 	chart:compute()
 
-	logicEngine.noteChart = chart
-	graphicEngine.noteChart = chart
+	logicEngine.chart = chart
+	graphicEngine.chart = chart
 
 	local newStates = {}
 	logicEngine.scoreEngine = {
@@ -106,7 +109,7 @@ local function test(notes, events, states, graphicStates)
 				oldState = event.oldState,
 				noteIndex = event.noteIndex,
 			}
-			-- print(inspect(eventCopy))
+			-- print(require("inspect")(eventCopy))
 			table.insert(newStates, eventCopy)
 		end},
 	}
@@ -120,7 +123,7 @@ local function test(notes, events, states, graphicStates)
 
 	local function press(time)
 		logicEngine:receive({
-			"key1",
+			1,
 			name = "keypressed",
 			virtual = true,
 			time = time
@@ -128,7 +131,7 @@ local function test(notes, events, states, graphicStates)
 	end
 	local function release(time)
 		logicEngine:receive({
-			"key1",
+			1,
 			name = "keyreleased",
 			virtual = true,
 			time = time

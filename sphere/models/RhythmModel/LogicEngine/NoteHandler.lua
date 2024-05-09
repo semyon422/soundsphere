@@ -141,7 +141,7 @@ function NoteHandler:setKeyState(state, input)
 	end
 
 	note.keyState = state
-	note.inputMatched = hnote.input == input
+	note.inputMatched = hnote.column == input
 
 	local _note = state and note.startNote or note.endNote
 	if _note then
