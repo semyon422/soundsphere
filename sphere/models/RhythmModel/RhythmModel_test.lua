@@ -65,7 +65,7 @@ local function test(notes, events, states, graphicStates)
 				time = time[1]
 			end
 			local p = layer:getPoint(time)
-			local vp = layer:newVisualPoint(p)
+			local vp = layer.visual:newPoint(p)
 
 			local note = Note(vp)
 
@@ -77,14 +77,14 @@ local function test(notes, events, states, graphicStates)
 			layer.notes:insert(note, 1)
 		elseif type(time) == "table" then
 			local p = layer:getPoint(time[1])
-			local vp = layer:newVisualPoint(p)
+			local vp = layer.visual:newPoint(p)
 
 			local startNote = Note(vp)
 			startNote.noteType = "LongNoteStart"
 			layer.notes:insert(startNote, 1)
 
 			p = layer:getPoint(time[2])
-			vp = layer:newVisualPoint(p)
+			vp = layer.visual:newPoint(p)
 
 			local endNoteData = Note(vp)
 			endNoteData.noteType = "LongNoteEnd"

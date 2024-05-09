@@ -116,7 +116,7 @@ end
 local function applyTempo(chart, tempo)
 	for _, layer in pairs(chart.layers) do
 		layer.visual.primaryTempo = tempo
-		layer.visual:compute(layer.visualPoints)
+		layer.visual:compute()
 	end
 end
 
@@ -124,13 +124,13 @@ end
 function GameplayController:swapVelocityType(chart)
 	for _, layer in pairs(chart.layers) do
 		layer.visual.tempoMultiplyTarget = "local"
-		for _, vp in ipairs(layer.visualPoints) do
+		for _, vp in ipairs(layer.visual.points) do
 			local vel = vp._velocity
 			if vel then
 				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
 			end
 		end
-		layer.visual:compute(layer.visualPoints)
+		layer.visual:compute()
 	end
 end
 

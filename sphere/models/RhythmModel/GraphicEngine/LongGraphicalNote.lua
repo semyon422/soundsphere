@@ -110,7 +110,7 @@ function LongGraphicalNote:getFakeVisualStartTime()
 	end
 
 	local interpolator = self.layer.visual.interpolator
-	local visualPoints = self.layer.visualPoints
+	local visualPoints = self.layer.visual.points
 
 	fakeStartVisualPoint.visualTime = currentVisualPoint.visualTime - offsetSum / globalSpeed
 	self.fakeIndex = interpolator:interpolate(visualPoints, self.fakeIndex, fakeStartVisualPoint, "visual")

@@ -100,7 +100,7 @@ function NoteDrawer:updateCurrentTime()
 	vp.point.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
 
 	local interpolator = self.layer.visual.interpolator
-	local visualPoints = self.layer.visualPoints
+	local visualPoints = self.layer.visual.points
 
 	self.currentVisualPointIndex = interpolator:interpolate(
 		visualPoints, self.currentVisualPointIndex, vp, "absolute"
