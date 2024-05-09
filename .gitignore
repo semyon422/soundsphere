@@ -56,3 +56,4 @@ temp/*
 graph.png
 luacov.stats.out
 lcov.info
+luacov.report.out

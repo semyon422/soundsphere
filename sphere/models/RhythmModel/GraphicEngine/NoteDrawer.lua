@@ -1,54 +1,70 @@
 local class = require("class")
 local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
+local Point = require("ncdk2.tp.Point")
+local VisualPoint = require("ncdk2.visual.VisualPoint")
 local table_util = require("table_util")
 
 ---@class sphere.NoteDrawer
 ---@operator call: sphere.NoteDrawer
 local NoteDrawer = class()
 
+---@param layer ncdk2.Layer
+---@param notes notechart.Note[]
+---@param column number
+---@param graphicEngine sphere.GraphicEngine
+function NoteDrawer:new(layer, notes, column, graphicEngine)
+	self.layer = layer
+	self._notes = notes
+	self.column = column
+	self.graphicEngine = graphicEngine
+end
+
 local function sort_const(a, b)
-	return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "absolute")
+	return a.startNote.visualPoint.point:compare(b.startNote.visualPoint.point)
 end
 
 local function sort_visual(a, b)
-	return a.startNoteData.timePoint:compare(b.startNoteData.timePoint, "visual")
+	return a.startNote.visualPoint:compare(b.startNote.visualPoint)
 end
 
 function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
+	local layer = self.layer
 
-	local layerData = self.layerData
+	local inputMap = graphicEngine.chart.inputMode:getInputMap()
+
 	self.eventOffset = 0
 
-	self.currentTimePointIndex = 1
-	self.currentTimePoint = layerData:newTimePoint()
+	self.currentVisualPointIndex = 1
+	self.currentVisualPoint = VisualPoint(Point())
 
 	self.notes = {}
 	local notes = self.notes
 
 	self.noteByTimePoint = {}
 
-	for _, noteData in ipairs(self.noteDatas) do
-		local note = GraphicalNoteFactory:getNote(noteData)
+	for _, _note in ipairs(self._notes) do
+		local note = GraphicalNoteFactory:getNote(_note)
 		if note then
-			note.currentTimePoint = self.currentTimePoint
+			local iti = inputMap[self.column]
+			note.currentVisualPoint = self.currentVisualPoint
 			note.graphicEngine = graphicEngine
-			note.layerData = layerData
-			note.logicalNote = graphicEngine:getLogicalNote(noteData)
-			note.inputType = self.inputType
-			note.inputIndex = self.inputIndex
+			note.layer = layer
+			note.column = self.column
+			note.inputType = iti[1]
+			note.inputIndex = iti[2]
 			table.insert(notes, note)
 
 			if self.graphicEngine.eventBasedRender then
-				local endNoteData = note.startNoteData.endNoteData
+				local endNoteData = note.startNote.endNoteData
 				if not endNoteData then
-					self.noteByTimePoint[note.startNoteData.timePoint] = {
+					self.noteByTimePoint[note.startNote.timePoint] = {
 						note = note,
 						show = true,
 						hide = true,
 					}
 				else
-					self.noteByTimePoint[note.startNoteData.timePoint] = {
+					self.noteByTimePoint[note.startNote.timePoint] = {
 						note = note,
 						show = true,
 					}
@@ -80,9 +96,15 @@ end
 
 function NoteDrawer:updateCurrentTime()
 	local graphicEngine = self.graphicEngine
-	local timePoint = self.currentTimePoint
-	timePoint.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
-	self.currentTimePointIndex = self.layerData:interpolateTimePointAbsolute(self.currentTimePointIndex, timePoint)
+	local vp = self.currentVisualPoint
+	vp.point.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
+
+	local interpolator = self.layer.visual.interpolator
+	local visualPoints = self.layer.visualPoints
+
+	self.currentVisualPointIndex = interpolator:interpolate(
+		visualPoints, self.currentVisualPointIndex, vp, "absolute"
+	)
 end
 
 function NoteDrawer:update()
@@ -95,7 +117,7 @@ end
 function NoteDrawer:updateEventBased()
 	self:updateCurrentTime()
 
-	local currentTime = self.currentTimePoint.absoluteTime
+	local currentTime = self.currentVisualPoint.point.absoluteTime
 	while self.eventOffset < #self.events do
 		local event = self.events[self.eventOffset + 1]
 		if event.time > currentTime then

@@ -4,16 +4,15 @@ local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 ---@operator call: sphere.ShortLogicalNote
 local ShortLogicalNote = LogicalNote + {}
 
----@param noteData ncdk.NoteData
+---@param note ncdk2.Note
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
 ---@param isInputMatchable boolean?
-function ShortLogicalNote:new(noteData, isPlayable, isScorable, isInputMatchable)
-	self.startNoteData = noteData
+function ShortLogicalNote:new(note, isPlayable, isScorable, isInputMatchable)
+	self.startNote = note
 	self.isPlayable = isPlayable
 	self.isScorable = isScorable
 	self.isInputMatchable = isInputMatchable
-	self.noteData = nil
 	self.state = "clear"
 end
 
@@ -97,7 +96,7 @@ function ShortLogicalNote:processAuto()
 
 	self.keyState = true
 	self.inputMatched = true  -- need for promode
-	self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
+	self.logicEngine:playSound(self.startNote, not self.isPlayable)
 
 	self.eventTime = self:getNoteTime()
 	self:processTimeState("exactly")

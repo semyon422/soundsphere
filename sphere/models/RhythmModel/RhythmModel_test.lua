@@ -3,8 +3,9 @@ local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local table_util = require("table_util")
 
-local NoteChart = require("ncdk.NoteChart")
-local NoteData = require("ncdk.NoteData")
+local Chart = require("ncdk2.Chart")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local Note = require("ncdk2.notes.Note")
 
 local visualTimeInfo = {
 	rate = 1,
@@ -50,12 +51,12 @@ end
 local function test(notes, events, states, graphicStates)
 	logicEngine.eventTime = 0  -- reset time on each test
 
-	local noteChart = NoteChart()
+	local chart = Chart()
 
-	local layerData = noteChart:getLayerData(1)
-	layerData:setTimeMode("absolute")
+	local layer = AbsoluteLayer()
+	chart.layers.main = layer
 
-	noteChart.inputMode.key = 1
+	chart.inputMode.key = 1
 
 	for _, time in ipairs(notes) do
 		local isAuto = type(time) == "table" and getmetatable(time) == auto_mt
@@ -65,7 +66,7 @@ local function test(notes, events, states, graphicStates)
 			end
 			local timePoint = layerData:getTimePoint(time, -1)
 
-			local noteData = NoteData(timePoint)
+			local noteData = Note(timePoint)
 
 			noteData.noteType = "ShortNote"
 			if isAuto then
@@ -76,13 +77,13 @@ local function test(notes, events, states, graphicStates)
 		elseif type(time) == "table" then
 			local timePoint = layerData:getTimePoint(time[1], -1)
 
-			local startNoteData = NoteData(timePoint)
+			local startNoteData = Note(timePoint)
 			startNoteData.noteType = "LongNoteStart"
 			layerData:addNoteData(startNoteData, "key", 1)
 
 			timePoint = layerData:getTimePoint(time[2], -1)
 
-			local endNoteData = NoteData(timePoint)
+			local endNoteData = Note(timePoint)
 			endNoteData.noteType = "LongNoteEnd"
 			layerData:addNoteData(endNoteData, "key", 1)
 
@@ -91,10 +92,10 @@ local function test(notes, events, states, graphicStates)
 		end
 	end
 
-	noteChart:compute()
+	chart:compute()
 
-	logicEngine.noteChart = noteChart
-	graphicEngine.noteChart = noteChart
+	logicEngine.noteChart = chart
+	graphicEngine.noteChart = chart
 
 	local newStates = {}
 	logicEngine.scoreEngine = {

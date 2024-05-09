@@ -12,43 +12,42 @@ GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 GraphicEngine.constant = false
 GraphicEngine.eventBasedRender = false
+GraphicEngine.range = {-1, 1}
 
----@param visualTimeInfo table
+---@param visualTimeInfo sphere.VisualTimeInfo
 ---@param logicEngine sphere.LogicEngine?
 function GraphicEngine:new(visualTimeInfo, logicEngine)
 	self.visualTimeInfo = visualTimeInfo
 	self.logicEngine = logicEngine
 end
 
----@param noteChart ncdk.NoteChart
-function GraphicEngine:setNoteChart(noteChart)
-	self.noteChart = noteChart
+---@param chart ncdk2.Chart
+function GraphicEngine:setChart(chart)
+	self.chart = chart
 end
 
 function GraphicEngine:load()
 	self.notes_count = 0
+
+	---@type sphere.NoteDrawer[]
 	self.noteDrawers = {}
 
 	local layerEvents = {}
+	-- if self.eventBasedRender then
+	-- 	for layerName, layer in pairs(self.chart.layers) do
+	-- 		layerEvents[layerName] = layerEvents[layerName] or TimeToEvent(layer.timePointList, range)
+	-- 		noteDrawer.events = layerEvents[layerName]
+	-- 	end
+	-- end
 
 	local range = {
 		self.range[1] / self.visualTimeRate,
 		self.range[2] / self.visualTimeRate,
 	}
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local layerData = self.noteChart.layerDatas[layerDataIndex]
-		local noteDrawer = NoteDrawer({
-			layerData = layerData,
-			noteDatas = noteDatas,
-			inputType = inputType,
-			inputIndex = inputIndex,
-			graphicEngine = self
-		})
-		if self.eventBasedRender then
-			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData.timePointList, range)
-			noteDrawer.events = layerEvents[layerDataIndex]
-		end
+	for notes, column, layerName in self.chart:getNotesIterator() do
+		local layer = self.chart.layers[layerName]
+		local noteDrawer = NoteDrawer(layer, notes, column, self)
 		noteDrawer:load()
 		table.insert(self.noteDrawers, noteDrawer)
 	end
@@ -100,11 +99,11 @@ function GraphicEngine:getInputOffset()
 	return logicEngine and logicEngine.inputOffset or 0
 end
 
----@param noteData ncdk.NoteData
+---@param note notechart.Note
 ---@return sphere.LogicalNote?
-function GraphicEngine:getLogicalNote(noteData)
+function GraphicEngine:getLogicalNote(note)
 	local logicEngine = self.logicEngine
-	return logicEngine and logicEngine:getLogicalNote(noteData)
+	return logicEngine and logicEngine:getLogicalNote(note)
 end
 
 ---@return number

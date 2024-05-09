@@ -111,23 +111,27 @@ function GameplayController:load()
 	self.previewModel:stop()
 end
 
+---@param chart ncdk2.Chart
 ---@param tempo number
-local function applyTempo(noteChart, tempo)
-	for _, layerData in noteChart:getLayerDataIterator() do
-		layerData:setPrimaryTempo(tempo)
+local function applyTempo(chart, tempo)
+	for _, layer in pairs(chart.layers) do
+		layer.visual.primaryTempo = tempo
+		layer.visual:compute(layer.visualPoints)
 	end
-	noteChart:compute()
 end
 
----@param noteChart ncdk.NoteChart
-function GameplayController:swapVelocityType(noteChart)
-	for _, layerData in noteChart:getLayerDataIterator() do
-		layerData.tempoMultiplyTarget = "local"
-		for _, vd in ipairs(layerData.velocityDatas) do
-			vd.localSpeed, vd.currentSpeed = vd.currentSpeed, vd.localSpeed
+---@param chart ncdk2.Chart
+function GameplayController:swapVelocityType(chart)
+	for _, layer in pairs(chart.layers) do
+		layer.visual.tempoMultiplyTarget = "local"
+		for _, vp in ipairs(layer.visualPoints) do
+			local vel = vp._velocity
+			if vel then
+				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
+			end
 		end
+		layer.visual:compute(layer.visualPoints)
 	end
-	noteChart:compute()
 end
 
 ---@param tempoFactor string

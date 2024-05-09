@@ -1,8 +1,8 @@
 local class = require("class")
-local NoteChartFactory = require("notechart.NoteChartFactory")
+local ChartFactory = require("notechart.ChartFactory")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
-local NoteChartExporter = require("sph.NoteChartExporter")
-local NoteChartImporter = require("sph.NoteChartImporter")
+local ChartEncoder = require("sph.ChartEncoder")
+local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local SphLines = require("sph.SphLines")
 local TextLines = require("sph.lines.TextLines")
@@ -13,21 +13,23 @@ local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbso
 local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
 local NoteChart = require("ncdk.NoteChart")
 
-local function to_interval(noteChart)
-	local ld = noteChart:getLayerData(1)
+---@param chart ncdk2.Chart
+local function to_interval(chart)
+	local layer = chart.layers.main
 
-	if ld.mode == "absolute" then
-		ld = ConvertAbsoluteToInterval(ld, "closest_gte")
-	elseif ld.mode == "measure" then
-		ld = ConvertMeasureToInterval(ld)
-	end
+	-- if layer.mode == "absolute" then
+	-- 	layer = ConvertAbsoluteToInterval(layer, "closest_gte")
+	-- elseif layer.mode == "measure" then
+	-- 	layer = ConvertMeasureToInterval(layer)
+	-- end
 
-	local nc = NoteChart()
-	ld.noteChart = nc
-	nc.layerDatas[1] = ld
-	nc.chartmeta = noteChart.chartmeta
-	nc.inputMode = noteChart.inputMode
-	return nc
+	-- local nc = NoteChart()
+	-- layer.noteChart = nc
+	-- nc.layerDatas[1] = layer
+	-- nc.chartmeta = chart.chartmeta
+	-- nc.inputMode = chart.inputMode
+	-- return nc
+	return chart
 end
 
 ---@class sphere.ChartPreviewModel
@@ -57,46 +59,45 @@ function ChartPreviewModel:setChartview(chartview)
 		return
 	end
 
-	local noteChart = assert(NoteChartFactory:getNoteChart(
+	local charts = assert(ChartFactory:getCharts(
 		chartview.chartfile_name,
-		content,
-		chartview.index
+		content
 	))
-	noteChart = to_interval(noteChart)
+	local chart = charts[chartview.index]
 
-	local exp = NoteChartExporter()
-	exp.noteChart = noteChart
-	local sph_chart = exp:export()
+	-- chart = to_interval(chart)
 
-	local tl = TextLines()
-	tl.lines = exp.sph.sphLines:encode()
-	tl.columns = noteChart.inputMode:getColumns()
-	local sph_lines_str = tl:encode()
+	local encoder = ChartEncoder()
+	local sph = encoder:encodeSph(charts[1])
 
-	local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(exp.sph.sphLines:encode()), 1)
-	exp.sph.sphLines = SphLines()
-	exp.sph.sphLines:decode(SphPreview:decodeLines(sph_preview))
+	-- local tl = TextLines()
+	-- tl.lines = encoder.sph.sphLines:encode()
+	-- tl.columns = noteChart.inputMode:getColumns()
+	-- local sph_lines_str = tl:encode()
 
-	local tl = TextLines()
-	tl.lines = exp.sph.sphLines:encode()
-	tl.columns = noteChart.inputMode:getColumns()
-	local sph_lines_str2 = tl:encode()
+	local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(sph.sphLines:encode()), 1)
+	sph.sphLines = SphLines()
+	sph.sphLines:decode(SphPreview:decodeLines(sph_preview))
 
-	local imp = NoteChartImporter()
-	imp:importFromSph(exp.sph)
-	noteChart = imp.noteCharts[1]
+	-- local tl = TextLines()
+	-- tl.lines = encoder.sph.sphLines:encode()
+	-- tl.columns = noteChart.inputMode:getColumns()
+	-- local sph_lines_str2 = tl:encode()
 
-	local f = assert(io.open("sph_preview.bin", "wb"))
-	f:write(sph_preview)
-	f:close()
-	local f = assert(io.open("sph_lines_str.sph", "w"))
-	f:write(sph_lines_str)
-	f:close()
-	f = assert(io.open("sph_lines_str2.sph", "w"))
-	f:write(sph_lines_str2)
-	f:close()
+	local decoder = ChartDecoder()
+	chart = decoder:decodeSph(sph)
 
-	local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
+	-- local f = assert(io.open("sph_preview.bin", "wb"))
+	-- f:write(sph_preview)
+	-- f:close()
+	-- local f = assert(io.open("sph_lines_str.sph", "w"))
+	-- f:write(sph_lines_str)
+	-- f:close()
+	-- f = assert(io.open("sph_lines_str2.sph", "w"))
+	-- f:write(sph_lines_str2)
+	-- f:close()
+
+	local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 	noteSkin.editor = true
 
@@ -106,7 +107,7 @@ function ChartPreviewModel:setChartview(chartview)
 	self.graphicEngine.scaleSpeed = config.gameplay.scaleSpeed
 
 	self.graphicEngine.range = noteSkin.range
-	self.graphicEngine:setNoteChart(noteChart)
+	self.graphicEngine:setChart(chart)
 	self.graphicEngine:load()
 end
 

@@ -8,7 +8,7 @@ local simplify_notechart = require("libchart.simplify_notechart")
 local DifficultyModel = class()
 
 ---@param chartdiff table
----@param noteChart ncdk.NoteChart
+---@param noteChart ncdk2.Chart
 ---@param timeRate number
 function DifficultyModel:compute(chartdiff, noteChart, timeRate)
 	local notes = simplify_notechart(noteChart)

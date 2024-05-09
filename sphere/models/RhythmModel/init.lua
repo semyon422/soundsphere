@@ -60,12 +60,12 @@ function RhythmModel:unloadAllEngines()
 	self.logicEngine:unload()
 	self.graphicEngine:unload()
 
-	for _, inputType, inputIndex in self.noteChart:getInputIterator() do
-		self.observable:send({
-			name = "keyreleased",
-			virtual = true,
-			inputType .. inputIndex
-		})
+	for _, column in self.chart:getNotesIterator() do
+		-- self.observable:send({
+		-- 	name = "keyreleased",
+		-- 	virtual = true,
+		-- 	inputType .. inputIndex
+		-- })
 	end
 end
 
@@ -161,14 +161,14 @@ function RhythmModel:setAdjustRate(adjustRate)
 	self.timeEngine.adjustRate = adjustRate
 end
 
----@param noteChart ncdk.NoteChart
-function RhythmModel:setNoteChart(noteChart)
-	assert(noteChart)
-	self.noteChart = noteChart
-	self.timeEngine.noteChart = noteChart
-	self.scoreEngine.noteChart = noteChart
-	self.logicEngine.noteChart = noteChart
-	self.graphicEngine:setNoteChart(noteChart)
+---@param chart ncdk2.Chart
+function RhythmModel:setNoteChart(chart)
+	assert(chart)
+	self.chart = chart
+	self.timeEngine.noteChart = chart
+	self.scoreEngine.noteChart = chart
+	self.logicEngine:setChart(chart)
+	self.graphicEngine:setChart(chart)
 end
 
 ---@param range table

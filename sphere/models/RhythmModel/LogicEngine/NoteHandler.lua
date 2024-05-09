@@ -9,30 +9,30 @@ local NoteHandler = class()
 function NoteHandler:new(logicEngine)
 	self.logicEngine = logicEngine
 	self.notes = {}
-	self.logicNoteDatas = {}
+
+	---@type sphere.HandlerNote[]
+	self.logicNotes = {}
 end
 
 function NoteHandler:load()
+	---@type sphere.HandlerNote[]
 	self.notes = {}
 	local notes = self.notes
 
 	local logicEngine = self.logicEngine
 
-	for _, hnote in ipairs(self.logicNoteDatas) do
-		local noteData = hnote.noteData
-		local note = LogicalNoteFactory:getNote(noteData)
+	for _, hnote in ipairs(self.logicNotes) do
+		local _note = hnote._note
+		local note = LogicalNoteFactory:getNote(_note)
 		if note then
 			hnote.note = note
 			note.logicEngine = logicEngine
 			table.insert(notes, hnote)
-			logicEngine.sharedLogicalNotes[noteData] = note
+			logicEngine.sharedLogicalNotes[_note] = note
 		end
 	end
 
-	-- sort by absoluteTime because time points can have different types
-	table.sort(notes, function(a, b)
-		return a.noteData.timePoint.absoluteTime < b.noteData.timePoint.absoluteTime
-	end)
+	table.sort(notes)
 
 	for i, hnote in ipairs(notes) do
 		hnote.note.index = i
@@ -71,7 +71,7 @@ function NoteHandler:updateRange()
 end
 
 ---return current isPlayable note
----@return sphere.LogicalNote?
+---@return sphere.HandlerNote?
 function NoteHandler:getCurrentNote()
 	local notes = self.notes
 	self:updateRange()
@@ -143,9 +143,9 @@ function NoteHandler:setKeyState(state, input)
 	note.keyState = state
 	note.inputMatched = hnote.input == input
 
-	local noteData = state and note.startNoteData or note.endNoteData
-	if noteData then
-		self.logicEngine:playSound(noteData)
+	local _note = state and note.startNote or note.endNote
+	if _note then
+		self.logicEngine:playSound(_note)
 	end
 
 	note:update()

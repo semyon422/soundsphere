@@ -1,19 +1,18 @@
 local TimeToEvent = require("sphere.models.RhythmModel.GraphicEngine.TimeToEvent")
-local NoteChart = require("ncdk.NoteChart")
+local Chart = require("ncdk2.Chart")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local Velocity = require("ncdk2.visual.Velocity")
 
 local test = {}
 
 function test.basic(t)
-	local nc = NoteChart()
-	local ld = nc:getLayerData(1)
-	ld:setTimeMode("absolute")
+	local layer = AbsoluteLayer()
+	local vp = layer:newVisualPoint(layer:getPoint(0))
+	vp._velocity = Velocity(1)
 
-	local tp = ld:getTimePoint(0)
-	ld:insertVelocityData(tp, 1)
+	layer:compute()
 
-	nc:compute()
-
-	local events = TimeToEvent(ld.timePointList, {-1, 1})
+	local events = TimeToEvent(layer.visualPoints, {-1, 1})
 	t:eq(#events, 2)
 	t:eq(events[1].time, -1)
 	t:eq(events[1].action, "show")
@@ -22,19 +21,17 @@ function test.basic(t)
 end
 
 function test.local_1(t)
-	local nc = NoteChart()
-	local ld = nc:getLayerData(1)
-	ld:setTimeMode("absolute")
+	local layer = AbsoluteLayer()
 
-	local tp_1 = ld:getTimePoint(0)
-	ld:insertVelocityData(tp_1, 1)
+	local vp_1 = layer:newVisualPoint(layer:getPoint(0))
+	vp_1._velocity = Velocity(1)
 
-	local tp_2 = ld:getTimePoint(1)
-	ld:insertVelocityData(tp_2, 1, 0.5)
+	local vp_2 = layer:newVisualPoint(layer:getPoint(1))
+	vp_2._velocity = Velocity(1, 0.5)
 
-	nc:compute()
+	layer:compute()
 
-	local events = TimeToEvent(ld.timePointList, {-1, 1})
+	local events = TimeToEvent(layer.visualPoints, {-1, 1})
 	t:eq(#events, 4)
 end
 

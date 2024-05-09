@@ -45,14 +45,14 @@ function AudioEngine:unload()
 	self.loaded = false
 end
 
----@param noteData ncdk.NoteData
+---@param note ncdk2.Note
 ---@param isBackground boolean?
-function AudioEngine:playNote(noteData, isBackground)
-	if not self.loaded or not noteData or not noteData.sounds then
+function AudioEngine:playNote(note, isBackground)
+	if not self.loaded or not note or not note.sounds then
 		return
 	end
 
-	self:playAudio(noteData.sounds, isBackground, noteData.stream, noteData.timePoint.absoluteTime)
+	self:playAudio(note.sounds, isBackground, note.stream, note.visualPoint.point.absoluteTime)
 end
 
 ---@param sounds table

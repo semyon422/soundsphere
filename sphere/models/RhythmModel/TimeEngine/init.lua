@@ -3,6 +3,7 @@ local math_util = require("math_util")
 local Observable = require("Observable")
 local TimeManager = require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 local NearestTime = require("sphere.models.RhythmModel.TimeEngine.NearestTime")
+local VisualTimeInfo = require("sphere.models.RhythmModel.TimeEngine.VisualTimeInfo")
 
 ---@class sphere.TimeEngine
 ---@operator call: sphere.TimeEngine
@@ -17,10 +18,7 @@ function TimeEngine:new()
 	self.timer = TimeManager()
 	self.timer.timeEngine = self
 
-	self.visualTimeInfo = {
-		time = 0,
-		rate = 0,
-	}
+	self.visualTimeInfo = VisualTimeInfo()
 end
 
 TimeEngine.startTime = 0
