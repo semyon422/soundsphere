@@ -136,7 +136,7 @@ if arg[2] == "test" then
 
 	testing.get_time = love.timer.getTime
 
-	testing.test()
+	testing.test(arg[3], arg[4])
 
 	if luacov_runner then
 		local configuration = {
