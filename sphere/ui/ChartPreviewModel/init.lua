@@ -8,27 +8,24 @@ local SphLines = require("sph.SphLines")
 local TextLines = require("sph.lines.TextLines")
 local LinesCleaner = require("sph.lines.LinesCleaner")
 local stbl = require("stbl")
-
-local ConvertAbsoluteToInterval = require("sphere.models.EditorModel.ConvertAbsoluteToInterval")
-local ConvertMeasureToInterval = require("sphere.models.EditorModel.ConvertMeasureToInterval")
-local NoteChart = require("ncdk.NoteChart")
+local IntervalLayer = require("ncdk2.layers.IntervalLayer")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local MeasureLayer = require("ncdk2.layers.MeasureLayer")
+local AbsoluteInterval = require("ncdk2.convert.AbsoluteInterval")
+local MeasureInterval = require("ncdk2.convert.MeasureInterval")
 
 ---@param chart ncdk2.Chart
 local function to_interval(chart)
 	local layer = chart.layers.main
 
-	-- if layer.mode == "absolute" then
-	-- 	layer = ConvertAbsoluteToInterval(layer, "closest_gte")
-	-- elseif layer.mode == "measure" then
-	-- 	layer = ConvertMeasureToInterval(layer)
-	-- end
+	if AbsoluteLayer * layer then
+		local conv = AbsoluteInterval({1, 2, 3, 4, 5, 6, 8, 9, 12, 16}, 0.002)
+		conv:convert(layer, "closest_gte")
+	elseif MeasureLayer * layer then
+		local conv = MeasureInterval()
+		conv:convert(layer)
+	end
 
-	-- local nc = NoteChart()
-	-- layer.noteChart = nc
-	-- nc.layerDatas[1] = layer
-	-- nc.chartmeta = chart.chartmeta
-	-- nc.inputMode = chart.inputMode
-	-- return nc
 	return chart
 end
 
@@ -49,7 +46,7 @@ function ChartPreviewModel:new(configModel, previewModel, game)
 		rate = 0,
 	}
 	self.graphicEngine = GraphicEngine(self.visualTimeInfo)
-	self.graphicEngine.eventBasedRender = true
+	-- self.graphicEngine.eventBasedRender = true
 end
 
 function ChartPreviewModel:setChartview(chartview)
@@ -66,15 +63,20 @@ function ChartPreviewModel:setChartview(chartview)
 	))
 	local chart = charts[chartview.index]
 
-	-- chart = to_interval(chart)
+	chart = to_interval(chart)
+
+	assert(IntervalLayer * chart.layers.main)
 
 	local encoder = ChartEncoder()
 	local sph = encoder:encodeSph(charts[1])
 
 	-- local tl = TextLines()
-	-- tl.lines = encoder.sph.sphLines:encode()
-	-- tl.columns = noteChart.inputMode:getColumns()
+	-- tl.lines = sph.sphLines:encode()
+	-- tl.columns = chart.inputMode:getColumns()
 	-- local sph_lines_str = tl:encode()
+	-- print(sph_lines_str)
+
+	-- print("size", #sph_lines_str)
 
 	local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(sph.sphLines:encode()), 1)
 	sph.sphLines = SphLines()
