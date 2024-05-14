@@ -49,6 +49,7 @@ function ChartPreviewModel:new(configModel, previewModel, game)
 		rate = 0,
 	}
 	self.graphicEngine = GraphicEngine(self.visualTimeInfo)
+	self.graphicEngine.eventBasedRender = true
 end
 
 function ChartPreviewModel:setChartview(chartview)

@@ -36,18 +36,15 @@ function GraphicEngine:load()
 		self.range[2] / self.visualTimeRate,
 	}
 
-	---@type {[string]: ncdk2.VisualEvent[]}
-	local layerEvents = {}
 	if self.eventBasedRender then
-		for layerName, layer in pairs(self.chart.layers) do
-			layerEvents[layerName] = layer.visual:generateEvents(range)
+		for _, layer in pairs(self.chart.layers) do
+			layer.visual:generateEvents(range)
 		end
 	end
 
 	for notes, column, layerName in self.chart:getNotesIterator() do
 		local layer = self.chart.layers[layerName]
 		local noteDrawer = NoteDrawer(layer, notes, column, self)
-		noteDrawer.events = layerEvents[layerName]
 		noteDrawer:load()
 		table.insert(self.noteDrawers, noteDrawer)
 	end
