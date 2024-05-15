@@ -45,8 +45,8 @@ function NoteDrawer:load()
 
 	for _, _note in ipairs(self._notes) do
 		local note = GraphicalNoteFactory:getNote(_note)
-		if note then
-			local iti = inputMap[self.column]
+		local iti = inputMap[self.column]
+		if note and iti then
 			note.currentVisualPoint = self.currentVisualPoint
 			note.graphicEngine = graphicEngine
 			note.layer = layer
