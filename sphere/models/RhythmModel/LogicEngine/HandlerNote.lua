@@ -6,7 +6,7 @@ local class = require("class")
 local HandlerNote = class()
 
 ---@param note ncdk2.Note
----@param column number
+---@param column ncdk2.Column
 function HandlerNote:new(note, column)
 	self._note = note
 	self.column = column

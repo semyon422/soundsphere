@@ -5,9 +5,7 @@ local class = require("class")
 ---@field currentVisualPoint ncdk2.VisualPoint
 ---@field layer ncdk2.Layer
 ---@field graphicEngine sphere.GraphicEngine
----@field column number
----@field inputType string
----@field inputIndex number
+---@field column ncdk2.Column
 local GraphicalNote = class()
 
 ---@param noteType string?

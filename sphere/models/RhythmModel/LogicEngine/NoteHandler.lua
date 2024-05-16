@@ -127,6 +127,7 @@ function NoteHandler:handlePromode(note)
 end
 
 ---@param state boolean
+---@param input string
 function NoteHandler:setKeyState(state, input)
 	self:update()
 

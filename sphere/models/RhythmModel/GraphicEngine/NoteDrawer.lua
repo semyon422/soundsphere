@@ -10,7 +10,7 @@ local NoteDrawer = class()
 
 ---@param layer ncdk2.Layer
 ---@param notes notechart.Note[]
----@param column number
+---@param column ncdk2.Column
 ---@param graphicEngine sphere.GraphicEngine
 function NoteDrawer:new(layer, notes, column, graphicEngine)
 	self.layer = layer
@@ -31,8 +31,6 @@ function NoteDrawer:load()
 	local graphicEngine = self.graphicEngine
 	local layer = self.layer
 
-	local inputMap = graphicEngine.chart.inputMode:getInputMap()
-
 	self.eventOffset = 0
 
 	self.currentVisualPointIndex = 1
@@ -45,14 +43,11 @@ function NoteDrawer:load()
 
 	for _, _note in ipairs(self._notes) do
 		local note = GraphicalNoteFactory:getNote(_note)
-		local iti = inputMap[self.column]
-		if note and iti then
+		if note then
 			note.currentVisualPoint = self.currentVisualPoint
 			note.graphicEngine = graphicEngine
 			note.layer = layer
 			note.column = self.column
-			note.inputType = iti[1]
-			note.inputIndex = iti[2]
 			table.insert(notes, note)
 
 			if self.graphicEngine.eventBasedRender then

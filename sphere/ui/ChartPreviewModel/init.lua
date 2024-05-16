@@ -19,7 +19,7 @@ local function to_interval(chart)
 	local layer = chart.layers.main
 
 	if AbsoluteLayer * layer then
-		local conv = AbsoluteInterval({1, 2, 3, 4, 5, 6, 8, 9, 12, 16}, 0.002)
+		local conv = AbsoluteInterval({1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16}, 0.002)
 		conv:convert(layer, "closest_gte")
 	elseif MeasureLayer * layer then
 		local conv = MeasureInterval()
