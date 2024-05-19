@@ -82,19 +82,19 @@ SoundsphereScoring.notes = {
 	LongNote = {
 		clear = {
 			startPassedPressed = "hit",
-			startMissed = "miss",
-			startMissedPressed = "miss",
+			startMissed = nil,
+			startMissedPressed = nil,
 			clear = nil,
 		},
 		startPassedPressed = {
-			startMissed = "miss",
+			startMissed = nil,
 			endMissed = "miss",
 			endPassed = "hit",
 		},
 		startMissedPressed = {
 			endMissedPassed = "hit",
 			startMissed = nil,
-			endMissed = "hit",
+			endMissed = "miss",
 		},
 		startMissed = {
 			startMissedPressed = nil,
