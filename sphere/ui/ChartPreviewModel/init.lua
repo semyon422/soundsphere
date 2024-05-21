@@ -25,8 +25,6 @@ local function to_interval(chart)
 		local conv = MeasureInterval()
 		conv:convert(layer)
 	end
-
-	return chart
 end
 
 ---@class sphere.ChartPreviewModel
@@ -62,13 +60,12 @@ function ChartPreviewModel:setChartview(chartview)
 		content
 	))
 	local chart = charts[chartview.index]
-
-	chart = to_interval(chart)
+	to_interval(chart)
 
 	assert(IntervalLayer * chart.layers.main)
 
 	local encoder = ChartEncoder()
-	local sph = encoder:encodeSph(charts[1])
+	local sph = encoder:encodeSph(chart)
 
 	-- local tl = TextLines()
 	-- tl.lines = sph.sphLines:encode()
