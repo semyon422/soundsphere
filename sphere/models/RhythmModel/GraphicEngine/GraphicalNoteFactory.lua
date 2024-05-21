@@ -9,7 +9,7 @@ local GraphicalNoteFactory = {}
 ---@return string
 local function getImageNoteType(note)
 	local image = note.images[1]
-	if image and FileFinder:getType(image) == "video" then
+	if image and FileFinder:getType(image[1]) == "video" then
 		return "VideoNote"
 	end
 	return "ImageNote"

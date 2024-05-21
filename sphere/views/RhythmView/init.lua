@@ -58,6 +58,7 @@ function RhythmView:drawNote(note)
 		noteView.noteSkin = noteSkin
 		noteView.graphicalNote = note
 		noteView.rhythmView = self
+		noteView.resourceModel = self.game.resourceModel
 		noteView:draw()
 	end
 end
