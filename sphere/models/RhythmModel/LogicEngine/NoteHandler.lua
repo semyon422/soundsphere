@@ -42,7 +42,7 @@ function NoteHandler:load()
 	end
 
 	self.startNoteIndex = 1
-	self.endNoteIndex = 1
+	self.endNoteIndex = 0
 end
 
 function NoteHandler:updateRange()
@@ -59,7 +59,7 @@ function NoteHandler:updateRange()
 	end
 
 	local eventTime = self.logicEngine:getEventTime()
-	for i = self.endNoteIndex, #notes do
+	for i = self.endNoteIndex + 1, #notes do
 		local note = notes[i].note
 		if not note.ended and note.isPlayable and note:getNoteTime() >= eventTime then
 			self.endNoteIndex = i
