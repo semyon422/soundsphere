@@ -149,18 +149,18 @@ function GraphicEngine:update()
 	local newNotes = {}
 	self.notes = newNotes
 
-	for inputType, r in pairs(layerData.ranges.note) do
-		for inputIndex, range in pairs(r) do
-			local noteData = range.head
-			while noteData and noteData <= range.tail do
-				local note = notesMap[noteData] or
-					selectedNotesMap[noteData] or
-					self:newNote(noteData, editorModel, inputType, inputIndex)
-				table.insert(newNotes, note)
-				noteData = noteData.next
-			end
-		end
-	end
+	-- for inputType, r in pairs(layerData.ranges.note) do
+	-- 	for inputIndex, range in pairs(r) do
+	-- 		local noteData = range.head
+	-- 		while noteData and noteData <= range.tail do
+	-- 			local note = notesMap[noteData] or
+	-- 				selectedNotesMap[noteData] or
+	-- 				self:newNote(noteData, editorModel, inputType, inputIndex)
+	-- 			table.insert(newNotes, note)
+	-- 			noteData = noteData.next
+	-- 		end
+	-- 	end
+	-- end
 
 	for _, note in ipairs(editorModel.noteManager.grabbedNotes) do
 		table.insert(newNotes, note)

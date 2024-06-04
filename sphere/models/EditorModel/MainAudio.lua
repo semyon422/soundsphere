@@ -44,14 +44,14 @@ function MainAudio:getPosition()
 	end
 end
 
----@param noteChart ncdk.NoteChart
-function MainAudio:loadResources(noteChart)
+---@param chart ncdk2.Chart
+function MainAudio:loadResources(chart)
 	local audioSettings = self.editorModel:getAudioSettings()
-	for noteDatas in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			if noteData.stream then
-				self.offset = noteData.streamOffset or 0
-				local path = noteData.sounds[1][1]
+	for notes in chart:getNotesIterator() do
+		for _, note in ipairs(notes) do
+			if note.stream then
+				self.offset = note.streamOffset or 0
+				local path = note.sounds[1][1]
 				local soundData = self.editorModel.resourceModel:getResource(path)
 				if soundData then
 					self.soundData = soundData

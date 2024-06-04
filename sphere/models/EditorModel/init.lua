@@ -14,9 +14,11 @@ local NoteManager = require("sphere.models.EditorModel.NoteManager")
 local Scroller = require("sphere.models.EditorModel.Scroller")
 local Metronome = require("sphere.models.EditorModel.Metronome")
 local pattern_analyzer = require("libchart.pattern_analyzer")
+local Point = require("chartedit.Point")
 
 ---@class sphere.EditorModel
 ---@operator call: sphere.EditorModel
+---@field layerData chartedit.Layer
 local EditorModel = class()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
@@ -35,11 +37,11 @@ function EditorModel:new(configModel, resourceModel)
 	self.graphsGenerator = GraphsGenerator()
 	self.editorChanges = EditorChanges()
 	self.timer = TimeManager()
-	self.audioManager = AudioManager()
+	self.audioManager = AudioManager(self.timer, resourceModel)
 	self.noteManager = NoteManager()
 	self.graphicEngine = GraphicEngine()
 	self.scroller = Scroller()
-	self.metronome = Metronome()
+	-- self.metronome = Metronome()
 
 	for _, v in pairs(self) do
 		v.editorModel = self
@@ -56,16 +58,17 @@ function EditorModel:load()
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
 
-	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart:getLayerData(1)))
+	-- self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart:getLayerData(1)))
+	self.patterns_analyzed = {}
 
 	self.changes = Changes()
-	ld:syncChanges(self.changes:get())
+	-- ld:syncChanges(self.changes:get())
 
 	self.graphsGenerator:load()
 
 	self.resourcesLoaded = false
 
-	self.timePoint = ld:newTimePoint()
+	self.timePoint = Point()
 	self:getDtpAbsolute(0):clone(self.timePoint)
 
 	self.timer:pause()
@@ -79,8 +82,8 @@ function EditorModel:load()
 	self.mainAudio.volume = volume
 	self.mainAudio:load()
 
-	self.metronome.volume = volume
-	self.metronome:load()
+	-- self.metronome.volume = volume
+	-- self.metronome:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
 end
@@ -133,7 +136,7 @@ function EditorModel:loadResources()
 	local noteChart = self.noteChart
 
 	self.mainAudio:loadResources(noteChart)
-	self.audioManager:loadResources(noteChart)
+	self.audioManager:loadResources(noteChart, self:getAudioSettings())
 
 	self.audioManager:update(true)
 	self.mainAudio:update(true)
@@ -153,12 +156,12 @@ function EditorModel:getFirstLastTime()
 	local firstTime = math.min(
 		audioManager.firstTime,
 		mainAudio.offset,
-		ld.ranges.timePoint.first.absoluteTime
+		ld.points:getFirstPoint():tonumber()
 	)
 	local lastTime = math.max(
 		audioManager.lastTime,
 		mainAudio.offset + mainAudio.duration,
-		ld.ranges.timePoint.last.absoluteTime
+		ld.points:getLastPoint():tonumber()
 	)
 	return firstTime, lastTime
 end
@@ -170,18 +173,19 @@ function EditorModel:genGraphs()
 end
 
 ---@param time number
----@return ncdk.IntervalTimePoint?
+---@return chartedit.Point?
 function EditorModel:getDtpAbsolute(time)
 	local ld = self.layerData
 	local editor = self:getSettings()
-	return ld:getDynamicTimePointAbsolute(editor.snap, time)
+	-- return ld:getDynamicTimePointAbsolute(editor.snap, time)
+	return ld.points:interpolateAbsolute(editor.snap, time)
 end
 
 function EditorModel:unload()
 	self.loaded = false
 	self.audioManager:unload()
 	self.mainAudio:unload()
-	self.metronome:unload()
+	-- self.metronome:unload()
 end
 
 function EditorModel:save()
@@ -252,7 +256,7 @@ function EditorModel:update()
 	editor.time = time
 
 	self.noteManager:update()
-	self.metronome:update()
+	-- self.metronome:update()
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())

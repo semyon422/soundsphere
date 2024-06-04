@@ -10,15 +10,15 @@ function GraphsGenerator:load()
 	self.intervalDatasGraph = {n = 0}
 end
 
----@param noteChart ncdk.NoteChart
+---@param chart ncdk2.Chart
 ---@param firstTime number
 ---@param lastTime number
-function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
+function GraphsGenerator:genDensityGraph(chart, firstTime, lastTime)
 	local notes = {}
-	for noteDatas in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local offset = noteData.timePoint.absoluteTime
-			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
+	for _notes in chart:getNotesIterator() do
+		for _, note in ipairs(_notes) do
+			local offset = note.visualPoint.point:tonumber()
+			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
 				table.insert(notes, offset)
 			end
 		end
@@ -54,6 +54,7 @@ end
 ---@param firstTime number
 ---@param lastTime number
 function GraphsGenerator:genIntervalDatasGraph(layerData, firstTime, lastTime)
+	do return end
 	local intervalDatas = layerData.ranges.interval
 
 	local offsets = {}

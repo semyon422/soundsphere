@@ -31,6 +31,13 @@ end
 ---@operator call: sphere.EditorAudioManager
 local AudioManager = class()
 
+---@param timer util.Timer
+---@param resourceModel sphere.ResourceModel
+function AudioManager:new(timer, resourceModel)
+	self.timer = timer
+	self.resourceModel = resourceModel
+end
+
 AudioManager.time = 0
 
 ---@param key table
@@ -65,13 +72,13 @@ end
 
 ---@param force boolean?
 function AudioManager:update(force)
-	local time = self.editorModel.timer:getTime()
+	local time = self.timer:getTime()
 	if time == self.time and not force then
 		return
 	end
 	self.time = time
 
-	local isPlaying = self.editorModel.timer.isPlaying
+	local isPlaying = self.timer.isPlaying
 	local forcePosition = not isPlaying or force
 
 	local sources = self:getCurrentSources()
@@ -87,7 +94,7 @@ function AudioManager:update(force)
 		if not self.sources[placedSource] then
 			self.sources[placedSource] = true
 		end
-		placedSource.source:setRate(self.editorModel.timer.rate)
+		placedSource.source:setRate(self.timer.rate)
 		local volume = placedSource.isStream and self.volume.music or self.volume.effects
 		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
 	end
@@ -106,7 +113,7 @@ function AudioManager:update(force)
 end
 
 function AudioManager:play()
-	local time = self.editorModel.timer:getTime()
+	local time = self.timer:getTime()
 	for placedSource in pairs(self.sources) do
 		placedSource.source:setPosition(time - placedSource.offset)
 	end
@@ -191,15 +198,15 @@ function AudioManager:remove(placedSource)
 	end
 end
 
----@param noteChart ncdk.NoteChart
-function AudioManager:loadResources(noteChart)
-	local audioSettings = self.editorModel:getAudioSettings()
-	for noteDatas in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local offset = noteData.timePoint.absoluteTime
-			if noteData.sounds and not noteData.stream then
-				for _, s in ipairs(noteData.sounds) do
-					local soundData = self.editorModel.resourceModel:getResource(s[1])
+---@param chart ncdk2.Chart
+---@param audioSettings table
+function AudioManager:loadResources(chart, audioSettings)
+	for notes in chart:getNotesIterator() do
+		for _, note in ipairs(notes) do
+			local offset = note.visualPoint.point:tonumber()
+			if note.sounds and not note.stream then
+				for _, s in ipairs(note.sounds) do
+					local soundData = self.resourceModel:getResource(s[1])
 					if soundData then
 						local mode = audioSettings.mode.secondary
 						local duration = soundData:getDuration()
@@ -210,7 +217,7 @@ function AudioManager:loadResources(noteChart)
 							source = audio.newSource(soundData, mode),
 							name = s[1],
 							volume = s[2],
-							isStream = noteData.stream,
+							isStream = note.stream,
 						})
 						self.firstTime = math.min(self.firstTime, offset)
 						self.lastTime = math.max(self.lastTime, offset + duration)

@@ -12,7 +12,7 @@ function Scroller:updateRange()
 	local ld = self.editorModel.layerData
 	local delta = 1 / editor.speed
 	if ld.startTime ~= absoluteTime - delta then
-		ld:setRange(absoluteTime - delta, absoluteTime + delta)
+		-- ld:setRange(absoluteTime - delta, absoluteTime + delta)
 	end
 end
 
@@ -56,18 +56,18 @@ function Scroller:scrollSnaps(delta)
 		return
 	end
 	local ld = self.editorModel.layerData
-	self:scrollTimePoint(ld:getDynamicTimePoint(self:getNextSnapIntervalTime(self.editorModel.timePoint, delta)))
+	self:scrollTimePoint(ld.points:interpolateFraction(self:getNextSnapIntervalTime(self.editorModel.timePoint, delta)))
 end
 
----@param timePoint ncdk.IntervalTimePoint
+---@param point chartedit.Point
 ---@param delta number
----@return ncdk.IntervalData
+---@return chartedit.Interval
 ---@return ncdk.Fraction
-function Scroller:getNextSnapIntervalTime(timePoint, delta)
+function Scroller:getNextSnapIntervalTime(point, delta)
 	local editor = self.editorModel:getSettings()
 
 	local snap = editor.snap
-	local snapTime = timePoint.time * snap
+	local snapTime = point.time * snap
 
 	local targetSnapTime
 	if delta == -1 then
@@ -76,7 +76,7 @@ function Scroller:getNextSnapIntervalTime(timePoint, delta)
 		targetSnapTime = snapTime:floor() + 1
 	end
 
-	local intervalData = timePoint.intervalData
+	local interval = point.interval
 	-- if intervalData.next and targetSnapTime >= snap * intervalData:_end() then
 	-- 	intervalData = intervalData.next
 	-- 	targetSnapTime = intervalData:start() * snap
@@ -87,18 +87,18 @@ function Scroller:getNextSnapIntervalTime(timePoint, delta)
 	-- 	targetSnapTime = (intervalData:_end() * snap):ceil() - 1
 	-- end
 
-	if intervalData.next and targetSnapTime == snap * intervalData:_end() then
-		intervalData = intervalData.next
-		targetSnapTime = intervalData:start() * snap
-	elseif intervalData.next and targetSnapTime > snap * intervalData:_end() then
-		intervalData = intervalData.next
-		targetSnapTime = (intervalData:start() * snap):floor() + 1
-	elseif intervalData.prev and targetSnapTime < snap * intervalData:start() then
-		intervalData = intervalData.prev
-		targetSnapTime = (intervalData:_end() * snap):ceil() - 1
+	if interval.next and targetSnapTime == snap * interval:_end() then
+		interval = interval.next
+		targetSnapTime = interval:start() * snap
+	elseif interval.next and targetSnapTime > snap * interval:_end() then
+		interval = interval.next
+		targetSnapTime = (interval:start() * snap):floor() + 1
+	elseif interval.prev and targetSnapTime < snap * interval:start() then
+		interval = interval.prev
+		targetSnapTime = (interval:_end() * snap):ceil() - 1
 	end
 
-	return intervalData, Fraction(targetSnapTime, snap)
+	return interval, Fraction(targetSnapTime, snap)
 end
 
 return Scroller

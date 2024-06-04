@@ -52,7 +52,7 @@ function EditorRhythmView:draw()
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	if not ld.ranges.timePoint.head then
+	if not ld.points:getFirstPoint() then
 		return
 	end
 
