@@ -93,10 +93,9 @@ end
 
 ---@param noteData ncdk.NoteData
 ---@param editorModel sphere.EditorModel
----@param inputType string
----@param inputIndex number
+---@param column ncdk2.Column
 ---@return sphere.EditorNote?
-function GraphicEngine:newNote(noteData, editorModel, inputType, inputIndex)
+function GraphicEngine:newNote(noteData, editorModel, column)
 	local note = EditorNoteFactory:getNote(noteData)
 	if not note then
 		return
@@ -105,8 +104,7 @@ function GraphicEngine:newNote(noteData, editorModel, inputType, inputIndex)
 	note.currentTimePoint = editorModel.timePoint
 	note.graphicEngine = self
 	note.layerData = editorModel.layerData
-	note.inputType = inputType
-	note.inputIndex = inputIndex
+	note.column = column
 	return note
 end
 
@@ -116,18 +114,18 @@ function GraphicEngine:update()
 
 	local selectedNotesMap = {}
 	for _, note in ipairs(self.selectedNotes) do
-		selectedNotesMap[note.startNoteData] = note
+		selectedNotesMap[note.startNote] = note
 		note.selected = true
 	end
 
 	local notesMap = {}
 	for _, note in ipairs(self.notes) do
-		notesMap[note.startNoteData] = note
+		notesMap[note.startNote] = note
 		if note.selecting then
-			selectedNotesMap[note.startNoteData] = note
+			selectedNotesMap[note.startNote] = note
 		elseif self.selecting then
 			note.selected = false
-			selectedNotesMap[note.startNoteData] = nil
+			selectedNotesMap[note.startNote] = nil
 		end
 	end
 
@@ -135,7 +133,7 @@ function GraphicEngine:update()
 		for _, note in ipairs(self.notes) do
 			note.selected = note.selecting
 			if not note.selected then
-				selectedNotesMap[note.startNoteData] = nil
+				selectedNotesMap[note.startNote] = nil
 			end
 		end
 	end
@@ -149,18 +147,15 @@ function GraphicEngine:update()
 	local newNotes = {}
 	self.notes = newNotes
 
-	-- for inputType, r in pairs(layerData.ranges.note) do
-	-- 	for inputIndex, range in pairs(r) do
-	-- 		local noteData = range.head
-	-- 		while noteData and noteData <= range.tail do
-	-- 			local note = notesMap[noteData] or
-	-- 				selectedNotesMap[noteData] or
-	-- 				self:newNote(noteData, editorModel, inputType, inputIndex)
-	-- 			table.insert(newNotes, note)
-	-- 			noteData = noteData.next
-	-- 		end
-	-- 	end
-	-- end
+	for p, vp, notes in layerData:iter(editorModel:getIterRange()) do
+		for column, note in pairs(notes) do
+			local note = notesMap[note] or
+				selectedNotesMap[note] or
+				self:newNote(note, editorModel, column)
+			table.insert(newNotes, note)
+		end
+	end
+
 
 	for _, note in ipairs(editorModel.noteManager.grabbedNotes) do
 		table.insert(newNotes, note)

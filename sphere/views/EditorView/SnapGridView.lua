@@ -182,7 +182,7 @@ function SnapGridView:drawTimings(_w, _h)
 	love.graphics.push("all")
 	love.graphics.setColor(1, 0.8, 0.2)
 	love.graphics.setLineWidth(4)
-	for p, vp, notes in ld:iter(0, 100) do
+	for p, vp, notes in ld:iter(editorModel:getIterRange()) do
 		local interval = p._interval
 		local measure = p._measure
 

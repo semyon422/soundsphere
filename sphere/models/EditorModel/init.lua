@@ -128,6 +128,15 @@ function EditorModel:setTime(time)
 	self.mainAudio:update(true)
 end
 
+---@return number
+---@return number
+function EditorModel:getIterRange()
+	local editor = self:getSettings()
+	local absoluteTime = self.timePoint.absoluteTime
+	local delta = 1 / editor.speed
+	return absoluteTime - delta, absoluteTime + delta
+end
+
 function EditorModel:loadResources()
 	if not self.loaded then
 		return
@@ -177,8 +186,9 @@ end
 function EditorModel:getDtpAbsolute(time)
 	local ld = self.layerData
 	local editor = self:getSettings()
-	-- return ld:getDynamicTimePointAbsolute(editor.snap, time)
-	return ld.points:interpolateAbsolute(editor.snap, time)
+	local p = ld.points:interpolateAbsolute(editor.snap, time)
+	p.absoluteTime = time
+	return p
 end
 
 function EditorModel:unload()
