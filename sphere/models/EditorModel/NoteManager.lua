@@ -186,7 +186,10 @@ end
 ---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
 	note:remove()
-	self.editorModel.editorChanges:add()
+	self.editorModel.editorChanges:add(
+		{note, "remove", note},
+		{note, "add", note}
+	)
 end
 
 ---@param note sphere.EditorNote
@@ -199,7 +202,10 @@ end
 ---@param note sphere.EditorNote
 function NoteManager:_addNote(note)
 	note:add()
-	self.editorModel.editorChanges:add()
+	self.editorModel.editorChanges:add(
+		{note, "add", note},
+		{note, "remove", note}
+	)
 end
 
 ---@param noteType string

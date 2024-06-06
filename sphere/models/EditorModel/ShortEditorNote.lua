@@ -47,7 +47,7 @@ function ShortEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
 	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
-	local p = layer.points:saveSearchPoint(dtp)
+	local p = layer.points:saveSearchPoint()
 	local vp = layer.visual:getPoint(p)
 	self.startNote.visualPoint = vp
 end
@@ -71,10 +71,12 @@ function ShortEditorNote:paste(point)
 end
 
 function ShortEditorNote:remove()
+	print("remove", self.startNote)
 	self.editorModel.layer:removeNote(self.startNote, self.column)
 end
 
 function ShortEditorNote:add()
+	print("add", self.startNote)
 	self.editorModel.layer:addNote(self.startNote, self.column)
 end
 

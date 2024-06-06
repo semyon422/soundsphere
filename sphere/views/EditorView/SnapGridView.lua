@@ -173,7 +173,7 @@ end
 ---@param _h number
 function SnapGridView:drawTimings(_w, _h)
 	local editorModel = self.game.editorModel
-	local editorTimePoint = editorModel.timePoint
+	local editorTimePoint = editorModel.point
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
@@ -221,7 +221,7 @@ end
 ---@param self table
 local function drawMouse(self)
 	local editorModel = self.game.editorModel
-	local dt = editorModel:getMouseTime() - editorModel.timePoint.absoluteTime
+	local dt = editorModel:getMouseTime() - editorModel.point.absoluteTime
 
 	love.graphics.push()
 	local w, h = Layout:move("base")
