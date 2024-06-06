@@ -9,7 +9,7 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 return function(self)
 	local editorModel = self.game.editorModel
-	local editorTimePoint = editorModel.timePoint
+	local editorTimePoint = editorModel.point
 
 	local w, h = Layout:move("footer")
 	love.graphics.setColor(1, 1, 1, 1)

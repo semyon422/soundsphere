@@ -21,7 +21,7 @@ GraphicEngine.longNoteShortening = 0
 
 ---@return number
 function GraphicEngine:getCurrentTime()
-	return self.editorModel.timePoint.absoluteTime
+	return self.editorModel.point.absoluteTime
 end
 
 ---@return number
@@ -101,7 +101,7 @@ function GraphicEngine:newNote(noteData, editorModel, column)
 		return
 	end
 	note.editorModel = editorModel
-	note.currentTimePoint = editorModel.timePoint
+	note.currentTimePoint = editorModel.point
 	note.graphicEngine = self
 	note.layerData = editorModel.layerData
 	note.column = column

@@ -5,49 +5,32 @@ local Fraction = require("ncdk.Fraction")
 ---@operator call: sphere.Scroller
 local Scroller = class()
 
-function Scroller:updateRange()
-	local editor = self.editorModel:getSettings()
-	local absoluteTime = self.editorModel.timePoint.absoluteTime
-
-	local ld = self.editorModel.layerData
-	local delta = 1 / editor.speed
-	if ld.startTime ~= absoluteTime - delta then
-		-- ld:setRange(absoluteTime - delta, absoluteTime + delta)
-	end
-end
-
----@param timePoint ncdk.IntervalTimePoint
-function Scroller:_scrollTimePoint(timePoint)
-	if not timePoint then
+---@param point ncdk2.Point
+function Scroller:_scrollPoint(point)
+	if not point then
 		return
 	end
-
-	timePoint:clone(self.editorModel.timePoint)
-
-	self:updateRange()
+	point:clone(self.editorModel.point)
 end
 
----@param timePoint ncdk.IntervalTimePoint
-function Scroller:scrollTimePoint(timePoint)
-	if not timePoint then
+---@param point ncdk2.Point
+function Scroller:scrollPoint(point)
+	if not point then
 		return
 	end
-
-	self:_scrollTimePoint(timePoint)
-
-	local editorModel = self.editorModel
-	editorModel:setTime(timePoint.absoluteTime)
+	self:_scrollPoint(point)
+	self.editorModel:setTime(point.absoluteTime)
 end
 
 ---@param absoluteTime number
 function Scroller:scrollSeconds(absoluteTime)
-	local timePoint = self.editorModel:getDtpAbsolute(absoluteTime)
-	self:scrollTimePoint(timePoint)
+	local point = self.editorModel:getDtpAbsolute(absoluteTime)
+	self:scrollPoint(point)
 end
 
 ---@param delta number
 function Scroller:scrollSecondsDelta(delta)
-	self:scrollSeconds(self.editorModel.timePoint.absoluteTime + delta)
+	self:scrollSeconds(self.editorModel.point.absoluteTime + delta)
 end
 
 ---@param delta number
@@ -55,8 +38,11 @@ function Scroller:scrollSnaps(delta)
 	if self.editorModel.intervalManager:isGrabbed() then
 		return
 	end
-	local ld = self.editorModel.layerData
-	self:scrollTimePoint(ld.points:interpolateFraction(self:getNextSnapIntervalTime(self.editorModel.timePoint, delta)))
+	self:scrollPoint(
+		self.editorModel.layer.points:interpolateFraction(
+			self:getNextSnapIntervalTime(self.editorModel.point, delta)
+		)
+	)
 end
 
 ---@param point chartedit.Point

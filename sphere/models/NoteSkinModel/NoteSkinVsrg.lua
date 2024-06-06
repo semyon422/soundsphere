@@ -81,15 +81,10 @@ function NoteSkinVsrg:setInput(inputs)
 	self.columnsCount = #inputs
 end
 
----@param inputType string
----@param inputIndex number
+---@param column ncdk2.Column
 ---@return number?
-function NoteSkinVsrg:getInputColumn(inputType, inputIndex)
-	local input = inputType
-	if inputIndex then
-		input = inputType .. inputIndex
-	end
-	return self.input_to_columns[input][1]
+function NoteSkinVsrg:getInputColumn(column)
+	return self.input_to_columns[column][1]
 end
 
 ---@param column number
@@ -113,10 +108,9 @@ end
 ---@param column number
 ---@return string
 ---@return number
-function NoteSkinVsrg:getFirstColumnInputSplit(column)
+function NoteSkinVsrg:getFirstColumnInput(column)
 	local input = self:getColumnInputs(column)[1]
-	local inputType, inputIndex = input:match("^(.-)(%d+)$")
-	return inputType, tonumber(inputIndex)
+	return input
 end
 
 local colors = {

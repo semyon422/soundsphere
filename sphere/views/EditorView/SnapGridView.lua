@@ -258,7 +258,7 @@ function SnapGridView:draw()
 	local lineHeight = 55
 	imgui.setSize(w, h, 200, lineHeight)
 
-	local editorTimePoint = editorModel.timePoint
+	local editorTimePoint = editorModel.point
 
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.translate(noteSkin.baseOffset, 0)
@@ -281,11 +281,9 @@ function SnapGridView:draw()
 	if lalt and not speedOrig then
 		speedOrig = editor.speed
 		editor.speed = 1000 / noteSkin.unit * 10
-		editorModel.scroller:updateRange()
 	elseif not lalt and speedOrig then
 		editor.speed = speedOrig
 		speedOrig = nil
-		editorModel.scroller:updateRange()
 	end
 	if lalt or lshift or lctrl then
 		drawMouse(self)
@@ -316,7 +314,6 @@ function SnapGridView:draw()
 			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
 		elseif lctrl then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
-			editorModel.scroller:updateRange()
 		else
 			if editorModel.timer.isPlaying and scroll < 0 then
 				editorModel.scroller:scrollSnaps(scroll)

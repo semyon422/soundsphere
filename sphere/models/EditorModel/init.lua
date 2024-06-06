@@ -57,6 +57,7 @@ function EditorModel:load()
 
 	self.layerData = self.noteChartLoader:load()
 	local ld = self.layerData
+	self.layer = ld
 
 	-- self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart:getLayerData(1)))
 	self.patterns_analyzed = {}
@@ -68,8 +69,8 @@ function EditorModel:load()
 
 	self.resourcesLoaded = false
 
-	self.timePoint = Point()
-	self:getDtpAbsolute(0):clone(self.timePoint)
+	self.point = Point()
+	self:getDtpAbsolute(0):clone(self.point)
 
 	self.timer:pause()
 	self.timer:setTime(editor.time)
@@ -132,7 +133,7 @@ end
 ---@return number
 function EditorModel:getIterRange()
 	local editor = self:getSettings()
-	local absoluteTime = self.timePoint.absoluteTime
+	local absoluteTime = self.point.absoluteTime
 	local delta = 1 / editor.speed
 	return absoluteTime - delta, absoluteTime + delta
 end
@@ -236,7 +237,7 @@ function EditorModel:getMouseTime(dy)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
 	local noteSkin = self.noteSkin
 	local editor = self:getSettings()
-	return self.timePoint.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed
+	return self.point.absoluteTime - noteSkin:getInverseTimePosition(my + dy) / editor.speed
 end
 
 ---@param note sphere.EditorNote
@@ -283,10 +284,7 @@ function EditorModel:update()
 	self.audioManager:update()
 	self.mainAudio:update()
 
-	dtp:clone(self.timePoint)
-	if self.timer.isPlaying then
-		self.scroller:updateRange()
-	end
+	dtp:clone(self.point)
 
 	self.graphicEngine:update()
 end
@@ -320,8 +318,8 @@ end
 ---@return number
 ---@return number
 function EditorModel:getTotalBeats()
-	local ld = self.layerData
-	local range = ld.ranges.interval
+	local layer = self.layer
+	local range = layer.ranges.interval
 
 	local a, b = range.first.timePoint, range.last.timePoint
 	local beats = b:sub(a)

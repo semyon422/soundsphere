@@ -1,5 +1,7 @@
 local EditorNote = require("sphere.models.EditorModel.EditorNote")
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
+local VisualPoint = require("chartedit.VisualPoint")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.ShortEditorNote: sphere.EditorNote, sphere.ShortGraphicalNote
 ---@operator call: sphere.ShortEditorNote
@@ -9,15 +11,16 @@ local ShortEditorNote = EditorNote + ShortGraphicalNote
 ---@return sphere.ShortEditorNote?
 function ShortEditorNote:create(absoluteTime)
 	local editorModel = self.editorModel
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
-	local noteData = ld:getNoteData(dtp, self.inputType, self.inputIndex)
-	if not noteData then
-		return
-	end
-	noteData.noteType = "ShortNote"
-	self.startNoteData = noteData
+	local p = layer.points:saveSearchPoint(dtp)
+	local vp = layer.visual:getPoint(p)
+	local note = Note()
+	note.visualPoint = vp
+	self.editorModel.layer:addNote(note, self.column)
+	note.noteType = "ShortNote"
+	self.startNote = note
 
 	return self
 end
@@ -27,58 +30,52 @@ end
 ---@param deltaColumn number
 ---@param lockSnap boolean
 function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
-	local note = self
-
-	note.grabbedPart = part
-	note.grabbedDeltaColumn = deltaColumn
-
-	note.startNoteData = note.startNoteData:clone()
+	self.grabbedPart = part
+	self.grabbedDeltaColumn = deltaColumn
 
 	if lockSnap then
 		return
 	end
 
-	note.grabbedDeltaTime = t - note.startNoteData.timePoint.absoluteTime
-	note.startNoteData.timePoint = note.startNoteData.timePoint:clone()
+	self.grabbedDeltaTime = t - self.startNote.visualPoint.point.absoluteTime
+	self.startNote.visualPoint = VisualPoint({})
+	self:updateGrabbed(t)
 end
 
 ---@param t number
 function ShortEditorNote:drop(t)
 	local editorModel = self.editorModel
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
-	self.startNoteData.timePoint = ld:checkTimePoint(dtp)
+	local p = layer.points:saveSearchPoint(dtp)
+	local vp = layer.visual:getPoint(p)
+	self.startNote.visualPoint = vp
 end
 
 ---@param t number
 function ShortEditorNote:updateGrabbed(t)
-	local editorModel = self.editorModel
-	editorModel:getDtpAbsolute(t - self.grabbedDeltaTime):clone(self.startNoteData.timePoint)
+	self.editorModel:getDtpAbsolute(t - self.grabbedDeltaTime):clone(self.startNote.visualPoint.point)
 end
 
----@param copyTimePoint ncdk.IntervalTimePoint
-function ShortEditorNote:copy(copyTimePoint)
-	self.deltaStartTime = self.startNoteData.timePoint:sub(copyTimePoint)
+---@param copyPoint chartedit.Point
+function ShortEditorNote:copy(copyPoint)
+	self.deltaStartTime = self.startNote.visualPoint.point:sub(copyPoint)
 end
 
----@param timePoint ncdk.IntervalTimePoint
-function ShortEditorNote:paste(timePoint)
-	local ld = self.editorModel.layerData
-
-	self.startNoteData = self.startNoteData:clone()
-	self.startNoteData.timePoint = ld:getTimePoint(timePoint:add(self.deltaStartTime))
+---@param point chartedit.Point
+function ShortEditorNote:paste(point)
+	local layer = self.editorModel.layer
+	local new_point = layer.points:getPoint(point:add(self.deltaStartTime))
+	self.startNote.visualPoint = layer.visual:getPoint(new_point)
+	layer:addNote(self.startNote, self.column)
 end
 
 function ShortEditorNote:remove()
-	local ld = self.editorModel.layerData
-
-	ld:removeNoteData(self.startNoteData, self.inputType, self.inputIndex)
+	self.editorModel.layer:removeNote(self.startNote, self.column)
 end
 
 function ShortEditorNote:add()
-	local ld = self.editorModel.layerData
-
-	ld:addNoteData(self.startNoteData, self.inputType, self.inputIndex)
+	self.editorModel.layer:addNote(self.startNote, self.column)
 end
 
 return ShortEditorNote

@@ -3,6 +3,7 @@ local Fraction = require("ncdk.Fraction")
 local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 local ShortEditorNote = require("sphere.models.EditorModel.ShortEditorNote")
 local LongEditorNote = require("sphere.models.EditorModel.LongEditorNote")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.EditorNoteManager
 ---@operator call: sphere.EditorNoteManager
@@ -31,9 +32,7 @@ function NoteManager:update()
 		local column = self:getColumnOver()
 		if column then
 			column = column - note.grabbedDeltaColumn
-			local inputType, inputIndex = noteSkin:getFirstColumnInputSplit(column)
-			note.inputType = inputType
-			note.inputIndex = inputIndex
+			note.column = noteSkin:getFirstColumnInput(column)
 		end
 	end
 end
@@ -46,13 +45,13 @@ function NoteManager:copyNotes(cut)
 	-- local noteSkin = self.editorModel.noteSkin
 
 	self.copiedNotes = {}
-	local copyTimePoint
+	local copyPoint
 
 	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
 		-- local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
 		-- if _column then
-			if not copyTimePoint or note.startNoteData.timePoint < copyTimePoint then
-				copyTimePoint = note.startNoteData.timePoint
+			if not copyPoint or note.startNote.visualPoint.point < copyPoint then
+				copyPoint = note.startNote.visualPoint.point
 			end
 			table.insert(self.copiedNotes, note)
 			if cut then
@@ -62,7 +61,7 @@ function NoteManager:copyNotes(cut)
 	end
 
 	for _, note in ipairs(self.copiedNotes) do
-		note:copy(copyTimePoint)
+		note:copy(copyPoint)
 	end
 	if cut then
 		self.editorModel.editorChanges:next()
@@ -87,34 +86,36 @@ end
 
 function NoteManager:changeType()
 	local editorModel = self.editorModel
-	local ld = editorModel.layerData
-	local editor = self.editorModel:getSettings()
+	local layer = editorModel.layer
+	local editor = editorModel:getSettings()
 
 	-- self.editorModel.editorChanges:reset()
 
 	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
 		note:remove()
-		if not note.endNoteData then
-			local startNoteData = note.startNoteData
-			startNoteData.noteType = "LongNoteStart"
+		if not note.endNote then
+			local startNote = note.startNote
+			startNote.noteType = "LongNoteStart"
 
-			local tp = startNoteData.timePoint
+			local p = startNote.visualPoint.point
+			local p_end = layer.points:getPoint(p:add(Fraction(1, editor.snap)))
+			local vp_end = layer.visual:getPoint(p_end)
+			local endNote = Note(vp_end)
+			endNote.noteType = "LongNoteEnd"
+			layer:addNote(endNote, note.column)
 
-			local tp2 = ld:getTimePoint(tp:add(Fraction(1, editor.snap)))
-			local endNoteData = assert(ld:getNoteData(tp2, note.inputType, note.inputIndex))
-			endNoteData.noteType = "LongNoteEnd"
-			note.endNoteData = endNoteData
+			note.endNote = endNote
 
-			endNoteData.startNoteData = startNoteData
-			startNoteData.endNoteData = endNoteData
+			endNote.startNote = startNote
+			startNote.endNote = endNote
 
 			setmetatable(note, LongEditorNote)
 		else
-			local startNoteData = note.startNoteData
-			startNoteData.noteType = "ShortNote"
-			startNoteData.endNoteData = nil
-			note.endNoteData.startNoteData = nil
-			note.endNoteData = nil
+			local startNote = note.startNote
+			startNote.noteType = "ShortNote"
+			startNote.endNote = nil
+			note.endNote.startNote = nil
+			note.endNote = nil
 
 			setmetatable(note, ShortEditorNote)
 		end
@@ -133,9 +134,9 @@ function NoteManager:pasteNotes()
 	end
 
 	self.editorModel.editorChanges:reset()
-	local timePoint = self.editorModel.timePoint
+	local point = self.editorModel.point
 	for _, note in ipairs(copiedNotes) do
-		note:paste(timePoint)
+		note:paste(point)
 		self:_addNote(note)
 	end
 	self.editorModel.editorChanges:next()
@@ -151,7 +152,7 @@ function NoteManager:grabNotes(part, mouseTime)
 	self.editorModel.editorChanges:reset()
 	local column = self:getColumnOver()
 	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
-		local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
+		local _column = noteSkin:getInputColumn(note.column)
 		if _column then
 			table.insert(self.grabbedNotes, note)
 			self:_removeNote(note)
@@ -203,27 +204,24 @@ end
 
 ---@param noteType string
 ---@param absoluteTime number
----@param inputType string
----@param inputIndex number
+---@param column string
 ---@return sphere.EditorNote?
-function NoteManager:newNote(noteType, absoluteTime, inputType, inputIndex)
+function NoteManager:newNote(noteType, absoluteTime, column)
 	local note = EditorNoteFactory:newNote(noteType)
 	if not note then
 		return
 	end
 	note.editorModel = self.editorModel
-	note.currentTimePoint = self.editorModel.timePoint
+	note.currentTimePoint = self.editorModel.point
 	note.graphicEngine = self.editorModel.graphicEngine
 	note.layerData = self.editorModel.layerData
-	note.inputType = inputType
-	note.inputIndex = inputIndex
+	note.column = column
 	return note:create(absoluteTime)
 end
 
 ---@param absoluteTime number
----@param inputType string
----@param inputIndex number
-function NoteManager:addNote(absoluteTime, inputType, inputIndex)
+---@param column string
+function NoteManager:addNote(absoluteTime, column)
 	local editorModel = self.editorModel
 	editorModel.editorChanges:reset()
 	local editor = editorModel:getSettings()
@@ -231,9 +229,9 @@ function NoteManager:addNote(absoluteTime, inputType, inputIndex)
 
 	local note
 	if editor.tool == "ShortNote" then
-		note = self:newNote("ShortNote", absoluteTime, inputType, inputIndex)
+		note = self:newNote("ShortNote", absoluteTime, column)
 	elseif editor.tool == "LongNote" then
-		note = self:newNote("LongNoteStart", absoluteTime, inputType, inputIndex)
+		note = self:newNote("LongNoteStart", absoluteTime, column)
 	end
 
 	if not note then
@@ -246,7 +244,9 @@ function NoteManager:addNote(absoluteTime, inputType, inputIndex)
 	elseif editor.tool == "LongNote" then
 		self:grabNotes(
 			"tail",
-			editorModel:getMouseTime() + note.endNoteData.timePoint.absoluteTime - note.startNoteData.timePoint.absoluteTime
+			editorModel:getMouseTime() +
+			note.endNote.visualPoint.point.absoluteTime -
+			note.startNote.visualPoint.point.absoluteTime
 		)
 	end
 end
@@ -266,10 +266,8 @@ function NoteManager:flipNotes()
 
 	for _, note in ipairs(notes) do
 		local columns = noteSkin.columnsCount
-		local column = columns - noteSkin:getInputColumn(note.inputType, note.inputIndex) + 1
-		local inputType, inputIndex = noteSkin:getFirstColumnInputSplit(column)
-		note.inputType = inputType
-		note.inputIndex = inputIndex
+		local column = columns - noteSkin:getInputColumn(note.column) + 1
+		note.column = noteSkin:getFirstColumnInput(column)
 		self:_addNote(note)
 	end
 

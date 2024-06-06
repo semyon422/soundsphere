@@ -70,7 +70,7 @@ function EditorRhythmView:draw()
 				over = just.mouse_over("add note" .. i, over, "mouse")
 				if over and just.mousepressed(1) then
 					local t = editorModel:getMouseTime(h / 2)
-					noteManager:addNote(t, "key", i)
+					noteManager:addNote(t, "key" .. i)
 				end
 			end
 		elseif editor.tool == "Select" then
