@@ -113,8 +113,11 @@ end
 ---@param f function
 function EditorRhythmView:processNotes(f)
 	local editorModel = self.game.editorModel
-	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
-		f(self, graphicalNote)
+	for _, note in ipairs(editorModel.graphicEngine.notes) do
+		f(self, note)
+	end
+	for _, note in ipairs(editorModel.noteManager.grabbedNotes) do
+		f(self, note)
 	end
 end
 

@@ -18,7 +18,6 @@ function LongEditorNote:create(absoluteTime)
 	local vp = layer.visual:getPoint(p)
 	local startNote = Note()
 	startNote.visualPoint = vp
-	self.editorModel.layer:addNote(startNote, self.column)
 	startNote.noteType = "LongNoteStart"
 	self.startNote = startNote
 
@@ -26,12 +25,13 @@ function LongEditorNote:create(absoluteTime)
 	local vp = layer.visual:getPoint(p)
 	local endNote = Note()
 	endNote.visualPoint = vp
-	self.editorModel.layer:addNote(endNote, self.column)
 	endNote.noteType = "LongNoteEnd"
 	self.endNote = endNote
 
 	endNote.startNote = startNote
 	startNote.endNote = endNote
+
+	self:update()
 
 	return self
 end
@@ -44,12 +44,15 @@ function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 	self.grabbedPart = part
 	self.grabbedDeltaColumn = deltaColumn
 
-	self.startNote.endNote = self.endNote
-	self.endNote.startNote = self.startNote
-
 	if lockSnap then
 		return
 	end
+
+	self.startNote = self.startNote:clone()
+	self.endNote = self.endNote:clone()
+
+	self.startNote.endNote = self.endNote
+	self.endNote.startNote = self.startNote
 
 	local startTime = self.startNote.visualPoint.point.absoluteTime
 	local endTime = self.endNote.visualPoint.point.absoluteTime

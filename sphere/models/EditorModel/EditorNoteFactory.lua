@@ -14,17 +14,6 @@ local notes = {
 	SoundNote = {ShortEditorNote, "SoundNote"},
 }
 
----@param noteData ncdk.NoteData
----@return sphere.EditorNote?
-function EditorNoteFactory:getNote(noteData)
-	local classAndType = notes[noteData.noteType]
-	if not classAndType then
-		return
-	end
-
-	return classAndType[1](classAndType[2], noteData)
-end
-
 ---@param noteType string
 ---@return sphere.EditorNote?
 function EditorNoteFactory:newNote(noteType)

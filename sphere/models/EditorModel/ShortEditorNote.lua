@@ -18,9 +18,9 @@ function ShortEditorNote:create(absoluteTime)
 	local vp = layer.visual:getPoint(p)
 	local note = Note()
 	note.visualPoint = vp
-	self.editorModel.layer:addNote(note, self.column)
 	note.noteType = "ShortNote"
 	self.startNote = note
+	self:update()
 
 	return self
 end
@@ -36,6 +36,8 @@ function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
 	if lockSnap then
 		return
 	end
+
+	self.startNote = self.startNote:clone()
 
 	self.grabbedDeltaTime = t - self.startNote.visualPoint.point.absoluteTime
 	self.startNote.visualPoint = VisualPoint({})
@@ -67,7 +69,6 @@ function ShortEditorNote:paste(point)
 	local layer = self.editorModel.layer
 	local new_point = layer.points:getPoint(point:add(self.deltaStartTime))
 	self.startNote.visualPoint = layer.visual:getPoint(new_point)
-	layer:addNote(self.startNote, self.column)
 end
 
 function ShortEditorNote:remove()

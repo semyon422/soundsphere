@@ -25,6 +25,7 @@ function NoteManager:update()
 	local noteSkin = self.editorModel.noteSkin
 
 	for _, note in ipairs(self.grabbedNotes) do
+		note:update()
 		local time = self.editorModel:getMouseTime()
 		if not editor.lockSnap then
 			note:updateGrabbed(time)
@@ -42,22 +43,18 @@ function NoteManager:copyNotes(cut)
 	if cut then
 		self.editorModel.editorChanges:reset()
 	end
-	-- local noteSkin = self.editorModel.noteSkin
 
 	self.copiedNotes = {}
 	local copyPoint
 
-	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
-		-- local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
-		-- if _column then
-			if not copyPoint or note.startNote.visualPoint.point < copyPoint then
-				copyPoint = note.startNote.visualPoint.point
-			end
-			table.insert(self.copiedNotes, note)
-			if cut then
-				self:_removeNote(note)
-			end
-		-- end
+	for _, note in pairs(self.editorModel.graphicEngine.selectedNotes) do
+		if not copyPoint or note.startNote.visualPoint.point < copyPoint then
+			copyPoint = note.startNote.visualPoint.point
+		end
+		table.insert(self.copiedNotes, note)
+		if cut then
+			self:_removeNote(note)
+		end
 	end
 
 	for _, note in ipairs(self.copiedNotes) do
@@ -72,13 +69,10 @@ end
 function NoteManager:deleteNotes()
 	self.editorModel.editorChanges:reset()
 	local c = 0
-	-- local noteSkin = self.editorModel.noteSkin
-	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
-		-- local _column = noteSkin:getInputColumn(note.inputType, note.inputIndex)
-		-- if _column then
-			self:_removeNote(note)
-			c = c + 1
-		-- end
+
+	for n, note in pairs(self.editorModel.graphicEngine.selectedNotes) do
+		self:_removeNote(note)
+		c = c + 1
 	end
 	self.editorModel.editorChanges:next()
 	return c
@@ -91,7 +85,7 @@ function NoteManager:changeType()
 
 	-- self.editorModel.editorChanges:reset()
 
-	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
+	for _, note in pairs(self.editorModel.graphicEngine.selectedNotes) do
 		note:remove()
 		if not note.endNote then
 			local startNote = note.startNote
@@ -151,7 +145,7 @@ function NoteManager:grabNotes(part, mouseTime)
 	self.grabbedNotes = {}
 	self.editorModel.editorChanges:reset()
 	local column = self:getColumnOver()
-	for _, note in ipairs(self.editorModel.graphicEngine.selectedNotes) do
+	for _, note in pairs(self.editorModel.graphicEngine.selectedNotes) do
 		local _column = noteSkin:getInputColumn(note.column)
 		if _column then
 			table.insert(self.grabbedNotes, note)
@@ -166,18 +160,12 @@ function NoteManager:dropNotes(mouseTime)
 	local editor = self.editorModel:getSettings()
 	local grabbedNotes = self.grabbedNotes
 	self.grabbedNotes = {}
-
-	if editor.lockSnap then
-		for _, note in ipairs(grabbedNotes) do
-			self:_addNote(note)
-		end
-		self.editorModel.editorChanges:next()
-		return
-	end
-
 	local t = mouseTime
+
 	for _, note in ipairs(grabbedNotes) do
-		note:drop(t)
+		if not editor.lockSnap then
+			note:drop(t)
+		end
 		self:_addNote(note)
 	end
 	self.editorModel.editorChanges:next()
@@ -186,9 +174,10 @@ end
 ---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
 	note:remove()
+	self.editorModel.graphicEngine.selectedNotes[note.startNote] = nil
 	self.editorModel.editorChanges:add(
-		{note, "remove", note},
-		{note, "add", note}
+		{note, "remove", note:clone()},
+		{note, "add", note:clone()}
 	)
 end
 
@@ -203,8 +192,8 @@ end
 function NoteManager:_addNote(note)
 	note:add()
 	self.editorModel.editorChanges:add(
-		{note, "add", note},
-		{note, "remove", note}
+		{note, "add", note:clone()},
+		{note, "remove", note:clone()}
 	)
 end
 
@@ -243,6 +232,10 @@ function NoteManager:addNote(absoluteTime, column)
 	if not note then
 		return
 	end
+	self:_addNote(note)
+
+	editorModel.editorChanges:next()
+	do return end
 
 	editorModel.graphicEngine:selectNote(note)
 	if editor.tool == "ShortNote" then
@@ -265,7 +258,7 @@ function NoteManager:flipNotes()
 
 	local notes = {}
 
-	for _, note in ipairs(editorModel.graphicEngine.selectedNotes) do
+	for _, note in pairs(editorModel.graphicEngine.selectedNotes) do
 		table.insert(notes, note)
 		self:_removeNote(note)
 	end
