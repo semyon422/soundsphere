@@ -48,11 +48,11 @@ end
 function EditorRhythmView:draw()
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	if not ld.points:getFirstPoint() then
+	if not layer.points:getFirstPoint() then
 		return
 	end
 

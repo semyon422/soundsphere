@@ -71,14 +71,8 @@ function ShortEditorNote:paste(point)
 	self.startNote.visualPoint = layer.visual:getPoint(new_point)
 end
 
-function ShortEditorNote:remove()
-	print("remove", self.startNote)
-	self.editorModel.layer:removeNote(self.startNote, self.column)
-end
-
-function ShortEditorNote:add()
-	print("add", self.startNote)
-	self.editorModel.layer:addNote(self.startNote, self.column)
+function ShortEditorNote:getNotes()
+	return {self.startNote}
 end
 
 return ShortEditorNote

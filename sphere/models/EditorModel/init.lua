@@ -18,7 +18,7 @@ local Point = require("chartedit.Point")
 
 ---@class sphere.EditorModel
 ---@operator call: sphere.EditorModel
----@field layerData chartedit.Layer
+---@field layer chartedit.Layer
 local EditorModel = class()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
@@ -55,9 +55,7 @@ function EditorModel:load()
 	local editor = self:getSettings()
 	local audioSettings = self:getAudioSettings()
 
-	self.layerData = self.noteChartLoader:load()
-	local ld = self.layerData
-	self.layer = ld
+	self.layer = self.noteChartLoader:load()
 
 	-- self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart:getLayerData(1)))
 	self.patterns_analyzed = {}
@@ -96,7 +94,7 @@ function EditorModel:detectTempoOffset()
 end
 
 function EditorModel:applyTempoOffset()
-	self.ncbtContext:apply(self.layerData)
+	self.ncbtContext:apply(self.layer)
 end
 
 ---@return table
@@ -161,17 +159,17 @@ end
 function EditorModel:getFirstLastTime()
 	local audioManager = self.audioManager
 	local mainAudio = self.mainAudio
-	local ld = self.layerData
+	local layer = self.layer
 
 	local firstTime = math.min(
 		audioManager.firstTime,
 		mainAudio.offset,
-		ld.points:getFirstPoint():tonumber()
+		layer.points:getFirstPoint():tonumber()
 	)
 	local lastTime = math.max(
 		audioManager.lastTime,
 		mainAudio.offset + mainAudio.duration,
-		ld.points:getLastPoint():tonumber()
+		layer.points:getLastPoint():tonumber()
 	)
 	return firstTime, lastTime
 end
@@ -179,15 +177,14 @@ end
 function EditorModel:genGraphs()
 	local a, b = self:getFirstLastTime()
 	self.graphsGenerator:genDensityGraph(self.noteChart, a, b)
-	self.graphsGenerator:genIntervalDatasGraph(self.layerData, a, b)
+	self.graphsGenerator:genIntervalDatasGraph(self.layer, a, b)
 end
 
 ---@param time number
 ---@return chartedit.Point?
 function EditorModel:getDtpAbsolute(time)
-	local ld = self.layerData
 	local editor = self:getSettings()
-	local p = ld.points:interpolateAbsolute(editor.snap, time)
+	local p = self.layer.points:interpolateAbsolute(editor.snap, time)
 	p.absoluteTime = time
 	return p
 end
@@ -278,7 +275,7 @@ function EditorModel:update()
 	end
 
 	local dtp = self:getDtpAbsolute(time)
-	if self.intervalManager.grabbedIntervalData then
+	if self.intervalManager.grabbedInterval then
 		self.intervalManager:moveGrabbed(time)
 	end
 	self.audioManager:update()
@@ -319,9 +316,9 @@ end
 ---@return number
 function EditorModel:getTotalBeats()
 	local layer = self.layer
-	local range = layer.ranges.interval
+	local a = layer.points:getFirstPoint()
+	local b = layer.points:getLastPoint()
 
-	local a, b = range.first.timePoint, range.last.timePoint
 	local beats = b:sub(a)
 	local avgBeatDuration = (b.absoluteTime - a.absoluteTime) / beats
 

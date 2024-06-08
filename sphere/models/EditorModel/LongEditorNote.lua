@@ -138,16 +138,8 @@ function LongEditorNote:paste(timePoint)
 	self.startNote.endNote = self.endNote
 end
 
-function LongEditorNote:remove()
-	local layer = self.editorModel.layer
-	layer:removeNote(self.startNote, self.column)
-	layer:removeNote(self.endNote, self.column)
-end
-
-function LongEditorNote:add()
-	local layer = self.editorModel.layer
-	layer:addNote(self.startNote, self.column)
-	layer:addNote(self.endNote, self.column)
+function LongEditorNote:getNotes()
+	return {self.startNote, self.endNote}
 end
 
 return LongEditorNote

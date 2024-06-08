@@ -173,12 +173,16 @@ end
 
 ---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
-	note:remove()
 	self.editorModel.graphicEngine.selectedNotes[note.startNote] = nil
-	self.editorModel.editorChanges:add(
-		{note, "remove", note:clone()},
-		{note, "add", note:clone()}
-	)
+	local layer = self.editorModel.layer
+	local notes = note:getNotes()
+	for _, _note in ipairs(notes) do
+		layer:removeNote(_note, note.column)
+		self.editorModel.editorChanges:add(
+			{layer, "removeNote", layer, _note, note.column},
+			{layer, "addNote", layer, _note, note.column}
+		)
+	end
 end
 
 ---@param note sphere.EditorNote
@@ -190,11 +194,15 @@ end
 
 ---@param note sphere.EditorNote
 function NoteManager:_addNote(note)
-	note:add()
-	self.editorModel.editorChanges:add(
-		{note, "add", note:clone()},
-		{note, "remove", note:clone()}
-	)
+	local layer = self.editorModel.layer
+	local notes = note:getNotes()
+	for _, _note in ipairs(notes) do
+		layer:addNote(_note, note.column)
+		self.editorModel.editorChanges:add(
+			{layer, "addNote", layer, _note, note.column},
+			{layer, "removeNote", layer, _note, note.column}
+		)
+	end
 end
 
 ---@param noteType string

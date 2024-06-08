@@ -37,4 +37,9 @@ function EditorNote:clone()
 	return note
 end
 
+---@return ncdk2.Note[]
+function EditorNote:getNotes()
+	return {}
+end
+
 return EditorNote

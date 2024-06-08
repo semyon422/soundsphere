@@ -102,7 +102,7 @@ end
 function SnapGridView:drawComputedGrid(field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 	local snap = editor.snap
 
 	if not currentTime then
@@ -112,22 +112,22 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 	love.graphics.setLineWidth(1)
 
 	local range = 1 / editor.speed
-	local point = ld.points:interpolateAbsolute(1, currentTime - range)
+	local point = layer.points:interpolateAbsolute(1, currentTime - range)
 	local measureData
 
 	local interval = point.interval
 	local time = point.time
 	interval, time = point:add(Fraction((time * snap):ceil() + 1, snap) - time)
 
-	point = ld.points:interpolateAbsolute(1, currentTime + range)
+	point = layer.points:interpolateAbsolute(1, currentTime + range)
 	local endInterval = point.interval
 	local endTime = point.time
 	endTime = Fraction((endTime * snap):floor(), snap)
 
-	point = ld.points:interpolateFraction(interval, time)
+	point = layer.points:interpolateFraction(interval, time)
 
 	while interval and interval < endInterval or interval == endInterval and time <= endTime do
-		point = point or ld.points:interpolateFraction(interval, time)
+		point = point or layer.points:interpolateFraction(interval, time)
 		if not point or not point[field] then break end
 
 		local drawNothing, skipInterval
@@ -139,7 +139,7 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 				delta = delta + Fraction(1, snap)
 			end
 			interval, time = point:add(delta)
-			point = ld.points:interpolateFraction(interval, time)
+			point = layer.points:interpolateFraction(interval, time)
 			if not point or not point[field] then break end
 		end
 
@@ -177,12 +177,12 @@ function SnapGridView:drawTimings(_w, _h)
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	local ld = self.game.editorModel.layerData
+	local layer = self.game.editorModel.layer
 
 	love.graphics.push("all")
 	love.graphics.setColor(1, 0.8, 0.2)
 	love.graphics.setLineWidth(4)
-	for p, vp, notes in ld:iter(editorModel:getIterRange()) do
+	for p, vp, notes in layer:iter(editorModel:getIterRange()) do
 		local interval = p._interval
 		local measure = p._measure
 
