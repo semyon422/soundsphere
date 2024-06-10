@@ -176,7 +176,7 @@ end
 function EditorModel:genGraphs()
 	local a, b = self:getFirstLastTime()
 	self.graphsGenerator:genDensityGraph(self.noteChart, a, b)
-	self.graphsGenerator:genIntervalDatasGraph(self.layer, a, b)
+	self.graphsGenerator:genIntervalsGraph(self.layer, a, b)
 end
 
 ---@param time number

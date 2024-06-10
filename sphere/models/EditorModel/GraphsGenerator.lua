@@ -50,18 +50,16 @@ function GraphsGenerator:genDensityGraph(chart, firstTime, lastTime)
 	end
 end
 
----@param layerData ncdk.DynamicLayerData
+---@param layer chartedit.Layer
 ---@param firstTime number
 ---@param lastTime number
-function GraphsGenerator:genIntervalDatasGraph(layerData, firstTime, lastTime)
-	do return end
-	local intervalDatas = layerData.ranges.interval
+function GraphsGenerator:genIntervalsGraph(layer, firstTime, lastTime)
+	local ivl = layer.points:getFirstPoint().interval
 
 	local offsets = {}
-	local id = intervalDatas.first
-	while id and id <= intervalDatas.last do
-		table.insert(offsets, id.timePoint.absoluteTime)
-		id = id.next
+	while ivl do
+		table.insert(offsets, ivl.point.absoluteTime)
+		ivl = ivl.next
 	end
 	table.sort(offsets)
 
