@@ -2,7 +2,7 @@ local class = require("class")
 
 ---@class sphere.GraphicalNote
 ---@operator call: sphere.GraphicalNote
----@field currentVisualPoint ncdk2.VisualPoint
+---@field currentVisualPoint ncdk2.IVisualPoint
 ---@field layer ncdk2.Layer
 ---@field graphicEngine sphere.GraphicEngine
 ---@field column ncdk2.Column
@@ -29,7 +29,7 @@ function GraphicalNote:getPressedTime()
 	return logicalNote and logicalNote.pressedTime
 end
 
----@param visualPoint ncdk2.VisualPoint
+---@param visualPoint ncdk2.IVisualPoint
 ---@return number
 function GraphicalNote:getVisualTime(visualPoint)
 	if self.graphicEngine.constant then

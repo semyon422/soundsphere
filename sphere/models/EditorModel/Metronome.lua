@@ -21,22 +21,21 @@ function Metronome:unload()
 	self.soundData:release()
 end
 
-
 function Metronome:updateNextTime()
 	local editorModel = self.editorModel
-	local timePoint = editorModel.timePoint
-	local ld = editorModel.layerData
+	local point = editorModel.point
+	local layer = editorModel.layer
 	local currentTime = editorModel.timer:getTime()
 
-	if timePoint:tonumber() > currentTime then
-		self.nextTime = timePoint:tonumber()
-		self.isNextBeat = (timePoint.time % 1):tonumber() == 0
+	if point:tonumber() > currentTime then
+		self.nextTime = point:tonumber()
+		self.isNextBeat = (point.time % 1):tonumber() == 0
 		return
 	end
 
-	local id, t = editorModel.scroller:getNextSnapIntervalTime(timePoint, 1)
+	local interval, t = editorModel.scroller:getNextSnapIntervalTime(point, 1)
 
-	local nextTimePoint = ld:getDynamicTimePoint(id, t)
+	local nextTimePoint = layer.points:interpolateFraction(interval, t)
 
 	self.nextTime = nextTimePoint:tonumber()
 	self.isNextBeat = (nextTimePoint.time % 1):tonumber() == 0
@@ -50,10 +49,10 @@ function Metronome:update()
 		local source = self.source
 		source:stop()
 		source:setVolume(self.volume.master * self.volume.metronome)
-		-- source:setRate(2099 / 2645)
-		-- if self.isNextBeat then
-			-- source:setRate(1)
-		-- end
+		source:setRate(2099 / 2645)
+		if self.isNextBeat then
+			source:setRate(1)
+		end
 		source:play()
 	end
 

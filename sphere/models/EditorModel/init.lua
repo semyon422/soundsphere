@@ -41,7 +41,7 @@ function EditorModel:new(configModel, resourceModel)
 	self.noteManager = NoteManager()
 	self.graphicEngine = GraphicEngine()
 	self.scroller = Scroller()
-	-- self.metronome = Metronome()
+	self.metronome = Metronome()
 
 	for _, v in pairs(self) do
 		v.editorModel = self
@@ -81,8 +81,8 @@ function EditorModel:load()
 	self.mainAudio.volume = volume
 	self.mainAudio:load()
 
-	-- self.metronome.volume = volume
-	-- self.metronome:load()
+	self.metronome.volume = volume
+	self.metronome:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
 end
@@ -193,7 +193,7 @@ function EditorModel:unload()
 	self.loaded = false
 	self.audioManager:unload()
 	self.mainAudio:unload()
-	-- self.metronome:unload()
+	self.metronome:unload()
 end
 
 function EditorModel:save()
@@ -264,7 +264,7 @@ function EditorModel:update()
 	editor.time = time
 
 	self.noteManager:update()
-	-- self.metronome:update()
+	self.metronome:update()
 
 	if self.selectRect then
 		local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())

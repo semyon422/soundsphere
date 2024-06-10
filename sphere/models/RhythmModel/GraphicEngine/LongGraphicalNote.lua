@@ -19,7 +19,6 @@ function LongGraphicalNote:checkFakeStartTimePoint()
 	self.fakeStartTimePoint = fakeStartVisualPoint
 
 	fakeStartVisualPoint.visualTime = visualPoint.visualTime
-	fakeStartVisualPoint.velocity = visualPoint.velocity
 
 	self.fakeIndex = 1
 end
