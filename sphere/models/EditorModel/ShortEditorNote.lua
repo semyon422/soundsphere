@@ -65,10 +65,13 @@ function ShortEditorNote:copy(copyPoint)
 end
 
 ---@param point chartedit.Point
+---@return ncdk2.Note[]
 function ShortEditorNote:paste(point)
 	local layer = self.editorModel.layer
 	local new_point = layer.points:getPoint(point:add(self.deltaStartTime))
-	self.startNote.visualPoint = layer.visual:getPoint(new_point)
+	local startNote = self.startNote:clone()
+	startNote.visualPoint = layer.visual:getPoint(new_point)
+	return {startNote}
 end
 
 function ShortEditorNote:getNotes()

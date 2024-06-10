@@ -88,7 +88,7 @@ function LongEditorNote:drop(t)
 	elseif self.grabbedPart == "tail" then
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		local p = layer.points:saveSearchPoint()
-		if self.startNote.timePoint == p then
+		if self.startNote.visualPoint.point == p then
 			p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, 1))
 		end
 		local vp = layer.visual:getPoint(p)
@@ -118,26 +118,30 @@ function LongEditorNote:updateGrabbed(t)
 	end
 end
 
----@param copyTimePoint ncdk.IntervalTimePoint
-function LongEditorNote:copy(copyTimePoint)
-	self.deltaStartTime = self.startNote.timePoint:sub(copyTimePoint)
-	self.deltaEndTime = self.endNote.timePoint:sub(copyTimePoint)
+---@param copyPoint chartedit.Point
+function LongEditorNote:copy(copyPoint)
+	self.deltaStartTime = self.startNote.visualPoint.point:sub(copyPoint)
+	self.deltaEndTime = self.endNote.visualPoint.point:sub(copyPoint)
 end
 
----@param timePoint ncdk.IntervalTimePoint
-function LongEditorNote:paste(timePoint)
-	local ld = self.editorModel.layerData
+---@param point chartedit.Point
+---@return ncdk2.Note[]
+function LongEditorNote:paste(point)
+	local layer = self.editorModel.layer
 
-	self.startNote = self.startNote:clone()
-	self.endNote = self.endNote:clone()
+	local startNote = self.startNote:clone()
+	local endNote = self.endNote:clone()
 
-	self.startNote.timePoint = ld:getTimePoint(timePoint:add(self.deltaStartTime))
-	self.endNote.timePoint = ld:getTimePoint(timePoint:add(self.deltaEndTime))
+	startNote.visualPoint = layer.visual:getPoint(layer.points:getPoint(point:add(self.deltaStartTime)))
+	endNote.visualPoint = layer.visual:getPoint(layer.points:getPoint(point:add(self.deltaEndTime)))
 
-	self.endNote.startNote = self.startNote
-	self.startNote.endNote = self.endNote
+	endNote.startNote = startNote
+	startNote.endNote = endNote
+
+	return {startNote, endNote}
 end
 
+---@return ncdk2.Note[]
 function LongEditorNote:getNotes()
 	return {self.startNote, self.endNote}
 end

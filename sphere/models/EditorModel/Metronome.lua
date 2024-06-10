@@ -35,10 +35,10 @@ function Metronome:updateNextTime()
 
 	local interval, t = editorModel.scroller:getNextSnapIntervalTime(point, 1)
 
-	local nextTimePoint = layer.points:interpolateFraction(interval, t)
+	local nextPoint = layer.points:interpolateFraction(interval, t)
 
-	self.nextTime = nextTimePoint:tonumber()
-	self.isNextBeat = (nextTimePoint.time % 1):tonumber() == 0
+	self.nextTime = nextPoint:tonumber()
+	self.isNextBeat = (nextPoint.time % 1):tonumber() == 0
 end
 
 function Metronome:update()

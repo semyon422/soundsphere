@@ -97,7 +97,6 @@ function GraphicEngine:newNote(_note, editorModel, column)
 	end
 	note.startNote = _note
 	note.editorModel = editorModel
-	note.currentTimePoint = editorModel.point
 	note.graphicEngine = self
 	note.layerData = editorModel.layer
 	note.column = column

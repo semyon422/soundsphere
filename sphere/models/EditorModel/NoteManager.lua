@@ -130,8 +130,7 @@ function NoteManager:pasteNotes()
 	self.editorModel.editorChanges:reset()
 	local point = self.editorModel.point
 	for _, note in ipairs(copiedNotes) do
-		note:paste(point)
-		self:_addNote(note)
+		self:_addNotes(note:paste(point), note.column)
 	end
 	self.editorModel.editorChanges:next()
 end
@@ -166,7 +165,7 @@ function NoteManager:dropNotes(mouseTime)
 		if not editor.lockSnap then
 			note:drop(t)
 		end
-		self:_addNote(note)
+		self:_addNotes(note:getNotes(), note.column)
 	end
 	self.editorModel.editorChanges:next()
 end
@@ -192,15 +191,14 @@ function NoteManager:removeNote(note)
 	self.editorModel.editorChanges:next()
 end
 
----@param note sphere.EditorNote
-function NoteManager:_addNote(note)
+---@param notes ncdk2.Note[]
+function NoteManager:_addNotes(notes, column)
 	local layer = self.editorModel.layer
-	local notes = note:getNotes()
 	for _, _note in ipairs(notes) do
-		layer:addNote(_note, note.column)
+		layer:addNote(_note, column)
 		self.editorModel.editorChanges:add(
-			{layer, "addNote", layer, _note, note.column},
-			{layer, "removeNote", layer, _note, note.column}
+			{layer, "addNote", layer, _note, column},
+			{layer, "removeNote", layer, _note, column}
 		)
 	end
 end
@@ -215,7 +213,6 @@ function NoteManager:newNote(noteType, absoluteTime, column)
 		return
 	end
 	note.editorModel = self.editorModel
-	note.currentTimePoint = self.editorModel.point
 	note.graphicEngine = self.editorModel.graphicEngine
 	note.layerData = self.editorModel.layerData
 	note.column = column
@@ -240,7 +237,7 @@ function NoteManager:addNote(absoluteTime, column)
 	if not note then
 		return
 	end
-	self:_addNote(note)
+	self:_addNotes(note:getNotes(), note.column)
 
 	editorModel.editorChanges:next()
 	do return end
@@ -275,7 +272,7 @@ function NoteManager:flipNotes()
 		local columns = noteSkin.columnsCount
 		local column = columns - noteSkin:getInputColumn(note.column) + 1
 		note.column = noteSkin:getFirstColumnInput(column)
-		self:_addNote(note)
+		self:_addNotes(note:getNotes(), note.column)
 	end
 
 	editorModel.editorChanges:next()
