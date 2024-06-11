@@ -106,7 +106,7 @@ local function loadWaveform(self, w, h)
 	local samplesPerPoint = sampleRate / math.abs(noteSkin.unit * editor.speed)
 
 	local offset = editorModel.mainAudio:getWaveformOffset()
-	local sampleOffset = math.floor((editorModel.timePoint.absoluteTime - offset) * sampleRate)
+	local sampleOffset = math.floor((editorModel.point.absoluteTime - offset) * sampleRate)
 	local pointOffset = math.floor(sampleOffset / samplesPerPoint)
 	pointDrawDelta = sampleOffset / samplesPerPoint - pointOffset
 
