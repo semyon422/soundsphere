@@ -166,6 +166,7 @@ function NoteManager:dropNotes(mouseTime)
 			note:drop(t)
 		end
 		self:_addNotes(note:getNotes(), note.column)
+		self.editorModel.graphicEngine.selectedNotes[note.startNote] = note
 	end
 	self.editorModel.editorChanges:next()
 end
@@ -240,7 +241,6 @@ function NoteManager:addNote(absoluteTime, column)
 	self:_addNotes(note:getNotes(), note.column)
 
 	editorModel.editorChanges:next()
-	do return end
 
 	editorModel.graphicEngine:selectNote(note)
 	if editor.tool == "ShortNote" then

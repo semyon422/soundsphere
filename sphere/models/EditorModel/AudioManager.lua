@@ -201,27 +201,25 @@ end
 ---@param chart ncdk2.Chart
 ---@param audioSettings table
 function AudioManager:loadResources(chart, audioSettings)
-	for notes in chart:getNotesIterator() do
-		for _, note in ipairs(notes) do
-			local offset = note.visualPoint.point:tonumber()
-			if note.sounds and not note.stream then
-				for _, s in ipairs(note.sounds) do
-					local soundData = self.resourceModel:getResource(s[1])
-					if soundData then
-						local mode = audioSettings.mode.secondary
-						local duration = soundData:getDuration()
-						self:insert({
-							offset = offset,
-							duration = duration,
-							soundData = soundData,
-							source = audio.newSource(soundData, mode),
-							name = s[1],
-							volume = s[2],
-							isStream = note.stream,
-						})
-						self.firstTime = math.min(self.firstTime, offset)
-						self.lastTime = math.max(self.lastTime, offset + duration)
-					end
+	for note in chart:iterNotes() do
+		local offset = note.visualPoint.point:tonumber()
+		if note.sounds and not note.stream then
+			for _, s in ipairs(note.sounds) do
+				local soundData = self.resourceModel:getResource(s[1])
+				if soundData then
+					local mode = audioSettings.mode.secondary
+					local duration = soundData:getDuration()
+					self:insert({
+						offset = offset,
+						duration = duration,
+						soundData = soundData,
+						source = audio.newSource(soundData, mode),
+						name = s[1],
+						volume = s[2],
+						isStream = note.stream,
+					})
+					self.firstTime = math.min(self.firstTime, offset)
+					self.lastTime = math.max(self.lastTime, offset + duration)
 				end
 			end
 		end

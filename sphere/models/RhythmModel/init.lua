@@ -60,13 +60,13 @@ function RhythmModel:unloadAllEngines()
 	self.logicEngine:unload()
 	self.graphicEngine:unload()
 
-	for _, column in self.chart:getNotesIterator() do
+	-- for _, column in self.chart:iterLayerNotes() do
 		-- self.observable:send({
 		-- 	name = "keyreleased",
 		-- 	virtual = true,
 		-- 	inputType .. inputIndex
 		-- })
-	end
+	-- end
 end
 
 function RhythmModel:unloadLogicEngines()

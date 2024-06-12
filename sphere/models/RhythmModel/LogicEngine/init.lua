@@ -51,7 +51,7 @@ function LogicEngine:load()
 	self.noteHandlers = {}
 
 	-- many layers can be here
-	for notes, column in self.chart:getNotesIterator() do
+	for notes, column in self.chart:iterLayerNotes() do
 		local noteHandler = assert(self:getNoteHandler(column, true))
 		for _, note in ipairs(notes) do
 			table.insert(noteHandler.logicNotes, HandlerNote(note, column))

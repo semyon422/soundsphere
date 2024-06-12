@@ -42,8 +42,7 @@ function GraphicEngine:load()
 		end
 	end
 
-	for notes, column, layerName in self.chart:getNotesIterator() do
-		local layer = self.chart.layers[layerName]
+	for notes, column, layer in self.chart:iterLayerNotes() do
 		local noteDrawer = NoteDrawer(layer, notes, column, self)
 		noteDrawer:load()
 		table.insert(self.noteDrawers, noteDrawer)

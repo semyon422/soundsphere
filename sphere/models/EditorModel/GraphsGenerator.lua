@@ -15,12 +15,10 @@ end
 ---@param lastTime number
 function GraphsGenerator:genDensityGraph(chart, firstTime, lastTime)
 	local notes = {}
-	for _notes in chart:getNotesIterator() do
-		for _, note in ipairs(_notes) do
-			local offset = note.visualPoint.point:tonumber()
-			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
-				table.insert(notes, offset)
-			end
+	for note in chart:iterNotes() do
+		local offset = note.visualPoint.point:tonumber()
+		if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
+			table.insert(notes, offset)
 		end
 	end
 	table.sort(notes)
