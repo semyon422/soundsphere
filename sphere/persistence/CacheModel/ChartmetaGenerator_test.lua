@@ -76,14 +76,14 @@ function test.all(t)
 	local fs = get_fs(items)
 
 	local chart_error
-	local function getNoteCharts(path, content)
+	local function getCharts(path, content)
 		if chart_error then
 			return nil, chart_error
 		end
 		return {{chartmeta = {}}}
 	end
 
-	local cg = ChartmetaGenerator(chartRepo, chartRepo, {getNoteCharts = getNoteCharts})
+	local cg = ChartmetaGenerator(chartRepo, chartRepo, {getCharts = getCharts})
 
 	t:eq(cg:generate(chartfiles["charts/a"], "content"), "cached")
 	t:eq(cg:generate(chartfiles["charts/b"], "content"), "reused")

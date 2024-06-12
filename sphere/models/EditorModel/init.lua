@@ -57,7 +57,7 @@ function EditorModel:load()
 
 	self.layer = self.noteChartLoader:load()
 
-	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.noteChart.layers.main))
+	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.chart.layers.main))
 
 	self.changes = Changes()
 	-- ld:syncChanges(self.changes:get())
@@ -140,10 +140,10 @@ function EditorModel:loadResources()
 		return
 	end
 
-	local noteChart = self.noteChart
+	local chart = self.chart
 
-	self.mainAudio:loadResources(noteChart)
-	self.audioManager:loadResources(noteChart, self:getAudioSettings())
+	self.mainAudio:loadResources(chart)
+	self.audioManager:loadResources(chart, self:getAudioSettings())
 
 	self.audioManager:update(true)
 	self.mainAudio:update(true)
@@ -175,7 +175,7 @@ end
 
 function EditorModel:genGraphs()
 	local a, b = self:getFirstLastTime()
-	self.graphsGenerator:genDensityGraph(self.noteChart, a, b)
+	self.graphsGenerator:genDensityGraph(self.chart, a, b)
 	self.graphsGenerator:genIntervalsGraph(self.layer, a, b)
 end
 

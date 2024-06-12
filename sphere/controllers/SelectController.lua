@@ -3,7 +3,7 @@ local thread = require("thread")
 local path_util = require("path_util")
 local fs_util = require("fs_util")
 local Sph = require("sph.Sph")
-local NoteChartExporter = require("osu.NoteChartExporter")
+local ChartEncoder = require("osu.ChartEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
 local InputMode = require("ncdk.InputMode")
 
@@ -219,18 +219,18 @@ function SelectController:exportToOsu()
 		return
 	end
 
-	local nce = NoteChartExporter()
-	local noteChart = selectModel:loadNoteChart()
-	ModifierModel:apply(self.playContext.modifiers, noteChart)
+	local encoder = ChartEncoder()
 
-	nce.noteChart = noteChart
-	nce.chartmeta = chartview
+	local chart = selectModel:loadChart()
+	ModifierModel:apply(self.playContext.modifiers, chart)
+
+	local data = encoder:encode({chart})
 
 	local path = chartview.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
 	local fileName = path:match("^.+/(.-)$"):match("^(.+)%..-$")
 
-	assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), nce:export()))
+	assert(love.filesystem.write(("userdata/export/%s.osu"):format(fileName), data))
 end
 
 return SelectController

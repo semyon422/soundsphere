@@ -66,30 +66,30 @@ local snaps = {
 	[8] = colors.green,
 }
 
----@param timePoint ncdk.IntervalTimePoint
+---@param point ncdk2.IntervalPoint
 ---@param field string
 ---@param currentTime number
 ---@param width number
-function SnapGridView:drawSnap(timePoint, field, currentTime, width)
+function SnapGridView:drawSnap(point, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
+	local y = noteSkin:getTimePosition((currentTime - point[field]) * editor.speed)
 
 	love.graphics.push("all")
 	love.graphics.translate(0, y)
 
 	local size = 20
 	local changed, active, hovered = just.button(
-		tostring(timePoint) .. "scroll",
+		tostring(point) .. "scroll",
 		just.is_over(size, size, -size / 2, -size / 2) or just.is_over(size, size, -size / 2 + width, -size / 2)
 	)
 	if hovered then
 		love.graphics.setLineWidth(4)
 	end
 	if changed then
-		editorModel.scroller:scrollTimePoint(timePoint)
+		editorModel.scroller:scrollTimePoint(point)
 	end
 
 	love.graphics.line(0, 0, width, 0)

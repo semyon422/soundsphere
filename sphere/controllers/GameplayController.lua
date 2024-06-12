@@ -4,7 +4,7 @@ local sql_util = require("rdb.sql_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierModel = require("sphere.models.ModifierModel")
-local NoteData = require("ncdk.NoteData")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -26,7 +26,7 @@ function GameplayController:load()
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 
-	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
+	local noteChart = selectModel:loadChart(self:getImporterSettings())
 
 	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
@@ -155,18 +155,17 @@ function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
 	applyTempo(noteChart, t[tempoFactor])
 end
 
----@param noteChart ncdk.NoteChart
-function GameplayController:applyAutoKeysound(noteChart)
-	for noteDatas, _, _, layerDataIndex in noteChart:getInputIterator() do
-		local layerData = noteChart.layerDatas[layerDataIndex]
-		for _, noteData in ipairs(noteDatas) do
-			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
-				local soundNoteData = NoteData(noteData.timePoint)
+---@param chart ncdk2.Chart
+function GameplayController:applyAutoKeysound(chart)
+	for notes, column, layer in chart:iterLayerNotes() do
+		for _, note in ipairs(notes) do
+			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
+				local soundNote = Note(note.visualPoint)
 
-				soundNoteData.noteType = "SoundNote"
-				soundNoteData.sounds, noteData.sounds = noteData.sounds, {}
+				soundNote.noteType = "SoundNote"
+				soundNote.sounds, note.sounds = note.sounds, {}
 
-				layerData:addNoteData(soundNoteData, "auto", 0)
+				layer.notes:insert(soundNote, "auto")
 			end
 		end
 	end

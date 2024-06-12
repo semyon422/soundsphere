@@ -88,14 +88,14 @@ function ModifierModel:increaseModifierValue(modifier, delta)
 end
 
 ---@param modifiers table
----@param noteChart ncdk.NoteChart
-function ModifierModel:apply(modifiers, noteChart)
+---@param chart ncdk2.Chart
+function ModifierModel:apply(modifiers, chart)
 	local obj = {}
 	for _, modifier in ipairs(modifiers) do
 		local mod = self:getModifier(modifier.id)
 		if mod then
 			table_util.clear(obj)
-			obj.noteChart = noteChart
+			obj.chart = chart
 			setmetatable(obj, mod)
 			obj:apply(modifier)
 		end

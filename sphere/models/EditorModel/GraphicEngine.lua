@@ -40,9 +40,9 @@ function GraphicEngine:getVisualTimeRate()
 	return editor.speed
 end
 
----@param noteData ncdk.NoteData
+---@param note ncdk2.Note
 ---@return sphere.LogicalNote?
-function GraphicEngine:getLogicalNote(noteData)
+function GraphicEngine:getLogicalNote(note)
 	return
 end
 

@@ -6,7 +6,7 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
 local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
-local NoteChartFactory = require("notechart.NoteChartFactory")
+local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
@@ -39,7 +39,7 @@ function CacheManager:new(gdb)
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, NoteChartFactory)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, ChartFactory)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -187,11 +187,12 @@ function CacheManager:computeChartdiffs()
 			local full_path = path_util.join(prefix, chartfile.path)
 			local content = assert(love.filesystem.read(full_path))
 
-			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, chartmeta.index)
-			if not noteChart then
+			local charts, err = ChartFactory:getCharts(chartfile.name, content)
+			if not charts then
 				return nil, err
 			else
-				local chartdiff = self.chartdiffGenerator:compute(noteChart, 1)
+				local chart = charts[chartmeta.index]
+				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
 				chartdiff.hash = chartmeta.hash
 				chartdiff.index = chartmeta.index
 				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
@@ -215,13 +216,14 @@ function CacheManager:computeChartdiffs()
 			local full_path = path_util.join(prefix, chartfile.path)
 			local content = assert(love.filesystem.read(full_path))
 
-			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
-			if not noteChart then
+			local charts, err = ChartFactory:getCharts(chartfile.name, content)
+			if not charts then
 				return nil, err
 			else
-				ModifierModel:apply(score.modifiers, noteChart)
+				local chart = charts[score.index]
+				ModifierModel:apply(score.modifiers, chart)
 
-				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
+				local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
 				chartdiff.modifiers = score.modifiers
 				chartdiff.hash = score.hash
 				chartdiff.index = score.index

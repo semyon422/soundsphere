@@ -81,8 +81,8 @@ function RhythmView:drawSelected(note)
 	end
 end
 
----@param noteData ncdk.NoteData
-function RhythmView:pressNote(noteData) end
+---@param note ncdk2.Note
+function RhythmView:pressNote(note) end
 
 function RhythmView:draw()
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))

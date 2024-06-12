@@ -3,7 +3,6 @@ local delay = require("delay")
 local thread = require("thread")
 local path_util = require("path_util")
 local table_util = require("table_util")
-local NoteChartFactory = require("notechart.NoteChartFactory")
 local ChartFactory = require("notechart.ChartFactory")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
@@ -169,7 +168,7 @@ end
 
 ---@param settings table?
 ---@return ncdk2.Chart?
-function SelectModel:loadNoteChart(settings)
+function SelectModel:loadChart(settings)
 	local chartview = self.chartview
 
 	local content = love.filesystem.read(chartview.location_path)
@@ -182,12 +181,6 @@ function SelectModel:loadNoteChart(settings)
 		content
 	))
 	return charts[chartview.index]
-	-- return assert(NoteChartFactory:getNoteChart(
-	-- 	chartview.chartfile_name,
-	-- 	content,
-	-- 	chartview.index,
-	-- 	settings
-	-- ))
 end
 
 ---@return boolean
