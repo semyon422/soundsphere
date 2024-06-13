@@ -31,16 +31,14 @@ end
 ---@param config table
 ---@return table
 function Shift:getMap(config)
-	local noteChart = self.noteChart
+	local chart = self.chart
 
 	local map = {}
 
 	local value = config.value
-	for inputType, inputCount in pairs(noteChart.inputMode) do
-		map[inputType] = {}
-		local submap = map[inputType]
+	for inputType, inputCount in pairs(chart.inputMode) do
 		for i = 1, inputCount do
-			submap[i] = (i + value - 1) % inputCount + 1
+			map[inputType .. i] = inputType .. ((i + value - 1) % inputCount + 1)
 		end
 	end
 

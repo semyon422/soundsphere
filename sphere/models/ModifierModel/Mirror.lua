@@ -21,39 +21,31 @@ end
 ---@param config table
 ---@return table
 function Mirror:getMap(config)
-	local noteChart = self.noteChart
+	local chart = self.chart
 
-	local inputMode = noteChart.inputMode
+	local inputMode = chart.inputMode
 
+	---@type {[ncdk2.Column]: ncdk2.Column}
 	local map = {}
 
 	local value = config.value
 	for inputType, inputCount in pairs(inputMode) do
-		map[inputType] = {}
-		local submap = map[inputType]
-
-		for i = 1, inputCount do
-			submap[i] = i
-		end
-
 		local halfFloor = math.floor(inputCount / 2)
 		local halfCeil = math.ceil(inputCount / 2)
 		if value == "all" then
 			for i = 1, inputCount do
-				submap[i] = inputCount - i + 1
+				map[inputType .. i] = inputType .. (inputCount - i + 1)
 			end
 		elseif value == "left" then
 			for i = 1, halfFloor do
-				submap[i] = halfFloor - i + 1
+				map[inputType .. i] = inputType .. (halfFloor - i + 1)
 			end
 		elseif value == "right" then
 			for i = 1, halfFloor do
-				submap[halfCeil + i] = inputCount - i + 1
+				map[inputType .. (halfCeil + i)] = inputType .. (inputCount - i + 1)
 			end
 		end
 	end
-
-	print(require("inspect")(map))
 
 	return map
 end

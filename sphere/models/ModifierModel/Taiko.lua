@@ -1,4 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
+local InputMode = require("ncdk.InputMode")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sphere.Taiko: sphere.Modifier
 ---@operator call: sphere.Taiko
@@ -23,45 +25,40 @@ local function getKey(i)
 	return 1
 end
 
-local function sort_notes(a, b)
-	return a.timePoint.absoluteTime < b.timePoint.absoluteTime
-end
-
 ---@param config table
-function Taiko:apply(config)
-	local noteChart = self.noteChart
+---@param chart ncdk2.Chart
+function Taiko:apply(config, chart)
+	local inputMode = chart.inputMode
 
-	local inputMode = noteChart.inputMode
-	local keys = inputMode.key
-
-	if keys ~= 4 then
+	if tostring(inputMode) ~= "4key" then
 		return
 	end
 
-	for _, layerData in noteChart:getLayerDataIterator() do
-		if layerData.noteDatas.key then
-			local notes = {}
-			for inputIndex, noteDatas in pairs(layerData.noteDatas.key) do
-				local i = getKey(inputIndex)
-				notes[i] = notes[i] or {}
-				for _, nd in ipairs(noteDatas) do
-					table.insert(notes[i], nd)
-				end
+	for _, layer in pairs(chart.layers) do
+		local new_notes = Notes()
+		for column, notes in layer.notes:iter() do
+			local inputType, inputIndex = InputMode:splitInput(column)
+			local new_column = column
+			if inputType == "key" then
+				new_column = inputType .. getKey(inputIndex)
 			end
-			layerData.noteDatas.key = notes
+			for _, note in ipairs(notes) do
+				new_notes:insert(note, new_column)
+			end
+		end
+		layer.notes = new_notes
+		new_notes:sort()
 
-			local t, n
-			for _, noteDatas in ipairs(notes) do
-				table.sort(noteDatas, sort_notes)
-				for _, noteData in ipairs(noteDatas) do
-					local _t = noteData.timePoint.absoluteTime
-					if _t ~= t then
-						t = _t
-						n = noteData
-					else
-						n.isDouble = true
-						noteData.noteType = "Ignore"
-					end
+		local t, n
+		for _, notes in new_notes:iter() do
+			for _, note in ipairs(notes) do
+				local _t = note.visualPoint.point.absoluteTime
+				if _t ~= t then
+					t = _t
+					n = note
+				else
+					n.isDouble = true
+					note.noteType = "Ignore"
 				end
 			end
 		end
@@ -69,7 +66,7 @@ function Taiko:apply(config)
 
 	inputMode.key = 2
 
-	noteChart:compute()
+	chart:compute()
 end
 
 return Taiko

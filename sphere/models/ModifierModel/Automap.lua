@@ -6,6 +6,8 @@ local BlockFinder = require("libchart.BlockFinder")
 local NotePreprocessor = require("libchart.NotePreprocessor")
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
+local InputMode = require("ncdk.InputMode")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
 
 ---@class sphere.Automap: sphere.Modifier
 ---@operator call: sphere.Automap
@@ -41,10 +43,13 @@ function Automap:applyMeta(config, state)
 end
 
 ---@param config table
-function Automap:apply(config)
+---@param chart ncdk2.Chart
+function Automap:apply(config, chart)
 	self.old = config.old
 	self.targetMode = config.value
-	self.columnCount = self.noteChart.inputMode.key
+
+	self.chart = chart
+	self.columnCount = chart.inputMode.key
 
 	if self.targetMode == self.columnCount or self.columnCount == 0 then
 		return
@@ -57,24 +62,25 @@ function Automap:apply(config)
 		self:processUpscaler()
 	end
 
-	self.noteChart:compute()
+	chart:compute()
 end
 
 function Automap:applyAutomap()
 	local tNoteDatas = {}
 	self.tNoteDatas = tNoteDatas
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			if inputType == "key" and (noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart") then
+	for notes, column, layer in self.chart:iterLayerNotes() do
+		local inputType, inputIndex = InputMode:splitInput(column)
+		for _, note in ipairs(notes) do
+			if inputType == "key" and (note.noteType == "ShortNote" or note.noteType == "LongNoteStart") then
 				local n = {}
 
-				n.noteData = noteData
-				n.layerDataIndex = layerDataIndex
+				n.noteData = note
+				n.layer = layer
 
-				n.startTime = math_util.round(noteData.timePoint.absoluteTime * 1000)
-				if noteData.noteType == "LongNoteStart" and noteData.endNoteData then
-					n.endTime = math_util.round(noteData.endNoteData.timePoint.absoluteTime * 1000)
+				n.startTime = math_util.round(note.visualPoint.point.absoluteTime * 1000)
+				if note.noteType == "LongNoteStart" and note.endNoteData then
+					n.endTime = math_util.round(note.endNoteData.visualPoint.point.absoluteTime * 1000)
 					n.long = true
 				else
 					n.endTime = n.startTime
@@ -92,13 +98,18 @@ function Automap:applyAutomap()
 		return noteData1.startTime < noteData2.startTime
 	end)
 
-	for _, layerData in self.noteChart:getLayerDataIterator() do
-		layerData.noteDatas.key = {}
+	for _, layer in pairs(self.chart.layers) do
+		for column, notes in layer.notes:iter() do
+			local inputType, inputIndex = InputMode:splitInput(column)
+			if inputType == "key" then
+				layer.notes.column_notes[column] = nil
+			end
+		end
 	end
 end
 
 function Automap:processUpscaler()
-	local noteChart = self.noteChart
+	local chart = self.chart
 
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
@@ -124,16 +135,15 @@ function Automap:processUpscaler()
 
 	for i = 1, #notes do
 		local n = notes[i]
+		local layer = n.layer
 
-		local key = noteChart.layerDatas[n.layerDataIndex].noteDatas.key
-		key[n.columnIndex] = key[n.columnIndex] or {}
-		table.insert(key[n.columnIndex], n.noteData)
+		layer.notes:insert(n.noteData, "key" .. n.columnIndex)
 		if n.long then
-			table.insert(key[n.columnIndex], n.noteData.endNoteData)
+			layer.notes:insert(n.noteData.endNoteData, "key" .. n.columnIndex)
 		end
 	end
 
-	self.noteChart.inputMode.key = targetMode
+	self.chart.inputMode.key = targetMode
 end
 
 ---@return table
@@ -167,7 +177,7 @@ function Automap:getUpscalerNotes()
 end
 
 function Automap:processReductor()
-	local noteChart = self.noteChart
+	local chart = self.chart
 
 	local targetMode = self.targetMode
 	local columnCount = self.columnCount
@@ -187,7 +197,7 @@ function Automap:processReductor()
 	-- currently Automap only absolute time mode
 	-- reducting long notes requires creating new time points
 	-- time point interpolating is not fully inplemented in LayerData
-	if self.noteChart:getLayerData(1).mode ~= "absolute" then
+	if not (AbsoluteLayer * self.chart.layers.main) then
 		for _, tNoteData in ipairs(self.tNoteDatas) do
 			tNoteData.endTime = tNoteData.startTime
 		end
@@ -197,19 +207,18 @@ function Automap:processReductor()
 		local n = notes[i]
 		tNoteDatasMap[n] = nil
 
-		local layerData = noteChart.layerDatas[n.layerDataIndex]
-		layerData:addNoteData(n.noteData, "key", n.columnIndex)
+		local layer = n.layer
+		layer.notes:insert(n.noteData, "key" .. n.columnIndex)
 
 		if n.long then
 			if n.startTime == n.endTime then
 				n.noteData.noteType = "ShortNote"
 				-- n.noteData.endNoteData.noteType = "Ignore"
 			else
-				layerData:addNoteData(n.noteData.endNoteData, "key", n.columnIndex)
-				n.noteData.endNoteData.timePoint = layerData:getTimePoint(
-					n.endTime / 1000,
-					n.noteData.endNoteData.timePoint.side
-				)
+				layer.notes:insert(n.noteData.endNoteData, "key" .. n.columnIndex)
+				local p = layer:getPoint(n.endTime / 1000)
+				local vp = layer.visual:getPoint(p)
+				n.noteData.endNoteData.visualPoint = vp
 			end
 		end
 	end
@@ -218,15 +227,15 @@ function Automap:processReductor()
 		local noteData = n.noteData
 		noteData.noteType = "SoundNote"
 
-		local layerData = noteChart.layerDatas[n.layerDataIndex]
-		layerData:addNoteData(n.noteData, "auto", 0)
+		local layer = n.layer
+		layer.notes:insert(n.noteData, "auto")
 
 		-- if n.long then
 		-- 	n.noteData.endNoteData.noteType = "Ignore"
 		-- end
 	end
 
-	self.noteChart.inputMode.key = targetMode
+	self.chart.inputMode.key = targetMode
 end
 
 return Automap

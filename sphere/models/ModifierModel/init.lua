@@ -95,9 +95,8 @@ function ModifierModel:apply(modifiers, chart)
 		local mod = self:getModifier(modifier.id)
 		if mod then
 			table_util.clear(obj)
-			obj.chart = chart
 			setmetatable(obj, mod)
-			obj:apply(modifier)
+			obj:apply(modifier, chart)
 		end
 	end
 end

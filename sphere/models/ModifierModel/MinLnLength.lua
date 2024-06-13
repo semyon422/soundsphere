@@ -26,17 +26,15 @@ function MinLnLength:getString(config)
 end
 
 ---@param config table
-function MinLnLength:apply(config)
+---@param chart ncdk2.Chart
+function MinLnLength:apply(config, chart)
 	local duration = config.value
-	local noteChart = self.noteChart
 
-	for noteDatas in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			if noteData.noteType == "LongNoteStart" or noteData.noteType == "LaserNoteStart" then
-				if (noteData.endNoteData.timePoint.absoluteTime - noteData.timePoint.absoluteTime) <= duration then
-					noteData.noteType = "ShortNote"
-					noteData.endNoteData.noteType = "Ignore"
-				end
+	for note in chart:iterNotes() do
+		if note.noteType == "LongNoteStart" or note.noteType == "LaserNoteStart" then
+			if (note.endNote.visualPoint.point.absoluteTime - note.visualPoint.point.absoluteTime) <= duration then
+				note.noteType = "ShortNote"
+				note.endNote.noteType = "Ignore"
 			end
 		end
 	end
