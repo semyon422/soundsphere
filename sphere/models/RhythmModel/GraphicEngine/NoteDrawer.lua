@@ -112,20 +112,13 @@ end
 function NoteDrawer:updateEventBased()
 	self:updateCurrentTime()
 
-	local currentTime = self.currentVisualPoint.point.absoluteTime
-
-	local events = self.layer.visual.events.events
-	while self.eventOffset < #events do
-		local event = events[self.eventOffset + 1]
-		if event.time > currentTime then
-			break
-		end
-		self.eventOffset = self.eventOffset + 1
-		local noteInfo = self.noteByTimePoint[event.point]
+	for _, event in ipairs(self.pointEvents) do
+		local vp, action = unpack(event)
+		local noteInfo = self.noteByTimePoint[vp]
 		if noteInfo then
-			if event.action == 1 and noteInfo.show then
+			if action == 1 and noteInfo.show then
 				self.visibleNotes[noteInfo.note] = true
-			elseif event.action == -1 and noteInfo.hide then
+			elseif action == -1 and noteInfo.hide then
 				self.visibleNotes[noteInfo.note] = nil
 			end
 		end

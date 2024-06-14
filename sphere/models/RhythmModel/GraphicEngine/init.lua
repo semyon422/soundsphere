@@ -1,4 +1,5 @@
 local class = require("class")
+local table_util = require("table_util")
 local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
 local flux = require("flux")
 
@@ -31,14 +32,13 @@ function GraphicEngine:load()
 	---@type sphere.NoteDrawer[]
 	self.noteDrawers = {}
 
-	local range = {
-		self.range[1] / self.visualTimeRate,
-		self.range[2] / self.visualTimeRate,
-	}
+	---@type {[ncdk2.Layer]: table}
+	self.pointEvents = {}
 
 	if self.eventBasedRender then
 		for _, layer in pairs(self.chart.layers) do
-			layer.visual:generateEvents(range)
+			self.pointEvents[layer] = {}
+			layer.visual:generateEvents()
 		end
 	end
 
@@ -54,7 +54,25 @@ function GraphicEngine:unload()
 end
 
 function GraphicEngine:update()
+	local currentTime = self:getCurrentTime()
+
+	local range = math.max(-self.range[1], self.range[2]) / self.visualTimeRate
+
+	local pointEvents = self.pointEvents
+	if self.eventBasedRender then
+		for _, layer in pairs(self.chart.layers) do
+			table_util.clear(pointEvents[layer])
+			local scroller = layer.visual.scroller
+			local function f(vp, action)
+				table.insert(pointEvents[layer], {vp, action})
+			end
+			scroller:scroll(currentTime, f)
+			scroller:scale(range, f)
+		end
+	end
+
 	for _, noteDrawer in ipairs(self.noteDrawers) do
+		noteDrawer.pointEvents = pointEvents[noteDrawer.layer]
 		noteDrawer:update()
 	end
 end
