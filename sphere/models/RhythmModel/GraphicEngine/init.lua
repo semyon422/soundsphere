@@ -1,6 +1,5 @@
 local class = require("class")
-local table_util = require("table_util")
-local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
+local LayerRenderer = require("sphere.models.RhythmModel.GraphicEngine.LayerRenderer")
 local flux = require("flux")
 
 ---@class sphere.GraphicEngine
@@ -19,6 +18,7 @@ GraphicEngine.range = {-1, 1}
 function GraphicEngine:new(visualTimeInfo, logicEngine)
 	self.visualTimeInfo = visualTimeInfo
 	self.logicEngine = logicEngine
+	self.layerRenderers = {}
 end
 
 ---@param chart ncdk2.Chart
@@ -29,51 +29,43 @@ end
 function GraphicEngine:load()
 	self.notes_count = 0
 
-	---@type sphere.NoteDrawer[]
-	self.noteDrawers = {}
+	---@type {[string]: sphere.LayerRenderer}
+	self.layerRenderers = {}
 
-	---@type {[ncdk2.Layer]: table}
-	self.pointEvents = {}
-
-	if self.eventBasedRender then
-		for _, layer in pairs(self.chart.layers) do
-			self.pointEvents[layer] = {}
-			layer.visual:generateEvents()
-		end
-	end
-
-	for notes, column, layer in self.chart:iterLayerNotes() do
-		local noteDrawer = NoteDrawer(layer, notes, column, self)
-		noteDrawer:load()
-		table.insert(self.noteDrawers, noteDrawer)
+	for name, layer in pairs(self.chart.layers) do
+		local layerRenderer = LayerRenderer(self, layer)
+		layerRenderer:load()
+		self.layerRenderers[name] = layerRenderer
 	end
 end
 
 function GraphicEngine:unload()
-	self.noteDrawers = {}
+	self.layerRenderers = {}
 end
 
 function GraphicEngine:update()
-	local currentTime = self:getCurrentTime()
-
-	local range = math.max(-self.range[1], self.range[2]) / self.visualTimeRate
-
-	local pointEvents = self.pointEvents
-	if self.eventBasedRender then
-		for _, layer in pairs(self.chart.layers) do
-			table_util.clear(pointEvents[layer])
-			local scroller = layer.visual.scroller
-			local function f(vp, action)
-				table.insert(pointEvents[layer], {vp, action})
-			end
-			scroller:scroll(currentTime, f)
-			scroller:scale(range, f)
-		end
+	for _, layerRenderer in pairs(self.layerRenderers) do
+		layerRenderer:update()
 	end
+end
 
-	for _, noteDrawer in ipairs(self.noteDrawers) do
-		noteDrawer.pointEvents = pointEvents[noteDrawer.layer]
-		noteDrawer:update()
+---@generic T
+---@param f fun(obj: T, note: sphere.GraphicalNote)
+---@param obj T
+function GraphicEngine:iterNotes(f, obj)
+	local eventBasedRender = self.eventBasedRender
+	for _, layerRenderer in pairs(self.layerRenderers) do
+		for _, columnRenderer in pairs(layerRenderer.columnRenderers) do
+			if eventBasedRender then
+				for _, note in ipairs(columnRenderer.visibleNotesList) do
+					f(obj, note)
+				end
+			else
+				for i = columnRenderer.startNoteIndex, columnRenderer.endNoteIndex do
+					f(obj, columnRenderer.notes[i])
+				end
+			end
+		end
 	end
 end
 

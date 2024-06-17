@@ -114,9 +114,6 @@ end
 function ChartPreviewModel:update()
 	self.visualTimeInfo.time = self.previewModel:getTime()
 	self.visualTimeInfo.rate = self.previewModel.rate
-	if not self.graphicEngine.noteDrawers then
-		return
-	end
 	self.graphicEngine:update()
 end
 

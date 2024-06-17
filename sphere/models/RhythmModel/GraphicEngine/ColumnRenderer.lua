@@ -1,22 +1,20 @@
 local class = require("class")
-local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
-local Point = require("ncdk2.tp.Point")
-local VisualPoint = require("ncdk2.visual.VisualPoint")
 local table_util = require("table_util")
+local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNoteFactory")
 
----@class sphere.NoteDrawer
----@operator call: sphere.NoteDrawer
-local NoteDrawer = class()
+---@class sphere.ColumnRenderer
+---@operator call: sphere.ColumnRenderer
+local ColumnRenderer = class()
 
 ---@param layer ncdk2.Layer
 ---@param notes notechart.Note[]
 ---@param column ncdk2.Column
----@param graphicEngine sphere.GraphicEngine
-function NoteDrawer:new(layer, notes, column, graphicEngine)
+---@param layerRenderer sphere.LayerRenderer
+function ColumnRenderer:new(layer, notes, column, layerRenderer)
 	self.layer = layer
 	self._notes = notes
 	self.column = column
-	self.graphicEngine = graphicEngine
+	self.layerRenderer = layerRenderer
 end
 
 local function sort_const(a, b)
@@ -27,14 +25,10 @@ local function sort_visual(a, b)
 	return a.startNote.visualPoint:compare(b.startNote.visualPoint)
 end
 
-function NoteDrawer:load()
-	local graphicEngine = self.graphicEngine
+function ColumnRenderer:load()
+	local layerRenderer = self.layerRenderer
+	local graphicEngine = layerRenderer.graphicEngine
 	local layer = self.layer
-
-	self.eventOffset = 0
-
-	self.currentVisualPointIndex = 1
-	self.currentVisualPoint = VisualPoint(Point())
 
 	self.notes = {}
 	local notes = self.notes
@@ -44,13 +38,13 @@ function NoteDrawer:load()
 	for _, _note in ipairs(self._notes) do
 		local note = GraphicalNoteFactory:getNote(_note)
 		if note then
-			note.currentVisualPoint = self.currentVisualPoint
+			note.currentVisualPoint = layerRenderer.currentVisualPoint
 			note.graphicEngine = graphicEngine
 			note.layer = layer
 			note.column = self.column
 			table.insert(notes, note)
 
-			if self.graphicEngine.eventBasedRender then
+			if graphicEngine.eventBasedRender then
 				local endNote = note.startNote.endNote
 				if not endNote then
 					self.noteByTimePoint[note.startNote.visualPoint] = {
@@ -89,29 +83,14 @@ function NoteDrawer:load()
 	self.visibleNotesList = {}
 end
 
-function NoteDrawer:updateCurrentTime()
-	local graphicEngine = self.graphicEngine
-	local vp = self.currentVisualPoint
-	vp.point.absoluteTime = graphicEngine:getCurrentTime() - graphicEngine:getInputOffset()
-
-	local interpolator = self.layer.visual.interpolator
-	local visualPoints = self.layer.visual.points
-
-	self.currentVisualPointIndex = interpolator:interpolate(
-		visualPoints, self.currentVisualPointIndex, vp, "absolute"
-	)
-end
-
-function NoteDrawer:update()
-	if self.graphicEngine.eventBasedRender then
+function ColumnRenderer:update()
+	if self.layerRenderer.graphicEngine.eventBasedRender then
 		return self:updateEventBased()
 	end
 	return self:updateSorted()
 end
 
-function NoteDrawer:updateEventBased()
-	self:updateCurrentTime()
-
+function ColumnRenderer:updateEventBased()
 	for _, event in ipairs(self.pointEvents) do
 		local vp, action = unpack(event)
 		local noteInfo = self.noteByTimePoint[vp]
@@ -135,9 +114,7 @@ function NoteDrawer:updateEventBased()
 	table.sort(visibleNotesList, sort_const)
 end
 
-function NoteDrawer:updateSorted()
-	self:updateCurrentTime()
-
+function ColumnRenderer:updateSorted()
 	local notes = self.notes
 	local note
 
@@ -180,4 +157,4 @@ function NoteDrawer:updateSorted()
 	end
 end
 
-return NoteDrawer
+return ColumnRenderer

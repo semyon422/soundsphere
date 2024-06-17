@@ -145,7 +145,7 @@ local function test(notes, events, states, graphicStates)
 		graphicEngine:update()
 		local state = {}
 		table.insert(newGraphicStates, state)
-		for _, note in ipairs(graphicEngine.noteDrawers[1].notes) do
+		for _, note in ipairs(graphicEngine.layerRenderers.main.columnRenderers[1].notes) do
 			if note.endTimeState then
 				table.insert(state, {
 					-note.startTimeState.scaledFakeVisualDeltaTime + time,
