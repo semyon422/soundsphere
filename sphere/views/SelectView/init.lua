@@ -6,6 +6,7 @@ local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
 local NotechartsSubscreen = require("sphere.views.SelectView.NotechartsSubscreen")
 local CollectionsSubscreen = require("sphere.views.SelectView.CollectionsSubscreen")
 local OsudirectSubscreen = require("sphere.views.SelectView.OsudirectSubscreen")
+local Background = require("sphere.views.SelectView.Background")
 local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
 ---@class sphere.SelectView: sphere.ScreenView
@@ -46,8 +47,9 @@ function SelectView:draw()
 	just.container("select container", true)
 
 	Layout:draw()
-	SelectViewConfig(self)
+	Background(self)
 	self.chartPreviewView:draw()
+	SelectViewConfig(self)
 
 	local cacheModel = self.game.cacheModel
 

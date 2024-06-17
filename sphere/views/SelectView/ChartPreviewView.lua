@@ -1,5 +1,6 @@
 local class = require("class")
 local SequenceView = require("sphere.views.SequenceView")
+local ChartPreviewRhythmView = require("sphere.views.SelectView.ChartPreviewRhythmView")
 
 ---@class sphere.ChartPreviewView
 ---@operator call: sphere.ChartPreviewView
@@ -18,20 +19,30 @@ function ChartPreviewView:load()
 		return
 	end
 
-	local playfield = noteSkin.playField
-
-	self.transform = playfield:newNoteskinTransform()
+	local playfield = self.game.chartPreviewModel.playField
+	local transform = playfield:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
-
 	sequenceView.game = self.game
 	sequenceView.subscreen = "preview"
-	sequenceView:setSequenceConfig(playfield)
+	-- sequenceView:setSequenceConfig(playfield)
+
+	sequenceView:setSequenceConfig({
+		ChartPreviewRhythmView({
+			transform = transform,
+			subscreen = "preview",
+		}),
+	})
 	sequenceView:load()
+
+	self.loaded = true
 end
 
 ---@param dt number
 function ChartPreviewView:update(dt)
+	if not self.loaded then
+		self:load()
+	end
 	self.sequenceView:update(dt)
 end
 

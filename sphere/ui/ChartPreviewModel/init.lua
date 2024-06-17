@@ -13,6 +13,7 @@ local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
 local MeasureLayer = require("ncdk2.layers.MeasureLayer")
 local AbsoluteInterval = require("ncdk2.convert.AbsoluteInterval")
 local MeasureInterval = require("ncdk2.convert.MeasureInterval")
+local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
 
 ---@param chart ncdk2.Chart
 local function to_interval(chart)
@@ -44,11 +45,29 @@ function ChartPreviewModel:new(configModel, previewModel, game)
 		rate = 0,
 	}
 	self.graphicEngine = GraphicEngine(self.visualTimeInfo)
+	self.skinInfo = BaseSkinInfo()
+
+	self.skin_by_mode = {}
 	-- self.graphicEngine.eventBasedRender = true
 end
 
+---@param inputMode string
+function ChartPreviewModel:getNoteSkin(inputMode)
+	local skin_by_mode = self.skin_by_mode
+	local noteSkin = skin_by_mode[inputMode]
+	if noteSkin then
+		return noteSkin
+	end
+	noteSkin = self.skinInfo:loadSkin(inputMode)
+	noteSkin:loadData()
+	skin_by_mode[inputMode] = noteSkin
+	return noteSkin
+end
+
 function ChartPreviewModel:setChartview(chartview)
-	print(chartview.real_path)
+	if not chartview then
+		return
+	end
 
 	local content = love.filesystem.read(chartview.location_path)
 	if not content then
@@ -97,9 +116,12 @@ function ChartPreviewModel:setChartview(chartview)
 	-- f:write(sph_lines_str2)
 	-- f:close()
 
-	local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
-	noteSkin:loadData()
-	noteSkin.editor = true
+	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
+	self.playField = noteSkin.playField
+	self.game.noteSkinModel.noteSkin = noteSkin
+	-- local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
+	-- noteSkin:loadData()
+	-- noteSkin.editor = true
 
 	local config = self.configModel.configs.settings
 	self.graphicEngine.visualTimeRate = config.gameplay.speed
