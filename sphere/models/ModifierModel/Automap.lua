@@ -228,7 +228,7 @@ function Automap:processReductor()
 		noteData.noteType = "SoundNote"
 
 		local layer = n.layer
-		layer.notes:insert(n.noteData, "auto")
+		layer.notes:insert(n.noteData, "auto" .. n.columnIndex)
 
 		-- if n.long then
 		-- 	n.noteData.endNoteData.noteType = "Ignore"

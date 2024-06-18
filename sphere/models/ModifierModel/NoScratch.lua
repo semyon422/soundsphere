@@ -27,7 +27,7 @@ function NoScratch:apply(config, chart)
 			if inputType == "scratch" then
 				for _, note in ipairs(notes) do
 					note.noteType = "SoundNote"
-					layer.notes:insert(note, "auto")
+					layer.notes:insert(note, "auto" .. inputIndex)
 				end
 				layer.notes.column_notes[column] = nil
 			end

@@ -103,6 +103,8 @@ function MaxChord:apply(config, chart)
 						time = note.visualPoint.point.absoluteTime,
 						nextTime = getNextTime(_notes, i),
 						prevTime = getNextTime(_notes, i, -1),
+						inputType = inputIndex,
+						inputIndex = inputIndex,
 						column = inputIndex,
 						layer = layer,
 					})
@@ -197,7 +199,7 @@ function MaxChord:apply(config, chart)
 		soundNote.noteType = "SoundNote"
 		soundNote.sounds, noteData.sounds = noteData.sounds, {}
 
-		layer.notes:insert(soundNote, "auto")
+		layer.notes:insert(soundNote, "auto" .. note.inputIndex)
 	end
 end
 

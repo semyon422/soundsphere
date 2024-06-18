@@ -125,7 +125,7 @@ function LessChord:apply(config, chart)
 						end
 
 						note.noteData.noteType = "SoundNote"
-						layer.notes:insert(note.noteData, "auto")
+						layer.notes:insert(note.noteData, "auto" .. note.inputIndex)
 					else
 						layer.notes:insert(note.noteData, "key" .. note.inputIndex)
 					end
