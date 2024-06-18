@@ -1,32 +1,15 @@
 local class = require("class")
+local InputMode = require("ncdk.InputMode")
 local ChartFactory = require("notechart.ChartFactory")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local ChartEncoder = require("sph.ChartEncoder")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local SphLines = require("sph.SphLines")
+local Sph = require("sph.Sph")
 local TextLines = require("sph.lines.TextLines")
-local LinesCleaner = require("sph.lines.LinesCleaner")
-local stbl = require("stbl")
-local IntervalLayer = require("ncdk2.layers.IntervalLayer")
-local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
-local MeasureLayer = require("ncdk2.layers.MeasureLayer")
-local AbsoluteInterval = require("ncdk2.convert.AbsoluteInterval")
-local MeasureInterval = require("ncdk2.convert.MeasureInterval")
 local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
 
----@param chart ncdk2.Chart
-local function to_interval(chart)
-	local layer = chart.layers.main
-
-	if AbsoluteLayer * layer then
-		local conv = AbsoluteInterval({1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16}, 0.002)
-		conv:convert(layer, "closest_gte")
-	elseif MeasureLayer * layer then
-		local conv = MeasureInterval()
-		conv:convert(layer)
-	end
-end
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -64,6 +47,11 @@ function ChartPreviewModel:getNoteSkin(inputMode)
 	return noteSkin
 end
 
+local empty_lines = SphPreview:previewLinesToLines({
+	{offset = 0},
+	{offset = 1},
+})
+
 function ChartPreviewModel:setChartview(chartview)
 	if not chartview then
 		return
@@ -74,17 +62,25 @@ function ChartPreviewModel:setChartview(chartview)
 		return
 	end
 
-	local charts = assert(ChartFactory:getCharts(
-		chartview.chartfile_name,
-		content
-	))
-	local chart = charts[chartview.index]
-	to_interval(chart)
+	local notes_preview = chartview.notes_preview
 
-	assert(IntervalLayer * chart.layers.main)
+	local lines = empty_lines
+	if notes_preview then
+		lines = SphPreview:decodeLines(notes_preview)
+	end
 
-	local encoder = ChartEncoder()
-	local sph = encoder:encodeSph(chart)
+
+	-- local charts = assert(ChartFactory:getCharts(
+	-- 	chartview.chartfile_name,
+	-- 	content
+	-- ))
+	-- local chart = charts[chartview.index]
+	-- to_interval(chart)
+
+	-- assert(IntervalLayer * chart.layers.main)
+
+	-- local encoder = ChartEncoder()
+	-- local sph = encoder:encodeSph(chart)
 
 	-- local tl = TextLines()
 	-- tl.lines = sph.sphLines:encode()
@@ -94,9 +90,12 @@ function ChartPreviewModel:setChartview(chartview)
 
 	-- print("size", #sph_lines_str)
 
-	local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(sph.sphLines:encode()), 1)
-	sph.sphLines = SphLines()
-	sph.sphLines:decode(SphPreview:decodeLines(sph_preview))
+	-- local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(sph.sphLines:encode()), 1)
+	-- sph.sphLines = SphLines()
+
+	local sph = Sph()
+	sph.metadata.input = assert(chartview.chartdiff_inputmode)
+	sph.sphLines:decode(lines)
 
 	-- local tl = TextLines()
 	-- tl.lines = encoder.sph.sphLines:encode()
@@ -104,7 +103,7 @@ function ChartPreviewModel:setChartview(chartview)
 	-- local sph_lines_str2 = tl:encode()
 
 	local decoder = ChartDecoder()
-	chart = decoder:decodeSph(sph)
+	local chart = decoder:decodeSph(sph)
 
 	-- local f = assert(io.open("sph_preview.bin", "wb"))
 	-- f:write(sph_preview)
