@@ -4,6 +4,7 @@ local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local theme = require("imgui.theme")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -229,7 +230,9 @@ function section_draw.database(self)
 
 
 	if imgui.button("compute diff", "compute diff") then
+		local chartdiff = self.game.selectModel.chartview
 		local chart = self.game.selectModel:loadChart()
+		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
 	end
 end
