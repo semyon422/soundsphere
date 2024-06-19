@@ -1,15 +1,9 @@
 local class = require("class")
-local InputMode = require("ncdk.InputMode")
-local ChartFactory = require("notechart.ChartFactory")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
-local ChartEncoder = require("sph.ChartEncoder")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
-local SphLines = require("sph.SphLines")
 local Sph = require("sph.Sph")
-local TextLines = require("sph.lines.TextLines")
 local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
-
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -57,63 +51,19 @@ function ChartPreviewModel:setChartview(chartview)
 		return
 	end
 
-	local content = love.filesystem.read(chartview.location_path)
-	if not content then
-		return
-	end
-
 	local notes_preview = chartview.notes_preview
 
 	local lines = empty_lines
 	if notes_preview then
-		lines = SphPreview:decodeLines(notes_preview)
+		lines = SphPreview:decodeLines(notes_preview)  -- slow
 	end
-
-
-	-- local charts = assert(ChartFactory:getCharts(
-	-- 	chartview.chartfile_name,
-	-- 	content
-	-- ))
-	-- local chart = charts[chartview.index]
-	-- to_interval(chart)
-
-	-- assert(IntervalLayer * chart.layers.main)
-
-	-- local encoder = ChartEncoder()
-	-- local sph = encoder:encodeSph(chart)
-
-	-- local tl = TextLines()
-	-- tl.lines = sph.sphLines:encode()
-	-- tl.columns = chart.inputMode:getColumns()
-	-- local sph_lines_str = tl:encode()
-	-- print(sph_lines_str)
-
-	-- print("size", #sph_lines_str)
-
-	-- local sph_preview = SphPreview:encodeLines(LinesCleaner:clean(sph.sphLines:encode()), 1)
-	-- sph.sphLines = SphLines()
 
 	local sph = Sph()
 	sph.metadata.input = assert(chartview.chartdiff_inputmode)
 	sph.sphLines:decode(lines)
 
-	-- local tl = TextLines()
-	-- tl.lines = encoder.sph.sphLines:encode()
-	-- tl.columns = noteChart.inputMode:getColumns()
-	-- local sph_lines_str2 = tl:encode()
-
 	local decoder = ChartDecoder()
-	local chart = decoder:decodeSph(sph)
-
-	-- local f = assert(io.open("sph_preview.bin", "wb"))
-	-- f:write(sph_preview)
-	-- f:close()
-	-- local f = assert(io.open("sph_lines_str.sph", "w"))
-	-- f:write(sph_lines_str)
-	-- f:close()
-	-- f = assert(io.open("sph_lines_str2.sph", "w"))
-	-- f:write(sph_lines_str2)
-	-- f:close()
+	local chart = decoder:decodeSph(sph)  -- slow
 
 	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
 	self.playField = noteSkin.playField

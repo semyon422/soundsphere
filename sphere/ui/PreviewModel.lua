@@ -35,6 +35,11 @@ function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode)
 	end
 end
 
+---@param f function
+function PreviewModel:onLoad(f)
+	self._on_load = f
+end
+
 function PreviewModel:update()
 	local settings = self.configModel.configs.settings
 	local muteOnUnfocus = settings.miscellaneous.muteOnUnfocus
@@ -148,6 +153,10 @@ function PreviewModel:loadPreview()
 		return
 	end
 	self.volume = volume
+	if self._on_load then
+		self._on_load()
+		self._on_load = nil
+	end
 end
 
 function PreviewModel:stop()
