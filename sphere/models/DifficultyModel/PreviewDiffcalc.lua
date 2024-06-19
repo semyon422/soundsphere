@@ -1,7 +1,4 @@
-local class = require("class")
-local enps = require("libchart.enps")
-local osu_starrate = require("libchart.osu_starrate")
-local simplify_notechart = require("libchart.simplify_notechart")
+local IDiffcalc = require("sphere.models.DifficultyModel.IDiffcalc")
 local ChartEncoder = require("sph.ChartEncoder")
 local SphPreview = require("sph.SphPreview")
 local LinesCleaner = require("sph.lines.LinesCleaner")
@@ -10,6 +7,13 @@ local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
 local MeasureLayer = require("ncdk2.layers.MeasureLayer")
 local AbsoluteInterval = require("ncdk2.convert.AbsoluteInterval")
 local MeasureInterval = require("ncdk2.convert.MeasureInterval")
+
+---@class sphere.PreviewDiffcalc: sphere.IDiffcalc
+---@operator call: sphere.PreviewDiffcalc
+local PreviewDiffcalc = IDiffcalc + {}
+
+PreviewDiffcalc.name = "enps"
+PreviewDiffcalc.chartdiff_field = "notes_preview"
 
 ---@param chart ncdk2.Chart
 local function to_interval(chart)
@@ -24,30 +28,9 @@ local function to_interval(chart)
 	end
 end
 
----@class sphere.DifficultyModel
----@operator call: sphere.DifficultyModel
-local DifficultyModel = class()
-
----@param chartdiff table
----@param chart ncdk2.Chart
----@param timeRate number
-function DifficultyModel:compute(chartdiff, chart, timeRate)
-	local notes = simplify_notechart(chart)
-
-	local long_notes_count = 0
-	for _, note in ipairs(notes) do
-		if note.end_time then
-			long_notes_count = long_notes_count + 1
-		end
-	end
-
-	local columns = chart.inputMode:getColumns()
-	local bm = osu_starrate.Beatmap(notes, columns, timeRate)
-
-	chartdiff.notes_count = #notes
-	chartdiff.long_notes_count = long_notes_count
-	chartdiff.enps_diff = enps.getEnps(notes) * timeRate
-	chartdiff.osu_diff = bm:calculateStarRate()
+---@param ctx sphere.DiffcalcContext
+function PreviewDiffcalc:compute(ctx)
+	local chart = ctx.chart
 
 	to_interval(chart)
 	assert(IntervalLayer * chart.layers.main)
@@ -56,15 +39,16 @@ function DifficultyModel:compute(chartdiff, chart, timeRate)
 	local sph = encoder:encodeSph(chart)
 
 	local preview_ver = 1
-	if columns > 10 then
+	if chart.inputMode:getColumns() > 10 then
 		preview_ver = 0
 	end
 
+	-- SphPreview still have some issues with encoding unusual charts
 	pcall(function()
 		local lines = sph.sphLines:encode()
 		lines = LinesCleaner:clean(lines)
-		chartdiff.notes_preview = SphPreview:encodeLines(lines, preview_ver)
+		ctx.chartdiff.notes_preview = SphPreview:encodeLines(lines, preview_ver)
 	end)
 end
 
-return DifficultyModel
+return PreviewDiffcalc

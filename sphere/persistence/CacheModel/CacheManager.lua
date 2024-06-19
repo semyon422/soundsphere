@@ -38,7 +38,7 @@ function CacheManager:new(gdb)
 		end
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel())
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, ChartFactory)
 
 	self.locationManager = LocationManager(
