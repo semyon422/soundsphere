@@ -79,8 +79,8 @@ function Automap:applyAutomap()
 				n.layer = layer
 
 				n.startTime = math_util.round(note.visualPoint.point.absoluteTime * 1000)
-				if note.noteType == "LongNoteStart" and note.endNoteData then
-					n.endTime = math_util.round(note.endNoteData.visualPoint.point.absoluteTime * 1000)
+				if note.noteType == "LongNoteStart" and note.endNote then
+					n.endTime = math_util.round(note.endNote.visualPoint.point.absoluteTime * 1000)
 					n.long = true
 				else
 					n.endTime = n.startTime
@@ -139,7 +139,7 @@ function Automap:processUpscaler()
 
 		layer.notes:insert(n.noteData, "key" .. n.columnIndex)
 		if n.long then
-			layer.notes:insert(n.noteData.endNoteData, "key" .. n.columnIndex)
+			layer.notes:insert(n.noteData.endNote, "key" .. n.columnIndex)
 		end
 	end
 
@@ -215,10 +215,10 @@ function Automap:processReductor()
 				n.noteData.noteType = "ShortNote"
 				-- n.noteData.endNoteData.noteType = "Ignore"
 			else
-				layer.notes:insert(n.noteData.endNoteData, "key" .. n.columnIndex)
+				layer.notes:insert(n.noteData.endNote, "key" .. n.columnIndex)
 				local p = layer:getPoint(n.endTime / 1000)
 				local vp = layer.visual:getPoint(p)
-				n.noteData.endNoteData.visualPoint = vp
+				n.noteData.endNote.visualPoint = vp
 			end
 		end
 	end
