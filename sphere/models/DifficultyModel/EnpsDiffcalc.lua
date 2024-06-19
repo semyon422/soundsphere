@@ -6,7 +6,7 @@ local enps = require("libchart.enps")
 local EnpsDiffcalc = IDiffcalc + {}
 
 EnpsDiffcalc.name = "enps"
-EnpsDiffcalc.chartdiff_field = "osu_diff"
+EnpsDiffcalc.chartdiff_field = "enps_diff"
 
 ---@param ctx sphere.DiffcalcContext
 function EnpsDiffcalc:compute(ctx)

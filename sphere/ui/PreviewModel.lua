@@ -32,6 +32,11 @@ function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode)
 		self.preview_time = preview_time
 		self.mode = mode
 		self:loadPreviewDebounce()
+		return
+	end
+	if self._on_load then
+		self._on_load()
+		self._on_load = nil
 	end
 end
 

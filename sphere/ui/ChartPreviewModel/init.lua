@@ -56,6 +56,7 @@ function ChartPreviewModel:setChartview(chartview)
 	local lines = empty_lines
 	if notes_preview then
 		lines = SphPreview:decodeLines(notes_preview)  -- slow
+		print("decode", #lines)
 	end
 
 	local sph = Sph()

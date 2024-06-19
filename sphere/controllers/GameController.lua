@@ -4,7 +4,6 @@ local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
-local DifficultyModel = require("sphere.models.DifficultyModel")
 local SelectModel = require("sphere.models.SelectModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
@@ -50,7 +49,6 @@ function GameController:new()
 	self.onlineModel = OnlineModel(self.persistence.configModel)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
 	self.inputModel = InputModel(self.persistence.configModel)
-	self.difficultyModel = DifficultyModel()
 	self.resourceModel = ResourceModel(
 		self.persistence.configModel,
 		self.persistence.fileFinder
@@ -94,6 +92,7 @@ function GameController:new()
 	self.osudirectModel = self.persistence.osudirectModel
 	self.configModel = self.persistence.configModel
 	self.fileFinder = self.persistence.fileFinder
+	self.difficultyModel = self.persistence.difficultyModel
 
 	self.discordModel = self.app.discordModel
 	self.windowModel = self.app.windowModel
