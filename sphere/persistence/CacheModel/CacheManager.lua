@@ -175,7 +175,7 @@ end
 function CacheManager:getChartsByHash(hash)
 	local chartfile = self.chartfilesRepo:selectChartfileByHash(hash)
 	if not chartfile then
-		return
+		return nil, "chartfile not found for " .. hash
 	end
 
 	local location = self.locationsRepo:selectLocationById(chartfile.location_id)
@@ -206,14 +206,13 @@ function CacheManager:computeChartdiffs()
 		local charts, err = self:getChartsByHash(chartmeta.hash)
 		if not charts then
 			print(err)
-			return nil, err
+		else
+			local chart = charts[chartmeta.index]
+			local chartdiff = self.chartdiffGenerator:compute(chart, 1)
+			chartdiff.hash = chartmeta.hash
+			chartdiff.index = chartmeta.index
+			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 		end
-
-		local chart = charts[chartmeta.index]
-		local chartdiff = self.chartdiffGenerator:compute(chart, 1)
-		chartdiff.hash = chartmeta.hash
-		chartdiff.index = chartmeta.index
-		self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 
 		self.chartfiles_current = self.chartfiles_current + 1
 		self:checkProgress()
@@ -224,22 +223,21 @@ function CacheManager:computeChartdiffs()
 
 	print("computing modified chartdiffs")
 	for i, score in ipairs(scores) do
-		local charts, err = self:getChartsByHash(chartmeta.hash)
+		local charts, err = self:getChartsByHash(score.hash)
 		if not charts then
 			print(err)
-			return nil, err
+		else
+			local chart = charts[score.index]
+			ModifierModel:apply(score.modifiers, chart)
+
+			local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
+			chartdiff.modifiers = score.modifiers
+			chartdiff.hash = score.hash
+			chartdiff.index = score.index
+			chartdiff.rate_type = score.rate_type
+
+			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 		end
-
-		local chart = charts[score.index]
-		ModifierModel:apply(score.modifiers, chart)
-
-		local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
-		chartdiff.modifiers = score.modifiers
-		chartdiff.hash = score.hash
-		chartdiff.index = score.index
-		chartdiff.rate_type = score.rate_type
-
-		self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 
 		self.chartfiles_current = self.chartfiles_current + 1
 		self:checkProgress()
@@ -289,6 +287,7 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 				return nil, err
 			end
 			chart = charts[chartdiff.index]
+			ModifierModel:apply(chartdiff.modifiers, chart)
 		end
 
 		self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)

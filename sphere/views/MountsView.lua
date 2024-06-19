@@ -222,6 +222,16 @@ function section_draw.database(self)
 		end
 		just.sameline()
 	end
+	just.next()
+
+	imgui.separator()
+	imgui.text("debug")
+
+
+	if imgui.button("compute diff", "compute diff") then
+		local chart = self.game.selectModel:loadChart()
+		self.game.difficultyModel:compute({}, chart, 1)
+	end
 end
 
 return modal

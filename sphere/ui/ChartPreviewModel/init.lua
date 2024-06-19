@@ -47,7 +47,7 @@ local empty_lines = SphPreview:previewLinesToLines({
 })
 
 function ChartPreviewModel:setChartview(chartview)
-	if not chartview then
+	if not chartview or not chartview.chartdiff_inputmode then
 		return
 	end
 
@@ -56,7 +56,6 @@ function ChartPreviewModel:setChartview(chartview)
 	local lines = empty_lines
 	if notes_preview then
 		lines = SphPreview:decodeLines(notes_preview)  -- slow
-		print("decode", #lines)
 	end
 
 	local sph = Sph()
