@@ -112,9 +112,11 @@ function ChartviewsRepo:queryNoteChartSets()
 	}
 
 	local where = table_util.copy(params.where)
-	local model = self.models.chartviews
+
+	-- views without preview are 2x times faster
+	local model = self.models.chartviews_no_preview
 	if params.chartdiffs_list then
-		model = self.models.chartdiffviews
+		model = self.models.chartdiffviews_no_preview
 	end
 
 	local objs = model:select(where, options)

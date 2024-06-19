@@ -221,6 +221,54 @@ chartmetas.`index` = scores.`index`
 GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`
 ;
 
+CREATE TEMP VIEW IF NOT EXISTS chartviews_no_preview AS
+SELECT
+chartmetas.id AS chartmeta_id,
+chartfiles.id AS chartfile_id,
+chartdiffs.id AS chartdiff_id,
+chartfiles.set_id AS chartfile_set_id,
+chartfile_sets.location_id,
+chartfile_sets.is_file AS set_is_file,
+chartfile_sets.dir AS set_dir,
+chartfile_sets.name AS set_name,
+chartfile_sets.modified_at AS set_modified_at,
+chartfiles.name AS chartfile_name,
+chartfiles.modified_at,
+chartfiles.hash,
+MIN(scores.accuracy) AS accuracy,
+MIN(scores.miss) AS miss,
+MAX(scores.time) AS score_time,
+chartmetas.*,
+chartdiffs.modifiers,
+chartdiffs.rate,
+chartdiffs.rate_type,
+chartdiffs.inputmode AS chartdiff_inputmode,
+chartdiffs.notes_count,
+chartdiffs.long_notes_count,
+chartdiffs.density_data,
+chartdiffs.sv_data,
+chartdiffs.enps_diff,
+chartdiffs.osu_diff,
+chartdiffs.msd_diff,
+chartdiffs.msd_diff_data,
+chartdiffs.user_diff,
+chartdiffs.user_diff_data
+FROM chartfiles
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
+LEFT JOIN chartdiffs ON
+chartmetas.hash = chartdiffs.hash AND
+chartmetas.`index` = chartdiffs.`index` AND
+chartdiffs.modifiers = "" AND
+chartdiffs.rate = 1000
+LEFT JOIN scores ON
+chartmetas.hash = scores.hash AND
+chartmetas.`index` = scores.`index`
+GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`
+;
+
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
 SELECT
 chartmetas.id AS chartmeta_id,
@@ -246,6 +294,54 @@ chartdiffs.inputmode AS chartdiff_inputmode,
 chartdiffs.notes_count,
 chartdiffs.long_notes_count,
 chartdiffs.notes_preview,
+chartdiffs.density_data,
+chartdiffs.sv_data,
+chartdiffs.enps_diff,
+chartdiffs.osu_diff,
+chartdiffs.msd_diff,
+chartdiffs.msd_diff_data,
+chartdiffs.user_diff,
+chartdiffs.user_diff_data
+FROM chartfiles
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
+LEFT JOIN chartdiffs ON
+chartmetas.hash = chartdiffs.hash AND
+chartmetas.`index` = chartdiffs.`index`
+LEFT JOIN scores ON
+chartmetas.hash = scores.hash AND
+chartmetas.`index` = scores.`index` AND
+chartdiffs.modifiers = scores.modifiers AND
+chartdiffs.rate = scores.rate
+GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, scores.hash, scores.`index`, scores.modifiers, scores.rate
+;
+
+CREATE TEMP VIEW IF NOT EXISTS chartdiffviews_no_preview AS
+SELECT
+chartmetas.id AS chartmeta_id,
+chartfiles.id AS chartfile_id,
+chartdiffs.id AS chartdiff_id,
+chartfiles.set_id AS chartfile_set_id,
+chartfile_sets.location_id,
+chartfile_sets.is_file AS set_is_file,
+chartfile_sets.dir AS set_dir,
+chartfile_sets.name AS set_name,
+chartfile_sets.modified_at AS set_modified_at,
+chartfiles.name AS chartfile_name,
+chartfiles.modified_at,
+chartfiles.hash,
+MIN(scores.accuracy) AS accuracy,
+MIN(scores.miss) AS miss,
+MAX(scores.time) AS score_time,
+chartmetas.*,
+chartdiffs.modifiers,
+chartdiffs.rate,
+chartdiffs.rate_type,
+chartdiffs.inputmode AS chartdiff_inputmode,
+chartdiffs.notes_count,
+chartdiffs.long_notes_count,
 chartdiffs.density_data,
 chartdiffs.sv_data,
 chartdiffs.enps_diff,
