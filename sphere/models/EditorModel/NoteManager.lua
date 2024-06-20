@@ -96,7 +96,7 @@ function NoteManager:changeType()
 			local vp_end = layer.visual:getPoint(p_end)
 			local endNote = Note(vp_end)
 			endNote.noteType = "LongNoteEnd"
-			layer:addNote(endNote, note.column)
+			layer.notes:addNote(endNote, note.column)
 
 			note.endNote = endNote
 
@@ -174,13 +174,13 @@ end
 ---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
 	self.editorModel.graphicEngine.selectedNotes[note.startNote] = nil
-	local layer = self.editorModel.layer
+	local lnotes = self.editorModel.layer.notes
 	local notes = note:getNotes()
 	for _, _note in ipairs(notes) do
-		layer:removeNote(_note, note.column)
+		lnotes:removeNote(_note, note.column)
 		self.editorModel.editorChanges:add(
-			{layer, "removeNote", layer, _note, note.column},
-			{layer, "addNote", layer, _note, note.column}
+			{lnotes, "removeNote", lnotes, _note, note.column},
+			{lnotes, "addNote", lnotes, _note, note.column}
 		)
 	end
 end
@@ -194,12 +194,20 @@ end
 
 ---@param notes ncdk2.Note[]
 function NoteManager:_addNotes(notes, column)
-	local layer = self.editorModel.layer
+	local lnotes = self.editorModel.layer.notes
+	local found = false
 	for _, _note in ipairs(notes) do
-		layer:addNote(_note, column)
+		found = found or lnotes:findNote(_note, column)
+	end
+	if found then
+		return
+	end
+
+	for _, _note in ipairs(notes) do
+		lnotes:addNote(_note, column)
 		self.editorModel.editorChanges:add(
-			{layer, "addNote", layer, _note, column},
-			{layer, "removeNote", layer, _note, column}
+			{lnotes, "addNote", lnotes, _note, column},
+			{lnotes, "removeNote", lnotes, _note, column}
 		)
 	end
 end

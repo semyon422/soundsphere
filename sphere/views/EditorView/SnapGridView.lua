@@ -89,7 +89,7 @@ function SnapGridView:drawSnap(point, field, currentTime, width)
 		love.graphics.setLineWidth(4)
 	end
 	if changed then
-		editorModel.scroller:scrollTimePoint(point)
+		editorModel.scroller:scrollPoint(point)
 	end
 
 	love.graphics.line(0, 0, width, 0)
