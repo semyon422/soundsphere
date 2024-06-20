@@ -50,19 +50,14 @@ function Alternate:apply(config, chart)
 				if _inputType ~= inputType then
 					new_notes:insert(note, column)
 				elseif _inputType and inputIndex then
-					local newInputIndex = inputIndex
+					inputAlternate[inputIndex] = inputAlternate[inputIndex] or 1
+
 					local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
 					if isStartNote then
-						inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
-
-						if inputAlternate[inputIndex] == 0 then
-							newInputIndex = (inputIndex - 1) * 2 + 1
-							inputAlternate[inputIndex] = 1
-						elseif inputAlternate[inputIndex] == 1 then
-							newInputIndex = (inputIndex - 1) * 2 + 2
-							inputAlternate[inputIndex] = 0
-						end
+						inputAlternate[inputIndex] = math.abs(inputAlternate[inputIndex] - 1)
 					end
+
+					local newInputIndex = (inputIndex - 1) * 2 + 1 + inputAlternate[inputIndex]
 
 					new_notes:insert(note, _inputType .. newInputIndex)
 				end

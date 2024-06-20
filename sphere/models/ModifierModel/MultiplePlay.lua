@@ -40,14 +40,27 @@ function MultiplePlay:apply(config, chart)
 				for _, note in ipairs(notes) do
 					for i = 1, value do
 						local newInputIndex = inputIndex + inputCount * (i - 1)
+						if note.startNote then
+						elseif note.endNote then
+							local startNote = Note(note.visualPoint)
+							local endNote = Note(note.endNote.visualPoint)
 
-						local newNote = Note(note.visualPoint)
+							startNote.endNote = endNote
+							endNote.startNote = startNote
 
-						newNote.endNote = note.endNote  -- fix wrong reference
-						newNote.noteType = note.noteType
-						newNote.sounds = note.sounds
+							startNote.noteType = note.noteType
+							startNote.sounds = note.sounds
+							endNote.noteType = note.endNote.noteType
+							endNote.sounds = note.endNote.sounds
 
-						new_notes:insert(newNote, inputType .. newInputIndex)
+							new_notes:insert(startNote, inputType .. newInputIndex)
+							new_notes:insert(endNote, inputType .. newInputIndex)
+						else
+							local newNote = Note(note.visualPoint)
+							newNote.noteType = note.noteType
+							newNote.sounds = note.sounds
+							new_notes:insert(newNote, inputType .. newInputIndex)
+						end
 					end
 				end
 			end

@@ -15,8 +15,10 @@ function NoLongNote:apply(config, chart)
 	for note in chart:iterNotes() do
 		if note.noteType == "LongNoteStart" or note.noteType == "LaserNoteStart" then
 			note.noteType = "ShortNote"
+			note.endNote = nil
 		elseif note.noteType == "LongNoteEnd" or note.noteType == "LaserNoteEnd" then
 			note.noteType = "Ignore"
+			note.startNote = nil
 		end
 	end
 end

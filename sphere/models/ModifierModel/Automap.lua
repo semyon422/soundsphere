@@ -213,26 +213,23 @@ function Automap:processReductor()
 		if n.long then
 			if n.startTime == n.endTime then
 				n.noteData.noteType = "ShortNote"
-				-- n.noteData.endNoteData.noteType = "Ignore"
+				n.noteData.endNote = nil
 			else
 				layer.notes:insert(n.noteData.endNote, "key" .. n.columnIndex)
 				local p = layer:getPoint(n.endTime / 1000)
-				local vp = layer.visual:getPoint(p)
+				local vp = layer.visual:newPoint(p)
 				n.noteData.endNote.visualPoint = vp
 			end
 		end
 	end
 
 	for n in pairs(tNoteDatasMap) do
-		local noteData = n.noteData
-		noteData.noteType = "SoundNote"
+		local note = n.noteData
+		note.noteType = "SoundNote"
+		note.endNote = nil
 
 		local layer = n.layer
 		layer.notes:insert(n.noteData, "auto" .. n.columnIndex)
-
-		-- if n.long then
-		-- 	n.noteData.endNoteData.noteType = "Ignore"
-		-- end
 	end
 
 	self.chart.inputMode.key = targetMode
