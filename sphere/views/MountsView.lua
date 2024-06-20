@@ -200,8 +200,12 @@ function section_draw.database(self)
 	end
 	just.next()
 
-	if imgui.button("delete chartdiffs", "delete chartdiffs", inactive) then
+	if imgui.button("delete chartdiffs", "delete all chartdiffs", inactive) then
 		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
+	end
+
+	if imgui.button("delete modified chartdiffs", "delete modified chartdiffs", inactive) then
+		self.game.cacheModel.chartdiffsRepo:deleteModifiedChartdiffs()
 	end
 
 	-- ChartdiffsRepo:resetDiffcalcField(field)

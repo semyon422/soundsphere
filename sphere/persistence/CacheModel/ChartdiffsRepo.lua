@@ -64,6 +64,14 @@ function ChartdiffsRepo:deleteChartdiffs(conds)
 	self.models.chartdiffs:delete(conds)
 end
 
+function ChartdiffsRepo:deleteModifiedChartdiffs()
+	self.models.chartdiffs:delete({
+		"or",
+		modifiers__ne = {},
+		rate__ne = 1,
+	})
+end
+
 ---@param chartdiff table
 function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local _chartdiff = self:selectChartdiff(chartdiff)
