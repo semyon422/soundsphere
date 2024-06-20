@@ -56,7 +56,12 @@ function Alternate2:apply(config, chart)
 					local plusColumn = state < 2 and 1 or 2
 					local newInputIndex = (inputIndex - 1) * 2 + plusColumn
 
-					new_notes:insert(note, _inputType .. newInputIndex)
+					if note.noteType == "ShortNote" then
+						new_notes:insert(note, _inputType .. newInputIndex)
+					elseif note.noteType == "LongNoteStart" then
+						new_notes:insert(note, _inputType .. newInputIndex)
+						new_notes:insert(note.endNote, _inputType .. newInputIndex)
+					end
 				end
 			end
 		end
