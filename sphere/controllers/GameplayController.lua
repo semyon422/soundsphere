@@ -42,7 +42,13 @@ function GameplayController:load()
 	ModifierModel:applyMeta(playContext.modifiers, state)
 	ModifierModel:apply(playContext.modifiers, noteChart)
 
-	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	local chartdiff = {
+		rate = playContext.rate,
+		inputmode = tostring(noteChart.inputMode),
+		notes_preview = "",  -- do not generate preview
+	}
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, noteChart, playContext.rate)
+
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
