@@ -44,29 +44,17 @@ function Alternate2:apply(config, chart)
 				if _inputType ~= inputType then
 					new_notes:insert(note, column)
 				elseif _inputType and inputIndex then
-					local newInputIndex = inputIndex
+					inputAlternate[inputIndex] = inputAlternate[inputIndex] or 3
+					local state = inputAlternate[inputIndex]
+
 					local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
 					if isStartNote then
-						inputAlternate[inputIndex] = inputAlternate[inputIndex] or 0
-
-						local state = inputAlternate[inputIndex]
-						local plusColumn
-						if state == 0 then
-							plusColumn = 1
-							state = 1
-						elseif state == 1 then
-							plusColumn = 1
-							state = 2
-						elseif state == 2 then
-							plusColumn = 2
-							state = 3
-						elseif state == 3 then
-							plusColumn = 2
-							state = 0
-						end
-						newInputIndex = (inputIndex - 1) * 2 + plusColumn
+						state = (state + 1) % 4
 						inputAlternate[inputIndex] = state
 					end
+
+					local plusColumn = state < 2 and 1 or 2
+					local newInputIndex = (inputIndex - 1) * 2 + plusColumn
 
 					new_notes:insert(note, _inputType .. newInputIndex)
 				end
