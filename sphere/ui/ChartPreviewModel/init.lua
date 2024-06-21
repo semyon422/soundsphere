@@ -67,7 +67,7 @@ function ChartPreviewModel:setChartview(chartview)
 
 	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
 	self.playField = noteSkin.playField
-	self.game.noteSkinModel.noteSkin = noteSkin
+	self.noteSkin = noteSkin
 	-- local noteSkin = self.game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	-- noteSkin:loadData()
 	-- noteSkin.editor = true

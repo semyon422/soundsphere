@@ -14,7 +14,7 @@ function ChartPreviewView:new(game)
 end
 
 function ChartPreviewView:load()
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteSkin = self.game.chartPreviewModel.noteSkin
 	if not noteSkin then
 		return
 	end

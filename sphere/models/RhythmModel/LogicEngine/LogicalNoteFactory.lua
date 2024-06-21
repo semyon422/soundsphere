@@ -13,10 +13,10 @@ local notes = {
 	ImageNote = {ShortLogicalNote},
 }
 
----@param noteData ncdk2.Note
+---@param note ncdk2.Note
 ---@return sphere.LogicalNote?
-function LogicalNoteFactory:getNote(noteData)
-	local classAndData = notes[noteData.noteType]
+function LogicalNoteFactory:getNote(note)
+	local classAndData = notes[note.noteType]
 	if not classAndData then
 		return
 	end
@@ -24,7 +24,7 @@ function LogicalNoteFactory:getNote(noteData)
 	local isPlayable = classAndData[2]
 	local isScorable = classAndData[3]
 	local isInputMatchable = classAndData[4]
-	return classAndData[1](noteData, isPlayable, isScorable, isInputMatchable)
+	return classAndData[1](note, isPlayable, isScorable, isInputMatchable)
 end
 
 return LogicalNoteFactory

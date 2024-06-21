@@ -86,12 +86,12 @@ local function test(notes, events, states, graphicStates)
 			p = layer:getPoint(time[2])
 			vp = layer.visual:newPoint(p)
 
-			local endNoteData = Note(vp)
-			endNoteData.noteType = "LongNoteEnd"
-			layer.notes:insert(endNoteData, 1)
+			local endNote = Note(vp)
+			endNote.noteType = "LongNoteEnd"
+			layer.notes:insert(endNote, 1)
 
-			startNote.endNote = endNoteData
-			endNoteData.startNote = startNote
+			startNote.endNote = endNote
+			endNote.startNote = startNote
 		end
 	end
 

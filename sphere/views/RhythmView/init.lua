@@ -16,7 +16,7 @@ end
 
 ---@param note sphere.GraphicalNote
 function RhythmView:fillChord(note)
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteSkin = self:getNoteSkin()
 	local noteView = NoteViewFactory:getNoteView(note, self.mode)
 	if not noteView then
 		return
@@ -36,7 +36,7 @@ end
 
 ---@param note sphere.GraphicalNote
 function RhythmView:drawNote(note)
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteSkin = self:getNoteSkin()
 	local noteView = NoteViewFactory:getNoteView(note, self.mode)
 	if not noteView then
 		return
@@ -55,7 +55,7 @@ end
 
 ---@param note sphere.GraphicalNote
 function RhythmView:drawSelected(note)
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteSkin = self:getNoteSkin()
 	local noteView = NoteViewFactory:getNoteView(note, self.mode)
 	if not (noteView and noteView.drawSelected and note.selected) then
 		return
@@ -74,6 +74,11 @@ end
 ---@param note ncdk2.Note
 function RhythmView:pressNote(note) end
 
+---@return sphere.NoteSkin
+function RhythmView:getNoteSkin()
+	return self.game.noteSkinModel.noteSkin
+end
+
 function RhythmView:draw()
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.setColor(1, 1, 1, 1)
@@ -85,7 +90,7 @@ function RhythmView:draw()
 
 	self:processNotes(self.drawNote)
 
-	local noteSkin = self.game.noteSkinModel.noteSkin
+	local noteSkin = self:getNoteSkin()
 	local blendModes = noteSkin.blendModes
 	local spriteBatches = noteSkin.data.spriteBatches
 	for _, spriteBatch in ipairs(spriteBatches) do

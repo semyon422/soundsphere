@@ -10,4 +10,9 @@ function ChartPreviewRhythmView:processNotes(f)
 	graphicEngine:iterNotes(f, self)
 end
 
+---@return sphere.NoteSkin
+function ChartPreviewRhythmView:getNoteSkin()
+	return self.game.chartPreviewModel.noteSkin
+end
+
 return ChartPreviewRhythmView
