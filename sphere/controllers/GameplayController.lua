@@ -320,7 +320,9 @@ function GameplayController:saveScore()
 		playContext
 	)
 
-	local chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(self.playContext.chartdiff)
+	local chartdiff = self.playContext.chartdiff
+	chartdiff.notes_preview = nil  -- fixes erasing
+	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local judge = scoreSystem.soundsphere.judges["Soundsphere"]
 	local score = {
 		hash = chartdiff.hash,
