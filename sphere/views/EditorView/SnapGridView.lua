@@ -113,7 +113,7 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 
 	local range = 1 / editor.speed
 	local point = layer.points:interpolateAbsolute(1, currentTime - range)
-	local measureData
+	local measure
 
 	local interval = point.interval
 	local time = point.time
@@ -128,19 +128,23 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 
 	while interval and interval < endInterval or interval == endInterval and time <= endTime do
 		point = point or layer.points:interpolateFraction(interval, time)
-		if not point or not point[field] then break end
+		if not point or not point[field] then
+			break
+		end
 
 		local drawNothing, skipInterval
 
-		if measureData ~= point.measureData then
-			measureData = point.measureData
-			local delta = -(time % 1) + measureData.timePoint.time % 1 - measureData.start
+		if measure ~= point.measure then
+			measure = point.measure
+			local delta = -(time % 1) - measure.offset
 			while delta[1] < 0 do
 				delta = delta + Fraction(1, snap)
 			end
 			interval, time = point:add(delta)
 			point = layer.points:interpolateFraction(interval, time)
-			if not point or not point[field] then break end
+			if not point or not point[field] then
+				break
+			end
 		end
 
 		if not drawNothing and interval.next then
