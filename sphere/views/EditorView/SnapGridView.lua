@@ -143,8 +143,8 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 			if not point or not point[field] then break end
 		end
 
-		if not drawNothing and interval.prev then
-			local dt = interval.point.absoluteTime - interval.prev.point.absoluteTime
+		if not drawNothing and interval.next then
+			local dt = interval.next.point.absoluteTime - interval.point.absoluteTime
 			if dt < 0.01 then
 				drawNothing = true
 				skipInterval = true
