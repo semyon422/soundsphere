@@ -9,8 +9,7 @@ if arg[2] == "debug" then
     require("lldebugger").start()
 end
 
-local pkg = require("aqua.package")
-pkg.reset()
+local pkg = require("aqua.pkg")
 pkg.addc("3rd-deps/lib")
 pkg.addc("bin/lib")
 pkg.add("3rd-deps/lua")
@@ -19,6 +18,9 @@ pkg.add("ncdk")
 pkg.add("chartbase")
 pkg.add("libchart")
 pkg.add("tree/share/lua/5.1")
+
+pkg.export_lua()
+pkg.export_love()
 
 require("aqua.string")
 
