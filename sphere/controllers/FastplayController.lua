@@ -40,7 +40,13 @@ function FastplayController:play(chart, replay)
 
 	rhythmModel:load()
 
-	local chartdiff = cacheModel.chartdiffGenerator:compute(chart, playContext.rate)
+	local chartdiff = {
+		rate = playContext.rate,
+		inputmode = tostring(chart.inputMode),
+		notes_preview = "",  -- do not generate preview
+	}
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+
 	chartdiff.modifiers = playContext.modifiers
 	playContext.chartdiff = chartdiff
 
