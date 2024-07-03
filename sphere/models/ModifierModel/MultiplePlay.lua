@@ -63,6 +63,10 @@ function MultiplePlay:apply(config, chart)
 						end
 					end
 				end
+			else
+				for _, note in ipairs(notes) do
+					new_notes:insert(note, column)
+				end
 			end
 		end
 		layer.notes = new_notes
