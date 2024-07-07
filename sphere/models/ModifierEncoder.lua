@@ -37,7 +37,7 @@ end
 ---@return table
 function ModifierEncoder:decode(s)
 	local ok, err = pcall(stbl.decode, s)
-	if not ok then
+	if not ok or not err then
 		return {}
 	end
 	local t = {}
