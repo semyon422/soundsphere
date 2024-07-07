@@ -21,6 +21,7 @@ function ChartPreviewModel:new(configModel, previewModel, game)
 		time = 0,
 		rate = 0,
 	}
+	self.audio_offset = 0
 	self.graphicEngine = GraphicEngine(self.visualTimeInfo)
 	self.skinInfo = BaseSkinInfo()
 
@@ -85,10 +86,12 @@ function ChartPreviewModel:setChartview(chartview)
 	self.graphicEngine.range = noteSkin.range
 	self.graphicEngine:setChart(chart)
 	self.graphicEngine:load()
+
+	self.audio_offset = chartview.audio_offset or 0
 end
 
 function ChartPreviewModel:update()
-	self.visualTimeInfo.time = self.previewModel:getTime()
+	self.visualTimeInfo.time = self.previewModel:getTime() + self.audio_offset
 	self.visualTimeInfo.rate = self.previewModel.rate
 	self.graphicEngine:update()
 end

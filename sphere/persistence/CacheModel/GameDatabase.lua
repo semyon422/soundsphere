@@ -8,7 +8,7 @@ local autoload = require("autoload")
 ---@operator call: sphere.GameDatabase
 local GameDatabase = class()
 
-local user_version = 3
+local user_version = 4
 
 ---@param migrations table?
 function GameDatabase:new(migrations)
