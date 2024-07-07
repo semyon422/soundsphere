@@ -35,7 +35,7 @@ end
 ---@return string
 function Format.timeRate(rate)
 	local exp = int_rates.get_exp(rate, 10)
-	if int_rates.is_q_rate(rate, 10) then
+	if int_rates.is_q_rate(rate, 10) and rate % 1 ~= 0 then
 		return ("%dQ"):format(exp)
 	end
 	return ("%.2f"):format(rate)
