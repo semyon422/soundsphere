@@ -266,7 +266,6 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 		---@type ncdk2.Chart
 		local chart
 
-
 		local chartfile = self.chartfilesRepo:selectChartfileByHash(chartdiff.hash)
 		print(chartfile and chartfile.path)
 
@@ -284,15 +283,17 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 			local charts, err = self:getChartsByHash(chartdiff.hash)
 			if not charts then
 				print(err)
-				return nil, err
+			else
+				chart = charts[chartdiff.index]
+				ModifierModel:apply(chartdiff.modifiers, chart)
 			end
-			chart = charts[chartdiff.index]
-			ModifierModel:apply(chartdiff.modifiers, chart)
 		end
 
-		self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
+		if chart then
+			self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
+			chartdiffsRepo:updateChartdiff(chartdiff)
+		end
 
-		chartdiffsRepo:updateChartdiff(chartdiff)
 		self.chartfiles_current = i
 
 		self:checkProgress()
