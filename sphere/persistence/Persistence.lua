@@ -4,6 +4,7 @@ local CacheModel = require("sphere.persistence.CacheModel")
 local ConfigModel = require("sphere.persistence.ConfigModel")
 local OsudirectModel = require("sphere.persistence.OsudirectModel")
 local FileFinder = require("sphere.persistence.FileFinder")
+local DifficultyModel = require("sphere.models.DifficultyModel")
 
 local dirs = require("sphere.persistence.dirs")
 
@@ -12,7 +13,8 @@ local dirs = require("sphere.persistence.dirs")
 local Persistence = class()
 
 function Persistence:new()
-	self.cacheModel = CacheModel()
+	self.difficultyModel = DifficultyModel()
+	self.cacheModel = CacheModel(self.difficultyModel)
 	self.configModel = ConfigModel()
 	self.osudirectModel = OsudirectModel(self.configModel, self.cacheModel)
 	self.fileFinder = FileFinder()

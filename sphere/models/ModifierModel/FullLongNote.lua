@@ -1,5 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
-local NoteData = require("ncdk.NoteData")
+local Notes = require("ncdk2.notes.Notes")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.FullLongNote: sphere.Modifier
 ---@operator call: sphere.FullLongNote
@@ -20,28 +21,28 @@ function FullLongNote:getString(config)
 end
 
 ---@param config table
-function FullLongNote:apply(config)
+---@param chart ncdk2.Chart
+function FullLongNote:apply(config, chart)
 	self.notes = {}
 
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
+	for notes, column, layer in chart:iterLayerNotes() do
+		for _, note in ipairs(notes) do
 			if
-				noteData.noteType == "ShortNote" or
-				noteData.noteType == "LongNoteStart" or
-				noteData.noteType == "LongNoteEnd"
+				note.noteType == "ShortNote" or
+				note.noteType == "LongNoteStart" or
+				note.noteType == "LongNoteEnd"
 			then
 				table.insert(self.notes, {
-					noteData = noteData,
-					inputType = inputType,
-					inputIndex = inputIndex,
-					layerDataIndex = layerDataIndex,
+					noteData = note,
+					column = column,
+					layer = layer,
 				})
 			end
 		end
 	end
 
 	table.sort(self.notes, function(a, b)
-		return a.noteData.timePoint < b.noteData.timePoint
+		return a.noteData < b.noteData
 	end)
 
 	self.level = config.value
@@ -51,7 +52,7 @@ function FullLongNote:apply(config)
 		self:processNoteData(i)
 	end
 
-	self.noteChart:compute()
+	chart:compute()
 end
 
 ---@param noteDataIndex number
@@ -66,11 +67,8 @@ function FullLongNote:processNoteData(noteDataIndex)
 	local _n
 	for i = noteDataIndex + 1, #notes do
 		_n = notes[i]
-		timePoints[_n.noteData.timePoint] = true
-		if
-			_n.inputType == n.inputType and
-			_n.inputIndex == n.inputIndex
-		then
+		timePoints[_n.noteData.visualPoint] = true
+		if _n.column == n.column then
 			break
 		end
 	end
@@ -81,7 +79,7 @@ function FullLongNote:processNoteData(noteDataIndex)
 	end
 	table.sort(timePointList)
 	timePointList = self:cleanTimePointList(timePointList, _n)
-	if timePointList[1] == n.noteData.timePoint then
+	if timePointList[1] == n.noteData.visualPoint then
 		table.remove(timePointList, 1)
 	end
 
@@ -95,9 +93,9 @@ function FullLongNote:processNoteData(noteDataIndex)
 		end
 	elseif level >= 2 and #timePointList >= 3 then
 		endTimePoint = timePointList[math.ceil(#timePointList / 2)]
-	elseif level >= 1 and #timePointList >= 2 and (not _n or _n.noteData.timePoint ~= timePointList[2]) then
+	elseif level >= 1 and #timePointList >= 2 and (not _n or _n.noteData.visualPoint ~= timePointList[2]) then
 		endTimePoint = timePointList[2]
-	elseif level >= 0 and #timePointList >= 1 and (not _n or _n.noteData.timePoint ~= timePointList[1]) then
+	elseif level >= 0 and #timePointList >= 1 and (not _n or _n.noteData.visualPoint ~= timePointList[1]) then
 		endTimePoint = timePointList[1]
 	end
 
@@ -107,31 +105,29 @@ function FullLongNote:processNoteData(noteDataIndex)
 
 	n.noteData.noteType = "LongNoteStart"
 
-	local endNoteData = NoteData(endTimePoint)
-	endNoteData.noteType = "LongNoteEnd"
+	local endNote = Note(endTimePoint)
+	endNote.noteType = "LongNoteEnd"
 
-	endNoteData.startNoteData = n.noteData
-	n.noteData.endNoteData = endNoteData
+	endNote.startNote = n.noteData
+	n.noteData.endNote = endNote
 
-	local noteChart = self.noteChart
-	noteChart.layerDatas[n.layerDataIndex]:addNoteData(endNoteData, n.inputType, n.inputIndex)
+	n.layer.notes:insert(endNote, n.column)
 end
 
----@param timePointList table
+---@param timePointList ncdk2.VisualPoint[]
 ---@param _n table
 ---@return table
 function FullLongNote:cleanTimePointList(timePointList, _n)
-	local out = {}
-	out[#out + 1] = timePointList[1]
+	local out = {timePointList[1]}
 
 	for i = 2, #timePointList do
-		if timePointList[i].absoluteTime - out[#out].absoluteTime >= 0.005 then
-			out[#out + 1] = timePointList[i]
+		if timePointList[i].point.absoluteTime - out[#out].point.absoluteTime >= 0.005 then
+			table.insert(out, timePointList[i])
 		end
 	end
 
-	if _n and _n.noteData.timePoint.absoluteTime - out[#out].absoluteTime < 0.005 then
-		out[#out] = _n.noteData.timePoint
+	if _n and _n.noteData.visualPoint.point.absoluteTime - out[#out].point.absoluteTime < 0.005 then
+		out[#out] = _n.noteData.visualPoint
 	end
 
 	return out

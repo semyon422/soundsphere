@@ -1,12 +1,16 @@
 local class = require("class")
+local table_util = require("table_util")
+local sql_util = require("rdb.sql_util")
 
 ---@class sphere.ChartdiffsRepo
 ---@operator call: sphere.ChartdiffsRepo
 local ChartdiffsRepo = class()
 
 ---@param gdb sphere.GameDatabase
-function ChartdiffsRepo:new(gdb)
+---@param diffcalc_fields string[]
+function ChartdiffsRepo:new(gdb, diffcalc_fields)
 	self.models = gdb.models
+	self.diffcalc_fields = diffcalc_fields
 end
 
 ---@param chartdiff table
@@ -60,6 +64,14 @@ function ChartdiffsRepo:deleteChartdiffs(conds)
 	self.models.chartdiffs:delete(conds)
 end
 
+function ChartdiffsRepo:deleteModifiedChartdiffs()
+	self.models.chartdiffs:delete({
+		"or",
+		modifiers__ne = {},
+		rate__ne = 1,
+	})
+end
+
 ---@param chartdiff table
 function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local _chartdiff = self:selectChartdiff(chartdiff)
@@ -68,6 +80,22 @@ function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
 	end
 	chartdiff.id = _chartdiff.id
 	return self:updateChartdiff(chartdiff)
+end
+
+function ChartdiffsRepo:getIncompleteChartdiffs()
+	local conds = {}
+	for _, field in ipairs(self.diffcalc_fields) do
+		conds[field .. "__isnull"] = true
+	end
+	assert(next(conds))
+	conds[1] = "or"
+	return self.models.chartdiffs:select(conds)
+end
+
+---@param field string
+function ChartdiffsRepo:resetDiffcalcField(field)
+	assert(table_util.indexof(self.diffcalc_fields, field))
+	self.models.chartdiffs:update({[field] = sql_util.NULL})
 end
 
 return ChartdiffsRepo

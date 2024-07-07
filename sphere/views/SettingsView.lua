@@ -193,6 +193,7 @@ function drawSection:select()
 
 	s.diff_column = imgui.combo("diff_column", s.diff_column, diff_columns, format_diff_columns, "difficulty")
 	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
+	s.chart_preview = imgui.checkbox("s.chart_preview", s.chart_preview, "chart preview")
 
 	imgui.separator()
 

@@ -3,6 +3,7 @@ local math_util = require("math_util")
 local Observable = require("Observable")
 local TimeManager = require("sphere.models.RhythmModel.TimeEngine.TimeManager")
 local NearestTime = require("sphere.models.RhythmModel.TimeEngine.NearestTime")
+local VisualTimeInfo = require("sphere.models.RhythmModel.TimeEngine.VisualTimeInfo")
 
 ---@class sphere.TimeEngine
 ---@operator call: sphere.TimeEngine
@@ -16,11 +17,12 @@ function TimeEngine:new()
 
 	self.timer = TimeManager()
 	self.timer.timeEngine = self
+
+	self.visualTimeInfo = VisualTimeInfo()
 end
 
 TimeEngine.startTime = 0
 TimeEngine.currentTime = 0
-TimeEngine.currentVisualTime = 0
 TimeEngine.timeRate = 1
 TimeEngine.baseTimeRate = 1
 TimeEngine.windUp = nil
@@ -37,7 +39,8 @@ function TimeEngine:load()
 
 	self.startTime = t
 	self.currentTime = t
-	self.currentVisualTime = t
+	self.visualTimeInfo.time = t
+	self.visualTimeInfo.rate = self.timeRate
 
 	self.minTime = self.noteChart.chartmeta.start_time
 	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
@@ -50,7 +53,7 @@ function TimeEngine:sync(time)
 	timer.eventTime = time
 
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
 
 	if self.windUp then
 		self:updateWindUp()
@@ -101,7 +104,7 @@ function TimeEngine:setPosition(position)
 	audioEngine:setPosition(position)
 	timer:setTime(position)
 	self.currentTime = timer:getTime()
-	self.currentVisualTime = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
 
 	audioEngine.forcePosition = true
 	self.logicEngine:update()
@@ -118,6 +121,7 @@ end
 function TimeEngine:setTimeRate(timeRate)
 	self.timeRate = timeRate
 	self.timer:setRate(timeRate)
+	self.visualTimeInfo.rate = timeRate
 end
 
 function TimeEngine:pause()

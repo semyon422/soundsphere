@@ -2,7 +2,7 @@ local RhythmView = require("sphere.views.RhythmView")
 local just = require("just")
 local gfx_util = require("gfx_util")
 
----@class sphere.EditorRhythmView: sphere.RhythmModel
+---@class sphere.EditorRhythmView: sphere.RhythmView
 ---@operator call: sphere.EditorRhythmView
 local EditorRhythmView = RhythmView + {}
 
@@ -48,11 +48,11 @@ end
 function EditorRhythmView:draw()
 	local editorModel = self.game.editorModel
 	local noteManager = editorModel.noteManager
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	if not ld.ranges.timePoint.head then
+	if not layer.points:getFirstPoint() then
 		return
 	end
 
@@ -70,7 +70,7 @@ function EditorRhythmView:draw()
 				over = just.mouse_over("add note" .. i, over, "mouse")
 				if over and just.mousepressed(1) then
 					local t = editorModel:getMouseTime(h / 2)
-					noteManager:addNote(t, "key", i)
+					noteManager:addNote(t, "key" .. i)
 				end
 			end
 		elseif editor.tool == "Select" then
@@ -113,8 +113,11 @@ end
 ---@param f function
 function EditorRhythmView:processNotes(f)
 	local editorModel = self.game.editorModel
-	for _, graphicalNote in ipairs(editorModel.graphicEngine.notes) do
-		f(self, graphicalNote)
+	for _, note in ipairs(editorModel.graphicEngine.notes) do
+		f(self, note)
+	end
+	for _, note in ipairs(editorModel.noteManager.grabbedNotes) do
+		f(self, note)
 	end
 end
 

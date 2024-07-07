@@ -6,33 +6,33 @@ local ModifierModel = require("sphere.models.ModifierModel")
 ---@operator call: sphere.FastplayController
 local FastplayController = class()
 
----@param noteChart ncdk.NoteChart
+---@param chart ncdk2.Chart
 ---@param replay sphere.Replay
 ---@return table
-function FastplayController:applyModifiers(noteChart, replay)
+function FastplayController:applyModifiers(chart, replay)
 	local state = {}
-	state.inputMode = InputMode(noteChart.inputMode)
+	state.inputMode = InputMode(chart.inputMode)
 
 	local modifiers = self.playContext.modifiers
 	ModifierModel:applyMeta(modifiers, state)
-	ModifierModel:apply(modifiers, noteChart)
+	ModifierModel:apply(modifiers, chart)
 
 	return state
 end
 
----@param noteChart ncdk.NoteChart
+---@param chart ncdk2.Chart
 ---@param replay sphere.Replay
-function FastplayController:play(noteChart, replay)
+function FastplayController:play(chart, replay)
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
 	local cacheModel = self.cacheModel
 	local playContext = self.playContext
 
-	local state = self:applyModifiers(noteChart, replay)
+	local state = self:applyModifiers(chart, replay)
 
 	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(noteChart)
+	rhythmModel:setNoteChart(chart)
 
 	replayModel:setMode("replay")
 	rhythmModel.inputManager:setMode("internal")
@@ -40,7 +40,13 @@ function FastplayController:play(noteChart, replay)
 
 	rhythmModel:load()
 
-	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	local chartdiff = {
+		rate = playContext.rate,
+		inputmode = tostring(chart.inputMode),
+		notes_preview = "",  -- do not generate preview
+	}
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+
 	chartdiff.modifiers = playContext.modifiers
 	playContext.chartdiff = chartdiff
 

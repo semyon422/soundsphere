@@ -1,5 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
-local NoteData = require("ncdk.NoteData")
+local Note = require("ncdk2.notes.Note")
+local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.MaxChord
 ---@operator call: sphere.MaxChord
@@ -23,7 +24,7 @@ function MaxChord:getString(config)
 	return "CH", tostring(config.value)
 end
 
----@param noteData ncdk.NoteData
+---@param noteData ncdk2.Note
 ---@return boolean
 local function checkNote(noteData)
 	return noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart"
@@ -38,7 +39,7 @@ local function getNextTime(noteDatas, i, dir)
 	for j = i + dir, #noteDatas, dir do
 		local noteData = noteDatas[j]
 		if checkNote(noteData) then
-			return noteData.timePoint.absoluteTime
+			return noteData.visualPoint.point.absoluteTime
 		end
 	end
 	return math.huge
@@ -86,24 +87,26 @@ local function zeroes(size)
 end
 
 ---@param config table
-function MaxChord:apply(config)
+---@param chart ncdk2.Chart
+function MaxChord:apply(config, chart)
 	local maxChord = config.value
-	local noteChart = self.noteChart
-
-	local columns = noteChart.inputMode.key
+	local columns = chart.inputMode.key
 
 	local notes = {}
-	for noteDatas, inputType, inputIndex, layerDataIndex in noteChart:getInputIterator() do
+	for _notes, column, layer in chart:iterLayerNotes() do
+		local inputType, inputIndex = InputMode:splitInput(column)
 		if inputType == "key" then
-			for i, noteData in ipairs(noteDatas) do
-				if checkNote(noteData) then
+			for i, note in ipairs(_notes) do
+				if checkNote(note) then
 					table.insert(notes, {
-						noteData = noteData,
-						time = noteData.timePoint.absoluteTime,
-						nextTime = getNextTime(noteDatas, i),
-						prevTime = getNextTime(noteDatas, i, -1),
+						noteData = note,
+						time = note.visualPoint.point.absoluteTime,
+						nextTime = getNextTime(_notes, i),
+						prevTime = getNextTime(_notes, i, -1),
+						inputType = inputIndex,
+						inputIndex = inputIndex,
 						column = inputIndex,
-						layer = layerDataIndex,
+						layer = layer,
 					})
 				end
 			end
@@ -182,21 +185,21 @@ function MaxChord:apply(config)
 	end
 
 	for _, note in ipairs(deletedNotes) do
-		local layerData = noteChart.layerDatas[note.layer]
+		local layer = note.layer
 
 		local noteData = note.noteData
 		-- noteData.noteType = "SoundNote"
 		noteData.noteType = "Ignore"
-		if noteData.endNoteData then
-			noteData.endNoteData.noteType = "Ignore"
+		if noteData.endNote then
+			noteData.endNote.noteType = "Ignore"
 		end
 
-		local soundNoteData = NoteData(noteData.timePoint)
+		local soundNote = Note(noteData.visualPoint)
 
-		soundNoteData.noteType = "SoundNote"
-		soundNoteData.sounds, noteData.sounds = noteData.sounds, {}
+		soundNote.noteType = "SoundNote"
+		soundNote.sounds, noteData.sounds = noteData.sounds, {}
 
-		layerData:addNoteData(soundNoteData, "auto", 0)
+		layer.notes:insert(soundNote, "auto" .. note.inputIndex)
 	end
 end
 

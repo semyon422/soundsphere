@@ -1,5 +1,6 @@
 local class = require("class")
 local NoteHandler = require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
+local HandlerNote = require("sphere.models.RhythmModel.LogicEngine.HandlerNote")
 local Observable = require("Observable")
 
 ---@class sphere.LogicEngine
@@ -17,37 +18,43 @@ function LogicEngine:new(timeEngine, scoreEngine)
 	self.scoreEngine = scoreEngine
 end
 
-function LogicEngine:getNoteHandler(input, create)
+---@param column number
+---@param create boolean?
+---@return sphere.NoteHandler?
+function LogicEngine:getNoteHandler(column, create)
 	if self.singleHandler then
-		input = 1
+		column = 1
 	end
 
-	local noteHandler = self.noteHandlers[input]
+	local noteHandler = self.noteHandlers[column]
 	if not noteHandler then
 		if not create then
 			return
 		end
 		noteHandler = NoteHandler(self)
-		self.noteHandlers[input] = noteHandler
+		self.noteHandlers[column] = noteHandler
 	end
 
 	return noteHandler
 end
 
+---@param chart ncdk2.Chart
+function LogicEngine:setChart(chart)
+	self.chart = chart
+end
+
 function LogicEngine:load()
+	---@type {[ncdk2.Note]: sphere.LogicalNote}
 	self.sharedLogicalNotes = {}
+
+	---@type sphere.NoteHandler[]
 	self.noteHandlers = {}
 
 	-- many layers can be here
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local input = inputType .. inputIndex
-		local noteHandler = self:getNoteHandler(input, true)
-
-		for _, noteData in ipairs(noteDatas) do
-			table.insert(noteHandler.logicNoteDatas, {
-				noteData = noteData,
-				input = input,
-			})
+	for notes, column in self.chart:iterLayerNotes() do
+		local noteHandler = assert(self:getNoteHandler(column, true))
+		for _, note in ipairs(notes) do
+			table.insert(noteHandler.logicNotes, HandlerNote(note, column))
 		end
 	end
 
@@ -91,10 +98,10 @@ function LogicEngine:receive(event)
 	self.eventTime = nil
 end
 
----@param noteData ncdk.NoteData
+---@param note ncdk2.Note
 ---@return sphere.LogicalNote?
-function LogicEngine:getLogicalNote(noteData)
-	return self.sharedLogicalNotes[noteData]
+function LogicEngine:getLogicalNote(note)
+	return self.sharedLogicalNotes[note]
 end
 
 ---@param event table
@@ -102,12 +109,12 @@ function LogicEngine:sendScore(event)
 	self.scoreEngine.scoreSystem:receive(event)
 end
 
----@param noteData ncdk.NoteData
+---@param note ncdk2.Note
 ---@param isBackground boolean?
-function LogicEngine:playSound(noteData, isBackground)
+function LogicEngine:playSound(note, isBackground)
 	self.observable:send({
 		name = "LogicalNoteSound",
-		noteData, isBackground
+		note, isBackground
 	})
 end
 

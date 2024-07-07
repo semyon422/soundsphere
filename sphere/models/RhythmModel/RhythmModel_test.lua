@@ -3,28 +3,23 @@ local LogicEngine = require("sphere.models.RhythmModel.LogicEngine")
 local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local table_util = require("table_util")
 
-local NoteChart = require("ncdk.NoteChart")
-local NoteData = require("ncdk.NoteData")
+local Chart = require("ncdk2.Chart")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local Note = require("notechart.Note")
 
-local rhythmModel = {}
+local visualTimeInfo = {
+	rate = 1,
+	time = 0,
+}
 
 local logicEngine = LogicEngine()
-local graphicEngine = GraphicEngine()
-
-rhythmModel.logicEngine = logicEngine
-rhythmModel.graphicEngine = graphicEngine
-
-logicEngine.rhythmModel = rhythmModel
-graphicEngine.rhythmModel = rhythmModel
+local graphicEngine = GraphicEngine(visualTimeInfo, logicEngine)
 
 logicEngine.eventTime = 0
 logicEngine.timeRate = 1
 logicEngine.inputOffset = 0
 
 graphicEngine.range = {-2, 2}
-
-rhythmModel.timeEngine = logicEngine  -- use logic engine as time engine (timeRate)
-rhythmModel.timeEngine.currentVisualTime = 0
 
 logicEngine.timings = {
 	ShortNote = {
@@ -56,12 +51,12 @@ end
 local function test(notes, events, states, graphicStates)
 	logicEngine.eventTime = 0  -- reset time on each test
 
-	local noteChart = NoteChart()
+	local chart = Chart()
 
-	local layerData = noteChart:getLayerData(1)
-	layerData:setTimeMode("absolute")
+	local layer = AbsoluteLayer()
+	chart.layers.main = layer
 
-	noteChart.inputMode.key = 1
+	chart.inputMode.key = 1
 
 	for _, time in ipairs(notes) do
 		local isAuto = type(time) == "table" and getmetatable(time) == auto_mt
@@ -69,41 +64,44 @@ local function test(notes, events, states, graphicStates)
 			if isAuto then
 				time = time[1]
 			end
-			local timePoint = layerData:getTimePoint(time, -1)
+			local p = layer:getPoint(time)
+			local vp = layer.visual:newPoint(p)
 
-			local noteData = NoteData(timePoint)
+			local note = Note(vp)
 
-			noteData.noteType = "ShortNote"
+			note.noteType = "ShortNote"
 			if isAuto then
-				noteData.noteType = "SoundNote"
+				note.noteType = "SoundNote"
 			end
 
-			layerData:addNoteData(noteData, "key", 1)
+			layer.notes:insert(note, 1)
 		elseif type(time) == "table" then
-			local timePoint = layerData:getTimePoint(time[1], -1)
+			local p = layer:getPoint(time[1])
+			local vp = layer.visual:newPoint(p)
 
-			local startNoteData = NoteData(timePoint)
-			startNoteData.noteType = "LongNoteStart"
-			layerData:addNoteData(startNoteData, "key", 1)
+			local startNote = Note(vp)
+			startNote.noteType = "LongNoteStart"
+			layer.notes:insert(startNote, 1)
 
-			timePoint = layerData:getTimePoint(time[2], -1)
+			p = layer:getPoint(time[2])
+			vp = layer.visual:newPoint(p)
 
-			local endNoteData = NoteData(timePoint)
-			endNoteData.noteType = "LongNoteEnd"
-			layerData:addNoteData(endNoteData, "key", 1)
+			local endNote = Note(vp)
+			endNote.noteType = "LongNoteEnd"
+			layer.notes:insert(endNote, 1)
 
-			startNoteData.endNoteData = endNoteData
-			endNoteData.startNoteData = startNoteData
+			startNote.endNote = endNote
+			endNote.startNote = startNote
 		end
 	end
 
-	noteChart:compute()
+	chart:compute()
 
-	logicEngine.noteChart = noteChart
-	graphicEngine.noteChart = noteChart
+	logicEngine.chart = chart
+	graphicEngine.chart = chart
 
 	local newStates = {}
-	rhythmModel.scoreEngine = {
+	logicEngine.scoreEngine = {
 		scoreSystem = {receive = function(self, event)
 			local eventCopy = {
 				currentTime = event.currentTime,
@@ -111,21 +109,21 @@ local function test(notes, events, states, graphicStates)
 				oldState = event.oldState,
 				noteIndex = event.noteIndex,
 			}
-			-- print(inspect(eventCopy))
+			-- print(require("inspect")(eventCopy))
 			table.insert(newStates, eventCopy)
 		end},
 	}
 
+	graphicEngine.visualTimeRate = 1
+
 	logicEngine:load()
 	graphicEngine:load()
-
-	graphicEngine.visualTimeRate = 1
 
 	local newGraphicStates = {}
 
 	local function press(time)
 		logicEngine:receive({
-			"key1",
+			1,
 			name = "keypressed",
 			virtual = true,
 			time = time
@@ -133,7 +131,7 @@ local function test(notes, events, states, graphicStates)
 	end
 	local function release(time)
 		logicEngine:receive({
-			"key1",
+			1,
 			name = "keyreleased",
 			virtual = true,
 			time = time
@@ -143,11 +141,11 @@ local function test(notes, events, states, graphicStates)
 		logicEngine:update()
 	end
 	local function updateGraphics(time)
-		rhythmModel.timeEngine.currentVisualTime = time
+		visualTimeInfo.time = time
 		graphicEngine:update()
 		local state = {}
 		table.insert(newGraphicStates, state)
-		for _, note in ipairs(graphicEngine.noteDrawers[1].notes) do
+		for _, note in ipairs(graphicEngine.layerRenderers.main.columnRenderers[1].notes) do
 			if note.endTimeState then
 				table.insert(state, {
 					-note.startTimeState.scaledFakeVisualDeltaTime + time,

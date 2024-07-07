@@ -65,5 +65,6 @@ return {
 		"osudirectModel",
 		"windowModel",
 		"playContext",
+		"chartPreviewModel",
 	},
 }

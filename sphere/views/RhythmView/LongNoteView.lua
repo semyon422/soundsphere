@@ -95,23 +95,23 @@ end
 ---@param chords table
 ---@param column number
 function LongNoteView:fillChords(chords, column)
-	local startNoteData = self.graphicalNote.startNoteData
-	local endNoteData = self.graphicalNote.endNoteData
+	local startNote = self.graphicalNote.startNote
+	local endNote = self.graphicalNote.endNote
 
-	if startNoteData then
-		local time = startNoteData.timePoint.absoluteTime
+	if startNote then
+		local time = startNote.visualPoint.point.absoluteTime
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 		chord[column] = chord[column] or {}
-		table.insert(chord[column], startNoteData)
+		table.insert(chord[column], startNote)
 	end
 
-	if endNoteData then
-		local time = endNoteData.timePoint.absoluteTime
+	if endNote then
+		local time = endNote.visualPoint.point.absoluteTime
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 		chord[column] = chord[column] or {}
-		table.insert(chord[column], endNoteData)
+		table.insert(chord[column], endNote)
 	end
 end
 

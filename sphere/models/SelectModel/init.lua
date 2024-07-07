@@ -3,7 +3,7 @@ local delay = require("delay")
 local thread = require("thread")
 local path_util = require("path_util")
 local table_util = require("table_util")
-local NoteChartFactory = require("notechart.NoteChartFactory")
+local ChartFactory = require("notechart.ChartFactory")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
@@ -167,8 +167,8 @@ function SelectModel:getAudioPathPreview()
 end
 
 ---@param settings table?
----@return ncdk.NoteChart?
-function SelectModel:loadNoteChart(settings)
+---@return ncdk2.Chart?
+function SelectModel:loadChart(settings)
 	local chartview = self.chartview
 
 	local content = love.filesystem.read(chartview.location_path)
@@ -176,12 +176,11 @@ function SelectModel:loadNoteChart(settings)
 		return
 	end
 
-	return assert(NoteChartFactory:getNoteChart(
+	local charts = assert(ChartFactory:getCharts(
 		chartview.chartfile_name,
-		content,
-		chartview.index,
-		settings
+		content
 	))
+	return charts[chartview.index]
 end
 
 ---@return boolean

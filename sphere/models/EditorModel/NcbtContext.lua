@@ -37,21 +37,24 @@ function NcbtContext:detect(soundData)
 	self.binsSize = out.binsSize
 end
 
----@param layerData ncdk.DynamicLayerData
-function NcbtContext:apply(layerData)
+---@param layer chartedit.Layer
+function NcbtContext:apply(layer)
 	if not self.tempo then
 		return
 	end
-
-	local ld = layerData
-	ld:init()
 
 	local beatDuration = 60 / self.tempo
 	local beats = math.floor((self.duration - self.offset) / beatDuration)
 	local lastOffset = beats * beatDuration + self.offset
 
-	ld:getIntervalData(self.offset, beats)
-	ld:getIntervalData(lastOffset, 1)
+	layer:new()
+	layer.points:initDefault()
+
+	local p = layer.points:getFirstPoint()
+	p._interval:new(self.offset, beats)
+
+	local p = layer.points:getLastPoint()
+	p._interval:new(lastOffset, 1)
 end
 
 return NcbtContext

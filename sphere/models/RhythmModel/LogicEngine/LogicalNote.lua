@@ -2,6 +2,7 @@ local class = require("class")
 
 ---@class sphere.LogicalNote
 ---@operator call: sphere.LogicalNote
+---@field logicEngine sphere.LogicEngine
 local LogicalNote = class()
 
 LogicalNote.state = ""
@@ -81,7 +82,7 @@ function LogicalNote:getNoteTime(side)
 	if self.isPlayable then
 		offset = self.logicEngine:getInputOffset()
 	end
-	return self.startNoteData.timePoint.absoluteTime + offset
+	return self.startNote.visualPoint.point.absoluteTime + offset
 end
 
 ---@return boolean

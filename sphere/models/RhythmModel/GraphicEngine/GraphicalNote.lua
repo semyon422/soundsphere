@@ -2,36 +2,40 @@ local class = require("class")
 
 ---@class sphere.GraphicalNote
 ---@operator call: sphere.GraphicalNote
+---@field currentVisualPoint ncdk2.IVisualPoint
+---@field layer ncdk2.Layer
+---@field graphicEngine sphere.GraphicEngine
+---@field column ncdk2.Column
 local GraphicalNote = class()
 
 ---@param noteType string?
----@param noteData ncdk.NoteData?
-function GraphicalNote:new(noteType, noteData)
+---@param note notechart.Note?
+function GraphicalNote:new(noteType, note)
 	self.noteType = noteType
-	self.startNoteData = noteData
+	self.startNote = note
 end
 
 function GraphicalNote:update() end
 
 ---@return string
 function GraphicalNote:getLogicalState()
-	local logicalNote = self.logicalNote
+	local logicalNote = self.graphicEngine:getLogicalNote(self.startNote)
 	return logicalNote and logicalNote.state or "clear"
 end
 
 ---@return number?
 function GraphicalNote:getPressedTime()
-	local logicalNote = self.logicalNote
+	local logicalNote = self.graphicEngine:getLogicalNote(self.startNote)
 	return logicalNote and logicalNote.pressedTime
 end
 
----@param timePoint ncdk.TimePoint
+---@param visualPoint ncdk2.IVisualPoint
 ---@return number
-function GraphicalNote:getVisualTime(timePoint)
+function GraphicalNote:getVisualTime(visualPoint)
 	if self.graphicEngine.constant then
-		return timePoint.absoluteTime
+		return visualPoint.point.absoluteTime
 	end
-	return timePoint:getVisualTime(self.currentTimePoint)
+	return visualPoint:getVisualTime(self.currentVisualPoint)
 end
 
 ---@param time number

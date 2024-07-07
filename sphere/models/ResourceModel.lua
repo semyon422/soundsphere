@@ -127,7 +127,7 @@ function ResourceModel:rewind()
 end
 
 ---@param chartPath string
----@param noteChart ncdk.NoteChart
+---@param noteChart ncdk2.Chart
 ---@param callback function
 function ResourceModel:load(chartPath, noteChart, callback)
 	local fileFinder = self.fileFinder
@@ -154,7 +154,7 @@ function ResourceModel:load(chartPath, noteChart, callback)
 
 	if noteChartType == "bms" then
 		local newResources = {}
-		for fileType, name, sequence in noteChart:getResourceIterator() do
+		for fileType, name, sequence in noteChart.resourceList:getIterator() do
 			for _, path in ipairs(sequence) do
 				local filePath
 				if fileType == "sound" then

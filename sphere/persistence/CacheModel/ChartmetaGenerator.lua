@@ -1,5 +1,4 @@
 local class = require("class")
-local path_util = require("path_util")
 local md5 = require("md5")
 
 ---@class sphere.ChartmetaGenerator
@@ -8,11 +7,11 @@ local ChartmetaGenerator = class()
 
 ---@param chartmetasRepo sphere.ChartmetasRepo
 ---@param chartfilesRepo sphere.ChartfilesRepo
----@param noteChartFactory notechart.NoteChartFactory
-function ChartmetaGenerator:new(chartmetasRepo, chartfilesRepo, noteChartFactory)
+---@param chartFactory notechart.ChartFactory
+function ChartmetaGenerator:new(chartmetasRepo, chartfilesRepo, chartFactory)
 	self.chartmetasRepo = chartmetasRepo
 	self.chartfilesRepo = chartfilesRepo
-	self.noteChartFactory = noteChartFactory
+	self.chartFactory = chartFactory
 end
 
 ---@param chartfile table
@@ -29,13 +28,13 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 		return "reused"
 	end
 
-	local noteCharts, err = self.noteChartFactory:getNoteCharts(chartfile.name, content)
-	if not noteCharts then
+	local charts, err = self.chartFactory:getCharts(chartfile.name, content)
+	if not charts then
 		return nil, err
 	end
 
-	for index, noteChart in ipairs(noteCharts) do
-		local chartmeta = noteChart.chartmeta
+	for index, chart in ipairs(charts) do
+		local chartmeta = chart.chartmeta
 		chartmeta.hash = hash
 		chartmeta.index = index
 		self:setChartmeta(chartmeta)
@@ -44,7 +43,7 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 	chartfile.hash = hash
 	self.chartfilesRepo:updateChartfile(chartfile)
 
-	return "cached", noteCharts
+	return "cached", charts
 end
 
 ---@param chartmeta table

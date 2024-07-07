@@ -66,16 +66,6 @@ function ReplayConverter:convertModifier(c, replay)
 		end
 	end
 
-	if not replay.timings then
-		if c.name == "Automap" then
-			c.old = true
-		elseif c.name == "MultiOverPlay" then
-			c.value = c.value + 1
-		elseif c.name == "MultiplePlay" then
-			c.value = c.value + 1
-		end
-	end
-
 	if c.name then
 		-- deleted modifiers
 		if c.name == "TimeRateQ" then
@@ -86,6 +76,16 @@ function ReplayConverter:convertModifier(c, replay)
 			replay.const = true
 		elseif c.name == "SpeedMode" and c.value == "constant" then
 			replay.const = true
+		end
+
+		if not replay.timings then
+			if c.name == "Automap" then
+				c.old = true
+			elseif c.name == "MultiOverPlay" then
+				c.value = c.value + 1
+			elseif c.name == "MultiplePlay" then
+				c.value = c.value + 1
+			end
 		end
 
 		c.id = ModifierModel.Modifiers[c.name]

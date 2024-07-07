@@ -9,8 +9,7 @@ if arg[2] == "debug" then
     require("lldebugger").start()
 end
 
-local pkg = require("aqua.package")
-pkg.reset()
+local pkg = require("aqua.pkg")
 pkg.addc("3rd-deps/lib")
 pkg.addc("bin/lib")
 pkg.add("3rd-deps/lua")
@@ -20,12 +19,17 @@ pkg.add("chartbase")
 pkg.add("libchart")
 pkg.add("tree/share/lua/5.1")
 
+pkg.export_lua()
+pkg.export_love()
+
 require("aqua.string")
 
+local luacov_runner
 if arg[2] == "test" then
 	local ok, err = pcall(require, "luacov.runner")
 	if ok then
-		err.init()
+		luacov_runner = err
+		luacov_runner.init()
 	end
 end
 
@@ -134,7 +138,22 @@ if arg[2] == "test" then
 
 	testing.get_time = love.timer.getTime
 
-	testing.test()
+	testing.test(arg[3], arg[4])
+
+	if luacov_runner then
+		local configuration = {
+			reporter = "lcov",
+			reportfile = "lcov.info",
+			exclude = {
+				"main$",
+			},
+			include = {},
+		}
+		debug.sethook(nil)
+		luacov_runner.save_stats()
+		luacov_runner.run_report(configuration)
+	end
+
 	os.exit()
 end
 

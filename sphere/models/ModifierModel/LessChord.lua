@@ -1,4 +1,5 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
+local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.LessChord: sphere.Modifier
 ---@operator call: sphere.LessChord
@@ -31,16 +32,16 @@ end
 --		 and LN + LN chords
 
 ---@param config table
-function LessChord:apply(config)
+---@param chart ncdk2.Chart
+function LessChord:apply(config, chart)
 	local configVal
 	if config.value ~= "none" then
 		configVal = tonumber(config.value)
 	end
 
-	local noteChart = self.noteChart
-	local inputCount = noteChart.inputMode.key
+	local inputCount = chart.inputMode.key
 
-	for _, layerData in noteChart:getLayerDataIterator() do
+	for _, layer in pairs(chart.layers) do
 		local chords = {}
 		local singles = {}
 		local noteDatas = {}
@@ -50,23 +51,24 @@ function LessChord:apply(config)
 		end
 
 		local notes = {}
-		if layerData.noteDatas.key then
-			for inputIndex, _noteDatas in pairs(layerData.noteDatas.key) do
-				for _, noteData in ipairs(_noteDatas) do
+		for column, _notes in layer.notes:iter() do
+			local inputType, inputIndex = InputMode:splitInput(column)
+			if inputType == "key" then
+				for _, note in ipairs(_notes) do
 					table.insert(notes, {
-						noteData = noteData,
+						noteData = note,
 						inputIndex = inputIndex,
 					})
 				end
 			end
-			layerData.noteDatas.key = {}
+			layer.notes.column_notes[column] = nil
 		end
 		table.sort(notes, function(a, b) return a.noteData < b.noteData end)
 
 		for _, note in ipairs(notes) do
 			local noteData = note.noteData
 			local index = note.inputIndex
-			local time = noteData.timePoint.absoluteTime
+			local time = noteData.visualPoint.point.absoluteTime
 
 			columnSizes[index] = columnSizes[index] + 1
 			if noteData.noteType == "ShortNote" then
@@ -91,7 +93,7 @@ function LessChord:apply(config)
 		end
 
 		for _, note in pairs(singles) do
-			layerData:addNoteData(note.noteData, "key", note.inputIndex)
+			layer.notes:insert(note.noteData, "key" .. note.inputIndex)
 		end
 
 		local sortedChords = {}
@@ -123,20 +125,20 @@ function LessChord:apply(config)
 						end
 
 						note.noteData.noteType = "SoundNote"
-						layerData:addNoteData(note.noteData, "auto", 0)
+						layer.notes:insert(note.noteData, "auto" .. note.inputIndex)
 					else
-						layerData:addNoteData(note.noteData, "key", note.inputIndex)
+						layer.notes:insert(note.noteData, "key" .. note.inputIndex)
 					end
 				end
 			else
 				for _, note in pairs(chord.notes) do
-					layerData:addNoteData(note.noteData, "key", note.inputIndex)
+					layer.notes:insert(note.noteData, "key" .. note.inputIndex)
 				end
 			end
 		end
 	end
 
-	noteChart:compute()
+	chart:compute()
 end
 
 return LessChord

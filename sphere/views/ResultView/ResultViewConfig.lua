@@ -464,7 +464,7 @@ local function NotechartInfo(self)
 	local bpm = scoreItem.tempo
 	local length = scoreItem.duration
 	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
-	local inputMode = show and tostring(rhythmModel.noteChart.inputMode) or scoreItem.inputmode
+	local inputMode = show and tostring(rhythmModel.chart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)

@@ -4,17 +4,16 @@ local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 ---@operator call: sphere.LongLogicalNote
 local LongLogicalNote = LogicalNote + {}
 
----@param noteData ncdk.NoteData
+---@param note notechart.Note
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
 ---@param isInputMatchable boolean?
-function LongLogicalNote:new(noteData, isPlayable, isScorable, isInputMatchable)
-	self.startNoteData = noteData
-	self.endNoteData = noteData.endNoteData
+function LongLogicalNote:new(note, isPlayable, isScorable, isInputMatchable)
+	self.startNote = note
+	self.endNote = note.endNote
 	self.isPlayable = isPlayable
 	self.isScorable = isScorable
 	self.isInputMatchable = isInputMatchable
-	self.noteData = nil
 	self.state = "clear"
 end
 
@@ -133,9 +132,9 @@ function LongLogicalNote:getNoteTime(side)
 		offset = self.logicEngine:getInputOffset()
 	end
 	if not side or side == "start" then
-		return self.startNoteData.timePoint.absoluteTime + offset
+		return self.startNote.visualPoint.point.absoluteTime + offset
 	elseif side == "end" then
-		return self.endNoteData.timePoint.absoluteTime + offset
+		return self.endNote.visualPoint.point.absoluteTime + offset
 	end
 	error("Wrong side")
 end
@@ -210,7 +209,7 @@ function LongLogicalNote:processAuto()
 	if deltaStartTime >= 0 and not self.keyState then
 		self.keyState = true
 		self.inputMatched = true
-		self.logicEngine:playSound(self.startNoteData, not self.isPlayable)
+		self.logicEngine:playSound(self.startNote, not self.isPlayable)
 
 		self.eventTime = self:getNoteTime("start")
 		self:processTimeState("exactly", "too early")
@@ -218,7 +217,7 @@ function LongLogicalNote:processAuto()
 	end
 	if deltaEndTime >= 0 and self.keyState or nextNote and nextNote:isHere() then
 		self.keyState = false
-		self.logicEngine:playSound(self.endNoteData, not self.isPlayable)
+		self.logicEngine:playSound(self.endNote, not self.isPlayable)
 
 		self.eventTime = self:getNoteTime("end")
 		self:processTimeState("too late", "exactly")

@@ -1,7 +1,7 @@
 local class = require("class")
 local path_util = require("path_util")
-local NoteChartExporter = require("sph.NoteChartExporter")
-local OsuNoteChartExporter = require("osu.NoteChartExporter")
+local ChartEncoder = require("sph.ChartEncoder")
+local OsuChartEncoder = require("osu.ChartEncoder")
 local NanoChart = require("libchart.NanoChart")
 local zlib = require("zlib")
 local stbl = require("stbl")
@@ -17,15 +17,15 @@ function EditorController:load()
 	local configModel = self.configModel
 	local fileFinder = self.fileFinder
 
-	local noteChart = selectModel:loadNoteChart()
+	local chart = selectModel:loadChart()
 	local chartview = selectModel.chartview
 
-	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
+	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 	noteSkin.editor = true
 
 	editorModel.noteSkin = noteSkin
-	editorModel.noteChart = noteChart
+	editorModel.chart = chart
 	editorModel:load()
 
 	self.previewModel:stop()
@@ -41,7 +41,7 @@ function EditorController:load()
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartview.location_path, noteChart, function()
+	self.resourceModel:load(chartview.location_path, chart, function()
 		editorModel:loadResources()
 	end)
 
@@ -61,13 +61,13 @@ function EditorController:save()
 	self.editorModel:save()
 	self.editorModel:genGraphs()
 
-	local exp = NoteChartExporter()
-	exp.noteChart = editorModel.noteChart
+	local encoder = ChartEncoder()
+	local data = encoder:encode({editorModel.chart})
 
 	local chartview = selectModel.chartview
 	local path = chartview.location_path:gsub(".sph$", "") .. ".sph"
 
-	assert(love.filesystem.write(path, exp:export()))
+	assert(love.filesystem.write(path, data))
 
 	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
 end
@@ -78,15 +78,13 @@ function EditorController:saveToOsu()
 
 	self.editorModel:save()
 
+	local encoder = OsuChartEncoder()
+	local data = encoder:encode({editorModel.chart})
+
 	local chartview = selectModel.chartview
-	local exp = OsuNoteChartExporter()
-	exp.noteChart = editorModel.noteChart
-	exp.chartmeta = chartview
+	path = chartview.location_path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
-	local path = chartview.location_path
-	path = path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
-
-	assert(love.filesystem.write(path, exp:export()))
+	assert(love.filesystem.write(path, data))
 end
 
 function EditorController:saveToNanoChart()
@@ -130,10 +128,10 @@ function EditorController:saveToNanoChart()
 	exp.noteChart = editorModel.noteChart
 	local sph_chart = exp:export()
 
-	local content, lines = SphPreview:encodeSphLines(exp.sph.sphLines)
+	local content = SphPreview:encodeLines(exp.sph.sphLines:encode())
 	local compressedContent = zlib.compress_s(content)
 
-	local content1, lines = SphPreview:encodeSphLines(exp.sph.sphLines, 1)
+	local content1 = SphPreview:encodeLines(exp.sph.sphLines:encode(), 1)
 	local compressedContent1 = zlib.compress_s(content1)
 
 	local f = assert(io.open(path .. ".preview0_compressed", "w"))

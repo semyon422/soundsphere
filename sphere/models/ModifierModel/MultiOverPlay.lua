@@ -1,4 +1,6 @@
-local NoteData = require("ncdk.NoteData")
+local Note = require("ncdk2.notes.Note")
+local Notes = require("ncdk2.notes.Notes")
+local InputMode = require("ncdk.InputMode")
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 
 ---@class sphere.MultiOverPlay: sphere.Modifier
@@ -31,43 +33,58 @@ function MultiOverPlay:applyMeta(config, state)
 end
 
 ---@param config table
-function MultiOverPlay:apply(config)
-	local noteChart = self.noteChart
+---@param chart ncdk2.Chart
+function MultiOverPlay:apply(config, chart)
 	local value = config.value
 
-	local inputMode = noteChart.inputMode
+	local inputMode = chart.inputMode
 
-	for _, layerData in noteChart:getLayerDataIterator() do
-		for inputType, r in pairs(layerData.noteDatas) do
+	for _, layer in pairs(chart.layers) do
+		local new_notes = Notes()
+		for column, notes in layer.notes:iter() do
+			local inputType, inputIndex = InputMode:splitInput(column)
 			local inputCount = inputMode[inputType]
 			if inputCount then
-				local _r = {}
-				for inputIndex, noteDatas in pairs(r) do
-					for _, noteData in ipairs(noteDatas) do
-						for i = 1, value do
-							local newInputIndex = (inputIndex - 1) * value + i
-							_r[newInputIndex] = _r[newInputIndex] or {}
+				for _, note in ipairs(notes) do
+					for i = 1, value do
+						local newInputIndex = (inputIndex - 1) * value + i
+						if note.startNote then
+						elseif note.endNote then
+							local startNote = Note(note.visualPoint)
+							local endNote = Note(note.endNote.visualPoint)
 
-							local newNoteData = NoteData(noteData.timePoint)
+							startNote.endNote = endNote
+							endNote.startNote = startNote
 
-							newNoteData.endNoteData = noteData.endNoteData  -- fix wrong reference
-							newNoteData.noteType = noteData.noteType
-							newNoteData.sounds = noteData.sounds
+							startNote.noteType = note.noteType
+							startNote.sounds = note.sounds
+							endNote.noteType = note.endNote.noteType
+							endNote.sounds = note.endNote.sounds
 
-							table.insert(_r[newInputIndex], newNoteData)
+							new_notes:insert(startNote, inputType .. newInputIndex)
+							new_notes:insert(endNote, inputType .. newInputIndex)
+						else
+							local newNote = Note(note.visualPoint)
+							newNote.noteType = note.noteType
+							newNote.sounds = note.sounds
+							new_notes:insert(newNote, inputType .. newInputIndex)
 						end
 					end
 				end
-				layerData.noteDatas[inputType] = _r
+			else
+				for _, note in ipairs(notes) do
+					new_notes:insert(note, column)
+				end
 			end
 		end
+		layer.notes = new_notes
 	end
 
 	for inputType, inputCount in pairs(inputMode) do
 		inputMode[inputType] = inputCount * value
 	end
 
-	noteChart:compute()
+	chart:compute()
 end
 
 return MultiOverPlay

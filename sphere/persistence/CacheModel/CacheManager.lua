@@ -6,11 +6,14 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
 local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
-local NoteChartFactory = require("notechart.NoteChartFactory")
+local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
+local ChartDecoder = require("sph.ChartDecoder")
+local SphPreview = require("sph.SphPreview")
+local Sph = require("sph.Sph")
 local class = require("class")
 local path_util = require("path_util")
 
@@ -22,11 +25,13 @@ local CacheManager = class()
 function CacheManager:new(gdb)
 	self.state = 0
 
+	self.difficultyModel = DifficultyModel()
+
 	self.gdb = gdb
 	self.locationsRepo = LocationsRepo(gdb)
 	self.scoresRepo = ScoresRepo(gdb)
 	self.chartfilesRepo = ChartfilesRepo(gdb)
-	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, self.difficultyModel.registry.fields)
 	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
@@ -38,8 +43,8 @@ function CacheManager:new(gdb)
 		end
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, NoteChartFactory)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, self.difficultyModel)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, ChartFactory)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -164,6 +169,25 @@ function CacheManager:computeCacheLocation(path, location_id)
 	self:checkProgress()
 end
 
+---@param hash string
+---@return ncdk2.Chart[]?
+---@return string?
+function CacheManager:getChartsByHash(hash)
+	local chartfile = self.chartfilesRepo:selectChartfileByHash(hash)
+	if not chartfile then
+		return nil, "chartfile not found for " .. hash
+	end
+
+	local location = self.locationsRepo:selectLocationById(chartfile.location_id)
+	local prefix = self.locationManager:getPrefix(location)
+
+	local full_path = path_util.join(prefix, chartfile.path)
+	local content = assert(love.filesystem.read(full_path))
+
+	local charts, err = ChartFactory:getCharts(chartfile.name, content)
+	return charts, err
+end
+
 function CacheManager:computeChartdiffs()
 	local chartmetasRepo = self.chartmetasRepo
 	local scoresRepo = self.scoresRepo
@@ -179,24 +203,17 @@ function CacheManager:computeChartdiffs()
 
 	print("computing default chartdiffs")
 	for i, chartmeta in ipairs(chartmetas) do
-		local chartfile = chartfilesRepo:selectChartfileByHash(chartmeta.hash)
-		if chartfile then
-			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
-			local prefix = self.locationManager:getPrefix(location)
-
-			local full_path = path_util.join(prefix, chartfile.path)
-			local content = assert(love.filesystem.read(full_path))
-
-			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, chartmeta.index)
-			if not noteChart then
-				return nil, err
-			else
-				local chartdiff = self.chartdiffGenerator:compute(noteChart, 1)
-				chartdiff.hash = chartmeta.hash
-				chartdiff.index = chartmeta.index
-				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
-			end
+		local charts, err = self:getChartsByHash(chartmeta.hash)
+		if not charts then
+			print(err)
+		else
+			local chart = charts[chartmeta.index]
+			local chartdiff = self.chartdiffGenerator:compute(chart, 1)
+			chartdiff.hash = chartmeta.hash
+			chartdiff.index = chartmeta.index
+			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 		end
+
 		self.chartfiles_current = self.chartfiles_current + 1
 		self:checkProgress()
 		if self.needStop then
@@ -206,31 +223,78 @@ function CacheManager:computeChartdiffs()
 
 	print("computing modified chartdiffs")
 	for i, score in ipairs(scores) do
-		local chartfile = chartfilesRepo:selectChartfileByHash(score.hash)
-		local chartmeta = chartmetasRepo:selectChartmeta(score.hash, score.index)
-		if chartfile and chartmeta then
-			local location = self.locationsRepo:selectLocationById(chartfile.location_id)
-			local prefix = self.locationManager:getPrefix(location)
+		local charts, err = self:getChartsByHash(score.hash)
+		if not charts then
+			print(err)
+		else
+			local chart = charts[score.index]
+			ModifierModel:apply(score.modifiers, chart)
 
-			local full_path = path_util.join(prefix, chartfile.path)
-			local content = assert(love.filesystem.read(full_path))
+			local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
+			chartdiff.modifiers = score.modifiers
+			chartdiff.hash = score.hash
+			chartdiff.index = score.index
+			chartdiff.rate_type = score.rate_type
 
-			local noteChart, err = NoteChartFactory:getNoteChart(chartfile.name, content, score.index)
-			if not noteChart then
-				return nil, err
-			else
-				ModifierModel:apply(score.modifiers, noteChart)
-
-				local chartdiff = self.chartdiffGenerator:compute(noteChart, score.rate)
-				chartdiff.modifiers = score.modifiers
-				chartdiff.hash = score.hash
-				chartdiff.index = score.index
-				chartdiff.rate_type = score.rate_type
-
-				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
-			end
+			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 		end
+
 		self.chartfiles_current = self.chartfiles_current + 1
+		self:checkProgress()
+		if self.needStop then
+			break
+		end
+	end
+
+	self.state = 0
+	self:checkProgress()
+end
+
+---@param prefer_preview boolean
+function CacheManager:computeIncompleteChartdiffs(prefer_preview)
+	local chartdiffsRepo = self.chartdiffsRepo
+
+	local chartdiffs = chartdiffsRepo:getIncompleteChartdiffs()
+	print(#chartdiffs)
+
+	self.state = 2
+	self.chartfiles_count = #chartdiffs
+	self.chartfiles_current = 0
+
+	print("computing incomplete chartdiffs")
+	for i, chartdiff in ipairs(chartdiffs) do
+		---@type ncdk2.Chart
+		local chart
+
+
+		local chartfile = self.chartfilesRepo:selectChartfileByHash(chartdiff.hash)
+		print(chartfile and chartfile.path)
+
+		local preview = chartdiff.notes_preview
+		if preview and prefer_preview then
+			local lines = SphPreview:decodeLines(preview)
+
+			local sph = Sph()
+			sph.metadata.input = assert(chartdiff.inputmode)
+			sph.sphLines:decode(lines)
+
+			local decoder = ChartDecoder()
+			chart = decoder:decodeSph(sph)
+		else
+			local charts, err = self:getChartsByHash(chartdiff.hash)
+			if not charts then
+				print(err)
+				return nil, err
+			end
+			chart = charts[chartdiff.index]
+			ModifierModel:apply(chartdiff.modifiers, chart)
+		end
+
+		self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
+
+		chartdiffsRepo:updateChartdiff(chartdiff)
+		self.chartfiles_current = i
+
 		self:checkProgress()
 		if self.needStop then
 			break

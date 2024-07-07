@@ -180,5 +180,6 @@ return {
 		chartdiffs_list = false,
 		diff_column = "enps_diff",
 		locations_in_collections = false,
+		chart_preview = true,
 	}
 }

@@ -1,6 +1,5 @@
 local class = require("class")
-local NoteDrawer = require("sphere.models.RhythmModel.GraphicEngine.NoteDrawer")
-local TimeToEvent = require("sphere.models.RhythmModel.GraphicEngine.TimeToEvent")
+local LayerRenderer = require("sphere.models.RhythmModel.GraphicEngine.LayerRenderer")
 local flux = require("flux")
 
 ---@class sphere.GraphicEngine
@@ -12,50 +11,61 @@ GraphicEngine.longNoteShortening = 0
 GraphicEngine.scaleSpeed = false
 GraphicEngine.constant = false
 GraphicEngine.eventBasedRender = false
+GraphicEngine.range = {-1, 1}
 
----@param timeEngine sphere.TimeEngine
----@param logicEngine sphere.LogicEngine
-function GraphicEngine:new(timeEngine, logicEngine)
-	self.timeEngine = timeEngine
+---@param visualTimeInfo sphere.VisualTimeInfo
+---@param logicEngine sphere.LogicEngine?
+function GraphicEngine:new(visualTimeInfo, logicEngine)
+	self.visualTimeInfo = visualTimeInfo
 	self.logicEngine = logicEngine
+	self.layerRenderers = {}
+end
+
+---@param chart ncdk2.Chart
+function GraphicEngine:setChart(chart)
+	self.chart = chart
 end
 
 function GraphicEngine:load()
 	self.notes_count = 0
-	self.noteDrawers = {}
 
-	local layerEvents = {}
+	---@type {[string]: sphere.LayerRenderer}
+	self.layerRenderers = {}
 
-	local range = {
-		self.range[1] / self.visualTimeRate,
-		self.range[2] / self.visualTimeRate,
-	}
-
-	for noteDatas, inputType, inputIndex, layerDataIndex in self.noteChart:getInputIterator() do
-		local layerData = self.noteChart.layerDatas[layerDataIndex]
-		local noteDrawer = NoteDrawer({
-			layerData = layerData,
-			noteDatas = noteDatas,
-			inputType = inputType,
-			inputIndex = inputIndex,
-			graphicEngine = self
-		})
-		if self.eventBasedRender then
-			layerEvents[layerDataIndex] = layerEvents[layerDataIndex] or TimeToEvent(layerData, range)
-			noteDrawer.events = layerEvents[layerDataIndex]
-		end
-		noteDrawer:load()
-		table.insert(self.noteDrawers, noteDrawer)
+	for name, layer in pairs(self.chart.layers) do
+		local layerRenderer = LayerRenderer(self, layer)
+		layerRenderer:load()
+		self.layerRenderers[name] = layerRenderer
 	end
 end
 
 function GraphicEngine:unload()
-	self.noteDrawers = {}
+	self.layerRenderers = {}
 end
 
 function GraphicEngine:update()
-	for _, noteDrawer in ipairs(self.noteDrawers) do
-		noteDrawer:update()
+	for _, layerRenderer in pairs(self.layerRenderers) do
+		layerRenderer:update()
+	end
+end
+
+---@generic T
+---@param f fun(obj: T, note: sphere.GraphicalNote)
+---@param obj T
+function GraphicEngine:iterNotes(f, obj)
+	local eventBasedRender = self.eventBasedRender
+	for _, layerRenderer in pairs(self.layerRenderers) do
+		for _, columnRenderer in pairs(layerRenderer.columnRenderers) do
+			if eventBasedRender then
+				for _, note in ipairs(columnRenderer.visibleNotesList) do
+					f(obj, note)
+				end
+			else
+				for i = columnRenderer.startNoteIndex, columnRenderer.endNoteIndex do
+					f(obj, columnRenderer.notes[i])
+				end
+			end
+		end
 	end
 end
 
@@ -76,7 +86,7 @@ end
 
 ---@return number
 function GraphicEngine:getVisualTimeRate()
-	local timeRate = self.timeEngine.timeRate
+	local timeRate = self.visualTimeInfo.rate
 	local visualTimeRate = self.visualTimeRate
 	if not self.scaleSpeed then
 		visualTimeRate = visualTimeRate / timeRate
@@ -86,12 +96,20 @@ end
 
 ---@return number
 function GraphicEngine:getCurrentTime()
-	return self.timeEngine.currentVisualTime
+	return self.visualTimeInfo.time
 end
 
 ---@return number
 function GraphicEngine:getInputOffset()
-	return self.logicEngine.inputOffset
+	local logicEngine = self.logicEngine
+	return logicEngine and logicEngine.inputOffset or 0
+end
+
+---@param note notechart.Note
+---@return sphere.LogicalNote?
+function GraphicEngine:getLogicalNote(note)
+	local logicEngine = self.logicEngine
+	return logicEngine and logicEngine:getLogicalNote(note)
 end
 
 ---@return number

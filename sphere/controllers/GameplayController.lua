@@ -4,7 +4,7 @@ local sql_util = require("rdb.sql_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierModel = require("sphere.models.ModifierModel")
-local NoteData = require("ncdk.NoteData")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -26,7 +26,7 @@ function GameplayController:load()
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 
-	local noteChart = selectModel:loadNoteChart(self:getImporterSettings())
+	local noteChart = selectModel:loadChart(self:getImporterSettings())
 
 	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
@@ -42,7 +42,13 @@ function GameplayController:load()
 	ModifierModel:applyMeta(playContext.modifiers, state)
 	ModifierModel:apply(playContext.modifiers, noteChart)
 
-	local chartdiff = cacheModel.chartdiffGenerator:compute(noteChart, playContext.rate)
+	local chartdiff = {
+		rate = playContext.rate,
+		inputmode = tostring(noteChart.inputMode),
+		notes_preview = "",  -- do not generate preview
+	}
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, noteChart, playContext.rate)
+
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
@@ -111,23 +117,27 @@ function GameplayController:load()
 	self.previewModel:stop()
 end
 
+---@param chart ncdk2.Chart
 ---@param tempo number
-local function applyTempo(noteChart, tempo)
-	for _, layerData in noteChart:getLayerDataIterator() do
-		layerData:setPrimaryTempo(tempo)
+local function applyTempo(chart, tempo)
+	for _, layer in pairs(chart.layers) do
+		layer.visual.primaryTempo = tempo
+		layer.visual:compute()
 	end
-	noteChart:compute()
 end
 
----@param noteChart ncdk.NoteChart
-function GameplayController:swapVelocityType(noteChart)
-	for _, layerData in noteChart:getLayerDataIterator() do
-		layerData.tempoMultiplyTarget = "local"
-		for _, vd in ipairs(layerData.velocityDatas) do
-			vd.localSpeed, vd.currentSpeed = vd.currentSpeed, vd.localSpeed
+---@param chart ncdk2.Chart
+function GameplayController:swapVelocityType(chart)
+	for _, layer in pairs(chart.layers) do
+		layer.visual.tempoMultiplyTarget = "local"
+		for _, vp in ipairs(layer.visual.points) do
+			local vel = vp._velocity
+			if vel then
+				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
+			end
 		end
+		layer.visual:compute()
 	end
-	noteChart:compute()
 end
 
 ---@param tempoFactor string
@@ -151,18 +161,17 @@ function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
 	applyTempo(noteChart, t[tempoFactor])
 end
 
----@param noteChart ncdk.NoteChart
-function GameplayController:applyAutoKeysound(noteChart)
-	for noteDatas, _, _, layerDataIndex in noteChart:getInputIterator() do
-		local layerData = noteChart.layerDatas[layerDataIndex]
-		for _, noteData in ipairs(noteDatas) do
-			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
-				local soundNoteData = NoteData(noteData.timePoint)
+---@param chart ncdk2.Chart
+function GameplayController:applyAutoKeysound(chart)
+	for notes, column, layer in chart:iterLayerNotes() do
+		for _, note in ipairs(notes) do
+			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
+				local soundNote = Note(note.visualPoint)
 
-				soundNoteData.noteType = "SoundNote"
-				soundNoteData.sounds, noteData.sounds = noteData.sounds, {}
+				soundNote.noteType = "SoundNote"
+				soundNote.sounds, note.sounds = note.sounds, {}
 
-				layerData:addNoteData(soundNoteData, "auto", 0)
+				layer.notes:insert(soundNote, "auto")
 			end
 		end
 	end
@@ -300,8 +309,11 @@ function GameplayController:saveScore()
 
 	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
 
-	local chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(self.playContext.chartdiff)
+	local chartdiff = self.playContext.chartdiff
+	chartdiff.notes_preview = nil  -- fixes erasing
+	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+
 	local score = {
 		hash = chartdiff.hash,
 		index = chartdiff.index,

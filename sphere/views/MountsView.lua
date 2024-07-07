@@ -4,6 +4,7 @@ local ModalImView = require("sphere.imviews.ModalImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local theme = require("imgui.theme")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -42,16 +43,16 @@ modal = ModalImView(function(self, quit)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	just.push()
-	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
-
 	just.push()
 	local tabsw
 	section, tabsw = imgui.vtabs("settings tabs", section, sections)
 	just.pop()
+	love.graphics.translate(tabsw, 0)
 
 	local inner_w = w - tabsw
 	imgui.setSize(inner_w, h, inner_w / 2, _h)
-	love.graphics.translate(tabsw, 0)
+
+	imgui.Container(window_id, inner_w, h, _h / 3, _h * 2, scrollY)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	section_draw[section](self, inner_w)
@@ -173,21 +174,46 @@ function section_draw.database(self)
 		cacheStatus:update()
 	end
 
+	local inactive = not love.keyboard.isDown("lshift")
+	imgui.text("Hold left shift to make inactive buttons active")
+
+	imgui.separator()
+	imgui.text("chartdiffs")
+
 	local cacheModel = self.game.cacheModel
-	if imgui.button("computeScores", "compute chartdiffs") then
+	if imgui.button("compute cds", "compute missing") then
 		cacheModel:computeChartdiffs()
 	end
+	if imgui.button("compute incomplete cds", "compute incomplete") then
+		cacheModel:computeIncompleteChartdiffs()
+	end
+	if imgui.button("compute incomplete cds pp", "compute incomplete, use preview when possible") then
+		cacheModel:computeIncompleteChartdiffs(true)
+	end
+
+	imgui.text("reset")
+	for _, field in ipairs(self.game.difficultyModel.registry.fields) do
+		if imgui.button("reset diffcalc " .. field, field, inactive) then
+			self.game.cacheModel.chartdiffsRepo:resetDiffcalcField(field)
+		end
+		just.sameline()
+	end
+	just.next()
+
+	if imgui.button("delete chartdiffs", "delete all chartdiffs", inactive) then
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
+	end
+
+	if imgui.button("delete modified chartdiffs", "delete modified chartdiffs", inactive) then
+		self.game.cacheModel.chartdiffsRepo:deleteModifiedChartdiffs()
+	end
+
+	-- ChartdiffsRepo:resetDiffcalcField(field)
 
 	imgui.separator()
 
-	local inactive = not love.keyboard.isDown("lshift")
-	imgui.text("Hold left shift to make buttons below active")
-
 	if imgui.button("reset chartfiles", "reset chartfiles.hash", inactive) then
 		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
-	end
-	if imgui.button("delete chartdiffs", "delete chartdiffs", inactive) then
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
 	end
 
 	imgui.separator()
@@ -200,6 +226,18 @@ function section_draw.database(self)
 			self.game.cacheModel.chartmetasRepo:deleteChartmetas({format = format})
 		end
 		just.sameline()
+	end
+	just.next()
+
+	imgui.separator()
+	imgui.text("debug")
+
+
+	if imgui.button("compute diff", "compute diff") then
+		local chartdiff = self.game.selectModel.chartview
+		local chart = self.game.selectModel:loadChart()
+		ModifierModel:apply(chartdiff.modifiers, chart)
+		self.game.difficultyModel:compute({}, chart, 1)
 	end
 end
 

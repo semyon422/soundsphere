@@ -32,7 +32,17 @@ function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode)
 		self.preview_time = preview_time
 		self.mode = mode
 		self:loadPreviewDebounce()
+		return
 	end
+	if self._on_load then
+		self._on_load()
+		self._on_load = nil
+	end
+end
+
+---@param f function
+function PreviewModel:onLoad(f)
+	self._on_load = f
 end
 
 function PreviewModel:update()
@@ -70,6 +80,13 @@ end
 ---@param rate number
 function PreviewModel:setRate(rate)
 	self.target_rate = rate
+end
+
+function PreviewModel:getTime()
+	if not self.audio then
+		return 0
+	end
+	return self.audio:getPosition()
 end
 
 function PreviewModel:loadPreviewDebounce()
@@ -141,6 +158,10 @@ function PreviewModel:loadPreview()
 		return
 	end
 	self.volume = volume
+	if self._on_load then
+		self._on_load()
+		self._on_load = nil
+	end
 end
 
 function PreviewModel:stop()

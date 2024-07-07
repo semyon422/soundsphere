@@ -1,3 +1,5 @@
+local int_rates = require("libchart.int_rates")
+
 local Format = {}
 
 ---@param score any
@@ -29,15 +31,14 @@ function Format.difficulty(difficulty)
 	return format:format(difficulty)
 end
 
----@param timeRate number
+---@param rate number
 ---@return string
-function Format.timeRate(timeRate)
-	local exp = 10 * math.log(timeRate, 2)
-	local roundedExp = math.floor(exp + 0.5)
-	if math.abs(exp - roundedExp) % 1 < 1e-2 and math.abs(exp) > 1e-2 then
-		return ("%dQ"):format(roundedExp)
+function Format.timeRate(rate)
+	local exp = int_rates.get_exp(rate, 10)
+	if int_rates.is_q_rate(rate, 10) then
+		return ("%dQ"):format(exp)
 	end
-	return ("%.2f"):format(timeRate)
+	return ("%.2f"):format(rate)
 end
 
 ---@param inputMode any?

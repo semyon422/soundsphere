@@ -6,9 +6,8 @@ local VideoNoteView = ImageNoteView + {}
 
 ---@return any?
 function VideoNoteView:getVideo()
-	local images = self.graphicalNote.startNoteData.images
-	local resourceModel = self.graphicalNote.graphicEngine.resourceModel
-	return resourceModel:getResource(images[1] and images[1][1])
+	local images = self.graphicalNote.startNote.images
+	return self.resourceModel:getResource(images[1] and images[1][1])
 end
 
 ---@return love.Image?
@@ -28,7 +27,7 @@ function VideoNoteView:draw()
 	end
 
 	local currentTime = self.graphicalNote.graphicEngine:getCurrentTime()
-	video:play(currentTime - self.graphicalNote.startNoteData.timePoint.absoluteTime)
+	video:play(currentTime - self.graphicalNote.startNote.visualPoint.point.absoluteTime)
 
 	ImageNoteView.draw(self)
 end

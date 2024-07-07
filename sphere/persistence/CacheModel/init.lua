@@ -12,13 +12,13 @@ local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGener
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
-local DifficultyModel = require("sphere.models.DifficultyModel")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
 local CacheModel = class()
 
-function CacheModel:new()
+---@param difficultyModel sphere.DifficultyModel
+function CacheModel:new(difficultyModel)
 	self.tasks = {}
 
 	local migrations = {}
@@ -32,13 +32,13 @@ function CacheModel:new()
 
 	self.gdb = GameDatabase(migrations)
 	self.chartviewsRepo = ChartviewsRepo(self.gdb)
-	self.chartdiffsRepo = ChartdiffsRepo(self.gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, difficultyModel.registry.fields)
 	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
 	self.scoresRepo = ScoresRepo(self.gdb)
 	self.chartfilesRepo = ChartfilesRepo(self.gdb)
 	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartmetasRepo, self.chartdiffsRepo)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, DifficultyModel)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, difficultyModel)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
 		self.chartfilesRepo,
@@ -84,6 +84,14 @@ function CacheModel:computeChartdiffs()
 	})
 end
 
+---@param prefer_preview boolean
+function CacheModel:computeIncompleteChartdiffs(prefer_preview)
+	table.insert(self.tasks, {
+		type = "update_incomplete_chartdiffs",
+		prefer_preview = prefer_preview,
+	})
+end
+
 ---@param path string
 ---@param location_id number
 function CacheModel:startUpdateAsync(path, location_id)
@@ -123,6 +131,8 @@ local runTaskAsync = thread.async(function(task)
 		cacheManager:computeCacheLocation(task.path, task.location_id)
 	elseif task.type == "update_chartdiffs" then
 		cacheManager:computeChartdiffs()
+	elseif task.type == "update_incomplete_chartdiffs" then
+		cacheManager:computeIncompleteChartdiffs(task.prefer_preview)
 	end
 
 	gdb:unload()

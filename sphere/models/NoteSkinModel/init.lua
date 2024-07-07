@@ -1,5 +1,4 @@
 local class = require("class")
-local ncdk = require("ncdk")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 local LuaSkinInfo = require("sphere.models.NoteSkinModel.LuaSkinInfo")
 local OsuSkinInfo = require("sphere.models.NoteSkinModel.OsuSkinInfo")

@@ -1,4 +1,5 @@
 local class = require("class")
+local table_util = require("table_util")
 
 ---@class sphere.EditorNote
 ---@operator call: sphere.EditorNote
@@ -20,14 +21,25 @@ function EditorNote:drop(t) end
 ---@param t number
 function EditorNote:updateGrabbed(t) end
 
----@param copyTimePoint ncdk.IntervalTimePoint
-function EditorNote:copy(copyTimePoint) end
+---@param point chartedit.Point
+function EditorNote:copy(point) end
 
----@param timePoint ncdk.IntervalTimePoint
-function EditorNote:paste(timePoint) end
+---@param point chartedit.Point
+function EditorNote:paste(point) end
 
 function EditorNote:remove() end
 
 function EditorNote:add() end
+
+function EditorNote:clone()
+	local note = table_util.copy(self)
+	setmetatable(note, getmetatable(self))
+	return note
+end
+
+---@return ncdk2.Note[]
+function EditorNote:getNotes()
+	return {}
+end
 
 return EditorNote

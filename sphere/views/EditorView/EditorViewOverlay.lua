@@ -16,7 +16,7 @@ end
 
 ---@param self table
 function tabs.info(self)
-	local md = self.game.editorModel.noteChart.chartmeta
+	local md = self.game.editorModel.chart.chartmeta
 
 	imgui.setSize(400, 1080, 400, 55)
 	imgui.text("Chart info")
@@ -100,9 +100,9 @@ function tabs.audio(self)
 	wf.scale = imgui.slider1("wf.scale", wf.scale, "%0.2f", 0, 1, 0.01, "scale")
 
 	imgui.separator()
-	local md = self.game.editorModel.noteChart.chartmeta
+	local md = self.game.editorModel.chart.chartmeta
 	if imgui.button("set as preview", "set this moment as a preview") then
-		md.preview_time = editorModel.timePoint.absoluteTime
+		md.preview_time = editorModel.point.absoluteTime
 	end
 end
 
@@ -113,9 +113,9 @@ local expand = {"0", "1"}
 function tabs.timings(self)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 
-	local dtp = editorModel.timePoint
+	local dtp = editorModel.point
 
 	if imgui.button("prev tp", "<") and dtp.prev then
 		editorModel.scroller:scrollTimePoint(dtp.prev)
@@ -141,36 +141,36 @@ function tabs.timings(self)
 
 	imgui.separator()
 
-	local intervalData = dtp._intervalData
+	local interval = dtp._interval
 	local intervalManager = editorModel.intervalManager
 
-	if dtp.intervalData then
-		imgui.text("Tempo: " .. dtp.intervalData:getTempo() .. " bpm")
+	if dtp.interval then
+		imgui.text("Tempo: " .. dtp.interval:getTempo() .. " bpm")
 	end
 
 	if not intervalManager:isGrabbed() then
-		if not intervalData then
+		if not interval then
 			if imgui.button("split button", "split") then
 				intervalManager:split(dtp)
 			end
 		elseif imgui.button("grab interval button", "grab") then
-			intervalManager:grab(intervalData)
+			intervalManager:grab(interval)
 		end
 	else
 		if imgui.button("drop interval button", "drop") then
 			intervalManager:drop()
 		end
 	end
-	if intervalData and not intervalManager:isGrabbed() then
+	if interval and not intervalManager:isGrabbed() then
 		just.sameline()
 		if imgui.button("merge interval button", "merge") then
-			intervalManager:merge(intervalData.timePoint)
+			intervalManager:merge(interval.point)
 			editorModel.scroller:scrollSecondsDelta(0)
 		end
-		local beats = intervalData.beats
+		local beats = interval.beats
 		local newBeats = imgui.intButtons("update interval", beats, 1, "beats")
 		if beats ~= newBeats then
-			intervalManager:update(intervalData, newBeats)
+			intervalManager:update(interval, newBeats)
 		end
 	end
 
@@ -187,7 +187,7 @@ function tabs.timings(self)
 	just.row(true)
 	velocity = imgui.input("velocity input", velocity, "velocity")
 	if imgui.button("add velocity button", "add") then
-		ld:getVelocityData(dtp, tonumber(velocity))
+		layer:getVelocityData(dtp, tonumber(velocity))
 	end
 
 	just.row(true)
@@ -196,7 +196,7 @@ function tabs.timings(self)
 	imgui.label("/ label", "/")
 	expand[2] = imgui.input("expand d input", expand[2], "expand")
 	if imgui.button("add expand button", "add") then
-		ld:getExpandData(dtp, Fraction(tonumber(expand[1]), tonumber(expand[2])))
+		layer:getExpandData(dtp, Fraction(tonumber(expand[1]), tonumber(expand[2])))
 	end
 
 	just.row()
@@ -205,14 +205,14 @@ function tabs.timings(self)
 		imgui.label("velocity label", "Velocity: " .. dtp._velocityData.currentSpeed .. " x")
 		just.sameline()
 		if imgui.button("remove velocity button", "remove") then
-			ld:removeVelocityData(dtp)
+			layer:removeVelocityData(dtp)
 		end
 	end
 	if dtp._expandData then
 		imgui.label("expand label", "Expand: " .. dtp._expandData.duration .. " beats")
 		just.sameline()
 		if imgui.button("remove expand button", "remove") then
-			ld:removeExpandData(dtp)
+			layer:removeExpandData(dtp)
 		end
 	end
 end
@@ -227,7 +227,6 @@ function tabs.notes(self)
 	local logSpeed = imgui.slider1("editor speed", editorModel:getLogSpeed(), "%d", -30, 50, 1, "speed")
 	if logSpeed ~= editorModel:getLogSpeed() then
 		editorModel:setLogSpeed(logSpeed)
-		editorModel.scroller:updateRange()
 	end
 	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, 16, 1, "snap")
 	editor.lockSnap = imgui.checkbox("lock snap", editor.lockSnap, "lock snap")

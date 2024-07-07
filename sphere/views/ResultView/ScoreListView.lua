@@ -55,7 +55,7 @@ function ScoreListView:drawItem(i, w, h)
 		rating = s * playContext.chartdiff.enps_diff
 
 		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
-		inputMode = tostring(self.game.rhythmModel.noteChart.inputMode) or inputMode
+		inputMode = tostring(self.game.rhythmModel.chart.inputMode) or inputMode
 	end
 
 	if rating ~= rating then

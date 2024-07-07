@@ -68,7 +68,7 @@ function ReplayModel:saveReplay(chartdiff, playContext)
 	local replay = self.replay
 	replay.hash = chartdiff.hash
 	replay.index = chartdiff.index
-	replay.inputMode = self.rhythmModel.noteChart.inputMode
+	replay.inputMode = self.rhythmModel.chart.inputMode
 	replay.rate_type = chartdiff.rate_type
 	playContext:save(replay)
 

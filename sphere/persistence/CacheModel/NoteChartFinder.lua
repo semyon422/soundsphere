@@ -1,4 +1,4 @@
-local NoteChartFactory = require("notechart.NoteChartFactory")
+local ChartLocation = require("notechart.ChartLocation")
 local path_util = require("path_util")
 local class = require("class")
 
@@ -42,7 +42,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	local chartPaths = false
 	for _, item in ipairs(items) do
 		local info = self.fs.getInfo(path_util.join(prefix, dir, item))
-		if info and info.type == "file" and NoteChartFactory:isRelatedContainer(item) then
+		if info and info.type == "file" and ChartLocation:isRelated(item) then
 			if not chartPaths then
 				chartPaths = true
 				local a, b = get_dir_name(dir)
@@ -60,7 +60,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	local containerPaths = false
 	for _, item in ipairs(items) do
 		local info = self.fs.getInfo(path_util.join(prefix, dir, item))
-		if info and info.type == "file" and NoteChartFactory:isUnrelatedContainer(item) then
+		if info and info.type == "file" and ChartLocation:isUnrelated(item) then
 			if not containerPaths then
 				containerPaths = true
 				local a, b = get_dir_name(dir)

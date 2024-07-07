@@ -21,10 +21,10 @@ end
 ---@param config table
 ---@return table
 function Random:getMap(config)
-	local noteChart = self.noteChart
+	local chart = self.chart
 	local value = config.value
 
-	local inputMode = noteChart.inputMode
+	local inputMode = chart.inputMode
 
 	local inputs = {}
 	for inputType, inputCount in pairs(inputMode) do
@@ -37,7 +37,7 @@ function Random:getMap(config)
 
 	local filteredInputs = {}
 	for inputType, subInputs in pairs(inputs) do
-		local inputCount = noteChart.inputMode[inputType]
+		local inputCount = inputMode[inputType]
 		filteredInputs[inputType] = {}
 		local filteredSubInputs = filteredInputs[inputType]
 
@@ -68,15 +68,9 @@ function Random:getMap(config)
 			availableIndices[i] = subInputs[i]
 		end
 
-		map[inputType] = {}
-		local submap = map[inputType]
-		for i = 1, inputMode[inputType] do
-			submap[i] = i
-		end
-
 		for i = 1, #subInputs do
 			local index = math.random(1, #availableIndices)
-			submap[subInputs[i]] = availableIndices[index]
+			map[inputType .. subInputs[i]] = inputType .. availableIndices[index]
 			table.remove(availableIndices, index)
 		end
 	end

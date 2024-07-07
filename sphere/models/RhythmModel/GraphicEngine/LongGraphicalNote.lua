@@ -1,36 +1,40 @@
 local GraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.GraphicalNote")
-local TimePoint = require("ncdk.TimePoint")
+local Point = require("ncdk2.tp.Point")
+local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 ---@class sphere.LongGraphicalNote: sphere.GraphicalNote
 ---@operator call: sphere.LongGraphicalNote
 local LongGraphicalNote = GraphicalNote + {}
 
 function LongGraphicalNote:checkFakeStartTimePoint()
-	local timePoint = self.startNoteData.timePoint
-	if self.baseStartTime == timePoint.absoluteTime then
+	local visualPoint = self.startNote.visualPoint
+	if self.baseStartTime == visualPoint.point.absoluteTime then
 		return
 	end
-	self.baseStartTime = timePoint.absoluteTime
+	self.baseStartTime = visualPoint.point.absoluteTime
 
-	self.fakeStartTimePoint = self.fakeStartTimePoint or TimePoint()
+	local fakeStartPoint = Point(visualPoint.point.absoluteTime)
+	local fakeStartVisualPoint = VisualPoint(fakeStartPoint)
+	self.fakeStartPoint = fakeStartPoint
+	self.fakeStartTimePoint = fakeStartVisualPoint
 
-	local fakeTimePoint = self.fakeStartTimePoint
-	fakeTimePoint.absoluteTime = timePoint.absoluteTime
-	fakeTimePoint.visualTime = timePoint.visualTime
-	fakeTimePoint.velocityData = timePoint.velocityData
-	fakeTimePoint.tempoData = timePoint.tempoData
-	fakeTimePoint.index = timePoint.index
+	fakeStartVisualPoint.visualTime = visualPoint.visualTime
+
+	self.fakeIndex = 1
 end
 
 function LongGraphicalNote:update()
 	self:checkFakeStartTimePoint()
 
-	self.endNoteData = self.startNoteData.endNoteData
+	self.endNote = self.startNote.endNote
 
-	local startTimePoint = self.startNoteData.timePoint
-	local endTimePoint = self.endNoteData.timePoint
-	local startVisualTime = self:getVisualTime(startTimePoint)
-	local endVisualTime = self:getVisualTime(endTimePoint)
+	local startVisualPoint = self.startNote.visualPoint
+	local endVisualPoint = self.endNote.visualPoint
+	local startPoint = startVisualPoint.point
+	local endPoint = endVisualPoint.point
+
+	local startVisualTime = self:getVisualTime(startVisualPoint)
+	local endVisualTime = self:getVisualTime(endVisualPoint)
 
 	self.startTimeState = self.startTimeState or {}
 	local startTimeState = self.startTimeState
@@ -41,9 +45,9 @@ function LongGraphicalNote:update()
 
 	startTimeState.currentTime = currentTime
 
-	startTimeState.absoluteTime = startTimePoint.absoluteTime
+	startTimeState.absoluteTime = startPoint.absoluteTime
 	startTimeState.currentVisualTime = startVisualTime
-	startTimeState.absoluteDeltaTime = currentTime - startTimePoint.absoluteTime
+	startTimeState.absoluteDeltaTime = currentTime - startPoint.absoluteTime
 	startTimeState.visualDeltaTime = currentTime - (startVisualTime + visualOffset)
 	startTimeState.scaledAbsoluteDeltaTime = startTimeState.absoluteDeltaTime * visualTimeRate
 	startTimeState.scaledVisualDeltaTime = startTimeState.visualDeltaTime * visualTimeRate
@@ -57,9 +61,9 @@ function LongGraphicalNote:update()
 
 	endTimeState.currentTime = currentTime
 
-	endTimeState.absoluteTime = endTimePoint.absoluteTime
+	endTimeState.absoluteTime = endPoint.absoluteTime
 	endTimeState.currentVisualTime = endVisualTime
-	endTimeState.absoluteDeltaTime = currentTime - endTimePoint.absoluteTime
+	endTimeState.absoluteDeltaTime = currentTime - endPoint.absoluteTime
 	endTimeState.visualDeltaTime = currentTime - (endVisualTime + visualOffset)
 	endTimeState.scaledAbsoluteDeltaTime = endTimeState.absoluteDeltaTime * visualTimeRate
 	endTimeState.scaledVisualDeltaTime = endTimeState.visualDeltaTime * visualTimeRate
@@ -75,41 +79,44 @@ end
 
 ---@param time number
 function LongGraphicalNote:clampAbsoluteTime(time)
-	time = math.max(time, self.startNoteData.timePoint.absoluteTime)
-	time = math.min(time, self.endNoteData.timePoint.absoluteTime)
+	time = math.max(time, self.startNote.visualPoint.point.absoluteTime)
+	time = math.min(time, self.endNote.visualPoint.point.absoluteTime)
 	return time
 end
 
 ---@return number
 function LongGraphicalNote:getFakeVisualStartTime()
-	local currentTimePoint = self.currentTimePoint
-	local fakeTimePoint = self.fakeStartTimePoint
+	local currentVisualPoint = self.currentVisualPoint
+	local fakeStartVisualPoint = self.fakeStartTimePoint
+	local fakeStartPoint = self.fakeStartPoint
 
 	local logicalState = self:getLogicalState()
 	if logicalState == "endPassed" then
-		return self:getVisualTime(self.endNoteData.timePoint)
+		return self:getVisualTime(self.endNote.visualPoint)
 	end
 	if logicalState ~= "startPassedPressed" then
-		return self:getVisualTime(fakeTimePoint)
+		return self:getVisualTime(fakeStartVisualPoint)
 	end
 
 	local offsetSum = self.graphicEngine:getVisualOffset() - self.graphicEngine:getInputOffset()
-	local globalSpeed = currentTimePoint.globalSpeed
+	local globalSpeed = currentVisualPoint.globalSpeed
+
+	local interpolator = self.layer.visual.interpolator
+	local visualPoints = self.layer.visual.points
 
 	if self.graphicEngine.constant then
-		local fakeStartTime = currentTimePoint.absoluteTime - offsetSum / globalSpeed
-		fakeTimePoint.absoluteTime = self:clampAbsoluteTime(fakeStartTime)
-		fakeTimePoint.index = self.layerData:interpolateTimePointAbsolute(fakeTimePoint.index, fakeTimePoint)
-		return fakeTimePoint.absoluteTime
+		local fakeStartTime = currentVisualPoint.point.absoluteTime - offsetSum / globalSpeed
+		fakeStartVisualPoint.point.absoluteTime = self:clampAbsoluteTime(fakeStartTime)
+		return fakeStartVisualPoint.point.absoluteTime
 	end
 
-	fakeTimePoint.visualTime = currentTimePoint.visualTime - offsetSum / globalSpeed
-	fakeTimePoint.index = self.layerData:interpolateTimePointVisual(fakeTimePoint.index, fakeTimePoint)
+	fakeStartVisualPoint.visualTime = currentVisualPoint.visualTime - offsetSum / globalSpeed
+	self.fakeIndex = interpolator:interpolate(visualPoints, self.fakeIndex, fakeStartVisualPoint, "visual")
 
-	fakeTimePoint.absoluteTime = self:clampAbsoluteTime(fakeTimePoint.absoluteTime)
-	fakeTimePoint.index = self.layerData:interpolateTimePointAbsolute(fakeTimePoint.index, fakeTimePoint)
+	fakeStartPoint.absoluteTime = self:clampAbsoluteTime(fakeStartPoint.absoluteTime)
+	self.fakeIndex = interpolator:interpolate(visualPoints, self.fakeIndex, fakeStartVisualPoint, "absolute")
 
-	return fakeTimePoint:getVisualTime(self.currentTimePoint)
+	return fakeStartVisualPoint:getVisualTime(self.currentVisualPoint)
 end
 
 ---@return number

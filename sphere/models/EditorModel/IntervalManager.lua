@@ -4,41 +4,42 @@ local class = require("class")
 ---@operator call: sphere.IntervalManager
 local IntervalManager = class()
 
----@param intervalData ncdk.IntervalData
-function IntervalManager:grab(intervalData)
-	self.grabbedIntervalData = intervalData
+---@param interval chartedit.Interval
+function IntervalManager:grab(interval)
+	self.grabbedInterval = interval
 end
 
 function IntervalManager:drop()
-	self.grabbedIntervalData = nil
+	self.grabbedInterval = nil
 end
 
 ---@return boolean
 function IntervalManager:isGrabbed()
-	return self.grabbedIntervalData ~= nil
+	return self.grabbedInterval ~= nil
 end
 
 ---@param time number
 function IntervalManager:moveGrabbed(time)
-	self.editorModel.layerData:moveInterval(self.grabbedIntervalData, time)
+	self.editorModel.layer.intervals:moveInterval(self.grabbedInterval, time)
 end
 
----@param timePoint ncdk.IntervalTimePoint
----@return ncdk.IntervalData
-function IntervalManager:split(timePoint)
-	local ld = self.editorModel.layerData
-	return ld:splitInterval(ld:getTimePoint(timePoint:getTime()))
+---@param point chartedit.Point
+---@return chartedit.Interval
+function IntervalManager:split(point)
+	local layer = self.editorModel.layer
+	local p = layer.points:getPoint(point:unpack())
+	return layer.intervals:splitInterval(p)
 end
 
----@param timePoint ncdk.IntervalTimePoint
-function IntervalManager:merge(timePoint)
-	self.editorModel.layerData:mergeInterval(timePoint)
+---@param point chartedit.Point
+function IntervalManager:merge(point)
+	self.editorModel.layer.intervals:mergeInterval(point)
 end
 
----@param intervalData ncdk.IntervalData
+---@param interval chartedit.Interval
 ---@param beats number
-function IntervalManager:update(intervalData, beats)
-	self.editorModel.layerData:updateInterval(intervalData, beats)
+function IntervalManager:update(interval, beats)
+	self.editorModel.layer.intervals:updateInterval(interval, beats)
 end
 
 return IntervalManager

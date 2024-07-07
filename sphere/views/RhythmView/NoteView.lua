@@ -3,6 +3,10 @@ local NotePartView = require("sphere.views.RhythmView.NotePartView")
 
 ---@class sphere.NoteView
 ---@operator call: sphere.NoteView
+---@field noteSkin sphere.NoteSkin
+---@field graphicalNote sphere.GraphicalNote
+---@field column number
+---@field chords table
 local NoteView = class()
 
 ---@param noteType string

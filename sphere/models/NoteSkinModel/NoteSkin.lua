@@ -36,7 +36,7 @@ local no_columns = {}
 ---@param note sphere.GraphicalNote
 ---@return table
 function NoteSkin:getColumns(note)
-	return self.notes[note.noteType] and self.input_to_columns[note.inputType .. note.inputIndex] or no_columns
+	return self.notes[note.noteType] and self.input_to_columns[note.column] or no_columns
 end
 
 ---@param value any?

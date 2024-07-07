@@ -10,17 +10,15 @@ function GraphsGenerator:load()
 	self.intervalDatasGraph = {n = 0}
 end
 
----@param noteChart ncdk.NoteChart
+---@param chart ncdk2.Chart
 ---@param firstTime number
 ---@param lastTime number
-function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
+function GraphsGenerator:genDensityGraph(chart, firstTime, lastTime)
 	local notes = {}
-	for noteDatas in noteChart:getInputIterator() do
-		for _, noteData in ipairs(noteDatas) do
-			local offset = noteData.timePoint.absoluteTime
-			if noteData.noteType == "ShortNote" or noteData.noteType == "LongNoteStart" then
-				table.insert(notes, offset)
-			end
+	for note in chart:iterNotes() do
+		local offset = note.visualPoint.point:tonumber()
+		if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
+			table.insert(notes, offset)
 		end
 	end
 	table.sort(notes)
@@ -50,17 +48,16 @@ function GraphsGenerator:genDensityGraph(noteChart, firstTime, lastTime)
 	end
 end
 
----@param layerData ncdk.DynamicLayerData
+---@param layer chartedit.Layer
 ---@param firstTime number
 ---@param lastTime number
-function GraphsGenerator:genIntervalDatasGraph(layerData, firstTime, lastTime)
-	local intervalDatas = layerData.ranges.interval
+function GraphsGenerator:genIntervalsGraph(layer, firstTime, lastTime)
+	local ivl = layer.points:getFirstPoint().interval
 
 	local offsets = {}
-	local id = intervalDatas.first
-	while id and id <= intervalDatas.last do
-		table.insert(offsets, id.timePoint.absoluteTime)
-		id = id.next
+	while ivl do
+		table.insert(offsets, ivl.point.absoluteTime)
+		ivl = ivl.next
 	end
 	table.sort(offsets)
 

@@ -10,32 +10,9 @@ local Layout = require("sphere.views.EditorView.Layout")
 
 local SnapGridView = class()
 
----@param timePoint ncdk.IntervalTimePoint
 ---@return string
-local function getTimingText(timePoint)
-	local out = {}
-	if timePoint._tempoData then
-		table.insert(out, timePoint._tempoData.tempo .. " bpm")
-	elseif timePoint._signatureData then
-		table.insert(out, "signature " .. tostring(timePoint._signatureData.signature) .. " beats")
-	elseif timePoint._stopData then
-		table.insert(out, "stop " .. tostring(timePoint._stopData.duration) .. " beats")
-	elseif timePoint._intervalData then
-		table.insert(out, timePoint.absoluteTime)
-	end
-	return table.concat(out, ", ")
-end
-
----@param timePoint ncdk.IntervalTimePoint
----@return string
-local function getVelocityText(timePoint)
-	local out = {}
-	if timePoint._velocityData then
-		table.insert(out, timePoint._velocityData.currentSpeed .. "x")
-	elseif timePoint._expandData then
-		table.insert(out, "expand " .. tostring(timePoint._expandData.duration) .. " beats")
-	end
-	return table.concat(out, ", ")
+local function getVelocityText()
+	return ""
 end
 
 ---@param field string
@@ -45,6 +22,7 @@ end
 ---@param align string
 ---@param getText function
 function SnapGridView:drawTimingObjects(field, currentTime, w, h, align, getText)
+	do return end
 	local editorModel = self.game.editorModel
 	local rangeTracker = editorModel.layerData.ranges.timePoint
 	local noteSkin = self.game.noteSkinModel.noteSkin
@@ -88,30 +66,30 @@ local snaps = {
 	[8] = colors.green,
 }
 
----@param timePoint ncdk.IntervalTimePoint
+---@param point ncdk2.IntervalPoint
 ---@param field string
 ---@param currentTime number
 ---@param width number
-function SnapGridView:drawSnap(timePoint, field, currentTime, width)
+function SnapGridView:drawSnap(point, field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	local y = noteSkin:getTimePosition((currentTime - timePoint[field]) * editor.speed)
+	local y = noteSkin:getTimePosition((currentTime - point[field]) * editor.speed)
 
 	love.graphics.push("all")
 	love.graphics.translate(0, y)
 
 	local size = 20
 	local changed, active, hovered = just.button(
-		tostring(timePoint) .. "scroll",
+		tostring(point) .. "scroll",
 		just.is_over(size, size, -size / 2, -size / 2) or just.is_over(size, size, -size / 2 + width, -size / 2)
 	)
 	if hovered then
 		love.graphics.setLineWidth(4)
 	end
 	if changed then
-		editorModel.scroller:scrollTimePoint(timePoint)
+		editorModel.scroller:scrollPoint(point)
 	end
 
 	love.graphics.line(0, 0, width, 0)
@@ -124,7 +102,7 @@ end
 function SnapGridView:drawComputedGrid(field, currentTime, width)
 	local editorModel = self.game.editorModel
 	local editor = self.game.configModel.configs.settings.editor
-	local ld = editorModel.layerData
+	local layer = editorModel.layer
 	local snap = editor.snap
 
 	if not currentTime then
@@ -134,39 +112,43 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 	love.graphics.setLineWidth(1)
 
 	local range = 1 / editor.speed
-	local timePoint = ld:getDynamicTimePointAbsolute(1, currentTime - range)
-	local measureData
+	local point = layer.points:interpolateAbsolute(1, currentTime - range)
+	local measure
 
-	local intervalData = timePoint.intervalData
-	local time = timePoint.time
-	intervalData, time = timePoint:add(Fraction((time * snap):ceil() + 1, snap) - time)
+	local interval = point.interval
+	local time = point.time
+	interval, time = point:add(Fraction((time * snap):ceil() + 1, snap) - time)
 
-	timePoint = ld:getDynamicTimePointAbsolute(1, currentTime + range)
-	local endIntervalData = timePoint.intervalData
-	local endTime = timePoint.time
+	point = layer.points:interpolateAbsolute(1, currentTime + range)
+	local endInterval = point.interval
+	local endTime = point.time
 	endTime = Fraction((endTime * snap):floor(), snap)
 
-	timePoint = ld:getDynamicTimePoint(intervalData, time)
+	point = layer.points:interpolateFraction(interval, time)
 
-	while intervalData and intervalData < endIntervalData or intervalData == endIntervalData and time <= endTime do
-		timePoint = timePoint or ld:getDynamicTimePoint(intervalData, time)
-		if not timePoint or not timePoint[field] then break end
+	while interval and interval < endInterval or interval == endInterval and time <= endTime do
+		point = point or layer.points:interpolateFraction(interval, time)
+		if not point or not point[field] then
+			break
+		end
 
 		local drawNothing, skipInterval
 
-		if measureData ~= timePoint.measureData then
-			measureData = timePoint.measureData
-			local delta = -(time % 1) + measureData.timePoint.time % 1 - measureData.start
+		if measure ~= point.measure then
+			measure = point.measure
+			local delta = -(time % 1) - measure.offset
 			while delta[1] < 0 do
 				delta = delta + Fraction(1, snap)
 			end
-			intervalData, time = timePoint:add(delta)
-			timePoint = ld:getDynamicTimePoint(intervalData, time)
-			if not timePoint or not timePoint[field] then break end
+			interval, time = point:add(delta)
+			point = layer.points:interpolateFraction(interval, time)
+			if not point or not point[field] then
+				break
+			end
 		end
 
-		if not drawNothing and intervalData.prev then
-			local dt = intervalData.timePoint.absoluteTime - intervalData.prev.timePoint.absoluteTime
+		if not drawNothing and interval.next then
+			local dt = interval.next.point.absoluteTime - interval.point.absoluteTime
 			if dt < 0.01 then
 				drawNothing = true
 				skipInterval = true
@@ -174,17 +156,17 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 		end
 
 		if not drawNothing then
-			local j = snap * timePoint:getBeatModulo()
+			local j = snap * point:getBeatModulo()
 			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
-			self:drawSnap(timePoint, field, currentTime, width)
+			self:drawSnap(point, field, currentTime, width)
 		end
 
 		if skipInterval then
-			intervalData, time = intervalData.next, intervalData:start()
-			timePoint = intervalData.timePoint
+			interval, time = interval.next, interval:start()
+			point = interval.point
 		else
-			intervalData, time = timePoint:add(Fraction(1, snap))
-			timePoint = nil
+			interval, time = point:add(Fraction(1, snap))
+			point = nil
 		end
 	end
 
@@ -195,36 +177,29 @@ end
 ---@param _h number
 function SnapGridView:drawTimings(_w, _h)
 	local editorModel = self.game.editorModel
-	local editorTimePoint = editorModel.timePoint
+	local editorTimePoint = editorModel.point
 	local noteSkin = self.game.noteSkinModel.noteSkin
 	local editor = self.game.configModel.configs.settings.editor
 
-	local rangeTracker = self.game.editorModel.layerData.ranges.timePoint
-	local timePoint = rangeTracker.head
-	if not timePoint then
-		return
-	end
+	local layer = self.game.editorModel.layer
 
 	love.graphics.push("all")
 	love.graphics.setColor(1, 0.8, 0.2)
 	love.graphics.setLineWidth(4)
-	local endTimePoint = rangeTracker.tail
-	while timePoint and timePoint <= endTimePoint do
-		local intervalData = timePoint._intervalData
-		local measureData = timePoint._measureData
+	for p, vp, notes in layer:iter(editorModel:getIterRange()) do
+		local interval = p._interval
+		local measure = p._measure
 
-		if intervalData then
+		if interval then
 			love.graphics.setColor(1, 0.8, 0.2)
-		elseif measureData then
-			love.graphics.setColor(snaps[editorModel:getSnap(timePoint:getBeatModulo())] or colors.white)
+		elseif measure then
+			love.graphics.setColor(snaps[editorModel:getSnap(p:getBeatModulo())] or colors.white)
 		end
 
-		if intervalData or measureData then
-			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - timePoint.absoluteTime) * editor.speed)
+		if interval or measure then
+			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - p.absoluteTime) * editor.speed)
 			love.graphics.line(0, y, _w, y)
 		end
-
-		timePoint = timePoint.next
 	end
 	love.graphics.pop()
 end
@@ -250,7 +225,7 @@ end
 ---@param self table
 local function drawMouse(self)
 	local editorModel = self.game.editorModel
-	local dt = editorModel:getMouseTime() - editorModel.timePoint.absoluteTime
+	local dt = editorModel:getMouseTime() - editorModel.point.absoluteTime
 
 	love.graphics.push()
 	local w, h = Layout:move("base")
@@ -287,7 +262,7 @@ function SnapGridView:draw()
 	local lineHeight = 55
 	imgui.setSize(w, h, 200, lineHeight)
 
-	local editorTimePoint = editorModel.timePoint
+	local editorTimePoint = editorModel.point
 
 	love.graphics.replaceTransform(gfx_util.transform(self.transform))
 	love.graphics.translate(noteSkin.baseOffset, 0)
@@ -310,11 +285,9 @@ function SnapGridView:draw()
 	if lalt and not speedOrig then
 		speedOrig = editor.speed
 		editor.speed = 1000 / noteSkin.unit * 10
-		editorModel.scroller:updateRange()
 	elseif not lalt and speedOrig then
 		editor.speed = speedOrig
 		speedOrig = nil
-		editorModel.scroller:updateRange()
 	end
 	if lalt or lshift or lctrl then
 		drawMouse(self)
@@ -345,7 +318,6 @@ function SnapGridView:draw()
 			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
 		elseif lctrl then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
-			editorModel.scroller:updateRange()
 		else
 			if editorModel.timer.isPlaying and scroll < 0 then
 				editorModel.scroller:scrollSnaps(scroll)

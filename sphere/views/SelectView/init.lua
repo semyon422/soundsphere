@@ -6,6 +6,8 @@ local SelectViewConfig = require("sphere.views.SelectView.SelectViewConfig")
 local NotechartsSubscreen = require("sphere.views.SelectView.NotechartsSubscreen")
 local CollectionsSubscreen = require("sphere.views.SelectView.CollectionsSubscreen")
 local OsudirectSubscreen = require("sphere.views.SelectView.OsudirectSubscreen")
+local Background = require("sphere.views.SelectView.Background")
+local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
 ---@class sphere.SelectView: sphere.ScreenView
 ---@operator call: sphere.SelectView
@@ -16,6 +18,8 @@ SelectView.searchMode = "filter"
 
 function SelectView:load()
 	self.game.selectController:load()
+	self.chartPreviewView = ChartPreviewView(self.game)
+	self.chartPreviewView:load()
 end
 
 function SelectView:beginUnload()
@@ -24,22 +28,27 @@ end
 
 function SelectView:unload()
 	self.game.selectController:unload()
+	self.chartPreviewView:unload()
 end
 
 ---@param dt number
 function SelectView:update(dt)
 	self.game.selectController:update()
+	self.chartPreviewView:update(dt)
 end
 
 ---@param event table
 function SelectView:receive(event)
 	self.game.selectController:receive(event)
+	self.chartPreviewView:receive(event)
 end
 
 function SelectView:draw()
 	just.container("select container", true)
 
 	Layout:draw()
+	Background(self)
+	self.chartPreviewView:draw()
 	SelectViewConfig(self)
 
 	local cacheModel = self.game.cacheModel
