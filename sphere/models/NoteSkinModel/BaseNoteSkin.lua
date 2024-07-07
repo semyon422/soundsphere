@@ -79,8 +79,8 @@ function BaseNoteSkin:load(inputMode)
 	guidelines.image[#inputs + 1] = "pixel.png"
 
 	self:setColumns({
-		offset = 0,
-		align = "center",
+		offset = config:get("offset") or 0,
+		align = config:get("align") or "center",
 		width = width,
 		space = space,
 		upscroll = config:get("upscroll"),

@@ -5,6 +5,8 @@ local config = JustConfig()
 
 config.data = --[[data]] {
 	autosave = false,
+	offset = 0,
+	align = "center",
 	noteWidth = 48,
 	noteHeight = 24,
 	hitposition = 450,
@@ -35,6 +37,9 @@ function config:draw(w, h)
 	data.judgementLineHeight = imgui.slider1("jlh", data.judgementLineHeight, "%d", 0, 16, 1, "J. line height")
 	data.upscroll = imgui.checkbox("upscroll", data.upscroll, "Upscroll")
 	data.measureLine = imgui.checkbox("measureLine", data.measureLine, "Measure line")
+
+	data.offset = imgui.slider1("offset", data.offset, "%d", -240, 240, 1, "Lanes offset")
+	data.align = imgui.combo("align", data.align, {"left", "right", "center"}, nil, "Lanes align")
 
 	imgui.separator()
 	local cover = data.covers.top
