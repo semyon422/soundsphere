@@ -47,6 +47,11 @@ local empty_lines = SphPreview:previewLinesToLines({
 })
 
 function ChartPreviewModel:setChartview(chartview)
+	if not self.configModel.configs.settings.select.chart_preview then
+		self.graphicEngine:unload()
+		return
+	end
+
 	if not chartview or not chartview.chartdiff_inputmode then
 		return
 	end
