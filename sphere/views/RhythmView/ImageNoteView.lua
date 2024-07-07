@@ -7,8 +7,7 @@ local ImageNoteView = NoteView + {}
 ---@return any?
 function ImageNoteView:getDrawable()
 	local images = self.graphicalNote.startNote.images
-	local resourceModel = self.graphicalNote.graphicEngine.resourceModel
-	return resourceModel:getResource(images[1] and images[1][1])
+	return self.resourceModel:getResource(images[1] and images[1][1])
 end
 
 function ImageNoteView:draw()
