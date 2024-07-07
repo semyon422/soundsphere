@@ -103,6 +103,9 @@ elseif jit.os == "OSX" then
 	pkg.addc("bin/mac64")
 end
 
+pkg.export_lua()
+pkg.export_love()
+
 love.errhand = require("errhand")
 
 local physfs = require("physfs")
