@@ -29,6 +29,8 @@ function FullLongNote:apply(config, chart)
 		for _, note in ipairs(notes) do
 			if
 				note.noteType == "ShortNote" or
+				note.noteType == "SoundNote" or
+				note.noteType == "Ignore" or
 				note.noteType == "LongNoteStart" or
 				note.noteType == "LongNoteEnd"
 			then
