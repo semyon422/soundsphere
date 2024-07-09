@@ -37,27 +37,23 @@ function Taiko:apply(config, chart)
 	local new_notes = Notes()
 	for _, note in chart.notes:iter() do
 		local inputType, inputIndex = InputMode:splitInput(note.column)
-		local new_column = note.column
 		if inputType == "key" then
-			new_column = inputType .. getKey(inputIndex)
+			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
+				note.noteType = "ShortNote"
+				note.endNote = nil
+				note.column = "key" .. getKey(inputIndex)
+				local found_note = new_notes:get(note.visualPoint, note.column)
+				if not found_note then
+					new_notes:insert(note)
+				else
+					found_note.isDouble = true
+				end
+			end
+		else
+			new_notes:insert(note)
 		end
-		note.column = new_column
-		new_notes:insert(note)
 	end
 	chart.notes = new_notes
-	new_notes:sort()
-
-	local t, n
-	for _, note in new_notes:iter() do
-		local _t = note.visualPoint.point.absoluteTime
-		if _t ~= t then
-			t = _t
-			n = note
-		else
-			n.isDouble = true
-			note.noteType = "Ignore"
-		end
-	end
 
 	inputMode.key = 2
 
