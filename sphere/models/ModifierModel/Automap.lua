@@ -91,7 +91,7 @@ function Automap:applyAutomap()
 			n.baseColumnIndex = inputIndex
 
 			tNoteDatas[#tNoteDatas + 1] = n
-		elseif inputType == "key" and note.noteType == "LongNoteEnd" then
+		elseif inputType == "key" then
 		else
 			new_notes:insert(note)
 		end
