@@ -8,6 +8,7 @@ local Modifier = require("sphere.models.ModifierModel.Modifier")
 local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
 local InputMode = require("ncdk.InputMode")
 local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sphere.Automap: sphere.Modifier
 ---@operator call: sphere.Automap
@@ -66,46 +67,40 @@ function Automap:apply(config, chart)
 end
 
 function Automap:applyAutomap()
+	local chart = self.chart
+
 	local tNoteDatas = {}
 	self.tNoteDatas = tNoteDatas
 
-	for notes, column, layer in self.chart:iterLayerNotes() do
-		local inputType, inputIndex = InputMode:splitInput(column)
-		for _, note in ipairs(notes) do
-			if inputType == "key" and (note.noteType == "ShortNote" or note.noteType == "LongNoteStart") then
-				local n = {}
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		local inputType, inputIndex = InputMode:splitInput(note.column)
+		if inputType == "key" and (note.noteType == "ShortNote" or note.noteType == "LongNoteStart") then
+			local n = {}
 
-				n.noteData = note
-				n.layer = layer
-
-				n.startTime = math_util.round(note.visualPoint.point.absoluteTime * 1000)
-				if note.noteType == "LongNoteStart" and note.endNote then
-					n.endTime = math_util.round(note.endNote.visualPoint.point.absoluteTime * 1000)
-					n.long = true
-				else
-					n.endTime = n.startTime
-				end
-				n.baseEndTime = n.endTime
-				n.columnIndex = inputIndex
-				n.baseColumnIndex = inputIndex
-
-				tNoteDatas[#tNoteDatas + 1] = n
+			n.noteData = note
+			n.startTime = math_util.round(note.visualPoint.point.absoluteTime * 1000)
+			if note.noteType == "LongNoteStart" and note.endNote then
+				n.endTime = math_util.round(note.endNote.visualPoint.point.absoluteTime * 1000)
+				n.long = true
+			else
+				n.endTime = n.startTime
 			end
+			n.baseEndTime = n.endTime
+			n.columnIndex = inputIndex
+			n.baseColumnIndex = inputIndex
+
+			tNoteDatas[#tNoteDatas + 1] = n
+		elseif inputType == "key" and note.noteType == "LongNoteEnd" then
+		else
+			new_notes:insert(note)
 		end
 	end
+	chart.notes = new_notes
 
 	table.sort(tNoteDatas, function(noteData1, noteData2)
 		return noteData1.startTime < noteData2.startTime
 	end)
-
-	for _, layer in pairs(self.chart.layers) do
-		for column, notes in layer.notes:iter() do
-			local inputType, inputIndex = InputMode:splitInput(column)
-			if inputType == "key" then
-				layer.notes.column_notes[column] = nil
-			end
-		end
-	end
 end
 
 function Automap:processUpscaler()
@@ -135,11 +130,12 @@ function Automap:processUpscaler()
 
 	for i = 1, #notes do
 		local n = notes[i]
-		local layer = n.layer
 
-		layer.notes:insert(n.noteData, "key" .. n.columnIndex)
+		n.noteData.column = "key" .. n.columnIndex
+		chart.notes:insert(n.noteData)
 		if n.long then
-			layer.notes:insert(n.noteData.endNote, "key" .. n.columnIndex)
+			n.noteData.endNote.column = "key" .. n.columnIndex
+			chart.notes:insert(n.noteData.endNote)
 		end
 	end
 
@@ -203,22 +199,25 @@ function Automap:processReductor()
 		end
 	end
 
+	local layer = chart.layers.main
 	for i = 1, #notes do
 		local n = notes[i]
 		tNoteDatasMap[n] = nil
 
-		local layer = n.layer
-		layer.notes:insert(n.noteData, "key" .. n.columnIndex)
+		n.noteData.column = "key" .. n.columnIndex
+		chart.notes:insert(n.noteData)
 
 		if n.long then
 			if n.startTime == n.endTime then
 				n.noteData.noteType = "ShortNote"
 				n.noteData.endNote = nil
 			else
-				layer.notes:insert(n.noteData.endNote, "key" .. n.columnIndex)
-				local p = layer:getPoint(n.endTime / 1000)
+				n.noteData.endNote.column = "key" .. n.columnIndex
+				-- we have main absolute layer here
+				local p = layer.points:getPoint(n.endTime / 1000)
 				local vp = layer.visual:newPoint(p)
 				n.noteData.endNote.visualPoint = vp
+				chart.notes:insert(n.noteData.endNote)
 			end
 		end
 	end
@@ -228,8 +227,8 @@ function Automap:processReductor()
 		note.noteType = "SoundNote"
 		note.endNote = nil
 
-		local layer = n.layer
-		layer.notes:insert(n.noteData, "auto" .. n.columnIndex)
+		n.noteData.column = "auto" .. n.columnIndex
+		chart.notes:insert(n.noteData)
 	end
 
 	self.chart.inputMode.key = targetMode

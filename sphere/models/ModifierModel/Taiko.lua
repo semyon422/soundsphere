@@ -34,33 +34,28 @@ function Taiko:apply(config, chart)
 		return
 	end
 
-	for _, layer in pairs(chart.layers) do
-		local new_notes = Notes()
-		for column, notes in layer.notes:iter() do
-			local inputType, inputIndex = InputMode:splitInput(column)
-			local new_column = column
-			if inputType == "key" then
-				new_column = inputType .. getKey(inputIndex)
-			end
-			for _, note in ipairs(notes) do
-				new_notes:insert(note, new_column)
-			end
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		local inputType, inputIndex = InputMode:splitInput(note.column)
+		local new_column = note.column
+		if inputType == "key" then
+			new_column = inputType .. getKey(inputIndex)
 		end
-		layer.notes = new_notes
-		new_notes:sort()
+		note.column = new_column
+		new_notes:insert(note)
+	end
+	chart.notes = new_notes
+	new_notes:sort()
 
-		local t, n
-		for _, notes in new_notes:iter() do
-			for _, note in ipairs(notes) do
-				local _t = note.visualPoint.point.absoluteTime
-				if _t ~= t then
-					t = _t
-					n = note
-				else
-					n.isDouble = true
-					note.noteType = "Ignore"
-				end
-			end
+	local t, n
+	for _, note in new_notes:iter() do
+		local _t = note.visualPoint.point.absoluteTime
+		if _t ~= t then
+			t = _t
+			n = note
+		else
+			n.isDouble = true
+			note.noteType = "Ignore"
 		end
 	end
 

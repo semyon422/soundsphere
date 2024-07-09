@@ -6,8 +6,9 @@ local table_util = require("table_util")
 local EditorNote = class()
 
 ---@param absoluteTime number
+---@param column ncdk2.Column
 ---@return sphere.EditorNote?
-function EditorNote:create(absoluteTime) end
+function EditorNote:create(absoluteTime, column) end
 
 ---@param t number
 ---@param part string

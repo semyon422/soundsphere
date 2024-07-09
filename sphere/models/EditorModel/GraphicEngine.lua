@@ -123,7 +123,7 @@ function GraphicEngine:update()
 	local newNotes = {}
 	self.notes = newNotes
 
-	for _note, column in layer.notes:iter(editorModel:getIterRange()) do
+	for _note, column in editorModel.notes:iter(editorModel:getIterRange()) do
 		local note = notesMap[_note] or
 			selectedNotes[_note] or
 			self:newNote(_note, column)

@@ -1,5 +1,6 @@
 local table_util = require("table_util")
 local Modifier = require("sphere.models.ModifierModel.Modifier")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sphere.SwapModifier: sphere.Modifier
 ---@operator call: sphere.SwapModifier
@@ -19,14 +20,12 @@ function SwapModifier:apply(config, chart)
 	self.chart = chart
 	local map = self:getMap(config)
 
-	for _, layer in pairs(chart.layers) do
-		local column_notes = layer.notes.column_notes
-		local new_column_notes = table_util.copy(column_notes)
-		for old, new in pairs(map) do
-			new_column_notes[new] = column_notes[old]
-		end
-		layer.notes.column_notes = new_column_notes
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		note.column = map[note.column] or note.column
+		new_notes:insert(note)
 	end
+	chart.notes = new_notes
 end
 
 return SwapModifier

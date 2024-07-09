@@ -30,7 +30,7 @@ end
 function MinLnLength:apply(config, chart)
 	local duration = config.value
 
-	for note in chart:iterNotes() do
+	for _, note in chart.notes:iter() do
 		if note.noteType == "LongNoteStart" or note.noteType == "LaserNoteStart" then
 			if (note.endNote.visualPoint.point.absoluteTime - note.visualPoint.point.absoluteTime) <= duration then
 				note.noteType = "ShortNote"

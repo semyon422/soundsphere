@@ -8,23 +8,22 @@ local Note = require("ncdk2.notes.Note")
 local LongEditorNote = EditorNote + LongGraphicalNote
 
 ---@param absoluteTime number
+---@param column ncdk2.Column
 ---@return sphere.LongEditorNote?
-function LongEditorNote:create(absoluteTime)
+function LongEditorNote:create(absoluteTime, column)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
 
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
 	local vp = layer.visual:getPoint(p)
-	local startNote = Note()
-	startNote.visualPoint = vp
+	local startNote = Note(vp, column)
 	startNote.noteType = "LongNoteStart"
 	self.startNote = startNote
 
 	local p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, 1))
 	local vp = layer.visual:getPoint(p)
-	local endNote = Note()
-	endNote.visualPoint = vp
+	local endNote = Note(vp, column)
 	endNote.noteType = "LongNoteEnd"
 	self.endNote = endNote
 

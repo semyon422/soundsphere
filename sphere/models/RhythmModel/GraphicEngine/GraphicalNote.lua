@@ -3,7 +3,7 @@ local class = require("class")
 ---@class sphere.GraphicalNote
 ---@operator call: sphere.GraphicalNote
 ---@field currentVisualPoint ncdk2.IVisualPoint
----@field layer ncdk2.Layer
+---@field visual ncdk2.Visual
 ---@field graphicEngine sphere.GraphicEngine
 ---@field column ncdk2.Column
 local GraphicalNote = class()

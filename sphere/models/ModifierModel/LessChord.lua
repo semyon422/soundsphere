@@ -1,5 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local InputMode = require("ncdk.InputMode")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sphere.LessChord: sphere.Modifier
 ---@operator call: sphere.LessChord
@@ -41,99 +42,102 @@ function LessChord:apply(config, chart)
 
 	local inputCount = chart.inputMode.key
 
-	for _, layer in pairs(chart.layers) do
-		local chords = {}
-		local singles = {}
-		local noteDatas = {}
-		local columnSizes = {}
-		for i = 1, inputCount do
-			columnSizes[i] = 0
+	local chords = {}
+	local singles = {}
+	local noteDatas = {}
+	local columnSizes = {}
+	for i = 1, inputCount do
+		columnSizes[i] = 0
+	end
+
+	local new_notes = Notes()
+	local notes = {}
+	for _, note in chart.notes:iter() do
+		local inputType, inputIndex = InputMode:splitInput(note.column)
+		if inputType == "key" then
+			table.insert(notes, {
+				noteData = note,
+				inputIndex = inputIndex,
+			})
+		else
+			new_notes:insert(note)
 		end
+	end
+	chart.notes = new_notes
+	table.sort(notes, function(a, b) return a.noteData < b.noteData end)
 
-		local notes = {}
-		for column, _notes in layer.notes:iter() do
-			local inputType, inputIndex = InputMode:splitInput(column)
-			if inputType == "key" then
-				for _, note in ipairs(_notes) do
-					table.insert(notes, {
-						noteData = note,
-						inputIndex = inputIndex,
-					})
-				end
-			end
-			layer.notes.column_notes[column] = nil
-		end
-		table.sort(notes, function(a, b) return a.noteData < b.noteData end)
+	for _, note in ipairs(notes) do
+		local noteData = note.noteData
+		local index = note.inputIndex
+		local time = noteData.visualPoint.point.absoluteTime
 
-		for _, note in ipairs(notes) do
-			local noteData = note.noteData
-			local index = note.inputIndex
-			local time = noteData.visualPoint.point.absoluteTime
-
-			columnSizes[index] = columnSizes[index] + 1
-			if noteData.noteType == "ShortNote" then
-				if chords[time] then
-					table.insert(chords[time].notes, note)
-					chords[time].columnSizes = {unpack(columnSizes)}
-				else
-					singles[time] = note
-
-					if noteDatas[time] then
-						chords[time] = {
-							time = time,
-							notes = {noteDatas[time], note},
-							columnSizes = {unpack(columnSizes)}
-						}
-						singles[time] = nil
-					end
-
-					noteDatas[time] = note
-				end
-			end
-		end
-
-		for _, note in pairs(singles) do
-			layer.notes:insert(note.noteData, "key" .. note.inputIndex)
-		end
-
-		local sortedChords = {}
-		for _, chord in pairs(chords) do
-			sortedChords[#sortedChords + 1] = chord
-		end
-		table.sort(sortedChords, function(a, b) return a.time < b.time end)
-
-		for chordCount, chord in ipairs(sortedChords) do
-			if configVal == nil or
-				(configVal > 0 and chordCount % configVal == 0) or
-				(configVal < 0 and chordCount % math.abs(configVal) ~= 0)
-			then
-				table.sort(chord.notes, function(a, b) return a.inputIndex < b.inputIndex end)
-				local lowestSize = math.huge
-				local noteDataToKeep
-				for _, note in ipairs(chord.notes) do
-					local columnSize = chord.columnSizes[note.inputIndex]
-					if columnSize < lowestSize then
-						lowestSize = columnSize
-						noteDataToKeep = note
-					end
-				end
-
-				for _, note in pairs(chord.notes) do
-					if note ~= noteDataToKeep then
-						for _, futureChord in ipairs(sortedChords) do
-							futureChord.columnSizes[note.inputIndex] = futureChord.columnSizes[note.inputIndex] - 1
-						end
-
-						note.noteData.noteType = "SoundNote"
-						layer.notes:insert(note.noteData, "auto" .. note.inputIndex)
-					else
-						layer.notes:insert(note.noteData, "key" .. note.inputIndex)
-					end
-				end
+		columnSizes[index] = columnSizes[index] + 1
+		if noteData.noteType == "ShortNote" then
+			if chords[time] then
+				table.insert(chords[time].notes, note)
+				chords[time].columnSizes = {unpack(columnSizes)}
 			else
-				for _, note in pairs(chord.notes) do
-					layer.notes:insert(note.noteData, "key" .. note.inputIndex)
+				singles[time] = note
+
+				if noteDatas[time] then
+					chords[time] = {
+						time = time,
+						notes = {noteDatas[time], note},
+						columnSizes = {unpack(columnSizes)}
+					}
+					singles[time] = nil
 				end
+
+				noteDatas[time] = note
+			end
+		end
+	end
+
+	for _, note in pairs(singles) do
+		note.noteData.column = "key" .. note.inputIndex
+		chart.notes:insert(note.noteData)
+	end
+
+	local sortedChords = {}
+	for _, chord in pairs(chords) do
+		sortedChords[#sortedChords + 1] = chord
+	end
+	table.sort(sortedChords, function(a, b) return a.time < b.time end)
+
+	for chordCount, chord in ipairs(sortedChords) do
+		if configVal == nil or
+			(configVal > 0 and chordCount % configVal == 0) or
+			(configVal < 0 and chordCount % math.abs(configVal) ~= 0)
+		then
+			table.sort(chord.notes, function(a, b) return a.inputIndex < b.inputIndex end)
+			local lowestSize = math.huge
+			local noteDataToKeep
+			for _, note in ipairs(chord.notes) do
+				local columnSize = chord.columnSizes[note.inputIndex]
+				if columnSize < lowestSize then
+					lowestSize = columnSize
+					noteDataToKeep = note
+				end
+			end
+
+			for _, note in pairs(chord.notes) do
+				if note ~= noteDataToKeep then
+					for _, futureChord in ipairs(sortedChords) do
+						futureChord.columnSizes[note.inputIndex] = futureChord.columnSizes[note.inputIndex] - 1
+					end
+
+					note.noteData.noteType = "SoundNote"
+					note.noteData.column = "auto" .. note.inputIndex
+					chart.notes:insert(note.noteData)
+				else
+					note.noteData.column = "key" .. note.inputIndex
+					chart.notes:insert(note.noteData)
+				end
+			end
+		else
+			for _, note in pairs(chord.notes) do
+				note.noteData.column = "key" .. note.inputIndex
+				chart.notes:insert(note.noteData)
 			end
 		end
 	end

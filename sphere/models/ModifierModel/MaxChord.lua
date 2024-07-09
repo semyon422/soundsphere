@@ -1,5 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local Note = require("ncdk2.notes.Note")
+local Notes = require("ncdk2.notes.Notes")
 local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.MaxChord
@@ -93,7 +94,9 @@ function MaxChord:apply(config, chart)
 	local columns = chart.inputMode.key
 
 	local notes = {}
-	for _notes, column, layer in chart:iterLayerNotes() do
+
+	local column_notes = chart.notes:getColumnNotes()
+	for column, _notes in pairs(column_notes) do
 		local inputType, inputIndex = InputMode:splitInput(column)
 		if inputType == "key" then
 			for i, note in ipairs(_notes) do
@@ -106,7 +109,6 @@ function MaxChord:apply(config, chart)
 						inputType = inputIndex,
 						inputIndex = inputIndex,
 						column = inputIndex,
-						layer = layer,
 					})
 				end
 			end
@@ -185,8 +187,6 @@ function MaxChord:apply(config, chart)
 	end
 
 	for _, note in ipairs(deletedNotes) do
-		local layer = note.layer
-
 		local noteData = note.noteData
 		-- noteData.noteType = "SoundNote"
 		noteData.noteType = "Ignore"
@@ -194,12 +194,12 @@ function MaxChord:apply(config, chart)
 			noteData.endNote.noteType = "Ignore"
 		end
 
-		local soundNote = Note(noteData.visualPoint)
+		local soundNote = Note(noteData.visualPoint, "auto" .. note.inputIndex)
 
 		soundNote.noteType = "SoundNote"
 		soundNote.sounds, noteData.sounds = noteData.sounds, {}
 
-		layer.notes:insert(soundNote, "auto" .. note.inputIndex)
+		chart.notes:insert(soundNote)
 	end
 end
 

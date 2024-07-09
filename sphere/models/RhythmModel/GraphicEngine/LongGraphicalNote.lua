@@ -101,8 +101,8 @@ function LongGraphicalNote:getFakeVisualStartTime()
 	local offsetSum = self.graphicEngine:getVisualOffset() - self.graphicEngine:getInputOffset()
 	local globalSpeed = currentVisualPoint.globalSpeed
 
-	local interpolator = self.layer.visual.interpolator
-	local visualPoints = self.layer.visual.points
+	local interpolator = self.visual.interpolator
+	local visualPoints = self.visual.points
 
 	if self.graphicEngine.constant then
 		local fakeStartTime = currentVisualPoint.point.absoluteTime - offsetSum / globalSpeed

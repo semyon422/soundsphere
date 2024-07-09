@@ -42,34 +42,34 @@ function Alternate:apply(config, chart)
 	---@type number[]
 	local inputAlternate = {}
 
-	for _, layer in pairs(chart.layers) do
-		local new_notes = Notes()
-		for column, notes in layer.notes:iter() do
-			for _, note in ipairs(notes) do
-				local _inputType, inputIndex = InputMode:splitInput(column)
-				if _inputType ~= inputType then
-					new_notes:insert(note, column)
-				elseif _inputType and inputIndex then
-					inputAlternate[inputIndex] = inputAlternate[inputIndex] or 1
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		local _inputType, inputIndex = InputMode:splitInput(note.column)
+		if _inputType ~= inputType then
+			new_notes:insert(note)
+		elseif _inputType and inputIndex then
+			inputAlternate[inputIndex] = inputAlternate[inputIndex] or 1
 
-					local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
-					if isStartNote then
-						inputAlternate[inputIndex] = math.abs(inputAlternate[inputIndex] - 1)
-					end
+			local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
+			if isStartNote then
+				inputAlternate[inputIndex] = math.abs(inputAlternate[inputIndex] - 1)
+			end
 
-					local newInputIndex = (inputIndex - 1) * 2 + 1 + inputAlternate[inputIndex]
+			local newInputIndex = (inputIndex - 1) * 2 + 1 + inputAlternate[inputIndex]
 
-					if note.noteType == "ShortNote" then
-						new_notes:insert(note, _inputType .. newInputIndex)
-					elseif note.noteType == "LongNoteStart" then
-						new_notes:insert(note, _inputType .. newInputIndex)
-						new_notes:insert(note.endNote, _inputType .. newInputIndex)
-					end
-				end
+			local column = _inputType .. newInputIndex
+			if note.noteType == "ShortNote" then
+				note.column = column
+				new_notes:insert(note)
+			elseif note.noteType == "LongNoteStart" then
+				note.column = column
+				note.endNote.column = column
+				new_notes:insert(note)
+				new_notes:insert(note.endNote)
 			end
 		end
-		layer.notes = new_notes
 	end
+	chart.notes = new_notes
 
 	inputMode[inputType] = inputMode[inputType] * 2
 

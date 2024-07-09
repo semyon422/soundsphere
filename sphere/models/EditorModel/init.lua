@@ -55,9 +55,9 @@ function EditorModel:load()
 	local editor = self:getSettings()
 	local audioSettings = self:getAudioSettings()
 
-	self.layer = self.noteChartLoader:load()
+	self.layer, self.notes = self.noteChartLoader:load()
 
-	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.chart.layers.main))
+	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.chart))
 
 	self.changes = Changes()
 	-- ld:syncChanges(self.changes:get())

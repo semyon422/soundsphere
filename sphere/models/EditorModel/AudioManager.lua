@@ -201,7 +201,7 @@ end
 ---@param chart ncdk2.Chart
 ---@param audioSettings table
 function AudioManager:loadResources(chart, audioSettings)
-	for note in chart:iterNotes() do
+	for _, note in chart.notes:iter() do
 		local offset = note.visualPoint.point:tonumber()
 		if note.sounds and not note.stream then
 			for _, s in ipairs(note.sounds) do

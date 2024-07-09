@@ -67,28 +67,28 @@ local function test(notes, events, states, graphicStates)
 			local p = layer:getPoint(time)
 			local vp = layer.visual:newPoint(p)
 
-			local note = Note(vp)
+			local note = Note(vp, 1)
 
 			note.noteType = "ShortNote"
 			if isAuto then
 				note.noteType = "SoundNote"
 			end
 
-			layer.notes:insert(note, 1)
+			chart.notes:insert(note)
 		elseif type(time) == "table" then
 			local p = layer:getPoint(time[1])
 			local vp = layer.visual:newPoint(p)
 
-			local startNote = Note(vp)
+			local startNote = Note(vp, 1)
 			startNote.noteType = "LongNoteStart"
-			layer.notes:insert(startNote, 1)
+			chart.notes:insert(startNote)
 
 			p = layer:getPoint(time[2])
 			vp = layer.visual:newPoint(p)
 
-			local endNote = Note(vp)
+			local endNote = Note(vp, 1)
 			endNote.noteType = "LongNoteEnd"
-			layer.notes:insert(endNote, 1)
+			chart.notes:insert(endNote)
 
 			startNote.endNote = endNote
 			endNote.startNote = startNote
@@ -145,7 +145,7 @@ local function test(notes, events, states, graphicStates)
 		graphicEngine:update()
 		local state = {}
 		table.insert(newGraphicStates, state)
-		for _, note in ipairs(graphicEngine.layerRenderers.main.columnRenderers[1].notes) do
+		for _, note in ipairs(graphicEngine.renderer.columnRenderers[1].notes) do
 			if note.endTimeState then
 				table.insert(state, {
 					-note.startTimeState.scaledFakeVisualDeltaTime + time,

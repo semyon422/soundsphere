@@ -96,7 +96,7 @@ function NoteManager:changeType()
 			local vp_end = layer.visual:getPoint(p_end)
 			local endNote = Note(vp_end)
 			endNote.noteType = "LongNoteEnd"
-			layer.notes:addNote(endNote, note.column)
+			editorModel.notes:addNote(endNote, note.column)
 
 			note.endNote = endNote
 
@@ -174,7 +174,7 @@ end
 ---@param note sphere.EditorNote
 function NoteManager:_removeNote(note)
 	self.editorModel.graphicEngine.selectedNotes[note.startNote] = nil
-	local lnotes = self.editorModel.layer.notes
+	local lnotes = self.editorModel.notes
 	local notes = note:getNotes()
 	for _, _note in ipairs(notes) do
 		lnotes:removeNote(_note, note.column)
@@ -194,7 +194,7 @@ end
 
 ---@param notes ncdk2.Note[]
 function NoteManager:_addNotes(notes, column)
-	local lnotes = self.editorModel.layer.notes
+	local lnotes = self.editorModel.notes
 	local found = false
 	for _, _note in ipairs(notes) do
 		found = found or lnotes:findNote(_note, column)
@@ -225,7 +225,7 @@ function NoteManager:newNote(noteType, absoluteTime, column)
 	note.graphicEngine = self.editorModel.graphicEngine
 	note.layerData = self.editorModel.layerData
 	note.column = column
-	return note:create(absoluteTime)
+	return note:create(absoluteTime, column)
 end
 
 ---@param absoluteTime number

@@ -1,5 +1,6 @@
 local Modifier = require("sphere.models.ModifierModel.Modifier")
 local InputMode = require("ncdk.InputMode")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sphere.NoScratch: sphere.Modifier
 ---@operator call: sphere.NoScratch
@@ -21,18 +22,17 @@ end
 function NoScratch:apply(config, chart)
 	chart.inputMode.scratch = nil
 
-	for _, layer in pairs(chart.layers) do
-		for column, notes in layer.notes:iter() do
-			local inputType, inputIndex = InputMode:splitInput(column)
-			if inputType == "scratch" then
-				for _, note in ipairs(notes) do
-					note.noteType = "SoundNote"
-					layer.notes:insert(note, "auto" .. inputIndex)
-				end
-				layer.notes.column_notes[column] = nil
-			end
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		local inputType, inputIndex = InputMode:splitInput(note.column)
+		if inputType == "scratch" then
+			note.noteType = "SoundNote"
+			note.column = "auto" .. inputIndex
+			new_notes:insert(note)
 		end
+		new_notes:insert(note)
 	end
+	chart.notes = new_notes
 end
 
 return NoScratch

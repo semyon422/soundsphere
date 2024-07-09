@@ -12,7 +12,7 @@ NoLongNote.description = "Remove long notes"
 ---@param config table
 ---@param chart ncdk2.Chart
 function NoLongNote:apply(config, chart)
-	for note in chart:iterNotes() do
+	for _, note in chart.notes:iter() do
 		if note.noteType == "LongNoteStart" or note.noteType == "LaserNoteStart" then
 			note.noteType = "ShortNote"
 			note.endNote = nil

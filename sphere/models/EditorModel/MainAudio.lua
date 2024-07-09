@@ -47,7 +47,7 @@ end
 ---@param chart ncdk2.Chart
 function MainAudio:loadResources(chart)
 	local audioSettings = self.editorModel:getAudioSettings()
-	for note in chart:iterNotes() do
+	for _, note in chart.notes:iter() do
 		if note.stream then
 			self.offset = note.streamOffset or 0
 			local path = note.sounds[1][1]

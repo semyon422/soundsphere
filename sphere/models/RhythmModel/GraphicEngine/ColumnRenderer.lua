@@ -6,15 +6,13 @@ local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.Gr
 ---@operator call: sphere.ColumnRenderer
 local ColumnRenderer = class()
 
----@param layer ncdk2.Layer
 ---@param notes notechart.Note[]
 ---@param column ncdk2.Column
----@param layerRenderer sphere.LayerRenderer
-function ColumnRenderer:new(layer, notes, column, layerRenderer)
-	self.layer = layer
+---@param columnsRenderer sphere.ColumnsRenderer
+function ColumnRenderer:new(notes, column, columnsRenderer)
 	self._notes = notes
 	self.column = column
-	self.layerRenderer = layerRenderer
+	self.columnsRenderer = columnsRenderer
 end
 
 local function sort_const(a, b)
@@ -26,43 +24,22 @@ local function sort_visual(a, b)
 end
 
 function ColumnRenderer:load()
-	local layerRenderer = self.layerRenderer
-	local graphicEngine = layerRenderer.graphicEngine
-	local layer = self.layer
+	local columnsRenderer = self.columnsRenderer
+	local graphicEngine = columnsRenderer.graphicEngine
+	local chart = columnsRenderer.chart
 
 	self.notes = {}
 	local notes = self.notes
 
-	self.noteByTimePoint = {}
-
 	for _, _note in ipairs(self._notes) do
 		local note = GraphicalNoteFactory:getNote(_note)
 		if note then
-			note.currentVisualPoint = layerRenderer.currentVisualPoint
+			local visual = chart:getVisualByPoint(_note.visualPoint)
+			note.currentVisualPoint = columnsRenderer.cvp[visual]
+			note.visual = visual
 			note.graphicEngine = graphicEngine
-			note.layer = layer
 			note.column = self.column
 			table.insert(notes, note)
-
-			if graphicEngine.eventBasedRender then
-				local endNote = note.startNote.endNote
-				if not endNote then
-					self.noteByTimePoint[note.startNote.visualPoint] = {
-						note = note,
-						show = true,
-						hide = true,
-					}
-				else
-					self.noteByTimePoint[note.startNote.visualPoint] = {
-						note = note,
-						show = true,
-					}
-					self.noteByTimePoint[endNote.visualPoint] = {
-						note = note,
-						hide = true,
-					}
-				end
-			end
 		end
 	end
 
@@ -78,44 +55,11 @@ function ColumnRenderer:load()
 
 	self.startNoteIndex = 1
 	self.endNoteIndex = 0
-
-	self.visibleNotes = {}
-	self.visibleNotesList = {}
 end
 
 function ColumnRenderer:update()
-	if self.layerRenderer.graphicEngine.eventBasedRender then
-		return self:updateEventBased()
-	end
-	return self:updateSorted()
-end
-
-function ColumnRenderer:updateEventBased()
-	for _, event in ipairs(self.pointEvents) do
-		local vp, action = unpack(event)
-		local noteInfo = self.noteByTimePoint[vp]
-		if noteInfo then
-			if action == 1 and noteInfo.show then
-				self.visibleNotes[noteInfo.note] = true
-			elseif action == -1 and noteInfo.hide then
-				self.visibleNotes[noteInfo.note] = nil
-			end
-		end
-	end
-
-	local visibleNotesList = self.visibleNotesList
-	table_util.clear(visibleNotesList)
-
-	for note in pairs(self.visibleNotes) do
-		note:update()
-		table.insert(visibleNotesList, note)
-	end
-
-	table.sort(visibleNotesList, sort_const)
-end
-
-function ColumnRenderer:updateSorted()
 	local notes = self.notes
+	---@type sphere.GraphicalNote
 	local note
 
 	for i = self.startNoteIndex, self.endNoteIndex do

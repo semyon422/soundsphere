@@ -18,7 +18,7 @@ function LogicEngine:new(timeEngine, scoreEngine)
 	self.scoreEngine = scoreEngine
 end
 
----@param column number
+---@param column ncdk2.Column
 ---@param create boolean?
 ---@return sphere.NoteHandler?
 function LogicEngine:getNoteHandler(column, create)
@@ -50,8 +50,8 @@ function LogicEngine:load()
 	---@type sphere.NoteHandler[]
 	self.noteHandlers = {}
 
-	-- many layers can be here
-	for notes, column in self.chart:iterLayerNotes() do
+	local column_notes = self.chart:getColumnNotes()
+	for column, notes in pairs(column_notes) do
 		local noteHandler = assert(self:getNoteHandler(column, true))
 		for _, note in ipairs(notes) do
 			table.insert(noteHandler.logicNotes, HandlerNote(note, column))

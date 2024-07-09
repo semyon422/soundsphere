@@ -31,46 +31,40 @@ function MultiplePlay:apply(config, chart)
 
 	local inputMode = chart.inputMode
 
-	for _, layer in pairs(chart.layers) do
-		local new_notes = Notes()
-		for column, notes in layer.notes:iter() do
-			local inputType, inputIndex = InputMode:splitInput(column)
-			local inputCount = inputMode[inputType]
-			if inputCount then
-				for _, note in ipairs(notes) do
-					for i = 1, value do
-						local newInputIndex = inputIndex + inputCount * (i - 1)
-						if note.startNote then
-						elseif note.endNote then
-							local startNote = Note(note.visualPoint)
-							local endNote = Note(note.endNote.visualPoint)
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		local inputType, inputIndex = InputMode:splitInput(column)
+		local inputCount = inputMode[inputType]
+		if inputCount then
+			for i = 1, value do
+				local newInputIndex = inputIndex + inputCount * (i - 1)
+				if note.startNote then
+				elseif note.endNote then
+					local startNote = Note(note.visualPoint, inputType .. newInputIndex)
+					local endNote = Note(note.endNote.visualPoint, inputType .. newInputIndex)
 
-							startNote.endNote = endNote
-							endNote.startNote = startNote
+					startNote.endNote = endNote
+					endNote.startNote = startNote
 
-							startNote.noteType = note.noteType
-							startNote.sounds = note.sounds
-							endNote.noteType = note.endNote.noteType
-							endNote.sounds = note.endNote.sounds
+					startNote.noteType = note.noteType
+					startNote.sounds = note.sounds
+					endNote.noteType = note.endNote.noteType
+					endNote.sounds = note.endNote.sounds
 
-							new_notes:insert(startNote, inputType .. newInputIndex)
-							new_notes:insert(endNote, inputType .. newInputIndex)
-						else
-							local newNote = Note(note.visualPoint)
-							newNote.noteType = note.noteType
-							newNote.sounds = note.sounds
-							new_notes:insert(newNote, inputType .. newInputIndex)
-						end
-					end
-				end
-			else
-				for _, note in ipairs(notes) do
-					new_notes:insert(note, column)
+					new_notes:insert(startNote)
+					new_notes:insert(endNote)
+				else
+					local newNote = Note(note.visualPoint, inputType .. newInputIndex)
+					newNote.noteType = note.noteType
+					newNote.sounds = note.sounds
+					new_notes:insert(newNote)
 				end
 			end
+		else
+			new_notes:insert(note)
 		end
-		layer.notes = new_notes
 	end
+	chart.notes = new_notes
 
 	for inputType, inputCount in pairs(inputMode) do
 		inputMode[inputType] = inputCount * value

@@ -24,22 +24,20 @@ end
 ---@param chart ncdk2.Chart
 function FullLongNote:apply(config, chart)
 	self.notes = {}
+	self.chart = chart
 
-	for notes, column, layer in chart:iterLayerNotes() do
-		for _, note in ipairs(notes) do
-			if
-				note.noteType == "ShortNote" or
-				note.noteType == "SoundNote" or
-				note.noteType == "Ignore" or
-				note.noteType == "LongNoteStart" or
-				note.noteType == "LongNoteEnd"
-			then
-				table.insert(self.notes, {
-					noteData = note,
-					column = column,
-					layer = layer,
-				})
-			end
+	for _, note in chart.notes:iter() do
+		if
+			note.noteType == "ShortNote" or
+			note.noteType == "SoundNote" or
+			note.noteType == "Ignore" or
+			note.noteType == "LongNoteStart" or
+			note.noteType == "LongNoteEnd"
+		then
+			table.insert(self.notes, {
+				noteData = note,
+				column = note.column,
+			})
 		end
 	end
 
@@ -107,13 +105,13 @@ function FullLongNote:processNoteData(noteDataIndex)
 
 	n.noteData.noteType = "LongNoteStart"
 
-	local endNote = Note(endTimePoint)
+	local endNote = Note(endTimePoint, n.column)
 	endNote.noteType = "LongNoteEnd"
 
 	endNote.startNote = n.noteData
 	n.noteData.endNote = endNote
 
-	n.layer.notes:insert(endNote, n.column)
+	self.chart.notes:insert(endNote)
 end
 
 ---@param timePointList ncdk2.VisualPoint[]

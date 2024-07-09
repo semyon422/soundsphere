@@ -1,5 +1,6 @@
 local class = require("class")
-local LayerRenderer = require("sphere.models.RhythmModel.GraphicEngine.LayerRenderer")
+local EventsRenderer = require("sphere.models.RhythmModel.GraphicEngine.EventsRenderer")
+local ColumnsRenderer = require("sphere.models.RhythmModel.GraphicEngine.ColumnsRenderer")
 local flux = require("flux")
 
 ---@class sphere.GraphicEngine
@@ -18,7 +19,6 @@ GraphicEngine.range = {-1, 1}
 function GraphicEngine:new(visualTimeInfo, logicEngine)
 	self.visualTimeInfo = visualTimeInfo
 	self.logicEngine = logicEngine
-	self.layerRenderers = {}
 end
 
 ---@param chart ncdk2.Chart
@@ -27,25 +27,21 @@ function GraphicEngine:setChart(chart)
 end
 
 function GraphicEngine:load()
-	self.notes_count = 0
-
-	---@type {[string]: sphere.LayerRenderer}
-	self.layerRenderers = {}
-
-	for name, layer in pairs(self.chart.layers) do
-		local layerRenderer = LayerRenderer(self, layer)
-		layerRenderer:load()
-		self.layerRenderers[name] = layerRenderer
+	if self.eventBasedRender then
+		self.renderer = EventsRenderer(self.chart, self)
+	else
+		self.renderer = ColumnsRenderer(self.chart, self)
 	end
+	self.renderer:load()
 end
 
 function GraphicEngine:unload()
-	self.layerRenderers = {}
+	self.renderer = nil
 end
 
 function GraphicEngine:update()
-	for _, layerRenderer in pairs(self.layerRenderers) do
-		layerRenderer:update()
+	if self.renderer then
+		self.renderer:update()
 	end
 end
 
@@ -53,19 +49,8 @@ end
 ---@param f fun(obj: T, note: sphere.GraphicalNote)
 ---@param obj T
 function GraphicEngine:iterNotes(f, obj)
-	local eventBasedRender = self.eventBasedRender
-	for _, layerRenderer in pairs(self.layerRenderers) do
-		for _, columnRenderer in pairs(layerRenderer.columnRenderers) do
-			if eventBasedRender then
-				for _, note in ipairs(columnRenderer.visibleNotesList) do
-					f(obj, note)
-				end
-			else
-				for i = columnRenderer.startNoteIndex, columnRenderer.endNoteIndex do
-					f(obj, columnRenderer.notes[i])
-				end
-			end
-		end
+	if self.renderer then
+		self.renderer:iterNotes(f, obj)
 	end
 end
 

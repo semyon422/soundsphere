@@ -8,16 +8,16 @@ local Note = require("ncdk2.notes.Note")
 local ShortEditorNote = EditorNote + ShortGraphicalNote
 
 ---@param absoluteTime number
+---@param column ncdk2.Column
 ---@return sphere.ShortEditorNote?
-function ShortEditorNote:create(absoluteTime)
+function ShortEditorNote:create(absoluteTime, column)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
 
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
 	local vp = layer.visual:getPoint(p)
-	local note = Note()
-	note.visualPoint = vp
+	local note = Note(vp, column)
 	note.noteType = "ShortNote"
 	self.startNote = note
 	self:update()
