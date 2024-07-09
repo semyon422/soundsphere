@@ -27,8 +27,7 @@ function NoScratch:apply(config, chart)
 		local inputType, inputIndex = InputMode:splitInput(note.column)
 		if inputType == "scratch" then
 			note.noteType = "SoundNote"
-			note.column = "auto" .. inputIndex
-			new_notes:insert(note)
+			note.column = "autoscratch" .. inputIndex
 		end
 		new_notes:insert(note)
 	end
