@@ -50,7 +50,7 @@ function LogicEngine:load()
 	---@type sphere.NoteHandler[]
 	self.noteHandlers = {}
 
-	local column_notes = self.chart:getColumnNotes()
+	local column_notes = self.chart.notes:getColumnNotes()
 	for column, notes in pairs(column_notes) do
 		local noteHandler = assert(self:getNoteHandler(column, true))
 		for _, note in ipairs(notes) do
