@@ -16,7 +16,7 @@ end
 function GraphsGenerator:genDensityGraph(chart, firstTime, lastTime)
 	local notes = {}
 	for _, note in chart.notes:iter() do
-		local offset = note.visualPoint.point:tonumber()
+		local offset = note.visualPoint.point.absoluteTime
 		if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
 			table.insert(notes, offset)
 		end

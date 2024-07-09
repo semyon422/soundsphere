@@ -33,7 +33,7 @@ function MultiplePlay:apply(config, chart)
 
 	local new_notes = Notes()
 	for _, note in chart.notes:iter() do
-		local inputType, inputIndex = InputMode:splitInput(column)
+		local inputType, inputIndex = InputMode:splitInput(note.column)
 		local inputCount = inputMode[inputType]
 		if inputCount then
 			for i = 1, value do

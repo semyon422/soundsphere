@@ -202,7 +202,7 @@ end
 ---@param audioSettings table
 function AudioManager:loadResources(chart, audioSettings)
 	for _, note in chart.notes:iter() do
-		local offset = note.visualPoint.point:tonumber()
+		local offset = note.visualPoint.point.absoluteTime
 		if note.sounds and not note.stream then
 			for _, s in ipairs(note.sounds) do
 				local soundData = self.resourceModel:getResource(s[1])
