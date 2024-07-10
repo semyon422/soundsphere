@@ -214,7 +214,7 @@ function Automap:processReductor()
 			else
 				n.noteData.endNote.column = "key" .. n.columnIndex
 				-- we have main absolute layer here
-				local p = layer.points:getPoint(n.endTime / 1000)
+				local p = layer:getPoint(n.endTime / 1000)
 				local vp = layer.visual:newPoint(p)
 				n.noteData.endNote.visualPoint = vp
 				chart.notes:insert(n.noteData.endNote)
