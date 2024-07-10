@@ -56,7 +56,7 @@ function EditorModel:load()
 	local audioSettings = self:getAudioSettings()
 
 	self.layer, self.notes = self.noteChartLoader:load()
-	self.visual = self.layer.visuals.main
+	self.visual = self.layer.visuals.main or self.layer.visuals[""]
 
 	self.patterns_analyzed = pattern_analyzer.format(pattern_analyzer.analyze(self.chart))
 
