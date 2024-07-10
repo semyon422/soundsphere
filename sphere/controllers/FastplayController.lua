@@ -49,6 +49,7 @@ function FastplayController:play(chart, replay)
 
 	chartdiff.modifiers = playContext.modifiers
 	playContext.chartdiff = chartdiff
+	chart.chartdiff = chartdiff
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

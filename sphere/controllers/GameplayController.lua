@@ -55,6 +55,7 @@ function GameplayController:load()
 	chartdiff.rate_type = config.gameplay.rate_type
 	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 	playContext.chartdiff = chartdiff
+	noteChart.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
 	noteSkin:loadData()

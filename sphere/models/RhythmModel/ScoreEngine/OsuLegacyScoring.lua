@@ -283,7 +283,7 @@ function OsuLegacyScoring:load()
 		self.judges[name:format(od)] = Judge(od)
 	end
 
-	totalNotes = self.scoreEngine.noteChart.chartmeta.notes_count
+	totalNotes = self.scoreEngine.noteChart.chartdiff.notes_count
 end
 
 function OsuLegacyScoring:getTimings(od)
