@@ -5,6 +5,7 @@ local table_util = require("table_util")
 
 local Chart = require("ncdk2.Chart")
 local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
+local Visual = require("ncdk2.visual.Visual")
 local Note = require("notechart.Note")
 
 local visualTimeInfo = {
@@ -56,6 +57,9 @@ local function test(notes, events, states, graphicStates)
 	local layer = AbsoluteLayer()
 	chart.layers.main = layer
 
+	local visual = Visual()
+	layer.visuals.main = visual
+
 	chart.inputMode.key = 1
 
 	for _, time in ipairs(notes) do
@@ -65,7 +69,7 @@ local function test(notes, events, states, graphicStates)
 				time = time[1]
 			end
 			local p = layer:getPoint(time)
-			local vp = layer.visual:newPoint(p)
+			local vp = visual:newPoint(p)
 
 			local note = Note(vp, 1)
 
@@ -77,14 +81,14 @@ local function test(notes, events, states, graphicStates)
 			chart.notes:insert(note)
 		elseif type(time) == "table" then
 			local p = layer:getPoint(time[1])
-			local vp = layer.visual:newPoint(p)
+			local vp = visual:newPoint(p)
 
 			local startNote = Note(vp, 1)
 			startNote.noteType = "LongNoteStart"
 			chart.notes:insert(startNote)
 
 			p = layer:getPoint(time[2])
-			vp = layer.visual:newPoint(p)
+			vp = visual:newPoint(p)
 
 			local endNote = Note(vp, 1)
 			endNote.noteType = "LongNoteEnd"

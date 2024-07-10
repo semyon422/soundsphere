@@ -120,23 +120,23 @@ end
 ---@param chart ncdk2.Chart
 ---@param tempo number
 local function applyTempo(chart, tempo)
-	for _, layer in pairs(chart.layers) do
-		layer.visual.primaryTempo = tempo
-		layer.visual:compute()
+	for _, visual in ipairs(chart:getVisuals()) do
+		visual.primaryTempo = tempo
+		visual:compute()
 	end
 end
 
 ---@param chart ncdk2.Chart
 function GameplayController:swapVelocityType(chart)
-	for _, layer in pairs(chart.layers) do
-		layer.visual.tempoMultiplyTarget = "local"
-		for _, vp in ipairs(layer.visual.points) do
+	for _, visual in ipairs(chart:getVisuals()) do
+		visual.tempoMultiplyTarget = "local"
+		for _, vp in ipairs(visual.points) do
 			local vel = vp._velocity
 			if vel then
 				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
 			end
 		end
-		layer.visual:compute()
+		visual:compute()
 	end
 end
 

@@ -13,16 +13,17 @@ local LongEditorNote = EditorNote + LongGraphicalNote
 function LongEditorNote:create(absoluteTime, column)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
+	local visual = editorModel.visual
 
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
-	local vp = layer.visual:getPoint(p)
+	local vp = visual:getPoint(p)
 	local startNote = Note(vp, column)
 	startNote.noteType = "LongNoteStart"
 	self.startNote = startNote
 
 	local p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, 1))
-	local vp = layer.visual:getPoint(p)
+	local vp = visual:getPoint(p)
 	local endNote = Note(vp, column)
 	endNote.noteType = "LongNoteEnd"
 	self.endNote = endNote
@@ -76,13 +77,14 @@ end
 function LongEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
+	local visual = editorModel.visual
 	if self.grabbedPart == "head" then
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 		local p = layer.points:saveSearchPoint()
 		if p == self.endNote.visualPoint.point then
 			p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, -1))
 		end
-		local vp = layer.visual:getPoint(p)
+		local vp = visual:getPoint(p)
 		self.startNote.visualPoint = vp
 	elseif self.grabbedPart == "tail" then
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
@@ -90,16 +92,16 @@ function LongEditorNote:drop(t)
 		if self.startNote.visualPoint.point == p then
 			p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, 1))
 		end
-		local vp = layer.visual:getPoint(p)
+		local vp = visual:getPoint(p)
 		self.endNote.visualPoint = vp
 	elseif self.grabbedPart == "body" then
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[1])
 		local p = layer.points:saveSearchPoint()
-		local vp = layer.visual:getPoint(p)
+		local vp = visual:getPoint(p)
 		self.startNote.visualPoint = vp
 		local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime[2])
 		local p = layer.points:saveSearchPoint()
-		local vp = layer.visual:getPoint(p)
+		local vp = visual:getPoint(p)
 		self.endNote.visualPoint = vp
 	end
 end
@@ -127,12 +129,13 @@ end
 ---@return ncdk2.Note[]
 function LongEditorNote:paste(point)
 	local layer = self.editorModel.layer
+	local visual = self.editorModel.visual
 
 	local startNote = self.startNote:clone()
 	local endNote = self.endNote:clone()
 
-	startNote.visualPoint = layer.visual:getPoint(layer.points:getPoint(point:add(self.deltaStartTime)))
-	endNote.visualPoint = layer.visual:getPoint(layer.points:getPoint(point:add(self.deltaEndTime)))
+	startNote.visualPoint = visual:getPoint(layer.points:getPoint(point:add(self.deltaStartTime)))
+	endNote.visualPoint = visual:getPoint(layer.points:getPoint(point:add(self.deltaEndTime)))
 
 	endNote.startNote = startNote
 	startNote.endNote = endNote

@@ -13,10 +13,11 @@ local ShortEditorNote = EditorNote + ShortGraphicalNote
 function ShortEditorNote:create(absoluteTime, column)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
+	local visual = editorModel.visual
 
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
-	local vp = layer.visual:getPoint(p)
+	local vp = visual:getPoint(p)
 	local note = Note(vp, column)
 	note.noteType = "ShortNote"
 	self.startNote = note
@@ -48,9 +49,10 @@ end
 function ShortEditorNote:drop(t)
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
+	local visual = editorModel.visual
 	local dtp = editorModel:getDtpAbsolute(t - self.grabbedDeltaTime)
 	local p = layer.points:saveSearchPoint()
-	local vp = layer.visual:getPoint(p)
+	local vp = visual:getPoint(p)
 	self.startNote.visualPoint = vp
 end
 
@@ -68,9 +70,10 @@ end
 ---@return ncdk2.Note[]
 function ShortEditorNote:paste(point)
 	local layer = self.editorModel.layer
+	local visual = self.editorModel.visual
 	local new_point = layer.points:getPoint(point:add(self.deltaStartTime))
 	local startNote = self.startNote:clone()
-	startNote.visualPoint = layer.visual:getPoint(new_point)
+	startNote.visualPoint = visual:getPoint(new_point)
 	return {startNote}
 end
 

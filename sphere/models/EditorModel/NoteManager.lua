@@ -81,6 +81,7 @@ end
 function NoteManager:changeType()
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
+	local visual = editorModel.visual
 	local editor = editorModel:getSettings()
 
 	-- self.editorModel.editorChanges:reset()
@@ -93,7 +94,7 @@ function NoteManager:changeType()
 
 			local p = startNote.visualPoint.point
 			local p_end = layer.points:getPoint(p:add(Fraction(1, editor.snap)))
-			local vp_end = layer.visual:getPoint(p_end)
+			local vp_end = visual:getPoint(p_end)
 			local endNote = Note(vp_end)
 			endNote.noteType = "LongNoteEnd"
 			editorModel.notes:addNote(endNote, note.column)
