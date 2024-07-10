@@ -9,6 +9,7 @@ config.data = --[[data]] {
 	DisableLimits = false,
 	OverallDifficulty = 5,
 	HitErrorPosition = 465,
+	HitErrorTransparancy = 0.5,
 	Barline = true,
 	ColumnLineMode = "default",
 	covers = {
@@ -49,6 +50,7 @@ function config:draw(w, h)
 	imgui.separator()
 	data.OverallDifficulty = imgui.slider1("OverallDifficulty", data.OverallDifficulty, "%d", 0, 10, 1, "Overall Difficulty")
 	data.HitErrorPosition = imgui.slider1("HitErrorPosition", data.HitErrorPosition, "%d", 0, 480, 1, "Hit Error Position")
+	data.HitErrorTransparancy = imgui.slider1("HitErrorTransparancy", data.HitErrorTransparancy, "%.1f", 0, 1, 0.1, "Hit Error Transparancy")
 	data.Barline = imgui.checkbox("Barline", data.Barline, "Barline")
 	data.ColumnLineMode = imgui.combo("ColumnLineMode", data.ColumnLineMode, {"default", "symmetric"}, nil, "Column Line Mode")
 	data.DisableLimits = imgui.checkbox("DisableLimits", data.DisableLimits, "Disable osu skin limits")
