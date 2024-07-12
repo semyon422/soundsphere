@@ -51,6 +51,11 @@ function NoteChartLibrary:indexof(chartview)
 			return i
 		end
 	end
+	for i, chart in ipairs(self.items) do
+		if chart.chartdiff_id == chartdiff_id then
+			return i
+		end
+	end
 	return 1
 end
 
