@@ -16,7 +16,7 @@ end
 ---@param b sphere.HandlerNote
 ---@return boolean
 function HandlerNote.__lt(a, b)
-	return a._note.visualPoint.point.absoluteTime < b._note.visualPoint.point.absoluteTime
+	return a._note:getTime() < b._note:getTime()
 end
 
 return HandlerNote

@@ -27,7 +27,7 @@ function VideoNoteView:draw()
 	end
 
 	local currentTime = self.graphicalNote.graphicEngine:getCurrentTime()
-	video:play(currentTime - self.graphicalNote.startNote.visualPoint.point.absoluteTime)
+	video:play(currentTime - self.graphicalNote.startNote:getTime())
 
 	ImageNoteView.draw(self)
 end

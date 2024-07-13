@@ -52,7 +52,7 @@ function AudioEngine:playNote(note, isBackground)
 		return
 	end
 
-	self:playAudio(note.sounds, isBackground, note.stream, note.visualPoint.point.absoluteTime)
+	self:playAudio(note.sounds, isBackground, note.stream, note:getTime())
 end
 
 ---@param sounds table

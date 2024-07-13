@@ -51,7 +51,7 @@ end
 ---@param column number
 function ShortNoteView:fillChords(chords, column)
 	local startNote = self.graphicalNote.startNote
-	local time = startNote.visualPoint.point.absoluteTime
+	local time = startNote:getTime()
 
 	chords[time] = chords[time] or {}
 	local chord = chords[time]

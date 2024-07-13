@@ -40,7 +40,7 @@ function ShortEditorNote:grab(t, part, deltaColumn, lockSnap)
 
 	self.startNote = self.startNote:clone()
 
-	self.grabbedDeltaTime = t - self.startNote.visualPoint.point.absoluteTime
+	self.grabbedDeltaTime = t - self.startNote:getTime()
 	self.startNote.visualPoint = VisualPoint({})
 	self:updateGrabbed(t)
 end

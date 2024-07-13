@@ -12,7 +12,7 @@ end
 
 ---@return boolean
 function ImageNote:willDrawAfterEnd()
-	return self.graphicEngine:getCurrentTime() < self.startNote.visualPoint.point.absoluteTime
+	return self.graphicEngine:getCurrentTime() < self.startNote:getTime()
 end
 
 return ImageNote

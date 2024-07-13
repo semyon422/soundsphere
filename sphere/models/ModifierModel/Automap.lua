@@ -79,9 +79,9 @@ function Automap:applyAutomap()
 			local n = {}
 
 			n.noteData = note
-			n.startTime = math_util.round(note.visualPoint.point.absoluteTime * 1000)
+			n.startTime = math_util.round(note:getTime() * 1000)
 			if note.noteType == "LongNoteStart" and note.endNote then
-				n.endTime = math_util.round(note.endNote.visualPoint.point.absoluteTime * 1000)
+				n.endTime = math_util.round(note.endNote:getTime() * 1000)
 				n.long = true
 			else
 				n.endTime = n.startTime

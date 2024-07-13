@@ -258,8 +258,8 @@ function NoteManager:addNote(absoluteTime, column)
 		self:grabNotes(
 			"tail",
 			editorModel:getMouseTime() +
-			note.endNote.visualPoint.point.absoluteTime -
-			note.startNote.visualPoint.point.absoluteTime
+			note.endNote:getTime() -
+			note.startNote:getTime()
 		)
 	end
 end

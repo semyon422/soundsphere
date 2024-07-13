@@ -82,7 +82,7 @@ function LogicalNote:getNoteTime(side)
 	if self.isPlayable then
 		offset = self.logicEngine:getInputOffset()
 	end
-	return self.startNote.visualPoint.point.absoluteTime + offset
+	return self.startNote:getTime() + offset
 end
 
 ---@return boolean

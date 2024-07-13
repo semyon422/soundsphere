@@ -126,7 +126,7 @@ function FullLongNote:cleanTimePointList(timePointList, _n)
 		end
 	end
 
-	if _n and _n.noteData.visualPoint.point.absoluteTime - out[#out].point.absoluteTime < 0.005 then
+	if _n and _n.noteData:getTime() - out[#out].point.absoluteTime < 0.005 then
 		out[#out] = _n.noteData.visualPoint
 	end
 

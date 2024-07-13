@@ -40,7 +40,7 @@ local function getNextTime(noteDatas, i, dir)
 	for j = i + dir, #noteDatas, dir do
 		local noteData = noteDatas[j]
 		if checkNote(noteData) then
-			return noteData.visualPoint.point.absoluteTime
+			return noteData:getTime()
 		end
 	end
 	return math.huge
@@ -103,7 +103,7 @@ function MaxChord:apply(config, chart)
 				if checkNote(note) then
 					table.insert(notes, {
 						noteData = note,
-						time = note.visualPoint.point.absoluteTime,
+						time = note:getTime(),
 						nextTime = getNextTime(_notes, i),
 						prevTime = getNextTime(_notes, i, -1),
 						inputType = inputIndex,

@@ -132,9 +132,9 @@ function LongLogicalNote:getNoteTime(side)
 		offset = self.logicEngine:getInputOffset()
 	end
 	if not side or side == "start" then
-		return self.startNote.visualPoint.point.absoluteTime + offset
+		return self.startNote:getTime() + offset
 	elseif side == "end" then
-		return self.endNote.visualPoint.point.absoluteTime + offset
+		return self.endNote:getTime() + offset
 	end
 	error("Wrong side")
 end

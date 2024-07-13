@@ -54,8 +54,8 @@ function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 	self.startNote.endNote = self.endNote
 	self.endNote.startNote = self.startNote
 
-	local startTime = self.startNote.visualPoint.point.absoluteTime
-	local endTime = self.endNote.visualPoint.point.absoluteTime
+	local startTime = self.startNote:getTime()
+	local endTime = self.endNote:getTime()
 	if part == "head" then
 		self.grabbedDeltaTime = t - startTime
 		self.startNote.visualPoint = VisualPoint({})

@@ -79,8 +79,8 @@ end
 
 ---@param time number
 function LongGraphicalNote:clampAbsoluteTime(time)
-	time = math.max(time, self.startNote.visualPoint.point.absoluteTime)
-	time = math.min(time, self.endNote.visualPoint.point.absoluteTime)
+	time = math.max(time, self.startNote:getTime())
+	time = math.min(time, self.endNote:getTime())
 	return time
 end
 

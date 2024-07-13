@@ -69,7 +69,7 @@ function LessChord:apply(config, chart)
 	for _, note in ipairs(notes) do
 		local noteData = note.noteData
 		local index = note.inputIndex
-		local time = noteData.visualPoint.point.absoluteTime
+		local time = noteData:getTime()
 
 		columnSizes[index] = columnSizes[index] + 1
 		if noteData.noteType == "ShortNote" then

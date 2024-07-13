@@ -99,7 +99,7 @@ function LongNoteView:fillChords(chords, column)
 	local endNote = self.graphicalNote.endNote
 
 	if startNote then
-		local time = startNote.visualPoint.point.absoluteTime
+		local time = startNote:getTime()
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 		chord[column] = chord[column] or {}
@@ -107,7 +107,7 @@ function LongNoteView:fillChords(chords, column)
 	end
 
 	if endNote then
-		local time = endNote.visualPoint.point.absoluteTime
+		local time = endNote:getTime()
 		chords[time] = chords[time] or {}
 		local chord = chords[time]
 		chord[column] = chord[column] or {}
