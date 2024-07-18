@@ -277,12 +277,17 @@ function OsudirectModel:downloadAsync(beatmap)
 
 	local filedata = love.filesystem.newFileData(data, filename)
 
-	local location_path = path_util.join("downloads", filename:match("^(.+)%.osz$"))
-	local extractPath = path_util.join(location.path, location_path)
+	local location_path = path_util.join("downloads", filename)
+	local extractPath = path_util.join(location.path, location_path:match("^(.+)%.osz$"))
+	local fallbackPath = path_util.join(location.path, location_path)
+
+
 	print("Extracting")
 	beatmap.status = "Extracting"
 	local extracted, err = fs_util.extractAsync(filedata, extractPath)
 	if not extracted then
+		love.filesystem.write(fallbackPath, filedata)
+		print("saved as " .. fallbackPath)
 		beatmap.status = err or "Extracting error"
 		return
 	end
