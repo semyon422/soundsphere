@@ -291,8 +291,8 @@ function MultiplayerModel:update()
 	end
 
 	local host = self.host
-	local event = host:service()
-	while event do
+	local ok, event = pcall(host.service, host)
+	while ok and event do
 		if event.type == "connect" then
 			self:peerconnected(remote.peer(event.peer))
 		elseif event.type == "receive" then
@@ -300,7 +300,7 @@ function MultiplayerModel:update()
 		elseif event.type == "disconnect" then
 			self:peerdisconnected(remote.peer(event.peer))
 		end
-		event = host:service()
+		ok, event = pcall(host.service, host)
 	end
 
 	remote.update()
