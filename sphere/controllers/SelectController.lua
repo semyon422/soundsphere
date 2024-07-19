@@ -223,7 +223,7 @@ function SelectController:exportToOsu()
 
 	local encoder = ChartEncoder()
 
-	local chart = selectModel:loadChart()
+	local chart = selectModel:loadChartAbsolute()
 	ModifierModel:apply(self.playContext.modifiers, chart)
 
 	local data = encoder:encode({chart})

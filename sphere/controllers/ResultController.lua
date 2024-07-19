@@ -78,8 +78,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	local noteChart = self.selectModel:loadChart()
-	self.fastplayController:play(noteChart, replay)
+	local chart = self.selectModel:loadChartAbsolute()
+	self.fastplayController:play(chart, replay)
 
 	rhythmModel.inputManager:setMode("external")
 	replayModel:setMode("record")

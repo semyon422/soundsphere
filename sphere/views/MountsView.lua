@@ -235,7 +235,7 @@ function section_draw.database(self)
 
 	if imgui.button("compute diff", "compute diff") then
 		local chartdiff = self.game.selectModel.chartview
-		local chart = self.game.selectModel:loadChart()
+		local chart = self.game.selectModel:loadChartAbsolute()
 		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
 	end

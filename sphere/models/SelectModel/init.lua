@@ -183,6 +183,17 @@ function SelectModel:loadChart(settings)
 	return charts[chartview.index]
 end
 
+---@param settings table?
+---@return ncdk2.Chart?
+function SelectModel:loadChartAbsolute(settings)
+	local chart = self:loadChart(settings)
+	if not chart then
+		return
+	end
+	chart.layers.main:toAbsolute()
+	return chart
+end
+
 ---@return boolean
 function SelectModel:isChanged()
 	local changed = self.changed

@@ -26,28 +26,28 @@ function GameplayController:load()
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 
-	local noteChart = selectModel:loadChart(self:getImporterSettings())
+	local chart = selectModel:loadChartAbsolute(self:getImporterSettings())
 
-	self:applyTempo(noteChart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
+	self:applyTempo(chart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
-		self:applyAutoKeysound(noteChart)
+		self:applyAutoKeysound(chart)
 	end
 	if config.gameplay.swapVelocityType then
-		self:swapVelocityType(noteChart)
+		self:swapVelocityType(chart)
 	end
 
 	local state = {}
-	state.inputMode = InputMode(noteChart.inputMode)
+	state.inputMode = InputMode(chart.inputMode)
 
 	ModifierModel:applyMeta(playContext.modifiers, state)
-	ModifierModel:apply(playContext.modifiers, noteChart)
+	ModifierModel:apply(playContext.modifiers, chart)
 
 	local chartdiff = {
 		rate = playContext.rate,
-		inputmode = tostring(noteChart.inputMode),
+		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
-	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, noteChart, playContext.rate)
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
 
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
@@ -55,9 +55,9 @@ function GameplayController:load()
 	chartdiff.rate_type = config.gameplay.rate_type
 	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 	playContext.chartdiff = chartdiff
-	noteChart.chartdiff = chartdiff
+	chart.chartdiff = chartdiff
 
-	local noteSkin = noteSkinModel:loadNoteSkin(tostring(noteChart.inputMode))
+	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 
 	rhythmModel.graphicEngine.eventBasedRender = config.gameplay.eventBasedRender
@@ -70,9 +70,9 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
-	rhythmModel:setNoteChart(noteChart)
+	rhythmModel:setNoteChart(chart)
 	rhythmModel:setDrawRange(noteSkin.range)
-	rhythmModel.inputManager:setInputMode(tostring(noteChart.inputMode))
+	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
 
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setTimeRate(playContext.rate)
@@ -102,7 +102,7 @@ function GameplayController:load()
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartview.location_path, noteChart, function()
+	self.resourceModel:load(chartview.location_path, chart, function()
 		if not self.loaded then
 			return
 		end
