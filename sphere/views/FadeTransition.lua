@@ -15,7 +15,7 @@ function FadeTransition:transit(cf)
 		return
 	end
 	self.coroutine = coroutine.create(function()
-		cf()
+		assert(xpcall(cf, debug.traceback))
 		self.coroutine = nil
 	end)
 	assert(coroutine.resume(self.coroutine))
