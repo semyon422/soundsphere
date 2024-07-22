@@ -166,12 +166,18 @@ end
 function GameplayController:applyAutoKeysound(chart)
 	for _, note in chart.notes:iter() do
 		if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
-			local soundNote = Note(note.visualPoint, "auto")
+			local soundNote = chart.notes:get(note.visualPoint, "auto")
+			if not soundNote then
+				soundNote = Note(note.visualPoint, "auto")
+				soundNote.noteType = "SoundNote"
+				soundNote.sounds = {}
+				chart.notes:insert(soundNote)
+			end
 
-			soundNote.noteType = "SoundNote"
-			soundNote.sounds, note.sounds = note.sounds, {}
-
-			chart.notes:insert(soundNote)
+			for _, s in ipairs(note.sounds) do
+				table.insert(soundNote.sounds, s)
+			end
+			note.sounds = {}
 		end
 	end
 end
