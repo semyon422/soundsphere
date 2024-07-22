@@ -90,7 +90,7 @@ function GraphicEngine:getInputOffset()
 	return logicEngine and logicEngine.inputOffset or 0
 end
 
----@param note notechart.Note
+---@param note ncdk2.Note
 ---@return sphere.LogicalNote?
 function GraphicEngine:getLogicalNote(note)
 	local logicEngine = self.logicEngine

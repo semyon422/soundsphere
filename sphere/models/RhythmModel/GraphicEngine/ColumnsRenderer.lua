@@ -27,7 +27,7 @@ function ColumnsRenderer:load()
 
 	---@type {[ncdk2.Column]: sphere.ColumnRenderer}
 	self.columnRenderers = {}
-	for column, notes in pairs(self.chart.notes:getColumnNotes()) do
+	for column, notes in pairs(self.chart.notes:getColumnLinkedNotes()) do
 		local columnRenderer = ColumnRenderer(notes, column, self)
 		columnRenderer:load()
 		self.columnRenderers[column] = columnRenderer

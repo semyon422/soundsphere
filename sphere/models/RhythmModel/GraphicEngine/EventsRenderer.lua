@@ -46,16 +46,16 @@ function EventsRenderer:load()
 	self.point_events = {}
 	self.note_events = {}
 
-	for _, _note in chart.notes:iter() do
+	for _, _note in ipairs(chart.notes:getLinkedNotes()) do
 		local note = GraphicalNoteFactory:getNote(_note)
 		if note then
-			local visual = chart:getVisualByPoint(_note.visualPoint)
+			local visual = chart:getVisualByPoint(_note.startNote.visualPoint)
 			note.currentVisualPoint = self.cvp[visual]
 			note.visual = visual
 			note.graphicEngine = graphicEngine
-			note.column = _note.column
+			note.column = _note:getColumn()
 
-			local endNote = note.startNote.endNote
+			local endNote = note.endNote
 			if not endNote then
 				self:insertNoteEvent(note.startNote.visualPoint, note, true, true)
 			else

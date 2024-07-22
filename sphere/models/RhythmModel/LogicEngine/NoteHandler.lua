@@ -6,41 +6,38 @@ local LogicalNoteFactory = require("sphere.models.RhythmModel.LogicEngine.Logica
 local NoteHandler = class()
 
 ---@param logicEngine sphere.LogicEngine
-function NoteHandler:new(logicEngine)
+---@param notes ncdk2.LinkedNote[]
+function NoteHandler:new(logicEngine, notes)
 	self.logicEngine = logicEngine
+	self.lnotes = notes
+	---@type sphere.LogicalNote[]
 	self.notes = {}
-
-	---@type sphere.HandlerNote[]
-	self.logicNotes = {}
 end
 
 function NoteHandler:load()
-	---@type sphere.HandlerNote[]
+	---@type sphere.LogicalNote[]
 	self.notes = {}
 	local notes = self.notes
 
 	local logicEngine = self.logicEngine
 
-	for _, hnote in ipairs(self.logicNotes) do
-		local _note = hnote._note
-		local note = LogicalNoteFactory:getNote(_note)
+	for _, lnote in ipairs(self.lnotes) do
+		local note = LogicalNoteFactory:getNote(lnote)
 		if note then
-			hnote.note = note
 			note.logicEngine = logicEngine
-			note.column = hnote.column
-			table.insert(notes, hnote)
-			logicEngine.sharedLogicalNotes[_note] = note
+			note.column = lnote:getColumn()
+			table.insert(notes, note)
+			logicEngine.sharedLogicalNotes[lnote.startNote] = note
 		end
 	end
 
-	table.sort(notes)
+	-- table.sort(notes)
 
 	local isPlayable = false
-	for i, hnote in ipairs(notes) do
-		hnote.note.index = i
-		local next_hnote = notes[i + 1]
-		hnote.note.nextNote = next_hnote and next_hnote.note
-		isPlayable = isPlayable or hnote.note.isPlayable
+	for i, note in ipairs(notes) do
+		note.index = i
+		note.nextNote = notes[i + 1]
+		isPlayable = isPlayable or note.isPlayable
 	end
 	self.isPlayable = isPlayable
 
@@ -52,7 +49,7 @@ function NoteHandler:updateRange()
 	local notes = self.notes
 
 	for i = self.startNoteIndex, #notes do
-		local note = notes[i].note
+		local note = notes[i]
 		if not note.ended then
 			self.startNoteIndex = i
 			break
@@ -71,7 +68,7 @@ function NoteHandler:updateRange()
 
 
 	for i = self.endNoteIndex, #notes do
-		local note = notes[i] and notes[i].note
+		local note = notes[i]
 		if
 			i == #notes or
 			note and not note.ended and note.isPlayable and note:getNoteTime() >= eventTime
@@ -83,24 +80,24 @@ function NoteHandler:updateRange()
 end
 
 ---return current isPlayable note
----@return sphere.HandlerNote?
+---@return sphere.LogicalNote?
 function NoteHandler:getCurrentNote()
 	local notes = self.notes
 	self:updateRange()
 
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local note = notes[i].note
+		local note = notes[i]
 		if not note.ended and note.state ~= "clear" then
-			return notes[i]
+			return note
 		end
 	end
 
 	local timings = self.logicEngine.timings
 	if not timings.nearest then
 		for i = self.startNoteIndex, self.endNoteIndex do
-			local note = notes[i].note
+			local note = notes[i]
 			if not note.ended and note.isPlayable then
-				return notes[i]
+				return note
 			end
 		end
 	end
@@ -110,7 +107,7 @@ function NoteHandler:getCurrentNote()
 	local nearestIndex
 	local nearestTime = math.huge
 	for i = self.startNoteIndex, self.endNoteIndex do
-		local note = notes[i].note
+		local note = notes[i]
 		local noteTime = note:getNoteTime()
 		local time = math.abs(noteTime - eventTime)
 		if not note.ended and note.isPlayable and time < nearestTime then
@@ -125,7 +122,7 @@ end
 function NoteHandler:update()
 	self:updateRange()
 	for i = self.startNoteIndex, self.endNoteIndex do
-		self.notes[i].note:update()
+		self.notes[i]:update()
 	end
 end
 
@@ -143,10 +140,8 @@ end
 function NoteHandler:setKeyState(state, input)
 	self:update()
 
-	local hnote = self:getCurrentNote()
-	if not hnote then return end
-
-	local note = hnote.note
+	local note = self:getCurrentNote()
+	if not note then return end
 
 	if self.logicEngine.promode then
 		self:handlePromode(note)
@@ -154,7 +149,7 @@ function NoteHandler:setKeyState(state, input)
 	end
 
 	note.keyState = state
-	note.inputMatched = hnote.column == input
+	note.inputMatched = note.column == input
 
 	local _note = state and note.startNote or note.endNote
 	if _note then

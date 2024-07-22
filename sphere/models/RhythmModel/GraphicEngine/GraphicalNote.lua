@@ -9,10 +9,11 @@ local class = require("class")
 local GraphicalNote = class()
 
 ---@param noteType string?
----@param note notechart.Note?
+---@param note ncdk2.LinkedNote
 function GraphicalNote:new(noteType, note)
 	self.noteType = noteType
-	self.startNote = note
+	self.startNote = note.startNote
+	self.endNote = note.endNote
 end
 
 function GraphicalNote:update() end

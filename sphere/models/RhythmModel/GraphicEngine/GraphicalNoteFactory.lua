@@ -5,10 +5,10 @@ local ImageNote = require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
 
 local GraphicalNoteFactory = {}
 
----@param note notechart.Note
+---@param note ncdk2.LinkedNote
 ---@return string
 local function getImageNoteType(note)
-	local image = note.images[1]
+	local image = note.startNote.images[1]
 	if image and FileFinder:getType(image[1]) == "video" then
 		return "VideoNote"
 	end
@@ -16,18 +16,21 @@ local function getImageNoteType(note)
 end
 
 local notes = {
-	ShortNote = {ShortGraphicalNote, "ShortNote"},
-	LongNoteStart = {LongGraphicalNote, "LongNote"},
-	LaserNoteStart = {LongGraphicalNote, "LongNote"},
-	LineNoteStart = {LongGraphicalNote, "LongNote"},
-	SoundNote = {ShortGraphicalNote, "SoundNote"},
-	ImageNote = {ImageNote, getImageNoteType},
+	note = {ShortGraphicalNote, "ShortNote"},
+	hold = {LongGraphicalNote, "LongNote"},
+	laser = {LongGraphicalNote, "LongNote"},
+	drumroll = {LongGraphicalNote, "LongNote"},
+	mine = {ShortGraphicalNote, "SoundNote"},
+	shade = {ShortGraphicalNote, "ShortNote"},
+	fake = {ShortGraphicalNote, "SoundNote"},
+	sample = {ShortGraphicalNote, "SoundNote"},
+	sprite = {ImageNote, getImageNoteType},
 }
 
----@param note notechart.Note
+---@param note ncdk2.LinkedNote
 ---@return sphere.GraphicalNote?
 function GraphicalNoteFactory:getNote(note)
-	local classAndType = notes[note.noteType]
+	local classAndType = notes[note:getType()]
 	if not classAndType then
 		return
 	end

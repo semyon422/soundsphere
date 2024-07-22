@@ -4,12 +4,12 @@ local LogicalNote = require("sphere.models.RhythmModel.LogicEngine.LogicalNote")
 ---@operator call: sphere.LongLogicalNote
 local LongLogicalNote = LogicalNote + {}
 
----@param note notechart.Note
+---@param note ncdk2.LinkedNote
 ---@param isPlayable boolean?
 ---@param isScorable boolean?
 ---@param isInputMatchable boolean?
 function LongLogicalNote:new(note, isPlayable, isScorable, isInputMatchable)
-	self.startNote = note
+	self.startNote = note.startNote
 	self.endNote = note.endNote
 	self.isPlayable = isPlayable
 	self.isScorable = isScorable

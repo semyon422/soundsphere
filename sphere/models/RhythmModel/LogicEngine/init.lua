@@ -1,6 +1,5 @@
 local class = require("class")
 local NoteHandler = require("sphere.models.RhythmModel.LogicEngine.NoteHandler")
-local HandlerNote = require("sphere.models.RhythmModel.LogicEngine.HandlerNote")
 local Observable = require("Observable")
 
 ---@class sphere.LogicEngine
@@ -18,26 +17,6 @@ function LogicEngine:new(timeEngine, scoreEngine)
 	self.scoreEngine = scoreEngine
 end
 
----@param column ncdk2.Column
----@param create boolean?
----@return sphere.NoteHandler?
-function LogicEngine:getNoteHandler(column, create)
-	if self.singleHandler then
-		column = 1
-	end
-
-	local noteHandler = self.noteHandlers[column]
-	if not noteHandler then
-		if not create then
-			return
-		end
-		noteHandler = NoteHandler(self)
-		self.noteHandlers[column] = noteHandler
-	end
-
-	return noteHandler
-end
-
 ---@param chart ncdk2.Chart
 function LogicEngine:setChart(chart)
 	self.chart = chart
@@ -50,19 +29,21 @@ function LogicEngine:load()
 	---@type sphere.NoteHandler[]
 	self.noteHandlers = {}
 
-	local column_notes = self.chart.notes:getColumnNotes()
-	for column, notes in pairs(column_notes) do
-		local noteHandler = assert(self:getNoteHandler(column, true))
-		for _, note in ipairs(notes) do
-			table.insert(noteHandler.logicNotes, HandlerNote(note, column))
+	if not self.singleHandler then
+		for column, notes in pairs(self.chart.notes:getColumnLinkedNotes()) do
+			local noteHandler = NoteHandler(self, notes)
+			self.noteHandlers[column] = noteHandler
 		end
+	else
+		local noteHandler = NoteHandler(self, self.chart.notes:getLinkedNotes())
+		self.noteHandlers[1] = noteHandler
 	end
 
 	local notesCount = 0
 	for _, noteHandler in pairs(self.noteHandlers) do
 		noteHandler:load()
 		for _, note in ipairs(noteHandler.notes) do
-			if note.note.isScorable then
+			if note.isScorable then
 				notesCount = notesCount + 1
 			end
 		end
@@ -88,7 +69,14 @@ function LogicEngine:receive(event)
 	end
 
 	local input = event[1]
-	local noteHandler = self:getNoteHandler(input)
+
+	local noteHandler
+	if not self.singleHandler then
+		noteHandler = self.noteHandlers[input]
+	else
+		noteHandler = self.noteHandlers[1]
+	end
+
 	if not noteHandler then
 		return
 	end

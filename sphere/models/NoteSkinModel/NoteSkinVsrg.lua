@@ -454,7 +454,7 @@ end
 function NoteSkinVsrg:addMeasureLine(params, index)
 	local i = self:setInputListIndex("measure1", index)
 
-	local Head = self.notes.LongNote.Head
+	local Head = self.notes.ShortNote.Head
 	Head.x[i] = params.x or self.baseOffset
 	Head.w[i] = params.w or self.fullWidth
 	Head.h[i] = params.h

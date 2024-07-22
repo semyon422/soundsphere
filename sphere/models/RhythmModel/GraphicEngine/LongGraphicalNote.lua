@@ -26,8 +26,6 @@ end
 function LongGraphicalNote:update()
 	self:checkFakeStartTimePoint()
 
-	self.endNote = self.startNote.endNote
-
 	local startVisualPoint = self.startNote.visualPoint
 	local endVisualPoint = self.endNote.visualPoint
 	local startPoint = startVisualPoint.point

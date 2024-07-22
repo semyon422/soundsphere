@@ -73,9 +73,9 @@ local function test(notes, events, states, graphicStates)
 
 			local note = Note(vp, 1)
 
-			note.noteType = "ShortNote"
+			note.type = "note"
 			if isAuto then
-				note.noteType = "SoundNote"
+				note.type = "shade"
 			end
 
 			chart.notes:insert(note)
@@ -84,18 +84,17 @@ local function test(notes, events, states, graphicStates)
 			local vp = visual:newPoint(p)
 
 			local startNote = Note(vp, 1)
-			startNote.noteType = "LongNoteStart"
+			startNote.type = "hold"
+			startNote.weight = 1
 			chart.notes:insert(startNote)
 
 			p = layer:getPoint(time[2])
 			vp = visual:newPoint(p)
 
 			local endNote = Note(vp, 1)
-			endNote.noteType = "LongNoteEnd"
+			endNote.type = "hold"
+			endNote.weight = -1
 			chart.notes:insert(endNote)
-
-			startNote.endNote = endNote
-			endNote.startNote = startNote
 		end
 	end
 
