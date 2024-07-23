@@ -40,7 +40,7 @@ function Alternate:apply(config, chart)
 	end
 
 	---@type number[]
-	local inputAlternate = {}
+	local alt = {}
 
 	local new_notes = Notes()
 	for _, note in chart.notes:iter() do
@@ -48,25 +48,13 @@ function Alternate:apply(config, chart)
 		if _inputType ~= inputType then
 			new_notes:insert(note)
 		elseif _inputType and inputIndex then
-			inputAlternate[inputIndex] = inputAlternate[inputIndex] or 1
-
-			local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
-			if isStartNote then
-				inputAlternate[inputIndex] = math.abs(inputAlternate[inputIndex] - 1)
+			alt[inputIndex] = alt[inputIndex] or 1
+			if note.weight >= 0 then
+				alt[inputIndex] = math.abs(alt[inputIndex] - 1)
 			end
-
-			local newInputIndex = (inputIndex - 1) * 2 + 1 + inputAlternate[inputIndex]
-
-			local column = _inputType .. newInputIndex
-			if note.noteType == "ShortNote" then
-				note.column = column
-				new_notes:insert(note)
-			elseif note.noteType == "LongNoteStart" then
-				note.column = column
-				note.endNote.column = column
-				new_notes:insert(note)
-				new_notes:insert(note.endNote)
-			end
+			local newInputIndex = (inputIndex - 1) * 2 + 1 + alt[inputIndex]
+			note.column = _inputType .. newInputIndex
+			new_notes:insert(note)
 		end
 	end
 	chart.notes = new_notes

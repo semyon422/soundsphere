@@ -30,12 +30,13 @@ end
 function MinLnLength:apply(config, chart)
 	local duration = config.value
 
-	for _, note in chart.notes:iter() do
-		if note.noteType == "LongNoteStart" or note.noteType == "LaserNoteStart" then
-			if (note.endNote:getTime() - note:getTime()) <= duration then
-				note.noteType = "ShortNote"
-				note.endNote.noteType = "Ignore"
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		if note:getType() == "hold" and note:getDuration() <= duration then
+			if note.endNote then
+				note.endNote.type = "ignore"
 			end
+			note:unlink()
+			note:setType("note")
 		end
 	end
 end

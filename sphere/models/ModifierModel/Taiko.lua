@@ -35,22 +35,20 @@ function Taiko:apply(config, chart)
 	end
 
 	local new_notes = Notes()
-	for _, note in chart.notes:iter() do
-		local inputType, inputIndex = InputMode:splitInput(note.column)
+	for _, _note in ipairs(chart.notes:getLinkedNotes()) do
+		local inputType, inputIndex = InputMode:splitInput(_note:getColumn())
 		if inputType == "key" then
-			if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
-				note.noteType = "ShortNote"
-				note.endNote = nil
-				note.column = "key" .. getKey(inputIndex)
-				local found_note = new_notes:get(note.visualPoint, note.column)
-				if not found_note then
-					new_notes:insert(note)
-				else
-					found_note.isDouble = true
-				end
+			local note = _note.startNote
+			note.type = "note"
+			note.column = "key" .. getKey(inputIndex)
+			local found_note = new_notes:get(note.visualPoint, note.column)
+			if not found_note then
+				new_notes:insert(note)
+			else
+				found_note.isDouble = true
 			end
 		else
-			new_notes:insert(note)
+			new_notes:insertLinked(_note)
 		end
 	end
 	chart.notes = new_notes

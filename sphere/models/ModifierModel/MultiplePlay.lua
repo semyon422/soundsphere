@@ -32,36 +32,18 @@ function MultiplePlay:apply(config, chart)
 	local inputMode = chart.inputMode
 
 	local new_notes = Notes()
-	for _, note in chart.notes:iter() do
-		local inputType, inputIndex = InputMode:splitInput(note.column)
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		local inputType, inputIndex = InputMode:splitInput(note:getColumn())
 		local inputCount = inputMode[inputType]
 		if inputCount then
 			for i = 1, value do
 				local newInputIndex = inputIndex + inputCount * (i - 1)
-				if note.startNote then
-				elseif note.endNote then
-					local startNote = Note(note.visualPoint, inputType .. newInputIndex)
-					local endNote = Note(note.endNote.visualPoint, inputType .. newInputIndex)
-
-					startNote.endNote = endNote
-					endNote.startNote = startNote
-
-					startNote.noteType = note.noteType
-					startNote.sounds = note.sounds
-					endNote.noteType = note.endNote.noteType
-					endNote.sounds = note.endNote.sounds
-
-					new_notes:insert(startNote)
-					new_notes:insert(endNote)
-				else
-					local newNote = Note(note.visualPoint, inputType .. newInputIndex)
-					newNote.noteType = note.noteType
-					newNote.sounds = note.sounds
-					new_notes:insert(newNote)
-				end
+				local new_note = note:clone()
+				new_note:setColumn(inputType .. newInputIndex)
+				new_notes:insertLinked(new_note)
 			end
 		else
-			new_notes:insert(note)
+			new_notes:insertLinked(note)
 		end
 	end
 	chart.notes = new_notes
