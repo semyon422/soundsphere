@@ -86,15 +86,14 @@ function GraphicEngine:selectNote(note, keepOthers)
 	self.selectedNotes[note.startNote] = nil
 end
 
----@param _note ncdk2.Note
+---@param _note ncdk2.LinkedNote
 ---@param column ncdk2.Column
 ---@return sphere.EditorNote?
 function GraphicEngine:newNote(_note, column)
-	local note = EditorNoteFactory:newNote(_note.noteType)
+	local note = EditorNoteFactory:newNote(_note)
 	if not note then
 		return
 	end
-	note.startNote = _note
 	note.editorModel = self.editorModel
 	note.graphicEngine = self
 	note.layerData = self.editorModel.layer
@@ -123,9 +122,10 @@ function GraphicEngine:update()
 	local newNotes = {}
 	self.notes = newNotes
 
-	for _note, column in editorModel.notes:iter(editorModel:getIterRange()) do
-		local note = notesMap[_note] or
-			selectedNotes[_note] or
+	for _note, column in editorModel.notes:iterLinked(editorModel:getIterRange()) do
+		local startNote = _note.startNote
+		local note = notesMap[startNote] or
+			selectedNotes[startNote] or
 			self:newNote(_note, column)
 		if note then
 			table.insert(newNotes, note)
