@@ -56,7 +56,7 @@ function ShortNoteView:fillChords(chords, column)
 	chords[time] = chords[time] or {}
 	local chord = chords[time]
 	chord[column] = chord[column] or {}
-	table.insert(chord[column], startNote)
+	table.insert(chord[column], self.graphicalNote)
 end
 
 ---@return boolean
