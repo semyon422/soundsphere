@@ -72,7 +72,7 @@ function LessChord:apply(config, chart)
 		local time = noteData:getTime()
 
 		columnSizes[index] = columnSizes[index] + 1
-		if noteData.noteType == "ShortNote" then
+		if noteData.type == "note" then
 			if chords[time] then
 				table.insert(chords[time].notes, note)
 				chords[time].columnSizes = {unpack(columnSizes)}
@@ -126,7 +126,7 @@ function LessChord:apply(config, chart)
 						futureChord.columnSizes[note.inputIndex] = futureChord.columnSizes[note.inputIndex] - 1
 					end
 
-					note.noteData.noteType = "SoundNote"
+					note.noteData.type = "sample"
 					note.noteData.column = "auto" .. note.inputIndex
 					chart.notes:insert(note.noteData)
 				else
