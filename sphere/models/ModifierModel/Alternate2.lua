@@ -37,21 +37,17 @@ function Alternate2:apply(config, chart)
 	local alt = {}
 
 	local new_notes = Notes()
-	for _, note in chart.notes:iter() do
-		local _inputType, inputIndex = InputMode:splitInput(note.column)
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		local _inputType, inputIndex = InputMode:splitInput(note:getColumn())
 		if _inputType ~= inputType then
-			new_notes:insert(note)
+			new_notes:insertLinked(note)
 		elseif _inputType and inputIndex then
 			alt[inputIndex] = alt[inputIndex] or 3
-			local state = alt[inputIndex]
-			if note.weight >= 0 then
-				state = (state + 1) % 4
-				alt[inputIndex] = state
-			end
-			local plusColumn = state < 2 and 1 or 2
+			alt[inputIndex] = (alt[inputIndex] + 1) % 4
+			local plusColumn = alt[inputIndex] < 2 and 1 or 2
 			local newInputIndex = (inputIndex - 1) * 2 + plusColumn
-			note.column = _inputType .. newInputIndex
-			new_notes:insert(note)
+			note:setColumn(_inputType .. newInputIndex)
+			new_notes:insertLinked(note)
 		end
 	end
 	chart.notes = new_notes
