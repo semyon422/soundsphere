@@ -218,13 +218,9 @@ end
 ---@param column string
 ---@return sphere.EditorNote?
 function NoteManager:newNote(noteType, absoluteTime, column)
-	local note = EditorNoteFactory:newNote(noteType)
-	if not note then
-		return
-	end
+	local note = EditorNoteFactory:newNote_t(noteType)
 	note.editorModel = self.editorModel
 	note.graphicEngine = self.editorModel.graphicEngine
-	note.layerData = self.editorModel.layerData
 	note.column = column
 	return note:create(absoluteTime, column)
 end
@@ -239,9 +235,9 @@ function NoteManager:addNote(absoluteTime, column)
 
 	local note
 	if editor.tool == "ShortNote" then
-		note = self:newNote("ShortNote", absoluteTime, column)
+		note = self:newNote("note", absoluteTime, column)
 	elseif editor.tool == "LongNote" then
-		note = self:newNote("LongNoteStart", absoluteTime, column)
+		note = self:newNote("hold", absoluteTime, column)
 	end
 
 	if not note then

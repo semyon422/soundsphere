@@ -18,18 +18,13 @@ function LongEditorNote:create(absoluteTime, column)
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
 	local vp = visual:getPoint(p)
-	local startNote = Note(vp, column)
-	startNote.noteType = "LongNoteStart"
+	local startNote = Note(vp, column, "hold", 1)
 	self.startNote = startNote
 
 	local p = layer.points:getPoint(editorModel.scroller:getNextSnapIntervalTime(p, 1))
 	local vp = visual:getPoint(p)
-	local endNote = Note(vp, column)
-	endNote.noteType = "LongNoteEnd"
+	local endNote = Note(vp, column, "hold", -1)
 	self.endNote = endNote
-
-	endNote.startNote = startNote
-	startNote.endNote = endNote
 
 	self:update()
 
@@ -50,9 +45,6 @@ function LongEditorNote:grab(t, part, deltaColumn, lockSnap)
 
 	self.startNote = self.startNote:clone()
 	self.endNote = self.endNote:clone()
-
-	self.startNote.endNote = self.endNote
-	self.endNote.startNote = self.startNote
 
 	local startTime = self.startNote:getTime()
 	local endTime = self.endNote:getTime()
@@ -136,9 +128,6 @@ function LongEditorNote:paste(point)
 
 	startNote.visualPoint = visual:getPoint(layer.points:getPoint(point:add(self.deltaStartTime)))
 	endNote.visualPoint = visual:getPoint(layer.points:getPoint(point:add(self.deltaEndTime)))
-
-	endNote.startNote = startNote
-	startNote.endNote = endNote
 
 	return {startNote, endNote}
 end

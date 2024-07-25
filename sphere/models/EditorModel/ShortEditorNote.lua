@@ -18,8 +18,7 @@ function ShortEditorNote:create(absoluteTime, column)
 	local dtp = editorModel:getDtpAbsolute(absoluteTime)
 	local p = layer.points:saveSearchPoint(dtp)
 	local vp = visual:getPoint(p)
-	local note = Note(vp, column)
-	note.noteType = "ShortNote"
+	local note = Note(vp, column, "note")
 	self.startNote = note
 	self:update()
 

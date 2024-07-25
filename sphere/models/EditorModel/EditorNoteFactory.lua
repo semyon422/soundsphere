@@ -25,8 +25,17 @@ function EditorNoteFactory:newNote(note)
 	if not classAndType then
 		return
 	end
-
 	return classAndType[1](classAndType[2], note)
+end
+
+---@param note_type ncdk2.NoteType
+---@return sphere.EditorNote?
+function EditorNoteFactory:newNote_t(note_type)
+	local classAndType = notes[note_type]
+	if not classAndType then
+		return
+	end
+	return classAndType[1](classAndType[2])
 end
 
 return EditorNoteFactory

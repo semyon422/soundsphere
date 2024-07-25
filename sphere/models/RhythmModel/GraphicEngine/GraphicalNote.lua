@@ -12,8 +12,8 @@ local GraphicalNote = class()
 ---@param note ncdk2.LinkedNote
 function GraphicalNote:new(noteType, note)
 	self.noteType = noteType
-	self.startNote = note.startNote
-	self.endNote = note.endNote
+	self.startNote = note and note.startNote
+	self.endNote = note and note.endNote
 end
 
 function GraphicalNote:update() end
