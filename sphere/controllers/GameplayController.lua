@@ -165,13 +165,19 @@ end
 ---@param chart ncdk2.Chart
 function GameplayController:applyAutoKeysound(chart)
 	for _, note in chart.notes:iter() do
-		if note.noteType == "ShortNote" or note.noteType == "LongNoteStart" then
-			local soundNote = Note(note.visualPoint, "auto")
+		if note.type == "note" or note.type == "hold" then
+			local soundNote = chart.notes:get(note.visualPoint, "auto")
+			if not soundNote then
+				soundNote = Note(note.visualPoint, "auto", "sample")
+				chart.notes:insert(soundNote)
+				soundNote.sounds = {}
+			end
 
-			soundNote.noteType = "SoundNote"
-			soundNote.sounds, note.sounds = note.sounds, {}
+			for _, t in ipairs(note.sounds) do
+				table.insert(soundNote.sounds, t)
+			end
 
-			chart.notes:insert(soundNote)
+			note.sounds = {}
 		end
 	end
 end
