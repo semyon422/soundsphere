@@ -1,12 +1,22 @@
+local class = require("class")
 local FileFinder = require("sphere.persistence.FileFinder")
 local ShortGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.ShortGraphicalNote")
 local LongGraphicalNote = require("sphere.models.RhythmModel.GraphicEngine.LongGraphicalNote")
 local ImageNote = require("sphere.models.RhythmModel.GraphicEngine.ImageNote")
 
-local GraphicalNoteFactory = {}
+---@class sphere.GraphicalNoteFactory
+---@operator call: sphere.GraphicalNoteFactory
+local GraphicalNoteFactory = class()
+
+---@alias sphere.GraphicalNoteType
+---| "ShortNote"
+---| "LongNote"
+---| "SoundNote"
+---| "ImageNote"
+---| "VideoNote"
 
 ---@param note ncdk2.LinkedNote
----@return string
+---@return sphere.GraphicalNoteType
 local function getImageNoteType(note)
 	local image = note.startNote.images[1]
 	if image and FileFinder:getType(image[1]) == "video" then
@@ -15,6 +25,10 @@ local function getImageNoteType(note)
 	return "ImageNote"
 end
 
+---@see notechart.Note
+---@see sphere.NoteViewFactory
+
+---@type {[notechart.NoteType]: {[1]: table, [2]: sphere.GraphicalNoteType}}
 local notes = {
 	note = {ShortGraphicalNote, "ShortNote"},
 	hold = {LongGraphicalNote, "LongNote"},
