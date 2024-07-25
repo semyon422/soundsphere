@@ -43,4 +43,13 @@ function EditorNote:getNotes()
 	return {}
 end
 
+---@param column ncdk2.Column
+function EditorNote:setColumn(column)
+	self.column = column
+	self.startNote.column = column
+	if self.endNote then
+		self.endNote.column = column
+	end
+end
+
 return EditorNote

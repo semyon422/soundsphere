@@ -96,14 +96,12 @@ function GraphicEngine:newNote(_note, column)
 	end
 	note.editorModel = self.editorModel
 	note.graphicEngine = self
-	note.layerData = self.editorModel.layer
 	note.column = column
 	return note
 end
 
 function GraphicEngine:update()
 	local editorModel = self.editorModel
-	local layer = editorModel.layer
 
 	local selectedNotes = self.selectedNotes
 
