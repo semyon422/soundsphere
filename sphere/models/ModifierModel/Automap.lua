@@ -79,13 +79,9 @@ function Automap:applyAutomap()
 			local n = {}
 
 			n.noteData = lnote
-			n.startTime = math_util.round(lnote.startNote:getTime() * 1000)
-			if lnote:getSize() > 1 then
-				n.endTime = math_util.round(lnote.endNote:getTime() * 1000)
-				n.long = true
-			else
-				n.endTime = n.startTime
-			end
+			n.startTime = math_util.round(lnote:getStartTime() * 1000)
+			n.endTime = math_util.round(lnote:getEndTime() * 1000)
+			n.long = lnote:isLong()
 			n.baseEndTime = n.endTime
 			n.columnIndex = inputIndex
 			n.baseColumnIndex = inputIndex
