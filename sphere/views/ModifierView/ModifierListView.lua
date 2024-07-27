@@ -4,6 +4,7 @@ local TextCellImView = require("sphere.imviews.TextCellImView")
 local SliderView = require("sphere.views.SliderView")
 local StepperView = require("sphere.views.StepperView")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 local ModifierListView = ListView()
 
@@ -46,7 +47,7 @@ function ModifierListView:drawItem(i, w, h)
 
 	just.row(true)
 	just.indent(44)
-	TextCellImView(w2 - 44, 72, "left", "", ModifierModel.Modifiers[item.id])
+	TextCellImView(w2 - 44, 72, "left", "", ModifierRegistry:getName(item.id))
 
 	local modifier = ModifierModel:getModifier(item.id)
 	if not modifier then

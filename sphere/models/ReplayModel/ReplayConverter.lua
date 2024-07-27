@@ -1,5 +1,6 @@
 local class = require("class")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 ---@class sphere.ReplayConverter
 ---@operator call: sphere.ReplayConverter
@@ -88,7 +89,7 @@ function ReplayConverter:convertModifier(c, replay)
 			end
 		end
 
-		c.id = ModifierModel.Modifiers[c.name]
+		c.id = ModifierRegistry.enum[c.name]
 		if not c.id then
 			return false
 		end

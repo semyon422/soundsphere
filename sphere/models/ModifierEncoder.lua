@@ -4,7 +4,7 @@ local stbl = require("stbl")
 local table_util = require("table_util")
 local md5 = require("md5")
 local int_rates = require("libchart.int_rates")
-local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 local ModifierEncoder = class()
 
@@ -59,8 +59,8 @@ AMod, 0Q, 1.2X, AltK, AM10
 
 local mods_encoded_since = 1633689604
 
-local ids = ModifierModel.Modifiers
-local ids_inv = table_util.invert(ModifierModel.Modifiers)
+local ids = ModifierRegistry.enum
+local ids_inv = table_util.invert(ModifierRegistry.enum)
 
 local function parse_mod_from_name(s)
 	if s == "AMod" or s == "XMod" or s == "ToOsu" or s:match("^(.+)dB$") then

@@ -1,31 +1,13 @@
 local class = require("class")
 local table_util = require("table_util")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 ---@class sphere.ModifierSelectModel
 ---@operator call: sphere.ModifierSelectModel
 local ModifierSelectModel = class()
 
-local Modifiers = {
-	"WindUp",
-	"NoScratch",
-	"NoLongNote",
-	"Automap",
-	"MultiplePlay",
-	"MultiOverPlay",
-	"Taiko",
-	"Alternate",
-	"Alternate2",
-	"Shift",
-	"Mirror",
-	"Random",
-	"BracketSwap",
-	"MaxChord",
-	"LessChord",
-	"FullLongNote",
-	"MinLnLength",
-}
-ModifierSelectModel.modifiers = Modifiers
+local Modifiers = ModifierRegistry.list
 
 local OneUseModifiers = {
 	"WindUp",
@@ -63,7 +45,7 @@ function ModifierSelectModel:updateAdded()
 		self.addedModifiers[name] = 0
 	end
 	for _, c in ipairs(self.playContext.modifiers) do
-		local name = ModifierModel.Modifiers[c.id]
+		local name = ModifierRegistry:getName(c.id)
 		self.addedModifiers[name] = self.addedModifiers[name] + 1
 	end
 end
@@ -137,7 +119,7 @@ function ModifierSelectModel:remove(index)
 		self.modifierIndex = math.max(self.modifierIndex - 1, 0)
 	end
 	if modifier then
-		local name = ModifierModel.Modifiers[modifier.id]
+		local name = ModifierRegistry:getName(modifier.id)
 		self.addedModifiers[name] = self.addedModifiers[name] - 1
 	end
 	self:change()

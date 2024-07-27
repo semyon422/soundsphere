@@ -3,13 +3,14 @@ local just = require("just")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 local AvailableModifierListView = ListView()
 
 AvailableModifierListView.rows = 11
 
 function AvailableModifierListView:reloadItems()
-	self.items = self.game.modifierSelectModel.modifiers
+	self.items = ModifierRegistry.list
 end
 
 ---@return number
@@ -34,7 +35,7 @@ function AvailableModifierListView:drawItem(i, w, h)
 	local id = "available modifier" .. i
 	local changed, active, hovered = just.button(id, just.is_over(w, h))
 	if changed then
-		local modifier = modifierSelectModel.modifiers[i]
+		local modifier = self.items[i]
 		modifierSelectModel:add(modifier)
 	end
 
