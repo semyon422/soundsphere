@@ -37,7 +37,7 @@ local notes = {
 	mine = {ShortGraphicalNote, "SoundNote"},
 	shade = {ShortGraphicalNote, "SoundNote"},
 	fake = {ShortGraphicalNote, "SoundNote"},
-	sample = {ShortGraphicalNote, "SoundNote"},
+	-- sample = {ShortGraphicalNote, "SoundNote"},
 	sprite = {ImageNote, getImageNoteType},
 }
 
