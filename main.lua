@@ -144,17 +144,9 @@ if arg[2] == "test" then
 	testing.test(arg[3], arg[4])
 
 	if luacov_runner then
-		local configuration = {
-			reporter = "lcov",
-			reportfile = "lcov.info",
-			exclude = {
-				"main$",
-			},
-			include = {},
-		}
 		debug.sethook(nil)
 		luacov_runner.save_stats()
-		luacov_runner.run_report(configuration)
+		require("luacov.reporter.lcov").report()
 	end
 
 	os.exit()

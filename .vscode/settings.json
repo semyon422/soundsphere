@@ -49,5 +49,8 @@
     "files.watcherExclude": {
         "**/.git/**": true,
         "**/tree/**": true,
-    },
+	},
+	"coverage-gutters.coverageFileNames": [
+		"luacov.report.out",
+	],
 }
