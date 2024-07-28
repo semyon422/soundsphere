@@ -43,8 +43,7 @@ function LessChord:apply(config, chart)
 	local inputCount = chart.inputMode.key
 
 	local chords = {}
-	local singles = {}
-	local noteDatas = {}
+	local time_notes = {}
 	local columnSizes = {}
 	for i = 1, inputCount do
 		columnSizes[i] = 0
@@ -52,50 +51,39 @@ function LessChord:apply(config, chart)
 
 	local new_notes = Notes()
 	local notes = {}
-	for _, note in chart.notes:iter() do
-		local inputType, inputIndex = InputMode:splitInput(note.column)
-		if inputType == "key" then
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		local inputType, inputIndex = InputMode:splitInput(note:getColumn())
+		if inputType == "key" and note:getType() == "note" then
 			table.insert(notes, {
 				noteData = note,
 				inputIndex = inputIndex,
 			})
-		else
-			new_notes:insert(note)
 		end
+		new_notes:insertLinked(note)
 	end
 	chart.notes = new_notes
 	table.sort(notes, function(a, b) return a.noteData < b.noteData end)
 
 	for _, note in ipairs(notes) do
-		local noteData = note.noteData
+		local lnote = note.noteData
 		local index = note.inputIndex
-		local time = noteData:getTime()
+		local time = lnote:getStartTime()
 
 		columnSizes[index] = columnSizes[index] + 1
-		if noteData.type == "note" then
-			if chords[time] then
-				table.insert(chords[time].notes, note)
-				chords[time].columnSizes = {unpack(columnSizes)}
-			else
-				singles[time] = note
-
-				if noteDatas[time] then
-					chords[time] = {
-						time = time,
-						notes = {noteDatas[time], note},
-						columnSizes = {unpack(columnSizes)}
-					}
-					singles[time] = nil
-				end
-
-				noteDatas[time] = note
+		if chords[time] then
+			table.insert(chords[time].notes, note)
+			chords[time].columnSizes = {unpack(columnSizes)}
+		else
+			if time_notes[time] then
+				chords[time] = {
+					time = time,
+					notes = {time_notes[time], note},
+					columnSizes = {unpack(columnSizes)}
+				}
 			end
-		end
-	end
 
-	for _, note in pairs(singles) do
-		note.noteData.column = "key" .. note.inputIndex
-		chart.notes:insert(note.noteData)
+			time_notes[time] = note
+		end
 	end
 
 	local sortedChords = {}
@@ -126,18 +114,8 @@ function LessChord:apply(config, chart)
 						futureChord.columnSizes[note.inputIndex] = futureChord.columnSizes[note.inputIndex] - 1
 					end
 
-					note.noteData.type = "sample"
-					note.noteData.column = "auto" .. note.inputIndex
-					chart.notes:insert(note.noteData)
-				else
-					note.noteData.column = "key" .. note.inputIndex
-					chart.notes:insert(note.noteData)
+					note.noteData:setType("sample")
 				end
-			end
-		else
-			for _, note in pairs(chord.notes) do
-				note.noteData.column = "key" .. note.inputIndex
-				chart.notes:insert(note.noteData)
 			end
 		end
 	end
