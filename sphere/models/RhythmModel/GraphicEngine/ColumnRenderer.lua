@@ -6,7 +6,7 @@ local GraphicalNoteFactory = require("sphere.models.RhythmModel.GraphicEngine.Gr
 ---@operator call: sphere.ColumnRenderer
 local ColumnRenderer = class()
 
----@param notes notechart.Note[]
+---@param notes ncdk2.LinkedNote[]
 ---@param column ncdk2.Column
 ---@param columnsRenderer sphere.ColumnsRenderer
 function ColumnRenderer:new(notes, column, columnsRenderer)
@@ -34,7 +34,7 @@ function ColumnRenderer:load()
 	for _, _note in ipairs(self._notes) do
 		local note = GraphicalNoteFactory:getNote(_note)
 		if note then
-			local visual = chart:getVisualByPoint(_note.visualPoint)
+			local visual = chart:getVisualByPoint(_note.startNote.visualPoint)
 			note.currentVisualPoint = columnsRenderer.cvp[visual]
 			note.visual = visual
 			note.graphicEngine = graphicEngine

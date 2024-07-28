@@ -7,21 +7,34 @@ local LongEditorNote = require("sphere.models.EditorModel.LongEditorNote")
 local EditorNoteFactory = class()
 
 local notes = {
-	ShortNote = {ShortEditorNote, "ShortNote"},
-	LongNoteStart = {LongEditorNote, "LongNote"},
-	LaserNoteStart = {LongEditorNote, "LongNote"},
-	LineNoteStart = {LongEditorNote, "LongNote"},
-	SoundNote = {ShortEditorNote, "SoundNote"},
+	note = {ShortEditorNote, "ShortNote"},
+	hold = {LongEditorNote, "LongNote"},
+	laser = {LongEditorNote, "LongNote"},
+	drumroll = {LongEditorNote, "LongNote"},
+	mine = {ShortEditorNote, "SoundNote"},
+	shade = {ShortEditorNote, "SoundNote"},
+	fake = {ShortEditorNote, "SoundNote"},
+	sample = {ShortEditorNote, "SoundNote"},
+	-- sprite = {ShortEditorNote, "SoundNote"},
 }
 
----@param noteType string
+---@param note ncdk2.LinkedNote
 ---@return sphere.EditorNote?
-function EditorNoteFactory:newNote(noteType)
-	local classAndType = notes[noteType]
+function EditorNoteFactory:newNote(note)
+	local classAndType = notes[note:getType()]
 	if not classAndType then
 		return
 	end
+	return classAndType[1](classAndType[2], note)
+end
 
+---@param note_type ncdk2.NoteType
+---@return sphere.EditorNote?
+function EditorNoteFactory:newNote_t(note_type)
+	local classAndType = notes[note_type]
+	if not classAndType then
+		return
+	end
 	return classAndType[1](classAndType[2])
 end
 

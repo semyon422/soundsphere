@@ -73,27 +73,25 @@ function Automap:applyAutomap()
 	self.tNoteDatas = tNoteDatas
 
 	local new_notes = Notes()
-	for _, note in chart.notes:iter() do
-		local inputType, inputIndex = InputMode:splitInput(note.column)
-		if inputType == "key" and (note.noteType == "ShortNote" or note.noteType == "LongNoteStart") then
+	for _, lnote in ipairs(chart.notes:getLinkedNotes()) do
+		local inputType, inputIndex = InputMode:splitInput(lnote:getColumn())
+		if inputType == "key" then
 			local n = {}
 
-			n.noteData = note
-			n.startTime = math_util.round(note:getTime() * 1000)
-			if note.noteType == "LongNoteStart" and note.endNote then
-				n.endTime = math_util.round(note.endNote:getTime() * 1000)
-				n.long = true
-			else
-				n.endTime = n.startTime
-			end
+			n.noteData = lnote
+			n.startTime = math_util.round(lnote:getStartTime() * 1000)
+			n.endTime = math_util.round(lnote:getEndTime() * 1000)
+			n.long = lnote:isLong()
 			n.baseEndTime = n.endTime
 			n.columnIndex = inputIndex
 			n.baseColumnIndex = inputIndex
 
 			tNoteDatas[#tNoteDatas + 1] = n
-		elseif inputType == "key" then
 		else
-			new_notes:insert(note)
+			new_notes:insert(lnote.startNote)
+			if lnote.endNote then
+				new_notes:insert(lnote.endNote)
+			end
 		end
 	end
 	chart.notes = new_notes
@@ -130,13 +128,8 @@ function Automap:processUpscaler()
 
 	for i = 1, #notes do
 		local n = notes[i]
-
-		n.noteData.column = "key" .. n.columnIndex
-		chart.notes:insert(n.noteData)
-		if n.long then
-			n.noteData.endNote.column = "key" .. n.columnIndex
-			chart.notes:insert(n.noteData.endNote)
-		end
+		n.noteData:setColumn("key" .. n.columnIndex)
+		chart.notes:insertLinked(n.noteData)
 	end
 
 	self.chart.inputMode.key = targetMode
@@ -193,42 +186,39 @@ function Automap:processReductor()
 	-- currently Automap only absolute time mode
 	-- reducting long notes requires creating new time points
 	-- time point interpolating is not fully inplemented in LayerData
-	if not (AbsoluteLayer * self.chart.layers.main) then
-		for _, tNoteData in ipairs(self.tNoteDatas) do
-			tNoteData.endTime = tNoteData.startTime
-		end
-	end
+	-- if not (AbsoluteLayer * self.chart.layers.main) then
+	-- 	for _, tNoteData in ipairs(self.tNoteDatas) do
+	-- 		tNoteData.endTime = tNoteData.startTime
+	-- 	end
+	-- end
 
 	local layer = chart.layers.main
 	for i = 1, #notes do
 		local n = notes[i]
 		tNoteDatasMap[n] = nil
 
-		n.noteData.column = "key" .. n.columnIndex
-		chart.notes:insert(n.noteData)
+		n.noteData:setColumn("key" .. n.columnIndex)
 
 		if n.long then
 			if n.startTime == n.endTime then
-				n.noteData.noteType = "ShortNote"
-				n.noteData.endNote = nil
+				n.noteData:unlink()
+				n.noteData:setType("note")
 			else
-				n.noteData.endNote.column = "key" .. n.columnIndex
-				-- we have main absolute layer here
 				local p = layer:getPoint(n.endTime / 1000)
 				local vp = layer.visuals.main:newPoint(p)
 				n.noteData.endNote.visualPoint = vp
-				chart.notes:insert(n.noteData.endNote)
 			end
 		end
+
+		chart.notes:insertLinked(n.noteData)
 	end
 
 	for n in pairs(tNoteDatasMap) do
 		local note = n.noteData
-		note.noteType = "SoundNote"
-		note.endNote = nil
-
-		n.noteData.column = "auto" .. n.columnIndex
-		chart.notes:insert(n.noteData)
+		note:unlink()
+		note:setType("sample")
+		note:setColumn("auto" .. n.columnIndex)
+		chart.notes:insertLinked(note)
 	end
 
 	self.chart.inputMode.key = targetMode

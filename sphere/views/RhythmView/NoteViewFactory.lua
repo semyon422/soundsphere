@@ -8,6 +8,20 @@ local VideoNoteView = require("sphere.views.RhythmView.VideoNoteView")
 ---@operator call: sphere.NoteViewFactory
 local NoteViewFactory = class()
 
+---@alias sphere.NoteViewType
+---| "ShortNote"
+---| "LongNote"
+---| "SoundNote"
+---| "ShortNoteAnimation"
+---| "LongNoteAnimation"
+---| "ShortNoteLighting"
+---| "LongNoteLighting"
+---| "ImageNote"
+---| "VideoNote"
+
+---@see sphere.GraphicalNoteFactory
+
+---@type {[string]: {[sphere.GraphicalNoteType]: {[1]: table, [2]: sphere.NoteViewType}}}
 local notes = {
 	default = {
 		ShortNote = {ShortNoteView, "ShortNote"},

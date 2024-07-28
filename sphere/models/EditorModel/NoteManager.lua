@@ -33,7 +33,7 @@ function NoteManager:update()
 		local column = self:getColumnOver()
 		if column then
 			column = column - note.grabbedDeltaColumn
-			note.column = noteSkin:getFirstColumnInput(column)
+			note:setColumn(noteSkin:getFirstColumnInput(column))
 		end
 	end
 end
@@ -79,6 +79,8 @@ function NoteManager:deleteNotes()
 end
 
 function NoteManager:changeType()
+	do return end  -- TODO: fix this
+
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
 	local visual = editorModel.visual
@@ -131,7 +133,7 @@ function NoteManager:pasteNotes()
 	self.editorModel.editorChanges:reset()
 	local point = self.editorModel.point
 	for _, note in ipairs(copiedNotes) do
-		self:_addNotes(note:paste(point), note.column)
+		self:_addNotes(note:paste(point))
 	end
 	self.editorModel.editorChanges:next()
 end
@@ -166,7 +168,7 @@ function NoteManager:dropNotes(mouseTime)
 		if not editor.lockSnap then
 			note:drop(t)
 		end
-		self:_addNotes(note:getNotes(), note.column)
+		self:_addNotes(note:getNotes())
 		self.editorModel.graphicEngine.selectedNotes[note.startNote] = note
 	end
 	self.editorModel.editorChanges:next()
@@ -178,10 +180,10 @@ function NoteManager:_removeNote(note)
 	local lnotes = self.editorModel.notes
 	local notes = note:getNotes()
 	for _, _note in ipairs(notes) do
-		lnotes:removeNote(_note, note.column)
+		lnotes:removeNote(_note)
 		self.editorModel.editorChanges:add(
-			{lnotes, "removeNote", lnotes, _note, note.column},
-			{lnotes, "addNote", lnotes, _note, note.column}
+			{lnotes, "removeNote", lnotes, _note},
+			{lnotes, "addNote", lnotes, _note}
 		)
 	end
 end
@@ -194,21 +196,21 @@ function NoteManager:removeNote(note)
 end
 
 ---@param notes ncdk2.Note[]
-function NoteManager:_addNotes(notes, column)
+function NoteManager:_addNotes(notes)
 	local lnotes = self.editorModel.notes
 	local found = false
 	for _, _note in ipairs(notes) do
-		found = found or lnotes:findNote(_note, column)
+		found = found or lnotes:findNote(_note)
 	end
 	if found then
 		return
 	end
 
 	for _, _note in ipairs(notes) do
-		lnotes:addNote(_note, column)
+		lnotes:addNote(_note)
 		self.editorModel.editorChanges:add(
-			{lnotes, "addNote", lnotes, _note, column},
-			{lnotes, "removeNote", lnotes, _note, column}
+			{lnotes, "addNote", lnotes, _note},
+			{lnotes, "removeNote", lnotes, _note}
 		)
 	end
 end
@@ -218,13 +220,9 @@ end
 ---@param column string
 ---@return sphere.EditorNote?
 function NoteManager:newNote(noteType, absoluteTime, column)
-	local note = EditorNoteFactory:newNote(noteType)
-	if not note then
-		return
-	end
+	local note = EditorNoteFactory:newNote_t(noteType)
 	note.editorModel = self.editorModel
 	note.graphicEngine = self.editorModel.graphicEngine
-	note.layerData = self.editorModel.layerData
 	note.column = column
 	return note:create(absoluteTime, column)
 end
@@ -239,9 +237,9 @@ function NoteManager:addNote(absoluteTime, column)
 
 	local note
 	if editor.tool == "ShortNote" then
-		note = self:newNote("ShortNote", absoluteTime, column)
+		note = self:newNote("note", absoluteTime, column)
 	elseif editor.tool == "LongNote" then
-		note = self:newNote("LongNoteStart", absoluteTime, column)
+		note = self:newNote("hold", absoluteTime, column)
 	end
 
 	if not note then
@@ -280,8 +278,8 @@ function NoteManager:flipNotes()
 	for _, note in ipairs(notes) do
 		local columns = noteSkin.columnsCount
 		local column = columns - noteSkin:getInputColumn(note.column) + 1
-		note.column = noteSkin:getFirstColumnInput(column)
-		self:_addNotes(note:getNotes(), note.column)
+		note:setColumn(noteSkin:getFirstColumnInput(column))
+		self:_addNotes(note:getNotes())
 	end
 
 	editorModel.editorChanges:next()

@@ -1,39 +1,12 @@
 local class = require("class")
 local table_util = require("table_util")
+local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 
 ---@class sphere.ModifierModel
 ---@operator call: sphere.ModifierModel
 local ModifierModel = class()
 
-local Modifiers = {
-	-- AutoPlay = 0,
-	-- ProMode = 1,
-	-- AutoKeySound = 2,
-	-- ConstSpeed = 3,
-	-- TimeRateQ = 4,
-	-- TimeRateX = 5,
-	WindUp = 6,
-	-- AudioClip = 7,
-	NoScratch = 8,
-	NoLongNote = 9,
-	-- NoMeasureLine = 10,
-	Automap = 11,
-	MultiplePlay = 12,
-	MultiOverPlay = 13,
-	Alternate = 14,
-	Shift = 15,
-	Mirror = 16,
-	Random = 17,
-	BracketSwap = 18,
-	FullLongNote = 19,
-	MinLnLength = 20,
-	-- ToOsu = 21,
-	Alternate2 = 22,
-	LessChord = 23,
-	MaxChord = 24,
-	Taiko = 25,
-}
-ModifierModel.Modifiers = Modifiers
+local Modifiers = ModifierRegistry.enum
 
 local ModifiersByName = {}
 local ModifiersById = {}
@@ -42,10 +15,6 @@ for name, id in pairs(Modifiers) do
 	local M = require("sphere.models.ModifierModel." .. name)
 	ModifiersByName[name] = M
 	ModifiersById[id] = M
-end
-
-for name, id in pairs(Modifiers) do
-	Modifiers[id] = name
 end
 
 ---@param nameOrId string|number?

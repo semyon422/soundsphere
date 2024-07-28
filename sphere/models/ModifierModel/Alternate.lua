@@ -40,33 +40,18 @@ function Alternate:apply(config, chart)
 	end
 
 	---@type number[]
-	local inputAlternate = {}
+	local alt = {}
 
 	local new_notes = Notes()
-	for _, note in chart.notes:iter() do
-		local _inputType, inputIndex = InputMode:splitInput(note.column)
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		local _inputType, inputIndex = InputMode:splitInput(note:getColumn())
 		if _inputType ~= inputType then
-			new_notes:insert(note)
+			new_notes:insertLinked(note)
 		elseif _inputType and inputIndex then
-			inputAlternate[inputIndex] = inputAlternate[inputIndex] or 1
-
-			local isStartNote = note.noteType == "ShortNote" or note.noteType == "LongNoteStart"
-			if isStartNote then
-				inputAlternate[inputIndex] = math.abs(inputAlternate[inputIndex] - 1)
-			end
-
-			local newInputIndex = (inputIndex - 1) * 2 + 1 + inputAlternate[inputIndex]
-
-			local column = _inputType .. newInputIndex
-			if note.noteType == "ShortNote" then
-				note.column = column
-				new_notes:insert(note)
-			elseif note.noteType == "LongNoteStart" then
-				note.column = column
-				note.endNote.column = column
-				new_notes:insert(note)
-				new_notes:insert(note.endNote)
-			end
+			alt[inputIndex] = math.abs((alt[inputIndex] or 1) - 1)
+			local newInputIndex = (inputIndex - 1) * 2 + 1 + alt[inputIndex]
+			note:setColumn(_inputType .. newInputIndex)
+			new_notes:insertLinked(note)
 		end
 	end
 	chart.notes = new_notes

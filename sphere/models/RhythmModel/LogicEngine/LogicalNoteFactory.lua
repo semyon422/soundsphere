@@ -4,19 +4,22 @@ local LongLogicalNote = require("sphere.models.RhythmModel.LogicEngine.LongLogic
 local LogicalNoteFactory = {}
 
 local notes = {
-	ShortNote = {ShortLogicalNote, true, true, true},
-	LongNoteStart = {LongLogicalNote, true, true, true},
-	LaserNoteStart = {LongLogicalNote, true, true, true},
-	DrumrollNoteStart = {LongLogicalNote, true, true, false},
-	LineNoteStart = {ShortLogicalNote},
-	SoundNote = {ShortLogicalNote},
-	ImageNote = {ShortLogicalNote},
+	note = {ShortLogicalNote, true, true, true},
+	hold = {LongLogicalNote, true, true, true},
+	laser = {LongLogicalNote, true, true, true},
+	drumroll = {LongLogicalNote, true, true, false},
+	mine = {ShortLogicalNote},
+	shade = {ShortLogicalNote},
+	fake = {ShortLogicalNote},
+	sample = {ShortLogicalNote},
+	sprite = {ShortLogicalNote},
 }
 
----@param note ncdk2.Note
+
+---@param note ncdk2.LinkedNote
 ---@return sphere.LogicalNote?
 function LogicalNoteFactory:getNote(note)
-	local classAndData = notes[note.noteType]
+	local classAndData = notes[note:getType()]
 	if not classAndData then
 		return
 	end
