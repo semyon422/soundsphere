@@ -8,7 +8,7 @@ local IntervalLayer = require("ncdk2.layers.IntervalLayer")
 ---@operator call: sphere.PreviewDiffcalc
 local PreviewDiffcalc = IDiffcalc + {}
 
-PreviewDiffcalc.name = "enps"
+PreviewDiffcalc.name = "preview"
 PreviewDiffcalc.chartdiff_field = "notes_preview"
 
 ---@param ctx sphere.DiffcalcContext
