@@ -173,10 +173,12 @@ function GameplayController:applyAutoKeysound(chart)
 				soundNote.sounds = {}
 			end
 
-			for _, t in ipairs(note.sounds) do
-				table.insert(soundNote.sounds, t)
+			if note.sounds then
+				for _, t in ipairs(note.sounds) do
+					table.insert(soundNote.sounds, t)
+				end
+				note.sounds = {}
 			end
-			note.sounds = {}
 		end
 	end
 end
