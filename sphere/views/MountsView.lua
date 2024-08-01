@@ -208,7 +208,23 @@ function section_draw.database(self)
 		self.game.cacheModel.chartdiffsRepo:deleteModifiedChartdiffs()
 	end
 
-	-- ChartdiffsRepo:resetDiffcalcField(field)
+	if imgui.button("delete selected chartdiff", "delete selected chartdiff", inactive) then
+		local chartview = self.game.selectModel.chartview
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
+	end
+
+	if imgui.button("delete chartdiff selected", "delete chartdiff of selected chart") then
+		local chartview = self.game.selectModel.chartview
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
+	end
+
+	if imgui.button("delete all chartdiff selected", "delete all chartdiffs of selected chart") then
+		local chartview = self.game.selectModel.chartview
+		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({
+			hash = assert(chartview.hash),
+			index = assert(chartview.index),
+		})
+	end
 
 	imgui.separator()
 
