@@ -228,6 +228,7 @@ function CacheManager:computeChartdiffs()
 			print(err)
 		else
 			local chart = charts[score.index]
+			chart.layers.main:toAbsolute()
 			ModifierModel:apply(score.modifiers, chart)
 
 			local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
@@ -285,6 +286,7 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 				print(err)
 			else
 				chart = charts[chartdiff.index]
+				chart.layers.main:toAbsolute()
 				ModifierModel:apply(chartdiff.modifiers, chart)
 			end
 		end
