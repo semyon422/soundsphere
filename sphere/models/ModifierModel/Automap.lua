@@ -9,6 +9,7 @@ local AutomapOldConfig = require("sphere.models.ModifierModel.AutomapOldConfig")
 local InputMode = require("ncdk.InputMode")
 local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
 local Notes = require("ncdk2.notes.Notes")
+local Note = require("ncdk2.notes.Note")
 
 ---@class sphere.Automap: sphere.Modifier
 ---@operator call: sphere.Automap
@@ -214,11 +215,20 @@ function Automap:processReductor()
 	end
 
 	for n in pairs(tNoteDatasMap) do
-		local note = n.noteData
-		note:unlink()
-		note:setType("sample")
-		note:setColumn("auto" .. n.columnIndex)
-		chart.notes:insertLinked(note)
+		local note = n.noteData.startNote
+
+		local vp = note.visualPoint
+		local snote = chart.notes:get(vp, "auto")
+		if not snote then
+			snote = Note(vp, "auto", "sample")
+			snote.sounds = {}
+			chart.notes:insert(snote)
+		end
+		if note.sounds then
+			for _, s in ipairs(note.sounds) do
+				table.insert(snote.sounds, s)
+			end
+		end
 	end
 
 	self.chart.inputMode.key = targetMode
