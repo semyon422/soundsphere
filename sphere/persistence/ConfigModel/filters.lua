@@ -1,3 +1,5 @@
+local ChartFactory = require("notechart.ChartFactory")
+
 local function newInputModeScoreFilter(name, inputMode)
 	return {
 		name = name,
@@ -30,9 +32,16 @@ return {
 			{name = "10K", conds = {chartdiff_inputmode__startswith = "10key"}},
 		},
 		(function()
-			local filter = {name = "format"}
+			local filter = {name = "format (used parser)"}
 			for i, format in ipairs({"osu", "qua", "sm", "ksh", "bms", "mid", "ojn", "sph"}) do
 				filter[i] = {name = format, conds = {format = format}}
+			end
+			return filter
+		end)(),
+		(function()
+			local filter = {name = "extension (file name)"}
+			for i, ext in ipairs(ChartFactory.extensions) do
+				filter[i] = {name = ext, conds = {chartfile_name__endswith = "." .. ext}}
 			end
 			return filter
 		end)(),

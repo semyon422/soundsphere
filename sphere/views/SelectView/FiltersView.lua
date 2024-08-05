@@ -8,7 +8,7 @@ local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 
 
 local scrollY = 0
 
-local w, h = 768, 768
+local w, h = 1366, 768
 local _w, _h = w / 2, 55
 local r = 8
 local window_id = "FiltersView"
