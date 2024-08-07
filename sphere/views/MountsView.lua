@@ -166,7 +166,10 @@ end
 
 local formats = {"bms", "ksh", "mid", "ojn", "osu", "qua", "sph", "sm"}
 function section_draw.database(self)
-	local cacheStatus = self.game.cacheModel.cacheStatus
+	---@type sphere.CacheModel
+	local cacheModel = self.game.cacheModel
+
+	local cacheStatus = cacheModel.cacheStatus
 	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
 	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
 
@@ -180,47 +183,56 @@ function section_draw.database(self)
 	imgui.separator()
 	imgui.text("chartdiffs")
 
-	local cacheModel = self.game.cacheModel
 	if imgui.button("compute cds", "compute missing") then
 		cacheModel:computeChartdiffs()
 	end
 	if imgui.button("compute incomplete cds", "compute incomplete") then
-		cacheModel:computeIncompleteChartdiffs()
+		cacheModel:computeIncompleteChartdiffs(false)
 	end
 	if imgui.button("compute incomplete cds pp", "compute incomplete, use preview when possible") then
 		cacheModel:computeIncompleteChartdiffs(true)
 	end
 
+	imgui.separator()
 	imgui.text("reset")
 	for _, field in ipairs(self.game.difficultyModel.registry.fields) do
 		if imgui.button("reset diffcalc " .. field, field, inactive) then
-			self.game.cacheModel.chartdiffsRepo:resetDiffcalcField(field)
+			cacheModel.chartdiffsRepo:resetDiffcalcField(field)
 		end
 		just.sameline()
 	end
 	just.next()
 
+	imgui.separator()
+	imgui.text("delete")
+	if imgui.button("delete charts cache", "delete all chart-files/sets/metas/diffs", inactive) then
+		cacheModel.chartfilesRepo:deleteChartfiles()
+		cacheModel.chartfilesRepo:deleteChartfileSets()
+		cacheModel.chartmetasRepo:deleteChartmetas()
+		cacheModel.chartdiffsRepo:deleteChartdiffs()
+	end
+
 	if imgui.button("delete chartdiffs", "delete all chartdiffs", inactive) then
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs()
+		cacheModel.chartdiffsRepo:deleteChartdiffs()
 	end
 
 	if imgui.button("delete modified chartdiffs", "delete modified chartdiffs", inactive) then
-		self.game.cacheModel.chartdiffsRepo:deleteModifiedChartdiffs()
+		cacheModel.chartdiffsRepo:deleteModifiedChartdiffs()
 	end
 
 	if imgui.button("delete selected chartdiff", "delete selected chartdiff", inactive) then
 		local chartview = self.game.selectModel.chartview
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
+		cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
 	end
 
 	if imgui.button("delete chartdiff selected", "delete chartdiff of selected chart") then
 		local chartview = self.game.selectModel.chartview
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
+		cacheModel.chartdiffsRepo:deleteChartdiffs({id = assert(chartview.chartdiff_id)})
 	end
 
 	if imgui.button("delete all chartdiff selected", "delete all chartdiffs of selected chart") then
 		local chartview = self.game.selectModel.chartview
-		self.game.cacheModel.chartdiffsRepo:deleteChartdiffs({
+		cacheModel.chartdiffsRepo:deleteChartdiffs({
 			hash = assert(chartview.hash),
 			index = assert(chartview.index),
 		})
@@ -229,17 +241,17 @@ function section_draw.database(self)
 	imgui.separator()
 
 	if imgui.button("reset chartfiles", "reset chartfiles.hash", inactive) then
-		self.game.cacheModel.chartfilesRepo:resetChartfileHash()
+		cacheModel.chartfilesRepo:resetChartfileHash()
 	end
 
 	imgui.separator()
 	imgui.text("chartmetas deletion")
 	if imgui.button("delete chartmetas", "delete all chartmetas", inactive) then
-		self.game.cacheModel.chartmetasRepo:deleteChartmetas()
+		cacheModel.chartmetasRepo:deleteChartmetas()
 	end
 	for _, format in ipairs(formats) do
 		if imgui.button("delete chartmetas " .. format, format, inactive) then
-			self.game.cacheModel.chartmetasRepo:deleteChartmetas({format = format})
+			cacheModel.chartmetasRepo:deleteChartmetas({format = format})
 		end
 		just.sameline()
 	end
