@@ -69,7 +69,11 @@ function ChartPreviewModel:setChartview(chartview)
 	sph.sphLines:decode(lines)
 
 	local decoder = ChartDecoder()
-	local chart = decoder:decodeSph(sph)  -- slow
+
+	local ok, chart = pcall(decoder.decodeSph, decoder, sph)  -- slow
+	if not ok then
+		return
+	end
 
 	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
 	self.playField = noteSkin.playField
