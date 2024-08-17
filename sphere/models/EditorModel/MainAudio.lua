@@ -48,8 +48,8 @@ end
 function MainAudio:loadResources(chart)
 	local audioSettings = self.editorModel:getAudioSettings()
 	for _, note in chart.notes:iter() do
-		if note.stream then
-			self.offset = note.streamOffset or 0
+		if note.column == "audio" and note.type == "sample" then
+			self.offset = note.visualPoint.point.absoluteTime
 			local path = note.sounds[1][1]
 			local soundData = self.editorModel.resourceModel:getResource(path)
 			if soundData then

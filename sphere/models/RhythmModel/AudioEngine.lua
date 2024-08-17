@@ -52,7 +52,8 @@ function AudioEngine:playNote(note, isBackground)
 		return
 	end
 
-	self:playAudio(note.sounds, isBackground, note.stream, note:getTime())
+	local is_stream = note.column == "audio"
+	self:playAudio(note.sounds, isBackground, is_stream, note:getTime())
 end
 
 ---@param sounds table

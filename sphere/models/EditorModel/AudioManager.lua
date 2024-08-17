@@ -95,7 +95,7 @@ function AudioManager:update(force)
 			self.sources[placedSource] = true
 		end
 		placedSource.source:setRate(self.timer.rate)
-		local volume = placedSource.isStream and self.volume.music or self.volume.effects
+		local volume = self.volume.effects
 		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
 	end
 
@@ -203,7 +203,7 @@ end
 function AudioManager:loadResources(chart, audioSettings)
 	for _, note in chart.notes:iter() do
 		local offset = note:getTime()
-		if note.sounds and not note.stream then
+		if note.column ~= "audio" and note.sounds then
 			for _, s in ipairs(note.sounds) do
 				local soundData = self.resourceModel:getResource(s[1])
 				if soundData then
@@ -216,7 +216,6 @@ function AudioManager:loadResources(chart, audioSettings)
 						source = audio.newSource(soundData, mode),
 						name = s[1],
 						volume = s[2],
-						isStream = note.stream,
 					})
 					self.firstTime = math.min(self.firstTime, offset)
 					self.lastTime = math.max(self.lastTime, offset + duration)
