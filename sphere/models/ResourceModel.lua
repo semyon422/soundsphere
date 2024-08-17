@@ -154,12 +154,13 @@ function ResourceModel:load(chartPath, noteChart, callback)
 
 	if noteChartType == "bms" then
 		local newResources = {}
-		for fileType, name, sequence in noteChart.resourceList:getIterator() do
-			for _, path in ipairs(sequence) do
+		for _type, paths in noteChart.resources:iter() do
+			local name = paths[1]
+			for _, path in ipairs(paths) do
 				local filePath
-				if fileType == "sound" then
+				if _type == "sound" then
 					filePath = fileFinder:findFile(path, "audio")
-				elseif fileType == "image" then
+				elseif _type == "image" then
 					if bga_image then
 						filePath = fileFinder:findFile(path, "image")
 					end
