@@ -87,7 +87,7 @@ function FileFinder:findFile(fullFileName, _fileType)
 		return
 	end
 
-	fullFileName = fullFileName:gsub("\\", "/")
+	fullFileName = fullFileName:gsub("\\", "/"):gsub("^/", "")
 	local fileName, fileType = removeExtension(fullFileName)
 	fileType = fileType or _fileType
 
