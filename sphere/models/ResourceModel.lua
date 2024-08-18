@@ -107,17 +107,6 @@ function ResourceModel:new(configModel, fileFinder)
 	self.aliases = {}
 end
 
-local NoteChartTypes = {
-	bms = {"bms", "osu", "quaver", "ksm", "sm", "midi"},
-	o2jam = {"o2jam"},
-}
-local NoteChartTypeMap = {}
-for t, list in pairs(NoteChartTypes) do
-	for i = 1, #list do
-		NoteChartTypeMap[list[i]] = t
-	end
-end
-
 function ResourceModel:rewind()
 	for _, resource in pairs(self.all_resources.loaded) do
 		if resource.rewind then
@@ -126,13 +115,10 @@ function ResourceModel:rewind()
 	end
 end
 
----@param chartPath string
----@param noteChart ncdk2.Chart
+---@param chart ncdk2.Chart
 ---@param callback function
-function ResourceModel:load(chartPath, noteChart, callback)
+function ResourceModel:load(chart, callback)
 	local fileFinder = self.fileFinder
-
-	local noteChartType = NoteChartTypeMap[noteChart.type]
 
 	local settings = self.configModel.configs.settings
 	local sample_gain = settings.audio.sampleGain
@@ -152,33 +138,31 @@ function ResourceModel:load(chartPath, noteChart, callback)
 	end
 	self:rewind()
 
-	if noteChartType == "bms" then
-		local newResources = {}
-		for _type, paths in noteChart.resources:iter() do
-			local name = paths[1]
-			for _, path in ipairs(paths) do
-				local filePath
-				if _type == "sound" then
-					filePath = fileFinder:findFile(path, "audio")
-				elseif _type == "image" then
-					if bga_image then
-						filePath = fileFinder:findFile(path, "image")
-					end
-					if bga_video and not filePath then
-						filePath = fileFinder:findFile(path, "video")
-					end
+	local newResources = {}
+	for _type, paths in chart.resources:iter() do
+		local name = paths[1]
+		for _, path in ipairs(paths) do
+			local filePath
+			if _type == "sound" then
+				filePath = fileFinder:findFile(path, "audio")
+			elseif _type == "image" then
+				if bga_image then
+					filePath = fileFinder:findFile(path, "image")
 				end
-				if filePath then
-					table.insert(newResources, filePath)
-					self.aliases[name] = filePath
-					break
+				if bga_video and not filePath then
+					filePath = fileFinder:findFile(path, "video")
 				end
+			elseif _type == "ojm" then
+				filePath = fileFinder:findFile(path, "ojm")
+			end
+			if filePath then
+				table.insert(newResources, filePath)
+				self.aliases[name] = filePath
+				break
 			end
 		end
-		self:loadResources(loaded, newResources)
-	elseif noteChartType == "o2jam" then
-		self:loadOJM(loaded, chartPath:match("^(.+)n$") .. "m")
 	end
+	self:loadResources(loaded, newResources)
 
 	self:process()
 end
@@ -209,19 +193,6 @@ function ResourceModel:getResource(name)
 	local aliases = self.aliases
 	local resources = self.resources
 	return resources[aliases[name]]
-end
-
----@param loaded table
----@param ojmPath string
-function ResourceModel:loadOJM(loaded, ojmPath)
-	for _, path in ipairs(loaded) do
-		if not path:find(ojmPath, 1, true) then
-			self.all_resources.loaded[path]:release()
-			self.all_resources.loaded[path] = nil
-		end
-	end
-
-	self.all_resources.not_loaded = {[ojmPath] = true}
 end
 
 ---@param loaded table

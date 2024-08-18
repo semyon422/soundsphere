@@ -4,6 +4,7 @@ local FileTypes = {
 	audio = {"wav", "ogg", "mp3"},
 	image = {"png", "bmp", "jpg"},
 	video = {"mpg", "avi", "mp4", "mpeg", "wmv"},
+	ojm = {"ojm"},
 }
 
 local FileTypeMap = {}

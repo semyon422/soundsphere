@@ -102,7 +102,7 @@ function GameplayController:load()
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(chartview.location_path, chart, function()
+	self.resourceModel:load(chart, function()
 		if not self.loaded then
 			return
 		end
