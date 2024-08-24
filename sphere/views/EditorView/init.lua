@@ -14,6 +14,8 @@ local WaveformView = require("sphere.views.EditorView.WaveformView")
 local OnsetsView = require("sphere.views.EditorView.OnsetsView")
 local OnsetsDistView = require("sphere.views.EditorView.OnsetsDistView")
 
+---@class sphere.EditorView: sphere.ScreenView
+---@operator call: sphere.EditorView
 local EditorView = ScreenView + {}
 
 ---@param game sphere.GameController
@@ -22,8 +24,8 @@ function EditorView:new(game)
 	self.sequenceView = SequenceView()
 end
 
-local loading
-EditorView.load = thread.coro(function(self)
+local loading = false
+function EditorView:load()
 	if loading then
 		return
 	end
@@ -47,7 +49,8 @@ EditorView.load = thread.coro(function(self)
 	sequenceView:load()
 
 	loading = false
-end)
+end
+EditorView.load = thread.coro(EditorView.load)
 
 ---@param dt number
 function EditorView:update(dt)
