@@ -1,4 +1,5 @@
-return {
+---@class sphere.PlayConfig
+local play = {
 	const = false,
 	rate = 1,
 	modifiers = {},
@@ -18,3 +19,5 @@ return {
 		}
 	}
 }
+
+return play

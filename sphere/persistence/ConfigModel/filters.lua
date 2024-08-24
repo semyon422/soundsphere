@@ -9,7 +9,8 @@ local function newInputModeScoreFilter(name, inputMode)
 	}
 end
 
-return {
+---@class sphere.FiltersConfig
+local filters = {
 	notechart = {
 		{
 			name = "original input mode",
@@ -80,3 +81,5 @@ return {
 		newInputModeScoreFilter("10K", "10key"),
 	}
 }
+
+return filters

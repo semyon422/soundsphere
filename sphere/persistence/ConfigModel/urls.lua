@@ -1,4 +1,5 @@
-return {
+---@class sphere.UrlsConfig
+local urls = {
 	host = "",
 	update = "",
 	multiplayer = "",
@@ -9,3 +10,5 @@ return {
 		search = "",
 	},
 }
+
+return urls

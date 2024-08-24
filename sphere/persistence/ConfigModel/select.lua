@@ -1,4 +1,5 @@
-return {
+---@class sphere.SelectConfig
+local _select = {
 	collection = nil,
 	location_id = nil,
 	chartmeta_id = 1,
@@ -15,3 +16,5 @@ return {
 	sortFunction = "title",
 	selected_filters = {},
 }
+
+return _select

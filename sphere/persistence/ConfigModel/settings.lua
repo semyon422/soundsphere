@@ -1,4 +1,5 @@
-return {
+---@class sphere.SettingsConfig
+local settings = {
 	audio = {
 		adjustRate = 0.1,
 		device = {  -- use default
@@ -183,3 +184,5 @@ return {
 		chart_preview = true,
 	}
 }
+
+return settings

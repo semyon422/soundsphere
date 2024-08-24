@@ -1,8 +1,20 @@
 local class = require("class")
 local serpent = require("serpent")
 
+---@class sphere.Configs
+---@field files sphere.FilesConfig
+---@field filters sphere.FiltersConfig
+---@field input sphere.InputConfig
+---@field judgements sphere.JudgementsConfig
+---@field online sphere.OnlineConfig
+---@field play sphere.PlayConfig
+---@field select sphere.SelectConfig
+---@field settings sphere.SettingsConfig
+---@field urls sphere.UrlsConfig
+
 ---@class sphere.ConfigModel
 ---@operator call: sphere.ConfigModel
+---@field configs sphere.Configs
 local ConfigModel = class()
 
 ConfigModel.userdataPath = "userdata"
