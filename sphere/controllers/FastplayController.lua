@@ -6,6 +6,22 @@ local ModifierModel = require("sphere.models.ModifierModel")
 ---@operator call: sphere.FastplayController
 local FastplayController = class()
 
+---@param rhythmModel sphere.RhythmModel
+---@param replayModel sphere.ReplayModel
+---@param cacheModel sphere.CacheModel
+---@param playContext sphere.PlayContext
+function FastplayController:new(
+	rhythmModel,
+	replayModel,
+	cacheModel,
+	playContext
+)
+	self.rhythmModel = rhythmModel
+	self.replayModel = replayModel
+	self.cacheModel = cacheModel
+	self.playContext = playContext
+end
+
 ---@param chart ncdk2.Chart
 ---@param replay sphere.Replay
 ---@return table

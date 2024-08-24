@@ -32,19 +32,10 @@ local UserInterface = require("sphere.ui.UserInterface")
 ---@operator call: sphere.GameController
 local GameController = class()
 
-local deps = require("sphere.deps")
-
 function GameController:new()
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
 	self.ui = UserInterface(self.persistence, self)
-
-	self.selectController = SelectController()
-	self.gameplayController = GameplayController()
-	self.fastplayController = FastplayController()
-	self.resultController = ResultController()
-	self.multiplayerController = MultiplayerController()
-	self.editorController = EditorController()
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
@@ -103,18 +94,81 @@ function GameController:new()
 	self.previewModel = self.ui.previewModel
 	self.chartPreviewModel = self.ui.chartPreviewModel
 
+	self.selectController = SelectController(
+		self.selectModel,
+		self.previewModel,
+		self.modifierSelectModel,
+		self.noteSkinModel,
+		self.configModel,
+		self.backgroundModel,
+		self.multiplayerModel,
+		self.onlineModel,
+		self.cacheModel,
+		self.osudirectModel,
+		self.windowModel,
+		self.playContext,
+		self.chartPreviewModel
+	)
+	self.gameplayController = GameplayController(
+		self.rhythmModel,
+		self.selectModel,
+		self.noteSkinModel,
+		self.configModel,
+		self.difficultyModel,
+		self.replayModel,
+		self.multiplayerModel,
+		self.previewModel,
+		self.discordModel,
+		self.onlineModel,
+		self.resourceModel,
+		self.windowModel,
+		self.notificationModel,
+		self.speedModel,
+		self.cacheModel,
+		self.fileFinder,
+		self.playContext,
+		self.pauseModel,
+		self.offsetModel
+	)
+	self.fastplayController = FastplayController(
+		self.rhythmModel,
+		self.replayModel,
+		self.cacheModel,
+		self.playContext
+	)
+	self.resultController = ResultController(
+		self.selectModel,
+		self.replayModel,
+		self.rhythmModel,
+		self.onlineModel,
+		self.configModel,
+		self.fastplayController,
+		self.playContext
+	)
+	self.multiplayerController = MultiplayerController(
+		self.multiplayerModel,
+		self.configModel,
+		self.selectModel,
+		self.playContext
+	)
+	self.editorController = EditorController(
+		self.selectModel,
+		self.editorModel,
+		self.noteSkinModel,
+		self.previewModel,
+		self.configModel,
+		self.resourceModel,
+		self.windowModel,
+		self.cacheModel,
+		self.fileFinder
+	)
+
 	self.gameView = self.ui.gameView
 	self.selectView = self.ui.selectView
 	self.resultView = self.ui.resultView
 	self.gameplayView = self.ui.gameplayView
 	self.multiplayerView = self.ui.multiplayerView
 	self.editorView = self.ui.editorView
-
-	for n, list in pairs(deps) do
-		for _, m in ipairs(list) do
-			self[n][m] = self[m]
-		end
-	end
 end
 
 function GameController:load()

@@ -1,10 +1,34 @@
 local class = require("class")
 local thread = require("thread")
-local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
 local ResultController = class()
+
+---@param selectModel sphere.SelectModel
+---@param replayModel sphere.ReplayModel
+---@param rhythmModel sphere.RhythmModel
+---@param onlineModel sphere.OnlineModel
+---@param configModel sphere.ConfigModel
+---@param fastplayController sphere.FastplayController
+---@param playContext sphere.PlayContext
+function ResultController:new(
+	selectModel,
+	replayModel,
+	rhythmModel,
+	onlineModel,
+	configModel,
+	fastplayController,
+	playContext
+)
+	self.selectModel = selectModel
+	self.replayModel = replayModel
+	self.rhythmModel = rhythmModel
+	self.onlineModel = onlineModel
+	self.configModel = configModel
+	self.fastplayController = fastplayController
+	self.playContext = playContext
+end
 
 function ResultController:load()
 	self.selectModel:pullScore()

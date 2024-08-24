@@ -10,6 +10,67 @@ local Note = require("ncdk2.notes.Note")
 ---@operator call: sphere.GameplayController
 local GameplayController = class()
 
+---@param rhythmModel sphere.RhythmModel
+---@param selectModel sphere.SelectModel
+---@param noteSkinModel sphere.NoteSkinModel
+---@param configModel sphere.ConfigModel
+---@param difficultyModel sphere.DifficultyModel
+---@param replayModel sphere.ReplayModel
+---@param multiplayerModel sphere.MultiplayerModel
+---@param previewModel sphere.PreviewModel
+---@param discordModel sphere.DiscordModel
+---@param onlineModel sphere.OnlineModel
+---@param resourceModel sphere.ResourceModel
+---@param windowModel sphere.WindowModel
+---@param notificationModel sphere.NotificationModel
+---@param speedModel sphere.SpeedModel
+---@param cacheModel sphere.CacheModel
+---@param fileFinder sphere.FileFinder
+---@param playContext sphere.PlayContext
+---@param pauseModel sphere.PauseModel
+---@param offsetModel sphere.OffsetModel
+function GameplayController:new(
+	rhythmModel,
+	selectModel,
+	noteSkinModel,
+	configModel,
+	difficultyModel,
+	replayModel,
+	multiplayerModel,
+	previewModel,
+	discordModel,
+	onlineModel,
+	resourceModel,
+	windowModel,
+	notificationModel,
+	speedModel,
+	cacheModel,
+	fileFinder,
+	playContext,
+	pauseModel,
+	offsetModel
+)
+	self.rhythmModel = rhythmModel
+	self.selectModel = selectModel
+	self.noteSkinModel = noteSkinModel
+	self.configModel = configModel
+	self.difficultyModel = difficultyModel
+	self.replayModel = replayModel
+	self.multiplayerModel = multiplayerModel
+	self.previewModel = previewModel
+	self.discordModel = discordModel
+	self.onlineModel = onlineModel
+	self.resourceModel = resourceModel
+	self.windowModel = windowModel
+	self.notificationModel = notificationModel
+	self.speedModel = speedModel
+	self.cacheModel = cacheModel
+	self.fileFinder = fileFinder
+	self.playContext = playContext
+	self.pauseModel = pauseModel
+	self.offsetModel = offsetModel
+end
+
 function GameplayController:load()
 	self.loaded = true
 

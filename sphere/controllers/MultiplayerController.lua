@@ -1,10 +1,25 @@
 local class = require("class")
-local table_util = require("table_util")
 local remote = require("remote")
 
 ---@class sphere.MultiplayerController
 ---@operator call: sphere.MultiplayerController
 local MultiplayerController = class()
+
+---@param multiplayerModel sphere.MultiplayerModel
+---@param configModel sphere.ConfigModel
+---@param selectModel sphere.SelectModel
+---@param playContext sphere.PlayContext
+function MultiplayerController:new(
+	multiplayerModel,
+	configModel,
+	selectModel,
+	playContext
+)
+	self.multiplayerModel = multiplayerModel
+	self.configModel = configModel
+	self.selectModel = selectModel
+	self.playContext = playContext
+end
 
 function MultiplayerController:load()
 	local mpModel = self.multiplayerModel

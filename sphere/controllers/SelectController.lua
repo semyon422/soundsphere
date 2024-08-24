@@ -11,7 +11,47 @@ local InputMode = require("ncdk.InputMode")
 ---@operator call: sphere.SelectController
 local SelectController = class()
 
-function SelectController:new()
+---@param selectModel sphere.SelectModel
+---@param previewModel sphere.PreviewModel
+---@param modifierSelectModel sphere.ModifierSelectModel
+---@param noteSkinModel sphere.NoteSkinModel
+---@param configModel sphere.ConfigModel
+---@param backgroundModel sphere.BackgroundModel
+---@param multiplayerModel sphere.MultiplayerModel
+---@param onlineModel sphere.OnlineModel
+---@param cacheModel sphere.CacheModel
+---@param osudirectModel sphere.OsudirectModel
+---@param windowModel sphere.WindowModel
+---@param playContext sphere.PlayContext
+---@param chartPreviewModel sphere.ChartPreviewModel
+function SelectController:new(
+	selectModel,
+	previewModel,
+	modifierSelectModel,
+	noteSkinModel,
+	configModel,
+	backgroundModel,
+	multiplayerModel,
+	onlineModel,
+	cacheModel,
+	osudirectModel,
+	windowModel,
+	playContext,
+	chartPreviewModel
+)
+	self.selectModel = selectModel
+	self.previewModel = previewModel
+	self.modifierSelectModel = modifierSelectModel
+	self.noteSkinModel = noteSkinModel
+	self.configModel = configModel
+	self.backgroundModel = backgroundModel
+	self.multiplayerModel = multiplayerModel
+	self.onlineModel = onlineModel
+	self.cacheModel = cacheModel
+	self.osudirectModel = osudirectModel
+	self.windowModel = windowModel
+	self.playContext = playContext
+	self.chartPreviewModel = chartPreviewModel
 	self.state = {
 		inputMode = InputMode(),
 	}

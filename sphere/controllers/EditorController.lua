@@ -1,15 +1,44 @@
 local class = require("class")
-local path_util = require("path_util")
 local ChartEncoder = require("sph.ChartEncoder")
 local OsuChartEncoder = require("osu.ChartEncoder")
 local NanoChart = require("libchart.NanoChart")
 local zlib = require("zlib")
-local stbl = require("stbl")
 local SphPreview = require("sph.SphPreview")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
 local EditorController = class()
+
+---@param selectModel sphere.SelectModel
+---@param editorModel sphere.EditorModel
+---@param noteSkinModel sphere.NoteSkinModel
+---@param previewModel sphere.PreviewModel
+---@param configModel sphere.ConfigModel
+---@param resourceModel sphere.ResourceModel
+---@param windowModel sphere.WindowModel
+---@param cacheModel sphere.CacheModel
+---@param fileFinder sphere.FileFinder
+function EditorController:new(
+	selectModel,
+	editorModel,
+	noteSkinModel,
+	previewModel,
+	configModel,
+	resourceModel,
+	windowModel,
+	cacheModel,
+	fileFinder
+)
+	self.selectModel = selectModel
+	self.editorModel = editorModel
+	self.noteSkinModel = noteSkinModel
+	self.previewModel = previewModel
+	self.configModel = configModel
+	self.resourceModel = resourceModel
+	self.windowModel = windowModel
+	self.cacheModel = cacheModel
+	self.fileFinder = fileFinder
+end
 
 function EditorController:load()
 	local selectModel = self.selectModel
