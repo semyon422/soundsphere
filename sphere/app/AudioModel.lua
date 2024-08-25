@@ -2,6 +2,7 @@ local class = require("class")
 local audio = require("audio")
 
 ---@class sphere.AudioModel
+---@operator call: sphere.AudioModel
 local AudioModel = class()
 
 ---@param device table
