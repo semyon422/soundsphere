@@ -130,18 +130,21 @@ function love.run()
 end
 
 if arg[2] == "test" then
-	local testing = require("testing")
+	local Testing = require("testing.Testing")
+	local BaseTestingIO = require("testing.BaseTestingIO")
 
-	testing.blacklist = {
+	local tio = BaseTestingIO()
+	tio.blacklist = {
 		".git",
 		"3rd-deps",
 		"tree",
 		"userdata",
 	}
 
-	testing.get_time = love.timer.getTime
+	local testing = Testing(tio)
 
-	testing.test(arg[3], arg[4])
+	local file_pattern, method_pattern = arg[3], arg[4]
+	testing:test(file_pattern, method_pattern)
 
 	if luacov_runner then
 		debug.sethook(nil)
