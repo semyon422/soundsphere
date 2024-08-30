@@ -261,7 +261,7 @@ function OsuNoteSkin:load()
 		if not images[lhead[i]] then
 			lhead[i] = shead[i]
 		end
-		if not images[ltail[i]] then
+		if not images[ltail[i]] and not mania[ltail[i]] then
 			ltail[i] = lhead[i]
 		end
 
