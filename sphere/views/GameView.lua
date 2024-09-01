@@ -47,18 +47,11 @@ function GameView:setView(view)
 	end)
 end
 
-function GameView:switchTheme()
-	local ui_model = self.game.uiModel
-	self.fadeTransition:transit(function()
-		self.fadeTransition:transitAsync(1, 0)
-		ui_model:switchTheme()
-	end)
-end
-
 function GameView:unload()
 	if not self.view then
 		return
 	end
+
 	self.view:unload()
 	self.view = nil
 end

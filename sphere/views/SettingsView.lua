@@ -243,7 +243,7 @@ function drawSection:graphics()
 	local previous_theme = g.userInterface
 	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, nil, "UI theme")
 	if g.userInterface ~= previous_theme then
-		self.game.ui.gameView:switchTheme()
+		ui_model:switchTheme()
 	end
 
 	imgui.separator()
