@@ -239,7 +239,12 @@ function drawSection:graphics()
 	g.mode.window = imgui.combo("mode.window", g.mode.window, self.modes, formatMode, "start window resolution")
 
 	g.cursor = imgui.combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
+
+	local previous_theme = g.userInterface
 	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, nil, "UI theme")
+	if g.userInterface ~= previous_theme then
+		self.game.ui.gameView:switchTheme()
+	end
 
 	imgui.separator()
 	just.indent(10)

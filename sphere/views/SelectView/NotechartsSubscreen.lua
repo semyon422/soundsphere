@@ -435,7 +435,7 @@ local function NotechartsSubscreen(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local gameView = self.game.gameView
+	local gameView = self.game.ui.gameView
 	just.row(true)
 	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
 		gameView:setModal(require("sphere.views.SettingsView"))

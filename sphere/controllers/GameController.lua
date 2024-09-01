@@ -196,8 +196,7 @@ function GameController:load()
 	self.backgroundModel:load()
 	self.previewModel:load()
 	self.uiModel:load()
-	self.ui = self.uiModel:getActiveTheme()
-	self.gameView = self.ui.gameView
+	self.ui = self.uiModel.activeUI
 end
 
 function GameController:unload()
