@@ -89,6 +89,10 @@ function UserInterfaceModel:setTheme(ui_name)
 		return
 	end
 
+	if metadata.configFileName then
+		self.persistence:openAndReadThemeConfig(metadata.configFileName, metadata.directory)
+	end
+
 	self.loadedThemes[metadata.name] = ui(self.persistence, self.game)
 	self.activeUI = self.loadedThemes[metadata.name]
 	self.activeUI:load()
