@@ -222,6 +222,8 @@ function drawSection:graphics()
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
+	local ui_model = self.game.uiModel
+
 	g.fps = imgui.intButtons("fps", g.fps, 2, "FPS limit")
 
 	local flags = g.mode.flags
@@ -237,6 +239,7 @@ function drawSection:graphics()
 	g.mode.window = imgui.combo("mode.window", g.mode.window, self.modes, formatMode, "start window resolution")
 
 	g.cursor = imgui.combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
+	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, nil, "UI theme")
 
 	imgui.separator()
 	just.indent(10)
