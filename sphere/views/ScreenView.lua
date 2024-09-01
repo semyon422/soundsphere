@@ -11,7 +11,7 @@ end
 ---@param screenName string
 function ScreenView:changeScreen(screenName)
 	self:beginUnload()
-	self.gameView:setView(self.game[screenName])
+	self.gameView:setView(self.game.ui[screenName])
 end
 
 function ScreenView:load() end

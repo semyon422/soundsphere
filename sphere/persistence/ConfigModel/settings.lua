@@ -143,7 +143,8 @@ local settings = {
 			yaw = 0,
 			z = -0.71407400337105997
 		},
-		vsyncOnSelect = true
+		vsyncOnSelect = true,
+		userInterface = "Default",
 	},
 	input = {
 		pause = "escape",

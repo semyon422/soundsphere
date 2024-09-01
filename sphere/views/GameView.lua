@@ -11,8 +11,10 @@ local ContextMenuImView = require("sphere.imviews.ContextMenuImView")
 local GameView = class()
 
 ---@param game sphere.GameController
-function GameView:new(game)
+---@param ui sphere.UserInterface
+function GameView:new(game, ui)
 	self.game = game
+	self.ui = ui
 	self.fadeTransition = FadeTransition()
 	self.frameTimeView = FrameTimeView()
 end
@@ -22,7 +24,7 @@ function GameView:load()
 
 	self.frameTimeView:load()
 
-	self:setView(self.game.selectView)
+	self:setView(self.ui.selectView)
 end
 
 ---@param view sphere.ScreenView
