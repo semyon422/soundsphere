@@ -1,5 +1,5 @@
 local just = require("just")
-local logo = require("sphere.views.logo")
+local logo = require("ui.views.logo")
 
 return function(id, size, scale)
 	local mx, my = love.graphics.inverseTransformPoint(love.mouse.getPosition())
