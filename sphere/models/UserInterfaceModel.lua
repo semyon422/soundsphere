@@ -1,7 +1,7 @@
 local class = require("class")
 local physfs = require("physfs")
 
-local DefaultUserInterface = require("sphere.ui.UserInterface")
+local DefaultUserInterface = require("ui")
 
 ---@class sphere.UserInterfaceMetadata
 ---@field name string
