@@ -1,13 +1,13 @@
-local ScreenView = require("sphere.views.ScreenView")
+local ScreenView = require("ui.views.ScreenView")
 local thread = require("thread")
 local just = require("just")
 local table_util = require("table_util")
 
-local Layout = require("sphere.views.ResultView.Layout")
-local ResultViewConfig = require("sphere.views.ResultView.ResultViewConfig")
+local Layout = require("ui.views.ResultView.Layout")
+local ResultViewConfig = require("ui.views.ResultView.ResultViewConfig")
 
----@class sphere.ResultView: sphere.ScreenView
----@operator call: sphere.ResultView
+---@class ui.ResultView: ui.ScreenView
+---@operator call: ui.ResultView
 local ResultView = ScreenView + {}
 
 local loading

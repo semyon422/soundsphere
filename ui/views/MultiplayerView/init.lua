@@ -1,11 +1,11 @@
-local ScreenView = require("sphere.views.ScreenView")
+local ScreenView = require("ui.views.ScreenView")
 local just = require("just")
 
-local Layout = require("sphere.views.MultiplayerView.Layout")
-local MultiplayerViewConfig = require("sphere.views.MultiplayerView.MultiplayerViewConfig")
+local Layout = require("ui.views.MultiplayerView.Layout")
+local MultiplayerViewConfig = require("ui.views.MultiplayerView.MultiplayerViewConfig")
 
----@class sphere.MultiplayerView: sphere.ScreenView
----@operator call: sphere.MultiplayerView
+---@class ui.MultiplayerView: ui.ScreenView
+---@operator call: ui.MultiplayerView
 local MultiplayerView = ScreenView + {}
 
 function MultiplayerView:load()

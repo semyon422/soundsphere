@@ -4,7 +4,7 @@ local imgui = require("imgui")
 local Fraction = require("ncdk.Fraction")
 local gfx_util = require("gfx_util")
 
-local Layout = require("sphere.views.EditorView.Layout")
+local Layout = require("ui.views.EditorView.Layout")
 
 local tabs = {}
 

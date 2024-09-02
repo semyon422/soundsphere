@@ -14,7 +14,7 @@ local ModifierIconGridView = require("ui.views.SelectView.ModifierIconGridView")
 local BarCellImView = require("ui.imviews.BarCellImView")
 local TextCellImView = require("ui.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local RoundedRectangle = require("sphere.views.RoundedRectangle")
+local RoundedRectangle = require("ui.views.RoundedRectangle")
 
 local Layout = require("ui.views.SelectView.Layout")
 local SelectFrame = require("ui.views.SelectView.SelectFrame")
@@ -317,9 +317,8 @@ local function NotechartFilterDropdown(self)
 	h = 60
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local gameView = self.game.gameView
 	if imgui.TextButton("open filters", "filters", w * size, h) then
-		gameView:setModal(require("ui.views.SelectView.FiltersView"))
+		self.gameView:setModal(require("ui.views.SelectView.FiltersView"))
 	end
 end
 

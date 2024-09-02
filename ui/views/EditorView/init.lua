@@ -1,21 +1,21 @@
-local ScreenView = require("sphere.views.ScreenView")
+local ScreenView = require("ui.views.ScreenView")
 local thread = require("thread")
 local just = require("just")
 local gfx_util = require("gfx_util")
 
-local Layout = require("sphere.views.EditorView.Layout")
-local EditorViewConfig = require("sphere.views.EditorView.EditorViewConfig")
-local EditorViewOverlay = require("sphere.views.EditorView.EditorViewOverlay")
-local SnapGridView = require("sphere.views.EditorView.SnapGridView")
+local Layout = require("ui.views.EditorView.Layout")
+local EditorViewConfig = require("ui.views.EditorView.EditorViewConfig")
+local EditorViewOverlay = require("ui.views.EditorView.EditorViewOverlay")
+local SnapGridView = require("ui.views.EditorView.SnapGridView")
 local SequenceView = require("sphere.views.SequenceView")
-local Footer = require("sphere.views.EditorView.Footer")
-local Foreground = require("sphere.views.EditorView.Foreground")
-local WaveformView = require("sphere.views.EditorView.WaveformView")
-local OnsetsView = require("sphere.views.EditorView.OnsetsView")
-local OnsetsDistView = require("sphere.views.EditorView.OnsetsDistView")
+local Footer = require("ui.views.EditorView.Footer")
+local Foreground = require("ui.views.EditorView.Foreground")
+local WaveformView = require("ui.views.EditorView.WaveformView")
+local OnsetsView = require("ui.views.EditorView.OnsetsView")
+local OnsetsDistView = require("ui.views.EditorView.OnsetsDistView")
 
----@class sphere.EditorView: sphere.ScreenView
----@operator call: sphere.EditorView
+---@class ui.EditorView: ui.ScreenView
+---@operator call: ui.EditorView
 local EditorView = ScreenView + {}
 
 ---@param game sphere.GameController

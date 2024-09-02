@@ -7,7 +7,7 @@ local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
-local UserInfoView = require("sphere.views.UserInfoView")
+local UserInfoView = require("ui.views.UserInfoView")
 local LogoImView = require("ui.imviews.LogoImView")
 
 local Layout = require("ui.views.SelectView.Layout")

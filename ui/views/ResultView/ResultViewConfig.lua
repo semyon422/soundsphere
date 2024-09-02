@@ -7,14 +7,15 @@ local BackgroundView = require("sphere.views.BackgroundView")
 local GaussianBlurView = require("sphere.views.GaussianBlurView")
 
 local PointGraphView = require("sphere.views.GameplayView.PointGraphView")
-local ScoreListView = require("sphere.views.ResultView.ScoreListView")
-local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
+local ScoreListView = require("ui.views.ResultView.ScoreListView")
+local ModifierIconGridView = require("ui.views.SelectView.ModifierIconGridView")
 local MatchPlayersView = require("sphere.views.GameplayView.MatchPlayersView")
-local TextCellImView = require("sphere.imviews.TextCellImView")
+local TextCellImView = require("ui.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
-local RoundedRectangle = require("sphere.views.RoundedRectangle")
+local RoundedRectangle = require("ui.views.RoundedRectangle")
 
 local time_util = require("time_util")
+local Layout = require("ui.views.ResultView.Layout")
 
 ---@param self table
 ---@return boolean
@@ -27,7 +28,6 @@ local function showLoadedScore(self)
 	return scoreItem.id == scoreEntry.id
 end
 
-local Layout = require("sphere.views.ResultView.Layout")
 
 ---@param w number
 ---@param h number

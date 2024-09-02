@@ -7,10 +7,10 @@ local ChartPreviewModel = require("ui.models.ChartPreviewModel")
 
 local GameView = require("ui.views.GameView")
 local SelectView = require("ui.views.SelectView")
---local ResultView = require("ui.views.ResultView")
---local GameplayView = require("ui.views.GameplayView")
---local MultiplayerView = require("ui.views.MultiplayerView")
---local EditorView = require("ui.views.EditorView")
+local ResultView = require("ui.views.ResultView")
+local GameplayView = require("ui.views.GameplayView")
+local MultiplayerView = require("ui.views.MultiplayerView")
+local EditorView = require("ui.views.EditorView")
 
 ---@class ui.UserInterface : sphere.IUserInterface
 ---@operator call: ui.UserInterface
@@ -27,10 +27,10 @@ function UserInterface:new(persistence, game)
 
 	self.gameView = GameView(game, self)
 	self.selectView = SelectView(game)
-	--self.resultView = ResultView(game)
-	--self.gameplayView = GameplayView(game)
-	--self.multiplayerView = MultiplayerView(game)
-	--self.editorView = EditorView(game)
+	self.resultView = ResultView(game)
+	self.gameplayView = GameplayView(game)
+	self.multiplayerView = MultiplayerView(game)
+	self.editorView = EditorView(game)
 end
 
 function UserInterface:load()

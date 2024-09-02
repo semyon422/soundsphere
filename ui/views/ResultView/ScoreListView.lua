@@ -1,6 +1,6 @@
 local ListView = require("sphere.views.ListView")
 local just = require("just")
-local TextCellImView = require("sphere.imviews.TextCellImView")
+local TextCellImView = require("ui.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
 local time_util = require("time_util")
 

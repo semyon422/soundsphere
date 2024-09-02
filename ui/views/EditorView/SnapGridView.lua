@@ -6,7 +6,7 @@ local just = require("just")
 local Fraction = require("ncdk.Fraction")
 local imgui = require("imgui")
 
-local Layout = require("sphere.views.EditorView.Layout")
+local Layout = require("ui.views.EditorView.Layout")
 
 local SnapGridView = class()
 

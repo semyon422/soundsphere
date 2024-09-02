@@ -5,19 +5,19 @@ local gfx_util = require("gfx_util")
 local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
-local UserInfoView = require("sphere.views.UserInfoView")
-local LogoImView = require("sphere.imviews.LogoImView")
-local RoomUsersListView = require("sphere.views.MultiplayerView.RoomUsersListView")
+local UserInfoView = require("ui.views.UserInfoView")
+local LogoImView = require("ui.imviews.LogoImView")
+local RoomUsersListView = require("ui.views.MultiplayerView.RoomUsersListView")
 
-local ModifierIconGridView = require("sphere.views.SelectView.ModifierIconGridView")
-local TextCellImView = require("sphere.imviews.TextCellImView")
-local BarCellImView = require("sphere.imviews.BarCellImView")
-local RoundedRectangle = require("sphere.views.RoundedRectangle")
+local ModifierIconGridView = require("ui.views.SelectView.ModifierIconGridView")
+local TextCellImView = require("ui.imviews.TextCellImView")
+local BarCellImView = require("ui.imviews.BarCellImView")
+local RoundedRectangle = require("ui.views.RoundedRectangle")
 local Format = require("sphere.views.Format")
 
 local time_util = require("time_util")
 
-local Layout = require("sphere.views.MultiplayerView.Layout")
+local Layout = require("ui.views.MultiplayerView.Layout")
 
 ---@param w number
 ---@param h number

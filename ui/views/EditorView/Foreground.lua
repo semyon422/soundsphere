@@ -2,7 +2,7 @@ local just = require("just")
 local gfx_util = require("gfx_util")
 local spherefonts = require("sphere.assets.fonts")
 
-local Layout = require("sphere.views.EditorView.Layout")
+local Layout = require("ui.views.EditorView.Layout")
 
 ---@param self table
 local function Hotkeys(self)

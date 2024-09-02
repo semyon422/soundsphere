@@ -3,9 +3,9 @@ local just = require("just")
 local time_util = require("time_util")
 local imgui = require("imgui")
 
-local ChartSlider = require("sphere.views.EditorView.ChartSlider")
+local ChartSlider = require("ui.views.EditorView.ChartSlider")
 
-local Layout = require("sphere.views.EditorView.Layout")
+local Layout = require("ui.views.EditorView.Layout")
 
 return function(self)
 	local editorModel = self.game.editorModel

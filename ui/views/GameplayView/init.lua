@@ -1,13 +1,13 @@
-local Layout = require("sphere.views.GameplayView.Layout")
-local Background = require("sphere.views.GameplayView.Background")
-local Foreground = require("sphere.views.GameplayView.Foreground")
-local PauseSubscreen = require("sphere.views.GameplayView.PauseSubscreen")
-local ScreenView = require("sphere.views.ScreenView")
+local Layout = require("ui.views.GameplayView.Layout")
+local Background = require("ui.views.GameplayView.Background")
+local Foreground = require("ui.views.GameplayView.Foreground")
+local PauseSubscreen = require("ui.views.GameplayView.PauseSubscreen")
+local ScreenView = require("ui.views.ScreenView")
 local SequenceView = require("sphere.views.SequenceView")
 local just = require("just")
 
----@class sphere.GameplayView: sphere.ScreenView
----@operator call: sphere.GameplayView
+---@class ui.GameplayView: ui.ScreenView
+---@operator call: ui.GameplayView
 local GameplayView = ScreenView + {}
 
 ---@param game sphere.GameController

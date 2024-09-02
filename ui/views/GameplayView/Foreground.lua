@@ -1,4 +1,4 @@
-local Layout = require("sphere.views.GameplayView.Layout")
+local Layout = require("ui.views.GameplayView.Layout")
 local gfx_util = require("gfx_util")
 local just = require("just")
 local spherefonts = require("sphere.assets.fonts")

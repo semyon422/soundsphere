@@ -3,7 +3,7 @@ local spherefonts = require("sphere.assets.fonts")
 local OsudirectListView = require("ui.views.SelectView.OsudirectListView")
 local OsudirectDifficultiesListView = require("ui.views.SelectView.OsudirectDifficultiesListView")
 local OsudirectProcessingListView = require("ui.views.SelectView.OsudirectProcessingListView")
-local RoundedRectangle = require("sphere.views.RoundedRectangle")
+local RoundedRectangle = require("ui.views.RoundedRectangle")
 local imgui = require("imgui")
 
 local Layout = require("ui.views.SelectView.Layout")
