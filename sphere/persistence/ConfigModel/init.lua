@@ -54,7 +54,12 @@ function ConfigModel:_read(name, default_path)
 	local config = configs[name]
 
 	local path = self.userdataPath .. "/" .. name .. ".lua"
-	default_path = default_path or self.configModelPath .. "/" .. name .. ".lua"
+
+	if default_path then
+		default_path = default_path .. "/" .. name .. ".lua"
+	else
+		default_path = self.configModelPath .. "/" .. name .. ".lua"
+	end
 
 	copyTable(self:readFile(default_path), config)
 
@@ -71,6 +76,7 @@ end
 function ConfigModel:read(specific_name, default_path)
 	if specific_name then
 		self:_read(specific_name, default_path)
+		return
 	end
 
 	for name in pairs(self.openedConfigs) do
