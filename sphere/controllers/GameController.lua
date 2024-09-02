@@ -28,11 +28,6 @@ local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")
 local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 
-local BackgroundModel = require("sphere.ui.BackgroundModel")
-local NotificationModel = require("sphere.ui.NotificationModel")
-local PreviewModel = require("sphere.ui.PreviewModel")
-local ChartPreviewModel = require("sphere.ui.ChartPreviewModel")
-
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
@@ -94,25 +89,18 @@ function GameController:new()
 	self.discordModel = self.app.discordModel
 	self.windowModel = self.app.windowModel
 
-	self.backgroundModel = BackgroundModel()
-	self.notificationModel = NotificationModel()
-	self.previewModel = PreviewModel(self.persistence.configModel)
-	self.chartPreviewModel = ChartPreviewModel(self.persistence.configModel, self.previewModel, self)
-
 	self.selectController = SelectController(
 		self.selectModel,
-		self.previewModel,
 		self.modifierSelectModel,
 		self.noteSkinModel,
 		self.configModel,
-		self.backgroundModel,
 		self.multiplayerModel,
 		self.onlineModel,
 		self.cacheModel,
 		self.osudirectModel,
 		self.windowModel,
 		self.playContext,
-		self.chartPreviewModel
+		self.uiModel
 	)
 	self.gameplayController = GameplayController(
 		self.rhythmModel,
@@ -122,18 +110,17 @@ function GameController:new()
 		self.difficultyModel,
 		self.replayModel,
 		self.multiplayerModel,
-		self.previewModel,
 		self.discordModel,
 		self.onlineModel,
 		self.resourceModel,
 		self.windowModel,
-		self.notificationModel,
 		self.speedModel,
 		self.cacheModel,
 		self.fileFinder,
 		self.playContext,
 		self.pauseModel,
-		self.offsetModel
+		self.offsetModel,
+		self.uiModel
 	)
 	self.fastplayController = FastplayController(
 		self.rhythmModel,
@@ -160,12 +147,12 @@ function GameController:new()
 		self.selectModel,
 		self.editorModel,
 		self.noteSkinModel,
-		self.previewModel,
 		self.configModel,
 		self.resourceModel,
 		self.windowModel,
 		self.cacheModel,
-		self.fileFinder
+		self.fileFinder,
+		self.uiModel
 	)
 end
 
@@ -193,8 +180,6 @@ function GameController:load()
 	self.onlineModel.authManager:checkSession()
 	self.multiplayerModel:connect()
 
-	self.backgroundModel:load()
-	self.previewModel:load()
 	self.uiModel:load()
 	self.ui = self.uiModel.activeUI
 end
@@ -216,9 +201,6 @@ function GameController:update(dt)
 
 	self.cacheModel:update()
 
-	self.notificationModel:update()
-	self.backgroundModel:update()
-	self.chartPreviewModel:update()
 	self.ui:update(dt)
 end
 

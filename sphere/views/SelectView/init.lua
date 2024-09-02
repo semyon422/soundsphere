@@ -18,7 +18,7 @@ SelectView.searchMode = "filter"
 
 function SelectView:load()
 	self.game.selectController:load()
-	self.chartPreviewView = ChartPreviewView(self.game)
+	self.chartPreviewView = ChartPreviewView(self.game, self.ui)
 	self.chartPreviewView:load()
 end
 

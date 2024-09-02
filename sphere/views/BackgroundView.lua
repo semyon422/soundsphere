@@ -16,7 +16,7 @@ function BackgroundView:draw(w, h, dim, parallax)
 		return
 	end
 
-	local backgroundModel = self.game.backgroundModel
+	local backgroundModel = self.ui.backgroundModel
 
 	local images = backgroundModel.images
 	local alpha = backgroundModel.alpha

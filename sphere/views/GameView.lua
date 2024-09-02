@@ -39,6 +39,7 @@ end
 
 ---@param view sphere.ScreenView
 function GameView:setView(view)
+	view.ui = self.ui
 	view.gameView = self
 	self.fadeTransition:transit(function()
 		self.fadeTransition:transitAsync(1, 0)

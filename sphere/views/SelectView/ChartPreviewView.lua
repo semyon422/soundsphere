@@ -7,19 +7,21 @@ local ChartPreviewRhythmView = require("sphere.views.SelectView.ChartPreviewRhyt
 local ChartPreviewView = class()
 
 ---@param game sphere.GameController
-function ChartPreviewView:new(game)
+---@param ui sphere.UserInterface
+function ChartPreviewView:new(game, ui)
 	self.game = game
+	self.ui = ui
 	self.sequenceView = SequenceView()
 	self.sequenceView:setSequenceConfig({})
 end
 
 function ChartPreviewView:load()
-	local noteSkin = self.game.chartPreviewModel.noteSkin
+	local noteSkin = self.ui.chartPreviewModel.noteSkin
 	if not noteSkin then
 		return
 	end
 
-	local playfield = self.game.chartPreviewModel.playField
+	local playfield = self.ui.chartPreviewModel.playField
 	local transform = playfield:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
@@ -31,6 +33,7 @@ function ChartPreviewView:load()
 		ChartPreviewRhythmView({
 			transform = transform,
 			subscreen = "preview",
+			chartPreviewModel = self.ui.chartPreviewModel
 		}),
 	})
 	sequenceView:load()

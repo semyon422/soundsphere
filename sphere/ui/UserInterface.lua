@@ -19,6 +19,11 @@ local UserInterface = IUserInterface + {}
 ---@param persistence sphere.Persistence
 ---@param game sphere.GameController
 function UserInterface:new(persistence, game)
+	self.backgroundModel = BackgroundModel()
+	self.notificationModel = NotificationModel()
+	self.previewModel = PreviewModel(persistence.configModel)
+	self.chartPreviewModel = ChartPreviewModel(persistence.configModel, self.previewModel, game)
+
 	self.gameView = GameView(game, self)
 	self.selectView = SelectView(game)
 	self.resultView = ResultView(game)
@@ -28,15 +33,20 @@ function UserInterface:new(persistence, game)
 end
 
 function UserInterface:load()
+	self.backgroundModel:load()
+	self.previewModel:load()
 	self.gameView:load()
 end
 
 function UserInterface:unload()
+	self.previewModel:stop()
 	self.gameView:unload()
 end
 
 ---@param dt number
 function UserInterface:update(dt)
+	self.backgroundModel:update()
+	self.chartPreviewModel:update()
 	self.gameView:update(dt)
 end
 

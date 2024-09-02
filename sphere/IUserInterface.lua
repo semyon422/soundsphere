@@ -2,6 +2,10 @@ local class = require("class")
 
 ---@class sphere.IUserInterface
 ---@operator call: sphere.IUserInterface
+---@field previewModel sphere.PreviewModel
+---@field backgroundModel sphere.BackgroundModel
+---@field chartPreviewModel sphere.ChartPreviewModel
+---@field notificationModel sphere.NotificationModel
 local IUserInterface = class()
 
 function IUserInterface:load() end

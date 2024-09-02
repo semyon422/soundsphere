@@ -12,35 +12,37 @@ local EditorController = class()
 ---@param selectModel sphere.SelectModel
 ---@param editorModel sphere.EditorModel
 ---@param noteSkinModel sphere.NoteSkinModel
----@param previewModel sphere.PreviewModel
 ---@param configModel sphere.ConfigModel
 ---@param resourceModel sphere.ResourceModel
 ---@param windowModel sphere.WindowModel
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
+---@param uiModel sphere.UserInterfaceModel
 function EditorController:new(
 	selectModel,
 	editorModel,
 	noteSkinModel,
-	previewModel,
 	configModel,
 	resourceModel,
 	windowModel,
 	cacheModel,
-	fileFinder
+	fileFinder,
+	uiModel
 )
 	self.selectModel = selectModel
 	self.editorModel = editorModel
 	self.noteSkinModel = noteSkinModel
-	self.previewModel = previewModel
 	self.configModel = configModel
 	self.resourceModel = resourceModel
 	self.windowModel = windowModel
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
+	self.uiModel = uiModel
 end
 
 function EditorController:load()
+	self.previewModel = self.uiModel.activeUI.previewModel
+
 	local selectModel = self.selectModel
 	local editorModel = self.editorModel
 	local configModel = self.configModel

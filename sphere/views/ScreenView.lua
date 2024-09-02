@@ -1,6 +1,10 @@
 local class = require("class")
 
 ---@class sphere.ScreenView
+---@operator call: sphere.ScreenView
+---@field ui sphere.UserInterface
+---@field gameView sphere.GameView
+---@field prevView sphere.ScreenView
 local ScreenView = class()
 
 ---@param game sphere.GameController
