@@ -9,7 +9,7 @@ local function Background(self)
 
 	local graphics = self.game.configModel.configs.settings.graphics
 	local dim = graphics.dim.select
-	BackgroundView.ui = self.ui
+	BackgroundView.game = self.game
 
 	GaussianBlurView:draw(graphics.blur.select)
 	BackgroundView:draw(w, h, dim, 0.01)

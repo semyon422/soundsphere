@@ -17,7 +17,7 @@ local EditorController = class()
 ---@param windowModel sphere.WindowModel
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
----@param uiModel sphere.UserInterfaceModel
+---@param previewModel sphere.PreviewModel
 function EditorController:new(
 	selectModel,
 	editorModel,
@@ -27,7 +27,7 @@ function EditorController:new(
 	windowModel,
 	cacheModel,
 	fileFinder,
-	uiModel
+	previewModel
 )
 	self.selectModel = selectModel
 	self.editorModel = editorModel
@@ -37,11 +37,10 @@ function EditorController:new(
 	self.windowModel = windowModel
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
-	self.uiModel = uiModel
+	self.previewModel = previewModel
 end
 
 function EditorController:load()
-	self.previewModel = self.uiModel.activeUI.previewModel
 
 	local selectModel = self.selectModel
 	local editorModel = self.editorModel

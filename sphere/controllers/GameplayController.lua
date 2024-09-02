@@ -27,7 +27,8 @@ local GameplayController = class()
 ---@param playContext sphere.PlayContext
 ---@param pauseModel sphere.PauseModel
 ---@param offsetModel sphere.OffsetModel
----@param uiModel sphere.UserInterfaceModel
+---@param previewModel sphere.PreviewModel
+---@param notificationModel sphere.NotificationModel
 function GameplayController:new(
 	rhythmModel,
 	selectModel,
@@ -46,7 +47,8 @@ function GameplayController:new(
 	playContext,
 	pauseModel,
 	offsetModel,
-	uiModel
+	previewModel,
+	notificationModel
 )
 	self.rhythmModel = rhythmModel
 	self.selectModel = selectModel
@@ -65,15 +67,12 @@ function GameplayController:new(
 	self.playContext = playContext
 	self.pauseModel = pauseModel
 	self.offsetModel = offsetModel
-	self.uiModel = uiModel
+	self.previewModel = previewModel
+	self.notificationModel = notificationModel
 end
 
 function GameplayController:load()
 	self.loaded = true
-
-	local ui = self.uiModel.activeUI
-	self.previewModel = ui.previewModel
-	self.notificationModel = ui.notificationModel
 
 	local rhythmModel = self.rhythmModel
 	local selectModel = self.selectModel

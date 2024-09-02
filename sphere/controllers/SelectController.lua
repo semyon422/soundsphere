@@ -21,7 +21,9 @@ local SelectController = class()
 ---@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
 ---@param playContext sphere.PlayContext
----@param uiModel sphere.UserInterfaceModel
+---@param backgroundModel sphere.BackgroundModel
+---@param previewModel sphere.PreviewModel
+---@param chartPreviewModel sphere.ChartPreviewModel
 function SelectController:new(
 	selectModel,
 	modifierSelectModel,
@@ -33,7 +35,9 @@ function SelectController:new(
 	osudirectModel,
 	windowModel,
 	playContext,
-	uiModel
+	backgroundModel,
+	previewModel,
+	chartPreviewModel
 )
 	self.selectModel = selectModel
 	self.modifierSelectModel = modifierSelectModel
@@ -45,17 +49,15 @@ function SelectController:new(
 	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
 	self.playContext = playContext
-	self.uiModel = uiModel
+	self.backgroundModel = backgroundModel
+	self.previewModel = previewModel
+	self.chartPreviewModel = chartPreviewModel
 	self.state = {
 		inputMode = InputMode(),
 	}
 end
 
 function SelectController:load()
-	local ui = self.uiModel.activeUI
-	self.previewModel = ui.previewModel
-	self.backgroundModel = ui.backgroundModel
-	self.chartPreviewModel = ui.chartPreviewModel
 	local selectModel = self.selectModel
 
 	self.configModel:write()

@@ -23,7 +23,7 @@ local function Notification(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	gfx_util.printFrame(self.ui.notificationModel.message, 0, 0, w, h, "center", "center")
+	gfx_util.printFrame(self.game.notificationModel.message, 0, 0, w, h, "center", "center")
 end
 
 ---@param t number
