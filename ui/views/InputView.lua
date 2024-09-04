@@ -72,7 +72,7 @@ return ModalImView(function(self, quit)
 			end
 			just.sameline()
 			if _device and just.mouse_over(hotkey_id, false, "mouse") then
-				self.game.gameView.tooltip = ("%s (%s)"):format(_device, _device_id)
+				self.tooltip = ("%s (%s)"):format(_device, _device_id)
 			end
 		end
 		just.next()

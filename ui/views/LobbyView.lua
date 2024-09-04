@@ -122,7 +122,7 @@ function section_draw.rooms(self, inner_w)
 		end
 	else
 		close = true
-		self.game.gameView.view:changeScreen("multiplayerView")
+		self.game.ui.gameView.view:changeScreen("multiplayerView")
 	end
 	return close
 end

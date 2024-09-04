@@ -86,7 +86,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	local s = tostring(self)
 	if just.button(s .. i .. "button", just.is_over(w, -h)) then
 		local width = 200
-		self.game.gameView:setContextMenu(function()
+		self.gameView:setContextMenu(function()
 			local close = false
 			just.indent(10)
 			just.text(user.name)

@@ -70,7 +70,7 @@ function ScoreListView:drawItemOnline(i, w, h)
 	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", item.user.name)
 	-- TextCellImView(w * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", Format.inputMode(item.inputmode))
 	if just.mouse_over(i .. "b", just.is_over(-w * 3, h), "mouse") then
-		self.game.gameView.tooltip = os.date("%c", item.time)
+		self.game.ui.gameView.tooltip = os.date("%c", item.time)
 	end
 	just.row()
 end

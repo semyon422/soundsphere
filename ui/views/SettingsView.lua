@@ -96,7 +96,7 @@ function drawSection:gameplay()
 	g.speedType = imgui.combo("speedType", g.speedType, speedModel.types, nil, "speed type")
 
 	if imgui.TextButton("open timings", "timings", w / 4, _h) then
-		self.game.gameView:setModal(TimingsModalView)
+		self.game.ui.gameView:setModal(TimingsModalView)
 	end
 	just.sameline()
 	p.timings.nearest = imgui.checkbox("nearest", p.timings.nearest, "nearest input")

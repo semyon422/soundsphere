@@ -206,7 +206,7 @@ local function Header(self)
 	local session = self.game.configModel.configs.online.session
 	just.row(true)
 	if UserInfoView:draw(w, h, username, not not (session and next(session))) then
-		self.game.gameView:setModal(require("sphere.views.OnlineView"))
+		self.gameView:setModal(require("sphere.views.OnlineView"))
 	end
 	just.offset(0)
 
@@ -215,7 +215,7 @@ local function Header(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local w = h
-	local gameView = self.game.gameView
+	local gameView = self.gameView
 	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
 		gameView:setModal(require("sphere.views.SettingsView"))
 	end
@@ -233,6 +233,7 @@ local function RoomUsersList(self)
 	local w, h = Layout:move("column1")
 
 	RoomUsersListView.game = self.game
+	RoomUsersListView.gameView = self.gameView
 	RoomUsersListView:draw(w, h)
 end
 
@@ -306,7 +307,7 @@ local function RoomSettings(self)
 	end
 	if isHost or room.is_free_modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
-			self.game.gameView:setModal(require("sphere.views.ModifierView"))
+			self.gameView:setModal(require("sphere.views.ModifierView"))
 		end
 	end
 

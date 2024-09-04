@@ -31,6 +31,8 @@ local function AvailableModifierList(self)
 	love.graphics.translate(279, 144)
 	AvailableModifierListView.game = self.game
 	AvailableModifierListView:draw(454, 792)
+	self.game.ui.gameView.tooltip = AvailableModifierListView.tooltip
+	AvailableModifierListView.tooltip = nil
 end
 
 ---@param self table
