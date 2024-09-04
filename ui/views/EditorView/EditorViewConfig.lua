@@ -8,7 +8,7 @@ local function Background(self)
 	local w, h = Layout:move("base")
 
 	local dim = self.game.configModel.configs.settings.graphics.dim.select
-	BackgroundView.ui = self.ui
+	BackgroundView.game = self.game
 	BackgroundView:draw(w, h, 0.8, 0.01)
 end
 
