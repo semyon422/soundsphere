@@ -29,8 +29,10 @@
     ],
     "Lua.completion.autoRequire": false,
     "Lua.workspace.library": [
-        "${3rd}/love2d/library"
-    ],
+		"${3rd}/love2d/library",
+        "${3rd}/OpenResty/library",
+		"~/.config/Code/User/globalStorage/sumneko.lua/addonManager/addons/luasocket/module/library"
+	],
     "Lua.workspace.checkThirdParty": false,
     "Lua.diagnostics.disable": [
         "undefined-field",
