@@ -1,6 +1,6 @@
 #!/bin/bash
 . ./setenv
-luarocks install lapis
+luarocks install luasocket
 luarocks install luautf8
 luarocks install luacov
 luarocks install luacov-reporter-lcov
