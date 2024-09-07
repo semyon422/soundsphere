@@ -5,16 +5,16 @@ local DefaultUserInterface = require("ui")
 
 ---@class sphere.UserInterfaceMetadata
 ---@field name string
+---@field version number
 ---@field directory string
 ---@field mountDirectory string
----@field initFile fun(): sphere.IUserInterface
 ---@field configFileName string
 
 ---@class sphere.UserInterfaceModel
 ---@operator call: sphere.UserInterfaceModel
 ---@field activeUI sphere.IUserInterface
----@field private loadedThemes table<string, sphere.IUserInterface>
----@field private installedThemes table<string, sphere.UserInterfaceMetadata>
+---@field private loadedThemes {[string]: sphere.IUserInterface}
+---@field private installedThemes {[string]: sphere.UserInterfaceMetadata}
 ---@field private themeNames string[]
 ---@field private game sphere.GameController
 ---@field private persistence sphere.Persistence
@@ -35,18 +35,22 @@ function UserInterfaceModel:new(persistence, game)
 
 	for _, theme_dir in ipairs(dirs) do
 		local dir = ("%s/%s"):format(self.themesDirectory, theme_dir)
-		local metadata_file, err = love.filesystem.load(("%s/metadata.lua"):format(dir))
 
-		if err then
-			error(err)
+		local info = love.filesystem.getInfo(dir)
+
+		if info.type == "directory" or info.type == "symlink" then
+			local metadata_file, err = love.filesystem.load(("%s/metadata.lua"):format(dir))
+
+			if err then
+				error(err)
+			end
+
+			local metadata = metadata_file()
+			---@cast metadata sphere.UserInterfaceMetadata
+			metadata.directory = dir
+			self.installedThemes[metadata.name] = metadata
+			table.insert(self.themeNames, metadata.name)
 		end
-
-		local metadata = metadata_file()
-		---@cast metadata sphere.UserInterfaceMetadata
-		metadata.directory = dir
-		metadata.initFile = love.filesystem.load(("%s/init.lua"):format(dir, theme_dir))
-		self.installedThemes[metadata.name] = metadata
-		table.insert(self.themeNames, metadata.name)
 	end
 end
 
@@ -81,7 +85,7 @@ function UserInterfaceModel:setTheme(ui_name)
     	error(err)
     end
 
-    local ui, err = metadata.initFile()
+    local ui, err = love.filesystem.load(metadata.mountDirectory .. "/init.lua")()
 
     if err then
 		--- TODO: Do not crash the game. Instead, load default UI and show error on the screen

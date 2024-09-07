@@ -206,7 +206,7 @@ local function Header(self)
 	local session = self.game.configModel.configs.online.session
 	just.row(true)
 	if UserInfoView:draw(w, h, username, not not (session and next(session))) then
-		self.gameView:setModal(require("sphere.views.OnlineView"))
+		self.gameView:setModal(require("ui.views.OnlineView"))
 	end
 	just.offset(0)
 
@@ -217,13 +217,13 @@ local function Header(self)
 	local w = h
 	local gameView = self.gameView
 	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
-		gameView:setModal(require("sphere.views.SettingsView"))
+		gameView:setModal(require("ui.views.SettingsView"))
 	end
 	if imgui.TextOnlyButton("noteskins", "skins", w, h) then
-		gameView:setModal(require("sphere.views.NoteSkinView"))
+		gameView:setModal(require("ui.views.NoteSkinView"))
 	end
 	if imgui.TextOnlyButton("input", "input", w, h) then
-		gameView:setModal(require("sphere.views.InputView"))
+		gameView:setModal(require("ui.views.InputView"))
 	end
 	just.row()
 end
@@ -307,7 +307,7 @@ local function RoomSettings(self)
 	end
 	if isHost or room.is_free_modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
-			self.gameView:setModal(require("sphere.views.ModifierView"))
+			self.gameView:setModal(require("ui.views.ModifierView"))
 		end
 	end
 
