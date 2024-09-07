@@ -4,11 +4,13 @@ userdata/export/*
 userdata/replays/*
 userdata/screenshots/*
 userdata/backgrounds/*
+userdata/ui_themes/*
 userdata/charts
 userdata/export
 userdata/replays
 userdata/screenshots
 userdata/backgrounds
+userdata/ui_themes
 userdata/hitsounds
 userdata/testcharts
 !userdata/hitsounds/midi

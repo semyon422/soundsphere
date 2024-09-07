@@ -38,6 +38,15 @@ function Persistence:load()
 	self.cacheModel:load()
 end
 
+---@param name string
+---@param default_path string
+---@param mode boolean?
+function Persistence:openAndReadThemeConfig(name, default_path, mode)
+	local config_model = self.configModel
+	config_model:open(name, true)
+	config_model:read(name, default_path)
+end
+
 function Persistence:unload()
 	self.configModel:write()
 end

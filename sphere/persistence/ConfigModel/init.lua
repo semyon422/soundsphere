@@ -47,17 +47,21 @@ local function copyTable(src, dst)
 end
 
 ---@param name string
-function ConfigModel:_read(name)
+---@param default_path string?
+function ConfigModel:_read(name, default_path)
 	local configs = self.configs
 	configs[name] = {}
 	local config = configs[name]
 
 	local path = self.userdataPath .. "/" .. name .. ".lua"
-	local defaultPath = self.configModelPath .. "/" .. name .. ".lua"
 
-	if defaultPath then
-		copyTable(self:readFile(defaultPath), config)
+	if default_path then
+		default_path = default_path .. "/" .. name .. ".lua"
+	else
+		default_path = self.configModelPath .. "/" .. name .. ".lua"
 	end
+
+	copyTable(self:readFile(default_path), config)
 
 	local c = self:readFile(path)
 	if type(c) == "table" then
@@ -67,7 +71,14 @@ function ConfigModel:_read(name)
 	end
 end
 
-function ConfigModel:read()
+---@param specific_name string?
+---@param default_path string?
+function ConfigModel:read(specific_name, default_path)
+	if specific_name then
+		self:_read(specific_name, default_path)
+		return
+	end
+
 	for name in pairs(self.openedConfigs) do
 		self:_read(name)
 	end

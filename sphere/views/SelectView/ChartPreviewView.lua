@@ -31,6 +31,7 @@ function ChartPreviewView:load()
 		ChartPreviewRhythmView({
 			transform = transform,
 			subscreen = "preview",
+			chartPreviewModel = self.game.chartPreviewModel
 		}),
 	})
 	sequenceView:load()

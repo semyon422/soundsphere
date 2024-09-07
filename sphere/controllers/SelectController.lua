@@ -12,45 +12,45 @@ local InputMode = require("ncdk.InputMode")
 local SelectController = class()
 
 ---@param selectModel sphere.SelectModel
----@param previewModel sphere.PreviewModel
 ---@param modifierSelectModel sphere.ModifierSelectModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
----@param backgroundModel sphere.BackgroundModel
 ---@param multiplayerModel sphere.MultiplayerModel
 ---@param onlineModel sphere.OnlineModel
 ---@param cacheModel sphere.CacheModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
 ---@param playContext sphere.PlayContext
+---@param backgroundModel sphere.BackgroundModel
+---@param previewModel sphere.PreviewModel
 ---@param chartPreviewModel sphere.ChartPreviewModel
 function SelectController:new(
 	selectModel,
-	previewModel,
 	modifierSelectModel,
 	noteSkinModel,
 	configModel,
-	backgroundModel,
 	multiplayerModel,
 	onlineModel,
 	cacheModel,
 	osudirectModel,
 	windowModel,
 	playContext,
+	backgroundModel,
+	previewModel,
 	chartPreviewModel
 )
 	self.selectModel = selectModel
-	self.previewModel = previewModel
 	self.modifierSelectModel = modifierSelectModel
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
-	self.backgroundModel = backgroundModel
 	self.multiplayerModel = multiplayerModel
 	self.onlineModel = onlineModel
 	self.cacheModel = cacheModel
 	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
 	self.playContext = playContext
+	self.backgroundModel = backgroundModel
+	self.previewModel = previewModel
 	self.chartPreviewModel = chartPreviewModel
 	self.state = {
 		inputMode = InputMode(),
@@ -59,7 +59,6 @@ end
 
 function SelectController:load()
 	local selectModel = self.selectModel
-	local previewModel = self.previewModel
 
 	self.configModel:write()
 	self.playContext:load(self.configModel.configs.play)
@@ -68,7 +67,7 @@ function SelectController:load()
 	self.selectModel:setLock(false)
 
 	selectModel:load()
-	previewModel:load()
+	self.previewModel:load()
 
 	self:applyModifierMeta()
 end
