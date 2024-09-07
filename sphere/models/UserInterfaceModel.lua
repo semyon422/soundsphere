@@ -1,26 +1,29 @@
 local class = require("class")
+local path_util = require("path_util")
 local physfs = require("physfs")
+local pkg = require("pkg")
 
 local DefaultUserInterface = require("ui")
 
 ---@class sphere.UserInterfaceMetadata
 ---@field name string
 ---@field version number
----@field directory string
----@field mountDirectory string
----@field configFileName string
+---@field module string
+---@field config string
 
 ---@class sphere.UserInterfaceModel
 ---@operator call: sphere.UserInterfaceModel
 ---@field activeUI sphere.IUserInterface
 ---@field private loadedThemes {[string]: sphere.IUserInterface}
 ---@field private installedThemes {[string]: sphere.UserInterfaceMetadata}
+---@field private mountPaths {[string]: string}
 ---@field private themeNames string[]
 ---@field private game sphere.GameController
 ---@field private persistence sphere.Persistence
 local UserInterfaceModel = class()
 
 UserInterfaceModel.themesDirectory = "userdata/ui_themes"
+UserInterfaceModel.themesMount = "theme_mount"
 
 ---@param persistence sphere.Persistence
 ---@param game sphere.GameController
@@ -29,29 +32,58 @@ function UserInterfaceModel:new(persistence, game)
 	self.game = game
 	self.loadedThemes = {}
 	self.installedThemes = {}
+	self.mountPaths = {}
 	self.themeNames = { "Default" }
+end
 
-	local dirs = love.filesystem.getDirectoryItems(self.themesDirectory)
+function UserInterfaceModel:load()
+	---@type string[]
+	local items = love.filesystem.getDirectoryItems(self.themesDirectory)
 
-	for _, theme_dir in ipairs(dirs) do
-		local dir = ("%s/%s"):format(self.themesDirectory, theme_dir)
+	for _, item in ipairs(items) do
+		local path = path_util.join(self.themesDirectory, item)
+		local info = love.filesystem.getInfo(path)
 
-		local info = love.filesystem.getInfo(dir)
-
-		if info.type == "directory" or info.type == "symlink" then
-			local metadata_file, err = love.filesystem.load(("%s/metadata.lua"):format(dir))
-
-			if err then
-				error(err)
+		local mountPath = path_util.join(self.themesMount, item)
+		if info.type == "directory" or info.type == "symlink" or
+			(info.type == "file" and item:match("%.zip$"))
+		then
+			local ok, err = physfs.mount(path, mountPath, false)
+			if not ok then
+				print(err)
+			else
+				pkg.add(mountPath)
 			end
-
-			local metadata = metadata_file()
-			---@cast metadata sphere.UserInterfaceMetadata
-			metadata.directory = dir
-			self.installedThemes[metadata.name] = metadata
-			table.insert(self.themeNames, metadata.name)
 		end
 	end
+	pkg.export_lua()
+	pkg.export_love()
+
+	---@type string[]
+	items = love.filesystem.getDirectoryItems(self.themesMount)
+
+	for _, item in ipairs(items) do
+		local dir = path_util.join(self.themesMount, item)
+		local metadataPath = path_util.join(self.themesMount, item, "metadata.lua")
+
+		local metadata_file = assert(love.filesystem.load(metadataPath))
+		---@type sphere.UserInterfaceMetadata
+		local metadata = metadata_file()
+
+		self.installedThemes[metadata.name] = metadata
+		self.mountPaths[metadata.name] = dir
+		table.insert(self.themeNames, metadata.name)
+	end
+
+	local graphics_config = self.persistence.configModel.configs.settings.graphics
+	local ui_name = graphics_config.userInterface
+
+	if ui_name == "Default" then
+		self:setDefaultTheme()
+		return
+	end
+
+	self:setTheme(ui_name)
 end
 
 ---@private
@@ -77,41 +109,40 @@ function UserInterfaceModel:setTheme(ui_name)
 		return
 	end
 
-	local source = love.filesystem.getSource()
-	local success, err = physfs.mount(source .. "/" .. metadata.directory .. "/", metadata.mountDirectory, false)
-    success = success and true or false
+	local ok, err = xpcall(require, debug.traceback, metadata.module)
 
-    if not success then
-    	error(err)
-    end
-
-    local ui, err = love.filesystem.load(metadata.mountDirectory .. "/init.lua")()
-
-    if err then
+    if not ok then
 		--- TODO: Do not crash the game. Instead, load default UI and show error on the screen
-		error("Failed to load external UI: " .. err)
-		return
-	end
-
-	if metadata.configFileName then
-		self.persistence:openAndReadThemeConfig(metadata.configFileName, metadata.directory)
-	end
-
-	self.loadedThemes[metadata.name] = ui(self.persistence, self.game)
-	self.activeUI = self.loadedThemes[metadata.name]
-	self.activeUI:load()
-end
-
-function UserInterfaceModel:load()
-	local graphics_config = self.persistence.configModel.configs.settings.graphics
-	local ui_name = graphics_config.userInterface
-
-	if ui_name == "Default" then
+		print("Failed to require external UI: " .. err)
 		self:setDefaultTheme()
 		return
 	end
 
-	self:setTheme(ui_name)
+	local mountPath = self.mountPaths[metadata.name]
+
+	if metadata.config then
+		self.persistence:openAndReadThemeConfig(metadata.config, mountPath)
+	end
+
+	ok, err = pcall(function()
+		self.loadedThemes[metadata.name] = err(self.persistence, self.game, mountPath)
+	end)
+    if not ok then
+		print("Failed to create external UI: " .. err)
+		self:setDefaultTheme()
+		return
+	end
+
+	self.activeUI = self.loadedThemes[metadata.name]
+
+	ok, err = pcall(function()
+		self.activeUI:load()
+	end)
+    if not ok then
+		print("Failed to load external UI: " .. err)
+		self:setDefaultTheme()
+		return
+	end
 end
 
 function UserInterfaceModel:switchTheme()

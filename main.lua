@@ -34,7 +34,6 @@ if arg[2] == "test" then
 end
 
 local deco = require("deco")
-deco.package_path = love.filesystem.getRequirePath()
 deco.read_file = love.filesystem.read
 deco.blacklist = {
 	"3rd-deps",
