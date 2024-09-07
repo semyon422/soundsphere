@@ -16,7 +16,7 @@ local DefaultUserInterface = require("ui")
 ---@field activeUI sphere.IUserInterface
 ---@field private loadedThemes {[string]: sphere.IUserInterface}
 ---@field private installedThemes {[string]: sphere.UserInterfaceMetadata}
----@field private mountPaths {[string]: string}
+---@field private themeRoots {[string]: string}
 ---@field private themeNames string[]
 ---@field private game sphere.GameController
 ---@field private persistence sphere.Persistence
@@ -32,7 +32,7 @@ function UserInterfaceModel:new(persistence, game)
 	self.game = game
 	self.loadedThemes = {}
 	self.installedThemes = {}
-	self.mountPaths = {}
+	self.themeRoots = {}
 	self.themeNames = { "Default" }
 end
 
@@ -51,29 +51,30 @@ function UserInterfaceModel:load()
 			local ok, err = physfs.mount(path, mountPath, false)
 			if not ok then
 				print(err)
-			else
-				pkg.add(mountPath)
 			end
 		end
 	end
-	pkg.export_lua()
-	pkg.export_love()
 
 	---@type string[]
 	items = love.filesystem.getDirectoryItems(self.themesMount)
 
 	for _, item in ipairs(items) do
-		local dir = path_util.join(self.themesMount, item)
-		local metadataPath = path_util.join(self.themesMount, item, "metadata.lua")
+		local dir = self:lookupRootDir(path_util.join(self.themesMount, item))
+		if dir then
+			pkg.add(dir)
 
-		local metadata_file = assert(love.filesystem.load(metadataPath))
-		---@type sphere.UserInterfaceMetadata
-		local metadata = metadata_file()
+			local metadata_path = path_util.join(dir, "metadata.lua")
+			local metadata_file = assert(love.filesystem.load(metadata_path))
+			---@type sphere.UserInterfaceMetadata
+			local metadata = metadata_file()
 
-		self.installedThemes[metadata.name] = metadata
-		self.mountPaths[metadata.name] = dir
-		table.insert(self.themeNames, metadata.name)
+			self.installedThemes[metadata.name] = metadata
+			self.themeRoots[metadata.name] = dir
+			table.insert(self.themeNames, metadata.name)
+		end
 	end
+	pkg.export_lua()
+	pkg.export_love()
 
 	local graphics_config = self.persistence.configModel.configs.settings.graphics
 	local ui_name = graphics_config.userInterface
@@ -84,6 +85,28 @@ function UserInterfaceModel:load()
 	end
 
 	self:setTheme(ui_name)
+end
+
+---@param dir string
+---@return string?
+---@private
+function UserInterfaceModel:lookupRootDir(dir)
+	local path = path_util.join(dir, "metadata.lua")
+	if love.filesystem.getInfo(path, "file") then
+		return dir
+	end
+
+	---@type string[]
+	local items = love.filesystem.getDirectoryItems(dir)
+	for _, item in ipairs(items) do
+		local _dir = path_util.join(dir, item)
+		local _path = path_util.join(dir, item, "metadata.lua")
+		local dir_info = love.filesystem.getInfo(_dir, "directory")
+		local file_info = love.filesystem.getInfo(_path, "file")
+		if dir_info and file_info then
+			return _dir
+		end
+	end
 end
 
 ---@private
@@ -118,14 +141,14 @@ function UserInterfaceModel:setTheme(ui_name)
 		return
 	end
 
-	local mountPath = self.mountPaths[metadata.name]
+	local rootDir = self.themeRoots[metadata.name]
 
 	if metadata.config then
-		self.persistence:openAndReadThemeConfig(metadata.config, mountPath)
+		self.persistence:openAndReadThemeConfig(metadata.config, rootDir)
 	end
 
 	ok, err = pcall(function()
-		self.loadedThemes[metadata.name] = err(self.persistence, self.game, mountPath)
+		self.loadedThemes[metadata.name] = err(self.persistence, self.game, rootDir)
 	end)
     if not ok then
 		print("Failed to create external UI: " .. err)
