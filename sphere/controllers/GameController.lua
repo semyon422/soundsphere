@@ -219,6 +219,7 @@ function GameController:update(dt)
 	self.backgroundModel:update()
 	self.chartPreviewModel:update()
 	self.ui:update(dt)
+	self.notificationModel:update()
 end
 
 function GameController:draw()
