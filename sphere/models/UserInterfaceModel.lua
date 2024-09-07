@@ -148,7 +148,7 @@ function UserInterfaceModel:setTheme(ui_name)
 	end
 
 	ok, err = pcall(function()
-		self.loadedThemes[metadata.name] = err(self.persistence, self.game, rootDir)
+		self.loadedThemes[metadata.name] = err(self.game, rootDir)
 	end)
     if not ok then
 		print("Failed to create external UI: " .. err)
