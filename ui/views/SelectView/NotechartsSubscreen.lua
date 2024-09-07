@@ -461,7 +461,7 @@ local function NotechartsSubscreen(self)
 	just.row(true)
 	just.indent(-h)
 	if imgui.TextOnlyButton("pause music", "pause", h, h) then
-		self.ui.previewModel:stop()
+		self.game.previewModel:stop()
 	end
 	if imgui.TextOnlyButton("collections", "collections", w / 2, h) then
 		self:switchToCollections()
