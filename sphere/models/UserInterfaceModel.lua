@@ -23,7 +23,7 @@ local DefaultUserInterface = require("ui")
 local UserInterfaceModel = class()
 
 UserInterfaceModel.themesDirectory = "userdata/ui_themes"
-UserInterfaceModel.themesMount = "theme_mount"
+UserInterfaceModel.themesMount = "theme_mount" .. tostring(os.time()):sub(-4)
 
 ---@param persistence sphere.Persistence
 ---@param game sphere.GameController
