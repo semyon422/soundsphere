@@ -173,6 +173,9 @@ function GameController:load()
 	self.persistence:load()
 	self.app:load()
 
+	self.uiModel:load()
+	self.ui = self.uiModel.activeUI
+
 	local configModel = self.configModel
 	local rhythmModel = self.rhythmModel
 
@@ -195,8 +198,6 @@ function GameController:load()
 
 	self.backgroundModel:load()
 	self.previewModel:load()
-	self.uiModel:load()
-	self.ui = self.uiModel.activeUI
 end
 
 function GameController:unload()
