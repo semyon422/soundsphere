@@ -7,14 +7,13 @@ local GameplayView = require("ui.views.GameplayView")
 local MultiplayerView = require("ui.views.MultiplayerView")
 local EditorView = require("ui.views.EditorView")
 
----@class ui.UserInterface : sphere.IUserInterface
+---@class ui.UserInterface: sphere.IUserInterface
 ---@operator call: ui.UserInterface
 ---@field selectView ui.ScreenView
 local UserInterface = IUserInterface + {}
 
----@param persistence sphere.Persistence
 ---@param game sphere.GameController
-function UserInterface:new(persistence, game)
+function UserInterface:new(game)
 	self.gameView = GameView(game, self)
 	self.selectView = SelectView(game)
 	self.resultView = ResultView(game)

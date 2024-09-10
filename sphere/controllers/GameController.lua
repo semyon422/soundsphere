@@ -40,7 +40,7 @@ local GameController = class()
 function GameController:new()
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
-	self.uiModel = UserInterfaceModel(self.persistence, self)
+	self.uiModel = UserInterfaceModel(self)
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)

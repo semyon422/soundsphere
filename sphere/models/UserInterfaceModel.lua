@@ -3,7 +3,7 @@ local path_util = require("path_util")
 local physfs = require("physfs")
 local pkg = require("pkg")
 
-local DefaultUserInterface = require("ui")
+local DefaultUserInterface = require("ui.UserInterface")
 
 ---@class sphere.UserInterfaceMetadata
 ---@field name string
@@ -19,16 +19,13 @@ local DefaultUserInterface = require("ui")
 ---@field private themeRoots {[string]: string}
 ---@field private themeNames string[]
 ---@field private game sphere.GameController
----@field private persistence sphere.Persistence
 local UserInterfaceModel = class()
 
 UserInterfaceModel.themesDirectory = "userdata/ui_themes"
 UserInterfaceModel.themesMount = "theme_mount" .. tostring(os.time()):sub(-4)
 
----@param persistence sphere.Persistence
 ---@param game sphere.GameController
-function UserInterfaceModel:new(persistence, game)
-	self.persistence = persistence
+function UserInterfaceModel:new(game)
 	self.game = game
 	self.loadedThemes = {}
 	self.installedThemes = {}
@@ -76,7 +73,7 @@ function UserInterfaceModel:load()
 	pkg.export_lua()
 	pkg.export_love()
 
-	local graphics_config = self.persistence.configModel.configs.settings.graphics
+	local graphics_config = self.game.persistence.configModel.configs.settings.graphics
 	local ui_name = graphics_config.userInterface
 
 	if ui_name == "Default" then
@@ -111,7 +108,7 @@ end
 
 ---@private
 function UserInterfaceModel:setDefaultTheme()
-	self.loadedThemes["Default"] = DefaultUserInterface(self.persistence, self.game)
+	self.loadedThemes["Default"] = DefaultUserInterface(self.game)
 	self.activeUI = self.loadedThemes["Default"]
 	self.activeUI:load()
 end
@@ -144,7 +141,7 @@ function UserInterfaceModel:setTheme(ui_name)
 	local rootDir = self.themeRoots[metadata.name]
 
 	if metadata.config then
-		self.persistence:openAndReadThemeConfig(metadata.config, rootDir)
+		self.game.persistence:openAndReadThemeConfig(metadata.config, rootDir)
 	end
 
 	ok, err = pcall(function()
@@ -169,7 +166,7 @@ function UserInterfaceModel:setTheme(ui_name)
 end
 
 function UserInterfaceModel:switchTheme()
-	local graphics_config = self.persistence.configModel.configs.settings.graphics
+	local graphics_config = self.game.persistence.configModel.configs.settings.graphics
 	local ui_name = graphics_config.userInterface
 	self.activeUI:unload()
 	self:setTheme(ui_name)
