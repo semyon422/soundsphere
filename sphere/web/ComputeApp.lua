@@ -20,9 +20,8 @@ local RouterHandler = require("web.router.RouterHandler")
 local PageHandler = require("web.page.PageHandler")
 local SessionHandler = require("web.cookie.SessionHandler")
 
-local WebReplayController = require("sphere.web.WebReplayController")
-local WebNoteChartController = require("sphere.web.WebNoteChartController")
-
+local WebReplayHandler = require("sphere.web.WebReplayHandler")
+local WebChartHandler = require("sphere.web.WebChartHandler")
 
 ---@class sphere.ComputeApp: web.IHandler
 ---@operator call: sphere.ComputeApp
@@ -31,8 +30,8 @@ local ComputeApp = IHandler + {}
 function ComputeApp:new()
 	local router = Router()
 
-	router:route("POST", "/replay", {controller = WebReplayController})
-	router:route("POST", "/notechart", {controller = WebNoteChartController})
+	router:route("POST", "/replay", {controller = WebReplayHandler()})
+	router:route("POST", "/notechart", {controller = WebChartHandler()})
 
 	self.handler = ErrorHandler(SequentialHandler({
 		RouterHandler(router),

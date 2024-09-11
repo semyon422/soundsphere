@@ -1,6 +1,7 @@
 #!/bin/bash
 . ./setenv
 luarocks install luasocket
+luarocks install luaossl
 luarocks install luautf8
 luarocks install luacov
 luarocks install luacov-reporter-lcov

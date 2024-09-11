@@ -1,5 +1,6 @@
+local class = require("class")
 local FastplayController = require("sphere.controllers.FastplayController")
-local WebNoteChartController = require("sphere.web.WebNoteChartController")
+local WebChartHandler = require("sphere.web.WebChartHandler")
 
 local Replay = require("sphere.models.ReplayModel.Replay")
 local ReplayModel = require("sphere.models.ReplayModel")
@@ -9,9 +10,17 @@ local RhythmModel = require("sphere.models.RhythmModel")
 local PlayContext = require("sphere.models.PlayContext")
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
-local WebReplayController = {}
+---@class sphere.WebReplayHandler
+---@operator call: sphere.WebReplayHandler
+local WebReplayHandler = class()
 
-WebReplayController.getReplay = function(replay)
+function WebReplayHandler:new()
+	self.webChartHandler = WebChartHandler()
+end
+
+---@param replay table
+---@return sphere.Replay?
+function WebReplayHandler:getReplay(replay)
 	local file = io.open(replay.path, "r")
 	if not file then
 		error("Replay not found")
@@ -22,15 +31,15 @@ WebReplayController.getReplay = function(replay)
 	return Replay():fromString(content)
 end
 
-function WebReplayController:POST()
+function WebReplayHandler:POST()
 	local params = self.params
 
-	local noteChart, err = WebNoteChartController.getNoteChart(params.notechart)
-	if not noteChart then
+	local chart, err = self.webChartHandler:getChart(params.notechart)
+	if not chart then
 		return {status = 500, json = {error = err}}
 	end
 
-	local replay = WebReplayController.getReplay(params.replay)
+	local replay = WebReplayHandler:getReplay(params.replay)
 
 	local fastplayController = FastplayController()
 
@@ -53,13 +62,13 @@ function WebReplayController:POST()
 	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
-	fastplayController:play(noteChart, replay)
+	fastplayController:play(chart, replay)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
 	return {json = {
 		score = score,
-		inputMode = tostring(noteChart.inputMode),
+		inputMode = tostring(chart.inputMode),
 		playContext = playContext,
 		modifiers = replay.modifiers,
 		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
@@ -68,5 +77,4 @@ function WebReplayController:POST()
 	}}
 end
 
-
-return WebReplayController
+return WebReplayHandler
