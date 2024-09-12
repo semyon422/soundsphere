@@ -46,10 +46,13 @@ function WebChartHandler:getChart(notechart)
 	return charts[1]
 end
 
-function WebChartHandler:POST()
-	local charts, err = WebChartHandler:getCharts(self.params.notechart)
+---@param params table
+---@return integer
+---@return table
+function WebChartHandler:handle(params)
+	local charts, err = WebChartHandler:getCharts(params.notechart)
 	if not charts then
-		return {status = 500, json = {error = err}}
+		return 500, {error = err}
 	end
 
 	local metadatas = {}
@@ -59,7 +62,7 @@ function WebChartHandler:POST()
 		table.insert(metadatas, chartmeta)
 	end
 
-	return {status = 200, json = {notecharts = metadatas}}
+	return 200, {notecharts = metadatas}
 end
 
 

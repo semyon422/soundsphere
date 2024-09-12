@@ -1,24 +1,14 @@
 local json = require("json")
 local IHandler = require("web.IHandler")
 
-local ParamsHandler = require("web.handlers.ParamsHandler")
 local ErrorHandler = require("web.handlers.ErrorHandler")
-local UserHandler = require("web.handlers.UserHandler")
-local ProtectedHandler = require("web.handlers.ProtectedHandler")
-local ConverterHandler = require("web.handlers.ConverterHandler")
 local SequentialHandler = require("web.handlers.SequentialHandler")
-local SelectHandler = require("web.handlers.SelectHandler")
-local StaticHandler = require("web.handlers.StaticHandler")
 local AnonHandler = require("web.handlers.AnonHandler")
 local BodyReader = require("web.body.BodyReader")
 
 local Router = require("web.router.Router")
-local Views = require("web.page.Views")
 
-local UsecaseHandler = require("web.usecase.UsecaseHandler")
 local RouterHandler = require("web.router.RouterHandler")
-local PageHandler = require("web.page.PageHandler")
-local SessionHandler = require("web.cookie.SessionHandler")
 
 local WebReplayHandler = require("sphere.web.WebReplayHandler")
 local WebChartHandler = require("sphere.web.WebChartHandler")
@@ -65,10 +55,10 @@ function ComputeApp:handleController(req, res, ctx)
 	local params = json.decode(body)
 
 	local controller = ctx.controller
-	local result = controller.POST({params = params})
-	local res_body = json.encode(result.json)
+	local status, data = controller:handle(params)
+	local res_body = json.encode(data)
 
-	res.status = result.status or 200
+	res.status = status
 	res.headers["Content-Type"] = "application/json"
 	res.headers["Content-Length"] = #res_body
 	res:write(res_body)

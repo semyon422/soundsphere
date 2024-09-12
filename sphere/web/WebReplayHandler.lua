@@ -31,12 +31,13 @@ function WebReplayHandler:getReplay(replay)
 	return Replay():fromString(content)
 end
 
-function WebReplayHandler:POST()
-	local params = self.params
-
+---@param params table
+---@return integer
+---@return table
+function WebReplayHandler:handle(params)
 	local chart, err = self.webChartHandler:getChart(params.notechart)
 	if not chart then
-		return {status = 500, json = {error = err}}
+		return 500, {error = err}
 	end
 
 	local replay = WebReplayHandler:getReplay(params.replay)
@@ -66,7 +67,7 @@ function WebReplayHandler:POST()
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
-	return {json = {
+	return 200, {
 		score = score,
 		inputMode = tostring(chart.inputMode),
 		playContext = playContext,
@@ -74,7 +75,7 @@ function WebReplayHandler:POST()
 		modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
 		modifiersHash = ModifierEncoder:hash(replay.modifiers),
 		modifiersString = ModifierModel:getString(replay.modifiers),
-	}}
+	}
 end
 
 return WebReplayHandler
