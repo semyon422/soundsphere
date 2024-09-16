@@ -1,5 +1,8 @@
 local class = require("class")
 local path_util = require("path_util")
+local http_util = require("http_util")
+local fs_util = require("fs_util")
+local thread = require("thread")
 local physfs = require("physfs")
 local pkg = require("pkg")
 
@@ -24,6 +27,14 @@ local UserInterfaceModel = class()
 UserInterfaceModel.themesDirectory = "userdata/ui_themes"
 UserInterfaceModel.themesMount = "theme_mount" .. tostring(os.time()):sub(-4)
 
+UserInterfaceModel.externalThemes = {
+	{
+		name = "osu!",
+		url = "https://codeload.github.com/Thetan-ILW/osu_ui/zip/refs/heads/main",
+		github = "https://github.com/Thetan-ILW/osu_ui",
+	},
+}
+
 ---@param game sphere.GameController
 function UserInterfaceModel:new(game)
 	self.game = game
@@ -34,6 +45,8 @@ function UserInterfaceModel:new(game)
 end
 
 function UserInterfaceModel:load()
+	love.filesystem.createDirectory(self.themesDirectory)
+
 	---@type string[]
 	local items = love.filesystem.getDirectoryItems(self.themesDirectory)
 
@@ -172,5 +185,48 @@ function UserInterfaceModel:switchTheme()
 	self:setTheme(ui_name)
 	self.game.ui = self.activeUI
 end
+
+function UserInterfaceModel:downloadTheme(theme_info)
+	print(("Downloading: %s"):format(theme_info.url))
+	theme_info.status = "Downloading"
+
+	theme_info.isDownloading = true
+	local data, code, headers, status_line = fs_util.downloadAsync(theme_info.url)
+	theme_info.isDownloading = false
+
+	if code == 302 then
+		print(require("inspect")(headers))
+	end
+
+	if not data then
+		theme_info.status = status_line or " QWEWQ"
+		return
+	end
+
+	local filename = theme_info.url:match("^.+/(.-)$")
+	for header, value in pairs(headers) do
+		header = header:lower()
+		if header == "content-disposition" then
+			local cd = http_util.parse_content_disposition(value)
+			filename = cd.filename or filename
+		end
+	end
+
+	filename = path_util.fix_illegal(filename)
+
+	print(("Downloaded: %s"):format(filename))
+	if not filename:find("%.zip$") then
+		theme_info.status = "Unsupported file type"
+		print("Unsupported file type")
+		return
+	end
+
+	local filedata = love.filesystem.newFileData(data, filename)
+	local path = path_util.join(self.themesDirectory, filename)
+	love.filesystem.write(path, filedata)
+
+	theme_info.status = "Done"
+end
+UserInterfaceModel.downloadTheme = thread.coro(UserInterfaceModel.downloadTheme)
 
 return UserInterfaceModel

@@ -1,5 +1,6 @@
 local just = require("just")
 local imgui = require("imgui")
+local thread = require("thread")
 local ModalImView = require("ui.imviews.ModalImView")
 local TimingsModalView = require("ui.views.TimingsModalView")
 local _transform = require("gfx_util").transform
@@ -14,6 +15,7 @@ local sections = {
 	"gameplay",
 	"select",
 	"graphics",
+	"themes",
 	"audio",
 	"offsets",
 	"misc",
@@ -222,8 +224,6 @@ function drawSection:graphics()
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
-	local ui_model = self.game.uiModel
-
 	g.fps = imgui.intButtons("fps", g.fps, 2, "FPS limit")
 
 	local flags = g.mode.flags
@@ -239,13 +239,6 @@ function drawSection:graphics()
 	g.mode.window = imgui.combo("mode.window", g.mode.window, self.modes, formatMode, "start window resolution")
 
 	g.cursor = imgui.combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
-
-	local previous_theme = g.userInterface
-	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, nil, "UI theme")
-	if g.userInterface ~= previous_theme then
-		self.game.previewModel:stop()
-		ui_model:switchTheme()
-	end
 
 	imgui.separator()
 	just.indent(10)
@@ -291,6 +284,56 @@ function drawSection:graphics()
 	just.sameline()
 	just.offset(120)
 	just.text(device)
+end
+
+function drawSection:themes()
+	local settings = self.game.configModel.configs.settings
+	local g = settings.graphics
+
+	local ui_model = self.game.uiModel
+
+	imgui.text("NOTICE!!!")
+	imgui.text("I am not responsible for the code that you can download on this tab.")
+	imgui.text("This code does not go through any moderation.")
+	imgui.text("For technical support, contact the corresponding authors.")
+
+	imgui.separator()
+
+	local previous_theme = g.userInterface
+	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, nil, "UI theme")
+	if g.userInterface ~= previous_theme then
+		self.game.previewModel:stop()
+		ui_model:switchTheme()
+	end
+
+	if imgui.button("open themes", "open themes") then
+		love.system.openURL(ui_model.themesDirectory)
+	end
+
+	imgui.separator()
+	imgui.text("download themes")
+
+	for _, theme_info in ipairs(ui_model.externalThemes) do
+		if imgui.button(theme_info.url, "download") then
+			ui_model:downloadTheme(theme_info)
+		end
+		just.sameline()
+		if imgui.button(theme_info.github, "github") then
+			love.system.openURL(theme_info.github)
+		end
+		just.sameline()
+		local label_text = theme_info.name
+		if theme_info.status then
+			label_text = theme_info.name .. ": " .. theme_info.status
+		end
+		if theme_info.isDownloading then
+			local shared = thread.shared.download[theme_info.url]
+			if shared then
+				label_text = ("%s (%.1fMB)"):format(label_text, (shared.total or 0) / 1e6)
+			end
+		end
+		imgui.label(theme_info.url, label_text)
+	end
 end
 
 local _formatModes = {
