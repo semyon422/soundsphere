@@ -199,7 +199,7 @@ function UserInterfaceModel:downloadTheme(theme_info)
 	end
 
 	if not data then
-		theme_info.status = status_line or " QWEWQ"
+		theme_info.status = status_line
 		return
 	end
 
@@ -225,7 +225,7 @@ function UserInterfaceModel:downloadTheme(theme_info)
 	local path = path_util.join(self.themesDirectory, filename)
 	love.filesystem.write(path, filedata)
 
-	theme_info.status = "Done"
+	theme_info.status = "Done! Restart the game."
 end
 UserInterfaceModel.downloadTheme = thread.coro(UserInterfaceModel.downloadTheme)
 
