@@ -7,6 +7,12 @@ local DiscordModel = class()
 
 DiscordModel.appId = "594443609668059149"
 
+---@param configModel sphere.ConfigModel
+function DiscordModel:new(configModel)
+	self.configModel = configModel
+	self.enabled = false
+end
+
 function DiscordModel:load()
 	discordrpc.ready = function(userId, username, discriminator, avatar)
 		return self:ready(userId, username, discriminator, avatar)
@@ -26,14 +32,29 @@ function DiscordModel:load()
 	discordrpc.joinRequest = function(userId, username, discriminator, avatar)
 		return self:joinRequest(userId, username, discriminator, avatar)
 	end
-	discordrpc.initialize(self.appId, true)
+	self:updateEnabled()
 
 	self.presence = {}
 	self.nextUpdate = 0
 end
 
+function DiscordModel:updateEnabled()
+	local discordPresence = self.configModel.configs.settings.miscellaneous.discordPresence
+	if discordPresence and not self.enabled then
+		discordrpc.initialize(self.appId, true)
+		self.enabled = true
+	elseif not discordPresence and self.enabled then
+		discordrpc.clearPresence()
+		discordrpc.shutdown()
+		self.enabled = false
+	end
+end
+
 ---@param presence table
 function DiscordModel:setPresence(presence)
+	if not self.enabled then
+		return
+	end
 	self.presence = self:validatePresence(presence)
 end
 
@@ -60,6 +81,12 @@ function DiscordModel:validatePresence(presence)
 end
 
 function DiscordModel:update()
+	self:updateEnabled()
+
+	if not self.enabled then
+		return
+	end
+
 	if self.nextUpdate < love.timer.getTime() then
 		pcall(discordrpc.updatePresence, self.presence)
 		self.nextUpdate = love.timer.getTime() + 2
@@ -68,6 +95,9 @@ function DiscordModel:update()
 end
 
 function DiscordModel:unload()
+	if not self.enabled then
+		return
+	end
 	discordrpc.shutdown()
 end
 
@@ -113,6 +143,9 @@ end
 ---@param userId any
 ---@param reply any
 function DiscordModel:respond(userId, reply)
+	if not self.enabled then
+		return
+	end
 	discordrpc.respond(userId, "yes")
 end
 

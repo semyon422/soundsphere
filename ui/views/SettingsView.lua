@@ -480,6 +480,8 @@ function drawSection:misc()
 	m.showFPS = imgui.checkbox("showFPS", m.showFPS, "show FPS")
 	m.showTasks = imgui.checkbox("showTasks", m.showTasks, "show tasks")
 	m.showDebugMenu = imgui.checkbox("showDebugMenu", m.showDebugMenu, "show debug menu")
+	m.discordPresence = imgui.checkbox("discordPresence", m.discordPresence, "discord presence")
+
 	if imgui.button("error button", "error") then
 		error("error")
 	end

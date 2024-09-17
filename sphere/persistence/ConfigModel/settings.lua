@@ -176,6 +176,7 @@ local settings = {
 		showFPS = false,
 		showTasks = false,
 		showDebugMenu = false,
+		discordPresence = true,
 	},
 	select = {
 		collapse = true,
