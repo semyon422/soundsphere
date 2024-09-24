@@ -33,11 +33,15 @@ local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")
 local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 
+local PackageLoader = require("sphere.pkg.PackageLoader")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
 
 function GameController:new()
+	self.packageLoader = PackageLoader()
+
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
 	self.uiModel = UserInterfaceModel(self)
@@ -170,6 +174,8 @@ function GameController:new()
 end
 
 function GameController:load()
+	self.packageLoader:load()
+
 	self.persistence:load()
 	self.app:load()
 
