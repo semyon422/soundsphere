@@ -1,8 +1,9 @@
 local physfs = require("physfs")
 local path_util = require("path_util")
 local class = require("class")
-local toml = require("toml")
+local json = require("json")
 local stbl = require("stbl")
+local Package = require("sphere.pkg.Package")
 
 ---@class sphere.PackageLoader
 ---@operator call: sphere.PackageLoader
@@ -12,7 +13,10 @@ PackageLoader.pkgsDir = "userdata/pkg"
 PackageLoader.mountDir = "mount" .. tostring(os.time()):sub(-4)
 
 function PackageLoader:new()
+	---@type {[string]: sphere.Package}
 	self.packages = {}
+	---@type {[string]: string}
+	self.dirs = {}
 end
 
 function PackageLoader:load()
@@ -45,24 +49,26 @@ function PackageLoader:readPackage(mountPath)
 		return
 	end
 
-	local metadata_path = path_util.join(dir, "pkg.toml")
+	local metadata_path = path_util.join(dir, "pkg.json")
 	local data = love.filesystem.read(metadata_path)
 
-	---@type table
-	local metadata = toml.parse(data)
+	local pkg = Package(json.decode(data))
+	if self.packages[pkg.name] then
+		error("package duplicate: " .. stbl.encode(pkg))
+		return
+	end
 
-	print("package loaded: " .. stbl.encode(metadata))
-	table.insert(self.packages, {
-		metadata = metadata,
-		dir = dir,
-	})
+	self.packages[pkg.name] = pkg
+	self.dirs[pkg.name] = dir
+
+	print("package loaded: " .. stbl.encode(pkg))
 end
 
 ---@param dir string
 ---@return string?
 ---@private
 function PackageLoader:lookupRootDir(dir)
-	local path = path_util.join(dir, "pkg.toml")
+	local path = path_util.join(dir, "pkg.json")
 	if love.filesystem.getInfo(path, "file") then
 		return dir
 	end
@@ -71,7 +77,7 @@ function PackageLoader:lookupRootDir(dir)
 	local items = love.filesystem.getDirectoryItems(dir)
 	for _, item in ipairs(items) do
 		local _dir = path_util.join(dir, item)
-		local _path = path_util.join(dir, item, "pkg.toml")
+		local _path = path_util.join(dir, item, "pkg.json")
 		local dir_info = love.filesystem.getInfo(_dir, "directory")
 		local file_info = love.filesystem.getInfo(_path, "file")
 		if dir_info and file_info then
