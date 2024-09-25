@@ -15,11 +15,11 @@ QuaverScoring.metadata = {
 
 local Judge = BaseJudge + {}
 
-Judge.orderedCounters = { "marvelous", "perfect", "great", "good", "okay" }
-
 ---@param windows table
 function Judge:new(windows)
+	BaseJudge.new(self)
 	self.scoreSystemName = QuaverScoring.name
+	self.orderedCounters = { "marvelous", "perfect", "great", "good", "okay" }
 
 	self.windows = windows
 

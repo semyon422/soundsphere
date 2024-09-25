@@ -2,28 +2,27 @@ local class = require("class")
 
 ---@class sphere.Judge
 ---@operator call: sphere.Judge
+---@field scoreSystemName string
+---@field accuracy number
+---@field notes integer
+---@field lastCounter string?
+---@field lastUpdateTime number
+---@field orderedCounters string[]
+---@field weights {[string]: number}
+---@field counters {[string]: number}
+---@field earlyHitWindow number
+---@field lateHitWindow number
+---@field earlyMissWindow number
+---@field lateMissWindow number
+---@field windowReleaseMultiplier number
 local Judge = class()
 
-Judge.scoreSystemName = ""
-
----@type number
-Judge.accuracy = 1
-Judge.notes = 0
-
----@type string?
-Judge.lastCounter = nil
-Judge.lastUpdateTime = 0 -- useful for skins elements and animations
-
-Judge.orderedCounters = {}
-Judge.weights = {}
-Judge.windows = {}
-Judge.counters = {}
-
-Judge.earlyHitWindow = -120
-Judge.lateHitWindow = 120
-Judge.earlyMissWindow = 160
-Judge.lateMissWindow = 160
-Judge.windowReleaseMultiplier = 1.5
+function Judge:new()
+	self.accuracy = 1
+	self.notes = 0
+	self.lastCounter = nil
+	self.orderedCounters = {}
+end
 
 ---@param key string
 ---@param currentTime number

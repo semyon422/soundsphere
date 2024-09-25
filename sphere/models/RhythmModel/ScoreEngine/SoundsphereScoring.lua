@@ -15,12 +15,12 @@ SoundsphereScoring.metadata = {
 ---@operator call: sphere.SoundsphereJudge
 local Judge = BaseJudge + {}
 
-Judge.orderedCounters = { "perfect", "not perfect" }
 
 function Judge:new()
+	BaseJudge.new(self)
 	self.scoreSystemName = SoundsphereScoring.name
-
-	BaseJudge.accuracy = nil
+	self.orderedCounters = { "perfect", "not perfect" }
+	self.accuracy = nil
 
 	self.windows = {
 		perfect = 0.016,

@@ -24,11 +24,11 @@ LunaticRaveScoring.metadata = {
 ---@operator call: sphere.LunaticRaveJudge
 local Judge = BaseJudge + {}
 
-Judge.orderedCounters = { "pgreat", "great", "good", "bad" }
-
 ---@param windows table
 function Judge:new(windows)
+	BaseJudge.new(self)
 	self.scoreSystemName = LunaticRaveScoring.name
+	self.orderedCounters = { "pgreat", "great", "good", "bad" }
 
 	self.weights = {
 		pgreat = 2,

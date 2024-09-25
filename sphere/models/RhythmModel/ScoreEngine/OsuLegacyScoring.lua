@@ -20,8 +20,6 @@ OsuLegacyScoring.metadata = {
 ---@operator call: sphere.OsuLegacyJudge
 local Judge = BaseJudge + {}
 
-Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
-
 local totalNotes = 0
 
 local counterIndex = {
@@ -61,7 +59,9 @@ local hitBonusValue = {
 
 ---@param od number
 function Judge:new(od)
+	BaseJudge.new(self)
 	self.scoreSystemName = OsuLegacyScoring.name
+	self.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 	self.weights = {
 		perfect = 300,

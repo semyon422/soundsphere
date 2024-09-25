@@ -18,11 +18,12 @@ OsuManiaScoring.metadata = {
 ---@operator call: sphere.OsuJudge
 local Judge = BaseJudge + {}
 
-Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 ---@param od number
 function Judge:new(od)
+	BaseJudge.new(self)
 	self.scoreSystemName = OsuManiaScoring.name
+	self.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 	self.weights = {
 		perfect = 305,
