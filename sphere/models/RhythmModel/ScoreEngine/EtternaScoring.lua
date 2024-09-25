@@ -163,6 +163,16 @@ function EtternaScoring:getTimings()
 	return judge:getTimings()
 end
 
+function EtternaScoring:getSlice()
+	local slice = {}
+
+	for i, v in ipairs(self.judges) do
+		slice[v.judgeName] = { accuracy = v.accuracy }
+	end
+
+	return slice
+end
+
 EtternaScoring.notes = {
 	ShortNote = {
 		clear = {

@@ -22,6 +22,7 @@ local Judge = BaseJudge + {}
 ---@param od number
 function Judge:new(od)
 	BaseJudge.new(self)
+	self.judgeName = OsuManiaScoring.name:format(od)
 	self.scoreSystemName = OsuManiaScoring.name
 	self.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
@@ -96,6 +97,16 @@ end
 function OsuManiaScoring:getTimings(od)
 	local judge = Judge(od)
 	return judge:getTimings()
+end
+
+function OsuManiaScoring:getSlice()
+	local slice = {}
+
+	for i, v in ipairs(self.judges) do
+		slice[v.judgeName] = { accuracy = v.accuracy }
+	end
+
+	return slice
 end
 
 OsuManiaScoring.notes = {

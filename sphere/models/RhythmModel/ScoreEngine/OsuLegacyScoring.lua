@@ -60,6 +60,7 @@ local hitBonusValue = {
 ---@param od number
 function Judge:new(od)
 	BaseJudge.new(self)
+	self.judgeName = OsuLegacyScoring.name:format(od)
 	self.scoreSystemName = OsuLegacyScoring.name
 	self.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
@@ -291,6 +292,19 @@ function OsuLegacyScoring:getTimings(od)
 	local timings = judge:getTimings()
 	timings.nearest = false
 	return timings
+end
+
+function OsuLegacyScoring:getSlice()
+	local slice = {}
+
+	for i, v in ipairs(self.judges) do
+		slice[v.judgeName] = {
+			accuracy = v.accuracy,
+			score = v.score,
+		}
+	end
+
+	return slice
 end
 
 OsuLegacyScoring.notes = {

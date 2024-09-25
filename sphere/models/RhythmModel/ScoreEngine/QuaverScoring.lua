@@ -114,6 +114,14 @@ function QuaverScoring:getTimings()
 	return judge:getTimings()
 end
 
+function QuaverScoring:getSlice()
+	local slice = {}
+	local judge_name = self.metadata.name
+	local judge = self.judges[judge_name]
+	slice[judge_name] = { accuracy = judge.accuracy }
+	return slice
+end
+
 QuaverScoring.notes = {
 	ShortNote = {
 		clear = {

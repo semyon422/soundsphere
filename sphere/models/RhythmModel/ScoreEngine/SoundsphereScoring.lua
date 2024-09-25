@@ -71,6 +71,14 @@ function SoundsphereScoring:miss(event)
 	judge:addCounter("miss", event.currentTime)
 end
 
+function SoundsphereScoring:getSlice()
+	local slice = {}
+	local judge_name = self.metadata.name
+	local judge = self.judges[judge_name]
+	slice[judge_name] = { accuracy = judge.accuracy }
+	return slice
+end
+
 SoundsphereScoring.notes = {
 	ShortNote = {
 		clear = {
