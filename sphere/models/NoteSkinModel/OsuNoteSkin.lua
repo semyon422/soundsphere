@@ -634,6 +634,15 @@ end
 function OsuNoteSkin:addScore()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
+
+	local key
+	local format
+	local judge = self.gameConfigs.select.judgements
+	if not self.config:get("DisplayNormalscore") and judge:find("osu!legacy") then
+		key = ("game.rhythmModel.scoreEngine.scoreSystem.judgements.%s.score"):format(judge)
+		format = "%i"
+	end
+
 	self.scoreConfig = ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
@@ -641,6 +650,8 @@ function OsuNoteSkin:addScore()
 		align = "right",
 		overlap = fonts.ScoreOverlap,
 		files = files,
+		key = key,
+		format = format
 	})
 	self.playField:addScore(self.scoreConfig)
 end
@@ -650,6 +661,15 @@ function OsuNoteSkin:addAccuracy()
 	local fonts = self.skinini.Fonts
 	local files = self:findCharFiles(fonts.ScorePrefix)
 	local scoreConfig = self.scoreConfig
+
+	local key
+	local multiplier
+	local judge = self.gameConfigs.select.judgements
+	if not self.config:get("DisplayNormalscore") and not judge:find("soundsphere") then
+		key = ("game.rhythmModel.scoreEngine.scoreSystem.judgements.%s.accuracy"):format(judge)
+		multiplier = 100
+	end
+
 	return self.playField:addAccuracy(ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
 		x = 1024,
@@ -659,6 +679,8 @@ function OsuNoteSkin:addAccuracy()
 		format = "%0.2f%%",
 		overlap = fonts.ScoreOverlap,
 		files = files,
+		key = key,
+		multiplier = multiplier,
 		draw = function(self)
 			self.y = scoreConfig.height
 			ImageValueView.draw(self)

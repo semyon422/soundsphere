@@ -221,14 +221,16 @@ function PlayfieldVsrg:addScore(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
-	function object:value()
-		local erfunc = require("libchart.erfunc")
-		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-		local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
-		return ("%d"):format(
-			erfunc.erf(ratingHitTimingWindow / ((normalscore.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
-		)
+	if not object.key then
+		object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
+		function object:value()
+			local erfunc = require("libchart.erfunc")
+			local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
+			local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
+			return ("%d"):format(
+				erfunc.erf(ratingHitTimingWindow / ((normalscore.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
+			)
+		end
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
@@ -242,10 +244,10 @@ function PlayfieldVsrg:addAccuracy(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
-	object.format = object.format or "%0.2f"
-	object.multiplier = 1000
 	object.color = object.color or {1, 1, 1, 1}
+	object.key = object.key or "game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
+	object.format = object.format or "%0.2f"
+	object.multiplier = object.multiplier or 1000
 	return self:add(object)
 end
 
