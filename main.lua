@@ -10,8 +10,11 @@ if arg[2] == "debug" then
 end
 
 local pkg = require("aqua.pkg")
+
+pkg.addc()
 pkg.addc("3rd-deps/lib")
 pkg.addc("bin/lib")
+pkg.add()
 pkg.add("3rd-deps/lua")
 pkg.add("aqua")
 pkg.add("ncdk")
