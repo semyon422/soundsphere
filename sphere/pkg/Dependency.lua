@@ -16,9 +16,9 @@ end
 
 ---@param dep_str string
 ---@return sphere.Dependency?
-function Dependency:fromString(dep_str)
+function Dependency:parse(dep_str)
 	local name, op, ver = dep_str:match("^(.-)([<=>]+)(.-)$")
-	return Dependency(name, op, Version:fromString(ver))
+	return Dependency(name, op, Version:parse(ver))
 end
 
 return Dependency

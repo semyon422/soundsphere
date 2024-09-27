@@ -1,4 +1,3 @@
-local physfs = require("physfs")
 local path_util = require("path_util")
 local class = require("class")
 local json = require("json")
@@ -9,57 +8,50 @@ local Package = require("sphere.pkg.Package")
 ---@operator call: sphere.PackageLoader
 local PackageLoader = class()
 
-PackageLoader.pkgsDir = "userdata/pkg"
-PackageLoader.mountDir = "mount" .. tostring(os.time()):sub(-4)
-
-function PackageLoader:new()
+---@param paths string[]
+---@param real_paths {[string]: string}?
+function PackageLoader:load(paths, real_paths)
 	---@type {[string]: sphere.Package}
 	self.packages = {}
 	---@type {[string]: string}
 	self.dirs = {}
-end
+	---@type {[string]: string}
+	self.real_paths = {}
 
-function PackageLoader:load()
-	---@type string[]
-	local items = love.filesystem.getDirectoryItems(self.pkgsDir)
-
-	for _, item in ipairs(items) do
-		local path = path_util.join(self.pkgsDir, item)
-		local info = love.filesystem.getInfo(path)
-
-		local mountPath = path_util.join(self.mountDir, item)
-		if info.type == "directory" or info.type == "symlink" or
-			(info.type == "file" and item:match("%.zip$"))
-		then
-			local ok, err = physfs.mount(path, mountPath, false)
-			if not ok then
-				print(err)
-			else
-				self:readPackage(mountPath)
-			end
-		end
+	for _, path in ipairs(paths) do
+		local real_path = real_paths and real_paths[path]
+		self:loadPackage(path, real_path)
 	end
 end
 
----@param mountPath string
+---@param path string
+---@param real_path string?
 ---@private
-function PackageLoader:readPackage(mountPath)
-	local dir = self:lookupRootDir(mountPath)
-	if not dir then
+function PackageLoader:loadPackage(path, real_path)
+	local root_path = self:lookupRootDir(path)
+	if not root_path then
 		return
 	end
 
-	local metadata_path = path_util.join(dir, "pkg.json")
+	local metadata_path = path_util.join(root_path, "pkg.json")
 	local data = love.filesystem.read(metadata_path)
 
 	local pkg = Package(json.decode(data))
-	if self.packages[pkg.name] then
-		error("package duplicate: " .. stbl.encode(pkg))
+	local name = pkg.name
+
+	local existing_pkg = self.packages[name]
+	if existing_pkg then
+		error(("package '%s' duplicate:\n%s\n%s"):format(
+			name,
+			real_path,
+			self.real_paths[name]
+		))
 		return
 	end
 
-	self.packages[pkg.name] = pkg
-	self.dirs[pkg.name] = dir
+	self.packages[name] = pkg
+	self.dirs[name] = root_path
+	self.real_paths[name] = real_path
 
 	print("package loaded: " .. stbl.encode(pkg))
 end

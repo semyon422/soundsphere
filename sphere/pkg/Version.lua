@@ -5,9 +5,12 @@ local table_util = require("table_util")
 ---@operator call: sphere.Version
 local Version = class()
 
----@param ver_str string
+---@param ver_str string?
 ---@return sphere.Version
-function Version:fromString(ver_str)
+function Version:parse(ver_str)
+	if not ver_str then
+		return Version()
+	end
 	local num_strs = ver_str:split(".")
 	---@type integer[]
 	local nums = {}
