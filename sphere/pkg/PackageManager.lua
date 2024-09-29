@@ -8,7 +8,6 @@ local PackageDownloader = require("sphere.pkg.PackageDownloader")
 local PackageManager = class()
 
 PackageManager.pkgs_path = "userdata/pkg"
-PackageManager.themes_path = "userdata/ui_themes"
 
 function PackageManager:new()
 	self.mounter = PackageMounter()
@@ -19,7 +18,6 @@ end
 function PackageManager:load()
 	self.mounter:unmount()
 	self.mounter:mount(self.pkgs_path)
-	self.mounter:mount(self.themes_path)
 	self.loader:unload()
 	self.loader:load(self.mounter.paths, self.mounter.real_paths)
 	self.packages = self.loader:getPackages()
