@@ -442,6 +442,9 @@ local function NotechartsSubscreen(self)
 	if imgui.IconOnlyButton("mounts", icons("folder_open"), h, 0.5) then
 		gameView:setModal(require("ui.views.MountsView"))
 	end
+	if imgui.IconOnlyButton("packages", icons("apps"), h, 0.5) then
+		gameView:setModal(require("ui.views.PackagesView"))
+	end
 	if imgui.TextOnlyButton("modifiers", "mods", w, h) then
 		gameView:setModal(require("ui.views.ModifierView"))
 	end

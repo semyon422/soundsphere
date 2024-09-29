@@ -10,8 +10,11 @@ if arg[2] == "debug" then
 end
 
 local pkg = require("aqua.pkg")
+
+pkg.addc()
 pkg.addc("3rd-deps/lib")
 pkg.addc("bin/lib")
+pkg.add()
 pkg.add("3rd-deps/lua")
 pkg.add("aqua")
 pkg.add("ncdk")
@@ -157,7 +160,26 @@ end
 local delay = require("delay")
 delay.set_timer(love.timer.getTime)
 
+---@type sphere.GameController?
+local game
+
 local thread = require("thread")
+thread.setInitFunc(function(packageLoader)
+	print("thread started")
+	require("preload")
+	if not packageLoader then
+		return
+	end
+	local PackageLoader = require("sphere.pkg.PackageLoader")
+	local PackageRequire = require("sphere.pkg.PackageRequire")
+	setmetatable(packageLoader, PackageLoader)
+	---@cast packageLoader sphere.PackageLoader
+	local packageRequire = PackageRequire()
+	packageRequire:require(packageLoader:getPackagesByType("require"))
+end, function()
+	return {game and game.packageManager.loader}
+end)
+
 thread.coro(function()
 	local UpdateController = require("sphere.update.UpdateController")
 	local updateController = UpdateController()
@@ -169,7 +191,7 @@ thread.coro(function()
 	end
 
 	local GameController = require("sphere.controllers.GameController")
-	local game = GameController()
+	game = GameController()
 
 	game:load()
 
