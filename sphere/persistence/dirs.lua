@@ -2,6 +2,7 @@ local dirs = {}
 
 local dirs_list = {
 	"userdata",
+	"userdata/pkg",
 	"userdata/skins",
 	"userdata/charts",
 	"userdata/charts/downloads",
