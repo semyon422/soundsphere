@@ -47,6 +47,11 @@ function ScoreSystem:receive(event)
 	self:after(event)
 end
 
+---@return number
+function ScoreSystem:getAccuracy(...) return -999 end
+---@return number
+function ScoreSystem:getScore(...) return -999 end
+
 ---@return table
 function ScoreSystem:getSlice()
 	local slice = {}

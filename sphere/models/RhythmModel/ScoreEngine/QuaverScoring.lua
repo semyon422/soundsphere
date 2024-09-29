@@ -11,15 +11,19 @@ local QuaverScoring = ScoreSystem + {}
 QuaverScoring.name = "quaver"
 QuaverScoring.metadata = {
 	name = "Quaver standard",
+	hasAccuracy = true,
+	hasScore = false
 }
 
+---@class sphere.QuaverJudge : sphere.Judge
+---@operator call: sphere.QuaverJudge
 local Judge = BaseJudge + {}
+Judge.orderedCounters = { "marvelous", "perfect", "great", "good", "okay" }
 
 ---@param windows table
 function Judge:new(windows)
 	BaseJudge.new(self)
 	self.scoreSystemName = QuaverScoring.name
-	self.orderedCounters = { "marvelous", "perfect", "great", "good", "okay" }
 
 	self.windows = windows
 
@@ -85,6 +89,10 @@ function QuaverScoring:load()
 	self.judges = {
 		[self.metadata.name] = Judge(stdWindows),
 	}
+end
+
+function QuaverScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
 end
 
 ---@param event table

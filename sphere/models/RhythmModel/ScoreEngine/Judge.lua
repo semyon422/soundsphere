@@ -21,7 +21,6 @@ function Judge:new()
 	self.accuracy = 1
 	self.notes = 0
 	self.lastCounter = nil
-	self.orderedCounters = {}
 end
 
 ---@param key string

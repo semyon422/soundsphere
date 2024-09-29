@@ -78,7 +78,6 @@ function NoteSkinModel:lookupSkins(tree, prefix)
 		if type(item) == "string" and item:lower():find("^.-skin%.%a-$") then
 			local info = new_skin_info(item)
 			if info then
-				info.game_configs = self.configModel.configs
 				info.file_name = item
 				info.dir = path_util.join(self.path, prefix)
 				table.insert(found, info)

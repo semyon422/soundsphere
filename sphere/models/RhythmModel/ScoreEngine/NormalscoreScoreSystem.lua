@@ -1,4 +1,5 @@
 local normalscore = require("libchart.normalscore3")
+local erfunc = require("libchart.erfunc")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
 ---@class sphere.NormalscoreScoreSystem: sphere.ScoreSystem
@@ -6,9 +7,17 @@ local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 local NormalscoreScoreSystem = ScoreSystem + {}
 
 NormalscoreScoreSystem.name = "normalscore"
+NormalscoreScoreSystem.metadata = {
+	hasAccuracy = true,
+	accuracyFormat = "%0.02f",
+	accuracyMultiplier = 1000,
+	scoreFormat = "%d",
+	scoreMultiplier = 1
+}
 
 function NormalscoreScoreSystem:load()
 	self.normalscore = normalscore:new()
+	self.accuracyAdjusted = 0
 end
 
 ---@param event table
@@ -22,6 +31,15 @@ function NormalscoreScoreSystem:after(event)
 	self.accuracy = score_not_adjusted
 	self.accuracyAdjusted = ns.score
 	self.adjustRatio = ns.score / score_not_adjusted
+end
+
+function NormalscoreScoreSystem:getAccuracy()
+	return self.accuracyAdjusted
+end
+
+function NormalscoreScoreSystem:getScore()
+	local rating_hit_window = self.scoreEngine.ratingHitWindow
+	return erfunc.erf(rating_hit_window / ((self.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
 end
 
 ---@param range_name string

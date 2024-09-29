@@ -9,17 +9,18 @@ local SoundsphereScoring = ScoreSystem + {}
 SoundsphereScoring.name = "soundsphere"
 SoundsphereScoring.metadata = {
 	name = "soundsphere",
+	hasAccuracy = false,
+	hasScore = false
 }
 
 ---@class sphere.SoundsphereJudge: sphere.Judge
 ---@operator call: sphere.SoundsphereJudge
 local Judge = BaseJudge + {}
-
+Judge.orderedCounters = { "perfect", "not perfect" }
 
 function Judge:new()
 	BaseJudge.new(self)
 	self.scoreSystemName = SoundsphereScoring.name
-	self.orderedCounters = { "perfect", "not perfect" }
 	self.accuracy = nil
 
 	self.windows = {

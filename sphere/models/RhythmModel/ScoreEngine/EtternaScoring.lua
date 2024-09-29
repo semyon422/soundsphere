@@ -14,6 +14,8 @@ EtternaScoring.name = "etterna"
 EtternaScoring.metadata = {
 	name = "Etterna J%d",
 	range = { 4, 9 },
+	hasAccuracy = true,
+	hasScore = false,
 }
 
 local judgeTimingWindows = {
@@ -33,13 +35,12 @@ local judgeDifficulty = { 0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20 }
 ---@class sphere.EtternaJudge: sphere.Judge
 ---@operator call: sphere.EtternaJudge
 local Judge = BaseJudge + {}
-
+Judge.orderedCounters = { "marvelous", "perfect", "great", "bad", "boo" }
 
 ---@param j number
 function Judge:new(j)
 	BaseJudge.new(self)
 	self.scoreSystemName = EtternaScoring.name
-	self.orderedCounters = { "marvelous", "perfect", "great", "bad", "boo" }
 
 	self.difficulty = judgeDifficulty[j]
 
@@ -141,6 +142,10 @@ function EtternaScoring:load()
 	for i = range[1], range[2], 1 do
 		self.judges[name:format(i)] = Judge(i)
 	end
+end
+
+function EtternaScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
 end
 
 function EtternaScoring:miss(event)

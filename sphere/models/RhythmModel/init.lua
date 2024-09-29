@@ -193,6 +193,13 @@ function RhythmModel:setVisualTimeRate(visualTimeRate)
 	self.graphicEngine.targetVisualTimeRate = visualTimeRate
 end
 
+---@param judgement_name string
+---@param rating_hit_window number
+function RhythmModel:setScoring(judgement_name, rating_hit_window)
+	self.scoreEngine.judgement = judgement_name
+	self.scoreEngine.ratingHitWindow = rating_hit_window
+end
+
 ---@param longNoteShortening number
 function RhythmModel:setLongNoteShortening(longNoteShortening)
 	self.graphicEngine.longNoteShortening = longNoteShortening

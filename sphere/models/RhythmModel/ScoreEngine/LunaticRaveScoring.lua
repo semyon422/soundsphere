@@ -18,18 +18,20 @@ LunaticRaveScoring.metadata = {
 		[2] = "Hard",
 		[3] = "Very hard",
 	},
+	hasAccuracy = true,
+	hasScore = false
 }
 
 ---@class sphere.LunaticRaveJudge: sphere.Judge
 ---@operator call: sphere.LunaticRaveJudge
 local Judge = BaseJudge + {}
+Judge.orderedCounters = { "pgreat", "great", "good", "bad" }
 
 ---@param windows table
 function Judge:new(judge_name, windows)
 	BaseJudge.new(self)
 	self.judgeName = judge_name
 	self.scoreSystemName = LunaticRaveScoring.name
-	self.orderedCounters = { "pgreat", "great", "good", "bad" }
 
 	self.weights = {
 		pgreat = 2,
@@ -106,6 +108,10 @@ function LunaticRaveScoring:load()
 		local judge_name = name:format(alias)
 		self.judges[judge_name] = Judge(judge_name, windows[alias])
 	end
+end
+
+function LunaticRaveScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
 end
 
 ---@param event table

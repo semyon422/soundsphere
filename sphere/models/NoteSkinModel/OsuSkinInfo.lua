@@ -40,7 +40,6 @@ function OsuSkinInfo:loadSkin(inputMode)
 	noteSkin.path = path
 	noteSkin.directoryPath = self.dir
 	noteSkin.fileName = self.file_name
-	noteSkin.gameConfigs = self.game_configs
 	noteSkin.skinini = skinini
 	noteSkin:setKeys(_inputMode:getColumns())
 	noteSkin.inputMode = _inputMode

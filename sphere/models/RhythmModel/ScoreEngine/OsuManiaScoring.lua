@@ -12,19 +12,22 @@ OsuManiaScoring.name = "osuMania"
 OsuManiaScoring.metadata = {
 	name = "osu!mania OD%d",
 	range = { 0, 10 },
+	hasAccuracy = true,
+	hasScore = false,
+	accuracyFormat = "%0.02f",
+	accuracyMultiplier = 100,
 }
 
 ---@class sphere.OsuJudge: sphere.Judge
 ---@operator call: sphere.OsuJudge
 local Judge = BaseJudge + {}
-
+Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 ---@param od number
 function Judge:new(od)
 	BaseJudge.new(self)
 	self.judgeName = OsuManiaScoring.name:format(od)
 	self.scoreSystemName = OsuManiaScoring.name
-	self.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 	self.weights = {
 		perfect = 305,
@@ -74,6 +77,10 @@ function OsuManiaScoring:load()
 	for od = range[1], range[2], 1 do
 		self.judges[name:format(od)] = Judge(od)
 	end
+end
+
+function OsuManiaScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
 end
 
 ---@param event table
