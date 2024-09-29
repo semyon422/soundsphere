@@ -224,7 +224,11 @@ function PlayfieldVsrg:addScore(object)
 	local base_load = object.load
 	function object:load()
 		base_load(self)
-		local scoring_metadata = self.game.rhythmModel.scoreEngine.scoreSource.metadata
+		local score_engine = self.game.rhythmModel.scoreEngine
+		if not score_engine.loaded then
+			return
+		end
+		local scoring_metadata = score_engine.scoreSource.metadata
 		object.format = scoring_metadata.scoreFormat
 		object.multiplier = scoring_metadata.scoreMultiplier
 	end
@@ -247,6 +251,10 @@ function PlayfieldVsrg:addAccuracy(object)
 	local base_load = object.load
 	function object:load()
 		base_load(self)
+		local score_engine = self.game.rhythmModel.scoreEngine
+		if not score_engine.loaded then
+			return
+		end
 		local scoring_metadata = self.game.rhythmModel.scoreEngine.accuracySource.metadata
 		object.format = scoring_metadata.accuracyFormat
 		object.multiplier = scoring_metadata.accuracyMultiplier
