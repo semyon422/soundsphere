@@ -2,41 +2,47 @@ local path_util = require("path_util")
 local aqua_pkg = require("pkg")
 local class = require("class")
 local json = require("json")
-local stbl = require("stbl")
 local Package = require("sphere.pkg.Package")
 
 ---@class sphere.PackageLoader
 ---@operator call: sphere.PackageLoader
 local PackageLoader = class()
 
----@param paths string[]
----@param real_paths {[string]: string}?
-function PackageLoader:load(paths, real_paths)
+function PackageLoader:new()
 	---@type {[string]: sphere.Package}
 	self.packages = {}
 	---@type {[string]: string}
 	self.dirs = {}
 	---@type {[string]: string}
 	self.real_paths = {}
+end
 
+---@param paths string[]
+---@param real_paths {[string]: string}?
+function PackageLoader:load(paths, real_paths)
+	self:new()
 	for _, path in ipairs(paths) do
 		local real_path = real_paths and real_paths[path]
 		self:loadPackage(path, real_path)
 	end
+end
 
+function PackageLoader:addLua()
+	local pkgs = self:getPackages()
+	for _, pkg in ipairs(pkgs) do
+		local path = self.dirs[pkg.name]
+		aqua_pkg.add(path)
+	end
 	aqua_pkg.export_lua()
 	aqua_pkg.export_love()
 end
 
-function PackageLoader:unload()
-	if not self.dirs then
-		return
-	end
-
-	for _, path in pairs(self.dirs) do
+function PackageLoader:removeLua()
+	local pkgs = self:getPackages()
+	for _, pkg in ipairs(pkgs) do
+		local path = self.dirs[pkg.name]
 		aqua_pkg.remove(path)
 	end
-
 	aqua_pkg.export_lua()
 	aqua_pkg.export_love()
 end
@@ -54,6 +60,19 @@ function PackageLoader:getPackages()
 	return pkgs
 end
 
+---@param _type string
+---@return sphere.Package[]
+function PackageLoader:getPackagesByType(_type)
+	---@type sphere.Package[]
+	local pkgs = {}
+	for _, pkg in pairs(self:getPackages()) do
+		if pkg.types[_type] then
+			table.insert(pkgs, pkg)
+		end
+	end
+	return pkgs
+end
+
 ---@param path string
 ---@param real_path string?
 ---@private
@@ -62,8 +81,6 @@ function PackageLoader:loadPackage(path, real_path)
 	if not root_path then
 		return
 	end
-
-	aqua_pkg.add(root_path)
 
 	local metadata_path = path_util.join(root_path, "pkg.json")
 	local data = love.filesystem.read(metadata_path)
