@@ -14,12 +14,17 @@ OsuLegacyScoring.name = "osuLegacy"
 OsuLegacyScoring.metadata = {
 	name = "osu!legacy OD%d",
 	range = { 0, 10 },
+	hasAccuracy = true,
+	hasScore = true,
+	accuracyFormat = "%0.02f",
+	accuracyMultiplier = 100,
+	scoreFormat = "%07d",
+	scoreMultiplier = 1,
 }
 
 ---@class sphere.OsuLegacyJudge: sphere.Judge
 ---@operator call: sphere.OsuLegacyJudge
 local Judge = BaseJudge + {}
-
 Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 
 local totalNotes = 0
@@ -61,6 +66,8 @@ local hitBonusValue = {
 
 ---@param od number
 function Judge:new(od)
+	BaseJudge.new(self)
+	self.judgeName = OsuLegacyScoring.name:format(od)
 	self.scoreSystemName = OsuLegacyScoring.name
 
 	self.weights = {
@@ -286,11 +293,32 @@ function OsuLegacyScoring:load()
 	totalNotes = self.scoreEngine.noteChart.chartdiff.notes_count
 end
 
+function OsuLegacyScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
+end
+
+function OsuLegacyScoring:getScore(judge)
+	return self.judges[judge].score
+end
+
 function OsuLegacyScoring:getTimings(od)
 	local judge = Judge(od)
 	local timings = judge:getTimings()
 	timings.nearest = false
 	return timings
+end
+
+function OsuLegacyScoring:getSlice()
+	local slice = {}
+
+	for i, v in ipairs(self.judges) do
+		slice[v.judgeName] = {
+			accuracy = v.accuracy,
+			score = v.score,
+		}
+	end
+
+	return slice
 end
 
 OsuLegacyScoring.notes = {

@@ -3,6 +3,11 @@ local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.Scor
 
 ---@class sphere.ScoreEngine
 ---@operator call: sphere.ScoreEngine
+---@field judgement string
+---@field ratingHitWindow number
+---@field selectedScoring sphere.ScoreSystem
+---@field accuracySource sphere.ScoreSystem
+---@field scoreSource sphere.ScoreSystem
 local ScoreEngine = class()
 
 ---@param timeEngine sphere.TimeEngine
@@ -21,6 +26,20 @@ function ScoreEngine:load()
 
 	self.minTime = self.noteChart.chartmeta.start_time
 	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
+
+	local judge = scoreSystem.judgements[self.judgement]
+
+	if not judge then
+		return -- loading result screen
+	end
+
+	local scoring = scoreSystem[judge.scoreSystemName]
+	local metadata = scoring.metadata
+
+	local normalscore = scoreSystem["normalscore"]
+	self.selectedScoring = scoring
+	self.accuracySource = metadata.hasAccuracy and scoring or normalscore
+	self.scoreSource = metadata.hasScore and scoring or normalscore
 end
 
 function ScoreEngine:update()
@@ -37,6 +56,18 @@ function ScoreEngine:update()
 	elseif timer.isPlaying and self.paused then
 		self.paused = false
 	end
+end
+
+function ScoreEngine:getAccuracy()
+	return self.accuracySource:getAccuracy(self.judgement)
+end
+
+function ScoreEngine:getScore()
+	return self.scoreSource:getScore(self.judgement)
+end
+
+function ScoreEngine:getJudge()
+	return self.selectedScoring.judges[self.judgement]
 end
 
 return ScoreEngine

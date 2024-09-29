@@ -9,18 +9,19 @@ local SoundsphereScoring = ScoreSystem + {}
 SoundsphereScoring.name = "soundsphere"
 SoundsphereScoring.metadata = {
 	name = "soundsphere",
+	hasAccuracy = false,
+	hasScore = false
 }
 
 ---@class sphere.SoundsphereJudge: sphere.Judge
 ---@operator call: sphere.SoundsphereJudge
 local Judge = BaseJudge + {}
-
 Judge.orderedCounters = { "perfect", "not perfect" }
 
 function Judge:new()
+	BaseJudge.new(self)
 	self.scoreSystemName = SoundsphereScoring.name
-
-	BaseJudge.accuracy = nil
+	self.accuracy = nil
 
 	self.windows = {
 		perfect = 0.016,
@@ -69,6 +70,14 @@ end
 function SoundsphereScoring:miss(event)
 	local judge = self.judges[self.metadata.name]
 	judge:addCounter("miss", event.currentTime)
+end
+
+function SoundsphereScoring:getSlice()
+	local slice = {}
+	local judge_name = self.metadata.name
+	local judge = self.judges[judge_name]
+	slice[judge_name] = { accuracy = judge.accuracy }
+	return slice
 end
 
 SoundsphereScoring.notes = {

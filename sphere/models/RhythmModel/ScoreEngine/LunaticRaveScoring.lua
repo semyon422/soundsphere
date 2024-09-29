@@ -18,16 +18,21 @@ LunaticRaveScoring.metadata = {
 		[2] = "Hard",
 		[3] = "Very hard",
 	},
+	hasAccuracy = true,
+	hasScore = false,
+	accuracyFormat = "%0.02f%%",
+	accuracyMultiplier = 100
 }
 
 ---@class sphere.LunaticRaveJudge: sphere.Judge
 ---@operator call: sphere.LunaticRaveJudge
 local Judge = BaseJudge + {}
-
 Judge.orderedCounters = { "pgreat", "great", "good", "bad" }
 
 ---@param windows table
-function Judge:new(windows)
+function Judge:new(judge_name, windows)
+	BaseJudge.new(self)
+	self.judgeName = judge_name
 	self.scoreSystemName = LunaticRaveScoring.name
 
 	self.weights = {
@@ -101,9 +106,14 @@ function LunaticRaveScoring:load()
 	local name = self.metadata.name
 
 	for rank = range[1], range[2], 1 do
-		local judge_name = self.metadata.rangeValueAlias[rank]
-		self.judges[name:format(judge_name)] = Judge(windows[judge_name])
+		local alias = self.metadata.rangeValueAlias[rank]
+		local judge_name = name:format(alias)
+		self.judges[judge_name] = Judge(judge_name, windows[alias])
 	end
+end
+
+function LunaticRaveScoring:getAccuracy(judge)
+	return self.judges[judge].accuracy
 end
 
 ---@param event table
@@ -132,9 +142,19 @@ end
 
 ---@return table
 function LunaticRaveScoring:getTimings()
-	local timings = Judge(windows["Easy"]):getTimings()
+	local timings = Judge("LR2 Easy", windows["Easy"]):getTimings()
 	timings.nearest = false
 	return timings
+end
+
+function LunaticRaveScoring:getSlice()
+	local slice = {}
+
+	for i, v in ipairs(self.judges) do
+		slice[v.judgeName] = { accuracy = v.accuracy }
+	end
+
+	return slice
 end
 
 LunaticRaveScoring.notes = {

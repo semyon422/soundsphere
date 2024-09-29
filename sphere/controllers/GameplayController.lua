@@ -86,6 +86,7 @@ function GameplayController:load()
 
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
+	local judgement = configModel.configs.select.judgements
 
 	local chart = selectModel:loadChartAbsolute(self:getImporterSettings())
 
@@ -126,6 +127,7 @@ function GameplayController:load()
 	rhythmModel:setVolume(config.audio.volume)
 	rhythmModel:setAudioMode(config.audio.mode)
 
+	rhythmModel:setScoring(judgement, config.gameplay.ratingHitTimingWindow)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)

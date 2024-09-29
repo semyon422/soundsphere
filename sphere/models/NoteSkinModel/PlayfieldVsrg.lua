@@ -221,14 +221,15 @@ function PlayfieldVsrg:addScore(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.score"
+	local base_load = object.load
+	function object:load()
+		base_load(self)
+		local scoring_metadata = self.game.rhythmModel.scoreEngine.scoreSource.metadata
+		object.format = scoring_metadata.scoreFormat
+		object.multiplier = scoring_metadata.scoreMultiplier
+	end
 	function object:value()
-		local erfunc = require("libchart.erfunc")
-		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-		local normalscore = self.game.rhythmModel.scoreEngine.scoreSystem.normalscore
-		return ("%d"):format(
-			erfunc.erf(ratingHitTimingWindow / ((normalscore.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
-		)
+		return self.game.rhythmModel.scoreEngine:getScore()
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
@@ -242,9 +243,18 @@ function PlayfieldVsrg:addAccuracy(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.normalscore.accuracyAdjusted"
-	object.format = object.format or "%0.2f"
-	object.multiplier = 1000
+
+	local base_load = object.load
+	function object:load()
+		base_load(self)
+		local scoring_metadata = self.game.rhythmModel.scoreEngine.accuracySource.metadata
+		object.format = scoring_metadata.accuracyFormat
+		object.multiplier = scoring_metadata.accuracyMultiplier
+	end
+	function object:value()
+		return self.game.rhythmModel.scoreEngine:getAccuracy()
+	end
+
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
 end
@@ -283,12 +293,10 @@ function PlayfieldVsrg:addJudgement(object)
 			rate = judgement.rate or object.rate,
 			cycles = judgement.cycles or object.cycles,
 		})
-		judgements[judgement[1]] = config
+		table.insert(judgements, config)
 		self:add(config)
 	end
-	local key = ("game.rhythmModel.scoreEngine.scoreSystem.judgements.%s"):format(object.judge)
 	return self:add(JudgementView({
-		key = key,
 		judgements = judgements,
 		subscreen = "gameplay",
 	}))
