@@ -8,23 +8,25 @@ local class = require("class")
 ---@field real_paths {[string]: string}
 local PackageMounter = class()
 
----@param pkgs_path string
-function PackageMounter:new(pkgs_path)
-	self.pkgs_path = pkgs_path
-	self.mount_path = "mount" .. tostring(os.time())
+PackageMounter.mount_path = "pkg_mount"
+
+function PackageMounter:new()
+	self.mount_index = 0
 	self.paths = {}
 	self.real_paths = {}
 end
 
-function PackageMounter:mount()
+---@param pkgs_path string
+function PackageMounter:mount(pkgs_path)
 	---@type string[]
-	local items = love.filesystem.getDirectoryItems(self.pkgs_path)
+	local items = love.filesystem.getDirectoryItems(pkgs_path)
 
 	for _, item in ipairs(items) do
-		local path = path_util.join(self.pkgs_path, item)
+		self.mount_index = self.mount_index + 1
+		local path = path_util.join(pkgs_path, item)
 		local info = love.filesystem.getInfo(path)
 
-		local mount_path = path_util.join(self.mount_path, item)
+		local mount_path = path_util.join(self.mount_path, self.mount_index)
 		if info.type == "directory" or info.type == "symlink" or
 			(info.type == "file" and item:match("%.zip$"))
 		then
@@ -32,7 +34,7 @@ function PackageMounter:mount()
 			if not ok then
 				print(err)
 			else
-				self.real_paths[path] = mount_path
+				self.real_paths[mount_path] = path
 				table.insert(self.paths, mount_path)
 			end
 		end

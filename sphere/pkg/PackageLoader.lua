@@ -1,4 +1,5 @@
 local path_util = require("path_util")
+local aqua_pkg = require("pkg")
 local class = require("class")
 local json = require("json")
 local stbl = require("stbl")
@@ -22,6 +23,35 @@ function PackageLoader:load(paths, real_paths)
 		local real_path = real_paths and real_paths[path]
 		self:loadPackage(path, real_path)
 	end
+
+	aqua_pkg.export_lua()
+	aqua_pkg.export_love()
+end
+
+function PackageLoader:unload()
+	if not self.dirs then
+		return
+	end
+
+	for _, path in pairs(self.dirs) do
+		aqua_pkg.remove(path)
+	end
+
+	aqua_pkg.export_lua()
+	aqua_pkg.export_love()
+end
+
+---@return sphere.Package[]
+function PackageLoader:getPackages()
+	---@type sphere.Package[]
+	local pkgs = {}
+	for _, pkg in pairs(self.packages) do
+		table.insert(pkgs, pkg)
+	end
+	table.sort(pkgs, function(a, b)
+		return a.name < b.name
+	end)
+	return pkgs
 end
 
 ---@param path string
@@ -32,6 +62,8 @@ function PackageLoader:loadPackage(path, real_path)
 	if not root_path then
 		return
 	end
+
+	aqua_pkg.add(root_path)
 
 	local metadata_path = path_util.join(root_path, "pkg.json")
 	local data = love.filesystem.read(metadata_path)
@@ -53,7 +85,7 @@ function PackageLoader:loadPackage(path, real_path)
 	self.dirs[name] = root_path
 	self.real_paths[name] = real_path
 
-	print("package loaded: " .. stbl.encode(pkg))
+	print("package loaded: " .. name)
 end
 
 ---@param dir string

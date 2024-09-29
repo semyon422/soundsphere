@@ -20,6 +20,10 @@ function Version:parse(ver_str)
 	return Version(nums)
 end
 
+function Version:__tostring()
+	return table.concat(self, ".")
+end
+
 function Version.__eq(a, b)
 	return table_util.equal(a, b)
 end
