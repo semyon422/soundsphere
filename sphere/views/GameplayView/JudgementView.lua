@@ -6,7 +6,11 @@ local class = require("class")
 local JudgementView = class()
 
 function JudgementView:load()
-	self.timeEngine = self.game.rhythmModel.timeEngine
+	local score_engine = self.game.rhythmModel.scoreEngine
+	if not score_engine.loaded then
+		return
+	end
+
 	self.judge = self.game.rhythmModel.scoreEngine:getJudge()
 	self.notes = 0
 

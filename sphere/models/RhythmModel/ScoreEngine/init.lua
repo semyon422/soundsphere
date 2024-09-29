@@ -8,6 +8,7 @@ local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.Scor
 ---@field selectedScoring sphere.ScoreSystem
 ---@field accuracySource sphere.ScoreSystem
 ---@field scoreSource sphere.ScoreSystem
+---@field loaded boolean
 local ScoreEngine = class()
 
 ---@param timeEngine sphere.TimeEngine
@@ -40,6 +41,7 @@ function ScoreEngine:load()
 	self.selectedScoring = scoring
 	self.accuracySource = metadata.hasAccuracy and scoring or normalscore
 	self.scoreSource = metadata.hasScore and scoring or normalscore
+	self.loaded = true
 end
 
 function ScoreEngine:update()
