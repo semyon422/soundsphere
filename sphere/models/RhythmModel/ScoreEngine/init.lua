@@ -5,6 +5,7 @@ local ScoreSystemContainer = require("sphere.models.RhythmModel.ScoreEngine.Scor
 ---@operator call: sphere.ScoreEngine
 ---@field judgement string
 ---@field ratingHitWindow number
+---@field selectedScoring sphere.ScoreSystem
 ---@field accuracySource sphere.ScoreSystem
 ---@field scoreSource sphere.ScoreSystem
 local ScoreEngine = class()
@@ -36,6 +37,7 @@ function ScoreEngine:load()
 	local metadata = scoring.metadata
 
 	local normalscore = scoreSystem["normalscore"]
+	self.selectedScoring = scoring
 	self.accuracySource = metadata.hasAccuracy and scoring or normalscore
 	self.scoreSource = metadata.hasScore and scoring or normalscore
 end
@@ -62,6 +64,10 @@ end
 
 function ScoreEngine:getScore()
 	return self.scoreSource:getScore(self.judgement)
+end
+
+function ScoreEngine:getJudge()
+	return self.selectedScoring.judges[self.judgement]
 end
 
 return ScoreEngine

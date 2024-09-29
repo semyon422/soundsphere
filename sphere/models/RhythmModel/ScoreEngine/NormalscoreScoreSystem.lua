@@ -9,6 +9,7 @@ local NormalscoreScoreSystem = ScoreSystem + {}
 NormalscoreScoreSystem.name = "normalscore"
 NormalscoreScoreSystem.metadata = {
 	hasAccuracy = true,
+	hasScore = true,
 	accuracyFormat = "%0.02f",
 	accuracyMultiplier = 1000,
 	scoreFormat = "%d",

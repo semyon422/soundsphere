@@ -293,12 +293,10 @@ function PlayfieldVsrg:addJudgement(object)
 			rate = judgement.rate or object.rate,
 			cycles = judgement.cycles or object.cycles,
 		})
-		judgements[judgement[1]] = config
+		table.insert(judgements, config)
 		self:add(config)
 	end
-	local key = ("game.rhythmModel.scoreEngine.scoreSystem.judgements.%s"):format(object.judge)
 	return self:add(JudgementView({
-		key = key,
 		judgements = judgements,
 		subscreen = "gameplay",
 	}))

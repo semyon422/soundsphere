@@ -527,12 +527,12 @@ assert(getNoteType(1, 4, 0) == 2)
 assert(getNoteType(1, 5, 0) == 2)
 
 local defaultJudgements = {
-	{"miss", "Hit0", "mania-hit0"},
-	{"meh", "Hit50", "mania-hit50"},
-	{"ok", "Hit100", "mania-hit100"},
-	{"good", "Hit200", "mania-hit200"},
-	{"great", "Hit300", "mania-hit300"},
 	{"perfect", "Hit300g", "mania-hit300g"},
+	{"great", "Hit300", "mania-hit300"},
+	{"good", "Hit200", "mania-hit200"},
+	{"ok", "Hit100", "mania-hit100"},
+	{"meh", "Hit50", "mania-hit50"},
+	{"miss", "Hit0", "mania-hit0"},
 }
 
 ---@param od number
@@ -569,8 +569,6 @@ function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
 		x = 0, y = position, ox = 0.5, oy = 0.5,
 		scale = 480 / 768,
 		transform = self.playField:newLaneCenterTransform(480),
-		score_system = "osuMania",
-		judge = ("osu!mania OD%d"):format(od),
 		rate = rate,
 		judgements = judgements,
 	})
