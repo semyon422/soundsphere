@@ -12,7 +12,9 @@ QuaverScoring.name = "quaver"
 QuaverScoring.metadata = {
 	name = "Quaver standard",
 	hasAccuracy = true,
-	hasScore = false
+	hasScore = false,
+	accuracyFormat = "%0.02f%%",
+	accuracyMultiplier = 100
 }
 
 ---@class sphere.QuaverJudge : sphere.Judge

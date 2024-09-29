@@ -19,7 +19,9 @@ LunaticRaveScoring.metadata = {
 		[3] = "Very hard",
 	},
 	hasAccuracy = true,
-	hasScore = false
+	hasScore = false,
+	accuracyFormat = "%0.02f%%",
+	accuracyMultiplier = 100
 }
 
 ---@class sphere.LunaticRaveJudge: sphere.Judge

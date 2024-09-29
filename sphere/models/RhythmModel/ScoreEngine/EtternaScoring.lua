@@ -16,6 +16,8 @@ EtternaScoring.metadata = {
 	range = { 4, 9 },
 	hasAccuracy = true,
 	hasScore = false,
+	accuracyFormat = "%0.02f%%",
+	accuracyMultiplier = 100
 }
 
 local judgeTimingWindows = {
