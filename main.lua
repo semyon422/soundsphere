@@ -165,7 +165,7 @@ local game
 
 local thread = require("thread")
 thread.setInitFunc(function(packageLoader)
-	print("thread started")
+	print("thread init")
 	require("preload")
 	if not packageLoader then
 		return
@@ -175,7 +175,8 @@ thread.setInitFunc(function(packageLoader)
 	setmetatable(packageLoader, PackageLoader)
 	---@cast packageLoader sphere.PackageLoader
 	local packageRequire = PackageRequire()
-	packageRequire:require(packageLoader:getPackagesByType("require"))
+	local pkgs = packageLoader:getPackagesByType("require")
+	packageRequire:require(pkgs)
 end, function()
 	return {game and game.packageManager.loader}
 end)
@@ -189,6 +190,7 @@ thread.coro(function()
 		thread.waitAsync()
 		return love.event.quit("restart")
 	end
+	thread.reinit()
 
 	local GameController = require("sphere.controllers.GameController")
 	game = GameController()
