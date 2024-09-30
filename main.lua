@@ -190,7 +190,7 @@ thread.coro(function()
 		thread.waitAsync()
 		return love.event.quit("restart")
 	end
-	thread.reinit()
+	thread.stopThreads()
 
 	local GameController = require("sphere.controllers.GameController")
 	game = GameController()
