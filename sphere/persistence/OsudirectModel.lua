@@ -11,6 +11,7 @@ local json = require("json")
 local OsudirectModel = class()
 
 OsudirectModel.changed = false
+OsudirectModel.limitedTo = os.time()
 
 OsudirectModel.rankedStatuses = {
 	{-3, "any"},
@@ -232,7 +233,15 @@ function OsudirectModel:getPreviewUrl()
 	return config.preview:format(self.beatmap.id)
 end
 
+function OsudirectModel:isLimited()
+	return os.time() < self.limitedTo
+end
+
 function OsudirectModel:downloadAsync(beatmap)
+	if self:isLimited() then
+		return
+	end
+
 	if not beatmap or beatmap == self.statusBeatmap then
 		return
 	end
@@ -251,6 +260,11 @@ function OsudirectModel:downloadAsync(beatmap)
 	beatmap.isDownloading = true
 	local data, code, headers, status_line = fs_util.downloadAsync(url)
 	beatmap.isDownloading = false
+
+	if code == 429 then
+		self.limitedTo = os.time() + 60
+		return
+	end
 
 	if not data then
 		beatmap.status = status_line

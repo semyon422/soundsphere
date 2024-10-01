@@ -130,15 +130,21 @@ local function OsudirectSubscreen(self)
 
 	w, h = Layout:move("column2row2row1")
 
-	local set = self.game.osudirectModel.beatmap
+	local osudirectModel = self.game.osudirectModel
+	local set = osudirectModel.beatmap
 	if not set then
 		return
 	end
 
+	local button_id = "download"
 	local button_text = set.downloaded and "redownload" or "download"
+	if osudirectModel:isLimited() then
+		button_id = nil
+		button_text = "rate limit, wait a minute"
+	end
 
 	just.indent(36)
-	if imgui.TextOnlyButton("download", button_text, w - 72, h) then
+	if imgui.TextOnlyButton(button_id, button_text, w - 72, h) then
 		self.game.osudirectModel:download(set)
 	end
 end
