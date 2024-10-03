@@ -20,6 +20,7 @@ local Judge = class()
 function Judge:new()
 	self.accuracy = 1
 	self.notes = 0
+	self.lastUpdateTime = -math.huge
 	self.lastCounter = nil
 end
 

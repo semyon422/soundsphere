@@ -455,12 +455,12 @@ function OsuNoteSkin:load()
 		foregroundColor = {1, 1, 1, 1},
 		draw = function(self)
 			self.y = accObj.y + self.r
-			self.x = accObj.x - accObj.width * accObj.scale - self.r
+			self.x = accObj.x - accObj.width * accObj.scale - self.r - 2
 			CircleProgressView.draw(self)
 		end,
 	})
 
-	self:addJudgements(config:get("OverallDifficulty"))
+	self:addJudgements()
 
 	local h = 14
 	BasePlayfield.addHitError(playfield, {
@@ -535,8 +535,7 @@ local defaultJudgements = {
 	{"miss", "Hit0", "mania-hit0"},
 }
 
----@param od number
-function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
+function OsuNoteSkin:addJudgements()  -- TriggerScoreIncrease
 	local mania = self.mania
 
 	local rate = 20
@@ -571,6 +570,7 @@ function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
 		transform = self.playField:newLaneCenterTransform(480),
 		rate = rate,
 		judgements = judgements,
+		animate = self.config:get("JudgementAnimation")
 	})
 end
 
@@ -635,13 +635,13 @@ function OsuNoteSkin:addScore()
 
 	self.scoreConfig = ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
-		x = 1024,
+		x = 1016,
 		y = 0,
+		scale = 0.95,
 		align = "right",
+		animate = true,
 		overlap = fonts.ScoreOverlap,
 		files = files,
-		key = key,
-		format = format
 	})
 	self.playField:addScore(self.scoreConfig)
 end
@@ -654,11 +654,12 @@ function OsuNoteSkin:addAccuracy()
 
 	return self.playField:addAccuracy(ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
-		x = 1024,
+		x = 1016,
 		y = 0,
 		scale = 0.6,
 		align = "right",
 		format = "%0.2f%%",
+		animate = true,
 		overlap = fonts.ScoreOverlap,
 		files = files,
 		draw = function(self)
@@ -666,6 +667,7 @@ function OsuNoteSkin:addAccuracy()
 			ImageValueView.draw(self)
 		end,
 	}))
+
 end
 
 ---@return table

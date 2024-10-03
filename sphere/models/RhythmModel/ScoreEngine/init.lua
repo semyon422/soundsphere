@@ -60,14 +60,17 @@ function ScoreEngine:update()
 	end
 end
 
+---@return number
 function ScoreEngine:getAccuracy()
 	return self.accuracySource:getAccuracy(self.judgement)
 end
 
+---@return number
 function ScoreEngine:getScore()
 	return self.scoreSource:getScore(self.judgement)
 end
 
+---@return sphere.Judge
 function ScoreEngine:getJudge()
 	return self.selectedScoring.judges[self.judgement]
 end
