@@ -13,6 +13,8 @@ function ImageAnimationView:load()
 	animation.rate = self.rate
 	animation.time = math.huge
 	self.animation = animation
+	self.color = self.color or { 1, 1, 1, 1 }
+	self.rotation = self.rotation or 0
 
 	if self.quad then
 		self:loadQuads()
@@ -82,18 +84,14 @@ function ImageAnimationView:draw()
 	local tf = transform(self.transform)
 	love.graphics.replaceTransform(tf)
 
-	if self.color then
-		love.graphics.setColor(self.color)
-	else
-		love.graphics.setColor(1, 1, 1, 1)
-	end
+	love.graphics.setColor(self.color)
 	if self.quad then
 		love.graphics.draw(
 			self.image,
 			self.quads[animation.frame],
 			self.x,
 			self.y,
-			0,
+			self.rotation,
 			sx, sy, ox, oy
 		)
 		return
@@ -102,7 +100,7 @@ function ImageAnimationView:draw()
 		self.images[animation.frame],
 		self.x,
 		self.y,
-		0,
+		self.rotation,
 		sx, sy, ox, oy
 	)
 end

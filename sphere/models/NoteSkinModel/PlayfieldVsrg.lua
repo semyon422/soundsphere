@@ -307,6 +307,8 @@ function PlayfieldVsrg:addJudgement(object)
 	return self:add(JudgementView({
 		judgements = judgements,
 		subscreen = "gameplay",
+		animate = object.animate,
+		scale = object.scale
 	}))
 end
 

@@ -460,7 +460,7 @@ function OsuNoteSkin:load()
 		end,
 	})
 
-	self:addJudgements(config:get("OverallDifficulty"))
+	self:addJudgements()
 
 	local h = 14
 	BasePlayfield.addHitError(playfield, {
@@ -535,8 +535,7 @@ local defaultJudgements = {
 	{"miss", "Hit0", "mania-hit0"},
 }
 
----@param od number
-function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
+function OsuNoteSkin:addJudgements()  -- TriggerScoreIncrease
 	local mania = self.mania
 
 	local rate = 20
@@ -571,6 +570,7 @@ function OsuNoteSkin:addJudgements(od)  -- TriggerScoreIncrease
 		transform = self.playField:newLaneCenterTransform(480),
 		rate = rate,
 		judgements = judgements,
+		animate = self.config:get("JudgementAnimation")
 	})
 end
 
