@@ -14,7 +14,7 @@ OsuManiaScoring.metadata = {
 	range = { 0, 10 },
 	hasAccuracy = true,
 	hasScore = false,
-	accuracyFormat = "%0.02f",
+	accuracyFormat = "%0.02f%%",
 	accuracyMultiplier = 100,
 }
 

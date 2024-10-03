@@ -455,7 +455,7 @@ function OsuNoteSkin:load()
 		foregroundColor = {1, 1, 1, 1},
 		draw = function(self)
 			self.y = accObj.y + self.r
-			self.x = accObj.x - accObj.width * accObj.scale - self.r
+			self.x = accObj.x - accObj.width * accObj.scale - self.r - 2
 			CircleProgressView.draw(self)
 		end,
 	})
@@ -635,13 +635,13 @@ function OsuNoteSkin:addScore()
 
 	self.scoreConfig = ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
-		x = 1024,
+		x = 1016,
 		y = 0,
+		scale = 0.95,
 		align = "right",
+		animate = true,
 		overlap = fonts.ScoreOverlap,
 		files = files,
-		key = key,
-		format = format
 	})
 	self.playField:addScore(self.scoreConfig)
 end
@@ -654,11 +654,12 @@ function OsuNoteSkin:addAccuracy()
 
 	return self.playField:addAccuracy(ImageValueView({
 		transform = self.playField:newTransform(1024, 768, "right"),
-		x = 1024,
+		x = 1016,
 		y = 0,
 		scale = 0.6,
 		align = "right",
 		format = "%0.2f%%",
+		animate = true,
 		overlap = fonts.ScoreOverlap,
 		files = files,
 		draw = function(self)
@@ -666,6 +667,7 @@ function OsuNoteSkin:addAccuracy()
 			ImageValueView.draw(self)
 		end,
 	}))
+
 end
 
 ---@return table

@@ -1,6 +1,7 @@
 local transform = require("gfx_util").transform
 local inside = require("table_util").inside
 local class = require("class")
+local flux = require("flux")
 
 ---@class sphere.ImageValueView
 ---@operator call: sphere.ImageValueView
@@ -12,9 +13,18 @@ function ImageValueView:load()
 	if not self.files then
 		return
 	end
+
+	self.maxCharW = 0
 	for char, path in pairs(self.files) do
 		images[char] = love.graphics.newImage(self.game.fileFinder:findFile(path))
+
+		if tonumber(char) then
+			self.maxCharW = math.max(images[char]:getWidth(), self.maxCharW)
+		end
 	end
+
+	self.displayValue = 0
+	self.targetValue = 0
 end
 
 ---@param value table
@@ -30,7 +40,11 @@ function ImageValueView:getDimensions(value)
 		local char = value:sub(i, i)
 		local image = images[char]
 		if image then
-			width = width + image:getWidth() - overlap
+			if tonumber(char) then
+				width = width + self.maxCharW - overlap
+			else
+				width = width + image:getWidth() - overlap
+			end
 			height = math.max(height, image:getHeight())
 		end
 	end
@@ -38,6 +52,17 @@ function ImageValueView:getDimensions(value)
 		width = width + overlap
 	end
 	return width, height
+end
+
+function ImageValueView:animation(value)
+	if value == self.targetValue then
+		return self.displayValue
+	end
+
+	self.targetValue = value
+	self.tween = flux.to(self, 0.3, { displayValue = value }):ease("quartout")
+
+	return self.displayValue
 end
 
 function ImageValueView:draw()
@@ -54,6 +79,9 @@ function ImageValueView:draw()
 	if value then
 		if type(value) == "function" then
 			value = value(self)
+		end
+		if self.animate then
+			value = self:animation(value)
 		end
 		if self.multiplier and tonumber(value) then
 			value = value * self.multiplier
@@ -85,8 +113,13 @@ function ImageValueView:draw()
 		local char = value:sub(i, i)
 		local image = images[char]
 		if image then
-			love.graphics.draw(image, x, self.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
-			x = x + (image:getWidth() - overlap) * sx
+			if tonumber(char) then
+				love.graphics.draw(image, x + (self.maxCharW - image:getWidth()) / 2, self.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
+				x = x + (self.maxCharW - overlap) * sx
+			else
+				love.graphics.draw(image, x, self.y + (height * (1 - oy) - image:getHeight()) * sy, 0, sx, sy)
+				x = x + (image:getWidth() - overlap) * sx
+			end
 		end
 	end
 end
