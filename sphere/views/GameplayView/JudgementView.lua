@@ -11,7 +11,7 @@ function JudgementView:load()
 		return
 	end
 
-	self.judge = self.game.rhythmModel.scoreEngine:getJudge()
+	self.judge = score_engine:getJudge()
 	self.notes = 0
 
 	self.counterIndex = {}

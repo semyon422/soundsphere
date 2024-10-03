@@ -592,10 +592,6 @@ function PlayfieldVsrg:addGuidelines(object)
 	end
 end
 
-local perfectColor = {1, 1, 1, 1}
-local notPerfectColor = {1, 0.6, 0.4, 1}
-local missColor = {1, 0.2, 0.2, 1}
-
 ---@param object table?
 ---@return table?
 function PlayfieldVsrg:addHitError(object)
@@ -605,18 +601,7 @@ function PlayfieldVsrg:addHitError(object)
 	object.subscreen = "gameplay"
 	object.transform = object.transform or self:newLaneCenterTransform(1080)
 	object.count = object.count or 1
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.sequence"
-	object.value = "misc.deltaTime"
 	object.unit = object.unit or 0.16
-	object.color = object.color or function(value, unit)
-		if math.abs(value) <= 0.016 then
-			return perfectColor
-		elseif math.abs(value) > 0.12 then
-			return missColor
-		end
-		return notPerfectColor
-	end
-
 	return self:add(HitErrorView(object))
 end
 
