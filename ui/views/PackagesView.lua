@@ -86,10 +86,10 @@ section_draw["local"] = function(self, inner_w)
 
 	for _, pkg in ipairs(pkgs) do
 		local id = "pkg " .. pkg.name
-		imgui.label(id, ("%s v%s by %s"):format(pkg.name, pkg.version, pkg.creator))
+		imgui.label(id, ("%s v%s by %s"):format(pkg.display_name, pkg.version, pkg.creator))
 		if just.mouse_over(id, false, "mouse") then
-			self.tooltip = ("type: %s\ndesc: %s\npath: %s"):format(
-				pkg.type,
+			self.tooltip = ("name: %s\ndesc: %s\npath: %s"):format(
+				pkg.name,
 				pkg.desc,
 				packageManager:getPackageRealPath(pkg.name)
 			)
@@ -121,9 +121,9 @@ function section_draw.remote(self)
 			love.system.openURL(pkg_info.github)
 		end
 		just.sameline()
-		local label_text = pkg_info.name
+		local label_text = pkg_info.display_name
 		if pkg_info.status then
-			label_text = pkg_info.name .. ": " .. pkg_info.status
+			label_text = label_text .. ": " .. pkg_info.status
 		end
 		if pkg_info.isDownloading then
 			local shared = thread.shared.download[pkg_info.url]
