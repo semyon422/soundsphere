@@ -18,6 +18,12 @@ local repo = {
 		url = "https://codeload.github.com/Thetan-ILW/PlayerProfile-soundsphere/zip/refs/heads/main",
 		source = "https://github.com/Thetan-ILW/PlayerProfile-soundsphere",
 	},
+	{
+		name = "manip_factor",
+		display_name = "Manip factor for 4K",
+		url = "https://codeload.github.com/Thetan-ILW/ManipFactorEtterna-soundsphere/zip/refs/heads/main",
+		source = "https://github.com/Thetan-ILW/ManipFactorEtterna-soundsphere",
+	},
 }
 
 return repo
