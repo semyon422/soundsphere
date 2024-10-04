@@ -118,7 +118,7 @@ function section_draw.remote(self)
 		end
 		just.sameline()
 		if imgui.button(pkg_info.source, "source") then
-			love.system.openURL(pkg_info.github)
+			love.system.openURL(pkg_info.source)
 		end
 		just.sameline()
 		local label_text = pkg_info.display_name
