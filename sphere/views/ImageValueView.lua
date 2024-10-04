@@ -10,16 +10,15 @@ local ImageValueView = class()
 function ImageValueView:load()
 	local images = {}
 	self.images = images
-	if not self.files then
-		return
-	end
 
 	self.maxCharW = 0
-	for char, path in pairs(self.files) do
-		images[char] = love.graphics.newImage(self.game.fileFinder:findFile(path))
+	if self.files then
+		for char, path in pairs(self.files) do
+			images[char] = love.graphics.newImage(self.game.fileFinder:findFile(path))
 
-		if tonumber(char) then
-			self.maxCharW = math.max(images[char]:getWidth(), self.maxCharW)
+			if tonumber(char) then
+				self.maxCharW = math.max(images[char]:getWidth(), self.maxCharW)
+			end
 		end
 	end
 

@@ -70,6 +70,9 @@ function JudgementView:update(dt)
 	local counter_index = self.counterIndex[judge.lastCounter]
 
 	local image = self.judgements[counter_index] or self.judgements[1]
+	if not image then
+		return
+	end
 
 	image.color[4] = self.alpha
 	image.sx = self.scale * self.animationScale
