@@ -94,22 +94,22 @@ local function pointsMultiplier(x)
 	return sign * y
 end
 
----@param deltaTime number
+---@param deltaTimeMs number
 ---@return number
-function Judge:getPoints(deltaTime)
-	if deltaTime <= self.ridic then
+function Judge:getPoints(deltaTimeMs)
+	if deltaTimeMs <= self.ridic then
 		return self.maxPoints
 	end
 
 	local zero = 65.0 * math.pow(self.difficulty, self.jPow)
 	local dev = 22.7 * math.pow(self.difficulty, self.jPow)
 
-	if deltaTime <= zero then
-		return self.maxPoints * pointsMultiplier((zero - deltaTime) / dev)
+	if deltaTimeMs <= zero then
+		return self.maxPoints * pointsMultiplier((zero - deltaTimeMs) / dev)
 	end
 
-	if deltaTime <= self.maxBooWeight then
-		return (deltaTime - zero) * self.missWeight / (self.maxBooWeight - zero)
+	if deltaTimeMs <= self.maxBooWeight then
+		return (deltaTimeMs - zero) * self.missWeight / (self.maxBooWeight - zero)
 	end
 
 	return self.missWeight
@@ -125,7 +125,7 @@ function Judge:hit(event)
 	end
 
 	delta_time = math.abs(delta_time)
-	self.points = self.points + self:getPoints(delta_time)
+	self.points = self.points + self:getPoints(delta_time * 1000)
 
 	local counter_name = self:getCounter(delta_time, self.windows) or "miss"
 	self:addCounter(counter_name, event.currentTime)
