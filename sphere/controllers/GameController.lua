@@ -47,7 +47,7 @@ function GameController:new()
 	self.uiModel = UserInterfaceModel(self)
 
 	self.onlineModel = OnlineModel(self.persistence.configModel)
-	self.noteSkinModel = NoteSkinModel(self.persistence.configModel)
+	self.noteSkinModel = NoteSkinModel(self.persistence.configModel, self.packageManager)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.resourceModel = ResourceModel(
 		self.persistence.configModel,

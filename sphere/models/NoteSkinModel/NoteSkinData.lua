@@ -19,6 +19,9 @@ function NoteSkinData:loadTexture(key, path)
 	local spriteBatches = self.spriteBatches
 
 	local status, texture = pcall(love.image.newImageData, self.noteSkin.directoryPath .. "/" .. path)
+	if not status then
+		status, texture = pcall(love.image.newImageData, path)
+	end
 	if status then
 		texture = love.graphics.newImage(gfx_util.limitImageData(texture))
 	else

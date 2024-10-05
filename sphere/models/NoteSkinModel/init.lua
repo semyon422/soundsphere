@@ -1,8 +1,10 @@
 local class = require("class")
+local path_util = require("path_util")
 local BaseNoteSkin = require("sphere.models.NoteSkinModel.BaseNoteSkin")
 local LuaSkinInfo = require("sphere.models.NoteSkinModel.LuaSkinInfo")
 local OsuSkinInfo = require("sphere.models.NoteSkinModel.OsuSkinInfo")
 local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
+local OsuSpriteRepo = require("sphere.models.NoteSkinModel.osu.OsuSpriteRepo")
 local path_util = require("path_util")
 
 ---@class sphere.NoteSkinModel
@@ -10,8 +12,10 @@ local path_util = require("path_util")
 local NoteSkinModel = class()
 
 ---@param configModel sphere.ConfigModel
-function NoteSkinModel:new(configModel)
+---@param packageManager sphere.PackageManager
+function NoteSkinModel:new(configModel, packageManager)
 	self.configModel = configModel
+	self.packageManager = packageManager
 	self.items = {}
 end
 
@@ -23,6 +27,8 @@ function NoteSkinModel:load()
 
 	local tree = {}
 	self:lookupTree(self.path, tree)
+
+	self:loadOsuSpritesRepo()
 
 	self.skinInfos = {}
 	self:lookupSkins(tree)
@@ -43,6 +49,23 @@ local function tree_to_list(tree, list, prefix)
 	end
 end
 
+function NoteSkinModel:loadOsuSpritesRepo()
+	local osu_ui_dir = self.packageManager:getPackageDir("osu_ui")
+	if not osu_ui_dir then
+		return
+	end
+
+	local path = path_util.join(osu_ui_dir, "osu_ui", "assets")
+
+	local tree = {}
+	self:lookupTree(path, tree)
+
+	local list = {}
+	tree_to_list(tree, list)
+
+	self.osuSpriteRepo = OsuSpriteRepo(path, list)
+end
+
 ---@param directoryPath string
 ---@param tree table
 function NoteSkinModel:lookupTree(directoryPath, tree)
@@ -61,13 +84,22 @@ function NoteSkinModel:lookupTree(directoryPath, tree)
 	end
 end
 
-local function new_skin_info(path)
+---@param path string
+---@return sphere.SkinInfo?
+function NoteSkinModel:newSkinInfo(path)
 	path = path:lower()
+
+	---@type sphere.SkinInfo?
+	local skin_info
+
 	if path:find("^.+%.lua$") then
-		return LuaSkinInfo()
+		skin_info = LuaSkinInfo()
 	elseif path:find("^.+%.ini$") then
-		return OsuSkinInfo()
+		skin_info = OsuSkinInfo()
+		skin_info:setDefaultSpritesRepo(self.osuSpriteRepo)
 	end
+
+	return skin_info
 end
 
 ---@param tree table
@@ -76,7 +108,7 @@ function NoteSkinModel:lookupSkins(tree, prefix)
 	local found = {}
 	for _, item in ipairs(tree) do
 		if type(item) == "string" and item:lower():find("^.-skin%.%a-$") then
-			local info = new_skin_info(item)
+			local info = self:newSkinInfo(item)
 			if info then
 				info.file_name = item
 				info.dir = path_util.join(self.path, prefix)

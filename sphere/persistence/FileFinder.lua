@@ -88,6 +88,10 @@ function FileFinder:findFile(fullFileName, _fileType)
 		return
 	end
 
+	if love.filesystem.getInfo(fullFileName) then
+		return fullFileName
+	end
+
 	fullFileName = fullFileName:gsub("\\", "/")
 	fullFileName = fullFileName:gsub("¥", "/")
 	fullFileName = fullFileName:gsub("^/", "")

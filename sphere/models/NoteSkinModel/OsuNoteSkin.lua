@@ -11,6 +11,7 @@ local CircleProgressView = require("sphere.views.GameplayView.CircleProgressView
 
 ---@class sphere.OsuNoteSkin: sphere.NoteSkinVsrg
 ---@operator call: sphere.OsuNoteSkin
+---@field sprite_locator sphere.OsuSpriteLocator
 local OsuNoteSkin = NoteSkinVsrg + {}
 
 ---@param s string
@@ -574,40 +575,12 @@ function OsuNoteSkin:addJudgements()  -- TriggerScoreIncrease
 	})
 end
 
-local supportedImageFormats = {
-	"png", "bmp", "tga", "jpg", "jpeg"
-}
-for _, format in ipairs(supportedImageFormats) do
-	supportedImageFormats[format] = true
-end
-
-local chars = {
-	comma = ",",
-	dot = ".",
-	percent = "%",
-}
-
 ---@param prefix string
 ---@return string|table?
 ---@return number?
 function OsuNoteSkin:findCharFiles(prefix)
 	prefix = prefix:gsub("\\", "/"):lower()
-	local files = self.files[prefix:gsub("\\", "/"):lower()]
-	if not files then
-		return
-	end
-
-	local images = {}
-	for _, file in ipairs(files) do
-		if file.char then
-			local dpi = file.dpi or 1
-			local char = chars[file.char] or file.char
-			images[dpi] = images[dpi] or {}
-			images[dpi][char] = file.path
-		end
-	end
-
-	return (self:getMaxResolution(images))
+	return self.sprite_locator:getCharPaths(prefix)
 end
 
 function OsuNoteSkin:addCombo()
@@ -704,21 +677,6 @@ function OsuNoteSkin:getDefaultKeyImages()
 	return pressed, released
 end
 
----@param images table
----@return string|table
----@return number
-function OsuNoteSkin:getMaxResolution(images)
-	local dpi = 0
-	local file
-	for k, v in pairs(images) do
-		if k > dpi then
-			dpi = k
-			file = v
-		end
-	end
-	return file, dpi
-end
-
 ---@param value string?
 ---@param preferFrame boolean?
 ---@return string|table?
@@ -728,31 +686,7 @@ function OsuNoteSkin:findImage(value, preferFrame)
 	end
 
 	value = self:removeExtLower(value:gsub("\\", "/"))
-	local files = self.files[value]
-	if not files then
-		return
-	end
-
-	local single = {}
-	local frame = {}
-	for _, file in ipairs(files) do
-		local dpi = file.dpi or 1
-		if not file.frame then
-			single[dpi] = file.path
-		elseif file.frame == 0 then
-			frame[dpi] = file.path
-		end
-	end
-
-	local file
-	if preferFrame and next(frame) then
-		file = self:getMaxResolution(frame)
-	elseif next(single) then
-		file = self:getMaxResolution(single)
-	elseif next(frame) then
-		file = self:getMaxResolution(frame)
-	end
-	return file
+	return self.sprite_locator:getSinglePath(value, preferFrame)
 end
 
 ---@param value string?
@@ -764,44 +698,7 @@ function OsuNoteSkin:findAnimation(value)
 	end
 
 	value = self:removeExtLower(value:gsub("\\", "/"))
-	local files = self.files[value]
-	if not files then
-		return
-	end
-
-	local singles = {}
-	local frames = {}
-	local framesPath = {}
-	for _, file in ipairs(files) do
-		local trueValue = file.path:sub(1, #value)
-		local dpi = file.dpi or 1
-		if not file.frame then
-			singles[dpi] = file.path
-		elseif file.frame then
-			frames[dpi] = frames[dpi] or {}
-			table.insert(frames[dpi], file.frame)
-			framesPath[dpi] = trueValue .. "-%d" .. (dpi > 1 and "@" .. dpi .. "x" or "") .. "." .. file.ext
-		end
-	end
-
-	if not next(frames) then
-		local file = self:getMaxResolution(singles)
-		return file
-	end
-	local frames, dpi = self:getMaxResolution(frames)
-
-	table.sort(frames)
-	local startFrame = frames[1]
-	local endFrame = frames[#frames]
-	for i = 2, #frames do
-		local frame, nextFrame = frames[i - 1], frames[i]
-		if nextFrame - frame > 1 then
-			endFrame = frame
-			break
-		end
-	end
-
-	return framesPath[dpi], {startFrame, endFrame}
+	return self.sprite_locator:getAnimation(value)
 end
 
 ---@param xl number
@@ -926,41 +823,10 @@ end
 ---@return string?
 function OsuNoteSkin:removeExtLower(file_name)
 	local name, ext = file_name:lower():match("^(.+)%.(.-)$")
-	if not name or not supportedImageFormats[ext] then
+	if not name then
 		return file_name:lower()
 	end
 	return name, ext
-end
-
----@param files table
----@return table
-function OsuNoteSkin:processFiles(files)
-	local _files = {}
-
-	for _, file in ipairs(files) do
-		local key1, ext = self:removeExtLower(file)
-		if supportedImageFormats[ext] then
-			local key2, dpi = key1:match("^(.+)@(%d+)x$")
-			key2 = key2 or key1
-
-			local key3, frame = key2:match("^(.+)-(.-)$")
-			if not (tonumber(frame) or chars[frame]) then
-				key3, frame = key2, nil
-			end
-			key3 = key3 or key2
-
-			_files[key3] = _files[key3] or {}
-			table.insert(_files[key3], {
-				path = file,
-				char = frame,
-				frame = tonumber(frame),
-				dpi = tonumber(dpi),
-				ext = ext,
-			})
-		end
-	end
-
-	return _files
 end
 
 ---@param content string

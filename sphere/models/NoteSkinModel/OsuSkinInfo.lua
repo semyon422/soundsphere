@@ -1,5 +1,7 @@
 local SkinInfo = require("sphere.models.NoteSkinModel.SkinInfo")
 local OsuNoteSkin = require("sphere.models.NoteSkinModel.OsuNoteSkin")
+local OsuSpriteRepo = require("sphere.models.NoteSkinModel.osu.OsuSpriteRepo")
+local OsuSpriteLocator = require("sphere.models.NoteSkinModel.osu.OsuSpriteLocator")
 local utf8validate = require("utf8validate")
 local InputMode = require("ncdk.InputMode")
 
@@ -21,6 +23,11 @@ function OsuSkinInfo:matchInput(inputMode)
 	return true
 end
 
+---@param sprites_repo sphere.OsuSpriteRepo?
+function OsuSkinInfo:setDefaultSpritesRepo(sprites_repo)
+	self.sprites_repo = sprites_repo
+end
+
 ---@param inputMode string
 ---@return sphere.OsuNoteSkin?
 function OsuSkinInfo:loadSkin(inputMode)
@@ -33,10 +40,12 @@ function OsuSkinInfo:loadSkin(inputMode)
 	content = utf8validate(content)
 	local skinini = OsuNoteSkin:parseSkinIni(content)
 
-	local files = OsuNoteSkin:processFiles(self.files)
+	local locator = OsuSpriteLocator()
+	locator:addSpriteRepo(OsuSpriteRepo(self.dir, self.files))
+	locator:addSpriteRepo(self.sprites_repo)
 
 	local noteSkin = OsuNoteSkin()
-	noteSkin.files = files
+	noteSkin.sprite_locator = locator
 	noteSkin.path = path
 	noteSkin.directoryPath = self.dir
 	noteSkin.fileName = self.file_name
