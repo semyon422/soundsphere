@@ -28,11 +28,7 @@ function ScoreEngine:load()
 	self.minTime = self.noteChart.chartmeta.start_time
 	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
 
-	local judge = scoreSystem.judgements[self.judgement]
-
-	if not judge then
-		return -- loading result screen
-	end
+	local judge = scoreSystem.judgements[self.judgement] or scoreSystem.judgements.soundsphere
 
 	local scoring = scoreSystem[judge.scoreSystemName]
 	local metadata = scoring.metadata
@@ -72,7 +68,7 @@ end
 
 ---@return sphere.Judge
 function ScoreEngine:getJudge()
-	return self.selectedScoring.judges[self.judgement]
+	return self.selectedScoring.judges[self.judgement] or self.selectedScoring.judges.soundsphere
 end
 
 return ScoreEngine
