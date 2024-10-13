@@ -371,25 +371,6 @@ function OsuNoteSkin:load()
 		mode = config:get("ColumnLineMode"),
 	})
 
-	if not SplitStages then
-		self:addStages(
-			columns[1],
-			columns[ninputs] + width[ninputs] + space[ninputs + 1],
-			self.fullWidth
-		)
-	else
-		self:addStages(
-			columns[1],
-			columns[ninputs2] + width[ninputs2],
-			widthLeft
-		)
-		self:addStages(
-			columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1],
-			columns[ninputs] + width[ninputs],
-			widthRight
-		)
-	end
-
 	self:addHpBar()
 
 	local pressed, released = self:getDefaultKeyImages()
@@ -437,6 +418,25 @@ function OsuNoteSkin:load()
 
 	if keysUnderNotes then
 		addNotes()
+	end
+
+	if not SplitStages then
+		self:addStages(
+			columns[1],
+			columns[ninputs] + width[ninputs] + space[ninputs + 1],
+			self.fullWidth
+		)
+	else
+		self:addStages(
+			columns[1],
+			columns[ninputs2] + width[ninputs2],
+			widthLeft
+		)
+		self:addStages(
+			columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1],
+			columns[ninputs] + width[ninputs],
+			widthRight
+		)
 	end
 
 	playfield:addLightings()
