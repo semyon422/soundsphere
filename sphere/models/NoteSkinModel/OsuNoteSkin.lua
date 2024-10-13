@@ -405,6 +405,14 @@ function OsuNoteSkin:load()
 	end
 
 	local keysUnderNotes = mania.KeysUnderNotes == 1
+
+	if not SplitStages then
+		self:addStageHint(columns[1], self.fullWidth)
+	else
+		self:addStageHint(columns[1], widthLeft)
+		self:addStageHint(columns[ninputs2] + width[ninputs2] + space[ninputs2 + 1], widthLeft)
+	end
+
 	if not keysUnderNotes then
 		addNotes()
 	end
@@ -702,6 +710,25 @@ function OsuNoteSkin:findAnimation(value)
 end
 
 ---@param xl number
+---@param w number
+function OsuNoteSkin:addStageHint(xl, w)
+	local mania = self.mania
+	local playfield = self.playField
+	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
+	if stageHint then
+		playfield:add(ImageView({
+			x = xl,
+			y = self.hitposition,
+			w = w,
+			sy = 1,
+			oy = 0.5,
+			transform = playfield:newNoteskinTransform(),
+			image = stageHint,
+		}))
+	end
+end
+
+---@param xl number
 ---@param xr number
 ---@param w number
 function OsuNoteSkin:addStages(xl, xr, w)
@@ -732,19 +759,6 @@ function OsuNoteSkin:addStages(xl, xr, w)
 			oy = 1,
 			transform = playfield:newNoteskinTransform(),
 			image = stageRight,
-		}))
-	end
-
-	local stageHint = self:findImage(mania.StageHint) or self:findImage("mania-stage-hint")
-	if stageHint then
-		playfield:add(ImageView({
-			x = xl,
-			y = self.hitposition,
-			w = w,
-			sy = 1,
-			oy = 0.5,
-			transform = playfield:newNoteskinTransform(),
-			image = stageHint,
 		}))
 	end
 
