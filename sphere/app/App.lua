@@ -39,13 +39,6 @@ end
 ---@param event table
 function App:receive(event)
 	self.windowModel:receive(event)
-
-	local screenshot = self.persistence.configModel.configs.settings.input.screenshot
-
-	if event.name == "keypressed" and event[1] == screenshot.capture then
-		local open = love.keyboard.isDown(screenshot.open)
-		self.screenshotModel:capture(open)
-	end
 end
 
 return App

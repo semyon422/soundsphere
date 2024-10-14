@@ -20,6 +20,9 @@ function UserInterface:new(game)
 	self.gameplayView = GameplayView(game)
 	self.multiplayerView = MultiplayerView(game)
 	self.editorView = EditorView(game)
+
+	self.configs = game.persistence.configModel.configs
+	self.screenshotModel = game.app.screenshotModel
 end
 
 function UserInterface:load()
@@ -42,6 +45,13 @@ end
 ---@param event table
 function UserInterface:receive(event)
 	self.gameView:receive(event)
+
+	local screenshot = self.configs.settings.input.screenshot
+
+	if event.name == "keypressed" and event[1] == screenshot.capture then
+		local open = love.keyboard.isDown(screenshot.open)
+		self.screenshotModel:capture(open)
+	end
 end
 
 return UserInterface

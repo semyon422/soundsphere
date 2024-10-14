@@ -2,6 +2,7 @@ local class = require("class")
 
 ---@class sphere.ScreenshotModel
 ---@operator call: sphere.ScreenshotModel
+---@field lastSavedImagePath string?
 local ScreenshotModel = class()
 
 local prefix = "userdata/screenshots/screenshot "
@@ -38,6 +39,7 @@ function ScreenshotModel:capture(open)
 		if open then
 			love.system.openURL("file://" .. love.filesystem.getSource() .. "/" .. path)
 		end
+		self.lastSavedImagePath = path
 	end)
 end
 
