@@ -286,8 +286,12 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 				print(err)
 			else
 				chart = charts[chartdiff.index]
-				chart.layers.main:toAbsolute()
-				ModifierModel:apply(chartdiff.modifiers, chart)
+				local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
+				if not ok then
+					chart = nil
+				else
+					ModifierModel:apply(chartdiff.modifiers, chart)
+				end
 			end
 		end
 
