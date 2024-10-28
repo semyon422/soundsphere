@@ -865,7 +865,7 @@ function OsuNoteSkin:parseSkinIni(content)
 				block = skinini[section]
 			end
 		else
-			local key, value = line:match("^(.-):%s*(.+)$")
+			local key, value = line:match("^(.-)%s*:%s*(.+)$")
 			if key and block then
 				block[key] = value
 			end
