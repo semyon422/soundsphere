@@ -112,7 +112,7 @@ function EditorController:saveToOsu()
 	local data = encoder:encode({editorModel.chart})
 
 	local chartview = selectModel.chartview
-	path = chartview.location_path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
+	local path = chartview.location_path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	assert(love.filesystem.write(path, data))
 end
