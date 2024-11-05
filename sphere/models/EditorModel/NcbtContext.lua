@@ -1,6 +1,7 @@
 local rbtree = require("rbtree")
 local ncbt = require("ncbt")
 local class = require("class")
+local Visual = require("chartedit.Visual")
 
 ---@class sphere.NcbtContext
 ---@operator call: sphere.NcbtContext
@@ -49,12 +50,17 @@ function NcbtContext:apply(layer)
 
 	layer:new()
 	layer.points:initDefault()
+	local visual = Visual()
+	layer.visuals.main = visual
 
 	local p = layer.points:getFirstPoint()
+	visual:getPoint(p)
 	p._interval:new(self.offset, beats)
 
 	local p = layer.points:getLastPoint()
+	visual:getPoint(p)
 	p._interval:new(lastOffset, 1)
+
 end
 
 return NcbtContext
