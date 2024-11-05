@@ -28,6 +28,7 @@ end
 function IntervalManager:split(point)
 	local layer = self.editorModel.layer
 	local p = layer.points:getPoint(point:unpack())
+	layer.visuals.main:getPoint(p)
 	return layer.intervals:splitInterval(p)
 end
 
