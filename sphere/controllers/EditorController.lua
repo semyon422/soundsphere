@@ -141,7 +141,7 @@ function EditorController:saveToNanoChart()
 
 	local emptyHash = string.char(0):rep(16)
 	local content = nanoChart:encode(emptyHash, editorModel.noteChart.inputMode.key, abs_notes)
-	local compressedContent = zlib.compress_s(content)
+	local compressedContent = zlib.compress(content)
 
 	local chartview = selectModel.chartview
 
@@ -159,10 +159,10 @@ function EditorController:saveToNanoChart()
 	local sph_chart = exp:export()
 
 	local content = SphPreview:encodeLines(exp.sph.sphLines:encode())
-	local compressedContent = zlib.compress_s(content)
+	local compressedContent = zlib.compress(content)
 
 	local content1 = SphPreview:encodeLines(exp.sph.sphLines:encode(), 1)
-	local compressedContent1 = zlib.compress_s(content1)
+	local compressedContent1 = zlib.compress(content1)
 
 	local f = assert(io.open(path .. ".preview0_compressed", "w"))
 	f:write(compressedContent)
