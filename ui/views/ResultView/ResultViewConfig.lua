@@ -751,13 +751,17 @@ local function BottomScreenMenu(self)
 	if imgui.TextOnlyButton("retry", "retry", 72 * 1.5, h) then
 		self:play("retry")
 	end
-	if imgui.TextOnlyButton("replay", "watch replay", 72 * 3, h) then
+	if imgui.TextOnlyButton("replay", "watch", 72 * 1.5, h) then
 		self:play("replay")
 	end
 	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(self.game.selectModel.chartview, scoreItem.replay_hash)
 		end
+	end
+	if imgui.TextOnlyButton("to osr", "to osr", 72 * 1.5, h) then
+		local chart = self.game.selectModel:loadChartAbsolute()
+		self.game.replayModel:saveOsr(chart.chartmeta)
 	end
 	just.row()
 end

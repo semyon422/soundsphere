@@ -1,6 +1,7 @@
 local class = require("class")
 local Replay = require("sphere.models.ReplayModel.Replay")
 local md5 = require("md5")
+local path_util = require("path_util")
 
 ---@class sphere.ReplayModel
 ---@operator call: sphere.ReplayModel
@@ -78,6 +79,24 @@ function ReplayModel:saveReplay(chartdiff, playContext)
 	assert(love.filesystem.write(self.path .. "/" .. replayHash, replayString))
 
 	return replayHash
+end
+
+---@param chartmeta chartbase.Chartmeta
+function ReplayModel:saveOsr(chartmeta)
+	local osr = self.replay:toOsr()
+	local data = osr:encode()
+
+	local display_title = ("%s - %s [%s]"):format(
+		chartmeta.artist, chartmeta.title, chartmeta.name
+	)
+
+	local name = ("%s - %s (%s) OsuMania.osr"):format(
+		osr.player_name,
+		display_title,
+		os.date("%Y-%m-%d", osr:getTimestamp())
+	)
+
+	love.filesystem.write(path_util.join("userdata", "export", name), data)
 end
 
 ---@param content string

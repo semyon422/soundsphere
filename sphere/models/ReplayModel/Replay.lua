@@ -3,6 +3,7 @@ local json = require("json")
 local ReplayNanoChart = require("sphere.models.ReplayModel.ReplayNanoChart")
 local ReplayConverter = require("sphere.models.ReplayModel.ReplayConverter")
 local InputMode = require("ncdk.InputMode")
+local Osr = require("osu.Osr")
 
 ---@class sphere.Replay
 ---@operator call: sphere.Replay
@@ -40,6 +41,29 @@ end
 ---@return table?
 function Replay:getNextEvent()
 	return self.events[self.eventOffset + 1]
+end
+
+---@return osu.Osr
+function Replay:toOsr()
+	local osr = Osr()
+
+	osr.beatmap_hash = assert(self.hash)
+
+	local inputMap = self.inputMode:getInputMap()
+
+	local mania_events = {}
+	for i, e in ipairs(self.events) do
+		mania_events[i] = {
+			math.floor(e.time * 1000),
+			inputMap[e[1]],
+			not not e.name:find("pressed")
+		}
+	end
+	osr:encodeManiaEvents(mania_events)
+	osr:setTimestamp(self.time)
+	osr.player_name = self.player
+
+	return osr
 end
 
 ---@return string
@@ -89,6 +113,7 @@ function Replay:fromString(s)
 	end
 
 	local inputMode = InputMode(object.inputMode)
+	self.inputMode = inputMode
 	self.events = self.replayNanoChart:decode(object.events, object.size, inputMode)
 
 	return self
