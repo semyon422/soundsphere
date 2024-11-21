@@ -12,11 +12,11 @@ end
 
 local number_fields = {
 	{
-		keys = {"difficulty", "d"},
+		keys = {"difficulty", "diff", "d"},
 		field = "difficulty",
 	},
 	{
-		keys = {"duration", "l"},
+		keys = {"duration", "dur", "len", "l"},
 		field = "duration",
 		transform = function(self, v)
 			if tonumber(v) then
@@ -29,11 +29,11 @@ local number_fields = {
 		end,
 	},
 	{
-		keys = {"bpm", "b"},
+		keys = {"bpm", "b", "tempo", "t"},
 		field = "bpm",
 	},
 	{
-		keys = {"notes_count", "nc"},
+		keys = {"notes_count", "nc", "obj"},
 		field = "notes_count",
 	},
 	{
@@ -52,7 +52,7 @@ local number_fields = {
 		field = "miss",
 	},
 	{
-		keys = {"accuracy", "a"},
+		keys = {"accuracy", "acc", "a"},
 		field = "accuracy",
 		transform = function(self, v)
 			return v / 1000
