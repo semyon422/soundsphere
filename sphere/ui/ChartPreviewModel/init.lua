@@ -54,6 +54,7 @@ function ChartPreviewModel:setChartview(chartview)
 	end
 
 	if not chartview or not chartview.chartdiff_inputmode then
+		self.graphicEngine:unload()
 		return
 	end
 
@@ -72,6 +73,7 @@ function ChartPreviewModel:setChartview(chartview)
 
 	local ok, chart = pcall(decoder.decodeSph, decoder, sph)  -- slow
 	if not ok then
+		self.graphicEngine:unload()
 		return
 	end
 
