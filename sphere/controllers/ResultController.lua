@@ -1,5 +1,6 @@
 local class = require("class")
 local thread = require("thread")
+local simplify_notechart = require("libchart.simplify_notechart")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
@@ -104,6 +105,19 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 
 	local chart = self.selectModel:loadChartAbsolute()
 	self.fastplayController:play(chart, replay)
+
+	if self.configModel.configs.settings.miscellaneous.generateGifResult then
+		local GifResult = require("libchart.GifResult")
+		local gif_result = GifResult()
+		gif_result:setBackgroundData(love.filesystem.read(self.selectModel:getBackgroundPath()))
+		local data = gif_result:create(
+			self.selectModel.chartview,
+			scoreEntry,
+			simplify_notechart(chart, {"note", "hold", "laser"}),
+			chart.inputMode:getColumns()
+		)
+		love.filesystem.write("userdata/result.gif", data)
+	end
 
 	rhythmModel.inputManager:setMode("external")
 	replayModel:setMode("record")

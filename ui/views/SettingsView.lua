@@ -467,6 +467,7 @@ function drawSection:misc()
 	m.showTasks = imgui.checkbox("showTasks", m.showTasks, "show tasks")
 	m.showDebugMenu = imgui.checkbox("showDebugMenu", m.showDebugMenu, "show debug menu")
 	m.discordPresence = imgui.checkbox("discordPresence", m.discordPresence, "discord presence")
+	m.generateGifResult = imgui.checkbox("generateGifResult", m.generateGifResult, "generate gif result")
 
 	if imgui.button("error button", "error") then
 		error("error")

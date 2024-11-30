@@ -177,6 +177,7 @@ local settings = {
 		showTasks = false,
 		showDebugMenu = false,
 		discordPresence = true,
+		generateGifResult = false,
 	},
 	select = {
 		collapse = true,
