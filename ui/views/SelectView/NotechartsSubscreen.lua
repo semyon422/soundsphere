@@ -110,8 +110,25 @@ local function NoteChartList(self)
 
 	local config = self.game.configModel.configs.settings.select
 
-	if imgui.TextCheckbox("chartdiffs list cb", config.chartdiffs_list, "modded", _w, h) then
-		config.chartdiffs_list = not config.chartdiffs_list
+	local chartviews_table = config.chartviews_table
+	local checked = chartviews_table ~= "chartviews"
+	local text = ""
+	if chartviews_table == "chartviews" then
+		text = "charts"
+	elseif chartviews_table == "chartdiffviews" then
+		text = "diffs"
+	elseif chartviews_table == "chartplayviews" then
+		text = "plays"
+	end
+
+	if imgui.TextCheckbox("chartdiffs list cb", checked, text, _w, h) then
+		if config.chartviews_table == "chartviews" then
+			config.chartviews_table = "chartdiffviews"
+		elseif config.chartviews_table == "chartdiffviews" then
+			config.chartviews_table = "chartplayviews"
+		elseif config.chartviews_table == "chartplayviews" then
+			config.chartviews_table = "chartviews"
+		end
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
 end

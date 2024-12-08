@@ -110,6 +110,7 @@ ResultView.play = thread.coro(function(self, mode)
 end)
 
 function ResultView:quit()
+	self.game.resultController:unload()
 	if self.game.multiplayerModel.room then
 		self:changeScreen("multiplayerView")
 		return

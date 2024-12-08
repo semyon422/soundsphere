@@ -41,7 +41,7 @@ function NoteChartListView:drawItem(i, w, h)
 	just.indent(18)
 
 	local baseTimeRate = self.game.playContext.rate
-	if self.game.configModel.configs.settings.select.chartdiffs_list then
+	if self.game.configModel.configs.settings.select.chartviews_table ~= "chartviews" then
 		baseTimeRate = 1
 	end
 

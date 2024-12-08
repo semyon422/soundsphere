@@ -15,6 +15,7 @@ function ChartviewsRepo:new(gdb)
 	self.set_id_to_global_index = {}
 	self.chartfile_id_to_global_index = {}
 	self.chartdiff_id_to_global_index = {}
+	self.score_id_to_global_index = {}
 	self.params = {}
 
 	self.models = gdb.models
@@ -28,6 +29,7 @@ ffi.cdef([[
 		int32_t chartfile_set_id;
 		int32_t chartmeta_id;
 		int32_t chartdiff_id;
+		int32_t score_id;
 		bool lamp;
 	} chartview_struct
 ]])
@@ -57,6 +59,7 @@ local _queryAsync = thread.async(function(params)
 		set_id_to_global_index = self.set_id_to_global_index,
 		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
 		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
+		score_id_to_global_index = self.score_id_to_global_index,
 		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
 	}
 
@@ -78,6 +81,7 @@ function ChartviewsRepo:queryAsync(params)
 	self.set_id_to_global_index = t.set_id_to_global_index
 	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
 	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
+	self.score_id_to_global_index = t.score_id_to_global_index
 
 	local size = ffi.sizeof("chartview_struct")
 	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
@@ -92,6 +96,7 @@ function ChartviewsRepo:queryNoteChartSets()
 		"chartfile_set_id",
 		"chartmeta_id",
 		"chartdiff_id",
+		"score_id",
 		params.difficulty .. " AS difficulty",
 	}
 
@@ -115,8 +120,12 @@ function ChartviewsRepo:queryNoteChartSets()
 
 	-- views without preview are 2x times faster
 	local model = self.models.chartviews_no_preview
-	if params.chartdiffs_list then
+	if params.chartviews_table == "chartviews" then
+		model = self.models.chartviews_no_preview
+	elseif params.chartviews_table == "chartdiffviews" then
 		model = self.models.chartdiffviews_no_preview
+	elseif params.chartviews_table == "chartplayviews" then
+		model = self.models.chartplayviews_no_preview
 	end
 
 	local objs = model:select(where, options)
@@ -125,10 +134,12 @@ function ChartviewsRepo:queryNoteChartSets()
 	local noteChartSets = ffi.new("chartview_struct[?]", #objs)
 	local chartfile_id_to_global_index = {}
 	local chartdiff_id_to_global_index = {}
+	local score_id_to_global_index = {}
 	local set_id_to_global_index = {}
 	self.chartviews = noteChartSets
 	self.chartfile_id_to_global_index = chartfile_id_to_global_index
 	self.chartdiff_id_to_global_index = chartdiff_id_to_global_index
+	self.score_id_to_global_index = score_id_to_global_index
 	self.set_id_to_global_index = set_id_to_global_index
 
 	local c = 0
@@ -138,10 +149,12 @@ function ChartviewsRepo:queryNoteChartSets()
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartdiff_id = row.chartdiff_id or 0
+		entry.score_id = row.score_id or 0
 		entry.lamp = row.lamp or 0
 		set_id_to_global_index[entry.chartfile_set_id] = i
 		chartfile_id_to_global_index[entry.chartfile_id] = i
 		chartdiff_id_to_global_index[entry.chartdiff_id] = i
+		score_id_to_global_index[entry.score_id] = i
 		c = c + 1
 	end
 
@@ -167,23 +180,32 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		table.insert(columns, case)
 	end
 
+	local order = {
+		"length(inputmode)",
+		"chartdiff_inputmode",
+		"inputmode",
+		"difficulty",
+		"name",
+		"chartmeta_id",
+		"chartdiff_id",
+		"score_id",
+	}
+
 	local model = self.models.chartviews
-	if params.chartdiffs_list then
+	if params.chartviews_table == "chartviews" then
+		model = self.models.chartviews
+	elseif params.chartviews_table == "chartdiffviews" then
 		model = self.models.chartdiffviews
 		where.chartmeta_id = chartview.chartmeta_id
+	elseif params.chartviews_table == "chartplayviews" then
+		model = self.models.chartplayviews
+		where.chartmeta_id = chartview.chartmeta_id
+		order = {"score_id"}
 	end
 
 	local options = {
 		columns = columns,
-		order = {
-			"length(inputmode)",
-			"chartdiff_inputmode",
-			"inputmode",
-			"difficulty",
-			"name",
-			"chartmeta_id",
-			"chartdiff_id",
-		},
+		order = order,
 	}
 
 	local objs = model:select(where, options)
@@ -197,14 +219,28 @@ function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
 	local chartdiff_id = _chartview.chartdiff_id
+	local score_id = _chartview.score_id
 
 	local params = self.params
 	local model = self.models.chartviews
-	if params.chartdiffs_list then
+	if params.chartviews_table == "chartviews" then
+		model = self.models.chartviews
+	elseif params.chartviews_table == "chartdiffviews" then
 		model = self.models.chartdiffviews
+	elseif params.chartviews_table == "chartplayviews" then
+		model = self.models.chartplayviews
 	end
 
 	local obj = model:find({
+		chartfile_id = chartfile_id,
+		score_id = score_id,
+		score_id__isnull = not score_id,
+	})
+	if obj then
+		return obj
+	end
+
+	obj = model:find({
 		chartfile_id = chartfile_id,
 		chartdiff_id = chartdiff_id,
 		chartdiff_id__isnull = not chartdiff_id,

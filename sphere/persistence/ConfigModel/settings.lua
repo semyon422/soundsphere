@@ -181,7 +181,7 @@ local settings = {
 	},
 	select = {
 		collapse = true,
-		chartdiffs_list = false,
+		chartviews_table = "chartviews",  ---@type "chartviews"|"chartdiffviews"|"chartplayviews"
 		diff_column = "enps_diff",
 		locations_in_collections = false,
 		chart_preview = true,

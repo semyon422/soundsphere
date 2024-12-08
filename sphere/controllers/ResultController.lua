@@ -44,6 +44,11 @@ function ResultController:load()
 	self.selectModel:scrollScore(nil, scoreItemIndex)
 end
 
+function ResultController:unload()
+	local config = self.configModel.configs.select
+	config.score_id = config.select_score_id
+end
+
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
 ---@param scoreEntry table

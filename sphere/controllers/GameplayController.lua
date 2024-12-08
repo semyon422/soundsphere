@@ -415,7 +415,9 @@ function GameplayController:saveScore()
 
 	self.playContext.scoreEntry = scoreEntry
 
-	self.configModel.configs.select.score_id = scoreEntry.id
+	local config = self.configModel.configs.select
+	config.select_score_id = config.score_id
+	config.score_id = scoreEntry.id
 end
 
 function GameplayController:skip()
