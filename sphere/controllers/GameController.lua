@@ -169,7 +169,8 @@ function GameController:new()
 		self.windowModel,
 		self.cacheModel,
 		self.fileFinder,
-		self.previewModel
+		self.previewModel,
+		self.playContext
 	)
 end
 

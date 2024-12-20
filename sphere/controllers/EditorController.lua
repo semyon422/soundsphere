@@ -4,6 +4,7 @@ local OsuChartEncoder = require("osu.ChartEncoder")
 local NanoChart = require("libchart.NanoChart")
 local zlib = require("zlib")
 local SphPreview = require("sph.SphPreview")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -18,6 +19,7 @@ local EditorController = class()
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
 ---@param previewModel sphere.PreviewModel
+---@param playContext sphere.PlayContext
 function EditorController:new(
 	selectModel,
 	editorModel,
@@ -27,7 +29,8 @@ function EditorController:new(
 	windowModel,
 	cacheModel,
 	fileFinder,
-	previewModel
+	previewModel,
+	playContext
 )
 	self.selectModel = selectModel
 	self.editorModel = editorModel
@@ -38,6 +41,7 @@ function EditorController:new(
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
 	self.previewModel = previewModel
+	self.playContext = playContext
 end
 
 function EditorController:load()
@@ -48,6 +52,11 @@ function EditorController:load()
 	local fileFinder = self.fileFinder
 
 	local chart = selectModel:loadChart()
+
+	if love.keyboard.isDown("lshift") then
+		ModifierModel:apply(self.playContext.modifiers, chart)
+	end
+
 	local chartview = selectModel.chartview
 
 	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
