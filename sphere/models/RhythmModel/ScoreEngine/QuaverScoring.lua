@@ -25,6 +25,7 @@ Judge.orderedCounters = { "marvelous", "perfect", "great", "good", "okay" }
 ---@param windows table
 function Judge:new(windows)
 	BaseJudge.new(self)
+	self.judgeName = QuaverScoring.metadata.name
 	self.scoreSystemName = QuaverScoring.name
 
 	self.windows = windows

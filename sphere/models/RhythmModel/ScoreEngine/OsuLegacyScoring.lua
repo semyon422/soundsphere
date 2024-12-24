@@ -67,7 +67,7 @@ local hitBonusValue = {
 ---@param od number
 function Judge:new(od)
 	BaseJudge.new(self)
-	self.judgeName = OsuLegacyScoring.name:format(od)
+	self.judgeName = OsuLegacyScoring.metadata.name:format(od)
 	self.scoreSystemName = OsuLegacyScoring.name
 
 	self.weights = {

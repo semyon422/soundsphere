@@ -26,7 +26,7 @@ Judge.orderedCounters = { "perfect", "great", "good", "ok", "meh" }
 ---@param od number
 function Judge:new(od)
 	BaseJudge.new(self)
-	self.judgeName = OsuManiaScoring.name:format(od)
+	self.judgeName = OsuManiaScoring.metadata.name:format(od)
 	self.scoreSystemName = OsuManiaScoring.name
 
 	self.weights = {

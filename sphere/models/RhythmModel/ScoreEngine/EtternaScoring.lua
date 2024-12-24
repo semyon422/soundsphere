@@ -42,6 +42,7 @@ Judge.orderedCounters = { "marvelous", "perfect", "great", "bad", "boo" }
 ---@param j number
 function Judge:new(j)
 	BaseJudge.new(self)
+	self.judgeName = EtternaScoring.metadata.name:format(j)
 	self.scoreSystemName = EtternaScoring.name
 
 	self.difficulty = judgeDifficulty[j]
