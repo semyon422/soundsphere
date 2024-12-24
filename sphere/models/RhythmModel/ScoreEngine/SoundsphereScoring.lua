@@ -20,6 +20,7 @@ Judge.orderedCounters = { "perfect", "not perfect" }
 
 function Judge:new()
 	BaseJudge.new(self)
+	self.judgeName = SoundsphereScoring.metadata.name
 	self.scoreSystemName = SoundsphereScoring.name
 	self.accuracy = nil
 
