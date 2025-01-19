@@ -16,6 +16,7 @@ local class = require("class")
 ---@field timings sea.Timings
 ---@field single boolean TODO: replace with "mode"
 ---@field created_at integer
+---@field submitted_at integer
 ---@field computed_at integer
 ---@field compute_state sea.ComputeState
 ---@field ranked_at integer

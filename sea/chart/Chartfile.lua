@@ -7,6 +7,8 @@ local class = require("class")
 ---@field name string
 ---@field size integer
 ---@field compute_state sea.ComputeState
+---@field creator_id integer
+---@field submitted_at integer
 local Chartfile = class()
 
 return Chartfile

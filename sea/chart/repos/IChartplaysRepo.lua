@@ -9,6 +9,12 @@ function IChartplaysRepo:getChartplays()
 	return {}
 end
 
+---@param id integer
+---@return sea.Chartplay?
+function IChartplaysRepo:getChartplay(id)
+	return {}
+end
+
 ---@param events_hash string
 ---@return sea.Chartplay?
 function IChartplaysRepo:getChartplayByEventsHash(events_hash)

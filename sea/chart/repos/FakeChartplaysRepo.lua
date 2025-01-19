@@ -9,6 +9,16 @@ function FakeChartplaysRepo:new()
 	self.chartplays = {}
 end
 
+---@param id integer
+---@return sea.Chartplay?
+function FakeChartplaysRepo:getChartplay(id)
+	for _, p in ipairs(self.chartplays) do
+		if p.id == id then
+			return p
+		end
+	end
+end
+
 ---@return sea.Chartplay[]
 function FakeChartplaysRepo:getChartplays()
 	return self.chartplays
