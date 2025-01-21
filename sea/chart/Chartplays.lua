@@ -9,12 +9,22 @@ local Chartplays = class()
 
 ---@param chartplaysRepo sea.IChartplaysRepo
 ---@param chartfilesRepo sea.IChartfilesRepo
+---@param chartdiffsRepo sea.IChartdiffsRepo
 ---@param clientPeers sea.ClientPeers
-function Chartplays:new(chartplaysRepo, chartfilesRepo, clientPeers)
+---@param chartplayComputer sea.IChartplayComputer
+function Chartplays:new(
+	chartplaysRepo,
+	chartfilesRepo,
+	chartdiffsRepo,
+	clientPeers,
+	chartplayComputer
+)
 	self.chartplaysRepo = chartplaysRepo
 	self.chartfilesRepo = chartfilesRepo
-	self.chartplaysAccess = ChartplaysAccess()
+	self.chartdiffsRepo = chartdiffsRepo
 	self.clientPeers = clientPeers
+	self.chartplayComputer = chartplayComputer
+	self.chartplaysAccess = ChartplaysAccess()
 end
 
 ---@return sea.Chartplay[]
@@ -90,18 +100,40 @@ function Chartplays:submit(user, chartplay_values)
 		return nil, "chartplay not submitted"
 	end
 
-	-- if is_valid_modifiers(chartplay.modifiers) then
-	-- 	compute(chartplay, notes, events)
-	-- 	validate(chartplay, chartplay_values)  -- should equal
-	-- 	chartdiff.notes_hash = chartplay.notes_hash  -- notify if changed
+	if chartplay.custom then
+		return chartplay
+	end
+
+	local cpcd, err = self.chartplayComputer:compute(chartplay)
+	if not cpcd then
+		-- if something custom-related then set custom = true
+		-- if n/a or something else then compute_state = "invalid"
+		return nil, err
+	end
+
+	chartplay.compute_state = "valid"
+
+	local computed_chartplay, computed_chartdiff = cpcd[1], cpcd[2]
+
+	if not chartplay:equalsComputed(computed_chartplay) then
+		chartplay.custom = true
+		self.chartplaysRepo:updateChartplay(chartplay)
+		-- client error?
+		return nil, "computed values differs"
+	end
+
+	self.chartplaysRepo:updateChartplay(chartplay)
+
+	local chartdiff = self.chartdiffsRepo:getChartdiffByChartkey(computed_chartdiff)
+	if not chartdiff then
+		self.chartdiffsRepo:createChartdiff(computed_chartdiff)
+	elseif not chartdiff:equalsComputed(computed_chartdiff) then
+		computed_chartdiff.id = chartdiff.id
+		self.chartdiffsRepo:updateChartdiff(computed_chartdiff)
+		-- add a note on chartdiff page about this change
+	end
 
 	-- 	add_to_leaderboards(chartplay)
-	-- 	chartplay.computed = true
-	-- else
-	-- 	-- custom mods
-	-- 	chartplay.computed = false
-
-	-- end
 
 	return chartplay
 end

@@ -1,4 +1,5 @@
 local IChartfilesRepo = require("sea.chart.repos.IChartfilesRepo")
+local table_util = require("table_util")
 
 ---@class sea.FakeChartfilesRepo: sea.IChartfilesRepo
 ---@operator call: sea.FakeChartfilesRepo
@@ -17,11 +18,7 @@ end
 ---@param hash string
 ---@return sea.Chartfile?
 function FakeChartfilesRepo:getChartfileByHash(hash)
-	for _, p in ipairs(self.chartfiles) do
-		if p.hash == hash then
-			return p
-		end
-	end
+	return table_util.value_by_field(self.chartfiles, "hash", hash)
 end
 
 ---@param chartfile sea.Chartfile

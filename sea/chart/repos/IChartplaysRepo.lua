@@ -27,4 +27,10 @@ function IChartplaysRepo:createChartplay(chartplay)
 	return chartplay
 end
 
+---@param chartplay sea.Chartplay
+---@return sea.Chartplay
+function IChartplaysRepo:updateChartplay(chartplay)
+	return chartplay
+end
+
 return IChartplaysRepo

@@ -1,7 +1,9 @@
 local Chartplay = require("sea.chart.Chartplay")
 local Chartplays = require("sea.chart.Chartplays")
+local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
 local FakeChartplaysRepo = require("sea.chart.repos.FakeChartplaysRepo")
 local FakeChartfilesRepo = require("sea.chart.repos.FakeChartfilesRepo")
+local FakeChartdiffsRepo = require("sea.chart.repos.FakeChartdiffsRepo")
 local User = require("sea.access.User")
 local ClientPeers = require("sea.access.ClientPeers")
 local FakeClientPeer = require("sea.access.FakeClientPeer")
@@ -12,12 +14,20 @@ local test = {}
 function test.submit_score(t)
 	local chartplaysRepo = FakeChartplaysRepo()
 	local chartfilesRepo = FakeChartfilesRepo()
+	local chartdiffsRepo = FakeChartdiffsRepo()
 	local clientPeers = ClientPeers()
+	local fakeChartplayComputer = FakeChartplayComputer()
 
 	local client_peer = FakeClientPeer()
 	clientPeers:set(1, client_peer)
 
-	local cps = Chartplays(chartplaysRepo, chartfilesRepo, clientPeers)
+	local cps = Chartplays(
+		chartplaysRepo,
+		chartfilesRepo,
+		chartdiffsRepo,
+		clientPeers,
+		fakeChartplayComputer
+	)
 
 	local chartplay_values = Chartplay()
 	chartplay_values.hash = "hash"
@@ -34,6 +44,7 @@ function test.submit_score(t)
 		chartplay, err = cps:submit(user, chartplay_values)
 		t:assert(chartplay, err)
 		t:assert(chartplay.user_id)
+		t:assert(chartplay.compute_state == "valid")
 		done = true
 	end)
 
