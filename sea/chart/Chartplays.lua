@@ -10,20 +10,20 @@ local Chartplays = class()
 ---@param chartplaysRepo sea.IChartplaysRepo
 ---@param chartfilesRepo sea.IChartfilesRepo
 ---@param chartdiffsRepo sea.IChartdiffsRepo
----@param clientPeers sea.ClientPeers
 ---@param chartplayComputer sea.IChartplayComputer
+---@param leaderboards sea.Leaderboards
 function Chartplays:new(
 	chartplaysRepo,
 	chartfilesRepo,
 	chartdiffsRepo,
-	clientPeers,
-	chartplayComputer
+	chartplayComputer,
+	leaderboards
 )
 	self.chartplaysRepo = chartplaysRepo
 	self.chartfilesRepo = chartfilesRepo
 	self.chartdiffsRepo = chartdiffsRepo
-	self.clientPeers = clientPeers
 	self.chartplayComputer = chartplayComputer
+	self.leaderboards = leaderboards
 	self.chartplaysAccess = ChartplaysAccess()
 end
 
@@ -33,10 +33,11 @@ function Chartplays:getChartplays()
 end
 
 ---@param user sea.User
+---@param remote sea.ISubmissionClientRemote
 ---@param hash string
 ---@return sea.Chartfile?
 ---@return string?
-function Chartplays:requireChartfile(user, hash)
+function Chartplays:requireChartfile(user, remote, hash)
 	local chartfile = self.chartfilesRepo:getChartfileByHash(hash)
 	if not chartfile then
 		local chartfile_values = Chartfile()
@@ -45,8 +46,7 @@ function Chartplays:requireChartfile(user, hash)
 		chartfile = self.chartfilesRepo:createChartfile(chartfile_values)
 	end
 
-	local peer = assert(self.clientPeers:get(user.id))
-	local ok, err = peer:requireChartfileData(hash)
+	local ok, err = remote:requireChartfileData(hash)
 	if not ok then
 		return nil, err or "missing error"
 	end
@@ -61,10 +61,11 @@ function Chartplays:requireChartfile(user, hash)
 end
 
 ---@param user sea.User
+---@param remote sea.ISubmissionClientRemote
 ---@param chartplay_values sea.Chartplay
 ---@return sea.Chartplay?
 ---@return string?
-function Chartplays:submit(user, chartplay_values)
+function Chartplays:submit(user, remote, chartplay_values)
 	local can, err = self.chartplaysAccess:canSubmit(user)
 	if not can then
 		return nil, err
@@ -79,17 +80,12 @@ function Chartplays:submit(user, chartplay_values)
 		chartplay = self.chartplaysRepo:createChartplay(chartplay_values)
 	end
 
-	local peer, err = self.clientPeers:get(user.id)
-	if not peer then
-		return nil, err
-	end
-
-	local chartfile, err = self:requireChartfile(user, chartplay.hash)
+	local chartfile, err = self:requireChartfile(user, remote, chartplay.hash)
 	if not chartfile then
 		return nil, err
 	end
 
-	local ok, err = peer:requireEventsData(chartplay.events_hash)
+	local ok, err = remote:requireEventsData(chartplay.events_hash)
 	if not ok then
 		return nil, err or "missing error"
 	end
@@ -133,27 +129,9 @@ function Chartplays:submit(user, chartplay_values)
 		-- add a note on chartdiff page about this change
 	end
 
-	-- 	add_to_leaderboards(chartplay)
+	self.leaderboards:addChartplay(chartplay)
 
 	return chartplay
-end
-
----@param user sea.User
----@param chartplay sea.Chartplay
-function Chartplays:compute(user, chartplay)
-	---@type sea.Chartfile
-	local chartfile = nil  -- get chartfile by hash
-	if not chartfile then
-		return nil, "not chartfile"
-	end
-
-	if chartfile.compute_state ~= "valid" then
-		return nil, 'chartfile.compute_state ~= "valid"'
-	end
-
-	-- compute chartplay using chartfile
-
-
 end
 
 return Chartplays

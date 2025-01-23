@@ -1,12 +1,12 @@
 local Chartplay = require("sea.chart.Chartplay")
 local Chartplays = require("sea.chart.Chartplays")
+local Leaderboards = require("sea.chart.Leaderboards")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
+local FakeYieldingRemote = require("sea.remotes.FakeYieldingRemote")
 local FakeChartplaysRepo = require("sea.chart.repos.FakeChartplaysRepo")
 local FakeChartfilesRepo = require("sea.chart.repos.FakeChartfilesRepo")
 local FakeChartdiffsRepo = require("sea.chart.repos.FakeChartdiffsRepo")
 local User = require("sea.access.User")
-local ClientPeers = require("sea.access.ClientPeers")
-local FakeClientPeer = require("sea.access.FakeClientPeer")
 
 local test = {}
 
@@ -15,18 +15,18 @@ function test.submit_score(t)
 	local chartplaysRepo = FakeChartplaysRepo()
 	local chartfilesRepo = FakeChartfilesRepo()
 	local chartdiffsRepo = FakeChartdiffsRepo()
-	local clientPeers = ClientPeers()
 	local fakeChartplayComputer = FakeChartplayComputer()
+	local leaderboards = Leaderboards()
 
-	local client_peer = FakeClientPeer()
-	clientPeers:set(1, client_peer)
+	---@type sea.ISubmissionClientRemote
+	local remote = FakeYieldingRemote()
 
 	local cps = Chartplays(
 		chartplaysRepo,
 		chartfilesRepo,
 		chartdiffsRepo,
-		clientPeers,
-		fakeChartplayComputer
+		fakeChartplayComputer,
+		leaderboards
 	)
 
 	local chartplay_values = Chartplay()
@@ -41,7 +41,7 @@ function test.submit_score(t)
 	local chartplay, err
 	local done = false
 	local resume = coroutine.wrap(function()
-		chartplay, err = cps:submit(user, chartplay_values)
+		chartplay, err = cps:submit(user, remote, chartplay_values)
 		t:assert(chartplay, err)
 		t:assert(chartplay.user_id)
 		t:assert(chartplay.compute_state == "valid")

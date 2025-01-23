@@ -4,15 +4,15 @@ local class = require("class")
 ---@operator call: sea.ClientPeers
 local ClientPeers = class()
 
----@return sea.IClientPeer?
+---@return sea.IPeer?
 ---@return string?
 function ClientPeers:new()
-	---@type sea.IClientPeer[]
+	---@type sea.IPeer[]
 	self.peers = {}
 end
 
 ---@param user_id integer
----@return sea.IClientPeer?
+---@return sea.IPeer?
 ---@return string?
 function ClientPeers:get(user_id)
 	local client_peer = self.peers[user_id]
@@ -23,7 +23,7 @@ function ClientPeers:get(user_id)
 end
 
 ---@param user_id integer
----@param client_peer sea.IClientPeer
+---@param client_peer sea.IPeer
 function ClientPeers:set(user_id, client_peer)
 	self.peers[user_id] = client_peer
 end
