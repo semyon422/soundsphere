@@ -13,6 +13,7 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field custom boolean
 ---@field rate number
 ---@field rate_type sea.RateType
+---@field mode sea.Gamemode
 ---@field const boolean
 ---@field timings sea.Timings
 ---@field single boolean TODO: replace with "mode"

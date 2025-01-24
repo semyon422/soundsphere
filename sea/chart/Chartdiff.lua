@@ -8,6 +8,7 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field modifiers sea.Modifier[]
 ---@field rate number
 ---@field rate_type sea.RateType
+---@field mode sea.Gamemode
 ---@field notes_hash string
 ---@field inputmode string
 ---@field notes_count integer

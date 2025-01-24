@@ -7,6 +7,7 @@ local table_util = require("table_util")
 ---@field index integer
 ---@field modifiers sea.Modifier[]
 ---@field rate number
+---@field mode sea.Gamemode
 local Chartkey = class()
 
 ---@param key sea.Chartkey
@@ -16,7 +17,8 @@ function Chartkey:equalsChartkey(key)
 		self.hash == key.hash and
 		self.index == key.index and
 		table_util.deepequal(self.modifiers, key.modifiers) and
-		self.rate == key.rate
+		self.rate == key.rate and
+		self.mode == key.mode
 end
 
 return Chartkey
