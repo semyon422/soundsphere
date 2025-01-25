@@ -5,13 +5,13 @@ local class = require("class")
 local ISubmissionClientRemote = class()
 
 ---@param hash string
----@return true?
+---@return {name: string, data: string}?
 ---@return string?
-function ISubmissionClientRemote:requireChartfileData(hash) end
+function ISubmissionClientRemote:getChartfileData(hash) end
 
 ---@param events_hash string
----@return true?
 ---@return string?
-function ISubmissionClientRemote:requireEventsData(events_hash) end
+---@return string?
+function ISubmissionClientRemote:getEventsData(events_hash) end
 
 return ISubmissionClientRemote

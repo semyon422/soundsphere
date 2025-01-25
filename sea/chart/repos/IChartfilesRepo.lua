@@ -21,4 +21,10 @@ function IChartfilesRepo:createChartfile(chartfile)
 	return chartfile
 end
 
+---@param chartfile sea.Chartfile
+---@return sea.Chartfile
+function IChartfilesRepo:updateChartfile(chartfile)
+	return chartfile
+end
+
 return IChartfilesRepo

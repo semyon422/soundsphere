@@ -29,4 +29,12 @@ function FakeChartfilesRepo:createChartfile(chartfile)
 	return chartfile
 end
 
+---@param chartfile sea.Chartfile
+---@return sea.Chartfile
+function FakeChartfilesRepo:updateChartfile(chartfile)
+	local _chartfile = table_util.value_by_field(self.chartfiles, "id", chartfile.id)
+	table_util.copy(chartfile, _chartfile)
+	return _chartfile
+end
+
 return FakeChartfilesRepo

@@ -1,8 +1,10 @@
+local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartplays = require("sea.chart.Chartplays")
 local Leaderboards = require("sea.chart.Leaderboards")
+local TableStorage = require("sea.chart.storage.TableStorage")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
-local FakeYieldingRemote = require("sea.remotes.FakeYieldingRemote")
+local FakeSubmissionClientRemote = require("sea.remotes.FakeSubmissionClientRemote")
 local FakeChartplaysRepo = require("sea.chart.repos.FakeChartplaysRepo")
 local FakeChartfilesRepo = require("sea.chart.repos.FakeChartfilesRepo")
 local FakeChartdiffsRepo = require("sea.chart.repos.FakeChartdiffsRepo")
@@ -18,45 +20,36 @@ function test.submit_score(t)
 	local fakeChartplayComputer = FakeChartplayComputer()
 	local leaderboards = Leaderboards()
 
-	---@type sea.ISubmissionClientRemote
-	local remote = FakeYieldingRemote()
-
 	local cps = Chartplays(
 		chartplaysRepo,
 		chartfilesRepo,
 		chartdiffsRepo,
 		fakeChartplayComputer,
+		TableStorage(),
+		TableStorage(),
 		leaderboards
 	)
 
+	local chartfile_data = "chart"
+	local replayfile_data = "replay"
+
+	local remote = FakeSubmissionClientRemote(chartfile_data, replayfile_data)
+
 	local chartplay_values = Chartplay()
-	chartplay_values.hash = "hash"
-	chartplay_values.events_hash = "events_hash"
+	chartplay_values.hash = md5.sumhexa(chartfile_data)
+	chartplay_values.events_hash = md5.sumhexa(replayfile_data)
 	chartplay_values.notes_hash = "notes_hash"
 
 	local user = User()
 	user.id = 1
 
-	---@type sea.Chartplay, string?
-	local chartplay, err
-	local done = false
-	local resume = coroutine.wrap(function()
-		chartplay, err = cps:submit(user, remote, chartplay_values)
-		t:assert(chartplay, err)
+	local chartplay, err = cps:submit(user, remote, chartplay_values)
+
+	if t:assert(chartplay, err) then
+		---@cast chartplay -?
 		t:assert(chartplay.user_id)
 		t:assert(chartplay.compute_state == "valid")
-		done = true
-	end)
-
-	t:eq(resume(), "hash")
-	local chartfile = chartfilesRepo:getChartfileByHash("hash")
-	chartfile.submitted_at = 0
-	t:eq(resume(true), "events_hash")
-	local chartplay = chartplaysRepo:getChartplayByEventsHash("events_hash")
-	chartplay.submitted_at = 0
-	t:eq(resume(true))
-
-	t:assert(done)
+	end
 end
 
 return test

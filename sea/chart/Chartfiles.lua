@@ -12,19 +12,24 @@ function Chartfiles:new(chartfilesRepo)
 end
 
 ---@param user sea.User
----@param file_hash string
+---@param hash string
+---@param name string
+---@param size integer
+---@param data string
 ---@return sea.Chartfile?
 ---@return string?
-function Chartfiles:submit(user, file_hash)
+function Chartfiles:submit(user, hash, name, size, data)
 	local can, err = self.chartfilesAccess:canSubmit(user)
 	if not can then
 		return nil, err
 	end
 
-	local chartfile = self.chartfilesRepo:getChartfileByHash(file_hash)
-	if chartfile then
-		return nil, "submitted before"
+	local chartfile = self.chartfilesRepo:getChartfileByHash(hash)
+	if not chartfile then
+		return nil, "missing chartfile"
 	end
+
+	chartfile.submitted_at = os.time()
 
 end
 

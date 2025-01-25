@@ -12,64 +12,36 @@ function ChartplaySubmitter:new(chartfilesReader, replayfileReader)
 	self.replayfileReader = replayfileReader
 end
 
----@param remote sea.ISubmissionServerRemote
 ---@param hash string
----@return true?
+---@return {name: string, data: string}?
 ---@return string?
-function ChartplaySubmitter:submitChartfileData(remote, hash)
+function ChartplaySubmitter:getChartfileData(hash)
 	local file, err = self.chartfilesReader:getFile(hash)
 	if not file then
 		return nil, err
 	end
 
-	local _hash = md5.sumhexa(file.data)
-	if _hash ~= hash then
+	if md5.sumhexa(file.data) ~= hash then
 		return nil, "invalid hash"
 	end
 
-	-- submit chartfile and data
-	local ok, err = remote:submitChartfileData(
-		hash,
-		file.name,
-		#file.data,
-		file.data
-	)
-
-	if not ok then
-		-- show error
-		return nil, err
-	end
-
-	return true
+	return file
 end
 
----@param remote sea.ISubmissionServerRemote
 ---@param events_hash string
----@return true?
 ---@return string?
-function ChartplaySubmitter:submitEventsData(remote, events_hash)
+---@return string?
+function ChartplaySubmitter:getEventsData(events_hash)
 	local file, err = self.replayfileReader:getFile(events_hash)
 	if not file then
 		return nil, err
 	end
 
-	local _hash = md5.sumhexa(file.data)
-	if _hash ~= events_hash then
+	if md5.sumhexa(file.data) ~= events_hash then
 		return nil, "invalid hash"
 	end
 
-	local ok, err = remote:submitEventsData(
-		events_hash,
-		#file.data,
-		file.data
-	)
-
-	if not ok then
-		-- show error
-		return nil, err
-	end
-
-	return true
+	return file.data
 end
 
 return ChartplaySubmitter

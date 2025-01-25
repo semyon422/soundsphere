@@ -1,5 +1,5 @@
 local class = require("class")
-local Chartplay = require("sea.chart.Chartplay")
+local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
@@ -11,18 +11,24 @@ local Chartplays = class()
 ---@param chartfilesRepo sea.IChartfilesRepo
 ---@param chartdiffsRepo sea.IChartdiffsRepo
 ---@param chartplayComputer sea.IChartplayComputer
+---@param chartsStorage sea.IKeyValueStorage
+---@param replaysStorage sea.IKeyValueStorage
 ---@param leaderboards sea.Leaderboards
 function Chartplays:new(
 	chartplaysRepo,
 	chartfilesRepo,
 	chartdiffsRepo,
 	chartplayComputer,
+	chartsStorage,
+	replaysStorage,
 	leaderboards
 )
 	self.chartplaysRepo = chartplaysRepo
 	self.chartfilesRepo = chartfilesRepo
 	self.chartdiffsRepo = chartdiffsRepo
 	self.chartplayComputer = chartplayComputer
+	self.chartsStorage = chartsStorage
+	self.replaysStorage = replaysStorage
 	self.leaderboards = leaderboards
 	self.chartplaysAccess = ChartplaysAccess()
 end
@@ -46,16 +52,22 @@ function Chartplays:requireChartfile(user, remote, hash)
 		chartfile = self.chartfilesRepo:createChartfile(chartfile_values)
 	end
 
-	local ok, err = remote:requireChartfileData(hash)
-	if not ok then
+	local file, err = remote:getChartfileData(hash)
+	if not file then
 		return nil, err or "missing error"
 	end
 
-	chartfile = assert(self.chartfilesRepo:getChartfileByHash(hash))
-	if not chartfile.submitted_at then
-		-- client error?
-		return nil, "chartfile not submitted"
+	if md5.sumhexa(file.data) ~= hash then
+		return nil, "invalid hash"
 	end
+
+	local ok, err = self.chartsStorage:set(hash, file.data)
+	if not ok then
+		return nil, err
+	end
+
+	chartfile.submitted_at = os.time()
+	self.chartfilesRepo:updateChartfile(chartfile)
 
 	return chartfile
 end
@@ -85,16 +97,22 @@ function Chartplays:submit(user, remote, chartplay_values)
 		return nil, err
 	end
 
-	local ok, err = remote:requireEventsData(chartplay.events_hash)
-	if not ok then
+	local events_data, err = remote:getEventsData(chartplay.events_hash)
+	if not events_data then
 		return nil, err or "missing error"
 	end
 
-	chartplay = assert(self.chartplaysRepo:getChartplay(chartplay.id))
-	if not chartplay.submitted_at then
-		-- client error?
-		return nil, "chartplay not submitted"
+	if md5.sumhexa(events_data) ~= chartplay.events_hash then
+		return nil, "invalid replay hash"
 	end
+
+	local ok, err = self.replaysStorage:set(chartplay.events_hash, events_data)
+	if not ok then
+		return nil, err
+	end
+
+	chartplay.submitted_at = os.time()
+	self.chartplaysRepo:updateChartplay(chartplay)
 
 	if chartplay.custom then
 		return chartplay
