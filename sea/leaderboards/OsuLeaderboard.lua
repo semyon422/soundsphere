@@ -22,6 +22,12 @@ function OsuLeaderboard:isOsuTimings(timings, od)
 	return true
 end
 
+---@param inputmode string
+function OsuLeaderboard:isOsuKeymode(inputmode)
+	-- ???
+	return true
+end
+
 ---@param chartplay sea.Chartplay
 ---@param chartdiff sea.Chartdiff
 ---@param chartmeta sea.Chartmeta
@@ -30,6 +36,7 @@ end
 function OsuLeaderboard:check(chartplay, chartdiff, chartmeta)
 	return
 		chartmeta.format == "osu" and
+		self:isOsuKeymode(chartdiff.inputmode) and
 		self:isOsuModifiers(chartdiff.modifiers) and
 		self:isOsuTimings(chartplay.timings, chartmeta.osu_od)
 end
