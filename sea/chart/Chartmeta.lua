@@ -5,6 +5,8 @@ local class = require("class")
 ---@field id integer
 ---@field hash string
 ---@field index integer
+---@field timings sea.Timings
+---@field healths sea.Healths
 ---@field title string
 ---@field artist string
 ---@field name string

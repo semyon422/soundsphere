@@ -14,20 +14,25 @@ local class = require("class")
 ---@field communities_combiner_count integer
 ---@field difftables_count integer
 ---@field users_count integer
+---filters
+---@field nearest nil|true|false any, enabled, disabled
+---@field result "fail"|"pass"|"fc"|"pfc"
+---@field allow_custom boolean
+---@field allow_const boolean
+---@field allow_pause boolean
+---@field allow_reorder boolean
+---@field allow_modifiers boolean
+---@field allow_tap_only boolean
+---@field allow_free_timings boolean
+---@field mode sea.Gamemode
+---@field rate "any"|number[]|{min: number, max: number} any, values, range
+---@field ranked_lists integer[]
 local Leaderboard = class()
 
----@param chartplay sea.Chartplay
-function Leaderboard:addChartplay(chartplay)
-
-end
-
----@param chartplay sea.Chartplay
----@param chartdiff sea.Chartdiff
----@param chartmeta sea.Chartmeta
----@return boolean? accept nil - error, true/false - accepted
----@return string?
-function Leaderboard:check(chartplay, chartdiff, chartmeta)
-	return true
+---@param user sea.User
+---@return sea.Chartplay[]
+function Leaderboard:getBestChartplays(user)
+	return {}
 end
 
 return Leaderboard

@@ -5,10 +5,13 @@ local class = require("class")
 ---@field id integer
 ---@field leaderboard_id integer
 ---@field user_id integer
----@field scores_count integer
 ---@field total_rating number
 ---@field rank integer
 ---@field updated_at integer
 local LeaderboardUser = class()
+
+function LeaderboardUser:calculateRating()
+	self.total_rating = 0
+end
 
 return LeaderboardUser

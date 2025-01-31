@@ -9,21 +9,23 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field notes_hash string
 ---@field hash string
 ---@field index integer
----@field modifiers sea.Modifier[] modifierset_id?
+---@field modifiers sea.Modifier[]
 ---@field custom boolean
 ---@field rate number
 ---@field rate_type sea.RateType
 ---@field mode sea.Gamemode
 ---@field const boolean
+---@field nearest boolean
+---@field tap_only boolean - like NoLongNote
 ---@field timings sea.Timings
----@field single boolean TODO: replace with "mode"
+---@field healths sea.Healths
+---@field columns_order integer[]? nil - unchanged
 ---@field created_at integer
 ---@field submitted_at integer
 ---@field computed_at integer
 ---@field compute_state sea.ComputeState
----@field ranked_at integer
----@field ranked_state boolean TODO: custom modifiers
 ---@field pause_count integer
+---@field result "fail"|"pass"|"fc"|"pfc" fail/pass is determined by sea.Healths, fc is miss_count = 0, pfc is not_perfect_count = 0
 ---@field accuracy number
 ---@field max_combo integer
 ---@field perfect_count integer
