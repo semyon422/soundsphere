@@ -11,10 +11,11 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field mode sea.Gamemode
 ---@field notes_hash string
 ---@field inputmode string
----@field notes_count integer
----@field long_notes_count integer
----@field density_data string
----@field sv_data string
+---@field notes_count integer total object count
+---@field judges_count integer total number of judgeable QTEs (long note = 2 qte)
+---@field note_types_count {[notechart.NoteType]: integer} by type, sum = notes_count
+---@field density_data number[] 128 values, 4 bit per value, density of hits
+---@field sv_data number[] 128 values, 4 bit per value, (visual duration) / (absoulte duration) ?
 ---@field enps_diff number
 ---@field osu_diff number
 ---@field msd_diff number

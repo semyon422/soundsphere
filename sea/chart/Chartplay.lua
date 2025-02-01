@@ -26,12 +26,16 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field compute_state sea.ComputeState
 ---@field pause_count integer
 ---@field result "fail"|"pass"|"fc"|"pfc" fail/pass is determined by sea.Healths, fc is miss_count = 0, pfc is not_perfect_count = 0
----@field accuracy number
----@field max_combo integer
----@field perfect_count integer
----@field not_perfect_count integer
----@field miss_count integer
----@field rating number
+---@field judges integer[] computed always using chart's timings/judges
+---@field accuracy number normalscore
+---@field max_combo integer strictly timing-based
+---@field perfect_count integer - [-0.016, 0.016] window hits
+---@field miss_count integer strictly timing-based
+---@field rating number enps normalscore 32
+---@field accuracy_osu number
+---@field accuracy_etterna number
+---@field rating_pp number
+---@field rating_msd number
 local Chartplay = Chartkey + {}
 
 local computed_keys = {
