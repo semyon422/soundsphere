@@ -5,15 +5,12 @@ local class = require("class")
 ---@field id integer
 ---@field name string
 ---@field description string
----@field owner_community_id integer - ?
 ---@field created_at integer
 ---@field rating_calculator integer enum
 ---@field scores_combiner integer enum
 ---@field scores_combiner_count integer
 ---@field communities_combiner integer enum
 ---@field communities_combiner_count integer
----@field difftables_count integer
----@field users_count integer
 ---filters
 ---@field nearest nil|true|false any, enabled, disabled
 ---@field result "fail"|"pass"|"fc"|"pfc"
@@ -27,6 +24,7 @@ local class = require("class")
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
 ---@field ranked_lists integer[]
+---@field inputmode string[] allowed inputmodes, empty = allow all
 local Leaderboard = class()
 
 ---@param user sea.User
