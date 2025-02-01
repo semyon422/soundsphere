@@ -8,7 +8,9 @@ local class = require("class")
 ---@field timings sea.Timings
 ---@field healths sea.Healths
 ---@field title string
+---@field title_unicode string
 ---@field artist string
+---@field artist_unicode string
 ---@field name string
 ---@field creator string
 ---@field level number
