@@ -38,7 +38,7 @@ function Leaderboards:create(user, leaderboard_values)
 	leaderboard.communities_combiner = 0
 	leaderboard.communities_combiner_count = 20
 
-	leaderboard.nearest = nil
+	leaderboard.nearest = "any"
 	leaderboard.result = "fail"
 	leaderboard.allow_custom = false
 	leaderboard.allow_const = false

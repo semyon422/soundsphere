@@ -38,4 +38,11 @@ function FakeLeaderboardsRepo:deleteLeaderboard(id)
 	return self.leaderboards:remove({id = id})[1]
 end
 
+---@param lb sea.Leaderboard
+---@param user sea.User
+---@return sea.Chartplay[]
+function FakeLeaderboardsRepo:getBestChartplays(lb, user)
+	return {}
+end
+
 return FakeLeaderboardsRepo

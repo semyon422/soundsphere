@@ -162,7 +162,7 @@ function ChartviewsRepo:queryNoteChartSets()
 end
 
 ---@param chartview table
----@return rdb.ModelRow[]
+---@return rdb.Row[]
 function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local params = self.params
 
@@ -214,7 +214,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 end
 
 ---@param _chartview table
----@return rdb.ModelRow
+---@return rdb.Row
 function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id

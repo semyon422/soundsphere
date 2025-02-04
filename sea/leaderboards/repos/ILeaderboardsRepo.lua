@@ -32,4 +32,11 @@ end
 function ILeaderboardsRepo:deleteLeaderboard(id)
 end
 
+---@param lb sea.Leaderboard
+---@param user sea.User
+---@return sea.Chartplay[]
+function ILeaderboardsRepo:getBestChartplays(lb, user)
+	return {}
+end
+
 return ILeaderboardsRepo

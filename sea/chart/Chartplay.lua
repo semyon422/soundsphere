@@ -25,7 +25,7 @@ local Chartkey = require("sea.chart.Chartkey")
 ---@field computed_at integer
 ---@field compute_state sea.ComputeState
 ---@field pause_count integer
----@field result "fail"|"pass"|"fc"|"pfc" fail/pass is determined by sea.Healths, fc is miss_count = 0, pfc is not_perfect_count = 0
+---@field result sea.Result
 ---@field judges integer[] computed always using chart's timings/judges
 ---@field accuracy number normalscore
 ---@field max_combo integer strictly timing-based

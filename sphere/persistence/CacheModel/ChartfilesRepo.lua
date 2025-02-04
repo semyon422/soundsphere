@@ -120,7 +120,7 @@ function ChartfilesRepo:countChartfiles(conds)
 end
 
 ---@param hashes table
----@return rdb.ModelRow[]
+---@return rdb.Row[]
 function ChartfilesRepo:getChartfilesByHashes(hashes)
 	return self.models.chartfiles:select({hash__in = hashes})
 end

@@ -6,14 +6,14 @@ local class = require("class")
 ---@field name string
 ---@field description string
 ---@field created_at integer
----@field rating_calculator integer enum
+---@field rating_calculator integer enum, difftable
 ---@field scores_combiner integer enum
 ---@field scores_combiner_count integer
 ---@field communities_combiner integer enum
 ---@field communities_combiner_count integer
 ---filters
----@field nearest nil|true|false any, enabled, disabled
----@field result "fail"|"pass"|"fc"|"pfc"
+---@field nearest sea.TernaryState
+---@field result sea.Result
 ---@field allow_custom boolean
 ---@field allow_const boolean
 ---@field allow_pause boolean
@@ -26,11 +26,5 @@ local class = require("class")
 ---@field ranked_lists integer[]
 ---@field inputmode string[] allowed inputmodes, empty = allow all
 local Leaderboard = class()
-
----@param user sea.User
----@return sea.Chartplay[]
-function Leaderboard:getBestChartplays(user)
-	return {}
-end
 
 return Leaderboard
