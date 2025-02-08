@@ -47,6 +47,7 @@ function SnapGridView:drawTimingObjects(field, currentTime, w, h, align, getText
 end
 
 local colors = {
+	gray = {0.2, 0.2, 0.2},
 	white = {1, 1, 1},
 	red = {1, 0, 0},
 	blue = {0, 0, 1},
@@ -157,7 +158,7 @@ function SnapGridView:drawComputedGrid(field, currentTime, width)
 
 		if not drawNothing then
 			local j = snap * point:getBeatModulo()
-			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.white)
+			love.graphics.setColor(snaps[editorModel:getSnap(j)] or colors.gray)
 			self:drawSnap(point, field, currentTime, width)
 		end
 
@@ -315,7 +316,11 @@ function SnapGridView:draw()
 
 	if scroll then
 		if lshift then
-			editor.snap = math.min(math.max(editor.snap + scroll, 1), 16)
+			if scroll == 1 then
+				editorModel:incSnap()
+			elseif scroll == -1 then
+				editorModel:decSnap()
+			end
 		elseif lctrl then
 			editorModel:setLogSpeed(editorModel:getLogSpeed() + scroll)
 		else

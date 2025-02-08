@@ -22,7 +22,8 @@ local Point = require("chartedit.Point")
 local EditorModel = class()
 
 EditorModel.tools = {"Select", "ShortNote", "LongNote", "SoundNote"}
-EditorModel.states = {"info", "audio", "timings", "notes"}
+EditorModel.states = {"info", "audio", "timings", "notes", "bms"}
+EditorModel.max_snap = 192
 
 ---@param configModel sphere.ConfigModel
 ---@param resourceModel sphere.ResourceModel
@@ -47,6 +48,8 @@ function EditorModel:new(configModel, resourceModel)
 		v.editorModel = self
 	end
 	self.state = self.states[1]
+
+	self.bms_tools = {}
 end
 
 function EditorModel:load()
@@ -85,6 +88,11 @@ function EditorModel:load()
 	self.metronome:load()
 
 	self.scroller:scrollSeconds(self.timer:getTime())
+
+	self.bms_tools = {
+		offset = self.layer.points:getFirstPoint().interval.offset,
+		tempo = self.layer.points:getFirstPoint().interval:getTempo(),
+	}
 end
 
 function EditorModel:detectTempoOffset()
@@ -93,8 +101,25 @@ function EditorModel:detectTempoOffset()
 	end
 end
 
-function EditorModel:applyTempoOffset()
+function EditorModel:applyNcbt()
 	self.ncbtContext:apply(self.layer)
+end
+
+function EditorModel:resetOffsetTempo()
+	local offset = self.bms_tools.offset
+	local tempo = self.bms_tools.tempo
+
+	local layer = self.layer
+
+	local p1 = layer.points:getFirstPoint()
+	local p2 = layer.points:getLastPoint()
+
+	if not p1 or not p2 then
+		return
+	end
+
+	p1.interval.offset = offset
+	p2.interval.offset = offset + p2:sub(p1):tonumber() * 60 / tempo
 end
 
 ---@return table
@@ -103,7 +128,7 @@ function EditorModel:getSettings()
 	if editor.speed <= 0 then
 		editor.speed = 1
 	end
-	editor.snap = math.min(math.max(editor.snap, 1), 16)
+	editor.snap = math.min(math.max(editor.snap, 1), self.max_snap)
 	return editor
 end
 
@@ -292,6 +317,18 @@ function EditorModel:receive(event)
 		local timer = self.timer
 		timer.eventTime = event.time
 	end
+end
+
+function EditorModel:incSnap()
+	local editor = self:getSettings()
+	editor.snap = editor.snap * 2
+	editor.snap = math.min(math.max(editor.snap, 1), self.max_snap)
+end
+
+function EditorModel:decSnap()
+	local editor = self:getSettings()
+	editor.snap = math.floor(editor.snap / 2)
+	editor.snap = math.min(math.max(editor.snap, 1), self.max_snap)
 end
 
 ---@param j number|table

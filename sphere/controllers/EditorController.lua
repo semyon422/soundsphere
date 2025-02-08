@@ -1,10 +1,12 @@
 local class = require("class")
+local path_util = require("path_util")
 local ChartEncoder = require("sph.ChartEncoder")
 local OsuChartEncoder = require("osu.ChartEncoder")
 local NanoChart = require("libchart.NanoChart")
 local zlib = require("zlib")
 local SphPreview = require("sph.SphPreview")
 local ModifierModel = require("sphere.models.ModifierModel")
+local Wave = require("audio.Wave")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -91,6 +93,55 @@ function EditorController:unload()
 	self.editorModel:unload()
 
 	self.windowModel:setVsyncOnSelect(true)
+end
+
+function EditorController:sliceKeysounds()
+	local selectModel = self.selectModel
+	local editorModel = self.editorModel
+
+	---@type audio.SoundData
+	local soundData = editorModel.mainAudio.soundData
+	if not soundData then
+		return
+	end
+
+	local chartview = selectModel.chartview
+	local real_dir = chartview.real_dir
+
+	local dir = path_util.join(real_dir, chartview.name)
+	assert(love.filesystem.createDirectory(dir))
+
+	---@type ncdk2.Chart
+	local chart = editorModel.chart
+
+	local linkedNotes = chart.notes:getLinkedNotes()
+
+	local sample_rate = soundData:getSampleRate()
+	local channels_count = soundData:getChannelCount()
+
+	for i = 1, #linkedNotes - 1 do
+		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
+		if key then
+			local a, b = linkedNotes[i]:getStartTime(), linkedNotes[i + 1]:getStartTime()
+
+			local sample_offset = math.floor(a * sample_rate)
+			local sample_count = math.floor((b - a) * sample_rate)
+
+			local wave = Wave()
+			wave:initBuffer(channels_count, sample_count)
+
+			for j = 0, sample_count - 1 do
+				for c = 1, channels_count do
+					local sample = soundData:getSample(sample_offset + j, c)
+					wave:setSample(j, c, sample * 32768)
+				end
+			end
+
+			local path = path_util.join(dir, i .. ".wav")
+			local data = wave:export()
+			love.filesystem.write(path, data)
+		end
+	end
 end
 
 function EditorController:save()

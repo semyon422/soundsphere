@@ -135,7 +135,7 @@ function tabs.timings(self)
 	if editorModel.ncbtContext.tempo then
 		just.sameline()
 		if imgui.button("ncbt apply", "apply") then
-			editorModel:applyTempoOffset()
+			editorModel:applyNcbt()
 		end
 	end
 
@@ -228,7 +228,7 @@ function tabs.notes(self)
 	if logSpeed ~= editorModel:getLogSpeed() then
 		editorModel:setLogSpeed(logSpeed)
 	end
-	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, 16, 1, "snap")
+	editor.snap = imgui.slider1("snap select", editor.snap, "%d", 1, editorModel.max_snap, 1, "snap")
 	editor.lockSnap = imgui.checkbox("lock snap", editor.lockSnap, "lock snap")
 	editor.tool = imgui.combo("tool select", editor.tool, editorModel.tools, nil, "tool")
 	imgui.text("Use qwer to select tool")
@@ -241,6 +241,37 @@ function tabs.notes(self)
 
 	if imgui.button("changeType", "change type") then
 		editorModel.noteManager:changeType()
+	end
+end
+
+---@param self table
+function tabs.bms(self)
+	local editorModel = self.game.editorModel
+	local editor = self.game.configModel.configs.settings.editor
+
+	local bms_tools = editorModel.bms_tools
+	imgui.text("BMS creation tools")
+
+	bms_tools.offset = tonumber(imgui.input("offset", bms_tools.offset, "offset")) or 0
+	bms_tools.tempo = tonumber(imgui.input("tempo", bms_tools.tempo, "tempo")) or 120
+
+	if imgui.button("bms apply tempo", "apply") then
+		editorModel:resetOffsetTempo()
+	end
+
+	imgui.text("offset")
+	if imgui.button("bms add offset", "+1ms") then
+		bms_tools.offset = bms_tools.offset + 0.001
+		editorModel:resetOffsetTempo()
+	end
+	just.sameline()
+	if imgui.button("bms sub offset", "-1ms") then
+		bms_tools.offset = bms_tools.offset - 0.001
+		editorModel:resetOffsetTempo()
+	end
+
+	if imgui.button("slice keysounds", "slice keysounds") then
+		self.game.editorController:sliceKeysounds()
 	end
 end
 
