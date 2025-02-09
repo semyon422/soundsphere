@@ -1,4 +1,5 @@
 local class = require("class")
+local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
 
 ---@class sphere.FileCacheGenerator
@@ -62,12 +63,14 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 		elseif typ == "directory" then
 			res = self:shouldScan(dir, name, modtime, location_id)
 		elseif typ == "directory_all" then
-			self.chartfilesRepo:deleteChartfileSets({
-				dir = dir,
-				dir__isnull = not dir,
-				name__notin = name,
-				location_id = location_id,
-			})
+			for _, slice in ipairs(table_util.slices(name, 1024)) do
+				self.chartfilesRepo:deleteChartfileSets({
+					dir = dir,
+					dir__isnull = not dir,
+					name__notin = slice,
+					location_id = location_id,
+				})
+			end
 		elseif typ == "not_found" then
 			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,
