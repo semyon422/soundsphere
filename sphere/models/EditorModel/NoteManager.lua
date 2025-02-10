@@ -79,8 +79,7 @@ function NoteManager:deleteNotes()
 end
 
 function NoteManager:changeType()
-	do return end  -- TODO: fix this
-
+	---@type sphere.EditorModel
 	local editorModel = self.editorModel
 	local layer = editorModel.layer
 	local visual = editorModel.visual
@@ -88,18 +87,18 @@ function NoteManager:changeType()
 
 	-- self.editorModel.editorChanges:reset()
 
-	for _, note in pairs(self.editorModel.graphicEngine.selectedNotes) do
+	for _, note in pairs(editorModel.graphicEngine.selectedNotes) do
 		note:remove()
 		if not note.endNote then
 			local startNote = note.startNote
-			startNote.noteType = "LongNoteStart"
+			startNote.type = "hold"
+			startNote.weight = 1
 
 			local p = startNote.visualPoint.point
 			local p_end = layer.points:getPoint(p:add(Fraction(1, editor.snap)))
 			local vp_end = visual:getPoint(p_end)
-			local endNote = Note(vp_end)
-			endNote.noteType = "LongNoteEnd"
-			editorModel.notes:addNote(endNote, note.column)
+			local endNote = Note(vp_end, note.column, "hold", -1)
+			editorModel.notes:addNote(endNote)
 
 			note.endNote = endNote
 
@@ -109,7 +108,8 @@ function NoteManager:changeType()
 			setmetatable(note, LongEditorNote)
 		else
 			local startNote = note.startNote
-			startNote.noteType = "ShortNote"
+			startNote.type = "note"
+			startNote.weight = 0
 			startNote.endNote = nil
 			note.endNote.startNote = nil
 			note.endNote = nil

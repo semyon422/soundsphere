@@ -3,6 +3,7 @@ local EditorNoteFactory = require("sphere.models.EditorModel.EditorNoteFactory")
 
 ---@class sphere.EditorGraphicEngine
 ---@operator call: sphere.EditorGraphicEngine
+---@field selectedNotes {[ncdk2.Note]: sphere.EditorNote}
 local GraphicEngine = class()
 
 function GraphicEngine:new()
