@@ -111,6 +111,8 @@ function NoteManager:changeType()
 			startNote.type = "note"
 			startNote.weight = 0
 			startNote.endNote = nil
+			note.endNote.type = "ignore"
+			note.endNote.weight = 0
 			note.endNote.startNote = nil
 			note.endNote = nil
 
