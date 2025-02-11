@@ -41,10 +41,17 @@ function ShortNoteView:drawSelected()
 	local x, y = tf:transformPoint(0, 0)
 	local _w, _h = tf:transformPoint(w, h)
 
-	love.graphics.setColor(1, 1, 1, 0.2)
+	local a = (math.sin(love.timer.getTime() * 2) + 1) / 2
+	local b = (math.sin(love.timer.getTime() * 2 + math.pi * 2 / 3) + 1) / 2
+	local c = (math.sin(love.timer.getTime() * 2 + math.pi * 4 / 3) + 1) / 2
+
+	love.graphics.setColor(a, b, c, 0.2)
 	love.graphics.rectangle("fill", x, y, _w - x, _h - y)
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(a, b, c)
+	love.graphics.setLineWidth(2)
 	love.graphics.rectangle("line", x, y, _w - x, _h - y)
+	love.graphics.setLineWidth(1)
+	love.graphics.setColor(1, 1, 1)
 end
 
 ---@param chords table

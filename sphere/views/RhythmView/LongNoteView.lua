@@ -86,10 +86,17 @@ function LongNoteView:drawSelected()
 	local ymin = math.min(y, _h, y1, _h1)
 	local ymax = math.max(y, _h, y1, _h1)
 
-	love.graphics.setColor(1, 1, 1, 0.2)
+	local a = (math.sin(love.timer.getTime() * 2) + 1) / 2
+	local b = (math.sin(love.timer.getTime() * 2 + math.pi * 2 / 3) + 1) / 2
+	local c = (math.sin(love.timer.getTime() * 2 + math.pi * 4 / 3) + 1) / 2
+
+	love.graphics.setColor(a, b, c, 0.2)
 	love.graphics.rectangle("fill", x, ymin, _w - x, ymax - ymin)
-	love.graphics.setColor(1, 1, 1)
+	love.graphics.setColor(a, b, c)
+	love.graphics.setLineWidth(2)
 	love.graphics.rectangle("line", x, ymin, _w - x, ymax - ymin)
+	love.graphics.setLineWidth(1)
+	love.graphics.setColor(1, 1, 1)
 end
 
 ---@param chords table
