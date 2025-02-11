@@ -240,6 +240,8 @@ end
 
 local qwerty = "qwerty"
 
+local batch_comment = ""
+
 ---@param self table
 function tabs.notes(self)
 	local editorModel = self.game.editorModel
@@ -267,6 +269,20 @@ function tabs.notes(self)
 	local _, note = next(editorModel.graphicEngine.selectedNotes)
 	if note and imgui.button("scroll to note", "scroll to") then
 		editorModel.scroller:scrollPoint(note.startNote.visualPoint.point)
+	end
+
+	imgui.separator()
+
+	batch_comment = imgui.input("vps comment", batch_comment, "comment")
+	if imgui.button("save comment notes", "save") then
+		for _, note in pairs(editorModel.graphicEngine.selectedNotes) do
+			note.startNote.visualPoint.comment = batch_comment
+		end
+	end
+	if imgui.button("reset comment notes", "reset") then
+		for _, note in pairs(editorModel.graphicEngine.selectedNotes) do
+			note.startNote.visualPoint.comment = nil
+		end
 	end
 end
 
