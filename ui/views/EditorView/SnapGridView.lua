@@ -205,6 +205,32 @@ function SnapGridView:drawTimings(_w, _h)
 	love.graphics.pop()
 end
 
+---@param _w number
+---@param _h number
+function SnapGridView:drawComments(_w, _h)
+	local editorModel = self.game.editorModel
+	local editorTimePoint = editorModel.point
+	local noteSkin = self.game.noteSkinModel.noteSkin
+	local editor = self.game.configModel.configs.settings.editor
+
+	---@type chartedit.Layer
+	local layer = editorModel.layer
+
+	love.graphics.push("all")
+	love.graphics.setColor(1, 1, 1)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
+	for p in layer:iter(editorModel:getIterRange()) do
+		local vp = editorModel.visual:getPoint(p)
+		local comment = vp.comment
+
+		if comment then
+			local y = noteSkin:getTimePosition((editorTimePoint.absoluteTime - p.absoluteTime) * editor.speed)
+			love.graphics.print(comment, _w + 20, y - 20, 0)
+		end
+	end
+	love.graphics.pop()
+end
+
 ---@param id any
 ---@param w number
 ---@param h number
@@ -276,6 +302,7 @@ function SnapGridView:draw()
 	if editor.showTimings then
 		self:drawTimings(width, h)
 	end
+	self:drawComments(width, h)
 
 	love.graphics.translate(width + 40, 0)
 	self:drawTimingObjects("absoluteTime", editorTimePoint.absoluteTime, 500, 50, "left", getVelocityText)
