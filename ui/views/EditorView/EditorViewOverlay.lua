@@ -194,6 +194,9 @@ function tabs.timings(self)
 		local vp = editorModel.visual:getPoint(p)
 		vp.temp_comment = imgui.input("vp comment", vp.temp_comment or vp.comment, "comment")
 		if imgui.button("save comment", "save") then
+			if vp.temp_comment == "" then
+				vp.temp_comment = nil
+			end
 			vp.comment = vp.temp_comment
 		end
 		if imgui.button("reset comment", "reset") then
@@ -275,6 +278,9 @@ function tabs.notes(self)
 
 	batch_comment = imgui.input("vps comment", batch_comment, "comment")
 	if imgui.button("save comment notes", "save") then
+		if batch_comment == "" then
+			batch_comment = nil
+		end
 		for _, note in pairs(editorModel.graphicEngine.selectedNotes) do
 			note.startNote.visualPoint.comment = batch_comment
 		end
