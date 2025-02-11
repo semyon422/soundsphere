@@ -182,6 +182,27 @@ function tabs.timings(self)
 
 	imgui.separator()
 
+	local p
+	if dtp.next then
+		p = dtp.next.prev
+	elseif dtp.prev then
+		p = dtp.prev.prev
+	end
+	---@cast p ncdk2.IntervalPoint
+
+	if p.absoluteTime == dtp.absoluteTime then
+		local vp = editorModel.visual:getPoint(p)
+		vp.temp_comment = imgui.input("vp comment", vp.temp_comment or vp.comment, "comment")
+		if imgui.button("save comment", "save") then
+			vp.comment = vp.temp_comment
+		end
+		if imgui.button("reset comment", "reset") then
+			vp.comment = nil
+			vp.temp_comment = nil
+		end
+	end
+
+
 	do return end
 
 	just.row(true)
