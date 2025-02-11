@@ -263,6 +263,11 @@ function tabs.notes(self)
 	if imgui.button("changeType", "change type") then
 		editorModel.noteManager:changeType()
 	end
+
+	local _, note = next(editorModel.graphicEngine.selectedNotes)
+	if note and imgui.button("scroll to note", "scroll to") then
+		editorModel.scroller:scrollPoint(note.startNote.visualPoint.point)
+	end
 end
 
 ---@param self table
