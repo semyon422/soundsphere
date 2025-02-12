@@ -1,12 +1,14 @@
 local class = require("class")
 local path_util = require("path_util")
 local ChartEncoder = require("sph.ChartEncoder")
+local ChartDecoder = require("sph.ChartDecoder")
 local OsuChartEncoder = require("osu.ChartEncoder")
 local NanoChart = require("libchart.NanoChart")
 local zlib = require("zlib")
 local SphPreview = require("sph.SphPreview")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Wave = require("audio.Wave")
+local base36 = require("bms.base36")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -119,10 +121,18 @@ function EditorController:sliceKeysounds()
 	local sample_rate = soundData:getSampleRate()
 	local channels_count = soundData:getChannelCount()
 
+	local ks_index = 1
 	for i = 1, #linkedNotes - 1 do
 		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
 		if key then
-			local a, b = linkedNotes[i]:getStartTime(), linkedNotes[i + 1]:getStartTime()
+			---@type number, number
+			local a, b
+			local n_a, n_b = linkedNotes[i], linkedNotes[i + 1]
+			if n_a:isShort() then
+				a, b = n_a:getStartTime(), n_b:getStartTime()
+			else
+				a, b = n_a:getStartTime(), n_a:getEndTime()
+			end
 
 			local sample_offset = math.floor(a * sample_rate)
 			local sample_count = math.floor((b - a) * sample_rate)
@@ -137,11 +147,181 @@ function EditorController:sliceKeysounds()
 				end
 			end
 
-			local path = path_util.join(dir, i .. ".wav")
-			local data = wave:export()
-			love.filesystem.write(path, data)
+			---@type string?
+			local comment = n_a.startNote.visualPoint.comment
+
+			local file_name = ks_index .. ".wav"
+			if comment then
+				file_name = comment .. ".wav"
+			end
+
+			local path = path_util.join(dir, file_name)
+			love.filesystem.write(path, wave:export())
+			ks_index = ks_index + 1
 		end
 	end
+end
+
+function EditorController:exportBmsTemplate()
+	local selectModel = self.selectModel
+	local editorModel = self.editorModel
+
+	local chartview = selectModel.chartview
+	local real_dir = chartview.real_dir
+
+	---@type ncdk2.Chart[]
+	local stem_charts = {}
+
+	for _, name in ipairs(love.filesystem.getDirectoryItems(real_dir) --[=[@as string[]]=]) do
+		if name:match("^stem.+%.sph$") then
+			local dec = ChartDecoder()
+			local chart = dec:decode(assert(love.filesystem.read(path_util.join(real_dir, name))))[1]
+			table.insert(stem_charts, chart)
+		end
+	end
+
+	print(#stem_charts)
+
+	---@type string[]
+	local sounds = {}
+
+	---@type {[string]: integer}
+	local sounds_map = {}
+
+	---@param path string
+	local function get_sound_index(path)
+		if sounds_map[path] then
+			return sounds_map[path]
+		end
+		table.insert(sounds, path)
+		sounds_map[path] = #sounds
+		return sounds_map[path]
+	end
+
+	---@type number
+	local tempo
+
+	---@type {time: ncdk.Fraction, column: integer, sound: integer}[]
+	local notes = {}
+
+	---@type ncdk.Fraction
+	local max_time
+
+	for column, chart in ipairs(stem_charts) do
+		-- local dir = path_util.join(real_dir, chart.chartmeta.name)
+		local dir = chart.chartmeta.name
+		local linkedNotes = chart.notes:getLinkedNotes()
+
+		local ks_index = 1
+		for i = 1, #linkedNotes - 1 do
+			local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
+			if key then
+				local n_a = linkedNotes[i]
+
+				---@type string?
+				local comment = n_a.startNote.visualPoint.comment
+
+				local file_name = ks_index .. ".wav"
+				if comment then
+					file_name = comment .. ".wav"
+				end
+
+				local path = path_util.join(dir, file_name)
+				ks_index = ks_index + 1
+
+				local point = n_a.startNote.visualPoint.point
+				---@cast point ncdk2.IntervalPoint
+
+				if not tempo then
+					tempo = point.interval:getTempo()
+				end
+
+				table.insert(notes, {
+					time = point.time,
+					column = column,
+					sound = get_sound_index(path),
+				})
+
+				if not max_time or point.time > max_time then
+					max_time = point.time
+				end
+			end
+		end
+	end
+
+	---@type {[integer]: {[integer]: {time: ncdk.Fraction, sound: integer}[]}}
+	local notes_grouped = {}
+
+	for _, note in ipairs(notes) do
+		local measure = (note.time / 4):floor()
+		notes_grouped[measure] = notes_grouped[measure] or {}
+		notes_grouped[measure][note.column] = notes_grouped[measure][note.column] or {}
+		table.insert(notes_grouped[measure][note.column], {
+			time = note.time / 4 - measure,
+			sound = note.sound,
+		})
+	end
+
+	---@type string[]
+	local lines = {
+		"",
+		"*---------------------- HEADER FIELD",
+		"",
+		"#PLAYER 1",
+		("#TITLE %s"):format(chartview.title),
+		("#ARTIST %s"):format(chartview.artist),
+		("#SUBARTIST OBJ: %s"):format(chartview.creator),
+		("#BPM %s"):format(tempo),
+		"#PLAYLEVEL 5",
+		"#RANK 3",
+		("#TOTAL %s"):format(#notes),
+		"#STAGEFILE title.bmp",
+		"",
+		"#00011:00",
+		"#00012:00",
+		"#00013:00",
+		"#00014:00",
+		"#00015:00",
+		"#00018:00",
+		"#00019:00",
+		"",
+	}
+
+	for i, path in ipairs(sounds) do
+		table.insert(lines, ("#WAV%s %s"):format(base36.tostring(i), path))
+	end
+
+	table.insert(lines, "")
+
+	local max_measure = (max_time / 4):ceil()
+
+	local snap = 384
+
+	for measure = 0, max_measure do
+		if notes_grouped[measure] then
+			for column = 1, table.maxn(notes_grouped[measure]) do
+				local column_notes = notes_grouped[measure][column]
+				if not column_notes then
+					table.insert(lines, ("#%03d01:00"):format(measure))
+				else
+					---@type string[]
+					local value = {}
+					for i = 1, snap do
+						value[i] = "00"
+					end
+					for _, note in ipairs(column_notes) do
+						local time = (note.time * snap):floor() + 1
+						value[time] = base36.tostring(note.sound)
+					end
+					table.insert(lines, ("#%03d01:%s"):format(measure, table.concat(value)))
+				end
+			end
+			table.insert(lines, "")
+		end
+	end
+
+	local out_path = path_util.join(real_dir, "template.bme")
+	love.filesystem.write(out_path, table.concat(lines, "\r\n"))
 end
 
 function EditorController:save()

@@ -321,6 +321,10 @@ function tabs.bms(self)
 	if imgui.button("slice keysounds", "slice keysounds") then
 		self.game.editorController:sliceKeysounds()
 	end
+
+	if imgui.button("create bms template", "create bms template") then
+		self.game.editorController:exportBmsTemplate()
+	end
 end
 
 return function(self)
