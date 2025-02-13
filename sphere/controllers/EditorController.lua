@@ -152,7 +152,13 @@ function EditorController:sliceKeysounds()
 
 			local file_name = ks_index .. ".wav"
 			if comment then
-				file_name = comment .. ".wav"
+				local new_index = tonumber(comment:match("^=(.+)$"))
+				if new_index then
+					ks_index = new_index
+					file_name = ks_index .. ".wav"
+				else
+					file_name = comment .. ".wav"
+				end
 			end
 
 			local path = path_util.join(dir, file_name)
@@ -208,7 +214,6 @@ function EditorController:exportBmsTemplate()
 	local max_time
 
 	for column, chart in ipairs(stem_charts) do
-		-- local dir = path_util.join(real_dir, chart.chartmeta.name)
 		local dir = chart.chartmeta.name
 		local linkedNotes = chart.notes:getLinkedNotes()
 
@@ -223,7 +228,13 @@ function EditorController:exportBmsTemplate()
 
 				local file_name = ks_index .. ".wav"
 				if comment then
-					file_name = comment .. ".wav"
+					local new_index = tonumber(comment:match("^=(.+)$"))
+					if new_index then
+						ks_index = new_index
+						file_name = ks_index .. ".wav"
+					else
+						file_name = comment .. ".wav"
+					end
 				end
 
 				local path = path_util.join(dir, file_name)
@@ -247,6 +258,12 @@ function EditorController:exportBmsTemplate()
 				end
 			end
 		end
+	end
+
+	print("sounds", #sounds)
+	if #sounds > 36 ^ 2 - 1 then
+		print("too much sounds")
+		return
 	end
 
 	---@type {[integer]: {[integer]: {time: ncdk.Fraction, sound: integer}[]}}
