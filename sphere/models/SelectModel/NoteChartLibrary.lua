@@ -43,7 +43,7 @@ function NoteChartLibrary:indexof(chartview)
 	local score_id = chartview.score_id
 
 	for i, chart in ipairs(self.items) do
-		if chart.chartfile_id == chartfile_id and chart.score_id == score_id then
+		if chart.chartfile_id == chartfile_id and chart.chartdiff_id == chartdiff_id and chart.score_id == score_id then
 			return i
 		end
 	end
