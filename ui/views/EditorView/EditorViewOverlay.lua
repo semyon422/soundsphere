@@ -290,6 +290,14 @@ function tabs.notes(self)
 			note.startNote.visualPoint.comment = nil
 		end
 	end
+
+	local _, sel_note = next(editorModel.graphicEngine.selectedNotes)
+	if sel_note then
+		local sounds = sel_note.startNote.sounds
+		if sounds and sounds[1] then
+			imgui.text(sounds[1][1])
+		end
+	end
 end
 
 ---@param self table
@@ -322,6 +330,7 @@ function tabs.bms(self)
 		self.game.editorController:sliceKeysounds()
 	end
 
+	bms_tools.beat_offset = tonumber(imgui.input("beat_offset", bms_tools.beat_offset, "beat offset")) or 0
 	if imgui.button("create bms template", "create bms template") then
 		self.game.editorController:exportBmsTemplate()
 	end

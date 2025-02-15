@@ -121,6 +121,9 @@ function EditorController:sliceKeysounds()
 	local sample_rate = soundData:getSampleRate()
 	local channels_count = soundData:getChannelCount()
 
+	---@type {[number]: string}
+	local sounds_by_time = {}
+
 	local ks_index = 1
 	for i = 1, #linkedNotes - 1 do
 		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
@@ -161,9 +164,34 @@ function EditorController:sliceKeysounds()
 				end
 			end
 
+			local p = n_a.startNote.visualPoint.point
+			---@cast p ncdk2.IntervalPoint
+			sounds_by_time[p.time:tonumber()] = file_name
+			print(p, p.interval, p.time:tonumber(), file_name)
+
 			local path = path_util.join(dir, file_name)
 			love.filesystem.write(path, wave:export())
 			ks_index = ks_index + 1
+		end
+	end
+
+	-- local enc = ChartEncoder()
+	-- print(enc:encode({chart}))
+
+	print('------------')
+
+
+	---@type chartedit.Notes
+	local notes = editorModel.notes
+	for note in notes:iter() do
+		local p = note.visualPoint.point
+		---@cast p ncdk2.IntervalPoint
+		local sound = sounds_by_time[p.time:tonumber()]
+		print(p.time:tonumber(), sound, note)
+		if sound then
+			note.sounds = {{path_util.join(chartview.name, sound), 1}}
+		else
+			note.sounds = nil
 		end
 	end
 end
@@ -213,6 +241,8 @@ function EditorController:exportBmsTemplate()
 	---@type ncdk.Fraction
 	local max_time
 
+	local beat_offset = editorModel.bms_tools.beat_offset
+
 	for column, chart in ipairs(stem_charts) do
 		local dir = chart.chartmeta.name
 		local linkedNotes = chart.notes:getLinkedNotes()
@@ -247,14 +277,16 @@ function EditorController:exportBmsTemplate()
 					tempo = point.interval:getTempo()
 				end
 
+				local time = point.time + beat_offset
+
 				table.insert(notes, {
-					time = point.time,
+					time = time,
 					column = column,
 					sound = get_sound_index(path),
 				})
 
-				if not max_time or point.time > max_time then
-					max_time = point.time
+				if not max_time or time > max_time then
+					max_time = time
 				end
 			end
 		end

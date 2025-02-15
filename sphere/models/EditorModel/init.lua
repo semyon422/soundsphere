@@ -92,6 +92,7 @@ function EditorModel:load()
 	self.bms_tools = {
 		offset = self.layer.points:getFirstPoint().interval.offset,
 		tempo = self.layer.points:getFirstPoint().interval:getTempo(),
+		beat_offset = 0,
 	}
 end
 
