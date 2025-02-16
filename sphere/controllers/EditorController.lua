@@ -113,16 +113,13 @@ function EditorController:sliceKeysounds()
 	local dir = path_util.join(real_dir, chartview.name)
 	assert(love.filesystem.createDirectory(dir))
 
-	---@type ncdk2.Chart
-	local chart = editorModel.chart
+	---@type chartedit.Notes
+	local notes = editorModel.notes
 
-	local linkedNotes = chart.notes:getLinkedNotes()
+	local linkedNotes = notes:getLinkedNotes()
 
 	local sample_rate = soundData:getSampleRate()
 	local channels_count = soundData:getChannelCount()
-
-	---@type {[number]: string}
-	local sounds_by_time = {}
 
 	local ks_index = 1
 	for i = 1, #linkedNotes - 1 do
@@ -164,34 +161,17 @@ function EditorController:sliceKeysounds()
 				end
 			end
 
-			local p = n_a.startNote.visualPoint.point
-			---@cast p ncdk2.IntervalPoint
-			sounds_by_time[p.time:tonumber()] = file_name
-			print(p, p.interval, p.time:tonumber(), file_name)
+			local note = n_a.startNote
+
+			local p = note.visualPoint.point
+			---@cast p chartedit.Point
+
+			print(p, file_name)
+			note.sounds = {{path_util.join(chartview.name, file_name), 1}}
 
 			local path = path_util.join(dir, file_name)
 			love.filesystem.write(path, wave:export())
 			ks_index = ks_index + 1
-		end
-	end
-
-	-- local enc = ChartEncoder()
-	-- print(enc:encode({chart}))
-
-	print('------------')
-
-
-	---@type chartedit.Notes
-	local notes = editorModel.notes
-	for note in notes:iter() do
-		local p = note.visualPoint.point
-		---@cast p ncdk2.IntervalPoint
-		local sound = sounds_by_time[p.time:tonumber()]
-		print(p.time:tonumber(), sound, note)
-		if sound then
-			note.sounds = {{path_util.join(chartview.name, sound), 1}}
-		else
-			note.sounds = nil
 		end
 	end
 end
