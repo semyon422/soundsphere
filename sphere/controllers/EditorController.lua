@@ -9,6 +9,7 @@ local SphPreview = require("sph.SphPreview")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Wave = require("audio.Wave")
 local base36 = require("bms.base36")
+local decibel = require("decibel")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -99,6 +100,8 @@ end
 
 function EditorController:sliceKeysounds()
 	local selectModel = self.selectModel
+
+	---@type sphere.EditorModel
 	local editorModel = self.editorModel
 
 	---@type audio.SoundData
@@ -106,6 +109,17 @@ function EditorController:sliceKeysounds()
 	if not soundData then
 		return
 	end
+
+	local volume = editorModel.metadata:get("volume") or "1"
+	local mulVolume = tonumber(volume)
+	local dbVolume = tonumber(volume:lower():match("^(.+)%s*db$"))
+	if mulVolume then
+		volume = mulVolume
+	elseif dbVolume then
+		volume = decibel.lf_to_f(dbVolume)
+	end
+
+	print("volume", volume)
 
 	local chartview = selectModel.chartview
 	local real_dir = chartview.real_dir
@@ -143,7 +157,7 @@ function EditorController:sliceKeysounds()
 			for j = 0, sample_count - 1 do
 				for c = 1, channels_count do
 					local sample = soundData:getSample(sample_offset + j, c)
-					wave:setSample(j, c, sample * 32768)
+					wave:setSampleFloat(j, c, sample * volume)
 				end
 			end
 
