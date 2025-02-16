@@ -15,6 +15,7 @@ local Scroller = require("sphere.models.EditorModel.Scroller")
 local Metronome = require("sphere.models.EditorModel.Metronome")
 local pattern_analyzer = require("libchart.pattern_analyzer")
 local Point = require("chartedit.Point")
+local Metadata = require("sph.Metadata")
 
 ---@class sphere.EditorModel
 ---@operator call: sphere.EditorModel
@@ -43,6 +44,7 @@ function EditorModel:new(configModel, resourceModel)
 	self.graphicEngine = GraphicEngine()
 	self.scroller = Scroller()
 	self.metronome = Metronome()
+	self.metadata = Metadata()
 
 	for _, v in pairs(self) do
 		v.editorModel = self
@@ -94,6 +96,9 @@ function EditorModel:load()
 		tempo = self.layer.points:getFirstPoint().interval:getTempo(),
 		beat_offset = 0,
 	}
+
+	self.metadata:new()
+	self.metadata:fromChartmeta(self.chart.chartmeta)
 end
 
 function EditorModel:detectTempoOffset()

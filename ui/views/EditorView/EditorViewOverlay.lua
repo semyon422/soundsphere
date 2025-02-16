@@ -16,22 +16,16 @@ end
 
 ---@param self table
 function tabs.info(self)
-	local md = self.game.editorModel.chart.chartmeta
+	---@type sphere.EditorModel
+	local editorModel = self.game.editorModel
 
 	imgui.setSize(400, 1080, 400, 55)
 	imgui.text("Chart info")
-	md.title = imgui.input("title input", md.title, "title")
-	md.artist = imgui.input("artist input", md.artist, "artist")
-	md.source = imgui.input("source input", md.source, "source")
-	md.tags = imgui.input("tags input", md.tags, "tags")
-	md.name = imgui.input("name input", md.name, "name")
-	md.creator = imgui.input("creator input", md.creator, "creator")
-	md.level = imgui.input("level input", md.level, "level")
-	md.audio_path = imgui.input("audio_path input", md.audio_path, "audio_path")
-	md.background_path = imgui.input("background_path input", md.background_path, "background_path")
-	md.preview_time = imgui.input("preview_time input", md.preview_time, "preview_time")
-	md.tempo = imgui.input("tempo input", md.tempo, "tempo")
-	md.inputmode = imgui.input("inputmode input", md.inputmode, "inputmode")
+
+	for k, v in editorModel.metadata:iter() do
+		v = imgui.input(k .. " input", v, k)
+		editorModel.metadata:set(k, v)
+	end
 
 	imgui.separator()
 
