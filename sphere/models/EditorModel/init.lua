@@ -228,6 +228,7 @@ function EditorModel:unload()
 end
 
 function EditorModel:save()
+	self.chart.chartmeta = self.metadata:toChartmeta()
 	self.noteChartLoader:save()
 end
 
