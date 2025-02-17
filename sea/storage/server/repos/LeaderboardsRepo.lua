@@ -1,5 +1,5 @@
 local class = require("class")
-local Leaderboard = require("sea.leaderboards.Leaderboard")
+local Result = require("sea.chart.Result")
 
 ---@class sea.LeaderboardsRepo
 ---@operator call: sea.LeaderboardsRepo
@@ -53,7 +53,7 @@ function LeaderboardsRepo:getBestChartplays(lb, user)
 	local conds = {
 		user_id = user.id,
 		nearest = nearest_cond[lb.nearest],
-		result = lb.result,
+		result__in = Result:condition(lb.result),
 		mode = lb.mode,
 	}
 	if not lb.allow_custom then
@@ -101,7 +101,7 @@ function LeaderboardsRepo:getBestChartplays(lb, user)
 		order = nil, -- rating_calculator
 	}
 
-	-- return self.models.
+	return self.models.chartplayviews:select(conds, options)
 end
 
 return LeaderboardsRepo

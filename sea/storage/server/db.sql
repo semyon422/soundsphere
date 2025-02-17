@@ -89,12 +89,12 @@ CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
-	`events_hash` TEXT NOT NULL,
-	`notes_hash` TEXT NOT NULL,
+	`events_hash` TEXT NOT NULL DEFAULT "",
+	`notes_hash` TEXT NOT NULL DEFAULT "",
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`modifiers` TEXT NOT NULL DEFAULT "",
-	`custom` INTEGER NOT NULL,
+	`custom` INTEGER NOT NULL DEFAULT 0,
 	`rate` INTEGER NOT NULL DEFAULT 1000,
 	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER,
@@ -150,3 +150,48 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`inputmode` BLOB,
 	UNIQUE(`name`)
 );
+
+CREATE TABLE IF NOT EXISTS `ranked_lists` (
+	`id` INTEGER PRIMARY KEY,
+	`name` TEXT,
+	`description` TEXT,
+	`created_at` INTEGER,
+	UNIQUE(`name`)
+);
+
+CREATE TABLE IF NOT EXISTS `ranked_list_chartmetas` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER,
+	`ranked_list_id` INTEGER NOT NULL,
+	`hash` TEXT NOT NULL,
+	`index` INTEGER NOT NULL,
+	`created_at` INTEGER,
+	UNIQUE(`hash`, 'index', `ranked_list_id`)
+);
+
+CREATE TEMP VIEW IF NOT EXISTS `chartplayviews` AS
+SELECT
+chartmetas.id AS chartmeta_id,
+chartdiffs.id AS chartdiff_id,
+ranked_list_chartmetas.ranked_list_id AS ranked_list_id,
+chartplays.*,
+MAX(chartplays.rating) AS _rating,
+chartmetas.timings AS chartmeta_timings,
+chartdiffs.modifiers,
+chartdiffs.rate,
+chartdiffs.rate_type,
+chartdiffs.inputmode AS chartdiff_inputmode,
+chartdiffs.notes_count
+FROM chartplays
+LEFT JOIN chartmetas ON
+chartmetas.hash = chartplays.hash
+LEFT JOIN chartdiffs ON
+chartdiffs.hash = chartplays.hash AND
+chartdiffs.`index` = chartplays.`index` AND
+chartdiffs.mode = chartplays.mode AND
+chartdiffs.modifiers = chartplays.modifiers AND
+chartdiffs.rate = chartplays.rate
+LEFT JOIN ranked_list_chartmetas ON
+ranked_list_chartmetas.hash = chartplays.hash
+GROUP BY chartmeta_id
+;

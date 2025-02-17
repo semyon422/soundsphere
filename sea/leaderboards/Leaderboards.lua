@@ -31,26 +31,26 @@ function Leaderboards:create(user, leaderboard_values)
 
 	leaderboard.name = leaderboard_values.name or "?"
 	leaderboard.description = ""
-	leaderboard.created_at = os.time()
+	leaderboard.created_at = leaderboard_values.created_at or os.time()
 	leaderboard.rating_calculator = 0
 	leaderboard.scores_combiner = 0
 	leaderboard.scores_combiner_count = 20
 	leaderboard.communities_combiner = 0
 	leaderboard.communities_combiner_count = 20
 
-	leaderboard.nearest = "any"
-	leaderboard.result = "fail"
-	leaderboard.allow_custom = false
-	leaderboard.allow_const = false
-	leaderboard.allow_pause = true
-	leaderboard.allow_reorder = true
-	leaderboard.allow_modifiers = false
-	leaderboard.allow_tap_only = false
-	leaderboard.allow_free_timings = false
-	leaderboard.mode = "mania"
-	leaderboard.rate = "any"
-	leaderboard.ranked_lists = {}
-	leaderboard.inputmode = {}
+	leaderboard.nearest = leaderboard_values.nearest or "any"
+	leaderboard.result = leaderboard_values.result or "fail"
+	leaderboard.allow_custom = not not leaderboard_values.allow_custom
+	leaderboard.allow_const = not not leaderboard_values.allow_const
+	leaderboard.allow_pause = not not leaderboard_values.allow_pause
+	leaderboard.allow_reorder = not not leaderboard_values.allow_reorder
+	leaderboard.allow_modifiers = not not leaderboard_values.allow_modifiers
+	leaderboard.allow_tap_only = not not leaderboard_values.allow_tap_only
+	leaderboard.allow_free_timings = not not leaderboard_values.allow_free_timings
+	leaderboard.mode = leaderboard_values.mode or "mania"
+	leaderboard.rate = leaderboard_values.rate or "any"
+	leaderboard.ranked_lists = leaderboard_values.ranked_lists or {}
+	leaderboard.inputmode = leaderboard_values.inputmode or {}
 
 	leaderboard = self.leaderboards_repo:createLeaderboard(leaderboard)
 

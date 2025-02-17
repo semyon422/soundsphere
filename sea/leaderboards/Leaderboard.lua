@@ -27,4 +27,20 @@ local class = require("class")
 ---@field inputmode string[] allowed inputmodes, empty = allow all
 local Leaderboard = class()
 
+function Leaderboard:new()
+	self.created_at = os.time()
+	self.nearest = "any"
+	self.result = "fail"
+	self.allow_custom = true
+	self.allow_pause = true
+	self.allow_reorder = true
+	self.allow_modifiers = true
+	self.allow_tap_only = true
+	self.allow_free_timings = true
+	self.mode = "mania"
+	self.rate = "any"
+	self.ranked_lists = {}
+	self.inputmode = {}
+end
+
 return Leaderboard

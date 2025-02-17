@@ -4,11 +4,12 @@ local Gamemode = require("sea.chart.Gamemode")
 local int_rates = require("libchart.int_rates")
 local json = require("web.json")
 
-local chartplays = {}
+---@type rdb.ModelOptions
+local chartplayviews = {}
 
-chartplays.table_name = "chartplays"
+chartplayviews.table_name = "chartplayviews"
 
-chartplays.types = {
+chartplayviews.types = {
 	nearest = TernaryState,
 	result = Result,
 	mode = Gamemode,
@@ -19,6 +20,6 @@ chartplays.types = {
 	rate = int_rates,
 }
 
-chartplays.relations = {}
+chartplayviews.relations = {}
 
-return chartplays
+return chartplayviews
