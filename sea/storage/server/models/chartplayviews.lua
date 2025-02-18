@@ -7,8 +7,6 @@ local json = require("web.json")
 ---@type rdb.ModelOptions
 local chartplayviews = {}
 
-chartplayviews.table_name = "chartplayviews"
-
 chartplayviews.types = {
 	nearest = "boolean",
 	result = Result,
@@ -21,7 +19,5 @@ chartplayviews.types = {
 	timings = Timings,
 	chartmeta_timings = Timings,
 }
-
-chartplayviews.relations = {}
 
 return chartplayviews

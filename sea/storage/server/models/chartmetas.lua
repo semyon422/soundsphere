@@ -1,14 +1,13 @@
 local Timings = require("sea.chart.Timings")
+local Chartmeta = require("sea.chart.Chartmeta")
 
 ---@type rdb.ModelOptions
 local chartmetas = {}
 
-chartmetas.table_name = "chartmetas"
+chartmetas.metatable = Chartmeta
 
 chartmetas.types = {
 	timings = Timings,
 }
-
-chartmetas.relations = {}
 
 return chartmetas

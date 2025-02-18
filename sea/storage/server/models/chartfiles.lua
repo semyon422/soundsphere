@@ -1,10 +1,8 @@
+local Chartfile = require("sea.chart.Chartfile")
+
 ---@type rdb.ModelOptions
 local chartfiles = {}
 
-chartfiles.table_name = "chartfiles"
-
-chartfiles.types = {}
-
-chartfiles.relations = {}
+chartfiles.metatable = Chartfile
 
 return chartfiles

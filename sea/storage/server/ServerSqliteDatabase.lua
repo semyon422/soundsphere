@@ -15,7 +15,7 @@ ServerSqliteDatabase.path = "server.db"
 function ServerSqliteDatabase:new()
 	self.db = LjsqliteDatabase()
 	self.orm = TableOrm(self.db)
-	self.models = Models(autoload("sea.storage.server.models"), self.orm)
+	self.models = Models(autoload("sea.storage.server.models", true), self.orm)
 end
 
 function ServerSqliteDatabase:remove()

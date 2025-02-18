@@ -1,5 +1,6 @@
 local Result = require("sea.chart.Result")
 local Gamemode = require("sea.chart.Gamemode")
+local Chartplay = require("sea.chart.Chartplay")
 local Timings = require("sea.chart.Timings")
 local int_rates = require("libchart.int_rates")
 local json = require("web.json")
@@ -7,7 +8,7 @@ local json = require("web.json")
 ---@type rdb.ModelOptions
 local chartplays = {}
 
-chartplays.table_name = "chartplays"
+chartplays.metatable = Chartplay
 
 chartplays.types = {
 	nearest = "boolean",
@@ -20,7 +21,5 @@ chartplays.types = {
 	rate = int_rates,
 	timings = Timings,
 }
-
-chartplays.relations = {}
 
 return chartplays

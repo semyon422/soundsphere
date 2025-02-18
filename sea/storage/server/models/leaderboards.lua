@@ -7,7 +7,7 @@ local json = require("web.json")
 ---@type rdb.ModelOptions
 local leaderboards = {}
 
-leaderboards.table_name = "leaderboards"
+leaderboards.metatable = Leaderboard
 
 leaderboards.types = {
 	nearest = TernaryState,
@@ -25,11 +25,5 @@ leaderboards.types = {
 	allow_tap_only = "boolean",
 	allow_free_timings = "boolean",
 }
-
-leaderboards.relations = {}
-
-function leaderboards:from_db()
-	return setmetatable(self, Leaderboard)
-end
 
 return leaderboards
