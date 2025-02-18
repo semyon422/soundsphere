@@ -1,6 +1,7 @@
 local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartplays = require("sea.chart.Chartplays")
+local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
@@ -18,7 +19,7 @@ function test.submit_score(t)
 	local chartfilesRepo = FakeChartfilesRepo()
 	local chartdiffsRepo = FakeChartdiffsRepo()
 	local fakeChartplayComputer = FakeChartplayComputer()
-	local leaderboards = Leaderboards()
+	local leaderboards = Leaderboards(ILeaderboardsRepo())
 
 	local cps = Chartplays(
 		chartplaysRepo,

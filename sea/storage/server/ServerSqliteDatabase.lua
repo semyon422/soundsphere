@@ -4,8 +4,8 @@ local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
 
----@class sphere.ServerSqliteDatabase
----@operator call: sphere.ServerSqliteDatabase
+---@class sea.ServerSqliteDatabase
+---@operator call: sea.ServerSqliteDatabase
 local ServerSqliteDatabase = class()
 
 ServerSqliteDatabase.path = "server.db"

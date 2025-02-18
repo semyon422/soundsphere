@@ -2,7 +2,7 @@ local Leaderboard = require("sea.leaderboards.Leaderboard")
 local Result = require("sea.chart.Result")
 local TernaryState = require("sea.chart.TernaryState")
 local Gamemode = require("sea.chart.Gamemode")
-local json = require("json")
+local json = require("web.json")
 
 ---@type rdb.ModelOptions
 local leaderboards = {}
@@ -15,7 +15,8 @@ leaderboards.types = {
 	mode = Gamemode,
 	rate = json,
 	ranked_lists = json,
-	inputmode = json,
+	chartmeta_inputmode = json,
+	chartdiff_inputmode = json,
 	allow_custom = "boolean",
 	allow_const = "boolean",
 	allow_pause = "boolean",

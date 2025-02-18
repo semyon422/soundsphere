@@ -5,7 +5,7 @@ local test = {}
 ---@param t testing.T
 function test.all(t)
 	for i = -1, 2000 do
-		t:eq(Timings:decode(i):encode(), i)
+		t:eq(Timings.encode(Timings.decode(i)), i)
 	end
 end
 

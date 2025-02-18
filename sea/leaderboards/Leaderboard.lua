@@ -24,7 +24,8 @@ local class = require("class")
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
 ---@field ranked_lists integer[]
----@field inputmode string[] allowed inputmodes, empty = allow all
+---@field chartmeta_inputmode string[] allowed inputmodes, empty = allow all
+---@field chartdiff_inputmode string[] allowed inputmodes, empty = allow all
 local Leaderboard = class()
 
 function Leaderboard:new()
@@ -40,7 +41,8 @@ function Leaderboard:new()
 	self.mode = "mania"
 	self.rate = "any"
 	self.ranked_lists = {}
-	self.inputmode = {}
+	self.chartmeta_inputmode = {}
+	self.chartdiff_inputmode = {}
 end
 
 return Leaderboard

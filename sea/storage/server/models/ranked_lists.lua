@@ -1,3 +1,4 @@
+---@type rdb.ModelOptions
 local ranked_lists = {}
 
 ranked_lists.table_name = "ranked_lists"

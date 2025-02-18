@@ -10,8 +10,4 @@ local class = require("class")
 ---@field updated_at integer
 local LeaderboardUser = class()
 
-function LeaderboardUser:calculateRating()
-	self.total_rating = 0
-end
-
 return LeaderboardUser

@@ -1,3 +1,4 @@
+---@type rdb.ModelOptions
 local chartfiles = {}
 
 chartfiles.table_name = "chartfiles"

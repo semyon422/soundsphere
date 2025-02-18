@@ -23,7 +23,9 @@ function Timings:new(name, data)
 end
 
 ---@param t integer
-function Timings:decode(t)
+---@return sea.Timings
+function Timings.decode(t)
+	assert(t, "missing timings value")
 	if t >= 0 and t <= 500 then
 		return Timings("simple", t)
 	elseif t >= 1100 and t <= 1200 then
@@ -38,18 +40,19 @@ function Timings:decode(t)
 	return Timings("unknown", t)
 end
 
+---@param t sea.Timings
 ---@return integer
-function Timings:encode()
-	local v = self.data
-	if self.name == "simple" then
+function Timings.encode(t)
+	local v = t.data
+	if t.name == "simple" then
 		return v
-	elseif self.name == "osumania" then
+	elseif t.name == "osumania" then
 		return v * 10 + 1100
-	elseif self.name == "etterna" then
+	elseif t.name == "etterna" then
 		return v + 1300
-	elseif self.name == "quaver" then
+	elseif t.name == "quaver" then
 		return 1400
-	elseif self.name == "lr2" then
+	elseif t.name == "lr2" then
 		return _lr2[v] + 1500
 	end
 	return v

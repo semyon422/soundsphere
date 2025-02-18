@@ -46,12 +46,13 @@ local nearest_cond = {
 }
 
 ---@param lb sea.Leaderboard
----@param user sea.User
----@return sea.Chartplay[]
-function LeaderboardsRepo:getBestChartplays(lb, user)
+---@param user_id integer
+---@return rdb.Conditions
+---@return rdb.Options
+function LeaderboardsRepo:getFilterConds(lb, user_id)
 	---@type rdb.Conditions
 	local conds = {
-		user_id = user.id,
+		user_id = user_id,
 		nearest = nearest_cond[lb.nearest],
 		result__in = Result:condition(lb.result),
 		mode = lb.mode,
@@ -84,9 +85,14 @@ function LeaderboardsRepo:getBestChartplays(lb, user)
 		conds.rate__gte, conds.rate__lte = rate.min, rate.max
 	end
 
-	local inputmode = lb.inputmode
-	if inputmode[1] then
-		conds.inputmode__in = inputmode
+	local chartmeta_inputmode = lb.chartmeta_inputmode
+	if chartmeta_inputmode[1] then
+		conds.chartmeta_inputmode__in = chartmeta_inputmode
+	end
+
+	local chartdiff_inputmode = lb.chartdiff_inputmode
+	if chartdiff_inputmode[1] then
+		conds.chartdiff_inputmode__in = chartdiff_inputmode
 	end
 
 	local ranked_lists = lb.ranked_lists
@@ -96,12 +102,54 @@ function LeaderboardsRepo:getBestChartplays(lb, user)
 
 	---@type rdb.Options
 	local options = {
-		group = nil,
+		group = {"hash", "user_id"},
 		limit = lb.scores_combiner_count,
-		order = nil, -- rating_calculator
+		order = {"rating DESC"}, -- TODO: rating_calculator
+		columns = {"*", "MAX(rating) AS _rating"}
 	}
 
+	return conds, options
+end
+
+---@param lb sea.Leaderboard
+---@param chartplay sea.Chartplay
+---@return boolean
+function LeaderboardsRepo:checkChartplay(lb, chartplay)
+	local conds, options = self:getFilterConds(lb, chartplay.user_id)
+	conds.chartplay_id = chartplay.id
+	return not not self.models.chartplayviews:select(conds, options)[1]
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplay[]
+function LeaderboardsRepo:getBestChartplays(lb, user_id)
+	local conds, options = self:getFilterConds(lb, user_id)
 	return self.models.chartplayviews:select(conds, options)
+end
+
+--------------------------------------------------------------------------------
+
+---@param leaderboard_id integer
+---@param user_id integer
+---@return sea.LeaderboardUser?
+function LeaderboardsRepo:getLeaderboardUser(leaderboard_id, user_id)
+	return self.models.leaderboard_users:find({
+		leaderboard_id = assert(leaderboard_id),
+		user_id = assert(user_id),
+	})
+end
+
+---@param leaderboard_user sea.LeaderboardUser
+---@return sea.LeaderboardUser
+function LeaderboardsRepo:createLeaderboardUser(leaderboard_user)
+	return self.models.leaderboard_users:create(leaderboard_user)
+end
+
+---@param leaderboard_user sea.LeaderboardUser
+---@return sea.LeaderboardUser
+function LeaderboardsRepo:updateLeaderboardUser(leaderboard_user)
+	return self.models.leaderboard_users:update(leaderboard_user, {id = leaderboard_user.id})[1]
 end
 
 return LeaderboardsRepo
