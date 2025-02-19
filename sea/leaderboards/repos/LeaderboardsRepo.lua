@@ -75,6 +75,9 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	if not lb.allow_free_timings then
 		conds.timings_ = "chartmeta_timings"
 	end
+	if not lb.allow_free_healths then
+		conds.healths_ = "chartmeta_healths"
+	end
 
 	local rate = lb.rate
 	if type(rate) == "number" then
@@ -103,7 +106,7 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	---@type rdb.Options
 	local options = {
 		group = {"hash", "user_id"},
-		limit = lb.scores_combiner_count,
+		limit = lb.scores_comb_count,
 		order = {"rating DESC"}, -- TODO: rating_calculator
 		columns = {"*", "MAX(rating) AS _rating"}
 	}

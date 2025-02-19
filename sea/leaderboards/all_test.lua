@@ -5,6 +5,7 @@ local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
 local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 
 local test = {}
 
@@ -304,6 +305,36 @@ function test.free_timings_filter(t)
 	end
 
 	ctx.leaderboard.allow_free_timings = false
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+end
+
+---@param t testing.T
+function test.free_healths_filter(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		healths = Healths("simple", 10),
+		hash = "",
+		index = 1,
+	})
+
+	create_chartplay(ctx, {rating = 1, healths = Healths("simple", 10)})
+	create_chartplay(ctx, {rating = 2, healths = Healths("simple", 20)})
+
+	ctx.leaderboard.allow_free_healths = true
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.allow_free_healths = false
 	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)

@@ -24,6 +24,7 @@ leaderboards.types = {
 	allow_modifiers = "boolean",
 	allow_tap_only = "boolean",
 	allow_free_timings = "boolean",
+	allow_free_healths = "boolean",
 }
 
 return leaderboards

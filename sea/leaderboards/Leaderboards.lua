@@ -31,8 +31,8 @@ function Leaderboards:updateLeaderboardUser(lb, user_id)
 	-- TODO: score combiners, rank
 
 	local sum = 0
-	for _, cp in ipairs(chartplays) do
-		sum = sum + cp.rating
+	for i = 1, math.min(lb.scores_comb_count, #chartplays) do
+		sum = sum + chartplays[i].rating
 	end
 
 	lb_user.total_rating = sum / #chartplays
@@ -44,6 +44,7 @@ end
 function Leaderboards:addChartplay(chartplay)
 	local repo = self.leaderboards_repo
 
+	-- TODO: optimize: cache leaderboards, fast check in lua before sql
 	for _, lb in ipairs(repo:getLeaderboards()) do
 		if repo:checkChartplay(lb, chartplay) then
 			self:updateLeaderboardUser(lb, chartplay.user_id)
@@ -66,11 +67,9 @@ function Leaderboards:create(user, lb_values)
 	lb.name = lb_values.name or "?"
 	lb.description = ""
 	lb.created_at = lb_values.created_at or os.time()
-	lb.rating_calculator = 0
-	lb.scores_combiner = 0
-	lb.scores_combiner_count = 20
-	lb.communities_combiner = 0
-	lb.communities_combiner_count = 20
+	lb.rating_calc = lb_values.rating_calc or "enps"
+	lb.scores_comb = 0
+	lb.scores_comb_count = 20
 
 	lb.nearest = lb_values.nearest or "any"
 	lb.result = lb_values.result or "fail"
@@ -81,6 +80,7 @@ function Leaderboards:create(user, lb_values)
 	lb.allow_modifiers = not not lb_values.allow_modifiers
 	lb.allow_tap_only = not not lb_values.allow_tap_only
 	lb.allow_free_timings = not not lb_values.allow_free_timings
+	lb.allow_free_healths = not not lb_values.allow_free_healths
 	lb.mode = lb_values.mode or "mania"
 	lb.rate = lb_values.rate or "any"
 	lb.ranked_lists = lb_values.ranked_lists or {}

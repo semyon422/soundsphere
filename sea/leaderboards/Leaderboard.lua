@@ -6,11 +6,10 @@ local class = require("class")
 ---@field name string
 ---@field description string
 ---@field created_at integer
----@field rating_calculator integer enum, difftable
----@field scores_combiner integer enum
----@field scores_combiner_count integer
----@field communities_combiner integer enum
----@field communities_combiner_count integer
+---rating
+---@field rating_calc sea.RatingCalc
+---@field scores_comb sea.ScoreComb
+---@field scores_comb_count integer
 ---filters
 ---@field nearest sea.TernaryState
 ---@field result sea.Result
@@ -21,6 +20,7 @@ local class = require("class")
 ---@field allow_modifiers boolean
 ---@field allow_tap_only boolean
 ---@field allow_free_timings boolean
+---@field allow_free_healths boolean
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
 ---@field ranked_lists integer[]
@@ -30,6 +30,11 @@ local Leaderboard = class()
 
 function Leaderboard:new()
 	self.created_at = os.time()
+
+	self.rating_calc = "enps"
+	self.scores_comb = "avg"
+	self.scores_comb_count = 20
+
 	self.nearest = "any"
 	self.result = "fail"
 	self.allow_custom = true
@@ -38,6 +43,7 @@ function Leaderboard:new()
 	self.allow_modifiers = true
 	self.allow_tap_only = true
 	self.allow_free_timings = true
+	self.allow_free_healths = true
 	self.mode = "mania"
 	self.rate = "any"
 	self.ranked_lists = {}
