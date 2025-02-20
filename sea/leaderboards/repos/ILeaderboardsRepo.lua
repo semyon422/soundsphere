@@ -67,4 +67,10 @@ function ILeaderboardsRepo:updateLeaderboardUser(leaderboard_user)
 	return leaderboard_user
 end
 
+---@param lb_user sea.LeaderboardUser
+---@return integer
+function ILeaderboardsRepo:getLeaderboardUserRank(lb_user)
+	return 0
+end
+
 return ILeaderboardsRepo

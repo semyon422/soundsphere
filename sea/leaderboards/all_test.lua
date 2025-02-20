@@ -531,12 +531,47 @@ function test.total_rating(t)
 	local cp1 = create_chartplay(ctx, {rating = 1, hash = "1"})
 	local cp2 = create_chartplay(ctx, {rating = 2, hash = "2"})
 
+	ctx.leaderboard.scores_comb = "avg"
+	ctx.leaderboard.scores_comb_count = 10
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
 	ctx.leaderboards:addChartplay(cp1)
 
 	local lb_user = ctx.db.models.leaderboard_users:find({})
 	---@cast lb_user sea.LeaderboardUser
 
-	t:eq(lb_user.total_rating, 1.5)
+	t:eq(lb_user.total_rating, 0.3)
+end
+
+---@param t testing.T
+function test.rank(t)
+	local ctx = create_test_ctx()
+
+	ctx.leaderboard.scores_comb = "avg"
+	ctx.leaderboard.scores_comb_count = 1
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local cp1 = create_chartplay(ctx, {rating = 1, user_id = 1})
+	local cp2 = create_chartplay(ctx, {rating = 2, user_id = 2})
+
+	ctx.leaderboards:addChartplay(cp1)
+	ctx.leaderboards:addChartplay(cp2)
+
+	-- recalc all ranks
+	ctx.leaderboards:updateLeaderboardUser(ctx.leaderboard, 1)
+	ctx.leaderboards:updateLeaderboardUser(ctx.leaderboard, 2)
+
+	local lb_user_1 = ctx.db.models.leaderboard_users:find({user_id = 1})
+	---@cast lb_user_1 sea.LeaderboardUser
+
+	t:eq(lb_user_1.total_rating, 1)
+	t:eq(lb_user_1.rank, 2)
+
+	local lb_user_2 = ctx.db.models.leaderboard_users:find({user_id = 2})
+	---@cast lb_user_2 sea.LeaderboardUser
+
+	t:eq(lb_user_2.total_rating, 2)
+	t:eq(lb_user_2.rank, 1)
 end
 
 return test

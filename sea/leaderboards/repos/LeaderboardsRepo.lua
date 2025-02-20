@@ -1,9 +1,9 @@
-local class = require("class")
 local Result = require("sea.chart.Result")
+local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 
----@class sea.LeaderboardsRepo
+---@class sea.LeaderboardsRepo: sea.ILeaderboardsRepo
 ---@operator call: sea.LeaderboardsRepo
-local LeaderboardsRepo = class()
+local LeaderboardsRepo = ILeaderboardsRepo + {}
 
 ---@param models rdb.Models
 function LeaderboardsRepo:new(models)
@@ -143,16 +143,25 @@ function LeaderboardsRepo:getLeaderboardUser(leaderboard_id, user_id)
 	})
 end
 
----@param leaderboard_user sea.LeaderboardUser
+---@param lb_user sea.LeaderboardUser
 ---@return sea.LeaderboardUser
-function LeaderboardsRepo:createLeaderboardUser(leaderboard_user)
-	return self.models.leaderboard_users:create(leaderboard_user)
+function LeaderboardsRepo:createLeaderboardUser(lb_user)
+	return self.models.leaderboard_users:create(lb_user)
 end
 
----@param leaderboard_user sea.LeaderboardUser
+---@param lb_user sea.LeaderboardUser
 ---@return sea.LeaderboardUser
-function LeaderboardsRepo:updateLeaderboardUser(leaderboard_user)
-	return self.models.leaderboard_users:update(leaderboard_user, {id = leaderboard_user.id})[1]
+function LeaderboardsRepo:updateLeaderboardUser(lb_user)
+	return self.models.leaderboard_users:update(lb_user, {id = lb_user.id})[1]
+end
+
+---@param lb_user sea.LeaderboardUser
+---@return integer
+function LeaderboardsRepo:getLeaderboardUserRank(lb_user)
+	return self.models.leaderboard_users:count({
+		leaderboard_id = lb_user.leaderboard_id,
+		total_rating__gte = lb_user.total_rating,
+	})
 end
 
 return LeaderboardsRepo

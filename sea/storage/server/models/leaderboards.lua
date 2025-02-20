@@ -1,4 +1,5 @@
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local ScoreComb = require("sea.leaderboards.ScoreComb")
 local Result = require("sea.chart.Result")
 local TernaryState = require("sea.chart.TernaryState")
 local Gamemode = require("sea.chart.Gamemode")
@@ -10,6 +11,7 @@ local leaderboards = {}
 leaderboards.metatable = Leaderboard
 
 leaderboards.types = {
+	score_comb = ScoreComb,
 	nearest = TernaryState,
 	result = Result,
 	mode = Gamemode,

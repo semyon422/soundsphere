@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `ranked_list_chartmetas` (
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`created_at` INTEGER,
-	UNIQUE(`hash`, 'index', `ranked_list_id`)
+	UNIQUE(`hash`, `index`, `ranked_list_id`)
 );
 
 CREATE TEMP VIEW IF NOT EXISTS `chartplayviews` AS
@@ -205,4 +205,11 @@ chartdiffs.modifiers = chartplays.modifiers AND
 chartdiffs.rate = chartplays.rate
 LEFT JOIN ranked_list_chartmetas ON
 ranked_list_chartmetas.hash = chartplays.hash
+;
+
+CREATE TEMP VIEW IF NOT EXISTS `leaderboard_users_ranked` AS
+SELECT
+ROW_NUMBER() OVER (PARTITION BY leaderboard_id ORDER BY total_rating DESC) row_number,
+leaderboard_users.*
+FROM leaderboard_users
 ;

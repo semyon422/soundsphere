@@ -28,14 +28,22 @@ function Leaderboards:updateLeaderboardUser(lb, user_id)
 
 	local chartplays = repo:getBestChartplays(lb, user_id)
 
-	-- TODO: score combiners, rank
-
-	local sum = 0
-	for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-		sum = sum + chartplays[i].rating
+	local total_rating = 0
+	if lb.scores_comb == "avg" then
+		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
+			total_rating = total_rating + chartplays[i].rating
+		end
+		total_rating = total_rating / lb.scores_comb_count
+	elseif lb.scores_comb == "exp95" then
+		local mul = 1
+		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
+			total_rating = total_rating + chartplays[i].rating * mul
+			mul = mul * 0.95
+		end
 	end
 
-	lb_user.total_rating = sum / #chartplays
+	lb_user.total_rating = total_rating
+	lb_user.rank = repo:getLeaderboardUserRank(lb_user)
 	lb_user.updated_at = os.time()
 	repo:updateLeaderboardUser(lb_user)
 end
