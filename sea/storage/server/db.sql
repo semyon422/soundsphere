@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`allow_free_healths` INTEGER,
 	`mode` INTEGER,
 	`rate` BLOB,
-	`ranked_lists` BLOB,
+	`difftables` BLOB,
 	`chartmeta_inputmode` BLOB,
 	`chartdiff_inputmode` BLOB,
 	UNIQUE(`name`)
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `leaderboard_users` (
 	UNIQUE(`leaderboard_id`, `user_id`)
 );
 
-CREATE TABLE IF NOT EXISTS `ranked_lists` (
+CREATE TABLE IF NOT EXISTS `difftables` (
 	`id` INTEGER PRIMARY KEY,
 	`name` TEXT,
 	`description` TEXT,
@@ -169,31 +169,31 @@ CREATE TABLE IF NOT EXISTS `ranked_lists` (
 	UNIQUE(`name`)
 );
 
-CREATE TABLE IF NOT EXISTS `ranked_list_chartmetas` (
+CREATE TABLE IF NOT EXISTS `difftable_chartmetas` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
-	`ranked_list_id` INTEGER NOT NULL,
+	`difftable_id` INTEGER NOT NULL,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+	`level` REAL NOT NULL,
 	`created_at` INTEGER,
-	UNIQUE(`hash`, `index`, `ranked_list_id`)
+	UNIQUE(`hash`, `index`, `difftable_id`)
 );
 
 CREATE TEMP VIEW IF NOT EXISTS `chartplayviews` AS
 SELECT
 chartplays.id AS chartplay_id,
 chartdiffs.id AS chartdiff_id,
-chartdiffs.id AS chartdiff_id,
-ranked_list_chartmetas.ranked_list_id AS ranked_list_id,
-chartplays.*,
+chartmetas.id AS chartmeta_id,
+difftable_chartmetas.difftable_id AS difftable_id,
+difftable_chartmetas.level AS difftable_level,
+chartmetas.level AS chartmeta_level,
 chartmetas.timings AS chartmeta_timings,
 chartmetas.healths AS chartmeta_healths,
 chartmetas.inputmode AS chartmeta_inputmode,
-chartdiffs.modifiers,
-chartdiffs.rate,
-chartdiffs.rate_type,
 chartdiffs.inputmode AS chartdiff_inputmode,
-chartdiffs.notes_count
+chartdiffs.notes_count,
+chartplays.*
 FROM chartplays
 LEFT JOIN chartmetas ON
 chartmetas.hash = chartplays.hash
@@ -203,8 +203,8 @@ chartdiffs.`index` = chartplays.`index` AND
 chartdiffs.mode = chartplays.mode AND
 chartdiffs.modifiers = chartplays.modifiers AND
 chartdiffs.rate = chartplays.rate
-LEFT JOIN ranked_list_chartmetas ON
-ranked_list_chartmetas.hash = chartplays.hash
+LEFT JOIN difftable_chartmetas ON
+difftable_chartmetas.hash = chartplays.hash
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS `leaderboard_users_ranked` AS

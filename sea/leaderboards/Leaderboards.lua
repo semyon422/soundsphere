@@ -2,6 +2,7 @@ local class = require("class")
 local LeaderboardsAccess = require("sea.leaderboards.access.LeaderboardsAccess")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardUser = require("sea.leaderboards.LeaderboardUser")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
 
 ---@class sea.Leaderboards
 ---@operator call: sea.Leaderboards
@@ -11,6 +12,12 @@ local Leaderboards = class()
 function Leaderboards:new(leaderboards_repo)
 	self.leaderboards_repo = leaderboards_repo
 	self.leaderboards_access = LeaderboardsAccess()
+end
+
+---@param chartplay sea.Chartplayview
+---@param rating_calc sea.RatingCalc
+local function get_rating(chartplay, rating_calc)
+	return chartplay[RatingCalc:column(rating_calc)]
 end
 
 ---@param lb sea.Leaderboard
@@ -31,13 +38,13 @@ function Leaderboards:updateLeaderboardUser(lb, user_id)
 	local total_rating = 0
 	if lb.scores_comb == "avg" then
 		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + chartplays[i].rating
+			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc)
 		end
 		total_rating = total_rating / lb.scores_comb_count
 	elseif lb.scores_comb == "exp95" then
 		local mul = 1
 		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + chartplays[i].rating * mul
+			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc) * mul
 			mul = mul * 0.95
 		end
 	end
@@ -76,8 +83,8 @@ function Leaderboards:create(user, lb_values)
 	lb.description = ""
 	lb.created_at = lb_values.created_at or os.time()
 	lb.rating_calc = lb_values.rating_calc or "enps"
-	lb.scores_comb = 0
-	lb.scores_comb_count = 20
+	lb.scores_comb = "avg"
+	lb.scores_comb_count = lb_values.scores_comb_count or 20
 
 	lb.nearest = lb_values.nearest or "any"
 	lb.result = lb_values.result or "fail"
@@ -91,7 +98,7 @@ function Leaderboards:create(user, lb_values)
 	lb.allow_free_healths = not not lb_values.allow_free_healths
 	lb.mode = lb_values.mode or "mania"
 	lb.rate = lb_values.rate or "any"
-	lb.ranked_lists = lb_values.ranked_lists or {}
+	lb.difftables = lb_values.difftables or {}
 	lb.chartmeta_inputmode = lb_values.chartmeta_inputmode or {}
 	lb.chartdiff_inputmode = lb_values.chartdiff_inputmode or {}
 

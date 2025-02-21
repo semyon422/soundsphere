@@ -1,5 +1,6 @@
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 local ScoreComb = require("sea.leaderboards.ScoreComb")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
 local Result = require("sea.chart.Result")
 local TernaryState = require("sea.chart.TernaryState")
 local Gamemode = require("sea.chart.Gamemode")
@@ -12,11 +13,12 @@ leaderboards.metatable = Leaderboard
 
 leaderboards.types = {
 	score_comb = ScoreComb,
+	rating_calc = RatingCalc,
 	nearest = TernaryState,
 	result = Result,
 	mode = Gamemode,
 	rate = json,
-	ranked_lists = json,
+	difftables = json,
 	chartmeta_inputmode = json,
 	chartdiff_inputmode = json,
 	allow_custom = "boolean",

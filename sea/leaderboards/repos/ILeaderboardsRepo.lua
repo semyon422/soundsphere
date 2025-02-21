@@ -41,7 +41,7 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
----@return sea.Chartplay[]
+---@return sea.Chartplayview[]
 function ILeaderboardsRepo:getBestChartplays(lb, user_id)
 	return {}
 end

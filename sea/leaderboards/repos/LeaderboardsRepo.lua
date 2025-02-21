@@ -1,4 +1,5 @@
 local Result = require("sea.chart.Result")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 
 ---@class sea.LeaderboardsRepo: sea.ILeaderboardsRepo
@@ -98,17 +99,19 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		conds.chartdiff_inputmode__in = chartdiff_inputmode
 	end
 
-	local ranked_lists = lb.ranked_lists
-	if ranked_lists[1] then
-		conds.ranked_list_id__in = ranked_lists
+	local difftables = lb.difftables
+	if difftables[1] then
+		conds.difftable_id__in = difftables
 	end
+
+	local rating_column = RatingCalc:column(lb.rating_calc)
 
 	---@type rdb.Options
 	local options = {
 		group = {"hash", "user_id"},
 		limit = lb.scores_comb_count,
-		order = {"rating DESC"}, -- TODO: rating_calculator
-		columns = {"*", "MAX(rating) AS _rating"}
+		order = {rating_column .. " DESC"}, -- TODO: rating_calculator
+		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column), "MAX(difftable_level) AS _difftable_level"}
 	}
 
 	return conds, options
@@ -125,7 +128,7 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
----@return sea.Chartplay[]
+---@return sea.Chartplayview[]
 function LeaderboardsRepo:getBestChartplays(lb, user_id)
 	local conds, options = self:getFilterConds(lb, user_id)
 	return self.models.chartplayviews:select(conds, options)

@@ -469,7 +469,7 @@ function test.chartdiff_inputmode_filter(t)
 end
 
 ---@param t testing.T
-function test.ranked_list_filter(t)
+function test.difftable_filter_single(t)
 	local ctx = create_test_ctx()
 
 	local models = ctx.db.models
@@ -477,22 +477,102 @@ function test.ranked_list_filter(t)
 	create_chartplay(ctx, {rating = 1, hash = "1"})
 	create_chartplay(ctx, {rating = 2, hash = "2"})
 
-	local ranked_list = models.ranked_lists:create({
+	local difftable = models.difftables:create({
 		name = "Ranked list 1"
 	})
 
-	models.ranked_list_chartmetas:create({
-		ranked_list_id = ranked_list.id,
+	models.difftable_chartmetas:create({
+		difftable_id = difftable.id,
 		hash = "2",
 		index = 1,
+		level = 0,
 	})
 
-	ctx.leaderboard.ranked_lists = {1}
+	ctx.leaderboard.difftables = {difftable.id}
 	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
 		t:eq(chartplays[1].rating, 2)
+	end
+end
+
+---@param t testing.T
+function test.difftable_filter_multiple(t)
+	local ctx = create_test_ctx()
+
+	local models = ctx.db.models
+
+	create_chartplay(ctx, {rating = 1})
+
+	local difftable_1 = models.difftables:create({name = "Ranked list 1"})
+	local difftable_2 = models.difftables:create({name = "Ranked list 2"})
+
+	models.difftable_chartmetas:create({
+		difftable_id = difftable_1.id,
+		hash = "",
+		index = 1,
+		level = 1,
+	})
+
+	models.difftable_chartmetas:create({
+		difftable_id = difftable_2.id,
+		hash = "",
+		index = 1,
+		level = 2,
+	})
+
+	ctx.leaderboard.difftables = {difftable_1.id}
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].difftable_id, 1)
+		t:eq(chartplays[1].difftable_level, 1)
+	end
+
+	ctx.leaderboard.difftables = {difftable_2.id}
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].difftable_id, 2)
+		t:eq(chartplays[1].difftable_level, 2)
+	end
+
+	ctx.leaderboard.difftables = {difftable_1.id, difftable_2.id}
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].difftable_id, 2)
+		t:eq(chartplays[1].difftable_level, 2)
+	end
+end
+
+---@param t testing.T
+function test.rating_calc_filter(t)
+	local ctx = create_test_ctx()
+
+	create_chartplay(ctx, {rating = 1, rating_pp = 2, hash = "1"})
+	create_chartplay(ctx, {rating = 2, rating_pp = 1, hash = "2"})
+
+	ctx.leaderboard.rating_calc = "enps"
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 2) then
+		t:eq(chartplays[1].rating, 2)
+		t:eq(chartplays[1].rating_pp, 1)
+	end
+
+	ctx.leaderboard.rating_calc = "pp"
+	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 2) then
+		t:eq(chartplays[1].rating, 1)
+		t:eq(chartplays[1].rating_pp, 2)
 	end
 end
 
