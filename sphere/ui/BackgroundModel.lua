@@ -3,6 +3,7 @@ local thread = require("thread")
 local gfx_util = require("gfx_util")
 local flux = require("flux")
 local delay = require("delay")
+local Path = require("Path")
 
 ---@class sphere.BackgroundModel
 ---@operator call: sphere.BackgroundModel
@@ -79,6 +80,84 @@ function BackgroundModel:loadBackgroundDebounce(path)
 	delay.debounce(self, "loadDebounce", 0.1, self.loadBackground, self)
 end
 
+---@param path string?
+---@return boolean
+function BackgroundModel:isValidImage(path)
+	if not path then
+		return false
+	end
+	local info = love.filesystem.getInfo(path)
+	return info and info.type ~= "directory"
+end
+
+local image_ext = {
+	png = true,
+	jpg = true,
+	jpeg = true,
+	tga = true,
+	bmp = true
+}
+
+---@return string?
+function BackgroundModel:findBackground()
+	if not self.path then
+		return
+	end
+
+	local path = Path(self.path)
+
+	if self:isValidImage(tostring(path)) then
+		return tostring(path)
+	end
+
+	local search_directory = path:copy()
+
+	local info = love.filesystem.getInfo(tostring(search_directory))
+
+	if info and info.type == "directory" then
+		search_directory:toDirectory()
+	else
+		search_directory:trimLast()
+	end
+
+	local original_file_name = tostring(path:getFileName(true))
+	local files = love.filesystem.getDirectoryItems(tostring(search_directory))
+	local found = nil ---@type string?
+	local last_resort = nil ---@type string?
+
+	for _, filepath_str in ipairs(files) do
+		local filepath = Path(filepath_str)
+
+		if image_ext[filepath:getExtension()] then
+			local c = filepath:getFileName(true):lower()
+
+			if c:find("cdtitle") or c:find("banner") or c == "bn" then
+				-- ignore
+			elseif c:find("background") then
+				found = filepath_str
+				break
+			elseif c:find("bg") then
+				found = filepath_str
+				break
+			elseif c:find(original_file_name) then
+				found = filepath_str
+				break
+			else
+				last_resort = filepath_str
+			end
+		end
+	end
+
+	if not found and not last_resort then
+		return
+	end
+
+	local result = tostring(search_directory .. Path(found or last_resort))
+
+	if self:isValidImage(result) then
+		return result
+	end
+end
 
 function BackgroundModel:loadBackground()
 	local path = self.path
@@ -88,10 +167,12 @@ function BackgroundModel:loadBackground()
 	end
 
 	if not path:find("^http") then
-		local info = love.filesystem.getInfo(path)
-		if not info or info.type == "directory" then
-			self:setBackground(self:getDefaultImage())
-			return
+		if not self:isValidImage(path) then
+			path = self:findBackground()
+			if not path then
+				self:setBackground(self:getDefaultImage())
+				return
+			end
 		end
 	end
 
@@ -106,10 +187,13 @@ function BackgroundModel:loadBackground()
 		image = self:loadImage(path)
 	end
 
+	self.path = path
+	--[[
 	if path ~= self.path then
 		self:loadBackground()
 		return
 	end
+	]]
 
 	if image then
 		self:setBackground(image)
