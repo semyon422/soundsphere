@@ -30,27 +30,29 @@ end
 --------------------------------------------------------------------------------
 
 ---@param difftable_id integer
----@param chartdiff_id integer
----@return sea.DifftableChart?
-function IDifftablesRepo:getDifftableChart(difftable_id, chartdiff_id)
+---@param hash string
+---@param index integer
+---@return sea.DifftableChartmeta?
+function IDifftablesRepo:getDifftableChartmeta(difftable_id, hash, index)
 	return {}
 end
 
----@param difftable_chart sea.DifftableChart
----@return sea.DifftableChart
-function IDifftablesRepo:createDifftableChart(difftable_chart)
+---@param difftable_chartmeta sea.DifftableChartmeta
+---@return sea.DifftableChartmeta
+function IDifftablesRepo:createDifftableChartmeta(difftable_chartmeta)
 	return {}
 end
 
----@param difftable_chart sea.DifftableChart
----@return sea.DifftableChart
-function IDifftablesRepo:updateDifftableChart(difftable_chart)
+---@param difftable_chartmeta sea.DifftableChartmeta
+---@return sea.DifftableChartmeta
+function IDifftablesRepo:updateDifftableChartmeta(difftable_chartmeta)
 	return {}
 end
 
 ---@param difftable_id integer
----@param chartdiff_id integer
-function IDifftablesRepo:deleteDifftableChart(difftable_id, chartdiff_id)
+---@param hash string
+---@param index integer
+function IDifftablesRepo:deleteDifftableChartmeta(difftable_id, hash, index)
 end
 
 return IDifftablesRepo

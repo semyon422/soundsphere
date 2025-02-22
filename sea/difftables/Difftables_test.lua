@@ -20,21 +20,24 @@ function test.basic(t)
 	---@cast difftable -?
 	t:eq(difftable.name, "Difftable")
 
-	local difftable_chart, err = difftables:setDifftableChart(user, difftable.id, 1, 12)
-	if not t:assert(difftable_chart, err) then
+	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, 12)
+	if not t:assert(dt_cm, err) then
 		return
 	end
 
-	---@cast difftable_chart -?
-	t:eq(difftable_chart.level, 12)
+	---@cast dt_cm -?
+	t:eq(dt_cm.level, 12)
 
-	local difftable_chart, err = difftables:setDifftableChart(user, difftable.id, 1, 10)
-	if not t:assert(difftable_chart, err) then
+	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, 10)
+	if not t:assert(dt_cm, err) then
 		return
 	end
 
-	---@cast difftable_chart -?
-	t:eq(difftable_chart.level, 10)
+	---@cast dt_cm -?
+	t:eq(dt_cm.level, 10)
+
+	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, nil)
+	t:assert(not dt_cm)
 end
 
 return test

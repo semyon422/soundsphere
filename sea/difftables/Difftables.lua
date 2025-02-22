@@ -1,6 +1,6 @@
 local class = require("class")
 local Difftable = require("sea.difftables.Difftable")
-local DifftableChart = require("sea.difftables.DifftableChart")
+local DifftableChartmeta = require("sea.difftables.DifftableChartmeta")
 local DifftablesAccess = require("sea.difftables.access.DifftablesAccess")
 
 ---@class sea.Difftables
@@ -32,33 +32,35 @@ end
 
 ---@param user sea.User
 ---@param difftable_id integer
----@param chartdiff_id integer
----@param level number
----@return sea.DifftableChart?
+---@param hash string
+---@param index integer
+---@param level number?
+---@return sea.DifftableChartmeta?
 ---@return string?
-function Difftables:setDifftableChart(user, difftable_id, chartdiff_id, level)
+function Difftables:setDifftableChartmeta(user, difftable_id, hash, index, level)
 	local can, err = self.difftables_access:canManage(user)
 	if not can then
 		return nil, err
 	end
 
 	if not level then
-		self.difftables_repo:deleteDifftableChart(difftable_id, chartdiff_id)
+		self.difftables_repo:deleteDifftableChartmeta(difftable_id, hash, index)
 		return
 	end
 
-	local difftable_chart = self.difftables_repo:getDifftableChart(difftable_id, chartdiff_id)
-	if difftable_chart then
-		difftable_chart.level = level
-		return self.difftables_repo:createDifftableChart(difftable_chart)
+	local dt_cm = self.difftables_repo:getDifftableChartmeta(difftable_id, hash, index)
+	if dt_cm then
+		dt_cm.level = level
+		return self.difftables_repo:updateDifftableChartmeta(dt_cm)
 	end
 
-	difftable_chart = DifftableChart()
-	difftable_chart.difftable_id = difftable_id
-	difftable_chart.chartdiff_id = chartdiff_id
-	difftable_chart.level = level
+	dt_cm = DifftableChartmeta()
+	dt_cm.difftable_id = difftable_id
+	dt_cm.hash = hash
+	dt_cm.index = index
+	dt_cm.level = level
 
-	return self.difftables_repo:createDifftableChart(difftable_chart)
+	return self.difftables_repo:createDifftableChartmeta(dt_cm)
 end
 
 return Difftables

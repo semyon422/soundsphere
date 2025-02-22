@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `difftables` (
 	`id` INTEGER PRIMARY KEY,
 	`name` TEXT,
 	`description` TEXT,
+	`symbol` TEXT,
 	`created_at` INTEGER,
 	UNIQUE(`name`)
 );

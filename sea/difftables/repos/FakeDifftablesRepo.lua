@@ -7,7 +7,7 @@ local FakeDifftablesRepo = class()
 
 function FakeDifftablesRepo:new()
 	self.difftables = TestModel()
-	self.difftable_charts = TestModel()
+	self.difftable_chartmetas = TestModel()
 end
 
 ---@return sea.Difftable[]
@@ -36,28 +36,38 @@ end
 --------------------------------------------------------------------------------
 
 ---@param difftable_id integer
----@param chartdiff_id integer
----@return sea.DifftableChart?
-function FakeDifftablesRepo:getDifftableChart(difftable_id, chartdiff_id)
-	return self.difftable_charts:find({difftable_id = difftable_id, chartdiff_id = chartdiff_id})
+---@param hash string
+---@param index integer
+---@return sea.DifftableChartmeta?
+function FakeDifftablesRepo:getDifftableChartmeta(difftable_id, hash, index)
+	return self.difftable_chartmetas:find({
+		difftable_id = difftable_id,
+		hash = hash,
+		index = index,
+	})
 end
 
----@param difftable_chart sea.DifftableChart
----@return sea.DifftableChart
-function FakeDifftablesRepo:createDifftableChart(difftable_chart)
-	return self.difftable_charts:create(difftable_chart)
+---@param difftable_chartmeta sea.DifftableChartmeta
+---@return sea.DifftableChartmeta
+function FakeDifftablesRepo:createDifftableChartmeta(difftable_chartmeta)
+	return self.difftable_chartmetas:create(difftable_chartmeta)
 end
 
----@param difftable_chart sea.DifftableChart
----@return sea.DifftableChart
-function FakeDifftablesRepo:updateDifftableChart(difftable_chart)
-	return self.difftable_charts:update(difftable_chart, {id = difftable_chart.id})[1]
+---@param difftable_chartmeta sea.DifftableChartmeta
+---@return sea.DifftableChartmeta
+function FakeDifftablesRepo:updateDifftableChartmeta(difftable_chartmeta)
+	return self.difftable_chartmetas:update(difftable_chartmeta, {id = difftable_chartmeta.id})[1]
 end
 
 ---@param difftable_id integer
----@param chartdiff_id integer
-function FakeDifftablesRepo:deleteDifftableChart(difftable_id, chartdiff_id)
-	return self.difftable_charts:remove({difftable_id = difftable_id, chartdiff_id = chartdiff_id})[1]
+---@param hash string
+---@param index integer
+function FakeDifftablesRepo:deleteDifftableChartmeta(difftable_id, hash, index)
+	self.difftable_chartmetas:remove({
+		difftable_id = difftable_id,
+		hash = hash,
+		index = index,
+	})
 end
 
 return FakeDifftablesRepo
