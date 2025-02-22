@@ -104,23 +104,24 @@ function BackgroundModel:findBackground()
 		return
 	end
 
-	local path = Path(self.path)
+	local path = Path(self.path):normalize()
 
 	if self:isValidImage(tostring(path)) then
 		return tostring(path)
 	end
 
-	local search_directory = path:copy()
 
-	local info = love.filesystem.getInfo(tostring(search_directory))
+	local path_info = love.filesystem.getInfo(tostring(path))
 
-	if info and info.type == "directory" then
-		search_directory:toDirectory()
+	local search_directory ---@type aqua.Path
+	if path_info and path_info.type == "directory" then
+		path = path:toDirectory()
+		search_directory = path
 	else
-		search_directory:trimLast()
+		search_directory = path:trimLast()
 	end
 
-	local original_file_name = tostring(path:getFileName(true))
+	local original_file_name = path:isFile() and path:getName(true)
 	local files = love.filesystem.getDirectoryItems(tostring(search_directory))
 	local found = nil ---@type string?
 	local last_resort = nil ---@type string?
@@ -128,8 +129,9 @@ function BackgroundModel:findBackground()
 	for _, filepath_str in ipairs(files) do
 		local filepath = Path(filepath_str)
 
-		if image_ext[filepath:getExtension()] then
-			local c = filepath:getFileName(true):lower()
+		local ext = filepath:getExtension()
+		if ext and image_ext[ext] then
+			local c = filepath:getName(true):lower()
 
 			if c:find("cdtitle") or c:find("banner") or c == "bn" then
 				-- ignore
@@ -139,7 +141,7 @@ function BackgroundModel:findBackground()
 			elseif c:find("bg") then
 				found = filepath_str
 				break
-			elseif c:find(original_file_name) then
+			elseif original_file_name and c:find(original_file_name) then
 				found = filepath_str
 				break
 			else
@@ -188,12 +190,6 @@ function BackgroundModel:loadBackground()
 	end
 
 	self.path = path
-	--[[
-	if path ~= self.path then
-		self:loadBackground()
-		return
-	end
-	]]
 
 	if image then
 		self:setBackground(image)
