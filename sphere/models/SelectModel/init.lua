@@ -132,7 +132,7 @@ function SelectModel:getBackgroundPath()
 
 	local background_path = chartview.background_path
 	if not background_path or background_path == "" then
-		return
+		return chartview.location_dir
 	end
 
 	return path_util.join(chartview.location_dir, background_path)
