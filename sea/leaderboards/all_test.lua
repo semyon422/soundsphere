@@ -11,6 +11,9 @@ local test = {}
 
 local function create_test_ctx()
 	local db = ServerSqliteDatabase()
+
+	db.path = ":memory:"
+
 	db:remove()
 	db:open()
 

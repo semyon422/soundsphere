@@ -181,6 +181,29 @@ CREATE TABLE IF NOT EXISTS `difftable_chartmetas` (
 	UNIQUE(`hash`, `index`, `difftable_id`)
 );
 
+CREATE TABLE IF NOT EXISTS `teams` (
+	`id` INTEGER PRIMARY KEY,
+	`name` TEXT,
+	`alias` TEXT,
+	`description` TEXT,
+	`owner_id` INTEGER,
+	`type` INTEGER,
+	`users_count` INTEGER,
+	`created_at` INTEGER,
+	UNIQUE(`name`),
+	UNIQUE(`alias`)
+);
+
+CREATE TABLE IF NOT EXISTS `team_users` (
+	`id` INTEGER PRIMARY KEY,
+	`team_id` INTEGER NOT NULL,
+	`user_id` INTEGER NOT NULL,
+	`is_accepted` INTEGER,
+	`is_invitation` INTEGER,
+	`created_at` INTEGER,
+	UNIQUE(`team_id`, `user_id`)
+);
+
 CREATE TEMP VIEW IF NOT EXISTS `chartplayviews` AS
 SELECT
 chartplays.id AS chartplay_id,
