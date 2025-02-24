@@ -135,6 +135,8 @@ function EditorController:sliceKeysounds()
 	local sample_rate = soundData:getSampleRate()
 	local channels_count = soundData:getChannelCount()
 
+	print("sample rate", sample_rate)
+
 	local ks_index = 1
 	for i = 1, #linkedNotes - 1 do
 		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
@@ -152,11 +154,12 @@ function EditorController:sliceKeysounds()
 			local sample_count = math.floor((b - a) * sample_rate)
 
 			local wave = Wave()
+			wave.sample_rate = sample_rate
 			wave:initBuffer(channels_count, sample_count)
 
 			for j = 0, sample_count - 1 do
 				for c = 1, channels_count do
-					local sample = soundData:getSample(sample_offset + j, c)
+					local sample = soundData:getSample(math.min(sample_offset + j, soundData:getSampleCount() - 1), c)
 					wave:setSampleFloat(j, c, sample * volume)
 				end
 			end
