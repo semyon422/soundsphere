@@ -1,3 +1,27 @@
+CREATE TABLE IF NOT EXISTS `users` (
+	`id` INTEGER PRIMARY KEY,
+	`name` TEXT NOT NULL,
+	`email` TEXT NOT NULL,
+	`password` TEXT NOT NULL,
+	`description` TEXT NOT NULL,
+	`latest_activity` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
+	`is_banned` INTEGER NOT NULL,
+	`chartplays_count` INTEGER NOT NULL,
+	`chartmetas_count` INTEGER NOT NULL,
+	`chartdiffs_count` INTEGER NOT NULL,
+	`chartfiles_upload_size` INTEGER NOT NULL,
+	`chartplays_upload_size` INTEGER NOT NULL,
+	`play_time` INTEGER NOT NULL,
+	`color_left` INTEGER NOT NULL,
+	`color_right` INTEGER NOT NULL,
+	`banner` TEXT NOT NULL,
+	`discord` TEXT NOT NULL,
+	`custom_link` TEXT NOT NULL,
+	UNIQUE(`name`),
+	UNIQUE(`email`)
+);
+
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
