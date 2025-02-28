@@ -193,7 +193,42 @@ function EditorController:sliceKeysounds()
 	end
 end
 
-function EditorController:exportBmsTemplate()
+---@param notes chartedit.Notes
+---@return {[number]: integer[]}
+local function getPatternNotes(notes)
+	local linkedNotes = notes:getLinkedNotes()
+
+	---@type {[number]: integer[]}
+	local pattern_notes = {}
+
+	for i = 1, #linkedNotes - 1 do
+		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
+		if key then
+			---@type number, number
+			local a, b
+			local n_a, n_b = linkedNotes[i], linkedNotes[i + 1]
+
+			local note = n_a.startNote
+
+			local p = note.visualPoint.point
+			---@cast p chartedit.Point
+
+			local time = p:getGlobalTime():tonumber()
+			pattern_notes[time] = pattern_notes[time] or {}
+			table.insert(pattern_notes[time], key)
+		end
+	end
+
+	return pattern_notes
+end
+
+local bms_columns = {
+	[5] = {11, 12, 13, 14, 15},
+	[7] = {11, 12, 13, 14, 15, 18, 19},
+	[10] = {11, 12, 13, 14, 15, 21, 22, 23, 24, 25},
+}
+
+function EditorController:exportBmsTemplate(columns_out)
 	local selectModel = self.selectModel
 	local editorModel = self.editorModel
 
@@ -298,14 +333,43 @@ function EditorController:exportBmsTemplate()
 	---@type {[integer]: {[integer]: {time: ncdk.Fraction, sound: integer}[]}}
 	local notes_grouped = {}
 
+	---@type {[integer]: {[integer]: {time: ncdk.Fraction, sound: integer}[]}}
+	local play_notes_grouped = {}
+
+	local pattern_notes = getPatternNotes(editorModel.notes)
+
+	---@param time ncdk.Fraction
+	---@return integer?
+	local function getPatternKey(time)
+		local keys = pattern_notes[(time - beat_offset):tonumber()]
+		if not keys then
+			return
+		end
+		local key = table.remove(keys)
+		return key
+	end
+
 	for _, note in ipairs(notes) do
 		local measure = (note.time / 4):floor()
-		notes_grouped[measure] = notes_grouped[measure] or {}
-		notes_grouped[measure][note.column] = notes_grouped[measure][note.column] or {}
-		table.insert(notes_grouped[measure][note.column], {
+
+		local key = getPatternKey(note.time)
+
+		local t, k
+		if not key then
+			t = notes_grouped
+			k = note.column
+		else
+			t = play_notes_grouped
+			k = key
+		end
+
+		t[measure] = t[measure] or {}
+		t[measure][k] = t[measure][k] or {}
+		table.insert(t[measure][k], {
 			time = note.time / 4 - measure,
 			sound = note.sound,
 		})
+
 	end
 
 	---@type string[]
@@ -323,14 +387,6 @@ function EditorController:exportBmsTemplate()
 		("#TOTAL %s"):format(#notes),
 		"#STAGEFILE title.bmp",
 		"",
-		"#00011:00",
-		"#00012:00",
-		"#00013:00",
-		"#00014:00",
-		"#00015:00",
-		"#00018:00",
-		"#00019:00",
-		"",
 	}
 
 	for i, path in ipairs(sounds) do
@@ -342,6 +398,8 @@ function EditorController:exportBmsTemplate()
 	local max_measure = (max_time / 4):ceil()
 
 	local snap = 384
+
+	local play_channels = bms_columns[columns_out]
 
 	for measure = 0, max_measure do
 		if notes_grouped[measure] then
@@ -363,6 +421,25 @@ function EditorController:exportBmsTemplate()
 				end
 			end
 			table.insert(lines, "")
+		end
+
+		if play_notes_grouped[measure] then
+			for column = 1, table.maxn(play_notes_grouped[measure]) do
+				local column_notes = play_notes_grouped[measure][column]
+				if column_notes then
+					---@type string[]
+					local value = {}
+					for i = 1, snap do
+						value[i] = "00"
+					end
+					for _, note in ipairs(column_notes) do
+						local time = (note.time * snap):floor() + 1
+						value[time] = base36.tostring(note.sound)
+					end
+					local ch = play_channels[column]
+					table.insert(lines, ("#%03d%02d:%s"):format(measure, ch, table.concat(value)))
+				end
+			end
 		end
 	end
 

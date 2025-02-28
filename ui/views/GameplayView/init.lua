@@ -145,15 +145,16 @@ function GameplayView:keypressed()
 	local gameplayController = self.game.gameplayController
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
+	local ctrl = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
 	local state = self.game.pauseModel.state
 	if state == "play" then
 		if kp(input.pause) and not shift then gameplayController:changePlayState("pause")
-		elseif kp(input.pause) and shift then self:quit()
+		elseif kp(input.pause) and ctrl then self:quit()
 		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
 		end
 	elseif state == "pause" then
 		if kp(input.pause) and not shift then gameplayController:changePlayState("play")
-		elseif kp(input.pause) and shift then self:quit()
+		elseif kp(input.pause) and ctrl then self:quit()
 		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
 		end
 	elseif state == "pause-play" and kp(input.pause) then

@@ -325,8 +325,14 @@ function tabs.bms(self)
 	end
 
 	bms_tools.beat_offset = tonumber(imgui.input("beat_offset", bms_tools.beat_offset, "beat offset")) or 0
-	if imgui.button("create bms template", "create bms template") then
-		self.game.editorController:exportBmsTemplate()
+	if imgui.button("create bms template 5K", "create bms template 5K") then
+		self.game.editorController:exportBmsTemplate(5)
+	end
+	if imgui.button("create bms template 7K", "create bms template 7K") then
+		self.game.editorController:exportBmsTemplate(7)
+	end
+	if imgui.button("create bms template 10K", "create bms template 10K") then
+		self.game.editorController:exportBmsTemplate(10)
 	end
 end
 
