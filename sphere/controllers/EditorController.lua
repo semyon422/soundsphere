@@ -10,6 +10,7 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local Wave = require("audio.Wave")
 local base36 = require("bms.base36")
 local decibel = require("decibel")
+local table_util = require("table_util")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -242,6 +243,7 @@ function EditorController:exportBmsTemplate(columns_out)
 		if name:match("^stem.+%.sph$") then
 			local dec = ChartDecoder()
 			local chart = dec:decode(assert(love.filesystem.read(path_util.join(real_dir, name))))[1]
+			chart.name = name
 			table.insert(stem_charts, chart)
 		end
 	end
@@ -315,6 +317,7 @@ function EditorController:exportBmsTemplate(columns_out)
 					time = time,
 					column = column,
 					sound = get_sound_index(path),
+					chart_name = chart.name,
 				})
 
 				if not max_time or time > max_time then
@@ -349,10 +352,25 @@ function EditorController:exportBmsTemplate(columns_out)
 		return key
 	end
 
+	local always_bgm = {}
+	do
+		local data = love.filesystem.read(path_util.join(real_dir, "bgm.txt"))
+		if data then
+			for _, line in ipairs(data:split("\n")) do
+				line = line:trim()
+				always_bgm[line] = true
+				print("bgm", line)
+			end
+		end
+	end
+
 	for _, note in ipairs(notes) do
 		local measure = (note.time / 4):floor()
 
-		local key = getPatternKey(note.time)
+		local key
+		if not always_bgm[note.chart_name] then
+			key = getPatternKey(note.time)
+		end
 
 		local t, k
 		if not key then
