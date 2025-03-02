@@ -184,7 +184,7 @@ function tabs.timings(self)
 	end
 	---@cast p ncdk2.IntervalPoint
 
-	if p.absoluteTime == dtp.absoluteTime then
+	if p and p.absoluteTime == dtp.absoluteTime then
 		local vp = editorModel.visual:getPoint(p)
 		vp.temp_comment = imgui.input("vp comment", vp.temp_comment or vp.comment, "comment")
 		if imgui.button("save comment", "save") then
