@@ -50,14 +50,15 @@ assert(Roles:belongs("above", "verified", "admin"))
 ---@param user_roles sea.UserRole[]
 ---@param role sea.Role
 ---@param exact boolean?
----@return true?
+---@return boolean
 function Roles:hasRole(user_roles, role, exact)
 	for _, user_role in ipairs(user_roles) do
 		local _role = user_role.role
-		if _role == role or not exact and self:belongs("below", _role, role) then
+		if _role == role or not exact and not user_role:isExpired() and self:belongs("below", _role, role) then
 			return true
 		end
 	end
+	return false
 end
 
 return Roles

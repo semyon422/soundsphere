@@ -18,7 +18,8 @@ local function create_test_ctx()
 
 	local teams_repo = TeamsRepo(models)
 	local teams = Teams(teams_repo)
-	local user = User({id = 1})
+	local user = User()
+	user.id = 1
 
 	local team, err = assert(teams:create(user, "Team 1", "T1"))
 
@@ -58,7 +59,8 @@ function test.join_open(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:join(new_user, team))
 
 	t:eq(#teams:getTeamUsers(team.id), 2)
@@ -81,7 +83,8 @@ function test.join_open_by_invite_1(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:inviteUser(ctx.user, team, new_user.id))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
@@ -106,7 +109,8 @@ function test.join_open_by_invite_2(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:inviteUser(ctx.user, team, new_user.id))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
@@ -131,7 +135,8 @@ function test.join_open_double_invite(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:inviteUser(ctx.user, team, new_user.id))
 	t:tdeq({teams:inviteUser(ctx.user, team, new_user.id)}, {nil, "already invited"})
 end
@@ -150,7 +155,8 @@ function test.join_request(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:join(new_user, team))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
@@ -180,7 +186,8 @@ function test.join_request_revoke(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(teams:join(new_user, team))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
@@ -209,7 +216,8 @@ function test.join_invite(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(not teams:join(new_user, team))
 
 	t:assert(teams:inviteUser(ctx.user, team, new_user.id))
@@ -241,7 +249,8 @@ function test.join_invite_revoke(t)
 	team = teams:update(ctx.user, team)
 	---@cast team -?
 
-	local new_user = User({id = 2})
+	local new_user = User()
+	new_user.id = 2
 	t:assert(not teams:join(new_user, team))
 
 	t:assert(teams:inviteUser(ctx.user, team, new_user.id))

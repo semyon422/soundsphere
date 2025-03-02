@@ -23,7 +23,8 @@ local function create_test_ctx()
 
 	local leaderboards_repo = LeaderboardsRepo(models)
 
-	local user = User({id = 1})
+	local user = User()
+	user.id = 1
 
 	local leaderboard = Leaderboard()
 	leaderboard.name = "Leaderboard 1"

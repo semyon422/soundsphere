@@ -1,4 +1,5 @@
 local class = require("class")
+local Roles = require("sea.access.Roles")
 
 ---@class sea.User
 ---@operator call: sea.User
@@ -21,6 +22,19 @@ local class = require("class")
 ---@field banner string
 ---@field discord string
 ---@field custom_link string
+---relations
+---@field user_roles sea.UserRole[]
 local User = class()
+
+function User:new()
+	self.user_roles = {}
+end
+
+---@param role sea.Role
+---@param exact boolean?
+---@return boolean
+function User:hasRole(role, exact)
+	return Roles:hasRole(self.user_roles or {}, role, exact)
+end
 
 return User

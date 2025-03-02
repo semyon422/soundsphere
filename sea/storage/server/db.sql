@@ -22,6 +22,15 @@ CREATE TABLE IF NOT EXISTS `users` (
 	UNIQUE(`email`)
 );
 
+CREATE TABLE IF NOT EXISTS `user_roles` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER,
+	`role` INTEGER,
+	`expires_at` INTEGER,
+	`total_time` INTEGER,
+	UNIQUE(`user_id`, `role`)
+);
+
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
