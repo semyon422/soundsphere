@@ -138,6 +138,28 @@ function EditorController:sliceKeysounds()
 
 	print("sample rate", sample_rate)
 
+	---@param wave audio.Wave
+	local function fade_in(wave)
+		local dur = 0.002
+		local samples_dur = math.floor(dur * wave.sample_rate)
+		for i = 0, samples_dur - 1 do
+			for c = 1, wave.channels_count do
+				wave:setSampleFloat(i, c, wave:getSampleFloat(i, c) * i / samples_dur)
+			end
+		end
+	end
+
+	---@param wave audio.Wave
+	local function fade_out(wave)
+		local dur = 0.002
+		local samples_dur = math.floor(dur * wave.sample_rate)
+		for i = 0, samples_dur - 1 do
+			for c = 1, wave.channels_count do
+				wave:setSampleFloat(wave.samples_count - samples_dur + i, c, wave:getSampleFloat(wave.samples_count - samples_dur + i, c) * (samples_dur - i) / samples_dur)
+			end
+		end
+	end
+
 	local ks_index = 1
 	for i = 1, #linkedNotes - 1 do
 		local key = tonumber(linkedNotes[i]:getColumn():match("^key(.+)$"))
@@ -164,6 +186,9 @@ function EditorController:sliceKeysounds()
 					wave:setSampleFloat(j, c, sample * volume)
 				end
 			end
+
+			-- fade_in(wave)
+			-- fade_out(wave)
 
 			---@type string?
 			local comment = n_a.startNote.visualPoint.comment
@@ -339,6 +364,7 @@ function EditorController:exportBmsTemplate(columns_out)
 	---@type {[integer]: {[integer]: {time: ncdk.Fraction, sound: integer}[]}}
 	local play_notes_grouped = {}
 
+	-- local pattern_notes = {}
 	local pattern_notes = getPatternNotes(editorModel.notes)
 
 	---@param time ncdk.Fraction
