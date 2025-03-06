@@ -213,15 +213,16 @@ function EditorController:sliceKeysounds()
 			note.sounds = {{path_util.join(chartview.name, file_name), 1}}
 
 			local path = path_util.join(dir, file_name)
-			love.filesystem.write(path, wave:export())
+			love.filesystem.write(path, wave:encode())
 			ks_index = ks_index + 1
 		end
 	end
 end
 
 ---@param notes chartedit.Notes
----@return {[number]: integer[]}
-local function getPatternNotes(notes)
+---@param sounds_map {[string]: integer}
+---@return {[number]: {[1]: integer, [2]: integer?}[]}
+local function getPatternNotes(notes, sounds_map)
 	local linkedNotes = notes:getLinkedNotes()
 
 	---@type {[number]: integer[]}
@@ -239,9 +240,11 @@ local function getPatternNotes(notes)
 			local p = note.visualPoint.point
 			---@cast p chartedit.Point
 
+			local sound = note.sounds and note.sounds[1] and note.sounds[1][1]
+
 			local time = p:getGlobalTime():tonumber()
 			pattern_notes[time] = pattern_notes[time] or {}
-			table.insert(pattern_notes[time], key)
+			table.insert(pattern_notes[time], {key, sounds_map[sound]})
 		end
 	end
 
@@ -365,17 +368,31 @@ function EditorController:exportBmsTemplate(columns_out)
 	local play_notes_grouped = {}
 
 	-- local pattern_notes = {}
-	local pattern_notes = getPatternNotes(editorModel.notes)
+	local pattern_notes = getPatternNotes(editorModel.notes, sounds_map)
 
 	---@param time ncdk.Fraction
+	---@param sound integer
 	---@return integer?
-	local function getPatternKey(time)
+	local function getPatternKey(time, sound)
 		local keys = pattern_notes[(time - beat_offset):tonumber()]
 		if not keys then
 			return
 		end
-		local key = table.remove(keys)
-		return key
+		local i
+		for j, key_sound in ipairs(keys) do
+			if key_sound[2] == sound then
+				i = j
+				break
+			end
+		end
+		if not i then
+			return
+		end
+		local key_sound = table.remove(keys, i)
+		if not key_sound then
+			return
+		end
+		return key_sound[1]
 	end
 
 	local always_bgm = {}
@@ -395,7 +412,7 @@ function EditorController:exportBmsTemplate(columns_out)
 
 		local key
 		if not always_bgm[note.chart_name] then
-			key = getPatternKey(note.time)
+			key = getPatternKey(note.time, note.sound)
 		end
 
 		local t, k
