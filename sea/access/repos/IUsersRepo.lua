@@ -15,6 +15,12 @@ function IUsersRepo:getUser(id)
 	return {}
 end
 
+---@param email string
+---@return sea.User?
+function IUsersRepo:findUserByEmail(email)
+	return {}
+end
+
 ---@param user sea.User
 ---@return sea.User
 function IUsersRepo:createUser(user)

@@ -25,6 +25,12 @@ function UsersRepo:getUser(id)
 	return user
 end
 
+---@param email string
+---@return sea.User?
+function UsersRepo:findUserByEmail(email)
+	return self.models.users:find({email = email})
+end
+
 ---@param user sea.User
 ---@return sea.User
 function UsersRepo:createUser(user)

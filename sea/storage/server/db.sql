@@ -31,6 +31,15 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 	UNIQUE(`user_id`, `role`)
 );
 
+CREATE TABLE IF NOT EXISTS `sessions` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER,
+	`active` INTEGER,
+	`ip` INTEGER,
+	`created_at` INTEGER,
+	`updated_at` INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
