@@ -7,14 +7,14 @@ local IPasswordHasher = class()
 ---@param password string
 ---@return string
 function IPasswordHasher:digest(password)
-	return ""
+	return password
 end
 
 ---@param password string
 ---@param password_hash string
 ---@return boolean
 function IPasswordHasher:verify(password, password_hash)
-	return true
+	return password == password_hash
 end
 
 return IPasswordHasher

@@ -31,6 +31,12 @@ function UsersRepo:findUserByEmail(email)
 	return self.models.users:find({email = email})
 end
 
+---@param name string
+---@return sea.User?
+function UsersRepo:findUserByName(name)
+	return self.models.users:find({name = name})
+end
+
 ---@param user sea.User
 ---@return sea.User
 function UsersRepo:createUser(user)
@@ -55,7 +61,7 @@ end
 ---@param role sea.Role
 ---@return sea.UserRole?
 function UsersRepo:getUserRole(user_id, role)
-	return self.models.user_users:find({
+	return self.models.user_roles:find({
 		user_id = assert(user_id),
 		role = assert(role),
 	})
@@ -64,13 +70,46 @@ end
 ---@param user_role sea.UserRole
 ---@return sea.UserRole
 function UsersRepo:createUserRole(user_role)
-	return self.models.user_users:create(user_role)
+	return self.models.user_roles:create(user_role)
 end
 
 ---@param user_role sea.UserRole
 ---@return sea.UserRole
 function UsersRepo:updateUserRole(user_role)
-	return self.models.user_users:update(user_role, {id = user_role.id})[1]
+	return self.models.user_roles:update(user_role, {id = user_role.id})[1]
+end
+
+--------------------------------------------------------------------------------
+
+---@param user_id integer
+---@param ip string
+---@return sea.UserLocation?
+function UsersRepo:getUserLocation(user_id, ip)
+	return self.models.user_locations:find({
+		user_id = assert(user_id),
+		ip = assert(ip),
+	})
+end
+
+---@param ip string
+---@return sea.UserLocation?
+function UsersRepo:getRecentRegisterUserLocation(ip)
+	return self.models.user_locations:find({
+		ip = assert(ip),
+		is_register = true,
+	}, {order = {"created_at DESC"}})
+end
+
+---@param user_location sea.UserLocation
+---@return sea.UserLocation?
+function UsersRepo:createUserLocation(user_location)
+	return self.models.user_locations:create(user_location)
+end
+
+---@param user_location sea.UserLocation
+---@return sea.UserLocation?
+function UsersRepo:updateUserLocation(user_location)
+	return self.models.user_locations:update(user_location, {id = user_location.id})[1]
 end
 
 return UsersRepo

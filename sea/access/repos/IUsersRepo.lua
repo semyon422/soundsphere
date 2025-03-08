@@ -21,6 +21,12 @@ function IUsersRepo:findUserByEmail(email)
 	return {}
 end
 
+---@param name string
+---@return sea.User?
+function IUsersRepo:findUserByName(name)
+	return {}
+end
+
 ---@param user sea.User
 ---@return sea.User
 function IUsersRepo:createUser(user)
@@ -57,6 +63,33 @@ end
 ---@return sea.UserRole
 function IUsersRepo:updateUserRole(user_user)
 	return user_user
+end
+
+--------------------------------------------------------------------------------
+
+---@param user_id integer
+---@param ip string
+---@return sea.UserLocation?
+function IUsersRepo:getUserLocation(user_id, ip)
+	return {}
+end
+
+---@param ip string
+---@return sea.UserLocation?
+function IUsersRepo:getRecentRegisterUserLocation(ip)
+	return {}
+end
+
+---@param user_location sea.UserLocation
+---@return sea.UserLocation?
+function IUsersRepo:createUserLocation(user_location)
+	return user_location
+end
+
+---@param user_location sea.UserLocation
+---@return sea.UserLocation?
+function IUsersRepo:updateUserLocation(user_location)
+	return user_location
 end
 
 return IUsersRepo

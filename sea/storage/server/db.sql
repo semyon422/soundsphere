@@ -13,11 +13,11 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`chartfiles_upload_size` INTEGER NOT NULL,
 	`chartplays_upload_size` INTEGER NOT NULL,
 	`play_time` INTEGER NOT NULL,
-	`color_left` INTEGER NOT NULL,
-	`color_right` INTEGER NOT NULL,
-	`banner` TEXT NOT NULL,
-	`discord` TEXT NOT NULL,
-	`custom_link` TEXT NOT NULL,
+	`color_left` INTEGER,
+	`color_right` INTEGER,
+	`banner` TEXT,
+	`discord` TEXT,
+	`custom_link` TEXT,
 	UNIQUE(`name`),
 	UNIQUE(`email`)
 );
@@ -29,6 +29,17 @@ CREATE TABLE IF NOT EXISTS `user_roles` (
 	`expires_at` INTEGER,
 	`total_time` INTEGER,
 	UNIQUE(`user_id`, `role`)
+);
+
+CREATE TABLE IF NOT EXISTS `user_locations` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER NOT NULL,
+	`ip` TEXT NOT NULL,
+	`created_at` INTEGER NOT NULL,
+	`updated_at` INTEGER NOT NULL,
+	`is_register` INTEGER NOT NULL,
+	`sessions_count` INTEGER NOT NULL,
+	UNIQUE(`user_id`, `ip`)
 );
 
 CREATE TABLE IF NOT EXISTS `sessions` (
