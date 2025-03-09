@@ -9,27 +9,31 @@ local class = require("class")
 ---@field total_time integer
 local UserRole = class()
 
--- TODO: inject clock here instead of direct usage of os.time
-
-function UserRole:new()
-	self.expires_at = os.time()
+---@param role sea.Role
+---@param time integer
+function UserRole:new(role, time)
+	self.role = role
+	self.expires_at = time
 	self.total_time = 0
 end
 
+---@param time integer
 ---@return boolean
-function UserRole:isExpired()
-	return self.expires_at < os.time()
+function UserRole:isExpired(time)
+	return self.expires_at < time
 end
 
+---@param time integer
 ---@param duration integer
-function UserRole:addTime(duration)
-	duration = math.max(duration, os.time() - self.expires_at)
+function UserRole:addTime(duration, time)
+	duration = math.max(duration, time - self.expires_at)
 	self.expires_at = self.expires_at + duration
 	self.total_time = self.total_time + duration
 end
 
-function UserRole:expire()
-	self:addTime(os.time() - self.expires_at)
+---@param time integer
+function UserRole:expire(time)
+	self:addTime(time - self.expires_at, time)
 end
 
 return UserRole

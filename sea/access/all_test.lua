@@ -51,8 +51,7 @@ function test.owner_role_bypass(t)
 	t:assert(not access:canUpdate(user, obj))
 	t:assert(not custom_access:canUpdate(user, obj))
 
-	local user_role = UserRole()
-	user_role.role = "owner"
+	local user_role = UserRole("owner", 0)
 	table.insert(user.user_roles, user_role)
 
 	t:assert(not access:canUpdate(user, obj))
@@ -65,14 +64,12 @@ function test.has_role(t)
 
 	t:assert(not user:hasRole("owner"))
 
-	local user_role = UserRole()
-	user_role.role = "admin"
+	local user_role = UserRole("admin", 0)
 	table.insert(user.user_roles, user_role)
 
 	t:assert(not user:hasRole("owner"))
 
-	user_role = UserRole()
-	user_role.role = "owner"
+	user_role = UserRole("owner", 0)
 	table.insert(user.user_roles, user_role)
 
 	t:assert(user:hasRole("owner"))
@@ -91,41 +88,44 @@ function test.register_email_password(t)
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
-	local session, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
 
-	if not t:assert(session, err) then
+	if not t:assert(su, err) then
 		return
 	end
-	---@cast session -?
+	---@cast su -?
 
-	t:eq(session.id, 1)
-	t:eq(session.user_id, 1)
+	t:eq(su.session.id, 1)
+	t:eq(su.session.user_id, 1)
 
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	---@type any
+	local _
+
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
 	t:eq(err, "rate_exceeded")
 
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:eq(err, "email_taken")
 
 	user_values.email = "user2@example.com"
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:eq(err, "name_taken")
 
 	user_values.name = "user2"
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:assert(session, err)
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:assert(su, err)
 
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:eq(err, "rate_exceeded")
 
 	time = time + users.ip_register_delay
 
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:eq(err, "email_taken")
 
 	users.is_register_enabled = false
 
-	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:eq(err, "disabled")
 end
 
@@ -142,33 +142,36 @@ function test.login_email_password(t)
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
-	local user, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
 
-	if not t:assert(user, err) then
+	if not t:assert(su, err) then
 		return
 	end
-	---@cast user -?
+	---@cast su -?
 
-	t:eq(user.id, 1)
+	t:eq(su.user.id, 1)
 
-	local session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
+	local su, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
 
-	if not t:assert(session, err) then
+	if not t:assert(su, err) then
 		return
 	end
-	---@cast session -?
+	---@cast su -?
 
-	t:eq(session.user_id, user.id)
+	t:eq(su.session.user_id, su.user.id)
 
-	session, err = users:login(ctx.anon_user, "127.0.0.1", "user2@example.com", "password")
+	---@type any
+	local _
+
+	_, err = users:login(ctx.anon_user, "127.0.0.1", "user2@example.com", "password")
 	t:eq(err, "invalid_credentials")
 
-	session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password1")
+	_, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password1")
 	t:eq(err, "invalid_credentials")
 
 	users.is_login_enabled = false
 
-	session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
+	_, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
 	t:eq(err, "disabled")
 end
 
@@ -191,6 +194,48 @@ end
 ---@param t testing.T
 function test.login_oauth_osu(t)
 	-- TODO
+end
+
+---@param t testing.T
+function test.ban(t)
+	local ctx = create_test_ctx()
+
+	local time = 0
+
+	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
+
+	local user_values = User()
+	user_values.name = "user"
+	user_values.email = "user@example.com"
+	user_values.password = "password"
+
+	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	---@cast su -?
+
+	local user_role = UserRole("owner", time)
+	user_role:addTime(100, time)
+	su.user.user_roles = {user_role}
+
+	user_values.name = "user2"
+	user_values.email = "user2@example.com"
+	local su2, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	---@cast su2 -?
+
+	local user, err = users:ban(su.user, time, su2.user.id)
+
+	if not t:assert(user, err) then
+		return
+	end
+	---@cast user -?
+
+	t:eq(user.id, su2.user.id)
+	t:assert(user.is_banned)
+
+	local _, err = users:ban(su.user, 0, su.user.id)
+	t:eq(err, "not_allowed")
+
+	local _, err = users:ban(su.user, 0, 3)
+	t:eq(err, "not_found")
 end
 
 return test

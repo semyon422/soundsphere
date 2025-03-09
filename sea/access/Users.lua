@@ -25,7 +25,7 @@ end
 ---@param _ sea.User
 ---@param user_values sea.User
 ---@param ip string
----@return sea.Session?
+---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"rate_exceeded"|"email_taken"|"name_taken"?
 function Users:register(_, user_values, ip)
 	if not self.is_register_enabled then
@@ -79,14 +79,14 @@ function Users:register(_, user_values, ip)
 
 	self.users_repo:createUserLocation(user_location)
 
-	return session
+	return {session = session, user = user}
 end
 
 ---@param _ sea.User
 ---@param ip string
 ---@param email string
 ---@param password string
----@return sea.Session?
+---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"invalid_credentials"?
 function Users:login(_, ip, email, password)
 	if not self.is_login_enabled then
@@ -131,13 +131,33 @@ function Users:login(_, ip, email, password)
 	user_location.sessions_count = user_location.sessions_count + 1
 	self.users_repo:updateUserLocation(user_location)
 
-	return session
+	return {session = session, user = user}
 end
 
 ---@param user sea.User
----@param target_user sea.User
-function Users:ban(user, target_user)
+---@param time integer
+---@param target_user_id integer
+---@return sea.User?
+---@return "not_allowed"|"not_found"?
+function Users:ban(user, time, target_user_id)
+	if user.id == target_user_id then
+		return nil, "not_allowed"
+	end
 
+	local target_user = self.users_repo:getUser(target_user_id)
+	if not target_user then
+		return nil, "not_found"
+	end
+
+	local can, err = self.users_access:canUpdate(user, target_user, time)
+	if not can then
+		return nil, "not_allowed"
+	end
+
+	target_user.is_banned = true
+	target_user = self.users_repo:updateUser(target_user)
+
+	return target_user
 end
 
 ---@param user sea.User
