@@ -91,6 +91,57 @@ function test.register_email_password(t)
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
+	local session, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+
+	if not t:assert(session, err) then
+		return
+	end
+	---@cast session -?
+
+	t:eq(session.id, 1)
+	t:eq(session.user_id, 1)
+
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	t:eq(err, "rate_exceeded")
+
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "email_taken")
+
+	user_values.email = "user2@example.com"
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "name_taken")
+
+	user_values.name = "user2"
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:assert(session, err)
+
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "rate_exceeded")
+
+	time = time + users.ip_register_delay
+
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "email_taken")
+
+	users.is_register_enabled = false
+
+	session, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "disabled")
+end
+
+---@param t testing.T
+function test.login_email_password(t)
+	local ctx = create_test_ctx()
+
+	local time = 0
+
+	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
+
+	local user_values = User()
+	user_values.name = "user"
+	user_values.email = "user@example.com"
+	user_values.password = "password"
+
 	local user, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
 
 	if not t:assert(user, err) then
@@ -100,59 +151,46 @@ function test.register_email_password(t)
 
 	t:eq(user.id, 1)
 
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
-	t:eq(err, "rate_exceeded")
+	local session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
 
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "email_taken")
+	if not t:assert(session, err) then
+		return
+	end
+	---@cast session -?
 
-	user_values.email = "user2@example.com"
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "name_taken")
+	t:eq(session.user_id, user.id)
 
-	user_values.name = "user2"
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:assert(user, err)
+	session, err = users:login(ctx.anon_user, "127.0.0.1", "user2@example.com", "password")
+	t:eq(err, "invalid_credentials")
 
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "rate_exceeded")
+	session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password1")
+	t:eq(err, "invalid_credentials")
 
-	time = time + users.ip_register_delay
+	users.is_login_enabled = false
 
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "email_taken")
-
-	users.is_register_enabled = false
-
-	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	session, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
 	t:eq(err, "disabled")
 end
 
 ---@param t testing.T
-function test.login_email_password(t)
-
-	-- test attempts limit
-end
-
----@param t testing.T
 function test.login_email_link(t)
-
+	-- TODO
 end
 
 ---@param t testing.T
 function test.login_quick(t)
-
+	-- TODO
 	-- same IP, limit by time
 end
 
 ---@param t testing.T
 function test.register_oauth_osu(t)
-
+	-- TODO
 end
 
 ---@param t testing.T
 function test.login_oauth_osu(t)
-
+	-- TODO
 end
 
 return test

@@ -92,4 +92,24 @@ function IUsersRepo:updateUserLocation(user_location)
 	return user_location
 end
 
+--------------------------------------------------------------------------------
+
+---@param id integer
+---@return sea.Session?
+function IUsersRepo:getSession(id)
+	return {}
+end
+
+---@param session sea.Session
+---@return sea.Session?
+function IUsersRepo:createSession(session)
+	return session
+end
+
+---@param session sea.Session
+---@return sea.Session?
+function IUsersRepo:updateSession(session)
+	return session
+end
+
 return IUsersRepo

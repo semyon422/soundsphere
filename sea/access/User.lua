@@ -27,6 +27,15 @@ local Roles = require("sea.access.Roles")
 local User = class()
 
 function User:new()
+	self.description = ""
+	self.is_banned = false
+	self.chartplays_count = 0
+	self.chartmetas_count = 0
+	self.chartdiffs_count = 0
+	self.chartfiles_upload_size = 0
+	self.chartplays_upload_size = 0
+	self.play_time = 0
+
 	self.user_roles = {}
 end
 

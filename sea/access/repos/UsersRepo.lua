@@ -112,4 +112,24 @@ function UsersRepo:updateUserLocation(user_location)
 	return self.models.user_locations:update(user_location, {id = user_location.id})[1]
 end
 
+--------------------------------------------------------------------------------
+
+---@param id integer
+---@return sea.Session?
+function UsersRepo:getSession(id)
+	return self.models.sessions:find({id = assert(id)})
+end
+
+---@param session sea.Session
+---@return sea.Session?
+function UsersRepo:createSession(session)
+	return self.models.sessions:create(session)
+end
+
+---@param session sea.Session
+---@return sea.Session?
+function UsersRepo:updateSession(session)
+	return self.models.sessions:update(session, {id = session.id})[1]
+end
+
 return UsersRepo

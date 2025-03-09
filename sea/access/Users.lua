@@ -2,11 +2,13 @@ local class = require("class")
 local UsersAccess = require("sea.access.access.UsersAccess")
 local User = require("sea.access.User")
 local UserLocation = require("sea.access.UserLocation")
+local Session = require("sea.access.Session")
 
 ---@class sea.Users
 ---@operator call: sea.Users
 local Users = class()
 
+Users.is_login_enabled = true
 Users.is_register_enabled = true
 Users.ip_register_delay = 24 * 60 * 60
 
@@ -23,7 +25,7 @@ end
 ---@param _ sea.User
 ---@param user_values sea.User
 ---@param ip string
----@return sea.User?
+---@return sea.Session?
 ---@return "disabled"|"rate_exceeded"|"email_taken"|"name_taken"?
 function Users:register(_, user_values, ip)
 	if not self.is_register_enabled then
@@ -53,18 +55,19 @@ function Users:register(_, user_values, ip)
 	user.name = user_values.name
 	user.email = email
 	user.password = self.password_hasher:digest(user_values.password)
-	user.description = ""
 	user.latest_activity = time
 	user.created_at = time
-	user.is_banned = false
-	user.chartplays_count = 0
-	user.chartmetas_count = 0
-	user.chartdiffs_count = 0
-	user.chartfiles_upload_size = 0
-	user.chartplays_upload_size = 0
-	user.play_time = 0
 
 	user = self.users_repo:createUser(user)
+
+	local session = Session()
+	session.user_id = user.id
+	session.active = true
+	session.ip = ip
+	session.created_at = time
+	session.updated_at = time
+
+	session = self.users_repo:createSession(session)
 
 	user_location = UserLocation()
 	user_location.user_id = user.id
@@ -72,30 +75,63 @@ function Users:register(_, user_values, ip)
 	user_location.created_at = time
 	user_location.updated_at = time
 	user_location.is_register = true
-	user_location.sessions_count = 0
+	user_location.sessions_count = 1
 
 	self.users_repo:createUserLocation(user_location)
 
-	return user
+	return session
 end
 
-local login_failed = "Login failed. Invalid email or password"
-
 ---@param _ sea.User
+---@param ip string
 ---@param email string
 ---@param password string
-function Users:login(_, email, password)
+---@return sea.Session?
+---@return "disabled"|"invalid_credentials"?
+function Users:login(_, ip, email, password)
+	if not self.is_login_enabled then
+		return nil, "disabled"
+	end
+
 	local user = self.users_repo:findUserByEmail(email)
 	if not user then
-		return nil, login_failed
+		return nil, "invalid_credentials"
 	end
 
 	local valid = self.password_hasher:verify(password, user.password)
 	if not valid then
-		return nil, login_failed
+		return nil, "invalid_credentials"
 	end
 
-	return user
+	local time = self.clock()
+
+	local session = Session()
+	session.active = true
+	session.created_at = time
+	session.user_id = user.id
+	session.active = true
+	session.ip = ip
+	session.created_at = time
+	session.updated_at = time
+
+	session = self.users_repo:createSession(session)
+
+	local user_location = self.users_repo:getUserLocation(user.id, ip)
+	if not user_location then
+		user_location = UserLocation()
+		user_location.user_id = user.id
+		user_location.ip = ip
+		user_location.created_at = time
+		user_location.updated_at = time
+		user_location.is_register = false
+		user_location.sessions_count = 0
+		user_location = assert(self.users_repo:createUserLocation(user_location))
+	end
+
+	user_location.sessions_count = user_location.sessions_count + 1
+	self.users_repo:updateUserLocation(user_location)
+
+	return session
 end
 
 ---@param user sea.User
