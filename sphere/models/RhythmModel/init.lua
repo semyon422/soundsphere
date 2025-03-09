@@ -154,6 +154,7 @@ end
 ---@param constant boolean
 function RhythmModel:setConstantSpeed(constant)
 	self.graphicEngine.constant = constant
+	self.timeEngine.constant = constant
 end
 
 ---@param adjustRate number

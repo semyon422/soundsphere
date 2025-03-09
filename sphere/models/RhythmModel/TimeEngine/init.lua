@@ -10,6 +10,7 @@ local VisualTimeInfo = require("sphere.models.RhythmModel.TimeEngine.VisualTimeI
 local TimeEngine = class()
 
 TimeEngine.timeToPrepare = 2
+TimeEngine.constant = false
 
 function TimeEngine:new()
 	self.observable = Observable()
@@ -53,7 +54,7 @@ function TimeEngine:sync(time)
 	timer.eventTime = time
 
 	self.currentTime = timer:getTime()
-	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.constant and self.currentTime or self.nearestTime:getVisualTime(self.currentTime)
 
 	if self.windUp then
 		self:updateWindUp()
@@ -104,7 +105,7 @@ function TimeEngine:setPosition(position)
 	audioEngine:setPosition(position)
 	timer:setTime(position)
 	self.currentTime = timer:getTime()
-	self.visualTimeInfo.time = self.nearestTime:getVisualTime(self.currentTime)
+	self.visualTimeInfo.time = self.constant and self.currentTime or self.nearestTime:getVisualTime(self.currentTime)
 
 	audioEngine.forcePosition = true
 	self.logicEngine:update()
