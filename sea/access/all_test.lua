@@ -82,7 +82,9 @@ end
 function test.register_email_password(t)
 	local ctx = create_test_ctx()
 
-	local users = Users(ctx.users_repo, IPasswordHasher())
+	local time = 0
+
+	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
 
 	local user_values = User()
 	user_values.name = "user"
@@ -99,18 +101,31 @@ function test.register_email_password(t)
 	t:eq(user.id, 1)
 
 	user, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
-	t:eq(err, "registration rate exceeded")
+	t:eq(err, "rate_exceeded")
 
 	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "this email is taken")
+	t:eq(err, "email_taken")
 
 	user_values.email = "user2@example.com"
 	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
-	t:eq(err, "this name is taken")
+	t:eq(err, "name_taken")
 
 	user_values.name = "user2"
 	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
 	t:assert(user, err)
+
+	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "rate_exceeded")
+
+	time = time + users.ip_register_delay
+
+	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "email_taken")
+
+	users.is_register_enabled = false
+
+	user, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	t:eq(err, "disabled")
 end
 
 ---@param t testing.T

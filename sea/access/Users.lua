@@ -12,9 +12,11 @@ Users.ip_register_delay = 24 * 60 * 60
 
 ---@param users_repo sea.IUsersRepo
 ---@param password_hasher sea.IPasswordHasher
-function Users:new(users_repo, password_hasher)
+---@param clock fun(): integer
+function Users:new(users_repo, password_hasher, clock)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
+	self.clock = clock
 	self.users_access = UsersAccess()
 end
 
@@ -22,30 +24,30 @@ end
 ---@param user_values sea.User
 ---@param ip string
 ---@return sea.User?
----@return string?
+---@return "disabled"|"rate_exceeded"|"email_taken"|"name_taken"?
 function Users:register(_, user_values, ip)
 	if not self.is_register_enabled then
-		return nil, "registration disabled"
+		return nil, "disabled"
 	end
 
+	local time = self.clock()
+
 	local user_location = self.users_repo:getRecentRegisterUserLocation(ip)
-	if user_location and user_location.created_at + self.ip_register_delay > os.time() then
-		return nil, "registration rate exceeded"
+	if user_location and user_location.created_at + self.ip_register_delay > time then
+		return nil, "rate_exceeded"
 	end
 
 	local email = user_values.email:lower()
 
 	local user = self.users_repo:findUserByEmail(email)
 	if user then
-		return nil, "this email is taken"
+		return nil, "email_taken"
 	end
 
 	user = self.users_repo:findUserByName(user_values.name)
 	if user then
-		return nil, "this name is taken"
+		return nil, "name_taken"
 	end
-
-	local time = os.time()
 
 	user = User()
 	user.name = user_values.name
