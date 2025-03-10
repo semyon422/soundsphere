@@ -40,10 +40,12 @@ function User:new()
 end
 
 ---@param role sea.Role
+---@param time integer
 ---@param exact boolean?
 ---@return boolean
-function User:hasRole(role, exact)
-	return Roles:hasRole(self.user_roles or {}, role, exact)
+function User:hasRole(role, time, exact)
+	local roles = Roles:filter(self.user_roles or {}, time)
+	return Roles:hasRole(roles, role, exact)
 end
 
 return User

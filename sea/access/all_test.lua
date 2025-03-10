@@ -36,7 +36,10 @@ function test.owner_role_bypass(t)
 	local access = {}
 	function access:canUpdate(user, obj) return user.id == obj.owner_id end
 
-	local custom_access = CustomAccess(access, "qwe")
+	local time = 0
+	local function clock() return time end
+
+	local custom_access = CustomAccess(access, "qwe", clock)
 
 	local user = User()
 	user.id = 1
@@ -62,17 +65,17 @@ end
 function test.has_role(t)
 	local user = User()
 
-	t:assert(not user:hasRole("owner"))
+	t:assert(not user:hasRole("owner", 0))
 
 	local user_role = UserRole("admin", 0)
 	table.insert(user.user_roles, user_role)
 
-	t:assert(not user:hasRole("owner"))
+	t:assert(not user:hasRole("owner", 0))
 
 	user_role = UserRole("owner", 0)
 	table.insert(user.user_roles, user_role)
 
-	t:assert(user:hasRole("owner"))
+	t:assert(user:hasRole("owner", 0))
 end
 
 ---@param t testing.T
@@ -81,14 +84,14 @@ function test.register_email_password(t)
 
 	local time = 0
 
-	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
+	local users = Users(ctx.users_repo, IPasswordHasher())
 
 	local user_values = User()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
-	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
 
 	if not t:assert(su, err) then
 		return
@@ -101,31 +104,31 @@ function test.register_email_password(t)
 	---@type any
 	local _
 
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	_, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
 	t:eq(err, "rate_exceeded")
 
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:eq(err, "email_taken")
 
 	user_values.email = "user2@example.com"
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:eq(err, "name_taken")
 
 	user_values.name = "user2"
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:assert(su, err)
 
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:eq(err, "rate_exceeded")
 
 	time = time + users.ip_register_delay
 
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:eq(err, "email_taken")
 
 	users.is_register_enabled = false
 
-	_, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	_, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	t:eq(err, "disabled")
 end
 
@@ -135,14 +138,14 @@ function test.login_email_password(t)
 
 	local time = 0
 
-	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
+	local users = Users(ctx.users_repo, IPasswordHasher())
 
 	local user_values = User()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
-	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
 
 	if not t:assert(su, err) then
 		return
@@ -151,7 +154,7 @@ function test.login_email_password(t)
 
 	t:eq(su.user.id, 1)
 
-	local su, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
+	local su, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password")
 
 	if not t:assert(su, err) then
 		return
@@ -163,15 +166,15 @@ function test.login_email_password(t)
 	---@type any
 	local _
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", "user2@example.com", "password")
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user2@example.com", "password")
 	t:eq(err, "invalid_credentials")
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password1")
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password1")
 	t:eq(err, "invalid_credentials")
 
 	users.is_login_enabled = false
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", "user@example.com", "password")
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password")
 	t:eq(err, "disabled")
 end
 
@@ -202,14 +205,14 @@ function test.ban(t)
 
 	local time = 0
 
-	local users = Users(ctx.users_repo, IPasswordHasher(), function() return time end)
+	local users = Users(ctx.users_repo, IPasswordHasher())
 
 	local user_values = User()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
-	local su, err = users:register(ctx.anon_user, user_values, "127.0.0.1")
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
 	---@cast su -?
 
 	local user_role = UserRole("owner", time)
@@ -218,7 +221,7 @@ function test.ban(t)
 
 	user_values.name = "user2"
 	user_values.email = "user2@example.com"
-	local su2, err = users:register(ctx.anon_user, user_values, "127.0.0.2")
+	local su2, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	---@cast su2 -?
 
 	local user, err = users:ban(su.user, time, su2.user.id)

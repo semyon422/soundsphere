@@ -57,13 +57,12 @@ assert(Roles:belongs("below", "admin", nil))
 assert(not Roles:belongs("below", nil, "admin"))
 assert(Roles:belongs("above", "verified", "admin"))
 
----@param user_roles sea.UserRole[] active user roles
+---@param roles sea.Role[]
 ---@param role sea.Role?
 ---@param exact boolean?
 ---@return boolean
-function Roles:hasRole(user_roles, role, exact)
-	for _, user_role in ipairs(user_roles) do
-		local _role = user_role.role
+function Roles:hasRole(roles, role, exact)
+	for _, _role in ipairs(roles) do
 		if _role == role or not exact and self:belongs("below", _role, role) then
 			return true
 		end
@@ -71,13 +70,12 @@ function Roles:hasRole(user_roles, role, exact)
 	return false
 end
 
----@param user_roles sea.UserRole[]
+---@param roles sea.Role[]
 ---@return sea.Role?
-function Roles:getHighestRole(user_roles)
+function Roles:getHighestRole(roles)
 	---@type sea.Role?
 	local role
-	for _, user_role in ipairs(user_roles) do
-		local _role = user_role.role
+	for _, _role in ipairs(roles) do
 		if not role or self:belongs("below", _role, role) then
 			role = _role
 		end
@@ -86,33 +84,33 @@ function Roles:getHighestRole(user_roles)
 end
 
 --- Returns true if 1st is "above" 2nd
----@param user_roles_a sea.UserRole[]
----@param user_roles_b sea.UserRole[]
+---@param roles_a sea.Role[]
+---@param roles_b sea.Role[]
 ---@return true?
-function Roles:compare(user_roles_a, user_roles_b)
-	local a = self:getHighestRole(user_roles_a)
-	local b = self:getHighestRole(user_roles_b)
+function Roles:compare(roles_a, roles_b)
+	local a = self:getHighestRole(roles_a)
+	local b = self:getHighestRole(roles_b)
 	return self:belongs("below", a, b)
 end
 
-assert(Roles:compare({UserRole("admin", 0)}, {UserRole("user", 0)}))
-assert(Roles:compare({UserRole("admin", 0)}, {}))
-assert(not Roles:compare({}, {UserRole("admin", 0)}))
+assert(Roles:compare({"admin"}, {"user"}))
+assert(Roles:compare({"admin"}, {}))
+assert(not Roles:compare({}, {"admin"}))
 assert(not Roles:compare({}, {}))
-assert(not Roles:compare({UserRole("moderator", 0)}, {UserRole("donator", 0)}))
+assert(not Roles:compare({"moderator"}, {"donator"}))
 
 ---@param user_roles sea.UserRole[]
 ---@param time integer
----@return sea.UserRole[]
-function Roles:filterActive(user_roles, time)
-	---@type sea.UserRole[]
-	local _user_roles = {}
+---@return sea.Role[]
+function Roles:filter(user_roles, time)
+	---@type sea.Role[]
+	local roles = {}
 	for _, user_role in ipairs(user_roles) do
 		if not user_role:isExpired(time) then
-			table.insert(_user_roles, user_role)
+			table.insert(roles, user_role.role)
 		end
 	end
-	return _user_roles
+	return roles
 end
 
 return Roles

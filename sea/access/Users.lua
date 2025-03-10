@@ -14,25 +14,22 @@ Users.ip_register_delay = 24 * 60 * 60
 
 ---@param users_repo sea.IUsersRepo
 ---@param password_hasher sea.IPasswordHasher
----@param clock fun(): integer
-function Users:new(users_repo, password_hasher, clock)
+function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
-	self.clock = clock
 	self.users_access = UsersAccess()
 end
 
 ---@param _ sea.User
----@param user_values sea.User
 ---@param ip string
+---@param time integer
+---@param user_values sea.User
 ---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"rate_exceeded"|"email_taken"|"name_taken"?
-function Users:register(_, user_values, ip)
+function Users:register(_, ip, time, user_values)
 	if not self.is_register_enabled then
 		return nil, "disabled"
 	end
-
-	local time = self.clock()
 
 	local user_location = self.users_repo:getRecentRegisterUserLocation(ip)
 	if user_location and user_location.created_at + self.ip_register_delay > time then
@@ -84,11 +81,12 @@ end
 
 ---@param _ sea.User
 ---@param ip string
+---@param time integer
 ---@param email string
 ---@param password string
 ---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"invalid_credentials"?
-function Users:login(_, ip, email, password)
+function Users:login(_, ip, time, email, password)
 	if not self.is_login_enabled then
 		return nil, "disabled"
 	end
@@ -102,8 +100,6 @@ function Users:login(_, ip, email, password)
 	if not valid then
 		return nil, "invalid_credentials"
 	end
-
-	local time = self.clock()
 
 	local session = Session()
 	session.active = true
@@ -161,14 +157,25 @@ function Users:ban(user, time, target_user_id)
 end
 
 ---@param user sea.User
----@param target_user sea.User
-function Users:giveRole(user, target_user)
+---@param time integer
+---@param target_user_id integer
+---@param role sea.Role
+function Users:giveRole(user, time, target_user_id, role)
+	local target_user = self.users_repo:getUser(target_user_id)
+	if not target_user then
+		return nil, "not_found"
+	end
 
+	local can, err = self.users_access:canChangeRole(user, target_user, time, role)
+	if not can then
+		return nil, "not_allowed"
+	end
 end
 
 ---@param user sea.User
----@param target_user sea.User
-function Users:takeRole(user, target_user)
+---@param time integer
+---@param target_user_id integer
+function Users:takeRole(user, time, target_user_id)
 
 end
 
