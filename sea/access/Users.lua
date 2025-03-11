@@ -1,6 +1,7 @@
 local class = require("class")
 local UsersAccess = require("sea.access.access.UsersAccess")
 local User = require("sea.access.User")
+local UserRole = require("sea.access.UserRole")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
 
@@ -166,9 +167,15 @@ function Users:giveRole(user, time, target_user_id, role)
 		return nil, "not_found"
 	end
 
-	local can, err = self.users_access:canChangeRole(user, target_user, time, role)
+	local can, err = self.users_access:canChangeRole(user, time, role)
 	if not can then
 		return nil, "not_allowed"
+	end
+
+	local user_role = self.users_repo:getUserRole(target_user_id, role)
+	if not user_role then
+		user_role = UserRole(role, time)
+		user_role = self.users_repo:createUserRole(user_role)
 	end
 end
 

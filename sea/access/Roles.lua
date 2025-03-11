@@ -70,31 +70,27 @@ function Roles:hasRole(roles, role, exact)
 	return false
 end
 
----@param roles sea.Role[]
----@return sea.Role?
-function Roles:getHighestRole(roles)
-	---@type sea.Role?
-	local role
-	for _, _role in ipairs(roles) do
-		if not role or self:belongs("below", _role, role) then
-			role = _role
-		end
-	end
-	return role
-end
-
 --- Returns true if 1st is "above" 2nd
+--- Isn't optimal but ok
 ---@param roles_a sea.Role[]
 ---@param roles_b sea.Role[]
 ---@return true?
 function Roles:compare(roles_a, roles_b)
-	local a = self:getHighestRole(roles_a)
-	local b = self:getHighestRole(roles_b)
-	return self:belongs("below", a, b)
+	for _, role_a in ipairs(roles_a) do
+		local above = true
+		for _, role_b in ipairs(roles_b) do
+			above = above and self:belongs("below", role_a, role_b)
+		end
+		if above then
+			return true
+		end
+	end
 end
 
 assert(Roles:compare({"admin"}, {"user"}))
 assert(Roles:compare({"admin"}, {}))
+assert(not Roles:compare({"user"}, {"user"}))
+assert(not Roles:compare({"user"}, {"verified"}))
 assert(not Roles:compare({}, {"admin"}))
 assert(not Roles:compare({}, {}))
 assert(not Roles:compare({"moderator"}, {"donator"}))

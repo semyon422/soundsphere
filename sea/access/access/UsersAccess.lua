@@ -16,15 +16,12 @@ function UsersAccess:canUpdate(user, target_user, time)
 end
 
 ---@param user sea.User
----@param target_user sea.User
 ---@param time integer
 ---@param role sea.Role
 ---@return true?
-function UsersAccess:canChangeRole(user, target_user, time, role)
+function UsersAccess:canChangeRole(user, time, role)
 	local roles = Roles:filter(user.user_roles, time)
-	local _roles = Roles:filter(target_user.user_roles, time)
-
-
+	return Roles:compare(roles, {role})
 end
 
 return UsersAccess

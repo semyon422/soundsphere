@@ -24,10 +24,11 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 CREATE TABLE IF NOT EXISTS `user_roles` (
 	`id` INTEGER PRIMARY KEY,
-	`user_id` INTEGER,
-	`role` INTEGER,
+	`user_id` INTEGER NOT NULL,
+	`role` INTEGER NOT NULL,
+	`started_at` INTEGER NOT NULL,
 	`expires_at` INTEGER,
-	`total_time` INTEGER,
+	`total_time` INTEGER NOT NULL,
 	UNIQUE(`user_id`, `role`)
 );
 
