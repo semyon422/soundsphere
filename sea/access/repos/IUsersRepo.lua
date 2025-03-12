@@ -59,10 +59,16 @@ function IUsersRepo:createUserRole(user_role)
 	return {}
 end
 
----@param user_user sea.UserRole
+---@param user_role sea.UserRole
 ---@return sea.UserRole
-function IUsersRepo:updateUserRole(user_user)
-	return user_user
+function IUsersRepo:updateUserRole(user_role)
+	return user_role
+end
+
+---@param user_role sea.UserRole
+---@return sea.UserRole
+function IUsersRepo:deleteUserRole(user_role)
+	return user_role
 end
 
 --------------------------------------------------------------------------------

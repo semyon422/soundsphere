@@ -13,8 +13,8 @@ local UserRole = class()
 ---@param role sea.Role
 ---@param time integer
 function UserRole:new(role, time)
-	self.role = role
-	self.started_at = time
+	self.role = assert(role)
+	self.started_at = assert(time)
 	self.total_time = 0
 end
 

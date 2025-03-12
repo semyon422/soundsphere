@@ -52,7 +52,7 @@ end
 ---@param id integer
 ---@return sea.User?
 function UsersRepo:deleteUser(id)
-	return self.models.users:remove({id = id})[1]
+	return self.models.users:delete({id = id})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -77,6 +77,12 @@ end
 ---@return sea.UserRole
 function UsersRepo:updateUserRole(user_role)
 	return self.models.user_roles:update(user_role, {id = user_role.id})[1]
+end
+
+---@param user_role sea.UserRole
+---@return sea.UserRole
+function UsersRepo:deleteUserRole(user_role)
+	return self.models.user_roles:delete({id = user_role.id})
 end
 
 --------------------------------------------------------------------------------

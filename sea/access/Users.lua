@@ -157,39 +157,4 @@ function Users:ban(user, time, target_user_id)
 	return target_user
 end
 
----@param user sea.User
----@param time integer
----@param target_user_id integer
----@param role sea.Role
-function Users:giveRole(user, time, target_user_id, role)
-	local target_user = self.users_repo:getUser(target_user_id)
-	if not target_user then
-		return nil, "not_found"
-	end
-
-	local can, err = self.users_access:canChangeRole(user, time, role)
-	if not can then
-		return nil, "not_allowed"
-	end
-
-	local user_role = self.users_repo:getUserRole(target_user_id, role)
-	if not user_role then
-		user_role = UserRole(role, time)
-		user_role = self.users_repo:createUserRole(user_role)
-	end
-end
-
----@param user sea.User
----@param time integer
----@param target_user_id integer
-function Users:takeRole(user, time, target_user_id)
-
-end
-
----@param user sea.User
----@param code string
-function Users:oauth(user, code)
-
-end
-
 return Users

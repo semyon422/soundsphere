@@ -3,7 +3,7 @@ local IPasswordHasher = require("sea.access.IPasswordHasher")
 local UsersRepo = require("sea.access.repos.UsersRepo")
 local Users = require("sea.access.Users")
 local User = require("sea.access.User")
-local UserRole = require("sea.access.UserRole")local table_util = require("table_util")
+local UserRole = require("sea.access.UserRole")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 local test = {}
