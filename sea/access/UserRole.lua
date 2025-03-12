@@ -24,6 +24,17 @@ function UserRole:isExpired(time)
 	return self.expires_at and self.expires_at < time or false
 end
 
+---@return boolean
+function UserRole:isExpirable()
+	return not not self.expires_at
+end
+
+---@param time integer
+function UserRole:makeUnexpirable(time)
+	self:addTime(0, time)
+	self.expires_at = nil
+end
+
 ---@param time integer
 ---@param duration integer
 function UserRole:addTime(duration, time)
@@ -41,7 +52,7 @@ end
 
 ---@param time integer
 function UserRole:expire(time)
-	self:addTime(time - self.expires_at, time)
+	self:addTime(time - (self.expires_at or time), time)
 end
 
 return UserRole

@@ -16,6 +16,38 @@ function test.no_expire_time(t)
 end
 
 ---@param t testing.T
+function test.make_unexpirable(t)
+	local time = 100
+
+	local user_role = UserRole("owner", time)
+
+	t:assert(not user_role:isExpirable())
+	user_role:addTime(10, time)
+	t:assert(user_role:isExpirable())
+
+	t:eq(user_role:isExpired(time - 10), false)
+	t:eq(user_role:isExpired(time), false)
+	t:eq(user_role:isExpired(time + 10), false)
+	t:eq(user_role:isExpired(time + 20), true)
+
+	t:eq(user_role.expires_at, 110)
+
+	time = 120
+
+	t:eq(user_role:getTotalTime(time), 10)
+
+	user_role:makeUnexpirable(time)
+	t:eq(user_role:getTotalTime(time), 10)
+
+	time = 130
+	t:eq(user_role:getTotalTime(time), 20)
+
+	user_role:expire(130)
+	t:eq(user_role.expires_at, 130)
+	t:eq(user_role:getTotalTime(time), 20)
+end
+
+---@param t testing.T
 function test.add_1(t)
 	local time = 100
 
