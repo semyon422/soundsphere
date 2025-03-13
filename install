@@ -1,7 +1,15 @@
 #!/bin/bash
-. ./setenv
+source ./aqua/env/openresty_setenv
+
 luarocks install luasocket
 luarocks install luaossl
+luarocks install luasec
 luarocks install luautf8
+luarocks install bcrypt
+luarocks install lsqlite3
+luarocks install etlua
 luarocks install luacov
 luarocks install luacov-reporter-lcov
+
+mkdir -p logs
+mkdir -p temp

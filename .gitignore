@@ -63,3 +63,5 @@ luacov.report.out
 userdata/osu_ui.lua
 userdata/result.gif
 server.db
+nginx.conf
+nginx_config.lua

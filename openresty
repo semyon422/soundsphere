@@ -1,0 +1,12 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+source ./aqua/env/openresty_setenv
+luajit aqua/web/nginx/compile.lua
+
+if [[ $1 == "start" ]]; then
+	openresty -p $(pwd) -c nginx.conf
+elif [[ $1 == "stop" ]]; then
+	openresty -p $(pwd) -c nginx.conf -s stop
+elif [[ $1 == "reload" ]]; then
+	openresty -p $(pwd) -c nginx.conf -s reload
+fi
