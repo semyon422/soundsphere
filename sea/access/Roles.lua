@@ -74,7 +74,7 @@ end
 --- Isn't optimal but ok
 ---@param roles_a sea.Role[]
 ---@param roles_b sea.Role[]
----@return true?
+---@return boolean
 function Roles:compare(roles_a, roles_b)
 	for _, role_a in ipairs(roles_a) do
 		local above = true
@@ -85,6 +85,7 @@ function Roles:compare(roles_a, roles_b)
 			return true
 		end
 	end
+	return false
 end
 
 assert(Roles:compare({"admin"}, {"user"}))

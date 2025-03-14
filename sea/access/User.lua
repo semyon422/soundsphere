@@ -48,4 +48,9 @@ function User:hasRole(role, time, exact)
 	return Roles:hasRole(roles, role, exact)
 end
 
+function User:hideConfidential()
+	self.email = nil
+	self.password = nil
+end
+
 return User

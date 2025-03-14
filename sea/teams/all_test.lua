@@ -1,11 +1,12 @@
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local TeamsRepo = require("sea.teams.repos.TeamsRepo")
 local Teams = require("sea.teams.Teams")
 local Team = require("sea.teams.Team")
 local User = require("sea.access.User")
 
 local function create_test_ctx()
-	local db = ServerSqliteDatabase()
+	local db = ServerSqliteDatabase(LjsqliteDatabase())
 
 	db.path = ":memory:"
 

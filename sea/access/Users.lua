@@ -1,7 +1,6 @@
 local class = require("class")
 local UsersAccess = require("sea.access.access.UsersAccess")
 local User = require("sea.access.User")
-local UserRole = require("sea.access.UserRole")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
 
@@ -19,6 +18,15 @@ function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
 	self.users_access = UsersAccess()
+end
+
+---@return sea.User[]
+function Users:getUsers()
+	local users = self.users_repo:getUsers()
+	for _, user in ipairs(users) do
+		user:hideConfidential()
+	end
+	return users
 end
 
 ---@param _ sea.User

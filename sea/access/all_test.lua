@@ -4,12 +4,13 @@ local UsersRepo = require("sea.access.repos.UsersRepo")
 local Users = require("sea.access.Users")
 local User = require("sea.access.User")
 local UserRole = require("sea.access.UserRole")
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 local test = {}
 
 local function create_test_ctx()
-	local db = ServerSqliteDatabase()
+	local db = ServerSqliteDatabase(LjsqliteDatabase())
 
 	db.path = ":memory:"
 
