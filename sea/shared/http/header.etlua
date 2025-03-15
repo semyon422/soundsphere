@@ -1,0 +1,37 @@
+<% local session = session or {} %>
+
+<nav class="navbar">
+	<div class="navbar-brand">
+		<strong class="navbar-item">soundsphere</strong>
+	</div>
+	<div class="navbar-start">
+		<a class="navbar-item" href="/contests">Contests</a>
+		<a class="navbar-item" href="/users">Users</a>
+		<% if session.user_id then %>
+			<a class="navbar-item" href="/users/<%= session.user_id %>">
+				Profile
+			</a>
+		<% else %>
+			<a class="navbar-item" href="/login_options">Login</a>
+		<% end %>
+	</div>
+	<div class="navbar-end">
+		<div class="navbar-item dropdown is-active" x-data="{
+			setDataTheme(v) {
+				const html = document.querySelector('html')
+				html.setAttribute('data-theme', v)
+				localStorage.setItem('theme', v)
+			},
+		}">
+			<a class="navbar-item" href="#" @click="setDataTheme('light')">
+				<i class="fas fa-sun"></i>
+			</a>
+			<a class="navbar-item" href="#" @click="setDataTheme('dark')">
+				<i class="fas fa-moon"></i>
+			</a>
+			<a class="navbar-item" href="#" @click="setDataTheme('system')">
+				<i class="fas fa-desktop"></i>
+			</a>
+		</div>
+	</div>
+</nav>

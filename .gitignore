@@ -65,3 +65,4 @@ userdata/result.gif
 server.db
 nginx.conf
 nginx_config.lua
+app_config.lua

@@ -1,0 +1,6 @@
+<h3>users:</h3>
+<ul>
+<% for _, user in ipairs(users) do %>
+	<li><%= user.name %></li>
+<% end %>
+</ul>

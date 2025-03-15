@@ -1,6 +1,8 @@
 local App = require("sea.app.App")
 
-local app = App()
+local app_config = require("app_config")
+
+local app = App(app_config)
 
 app:load()
 

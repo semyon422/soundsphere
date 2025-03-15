@@ -18,6 +18,9 @@ function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
 	self.users_access = UsersAccess()
+
+	self.anon_user = User()
+	self.anon_user.id = 0
 end
 
 ---@return sea.User[]
@@ -27,6 +30,21 @@ function Users:getUsers()
 		user:hideConfidential()
 	end
 	return users
+end
+
+---@param id integer?
+---@return sea.User
+function Users:getUser(id)
+	local anon_user = self.anon_user
+	if not id then
+		return anon_user
+	end
+	local user = self.users_repo:getUser(id)
+	if not user then
+		return anon_user
+	end
+	user:hideConfidential()
+	return user
 end
 
 ---@param _ sea.User

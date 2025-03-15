@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="/css/style.css?version=<%= os.time() %>">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+		<script src="https://unpkg.com/htmx.org@2.0.0"></script>
+		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
+		<script src="https://kit.fontawesome.com/dbaf22a3a8.js?v=1.0"></script>
+		<% if is_captcha_enabled then %>
+			<script src="https://www.google.com/recaptcha/api.js"></script>
+		<% end %>
+		<title>soundsphere</title>
+		<style>
+			[x-cloak] { display: none !important; }
+		</style>
+	</head>
+	<body hx-boost="true">
+		<main class="container">
+			<%- view:render("sea/shared/http/header.etlua") %>
+			<%- inner %>
+		</main>
+		<script>
+			const theme = localStorage.getItem("theme");
+			const html = document.querySelector("html");
+			html.setAttribute("data-theme", theme);
+		</script>
+	</body>
+</html>
