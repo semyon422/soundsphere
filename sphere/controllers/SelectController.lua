@@ -150,7 +150,7 @@ function SelectController:openDirectory()
 	if not location then
 		return
 	end
-	love.system.openURL("file://" .. path_util.join(location.path, chartview.dir))
+	love.system.openURL(path_util.join(location.path, chartview.dir))
 end
 
 function SelectController:openWebNotechart()
