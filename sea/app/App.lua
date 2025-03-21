@@ -2,14 +2,13 @@ local class = require("class")
 local socket_url = require("socket.url")
 local LsqliteDatabase = require("rdb.LsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
-local UsersRepo = require("sea.access.repos.UsersRepo")
-local Users = require("sea.access.Users")
-local UsersResource = require("sea.access.http.UsersResource")
-local StyleResource = require("sea.shared.http.StyleResource")
-local IPasswordHasher = require("sea.access.IPasswordHasher")
+local Resources = require("sea.app.Resources")
+local Repos = require("sea.app.Repos")
+local Domain = require("sea.app.Domain")
 local Views = require("web.framework.page.Views")
 local Router = require("web.framework.router.Router")
 local Sessions = require("web.framework.Sessions")
+local Recaptcha = require("web.framework.Recaptcha")
 local etlua_util = require("web.framework.page.etlua_util")
 
 ---@class sea.RequestContext
@@ -17,6 +16,8 @@ local etlua_util = require("web.framework.page.etlua_util")
 ---@field ip string
 ---@field time integer
 ---@field path_params {[string]: string}
+---@field session_user sea.User
+---@field session sea.Session?
 
 ---@class sea.App
 ---@operator call: sea.App
@@ -25,20 +26,24 @@ local App = class()
 ---@param app_config sea.AppConfig
 function App:new(app_config)
 	self.app_db = ServerSqliteDatabase(LsqliteDatabase())
-
-	self.users_repo = UsersRepo(self.app_db.models)
-	self.users = Users(self.users_repo, IPasswordHasher())
-
 	self.sessions = Sessions("sea", app_config.sessions_secret)
+	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key)
 
-	local views = Views(etlua_util.autoload())
+	self.repos = Repos(self.app_db.models)
+	self.domain = Domain(self.repos)
+
+	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
+	self.resources = Resources(self.domain, views, self.sessions)
 
 	local router = Router()
 	self.router = router
-	router:route({
-		StyleResource(),
-		UsersResource(self.users, views),
-	})
+	router:route(self.resources:getList())
+
+	self.domain.users.is_login_enabled = app_config.is_login_enabled
+	self.domain.users.is_register_enabled = app_config.is_register_enabled
+
+	self.resources.login:setRecaptcha(app_config.is_login_captcha_enabled, self.recaptcha)
+	self.resources.register:setRecaptcha(app_config.is_register_captcha_enabled, self.recaptcha)
 end
 
 function App:load()
@@ -50,17 +55,34 @@ function App:unload()
 end
 
 ---@param req web.IRequest
----@param res web.IResponse
-function App:handle(req, res)
-	req:receive_headers()
-	res:set_chunked_encoding()
+---@param ctx sea.RequestContext
+function App:handleSession(req, ctx)
+	---@type {id: integer}?
+	local t = self.sessions:get(req.headers)
+	if not t or not t.id then
+		return
+	end
 
+	local session = self.domain.users:getSession(t.id)
+	if not session or not session.active then
+		return
+	end
+
+	ctx.session = session
+	ctx.session_user = self.domain.users:getUser(session.user_id)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ip string
+function App:handle(req, res, ip)
 	local parsed_uri = socket_url.parse(req.uri)
 
 	local resource, path_params = self.router:getResource(parsed_uri.path)
 
 	if not resource or not path_params then
 		res.status = 404
+		res:set_chunked_encoding()
 		res:send("not found")
 		res:send("")
 		return
@@ -69,6 +91,7 @@ function App:handle(req, res)
 	local method = req.method
 	if method ~= method:upper() or not resource[method] then
 		res.status = 403
+		res:set_chunked_encoding()
 		res:send("invalid method")
 		res:send("")
 		return
@@ -78,18 +101,19 @@ function App:handle(req, res)
 	local ctx = {
 		parsed_uri = parsed_uri,
 		path_params = path_params,
-		ip = req.headers:get("X-Real-IP"),
+		ip = ip,
 		time = os.time(),
+		session_user = self.domain.users.anon_user,
 	}
 
-	ctx.session = self.sessions:get(req.headers)
-	ctx.session_user = self.users:getUser(ctx.session and ctx.session.user_id)
+	self:handleSession(req, ctx)
 
 	if resource.before then
 		local ok, err = xpcall(resource.before, debug.traceback, resource, req, res, ctx)
 		if not ok then
 			local body = ("<pre>%s</pre>"):format(err)
 			res.status = 500
+			res:set_chunked_encoding()
 			res:send(body)
 			res:send("")
 			return
@@ -104,6 +128,7 @@ function App:handle(req, res)
 	if not ok then
 		local body = ("<pre>%s</pre>"):format(err)
 		res.status = 500
+		res:set_chunked_encoding()
 		res:send(body)
 		res:send("")
 		return

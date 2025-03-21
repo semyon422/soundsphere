@@ -109,21 +109,20 @@ end
 ---@param _ sea.User
 ---@param ip string
 ---@param time integer
----@param email string
----@param password string
+---@param user_values sea.User
 ---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"invalid_credentials"?
-function Users:login(_, ip, time, email, password)
+function Users:login(_, ip, time, user_values)
 	if not self.is_login_enabled then
 		return nil, "disabled"
 	end
 
-	local user = self.users_repo:findUserByEmail(email)
+	local user = self.users_repo:findUserByEmail(user_values.email)
 	if not user then
 		return nil, "invalid_credentials"
 	end
 
-	local valid = self.password_hasher:verify(password, user.password)
+	local valid = self.password_hasher:verify(user_values.password, user.password)
 	if not valid then
 		return nil, "invalid_credentials"
 	end
@@ -181,6 +180,12 @@ function Users:ban(user, time, target_user_id)
 	target_user = self.users_repo:updateUser(target_user)
 
 	return target_user
+end
+
+---@param id integer
+---@return sea.Session?
+function Users:getSession(id)
+	return self.users_repo:getSession(id)
 end
 
 return Users

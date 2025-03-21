@@ -8,8 +8,9 @@ app:load()
 
 ---@param req web.IRequest
 ---@param res web.IResponse
-local function handler(req, res)
-	app:handle(req, res)
+---@param ip string
+local function handler(req, res, ip)
+	app:handle(req, res, ip)
 end
 
 return handler

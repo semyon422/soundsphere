@@ -1,0 +1,37 @@
+<script>
+function onSubmit(token) {
+	document.getElementById("login-form").submit();
+}
+</script>
+<div class="grid">
+	<div></div>
+	<form id="login-form" action="/login" method="post">
+		<h3 class="title is-3">Login</h3>
+
+		<div class="field">
+			<label class="label">Email</label>
+			<div class="control">
+				<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Password</label>
+			<div class="control">
+				<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<div class="control">
+				<button class="button is-link g-recaptcha"
+					data-sitekey="<%= recaptcha_site_key %>"
+					data-callback="onSubmit"
+					data-action="login"
+				>Submit</button>
+			</div>
+  			<p class="help is-danger"><%= table.concat(errors or {}, "<br>") or "" %></p>
+		</div>
+	</form>
+	<div></div>
+</div>

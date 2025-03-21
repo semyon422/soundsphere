@@ -1,0 +1,51 @@
+<script>
+function onSubmit(token) {
+	document.getElementById("register-form").submit();
+}
+</script>
+<div class="grid">
+	<div></div>
+	<form id="register-form" action="/register" method="post">
+		<h3 class="title is-3">Register</h3>
+
+		<div class="field">
+			<label class="label">Email</label>
+			<div class="control">
+				<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Name</label>
+			<div class="control">
+				<input class="input" type="text" name="name" required value="<%= user and user.name or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Password</label>
+			<div class="control">
+				<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<label class="label">Confirm password</label>
+			<div class="control">
+				<input class="input" type="password" name="confirm_password" required value="<%= user and user.password or "" %>">
+			</div>
+		</div>
+
+		<div class="field">
+			<div class="control">
+				<button class="button is-link g-recaptcha"
+					data-sitekey="<%= recaptcha_site_key %>"
+					data-callback="onSubmit"
+					data-action="register"
+				>Submit</button>
+			</div>
+  			<p class="help is-danger"><%= table.concat(errors or {}, "<br>") or "" %></p>
+		</div>
+	</form>
+	<div></div>
+</div>

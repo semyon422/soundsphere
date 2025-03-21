@@ -53,4 +53,48 @@ function User:hideConfidential()
 	self.password = nil
 end
 
+---@return true?
+---@return string[]?
+function User:validateLogin()
+	local errs = {}
+
+	local email = self.email
+	if type(email) ~= "string" or not email:find("@") then
+		table.insert(errs, "invalid email")
+	end
+
+	local password = self.password
+	if type(password) ~= "string" or #password == 0 then
+		table.insert(errs, "invalid password")
+	end
+
+	if #errs > 0 then
+		return nil, errs
+	end
+
+	return true
+end
+
+---@return true?
+---@return string[]?
+function User:validateRegister()
+	local ok, errs = self:validateLogin()
+	if not ok then
+		return nil, errs
+	end
+
+	---@cast errs -?
+
+	local name = self.name
+	if type(name) ~= "string" or #name == 0 then
+		table.insert(errs, "invalid password")
+	end
+
+	if #errs > 0 then
+		return nil, errs
+	end
+
+	return true
+end
+
 return User

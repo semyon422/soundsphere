@@ -155,7 +155,11 @@ function test.login_email_password(t)
 
 	t:eq(su.user.id, 1)
 
-	local su, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password")
+	local user_values = User()
+	user_values.email = "user@example.com"
+	user_values.password = "password"
+
+	local su, err = users:login(ctx.anon_user, "127.0.0.1", time, user_values)
 
 	if not t:assert(su, err) then
 		return
@@ -167,15 +171,19 @@ function test.login_email_password(t)
 	---@type any
 	local _
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user2@example.com", "password")
+	user_values.email = "user2@example.com"
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, user_values)
 	t:eq(err, "invalid_credentials")
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password1")
+	user_values.email = "user@example.com"
+	user_values.password = "password1"
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, user_values)
 	t:eq(err, "invalid_credentials")
 
 	users.is_login_enabled = false
 
-	_, err = users:login(ctx.anon_user, "127.0.0.1", time, "user@example.com", "password")
+	user_values.password = "password"
+	_, err = users:login(ctx.anon_user, "127.0.0.1", time, user_values)
 	t:eq(err, "disabled")
 end
 
