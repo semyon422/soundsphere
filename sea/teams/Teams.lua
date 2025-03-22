@@ -13,6 +13,20 @@ function Teams:new(teams_repo)
 	self.teams_access = TeamsAccess()
 end
 
+---@return sea.Team[]
+function Teams:getTeams()
+	return self.teams_repo:getTeams()
+end
+
+---@param id integer?
+---@return sea.Team?
+function Teams:getTeam(id)
+	if not id then
+		return
+	end
+	return self.teams_repo:getTeam(id)
+end
+
 ---@param user sea.User
 ---@param name string
 ---@param alias string

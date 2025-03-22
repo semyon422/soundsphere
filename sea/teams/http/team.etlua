@@ -1,0 +1,3 @@
+Team: <%= team.name %>
+<br>
+<a href="/teams/<%= team.id %>/edit">Edit</a>

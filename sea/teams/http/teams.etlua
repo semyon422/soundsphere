@@ -1,0 +1,8 @@
+<a href="/teams/create">Create</a>
+
+<h3>teams:</h3>
+<ul>
+<% for _, team in ipairs(teams) do %>
+	<li><a href="/teams/<%= team.id %>"><%= team.name %></a></li>
+<% end %>
+</ul>

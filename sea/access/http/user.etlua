@@ -1,0 +1,8 @@
+User: <%= user.name %>
+<br>
+<a href="/users/<%= user.id %>/sessions">Sessions</a>
+<br>
+<a href="/users/<%= user.id %>/settings">Settings</a>
+<br>
+<a href="/users/<%= user.id %>/teams">Teams</a>
+<br>

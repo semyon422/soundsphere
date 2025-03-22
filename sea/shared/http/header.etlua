@@ -5,8 +5,11 @@
 		<strong class="navbar-item">soundsphere</strong>
 	</div>
 	<div class="navbar-start">
-		<a class="navbar-item" href="/contests">Contests</a>
 		<a class="navbar-item" href="/users">Users</a>
+		<a class="navbar-item" href="/leaderboards">Leaderboards</a>
+		<a class="navbar-item" href="/teams">Teams</a>
+		<a class="navbar-item" href="/teams">Difftables</a>
+		<a class="navbar-item" href="/teams">Charts</a>
 		<% if session.user_id then %>
 			<a class="navbar-item" href="/users/<%= session.user_id %>">
 				Profile

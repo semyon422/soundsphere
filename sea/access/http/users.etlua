@@ -1,6 +1,6 @@
 <h3>users:</h3>
 <ul>
 <% for _, user in ipairs(users) do %>
-	<li><%= user.name %></li>
+	<li><a href="/users/<%= user.id %>"><%= user.name %></a></li>
 <% end %>
 </ul>

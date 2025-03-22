@@ -1,0 +1,3 @@
+Leaderboard: <%= leaderboard.name %>
+<br>
+<a href="/leaderboards/<%= leaderboard.id %>/edit">Edit</a>

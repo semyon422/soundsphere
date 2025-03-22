@@ -14,6 +14,20 @@ function Leaderboards:new(leaderboards_repo)
 	self.leaderboards_access = LeaderboardsAccess()
 end
 
+---@return sea.Leaderboard[]
+function Leaderboards:getLeaderboards()
+	return self.leaderboards_repo:getLeaderboards()
+end
+
+---@param id integer?
+---@return sea.Leaderboard?
+function Leaderboards:getLeaderboard(id)
+	if not id then
+		return
+	end
+	return self.leaderboards_repo:getLeaderboard(id)
+end
+
 ---@param chartplay sea.Chartplayview
 ---@param rating_calc sea.RatingCalc
 local function get_rating(chartplay, rating_calc)

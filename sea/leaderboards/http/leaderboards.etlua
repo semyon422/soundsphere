@@ -1,0 +1,8 @@
+<a href="/leaderboards/create">Create</a>
+
+<h3>leaderboards:</h3>
+<ul>
+<% for _, leaderboard in ipairs(leaderboards) do %>
+	<li><a href="/leaderboards/<%= leaderboard.id %>"><%= leaderboard.name %></a></li>
+<% end %>
+</ul>

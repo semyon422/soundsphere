@@ -18,16 +18,9 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function UsersResource:GET(req, res, ctx)
-	-- ctx.users = self.users:getUsers()
-	ctx.users = {{name = "qwe"}}
-
+	ctx.users = self.users:getUsers()
 	ctx.page = UsersPage(ctx.session_user, os.time())
-
-	local vc = {["sea/shared/http/layout.etlua"] = "sea/access/http/users.etlua"}
-	local s = self.views:render(vc, ctx)
-
-	res.headers:set("Content-Type", "text/html")
-	res:send(s)
+	self.views:render_send(res, "sea/access/http/users.etlua", ctx, true)
 end
 
 return UsersResource

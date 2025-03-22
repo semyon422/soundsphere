@@ -41,7 +41,6 @@ function LoginResource:POST(req, res, ctx)
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		res.status = 400
-		res:send_headers()
 		return
 	end
 
