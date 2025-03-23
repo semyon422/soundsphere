@@ -91,7 +91,12 @@ function Leaderboards:create(user, lb_values)
 		return nil, err
 	end
 
-	local lb = Leaderboard()
+	local lb = self.leaderboards_repo:getLeaderboardByName(lb_values.name)
+	if lb then
+		return nil, "name_taken"
+	end
+
+	lb = Leaderboard()
 
 	lb.name = lb_values.name or "?"
 	lb.description = ""

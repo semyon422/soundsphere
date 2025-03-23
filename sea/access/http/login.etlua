@@ -30,7 +30,11 @@ function onSubmit(token) {
 					data-action="login"
 				>Submit</button>
 			</div>
-  			<p class="help is-danger"><%= table.concat(errors or {}, "<br>") or "" %></p>
+  			<p class="help is-danger">
+				<% for _, err in ipairs(errors or {}) do %>
+					<%= err %><br>
+				<% end %>
+			</p>
 		</div>
 	</form>
 	<div></div>

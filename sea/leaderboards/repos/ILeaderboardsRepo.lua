@@ -15,6 +15,12 @@ function ILeaderboardsRepo:getLeaderboard(id)
 	return {}
 end
 
+---@param name string
+---@return sea.Leaderboard?
+function ILeaderboardsRepo:getLeaderboardByName(name)
+	return {}
+end
+
 ---@param leaderboard sea.Leaderboard
 ---@return sea.Leaderboard
 function ILeaderboardsRepo:createLeaderboard(leaderboard)

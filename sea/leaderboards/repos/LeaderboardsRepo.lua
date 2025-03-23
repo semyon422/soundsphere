@@ -22,6 +22,12 @@ function LeaderboardsRepo:getLeaderboard(id)
 	return self.models.leaderboards:find({id = id})
 end
 
+---@param name string
+---@return sea.Leaderboard?
+function LeaderboardsRepo:getLeaderboardByName(name)
+	return self.models.leaderboards:find({name = assert(name)})
+end
+
 ---@param leaderboard sea.Leaderboard
 ---@return sea.Leaderboard
 function LeaderboardsRepo:createLeaderboard(leaderboard)

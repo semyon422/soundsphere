@@ -1,4 +1,10 @@
 local class = require("class")
+local table_util = require("table_util")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
+local ScoreComb = require("sea.leaderboards.ScoreComb")
+local TernaryState = require("sea.chart.TernaryState")
+local Result = require("sea.chart.Result")
+local Gamemode = require("sea.chart.Gamemode")
 
 ---@class sea.Leaderboard
 ---@operator call: sea.Leaderboard
@@ -49,6 +55,108 @@ function Leaderboard:new()
 	self.difftables = {}
 	self.chartmeta_inputmode = {}
 	self.chartdiff_inputmode = {}
+end
+
+---@param rate any
+---@return boolean
+local function is_valid_rate(rate)
+	if type(rate) ~= "table" then
+		return rate == "any"
+	end
+	---@cast rate {[any]: [any]}
+	if rate[1] then
+		if not table_util.is_array_of(rate, "number") then
+			return false
+		end
+	elseif next(rate) then
+		for k, v in pairs(rate) do
+			if k ~= "min" or k ~= "max" or type(v) ~= "number" then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+---@param v any
+local function is_id(v)
+	return type(v) == "number" and v == math.floor(v) and v > 0
+end
+
+---@return true?
+---@return string[]?
+function Leaderboard:validate()
+	local errs = {}
+
+	if type(self.name) ~= "string" or #self.name == 0 then
+		table.insert(errs, "invalid name")
+	end
+	if type(self.description) ~= "string" then
+		table.insert(errs, "invalid description")
+	end
+
+	if not RatingCalc:encode_safe(self.rating_calc) then
+		table.insert(errs, "invalid rating_calc")
+	end
+	if not ScoreComb:encode_safe(self.scores_comb) then
+		table.insert(errs, "invalid scores_comb")
+	end
+	if type(self.scores_comb_count) ~= "number" or self.scores_comb_count <= 0 then
+		table.insert(errs, "invalid scores_comb_count")
+	end
+
+	if not TernaryState:encode_safe(self.nearest) then
+		table.insert(errs, "invalid nearest")
+	end
+	if not Result:encode_safe(self.result) then
+		table.insert(errs, "invalid result")
+	end
+	if type(self.allow_custom) ~= "boolean" then
+		table.insert(errs, "invalid allow_custom")
+	end
+	if type(self.allow_const) ~= "boolean" then
+		table.insert(errs, "invalid allow_const")
+	end
+	if type(self.allow_pause) ~= "boolean" then
+		table.insert(errs, "invalid allow_pause")
+	end
+	if type(self.allow_reorder) ~= "boolean" then
+		table.insert(errs, "invalid allow_reorder")
+	end
+	if type(self.allow_modifiers) ~= "boolean" then
+		table.insert(errs, "invalid allow_modifiers")
+	end
+	if type(self.allow_tap_only) ~= "boolean" then
+		table.insert(errs, "invalid allow_tap_only")
+	end
+	if type(self.allow_free_timings) ~= "boolean" then
+		table.insert(errs, "invalid allow_free_timings")
+	end
+	if type(self.allow_free_healths) ~= "boolean" then
+		table.insert(errs, "invalid allow_free_healths")
+	end
+	if not Gamemode:encode_safe(self.mode) then
+		table.insert(errs, "invalid mode " .. tostring(self.mode))
+	end
+
+	if not is_valid_rate(self.rate) then
+		table.insert(errs, "invalid rate")
+	end
+	if not table_util.is_array_of(self.difftables, is_id) then
+		table.insert(errs, "invalid difftables")
+	end
+	if not table_util.is_array_of(self.chartmeta_inputmode, "string") then
+		table.insert(errs, "invalid chartmeta_inputmode")
+	end
+	if not table_util.is_array_of(self.chartdiff_inputmode, "string") then
+		table.insert(errs, "invalid chartdiff_inputmode")
+	end
+
+	if #errs > 0 then
+		return nil, errs
+	end
+
+	return true
 end
 
 return Leaderboard
