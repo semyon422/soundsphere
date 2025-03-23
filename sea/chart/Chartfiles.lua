@@ -5,9 +5,9 @@ local ChartfilesAccess = require("sea.chart.access.ChartfilesAccess")
 ---@operator call: sea.Chartfiles
 local Chartfiles = class()
 
----@param chartfilesRepo sea.IChartfilesRepo
-function Chartfiles:new(chartfilesRepo)
-	self.chartfilesRepo = chartfilesRepo
+---@param charts_repo sea.IChartsRepo
+function Chartfiles:new(charts_repo)
+	self.charts_repo = charts_repo
 	self.chartfilesAccess = ChartfilesAccess()
 end
 
@@ -24,7 +24,7 @@ function Chartfiles:submit(user, hash, name, size, data)
 		return nil, err
 	end
 
-	local chartfile = self.chartfilesRepo:getChartfileByHash(hash)
+	local chartfile = self.charts_repo:getChartfileByHash(hash)
 	if not chartfile then
 		return nil, "missing chartfile"
 	end

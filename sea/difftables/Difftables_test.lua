@@ -1,18 +1,43 @@
-local User = require("sea.access.User")
 local Difftables = require("sea.difftables.Difftables")
-local FakeDifftablesRepo = require("sea.difftables.repos.FakeDifftablesRepo")
+local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
+
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
+local User = require("sea.access.User")
 
 local test = {}
 
----@param t testing.T
-function test.basic(t)
-	local difftablesRepo = FakeDifftablesRepo()
-	local difftables = Difftables(difftablesRepo)
+local function create_test_ctx()
+	local db = ServerSqliteDatabase(LjsqliteDatabase())
+
+	db.path = ":memory:"
+
+	db:remove()
+	db:open()
+
+	-- db.orm:debug(true)
+
+	local models = db.models
+
+	local difftables_repo = DifftablesRepo(models)
+	local difftables = Difftables(difftables_repo)
 
 	local user = User()
 	user.id = 1
 
-	local difftable, err = difftables:create(user, "Difftable")
+	return {
+		db = db,
+		difftables_repo = difftables_repo,
+		difftables = difftables,
+		user = user,
+	}
+end
+
+---@param t testing.T
+function test.basic(t)
+	local ctx = create_test_ctx()
+
+	local difftable, err = ctx.difftables:create(ctx.user, "Difftable")
 	if not t:assert(difftable, err) then
 		return
 	end
@@ -20,7 +45,7 @@ function test.basic(t)
 	---@cast difftable -?
 	t:eq(difftable.name, "Difftable")
 
-	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, 12)
+	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, 12)
 	if not t:assert(dt_cm, err) then
 		return
 	end
@@ -28,7 +53,7 @@ function test.basic(t)
 	---@cast dt_cm -?
 	t:eq(dt_cm.level, 12)
 
-	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, 10)
+	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, 10)
 	if not t:assert(dt_cm, err) then
 		return
 	end
@@ -36,7 +61,7 @@ function test.basic(t)
 	---@cast dt_cm -?
 	t:eq(dt_cm.level, 10)
 
-	local dt_cm, err = difftables:setDifftableChartmeta(user, difftable.id, "", 1, nil)
+	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, nil)
 	t:assert(not dt_cm)
 end
 

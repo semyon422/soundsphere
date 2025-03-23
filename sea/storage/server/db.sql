@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
-	`name` TEXT NOT NULL,
-	`size` INTEGER NOT NULL,
+	`name` TEXT,
+	`size` INTEGER,
 	`compute_state` INTEGER NOT NULL,
 	`creator_id` INTEGER NOT NULL,
 	`submitted_at` INTEGER NOT NULL,

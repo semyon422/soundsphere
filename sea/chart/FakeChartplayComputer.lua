@@ -14,6 +14,13 @@ function FakeChartplayComputer:compute(chartplay)
 
 	chartplay.compute_state = "valid"
 
+	chartdiff.hash = chartplay.hash
+	chartdiff.index = chartplay.index
+	chartdiff.modifiers = chartplay.modifiers
+	chartdiff.rate = chartplay.rate
+	chartdiff.rate_type = chartplay.rate_type
+	chartdiff.mode = chartplay.mode
+
 	return {chartplay, chartdiff}
 end
 

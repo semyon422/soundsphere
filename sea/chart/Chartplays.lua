@@ -7,25 +7,19 @@ local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 ---@operator call: sea.Chartplays
 local Chartplays = class()
 
----@param chartplaysRepo sea.IChartplaysRepo
----@param chartfilesRepo sea.IChartfilesRepo
----@param chartdiffsRepo sea.IChartdiffsRepo
+---@param charts_repo sea.IChartsRepo
 ---@param chartplayComputer sea.IChartplayComputer
 ---@param chartsStorage sea.IKeyValueStorage
 ---@param replaysStorage sea.IKeyValueStorage
 ---@param leaderboards sea.Leaderboards
 function Chartplays:new(
-	chartplaysRepo,
-	chartfilesRepo,
-	chartdiffsRepo,
+	charts_repo,
 	chartplayComputer,
 	chartsStorage,
 	replaysStorage,
 	leaderboards
 )
-	self.chartplaysRepo = chartplaysRepo
-	self.chartfilesRepo = chartfilesRepo
-	self.chartdiffsRepo = chartdiffsRepo
+	self.charts_repo = charts_repo
 	self.chartplayComputer = chartplayComputer
 	self.chartsStorage = chartsStorage
 	self.replaysStorage = replaysStorage
@@ -35,7 +29,7 @@ end
 
 ---@return sea.Chartplay[]
 function Chartplays:getChartplays()
-	return self.chartplaysRepo:getChartplays()
+	return self.charts_repo:getChartplays()
 end
 
 ---@param user sea.User
@@ -44,12 +38,14 @@ end
 ---@return sea.Chartfile?
 ---@return string?
 function Chartplays:requireChartfile(user, remote, hash)
-	local chartfile = self.chartfilesRepo:getChartfileByHash(hash)
+	local chartfile = self.charts_repo:getChartfileByHash(hash)
 	if not chartfile then
 		local chartfile_values = Chartfile()
 		chartfile_values.hash = hash
 		chartfile_values.creator_id = user.id
-		chartfile = self.chartfilesRepo:createChartfile(chartfile_values)
+		chartfile_values.compute_state = "new"
+		chartfile_values.submitted_at = os.time()
+		chartfile = self.charts_repo:createChartfile(chartfile_values)
 	end
 
 	local file, err = remote:getChartfileData(hash)
@@ -66,8 +62,10 @@ function Chartplays:requireChartfile(user, remote, hash)
 		return nil, err
 	end
 
+	chartfile.name = file.name
+	chartfile.size = #file.data
 	chartfile.submitted_at = os.time()
-	self.chartfilesRepo:updateChartfile(chartfile)
+	self.charts_repo:updateChartfile(chartfile)
 
 	return chartfile
 end
@@ -83,13 +81,13 @@ function Chartplays:submit(user, remote, chartplay_values)
 		return nil, err
 	end
 
-	local chartplay = self.chartplaysRepo:getChartplayByEventsHash(chartplay_values.events_hash)
+	local chartplay = self.charts_repo:getChartplayByEventsHash(chartplay_values.events_hash)
 	if not chartplay then
 		chartplay_values.id = nil
 		chartplay_values.user_id = user.id
 		chartplay_values.created_at = os.time()
 
-		chartplay = self.chartplaysRepo:createChartplay(chartplay_values)
+		chartplay = self.charts_repo:createChartplay(chartplay_values)
 	end
 
 	local chartfile, err = self:requireChartfile(user, remote, chartplay.hash)
@@ -112,7 +110,7 @@ function Chartplays:submit(user, remote, chartplay_values)
 	end
 
 	chartplay.submitted_at = os.time()
-	self.chartplaysRepo:updateChartplay(chartplay)
+	self.charts_repo:updateChartplay(chartplay)
 
 	if chartplay.custom then
 		return chartplay
@@ -131,19 +129,19 @@ function Chartplays:submit(user, remote, chartplay_values)
 
 	if not chartplay:equalsComputed(computed_chartplay) then
 		chartplay.custom = true
-		self.chartplaysRepo:updateChartplay(chartplay)
+		self.charts_repo:updateChartplay(chartplay)
 		-- client error?
 		return nil, "computed values differs"
 	end
 
-	self.chartplaysRepo:updateChartplay(chartplay)
+	self.charts_repo:updateChartplay(chartplay)
 
-	local chartdiff = self.chartdiffsRepo:getChartdiffByChartkey(computed_chartdiff)
+	local chartdiff = self.charts_repo:getChartdiffByChartkey(computed_chartdiff)
 	if not chartdiff then
-		self.chartdiffsRepo:createChartdiff(computed_chartdiff)
+		self.charts_repo:createChartdiff(computed_chartdiff)
 	elseif not chartdiff:equalsComputed(computed_chartdiff) then
 		computed_chartdiff.id = chartdiff.id
-		self.chartdiffsRepo:updateChartdiff(computed_chartdiff)
+		self.charts_repo:updateChartdiff(computed_chartdiff)
 		-- add a note on chartdiff page about this change
 	end
 
