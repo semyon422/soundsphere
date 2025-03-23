@@ -5,6 +5,8 @@
 <% local Result = require("sea.chart.Result") %>
 <% local Gamemode = require("sea.chart.Gamemode") %>
 
+<% local leaderboard = leaderboard or {} %>
+
 <h2>Create leaderboard</h2>
 
 <div class="grid">
@@ -15,14 +17,14 @@
 		<div class="field">
 			<label class="label">Name</label>
 			<div class="control">
-				<input class="input" type="text" name="name" required value="<%= leaderboard and leaderboard.name or "" %>">
+				<input class="input" type="text" name="name" required value="<%= leaderboard.name or "" %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Description</label>
 			<div class="control">
-				<textarea class="textarea" name="description"><%= leaderboard and leaderboard.description or "" %></textarea>
+				<textarea class="textarea" name="description"><%= leaderboard.description or "" %></textarea>
 			</div>
 		</div>
 
@@ -34,7 +36,7 @@
 				<div class="select">
 					<select name="rating_calc">
 						<% for _, v in ipairs(RatingCalc:list()) do %>
-							<option><%= v %></option>
+							<option <%= leaderboard.rating_calc == v and "selected" or "" %>><%= v %></option>
 						<% end %>
 					</select>
 				</div>
@@ -47,7 +49,7 @@
 				<div class="select">
 					<select name="scores_comb">
 						<% for _, v in ipairs(ScoreComb:list()) do %>
-							<option><%= v %></option>
+							<option <%= leaderboard.scores_comb == v and "selected" or "" %>><%= v %></option>
 						<% end %>
 					</select>
 				</div>
@@ -57,7 +59,7 @@
 		<div class="field">
 			<label class="label">Score count (combiner)</label>
 			<div class="control">
-				<input class="input" type="number" name="scores_comb_count" value="<%= leaderboard and leaderboard.scores_comb_count or 1 %>">
+				<input class="input" type="number" name="scores_comb_count" value="<%= leaderboard.scores_comb_count or 1 %>">
 			</div>
 		</div>
 
@@ -69,7 +71,7 @@
 				<div class="select">
 					<select name="nearest">
 						<% for _, v in ipairs(TernaryState:list()) do %>
-							<option><%= v %></option>
+							<option <%= leaderboard.nearest == v and "selected" or "" %>><%= v %></option>
 						<% end %>
 					</select>
 				</div>
@@ -82,7 +84,7 @@
 				<div class="select">
 					<select name="result">
 						<% for _, v in ipairs(Result:list()) do %>
-							<option><%= v %></option>
+							<option <%= leaderboard.result == v and "selected" or "" %>><%= v %></option>
 						<% end %>
 					</select>
 				</div>
@@ -92,7 +94,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_custom">
+					<input type="checkbox" name="allow_custom" <%= leaderboard.allow_custom and "checked" or "" %>>
 					Allow custom
 				</label>
 			</div>
@@ -101,7 +103,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_const">
+					<input type="checkbox" name="allow_const" <%= leaderboard.allow_const and "checked" or "" %>>
 					Allow const
 				</label>
 			</div>
@@ -110,7 +112,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_pause">
+					<input type="checkbox" name="allow_pause" <%= leaderboard.allow_pause and "checked" or "" %>>
 					Allow pause
 				</label>
 			</div>
@@ -119,7 +121,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_reorder">
+					<input type="checkbox" name="allow_reorder" <%= leaderboard.allow_reorder and "checked" or "" %>>
 					Allow reorder
 				</label>
 			</div>
@@ -128,7 +130,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_modifiers">
+					<input type="checkbox" name="allow_modifiers" <%= leaderboard.allow_modifiers and "checked" or "" %>>
 					Allow modifiers
 				</label>
 			</div>
@@ -137,7 +139,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_tap_only">
+					<input type="checkbox" name="allow_tap_only" <%= leaderboard.allow_tap_only and "checked" or "" %>>
 					Allow tap only
 				</label>
 			</div>
@@ -146,7 +148,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_free_timings">
+					<input type="checkbox" name="allow_free_timings" <%= leaderboard.allow_free_timings and "checked" or "" %>>
 					Allow free timings
 				</label>
 			</div>
@@ -155,7 +157,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_free_healths">
+					<input type="checkbox" name="allow_free_healths" <%= leaderboard.allow_free_healths and "checked" or "" %>>
 					Allow free healths
 				</label>
 			</div>
@@ -164,7 +166,7 @@
 		<div class="field">
 			<div class="control">
 				<label class="checkbox">
-					<input type="checkbox" name="allow_free_healths">
+					<input type="checkbox" name="allow_free_healths" <%= leaderboard.allow_free_healths and "checked" or "" %>>
 					Allow free healths
 				</label>
 			</div>
@@ -176,7 +178,7 @@
 				<div class="select">
 					<select name="mode">
 						<% for _, v in ipairs(Gamemode:list()) do %>
-							<option><%= v %></option>
+							<option <%= leaderboard.mode == v and "selected" or "" %>><%= v %></option>
 						<% end %>
 					</select>
 				</div>
@@ -186,28 +188,28 @@
 		<div class="field">
 			<label class="label">Rate "any"|number[]|{min: number, max: number}</label>
 			<div class="control">
-				<input class="input" type="text" name="rate" value="<%= leaderboard and json.encode(leaderboard.rate) or '"any"' %>">
+				<input class="input" type="text" name="rate" value="<%= json.encode(leaderboard.rate) or '"any"' %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Difftables integer[]</label>
 			<div class="control">
-				<input class="input" type="text" name="difftables" value="<%= leaderboard and json.encode(leaderboard.difftables) or "[]" %>">
+				<input class="input" type="text" name="difftables" value="<%= json.encode(leaderboard.difftables) or "[]" %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Chartmeta inputmode string[]</label>
 			<div class="control">
-				<input class="input" type="text" name="chartmeta_inputmode" value="<%= leaderboard and json.encode(leaderboard.chartmeta_inputmode) or "[]" %>">
+				<input class="input" type="text" name="chartmeta_inputmode" value="<%= json.encode(leaderboard.chartmeta_inputmode) or "[]" %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Chartdiff inputmode string[]</label>
 			<div class="control">
-				<input class="input" type="text" name="chartdiff_inputmode" value="<%= leaderboard and json.encode(leaderboard.chartdiff_inputmode) or "[]" %>">
+				<input class="input" type="text" name="chartdiff_inputmode" value="<%= json.encode(leaderboard.chartdiff_inputmode) or "[]" %>">
 			</div>
 		</div>
 
