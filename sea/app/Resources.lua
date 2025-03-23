@@ -22,6 +22,11 @@ local TeamsCreateResource = require("sea.teams.http.TeamsCreateResource")
 local TeamResource = require("sea.teams.http.TeamResource")
 local TeamEditResource = require("sea.teams.http.TeamEditResource")
 
+local DifftablesResource = require("sea.difftables.http.DifftablesResource")
+local DifftablesCreateResource = require("sea.difftables.http.DifftablesCreateResource")
+local DifftableResource = require("sea.difftables.http.DifftableResource")
+local DifftableEditResource = require("sea.difftables.http.DifftableEditResource")
+
 local WebsocketClientResource = require("sea.shared.http.WebsocketClientResource")
 local WebsocketServerResource = require("sea.shared.http.WebsocketServerResource")
 
@@ -55,6 +60,11 @@ function Resources:new(domain, views, sessions)
 	self.team = TeamResource(domain.teams, views)
 	self.team_edit = TeamEditResource(domain.teams, views)
 
+	self.difftables = DifftablesResource(domain.difftables, views)
+	self.difftables_create = DifftablesCreateResource(domain.difftables, views)
+	self.difftable = DifftableResource(domain.difftables, views)
+	self.difftable_edit = DifftableEditResource(domain.difftables, views)
+
 	self.ws_client = WebsocketClientResource(views)
 	self.ws_server = WebsocketServerResource()
 end
@@ -82,6 +92,11 @@ function Resources:getList()
 		self.teams_create,
 		self.team,
 		self.team_edit,
+
+		self.difftables,
+		self.difftables_create,
+		self.difftable,
+		self.difftable_edit,
 
 		self.ws_client,
 		self.ws_server,

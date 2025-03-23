@@ -1,0 +1,3 @@
+Difftable: <%= difftable.name %>
+<br>
+<a href="/difftables/<%= difftable.id %>/edit">Edit</a>

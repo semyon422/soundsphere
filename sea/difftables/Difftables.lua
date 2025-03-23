@@ -14,6 +14,20 @@ function Difftables:new(difftables_repo)
 	self.difftables_access = DifftablesAccess()
 end
 
+---@return sea.Difftable[]
+function Difftables:getDifftables()
+	return self.difftables_repo:getDifftables()
+end
+
+---@param id integer?
+---@return sea.Difftable?
+function Difftables:getDifftable(id)
+	if not id then
+		return
+	end
+	return self.difftables_repo:getDifftable(id)
+end
+
 ---@param user sea.User
 ---@param name string
 ---@return sea.Difftable?

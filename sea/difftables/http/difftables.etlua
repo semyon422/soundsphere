@@ -1,0 +1,8 @@
+<a href="/difftables/create">Create</a>
+
+<h3>difftables:</h3>
+<ul>
+<% for _, difftable in ipairs(difftables) do %>
+	<li><a href="/difftables/<%= difftable.id %>"><%= difftable.name %></a></li>
+<% end %>
+</ul>
