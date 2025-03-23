@@ -15,7 +15,8 @@
 				Profile
 			</a>
 		<% else %>
-			<a class="navbar-item" href="/login_options">Login</a>
+			<a class="navbar-item" href="/register">Register</a>
+			<a class="navbar-item" href="/login">Login</a>
 		<% end %>
 	</div>
 	<div class="navbar-end">

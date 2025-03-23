@@ -5,6 +5,7 @@ local StyleResource = require("sea.shared.http.StyleResource")
 
 local LoginResource = require("sea.access.http.LoginResource")
 local RegisterResource = require("sea.access.http.RegisterResource")
+local LogoutResource = require("sea.access.http.LogoutResource")
 
 local UsersResource = require("sea.access.http.UsersResource")
 local UserResource = require("sea.access.http.UserResource")
@@ -48,6 +49,7 @@ function Resources:new(domain, views, sessions)
 
 	self.login = LoginResource(sessions, domain.users, views)
 	self.register = RegisterResource(sessions, domain.users, views)
+	self.logout = LogoutResource(sessions, domain.users)
 
 	self.users = UsersResource(domain.users, views)
 	self.user = UserResource(domain.users, views)
@@ -86,6 +88,7 @@ function Resources:getList()
 
 		self.login,
 		self.register,
+		self.logout,
 
 		self.users,
 		self.user,

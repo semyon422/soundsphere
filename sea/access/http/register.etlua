@@ -32,7 +32,7 @@ function onSubmit(token) {
 		<div class="field">
 			<label class="label">Confirm password</label>
 			<div class="control">
-				<input class="input" type="password" name="confirm_password" required value="<%= user and user.password or "" %>">
+				<input class="input" type="password" name="confirm_password" required value="">
 			</div>
 		</div>
 

@@ -6,3 +6,5 @@ User: <%= user.name %>
 <br>
 <a href="/users/<%= user.id %>/teams">Teams</a>
 <br>
+<a hx-post="/logout">Logout</a>
+<br>

@@ -78,12 +78,9 @@ end
 ---@return true?
 ---@return string[]?
 function User:validateRegister()
-	local ok, errs = self:validateLogin()
-	if not ok then
-		return nil, errs
-	end
+	local _, errs = self:validateLogin()
 
-	---@cast errs -?
+	errs = errs or {}
 
 	local name = self.name
 	if type(name) ~= "string" or #name == 0 then

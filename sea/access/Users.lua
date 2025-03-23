@@ -157,6 +157,26 @@ function Users:login(_, ip, time, user_values)
 end
 
 ---@param user sea.User
+---@param session_id integer
+---@return true?
+---@return string?
+function Users:logout(user, session_id)
+	local session = self.users_repo:getSession(session_id)
+	if not session then
+		return nil, "not_found"
+	end
+
+	if session.user_id ~= user.id then
+		return nil, "not_allowed"
+	end
+
+	session.active = false
+	self.users_repo:updateSession(session)
+
+	return true
+end
+
+---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
 ---@return sea.User?
