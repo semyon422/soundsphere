@@ -27,6 +27,11 @@ local DifftablesCreateResource = require("sea.difftables.http.DifftablesCreateRe
 local DifftableResource = require("sea.difftables.http.DifftableResource")
 local DifftableEditResource = require("sea.difftables.http.DifftableEditResource")
 
+local ChartsResource = require("sea.chart.http.ChartsResource")
+local ChartmetaResource = require("sea.chart.http.ChartmetaResource")
+local ChartdiffResource = require("sea.chart.http.ChartdiffResource")
+local ChartplayResource = require("sea.chart.http.ChartplayResource")
+
 local WebsocketClientResource = require("sea.shared.http.WebsocketClientResource")
 local WebsocketServerResource = require("sea.shared.http.WebsocketServerResource")
 
@@ -65,6 +70,11 @@ function Resources:new(domain, views, sessions)
 	self.difftable = DifftableResource(domain.difftables, views)
 	self.difftable_edit = DifftableEditResource(domain.difftables, views)
 
+	self.charts = ChartsResource(nil, views)
+	self.chartmeta = ChartmetaResource(nil, views)
+	self.chartdiff = ChartdiffResource(nil, views)
+	self.chartplay = ChartplayResource(nil, views)
+
 	self.ws_client = WebsocketClientResource(views)
 	self.ws_server = WebsocketServerResource()
 end
@@ -97,6 +107,11 @@ function Resources:getList()
 		self.difftables_create,
 		self.difftable,
 		self.difftable_edit,
+
+		self.charts,
+		self.chartmeta,
+		self.chartdiff,
+		self.chartplay,
 
 		self.ws_client,
 		self.ws_server,
