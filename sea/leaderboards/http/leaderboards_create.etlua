@@ -188,28 +188,28 @@
 		<div class="field">
 			<label class="label">Rate "any"|number[]|{min: number, max: number}</label>
 			<div class="control">
-				<input class="input" type="text" name="rate" value="<%= json.encode(leaderboard.rate) or '"any"' %>">
+				<input class="input" type="text" name="rate" value="<%= json.encode(leaderboard.rate or "any") %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Difftables integer[]</label>
 			<div class="control">
-				<input class="input" type="text" name="difftables" value="<%= json.encode(leaderboard.difftables) or "[]" %>">
+				<input class="input" type="text" name="difftables" value="<%= json.encode(leaderboard.difftables or {}) %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Chartmeta inputmode string[]</label>
 			<div class="control">
-				<input class="input" type="text" name="chartmeta_inputmode" value="<%= json.encode(leaderboard.chartmeta_inputmode) or "[]" %>">
+				<input class="input" type="text" name="chartmeta_inputmode" value="<%= json.encode(leaderboard.chartmeta_inputmode or {}) %>">
 			</div>
 		</div>
 
 		<div class="field">
 			<label class="label">Chartdiff inputmode string[]</label>
 			<div class="control">
-				<input class="input" type="text" name="chartdiff_inputmode" value="<%= json.encode(leaderboard.chartdiff_inputmode) or "[]" %>">
+				<input class="input" type="text" name="chartdiff_inputmode" value="<%= json.encode(leaderboard.chartdiff_inputmode or {}) %>">
 			</div>
 		</div>
 

@@ -1,3 +1,78 @@
-Leaderboard: <%= leaderboard.name %>
-<br>
-<a href="/leaderboards/<%= leaderboard.id %>/edit">Edit</a>
+<p>Leaderboard: <%= leaderboard.name %></p>
+<p><a href="/leaderboards/<%= leaderboard.id %>/edit">Edit</a></p>
+
+<p>Description: <%= leaderboard.description %></p>
+
+<table class="table">
+	<tr>
+		<th>Rating calculator</td>
+		<th>Scores combiner</td>
+	</tr>
+	<tr>
+		<td>
+			<%= leaderboard.rating_calc %>
+		</td>
+		<td>
+			<%= leaderboard.scores_comb %> (<%= leaderboard.scores_comb_count %>)
+		</td>
+	</tr>
+</table>
+
+<% local allow_flags = {"custom", "const", "pause", "reorder", "modifiers", "tap_only", "free_timings", "free_healths"} %>
+
+<% local allowed = {} %>
+<% local disallowed = {} %>
+<% for _, flag in ipairs(allow_flags) do %>
+	<% if leaderboard["allow_" .. flag] then %>
+		<% table.insert(allowed, flag) %>
+	<% end %>
+<% end %>
+<% for _, flag in ipairs(allow_flags) do %>
+	<% if not leaderboard["allow_" .. flag] then %>
+		<% table.insert(disallowed, flag) %>
+	<% end %>
+<% end %>
+
+<table class="table">
+	<tr>
+		<th>Nearest</td>
+		<th>Required result</td>
+		<th>Game mode</td>
+		<th>Rate</td>
+		<th>Allowed</td>
+		<th>Disallowed</td>
+	</tr>
+	<tr>
+		<td><%= leaderboard.nearest %></td>
+		<td><%= leaderboard.result %></td>
+		<td><%= leaderboard.mode %></td>
+		<td>
+			<% if leaderboard.rate == "any" then %>
+				<%= leaderboard.rate %>
+			<% elseif leaderboard.rate[1] then %>
+				<%= table.concat(leaderboard.rate, ", ") %>
+			<% elseif leaderboard.rate.min then %>
+				From <%= leaderboard.rate.min %> to <%= leaderboard.rate.max %>
+			<% end %>
+		</td>
+		<td><%= table.concat(allowed, ", ") %></td>
+		<td><%= table.concat(disallowed, ", ") %></td>
+	</tr>
+</table>
+
+<table class="table">
+	<tr>
+		<th>Chartmeta inputmodes</th>
+		<th>Chartdiff inputmodes</th>
+	</tr>
+	<tr>
+		<td><%= table.concat(leaderboard.chartmeta_inputmode, ", ") %></td>
+		<td><%= table.concat(leaderboard.chartdiff_inputmode, ", ") %></td>
+	</tr>
+</table>
+
+<table class="table">
+	<tr>
+		TODO: Difftables
+	</tr>
+</table>

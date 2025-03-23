@@ -98,15 +98,15 @@ function Leaderboards:create(user, lb_values)
 
 	lb = Leaderboard()
 
-	lb.name = lb_values.name or "?"
-	lb.description = ""
+	lb.name = lb_values.name
+	lb.description = lb_values.description
 	lb.created_at = lb_values.created_at or os.time()
-	lb.rating_calc = lb_values.rating_calc or "enps"
-	lb.scores_comb = "avg"
-	lb.scores_comb_count = lb_values.scores_comb_count or 20
+	lb.rating_calc = lb_values.rating_calc
+	lb.scores_comb = lb_values.scores_comb
+	lb.scores_comb_count = lb_values.scores_comb_count
 
-	lb.nearest = lb_values.nearest or "any"
-	lb.result = lb_values.result or "fail"
+	lb.nearest = lb_values.nearest
+	lb.result = lb_values.result
 	lb.allow_custom = not not lb_values.allow_custom
 	lb.allow_const = not not lb_values.allow_const
 	lb.allow_pause = not not lb_values.allow_pause
@@ -115,11 +115,11 @@ function Leaderboards:create(user, lb_values)
 	lb.allow_tap_only = not not lb_values.allow_tap_only
 	lb.allow_free_timings = not not lb_values.allow_free_timings
 	lb.allow_free_healths = not not lb_values.allow_free_healths
-	lb.mode = lb_values.mode or "mania"
-	lb.rate = lb_values.rate or "any"
-	lb.difftables = lb_values.difftables or {}
-	lb.chartmeta_inputmode = lb_values.chartmeta_inputmode or {}
-	lb.chartdiff_inputmode = lb_values.chartdiff_inputmode or {}
+	lb.mode = lb_values.mode
+	lb.rate = lb_values.rate
+	lb.difftables = lb_values.difftables
+	lb.chartmeta_inputmode = lb_values.chartmeta_inputmode
+	lb.chartdiff_inputmode = lb_values.chartdiff_inputmode
 
 	lb = self.leaderboards_repo:createLeaderboard(lb)
 
