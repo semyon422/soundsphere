@@ -11,7 +11,7 @@
 }
 
 .rankings__table tr.has-text:hover td {
-  background-color: var(--bulma-border);
+	background-color: var(--bulma-border);
 }
 
 .rankings__table td:nth-child(2) {
