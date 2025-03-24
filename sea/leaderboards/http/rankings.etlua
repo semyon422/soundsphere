@@ -6,7 +6,7 @@ local function getQuery(field, value)
 		table.insert(strs, ("%s=%s"):format(k, k == field and value or v))
 	end
 
-	return ("ranking?%s"):format(table.concat(strs, "&"))
+	return ("rankings?%s"):format(table.concat(strs, "&"))
 end
 
 local function getQueryComplex(params)
@@ -22,13 +22,13 @@ local function getQueryComplex(params)
 		table.insert(strs, ("%s=%s"):format(qk, value))
 	end
 
-	return ("ranking?%s"):format(table.concat(strs, "&"))
+	return ("rankings?%s"):format(table.concat(strs, "&"))
 end
 %>
 
 <section class="hero">
 	<div class="hero-body">
-		<p class="title">Ranking</p>
+		<p class="title">Rankings</p>
 		<p class="subtitle">Explore player ranks in various leaderboards.</p>
 	</div>
 </section>

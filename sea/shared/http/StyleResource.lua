@@ -8,7 +8,7 @@ StyleResource.uri = "/style.css"
 
 local files = {
 	"sea/access/http/users.css",
-	"sea/leaderboards/http/ranking.css"
+	"sea/leaderboards/http/rankings.css"
 }
 
 ---@param path string
