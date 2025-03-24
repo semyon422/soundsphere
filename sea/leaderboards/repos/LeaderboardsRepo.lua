@@ -59,7 +59,7 @@ local nearest_cond = {
 function LeaderboardsRepo:getFilterConds(lb, user_id)
 	---@type rdb.Conditions
 	local conds = {
-		user_id = user_id,
+		user_id = assert(user_id),
 		nearest = nearest_cond[lb.nearest],
 		result__in = Result:condition(lb.result),
 		mode = lb.mode,
@@ -128,7 +128,7 @@ end
 ---@return boolean
 function LeaderboardsRepo:checkChartplay(lb, chartplay)
 	local conds, options = self:getFilterConds(lb, chartplay.user_id)
-	conds.chartplay_id = chartplay.id
+	conds.chartplay_id = assert(chartplay.id)
 	return not not self.models.chartplayviews:select(conds, options)[1]
 end
 

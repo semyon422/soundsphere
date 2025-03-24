@@ -17,7 +17,7 @@ end
 ---@param hash string
 ---@return sea.Chartfile?
 function ChartsRepo:getChartfileByHash(hash)
-	return self.models.chartfiles:find({hash = hash})
+	return self.models.chartfiles:find({hash = assert(hash)})
 end
 
 ---@param chartfile sea.Chartfile
@@ -29,7 +29,7 @@ end
 ---@param chartfile sea.Chartfile
 ---@return sea.Chartfile
 function ChartsRepo:updateChartfile(chartfile)
-	return self.models.chartfiles:update(chartfile, {id = chartfile.id})[1]
+	return self.models.chartfiles:update(chartfile, {id = assert(chartfile.id)})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -43,11 +43,11 @@ end
 ---@return sea.Chartdiff?
 function ChartsRepo:getChartdiffByChartkey(chartkey)
 	return self.models.chartdiffs:find({
-		hash = chartkey.hash,
-		index = chartkey.index,
-		modifiers = chartkey.modifiers,
-		rate = chartkey.rate,
-		mode = chartkey.mode,
+		hash = assert(chartkey.hash),
+		index = assert(chartkey.index),
+		modifiers = assert(chartkey.modifiers),
+		rate = assert(chartkey.rate),
+		mode = assert(chartkey.mode),
 	})
 end
 
@@ -60,7 +60,7 @@ end
 ---@param chartdiff sea.Chartdiff
 ---@return sea.Chartdiff
 function ChartsRepo:updateChartdiff(chartdiff)
-	return self.models.chartdiffs:update(chartdiff, {id = chartdiff.id})[1]
+	return self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ end
 ---@param id integer
 ---@return sea.Chartplay?
 function ChartsRepo:getChartplay(id)
-	return self.models.chartplays:find({id = id})
+	return self.models.chartplays:find({id = assert(id)})
 end
 
 ---@return sea.Chartplay[]
@@ -79,7 +79,7 @@ end
 ---@param events_hash string
 ---@return sea.Chartplay?
 function ChartsRepo:getChartplayByEventsHash(events_hash)
-	return self.models.chartplays:find({events_hash = events_hash})
+	return self.models.chartplays:find({events_hash = assert(events_hash)})
 end
 
 ---@param chartplay sea.Chartplay
@@ -91,7 +91,7 @@ end
 ---@param chartplay sea.Chartplay
 ---@return sea.Chartplay
 function ChartsRepo:updateChartplay(chartplay)
-	return self.models.chartplays:update(chartplay, {id = chartplay.id})[1]
+	return self.models.chartplays:update(chartplay, {id = assert(chartplay.id)})[1]
 end
 
 return ChartsRepo

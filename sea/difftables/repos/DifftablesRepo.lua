@@ -17,7 +17,7 @@ end
 ---@param id integer
 ---@return sea.Difftable?
 function DifftablesRepo:getDifftable(id)
-	return self.models.difftables:find({id = id})
+	return self.models.difftables:find({id = assert(id)})
 end
 
 ---@param difftable sea.Difftable
@@ -29,7 +29,7 @@ end
 ---@param difftable sea.Difftable
 ---@return sea.Difftable
 function DifftablesRepo:updateDifftable(difftable)
-	return self.models.difftables:update(difftable, {id = difftable.id})[1]
+	return self.models.difftables:update(difftable, {id = assert(difftable.id)})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ end
 ---@param difftable_chartmeta sea.DifftableChartmeta
 ---@return sea.DifftableChartmeta
 function DifftablesRepo:updateDifftableChartmeta(difftable_chartmeta)
-	return self.models.difftable_chartmetas:update(difftable_chartmeta, {id = difftable_chartmeta.id})[1]
+	return self.models.difftable_chartmetas:update(difftable_chartmeta, {id = assert(difftable_chartmeta.id)})[1]
 end
 
 ---@param difftable_id integer

@@ -20,7 +20,7 @@ end
 ---@param id integer
 ---@return sea.User?
 function UsersRepo:getUser(id)
-	local user = self.models.users:find({id = id})
+	local user = self.models.users:find({id = assert(id)})
 	relations.preload(self.models.users, {user}, "user_roles")
 	return user
 end
@@ -28,13 +28,13 @@ end
 ---@param email string
 ---@return sea.User?
 function UsersRepo:findUserByEmail(email)
-	return self.models.users:find({email = email})
+	return self.models.users:find({email = assert(email)})
 end
 
 ---@param name string
 ---@return sea.User?
 function UsersRepo:findUserByName(name)
-	return self.models.users:find({name = name})
+	return self.models.users:find({name = assert(name)})
 end
 
 ---@param user sea.User
@@ -46,13 +46,13 @@ end
 ---@param user sea.User
 ---@return sea.User
 function UsersRepo:updateUser(user)
-	return self.models.users:update(user, {id = user.id})[1]
+	return self.models.users:update(user, {id = assert(user.id)})[1]
 end
 
 ---@param id integer
 ---@return sea.User?
 function UsersRepo:deleteUser(id)
-	return self.models.users:delete({id = id})[1]
+	return self.models.users:delete({id = assert(id)})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -76,13 +76,13 @@ end
 ---@param user_role sea.UserRole
 ---@return sea.UserRole
 function UsersRepo:updateUserRole(user_role)
-	return self.models.user_roles:update(user_role, {id = user_role.id})[1]
+	return self.models.user_roles:update(user_role, {id = assert(user_role.id)})[1]
 end
 
 ---@param user_role sea.UserRole
 ---@return sea.UserRole
 function UsersRepo:deleteUserRole(user_role)
-	return self.models.user_roles:delete({id = user_role.id})
+	return self.models.user_roles:delete({id = assert(user_role.id)})
 end
 
 --------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ end
 ---@param user_location sea.UserLocation
 ---@return sea.UserLocation?
 function UsersRepo:updateUserLocation(user_location)
-	return self.models.user_locations:update(user_location, {id = user_location.id})[1]
+	return self.models.user_locations:update(user_location, {id = assert(user_location.id)})[1]
 end
 
 --------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ end
 ---@param session sea.Session
 ---@return sea.Session?
 function UsersRepo:updateSession(session)
-	return self.models.sessions:update(session, {id = session.id})[1]
+	return self.models.sessions:update(session, {id = assert(session.id)})[1]
 end
 
 return UsersRepo
