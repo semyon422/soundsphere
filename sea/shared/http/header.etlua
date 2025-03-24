@@ -5,6 +5,7 @@
 		<strong class="navbar-item">soundsphere</strong>
 	</div>
 	<div class="navbar-start">
+		<a class="navbar-item" href="/rankings">Rankings</a>
 		<a class="navbar-item" href="/users">Users</a>
 		<a class="navbar-item" href="/leaderboards">Leaderboards</a>
 		<a class="navbar-item" href="/teams">Teams</a>
