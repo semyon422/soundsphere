@@ -25,7 +25,6 @@ local function getQueryComplex(params)
 	return ("rankings?%s"):format(table.concat(strs, "&"))
 end
 %>
-
 <section class="hero">
 	<div class="hero-body">
 		<p class="title">Rankings</p>
@@ -165,12 +164,12 @@ end
 				<tbody>
 					<% for _, user in ipairs(users) do %>
 						<tr class="has-text">
-							<td class="rankings__table-left-cell rankings__table-first-cell has-background">#<%= user.rank %></td>
+							<td class="rankings__table-left-cell has-background">#<%= user.rank %></td>
 							<% if user.rankChange > 0 then %>
-								<td class="rankings__table-left-cell fa-solid fa-arrow-up has-text-success has-background"></td>
+								<td class="rankings__table-left-cell fa fa-solid fa-arrow-up has-text-success has-background"></td>
 								<td class="rankings__table-left-cell has-text-success has-background"><%= user.rankChange %></td>
 							<% elseif user.rankChange < 0 then %>
-								<td class="rankings__table-left-cell fa-solid fa-arrow-down has-text-danger has-background"></td>
+								<td class="rankings__table-left-cell fa fa-solid fa-arrow-down has-text-danger has-background "></td>
 								<td class="rankings__table-left-cell has-text-danger has-background"><%= math.abs(user.rankChange) %></td>
 							<% else %>
 								<td class="rankings__table-left-cell has-background"></td>
