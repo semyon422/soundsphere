@@ -81,6 +81,31 @@ function Leaderboards:addChartplay(chartplay)
 	end
 end
 
+---@param src sea.Leaderboard
+---@param dst sea.Leaderboard
+local function safe_copy_lb(src, dst)
+	dst.name = src.name
+	dst.description = src.description
+	dst.rating_calc = src.rating_calc
+	dst.scores_comb = src.scores_comb
+	dst.scores_comb_count = src.scores_comb_count
+	dst.nearest = src.nearest
+	dst.result = src.result
+	dst.allow_custom = not not src.allow_custom
+	dst.allow_const = not not src.allow_const
+	dst.allow_pause = not not src.allow_pause
+	dst.allow_reorder = not not src.allow_reorder
+	dst.allow_modifiers = not not src.allow_modifiers
+	dst.allow_tap_only = not not src.allow_tap_only
+	dst.allow_free_timings = not not src.allow_free_timings
+	dst.allow_free_healths = not not src.allow_free_healths
+	dst.mode = src.mode
+	dst.rate = src.rate
+	dst.difftables = src.difftables
+	dst.chartmeta_inputmode = src.chartmeta_inputmode
+	dst.chartdiff_inputmode = src.chartdiff_inputmode
+end
+
 ---@param user sea.User
 ---@param lb_values sea.Leaderboard
 ---@return sea.Leaderboard?
@@ -98,32 +123,56 @@ function Leaderboards:create(user, lb_values)
 
 	lb = Leaderboard()
 
-	lb.name = lb_values.name
-	lb.description = lb_values.description
-	lb.created_at = lb_values.created_at or os.time()
-	lb.rating_calc = lb_values.rating_calc
-	lb.scores_comb = lb_values.scores_comb
-	lb.scores_comb_count = lb_values.scores_comb_count
-
-	lb.nearest = lb_values.nearest
-	lb.result = lb_values.result
-	lb.allow_custom = not not lb_values.allow_custom
-	lb.allow_const = not not lb_values.allow_const
-	lb.allow_pause = not not lb_values.allow_pause
-	lb.allow_reorder = not not lb_values.allow_reorder
-	lb.allow_modifiers = not not lb_values.allow_modifiers
-	lb.allow_tap_only = not not lb_values.allow_tap_only
-	lb.allow_free_timings = not not lb_values.allow_free_timings
-	lb.allow_free_healths = not not lb_values.allow_free_healths
-	lb.mode = lb_values.mode
-	lb.rate = lb_values.rate
-	lb.difftables = lb_values.difftables
-	lb.chartmeta_inputmode = lb_values.chartmeta_inputmode
-	lb.chartdiff_inputmode = lb_values.chartdiff_inputmode
+	safe_copy_lb(lb_values, lb)
+	lb.created_at = os.time()
 
 	lb = self.leaderboards_repo:createLeaderboard(lb)
 
 	return lb
+end
+
+---@param user sea.User
+---@param id integer
+---@param lb_values sea.Leaderboard
+---@return sea.Leaderboard?
+---@return string?
+function Leaderboards:update(user, id, lb_values)
+	local can, err = self.leaderboards_access:canManage(user)
+	if not can then
+		return nil, err
+	end
+
+	local lb = self.leaderboards_repo:getLeaderboardByName(lb_values.name)
+	if lb and lb.id ~= id then
+		return nil, "name_taken"
+	end
+
+	lb = lb or self.leaderboards_repo:getLeaderboard(id)
+
+	if not lb then
+		return nil, "not_found"
+	end
+
+	safe_copy_lb(lb_values, lb)
+
+	self.leaderboards_repo:updateLeaderboard(lb)
+
+	return lb
+end
+
+---@param user sea.User
+---@param id integer
+---@return true?
+---@return string?
+function Leaderboards:delete(user, id)
+	local can, err = self.leaderboards_access:canManage(user)
+	if not can then
+		return nil, err
+	end
+
+	self.leaderboards_repo:deleteLeaderboard(id)
+
+	return true
 end
 
 return Leaderboards

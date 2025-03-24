@@ -1,3 +1,5 @@
+<div class="section">
+
 <a href="/leaderboards/create">Create</a>
 
 <h3>leaderboards:</h3>
@@ -6,3 +8,5 @@
 	<li><a href="/leaderboards/<%= leaderboard.id %>"><%= leaderboard.name %></a></li>
 <% end %>
 </ul>
+
+</div>

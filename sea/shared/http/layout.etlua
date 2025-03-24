@@ -22,6 +22,8 @@
 			<%- view:render("sea/shared/http/header.etlua") %>
 			<%- inner %>
 		</main>
+		<footer class="footer">
+		</footer>
 		<script>
 			const theme = localStorage.getItem("theme");
 			const html = document.querySelector("html");

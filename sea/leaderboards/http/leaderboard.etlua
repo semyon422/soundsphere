@@ -1,3 +1,5 @@
+<div class="section">
+
 <p>Leaderboard: <%= leaderboard.name %></p>
 <p><a href="/leaderboards/<%= leaderboard.id %>/edit">Edit</a></p>
 
@@ -76,3 +78,5 @@
 		TODO: Difftables
 	</tr>
 </table>
+
+</div>

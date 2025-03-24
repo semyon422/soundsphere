@@ -19,7 +19,7 @@ end
 ---@param id integer
 ---@return sea.Leaderboard?
 function LeaderboardsRepo:getLeaderboard(id)
-	return self.models.leaderboards:find({id = id})
+	return self.models.leaderboards:find({id = assert(id)})
 end
 
 ---@param name string
@@ -37,13 +37,13 @@ end
 ---@param leaderboard sea.Leaderboard
 ---@return sea.Leaderboard
 function LeaderboardsRepo:updateLeaderboard(leaderboard)
-	return self.models.leaderboards:update(leaderboard, {id = leaderboard.id})[1]
+	return self.models.leaderboards:update(leaderboard, {id = assert(leaderboard.id)})[1]
 end
 
 ---@param id integer
 ---@return sea.Leaderboard?
 function LeaderboardsRepo:deleteLeaderboard(id)
-	return self.models.leaderboards:remove({id = id})[1]
+	return self.models.leaderboards:delete({id = assert(id)})[1]
 end
 
 local nearest_cond = {
@@ -161,15 +161,15 @@ end
 ---@param lb_user sea.LeaderboardUser
 ---@return sea.LeaderboardUser
 function LeaderboardsRepo:updateLeaderboardUser(lb_user)
-	return self.models.leaderboard_users:update(lb_user, {id = lb_user.id})[1]
+	return self.models.leaderboard_users:update(lb_user, {id = assert(lb_user.id)})[1]
 end
 
 ---@param lb_user sea.LeaderboardUser
 ---@return integer
 function LeaderboardsRepo:getLeaderboardUserRank(lb_user)
 	return self.models.leaderboard_users:count({
-		leaderboard_id = lb_user.leaderboard_id,
-		total_rating__gte = lb_user.total_rating,
+		leaderboard_id = assert(lb_user.leaderboard_id),
+		total_rating__gte = assert(lb_user.total_rating),
 	})
 end
 
