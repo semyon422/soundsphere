@@ -41,6 +41,7 @@
 .rankings__table-flag {
 	width: 40px;
 	height: 30px;
+	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
 	border-radius: 6px;

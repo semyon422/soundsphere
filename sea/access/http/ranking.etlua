@@ -177,7 +177,7 @@ end
 								<td class="rankings__table-left-cell has-background"></td>
 							<% end %>
 							<td class="rankings__table-left-cell rankings__table-flag-cell has-background">
-								<div class="rankings__table-flag" style="background-image: url(<%= user.flag %>);"></div>
+								<div class="rankings__table-flag fi-<%= user.flag %>"></div>
 							</td>
 							<td align="left" class="rankings_table-cell has-background"><%= user.username %></td>
 							<% for _, v in ipairs(user.cellValues) do %>

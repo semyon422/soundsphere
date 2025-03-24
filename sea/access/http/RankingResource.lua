@@ -9,7 +9,6 @@ local RankingResource = IResource + {}
 
 RankingResource.uri = "/ranking"
 RankingResource.maxUsersPerPage = 50
-RankingResource.flagUrlFormat = "https://raw.githubusercontent.com/lipis/flag-icons/refs/heads/main/flags/4x3/%s.svg"
 
 ---@param views web.Views
 function RankingResource:new(views)
@@ -27,7 +26,7 @@ function RankingResource:new(views)
 			msd = 32 - (i * 0.032),
 			accuracy = math.random(95, 100) * 0.01,
 			scoreCount = math.random(200, 30000),
-			flag = self.flagUrlFormat:format(flags[math.random(1, #flags)]),
+			flag = flags[math.random(1, #flags)],
 			playTime = math.random(400, 1000000),
 			hardcodeHealth = math.random(1, 10)
 		})
