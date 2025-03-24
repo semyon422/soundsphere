@@ -27,10 +27,10 @@ end
 %>
 
 <section class="hero">
-  <div class="hero-body">
-    <p class="title">Ranking</p>
-    <p class="subtitle">Explore player ranks in various leaderboards.</p>
-  </div>
+	<div class="hero-body">
+		<p class="title">Ranking</p>
+		<p class="subtitle">Explore player ranks in various leaderboards.</p>
+	</div>
 </section>
 
 <div class="tabs is-centered">
@@ -49,14 +49,14 @@ end
 	<% if display_leaderboards then %>
 		<div class="column is-one-quarter">
 			<div class="block">
-			  <h1 class="title">Game mode</h1>
+				<h1 class="title">Game mode</h1>
 				<aside class="menu">
 					<ul class="menu-list">
 						<% for _, v in ipairs(gamemodes) do %>
-							<% if v.id == query.gamemode_id then  %>
+							<% if v.id == query.mode then %>
 								<li><a class="is-active"><%= v.name %></a></li>
 							<% else %>
-								<li><a href="<%= getQueryComplex({leaderboard_id = -1, gamemode_id = v.id}) %>"><%= v.name %></a></li>
+								<li><a href="<%= getQueryComplex({leaderboard_id = -1, mode = v.id}) %>"><%= v.name %></a></li>
 							<% end %>
 						<% end %>
 					</ul>
@@ -87,10 +87,10 @@ end
 						<p class="menu-label"><%= category.name %></p>
 						<ul class="menu-list">
 							<% for _, filter in ipairs(category.items) do %>
-								<% if filter.id == query.key_mode_id then %>
+								<% if filter.id == query.inputmode then %>
 									<li><a class="is-active"><%= filter.name %></a></li>
 								<% else %>
-									<li><a href="<%= getQuery('key_mode_id', filter.id) %>"><%= filter.name %></a></li>
+									<li><a href="<%= getQuery('inputmode', filter.id) %>"><%= filter.name %></a></li>
 								<% end %>
 							<% end %>
 						</ul>
@@ -128,24 +128,24 @@ end
 				</div>
 				<div class="block">
 					<nav class="level">
-					  <div class="level-item has-text-centered">
-						<div>
-						  <p class="title is-4">Rating calculator</p>
-						  <p class="subtitle is-4">osu! PP</p>
+						<div class="level-item has-text-centered">
+							<div>
+							<p class="title is-4">Rating calculator</p>
+							<p class="subtitle is-4">osu! PP</p>
+							</div>
 						</div>
-					  </div>
-					  <div class="level-item has-text-centered">
-						<div>
-						  <p class="title is-4">Pauses</p>
-						  <p class="subtitle is-4">Allowed</p>
+						<div class="level-item has-text-centered">
+							<div>
+							<p class="title is-4">Pauses</p>
+							<p class="subtitle is-4">Allowed</p>
+							</div>
 						</div>
-					  </div>
-					  <div class="level-item has-text-centered">
-						<div>
-						  <p class="title is-4">Constant scroll speed</p>
-						  <p class="subtitle is-4">Banned</p>
+						<div class="level-item has-text-centered">
+							<div>
+							<p class="title is-4">Constant scroll speed</p>
+							<p class="subtitle is-4">Banned</p>
+							</div>
 						</div>
-					  </div>
 					</nav>
 				</div>
 			</div>

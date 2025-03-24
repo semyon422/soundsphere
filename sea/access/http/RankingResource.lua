@@ -1,7 +1,6 @@
 local http_util = require("web.http.util")
 local math_util = require("math_util")
 local IResource = require("web.framework.IResource")
-local User = require("sea.access.User")
 
 ---@class sea.RankingResource: web.IResource
 ---@operator call: sea.RankingResource
@@ -120,16 +119,16 @@ function RankingResource:GET(req, res, ctx)
 	local page_count = math.ceil(#self.testUsers / self.maxUsersPerPage)
 
 	local page = 1
-	local gamemode_id = "mania"
+	local mode = "mania"
 	local leaderboard_id = 0
-	local key_mode_id = "10key"
+	local inputmode = "10key"
 	local ranking_type_id = "performance"
 
 	if query then
 		page = math.floor(math_util.clamp(tonumber(query.page) or 1, 1, page_count)) or page
-		gamemode_id = query.gamemode_id or gamemode_id
+		mode = query.mode or mode
 		leaderboard_id = tonumber(query.leaderboard_id) or leaderboard_id
-		key_mode_id = query.key_mode_id or key_mode_id
+		inputmode = query.inputmode or inputmode
 		ranking_type_id = query.ranking_type_id or ranking_type_id
 	end
 
@@ -171,16 +170,16 @@ function RankingResource:GET(req, res, ctx)
 	ctx.gamemodes = self.testGamemodes
 	ctx.query = {
 		page = page,
-		gamemode_id = gamemode_id,
+		mode = mode,
 		leaderboard_id = leaderboard_id,
 		ranking_type_id = ranking_type_id
 	}
 
-	if gamemode_id == "mania" then
+	if mode == "mania" then
 		ctx.leaderboards = self.testManiaLeaderboards
 		ctx.key_modes = self.testKeyModes
 		ctx.display_key_modes = true
-		ctx.query.key_mode_id = key_mode_id
+		ctx.query.inputmode = inputmode
 	else
 		ctx.leaderboards = self.testOsuOrTaikoLeaderboards
 		ctx.display_key_modes = false
