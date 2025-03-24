@@ -195,7 +195,7 @@ function RankingResource:GET(req, res, ctx)
 		ctx.display_leaderboards = false
 	end
 
-	self.views:render_send(res, "sea/access/http/ranking.etlua", ctx, true)
+	self.views:render_send(res, "sea/leaderboards/http/ranking.etlua", ctx, true)
 end
 
 return RankingResource

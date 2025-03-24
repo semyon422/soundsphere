@@ -13,7 +13,7 @@ local UserSessionsResource = require("sea.access.http.UserSessionsResource")
 local UsersSettingsResource = require("sea.access.http.UsersSettingsResource")
 local UserTeamsResource = require("sea.access.http.UserTeamsResource")
 
-local RankingResource = require("sea.access.http.RankingResource")
+local RankingResource = require("sea.leaderboards.http.RankingResource")
 
 local LeaderboardsResource = require("sea.leaderboards.http.LeaderboardsResource")
 local LeaderboardsCreateResource = require("sea.leaderboards.http.LeaderboardsCreateResource")
