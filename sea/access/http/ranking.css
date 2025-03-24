@@ -1,0 +1,67 @@
+.rankings__table {
+	text-align: center;
+	border-collapse: separate;
+	border-spacing: 0 4px;
+}
+
+.rankings__table td {
+	min-width: 5%;
+	height: 40px;
+	line-height: 40px;
+}
+
+.rankings__table tr.has-text:hover td {
+  background-color: var(--bulma-border);
+}
+
+.rankings__table td:nth-child(2) {
+	min-width: 1%;
+}
+
+.rankings__table td:nth-child(3) {
+	min-width: 3%;
+}
+
+.rankings__table td:nth-child(4) {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.rankings__table td:nth-child(5) {
+	padding-left: 10px;
+	min-width: 100%;
+}
+
+.rankings__table-flag-cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.rankings__table-flag {
+	width: 40px;
+	height: 30px;
+	background-repeat: no-repeat;
+	background-position: center;
+	border-radius: 6px;
+}
+
+.rankings__table-left-cell {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.rankings__table-right-cell {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.rankings__table-first-cell {
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+}
+
+.rankings__table-last-cell {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+}

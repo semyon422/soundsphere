@@ -13,6 +13,8 @@ local UserSessionsResource = require("sea.access.http.UserSessionsResource")
 local UsersSettingsResource = require("sea.access.http.UsersSettingsResource")
 local UserTeamsResource = require("sea.access.http.UserTeamsResource")
 
+local RankingResource = require("sea.access.http.RankingResource")
+
 local LeaderboardsResource = require("sea.leaderboards.http.LeaderboardsResource")
 local LeaderboardsCreateResource = require("sea.leaderboards.http.LeaderboardsCreateResource")
 local LeaderboardResource = require("sea.leaderboards.http.LeaderboardResource")
@@ -57,6 +59,8 @@ function Resources:new(domain, views, sessions)
 	self.user_settings = UsersSettingsResource(domain.users, views)
 	self.user_teams = UserTeamsResource(domain.users, views)
 
+	self.ranking = RankingResource(views)
+
 	self.leaderboards = LeaderboardsResource(domain.leaderboards, views)
 	self.leaderboards_create = LeaderboardsCreateResource(domain.leaderboards, views)
 	self.leaderboard = LeaderboardResource(domain.leaderboards, views)
@@ -95,6 +99,8 @@ function Resources:getList()
 		self.user_sessions,
 		self.user_settings,
 		self.user_teams,
+
+		self.ranking,
 
 		self.leaderboards,
 		self.leaderboards_create,

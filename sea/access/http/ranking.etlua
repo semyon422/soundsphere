@@ -1,0 +1,220 @@
+<%
+local function getQuery(field, value)
+	local strs = {}
+
+	for k, v in pairs(query) do
+		table.insert(strs, ("%s=%s"):format(k, k == field and value or v))
+	end
+
+	return ("ranking?%s"):format(table.concat(strs, "&"))
+end
+
+local function getQueryComplex(params)
+	local strs = {}
+
+	for qk, qv in pairs(query) do
+		local value = qv
+		for pk, pv in pairs(params) do
+			if qk == pk then
+				value = pv
+			end
+		end
+		table.insert(strs, ("%s=%s"):format(qk, value))
+	end
+
+	return ("ranking?%s"):format(table.concat(strs, "&"))
+end
+%>
+
+<section class="hero">
+  <div class="hero-body">
+    <p class="title">Ranking</p>
+    <p class="subtitle">Explore player ranks in various leaderboards.</p>
+  </div>
+</section>
+
+<div class="tabs is-centered">
+	<ul>
+		<% for _, v in ipairs(ranking_types) do %>
+			<% if v.id == query.ranking_type_id then %>
+				<li class="is-active"><a><%= v.name %></a></li>
+			<% else %>
+				<li><a href="<%= getQuery('ranking_type_id', v.id)%>"><%= v.name %></a></li>
+			<% end %>
+		<% end %>
+	</ul>
+</div>
+
+<div class="columns">
+	<% if display_leaderboards then %>
+		<div class="column is-one-quarter">
+			<div class="block">
+			  <h1 class="title">Game mode</h1>
+				<aside class="menu">
+					<ul class="menu-list">
+						<% for _, v in ipairs(gamemodes) do %>
+							<% if v.id == query.gamemode_id then  %>
+								<li><a class="is-active"><%= v.name %></a></li>
+							<% else %>
+								<li><a href="<%= getQueryComplex({leaderboard_id = -1, gamemode_id = v.id}) %>"><%= v.name %></a></li>
+							<% end %>
+						<% end %>
+					</ul>
+				</aside>
+			</div>
+			<div class="block">
+				<h1 class="title">Leaderboard</h1>
+				<aside class="menu">
+					<% for _, category in ipairs(leaderboards) do %>
+						<p class="menu-label"><%= category.name %></p>
+						<ul class="menu-list">
+							<% for _, leaderboard in ipairs(category.items) do %>
+								<% if leaderboard.id == query.leaderboard_id then %>
+									<li><a class="is-active"><%= leaderboard.name %></a></li>
+								<% else %>
+									<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>"><%= leaderboard.name %></a></li>
+								<% end %>
+							<% end %>
+						</ul>
+					<% end %>
+				</aside>
+			</div>
+			<% if display_key_modes then %>
+				<div class="block">
+					<h1 class="title">Key mode</h1>
+					<aside class="menu">
+					<% for _, category in ipairs(key_modes) do %>
+						<p class="menu-label"><%= category.name %></p>
+						<ul class="menu-list">
+							<% for _, filter in ipairs(category.items) do %>
+								<% if filter.id == query.key_mode_id then %>
+									<li><a class="is-active"><%= filter.name %></a></li>
+								<% else %>
+									<li><a href="<%= getQuery('key_mode_id', filter.id) %>"><%= filter.name %></a></li>
+								<% end %>
+							<% end %>
+						</ul>
+					<% end %>
+					</aside>
+				</div>
+			<% end %>
+		</div>
+	<% end %>
+	<div class="column">
+		<% if display_leaderboards then %>
+			<div class="block">
+				<div class="card">
+					<div class="card-content">
+						<div class="content">
+							<h3>Official osu! ranked</h3>
+							This leaderboard includes ranked charts from osu! that you can download on the <a href="https://osu.ppy.sh/beatmapsets">osu! beatmaps page</a>.
+							<h3>Score requirements</h3>
+							<ul>
+								<li>
+									You should use chart specific timing windows
+								</li>
+								<li>
+									Pauses are allowed
+								</li>
+								<li>
+									Constant scroll speed is not allowed
+								</li>
+								<li>
+									0.75x, 1.0x and 1.5x are the only allowed rates
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="block">
+					<nav class="level">
+					  <div class="level-item has-text-centered">
+						<div>
+						  <p class="title is-4">Rating calculator</p>
+						  <p class="subtitle is-4">osu! PP</p>
+						</div>
+					  </div>
+					  <div class="level-item has-text-centered">
+						<div>
+						  <p class="title is-4">Pauses</p>
+						  <p class="subtitle is-4">Allowed</p>
+						</div>
+					  </div>
+					  <div class="level-item has-text-centered">
+						<div>
+						  <p class="title is-4">Constant scroll speed</p>
+						  <p class="subtitle is-4">Banned</p>
+						</div>
+					  </div>
+					</nav>
+				</div>
+			</div>
+		<% end %>
+		<div class="block">
+			<table class="rankings__table">
+				<thead>
+					<th>Rank</th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<% for _, v in ipairs(table_cell_names) do %>
+						<th><%= v %></th>
+					<% end %>
+				</thead>
+				<tbody>
+					<% for _, user in ipairs(users) do %>
+						<tr class="has-text">
+							<td class="rankings__table-left-cell rankings__table-first-cell has-background">#<%= user.rank %></td>
+							<% if user.rankChange > 0 then %>
+								<td class="rankings__table-left-cell fa-solid fa-arrow-up has-text-success has-background"></td>
+								<td class="rankings__table-left-cell has-text-success has-background"><%= user.rankChange %></td>
+							<% elseif user.rankChange < 0 then %>
+								<td class="rankings__table-left-cell fa-solid fa-arrow-down has-text-danger has-background"></td>
+								<td class="rankings__table-left-cell has-text-danger has-background"><%= math.abs(user.rankChange) %></td>
+							<% else %>
+								<td class="rankings__table-left-cell has-background"></td>
+								<td class="rankings__table-left-cell has-background"></td>
+							<% end %>
+							<td class="rankings__table-left-cell rankings__table-flag-cell has-background">
+								<div class="rankings__table-flag" style="background-image: url(<%= user.flag %>);"></div>
+							</td>
+							<td align="left" class="rankings_table-cell has-background"><%= user.username %></td>
+							<% for _, v in ipairs(user.cellValues) do %>
+								<% if v.dimmed then %>
+									<td class="rankings__table-right-cell has-background has-text-grey"><%= v.label %></td>
+								<% else %>
+									<td class="rankings__table-right-cell has-background"><%= v.label %></td>
+								<% end %>
+							<% end %>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+		</div>
+		<div class="block">
+			<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+				<ul class="pagination-list">
+					<% local page = query.page %>
+					<% if page ~= 1 then %>
+						<% if page ~= 2 then %>
+							<li><a href="<%= getQuery('page', 1) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
+							<li><span class="pagination-ellipsis">&hellip;</span></li>
+						<% end %>
+						<li><a href="<%= getQuery('page', page - 1) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
+					<% end %>
+					<li>
+					<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
+					</li>
+					<% if page ~= page_count then %>
+						<li><a href="<%= getQuery('page', page + 1) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
+						<% if page ~= page_count - 1 then %>
+							<li><span class="pagination-ellipsis">&hellip;</span></li>
+							<li><a href="<%= getQuery('page', page_count) %>" class="pagination-link"><%= page_count %></a></li>
+						<% end %>
+					<% end %>
+				</ul>
+			</nav>
+		<div>
+	</div>
+</div>
