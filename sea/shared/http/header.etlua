@@ -1,42 +1,103 @@
 <% local session = session or {} %>
 
-<nav class="navbar">
-	<div class="navbar-brand">
-		<strong class="navbar-item">soundsphere</strong>
-	</div>
-	<div class="navbar-start">
-		<a class="navbar-item" href="/rankings">Rankings</a>
-		<a class="navbar-item" href="/users">Users</a>
-		<a class="navbar-item" href="/leaderboards">Leaderboards</a>
-		<a class="navbar-item" href="/teams">Teams</a>
-		<a class="navbar-item" href="/difftables">Difftables</a>
-		<a class="navbar-item" href="/charts">Charts</a>
-		<% if session.user_id then %>
-			<a class="navbar-item" href="/users/<%= session.user_id %>">
-				Profile
+<nav class="navbar has-background">
+	<div class="container">
+		<div class="navbar-brand">
+			<a class="navbar-item" href="/">
+				<svg class="header__logo has-text" version="1.0" xmlns="http://www.w3.org/2000/svg"
+					 width="80.000000pt" height="80.000000pt" viewBox="0 0 80.000000 80.000000"
+					 preserveAspectRatio="xMidYMid meet">
+
+					<g transform="translate(0.000000,80.000000) scale(0.100000,-0.100000)"
+					fill="currentColor" stroke="none">
+					<path d="M400 611 l0 -109 -63 5 c-51 4 -71 1 -103 -15 -54 -27 -101 -83 -110
+					-127 -10 -53 1 -124 23 -153 78 -104 207 -124 295 -44 62 56 68 79 68 257 0
+					85 4 155 8 155 26 0 84 -89 97 -147 6 -32 8 -33 57 -33 l50 0 -7 43 c-23 139
+					-135 250 -272 271 l-43 6 0 -109z"/>
+					</g>
+				</svg>
+				<strong class="navbar-item">soundsphere</strong>
 			</a>
-		<% else %>
-			<a class="navbar-item" href="/register">Register</a>
-			<a class="navbar-item" href="/login">Login</a>
-		<% end %>
-	</div>
-	<div class="navbar-end">
-		<div class="navbar-item dropdown is-active" x-data="{
-			setDataTheme(v) {
-				const html = document.querySelector('html')
-				html.setAttribute('data-theme', v)
-				localStorage.setItem('theme', v)
-			},
-		}">
-			<a class="navbar-item" href="#" @click="setDataTheme('light')">
-				<i class="fas fa-sun"></i>
+		</div>
+		<div class="navbar-start">
+			<div class="navbar-item has-dropdown is-hoverable">
+				<a class="navbar-link">Community</a>
+				<div class="navbar-dropdown">
+					<a class="navbar-item" href="/rankings">Rankings</a>
+					<a class="navbar-item" href="/leaderboards">Leaderboards</a>
+					<a class="navbar-item" href="/teams">Teams</a>
+				</div>
+			</div>
+			<div class="navbar-item has-dropdown is-hoverable">
+				<a class="navbar-link">Admin</a>
+				<div class="navbar-dropdown">
+					<a class="navbar-item" href="/difftables">Difftables</a>
+				</div>
+			</div>
+			<a class="navbar-item" href="/support">
+				<p>
+					<i class="fas fa-heart header__button-icon header__support-icon"></i>
+					Donate
+				</p>
 			</a>
-			<a class="navbar-item" href="#" @click="setDataTheme('dark')">
-				<i class="fas fa-moon"></i>
+			<a class="navbar-item" href="/download">
+				<p>
+					<i class="fas fa-download header__button-icon"></i>
+					Download
+				</p>
 			</a>
-			<a class="navbar-item" href="#" @click="setDataTheme('system')">
-				<i class="fas fa-desktop"></i>
-			</a>
+		</div>
+		<div class="navbar-end">
+			<div class="navbar-item has-dropdown is-hoverable" x-data="{
+				setDataTheme(v) {
+					const html = document.querySelector('html')
+					html.setAttribute('data-theme', v)
+					localStorage.setItem('theme', v)
+				},
+			}">
+				<a class="navbar-link"><p><i class="fas fa-palette header__button-icon"></i>Theme</p></a>
+				<div class="navbar-dropdown is-right">
+					<a class="navbar-item" href="#" @click="setDataTheme('light')">
+						<p><i class="fas fa-sun header__button-icon"></i>Light</p>
+					</a>
+					<a class="navbar-item" href="#" @click="setDataTheme('dark')">
+						<p><i class="fas fa-moon header__button-icon"></i>Dark</p>
+					</a>
+					<a class="navbar-item" href="#" @click="setDataTheme('system')">
+						<p><i class="fas fa-desktop header__button-icon"></i>OS Default</p>
+					</a>
+				</div>
+			</div>
+
+			<% if session.user_id then %>
+				<div class="navbar-item has-dropdown is-hoverable">
+					<a class="navbar-link is-arrowless">
+						<p>
+							<%= session_user.name %>
+						</p>
+						<img
+							class="header__avatar is-hidden-touch"
+							src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=128">
+						</img>
+					</a>
+					<div class="navbar-dropdown is-right">
+						<% local user_id = session.user_id %>
+						<a class="navbar-item" href="/users/<%= user_id %>">My profile</a>
+						<a class="navbar-item" href="/users/<%= user_id %>/teams">My teams</a>
+						<a class="navbar-item" href="/users/<%= user_id %>/sessions">Sessions</a>
+						<a class="navbar-item" href="/users/<%= user_id %>/settings">Settings</a>
+						<a class="navbar-item" hx-post="/logout">Log out</a>
+					</div>
+				</div>
+			<% else %>
+				<div class="navbar-item">
+					<div class="buttons">
+						<a class="button is-primary" href="/login">
+							<strong>Log in</strong>
+						</a>
+					</div>
+				</div>
+			<% end %>
 		</div>
 	</div>
 </nav>
