@@ -27,7 +27,7 @@ end
 %>
 <section class="hero">
 	<div class="hero-body">
-		<p class="title">Rankings</p>
+		<h1 class="title">Rankings</h1>
 		<p class="subtitle">Explore player ranks in various leaderboards.</p>
 	</div>
 </section>
@@ -178,7 +178,7 @@ end
 							<td class="rankings__table-left-cell rankings__table-flag-cell has-background">
 								<div class="rankings__table-flag fi-<%= user.flag %>"></div>
 							</td>
-							<td align="left" class="rankings_table-cell has-background"><%= user.username %></td>
+							<td align="left" class="has-background"><%= user.username %></td>
 							<% for _, v in ipairs(user.cellValues) do %>
 								<% if v.dimmed then %>
 									<td class="rankings__table-right-cell has-background has-text-grey"><%= v.label %></td>

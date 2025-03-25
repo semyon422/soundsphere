@@ -16,14 +16,23 @@
 		<title>soundsphere</title>
 		<style>
 			[x-cloak] { display: none !important; }
+
+			body {
+			  min-height: 100vh;
+			  margin: 0;
+			  display: grid;
+			  grid-template-rows: auto 1fr auto;
+			}
 		</style>
 	</head>
 	<body hx-boost="true">
+		<%- view:render("sea/shared/http/header.etlua") %>
 		<main class="container">
-			<%- view:render("sea/shared/http/header.etlua") %>
 			<%- inner %>
 		</main>
 		<footer class="footer">
+			<div class="content">
+			</div>
 		</footer>
 		<script>
 			const theme = localStorage.getItem("theme");
