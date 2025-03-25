@@ -7,6 +7,7 @@ local StyleResource = IResource + {}
 StyleResource.uri = "/style.css"
 
 local files = {
+	"sea/shared/http/style.css",
 	"sea/shared/http/header.css",
 	"sea/access/http/users.css",
 	"sea/leaderboards/http/rankings.css"

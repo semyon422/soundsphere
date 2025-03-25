@@ -1,0 +1,12 @@
+.body__container {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	margin: 0;
+}
+
+.center-form-vertical {
+	display: grid;
+	max-height: 80vh;
+	grid-template-rows: repeat(3, 1fr);
+}
