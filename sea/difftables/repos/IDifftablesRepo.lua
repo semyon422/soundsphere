@@ -15,6 +15,12 @@ function IDifftablesRepo:getDifftable(id)
 	return {}
 end
 
+---@param name string
+---@return sea.Difftable?
+function IDifftablesRepo:getDifftableByName(name)
+	return {}
+end
+
 ---@param difftable sea.Difftable
 ---@return sea.Difftable
 function IDifftablesRepo:createDifftable(difftable)
@@ -25,6 +31,12 @@ end
 ---@return sea.Difftable
 function IDifftablesRepo:updateDifftable(difftable)
 	return difftable
+end
+
+---@param id integer
+---@return sea.Difftable?
+function IDifftablesRepo:deleteDifftable(id)
+	return {}
 end
 
 --------------------------------------------------------------------------------

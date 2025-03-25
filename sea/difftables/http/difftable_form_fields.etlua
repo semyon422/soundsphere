@@ -1,0 +1,22 @@
+<% local difftable = difftable or {} %>
+
+<div class="field">
+	<label class="label">Name</label>
+	<div class="control">
+		<input class="input" type="text" name="name" required value="<%= difftable.name or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Symbol</label>
+	<div class="control">
+		<input class="input" type="text" name="symbol" required value="<%= difftable.symbol or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Description</label>
+	<div class="control">
+		<textarea class="textarea" name="description"><%= difftable.description or "" %></textarea>
+	</div>
+</div>

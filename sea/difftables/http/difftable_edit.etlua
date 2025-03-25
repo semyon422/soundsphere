@@ -1,1 +1,33 @@
-edit
+<div class="section">
+
+<div class="columns">
+	<div class="column"></div>
+	<div class="column">
+		<form action="/difftables/<%= difftable.id %>/edit" method="post">
+			<h3 class="title is-3">Edit difftable</h3>
+
+			<%- view:render("sea/difftables/http/difftable_form_fields.etlua") %>
+
+			<div class="field is-grouped">
+				<div class="control">
+					<button class="button is-link">Update</button>
+				</div>
+				<div class="control">
+					<a class="button is-link is-light" href="/difftables/<%= difftable.id %>">Cancel</a>
+				</div>
+				<div class="control">
+					<button
+						class="button is-danger"
+						hx-delete="/difftables/<%= difftable.id %>"
+						hx-confirm="Delete difftable?"
+						hx-params="none"
+					>Delete</button>
+				</div>
+				<%- view:render("sea/shared/http/field_errors.etlua") %>
+			</div>
+		</form>
+	</div>
+	<div class="column"></div>
+</div>
+
+</div>

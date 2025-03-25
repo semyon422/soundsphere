@@ -1,3 +1,23 @@
-Difftable: <%= difftable.name %>
+Difftable: <%= difftable.name %> (<%= difftable.symbol %>)
 <br>
 <a href="/difftables/<%= difftable.id %>/edit">Edit</a>
+<br>
+Description: <%= difftable.description %>
+
+<br>
+Charts
+
+<table class="table">
+	<tr>
+		<th>Title</th>
+		<th>Level</th>
+		<th>Added by</th>
+		<th>Added at</th>
+	</tr>
+	<tr>
+		<td>difftable_chartmetas.chartmeta.title</td>
+		<td>difftable_chartmetas.level</td>
+		<td>difftable_chartmetas.user.name</td>
+		<td>difftable_chartmetas.created_at</td>
+	</tr>
+</table>

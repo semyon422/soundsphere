@@ -29,19 +29,68 @@ function Difftables:getDifftable(id)
 end
 
 ---@param user sea.User
----@param name string
+---@param dt_values sea.Difftable
 ---@return sea.Difftable?
 ---@return string?
-function Difftables:create(user, name)
+function Difftables:create(user, dt_values)
 	local can, err = self.difftables_access:canManage(user)
 	if not can then
 		return nil, err
 	end
 
-	local difftable = Difftable()
-	difftable.name = name
+	local dt = Difftable()
+	dt.name = dt_values.name
+	dt.description = dt_values.description
+	dt.symbol = dt_values.symbol
+	dt.created_at = os.time()
 
-	return self.difftables_repo:createDifftable(difftable)
+	return self.difftables_repo:createDifftable(dt)
+end
+
+---@param user sea.User
+---@param id integer
+---@param dt_values sea.Difftable
+---@return sea.Difftable?
+---@return string?
+function Difftables:update(user, id, dt_values)
+	local can, err = self.difftables_access:canManage(user)
+	if not can then
+		return nil, err
+	end
+
+	local dt = self.difftables_repo:getDifftableByName(dt_values.name)
+	if dt and dt.id ~= id then
+		return nil, "name_taken"
+	end
+
+	dt = dt or self.difftables_repo:getDifftable(id)
+
+	if not dt then
+		return nil, "not_found"
+	end
+
+	dt.name = dt_values.name
+	dt.description = dt_values.description
+	dt.symbol = dt_values.symbol
+
+	self.difftables_repo:updateDifftable(dt)
+
+	return dt
+end
+
+---@param user sea.User
+---@param id integer
+---@return true?
+---@return string?
+function Difftables:delete(user, id)
+	local can, err = self.difftables_access:canManage(user)
+	if not can then
+		return nil, err
+	end
+
+	self.difftables_repo:deleteDifftable(id)
+
+	return true
 end
 
 ---@param user sea.User

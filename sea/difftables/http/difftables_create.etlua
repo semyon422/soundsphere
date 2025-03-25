@@ -1,1 +1,22 @@
-create
+<div class="section">
+
+<div class="columns">
+	<div class="column"></div>
+	<div class="column">
+		<form action="/difftables/create" method="post">
+			<h3 class="title is-3">Create difftable</h3>
+
+			<%- view:render("sea/difftables/http/difftable_form_fields.etlua") %>
+
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">Create</button>
+				</div>
+				<%- view:render("sea/shared/http/field_errors.etlua") %>
+			</div>
+		</form>
+	</div>
+	<div class="column"></div>
+</div>
+
+</div>

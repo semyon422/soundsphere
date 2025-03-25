@@ -26,4 +26,18 @@ function DifftableResource:GET(req, res, ctx)
 	self.views:render_send(res, "sea/difftables/http/difftable.etlua", ctx, true)
 end
 
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function DifftableResource:DELETE(req, res, ctx)
+	local difftable_id = tonumber(ctx.path_params.difftable_id)
+
+	if difftable_id then
+		self.difftables:delete(ctx.session_user, difftable_id)
+	end
+
+	res.status = 302
+	res.headers:set("HX-Location", "/difftables")
+end
+
 return DifftableResource

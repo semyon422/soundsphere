@@ -20,6 +20,12 @@ function DifftablesRepo:getDifftable(id)
 	return self.models.difftables:find({id = assert(id)})
 end
 
+---@param name string
+---@return sea.Difftable?
+function DifftablesRepo:getDifftableByName(name)
+	return self.models.difftables:find({name = assert(name)})
+end
+
 ---@param difftable sea.Difftable
 ---@return sea.Difftable
 function DifftablesRepo:createDifftable(difftable)
@@ -30,6 +36,12 @@ end
 ---@return sea.Difftable
 function DifftablesRepo:updateDifftable(difftable)
 	return self.models.difftables:update(difftable, {id = assert(difftable.id)})[1]
+end
+
+---@param id integer
+---@return sea.Difftable?
+function DifftablesRepo:deleteDifftable(id)
+	return self.models.difftables:delete({id = assert(id)})[1]
 end
 
 --------------------------------------------------------------------------------
