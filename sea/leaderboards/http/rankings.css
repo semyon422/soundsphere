@@ -11,7 +11,7 @@
 }
 
 .rankings__table tr.has-text:hover td {
-  background-color: var(--bulma-border);
+	background-color: var(--bulma-border);
 }
 
 .rankings__table td:nth-child(2) {
@@ -40,8 +40,8 @@
 }
 
 .rankings__table-flag {
-	width: 40px;
-	height: 30px;
+	width: 32px;
+	height: 24px;
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
