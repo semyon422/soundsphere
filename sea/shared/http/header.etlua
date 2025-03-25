@@ -75,10 +75,7 @@
 						<p>
 							<%= session_user.name %>
 						</p>
-						<img
-							class="header__avatar is-hidden-touch"
-							src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=128">
-						</img>
+						<img class="header__avatar is-hidden-touch" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=128">
 					</a>
 					<div class="navbar-dropdown is-right">
 						<% local user_id = session.user_id %>
