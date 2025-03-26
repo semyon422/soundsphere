@@ -1,5 +1,6 @@
 .user__container {
 	margin-top: 20px;
+	margin-bottom: 20px;
 }
 
 .user__table-flag {
@@ -12,6 +13,9 @@
 }
 
 .user__avatar {
+	display: block;
+	margin-left:auto;
+	margin-right:auto;
 	aspect-ratio: 1;
 	border-radius: 10%;
 }
@@ -42,4 +46,10 @@
 .user__key-value {
 	display: flex;
 	justify-content: space-between;
+}
+
+.user__options-menu-touch {
+	margin-left: 8px;
+	margin-right: 8px;
+	margin-bottom: 200px;
 }
