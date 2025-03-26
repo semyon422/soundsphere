@@ -18,6 +18,7 @@ end
 ---@param ctx sea.RequestContext
 function UserResource:GET(req, res, ctx)
 	ctx.user = self.users:getUser(tonumber(ctx.path_params.user_id))
+	ctx.ignore_main_container = true
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 

@@ -21,13 +21,16 @@
 	<body hx-boost="true">
 		<%- view:render("sea/shared/http/header.etlua") %>
 
-		<main class="container">
+		<% if ignore_main_container then %>
 			<%- inner %>
-		</main>
+		<% else %>
+			<main class="container">
+				<%- inner %>
+			</main>
+		<% end %>
 
 		<footer class="footer">
-			<div class="content">
-			</div>
+			<div class="content"></div>
 		</footer>
 
 		<script>

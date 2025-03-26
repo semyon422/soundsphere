@@ -1,6 +1,6 @@
 <% local session = session or {} %>
 
-<nav class="navbar has-background">
+<nav class="navbar">
 	<div class="container">
 		<div class="navbar-brand">
 			<a class="navbar-item" href="/">
