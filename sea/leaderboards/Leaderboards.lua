@@ -1,7 +1,9 @@
 local class = require("class")
+local table_util = require("table_util")
 local LeaderboardsAccess = require("sea.leaderboards.access.LeaderboardsAccess")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardUser = require("sea.leaderboards.LeaderboardUser")
+local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 
 ---@class sea.Leaderboards
@@ -101,7 +103,6 @@ local function safe_copy_lb(src, dst)
 	dst.allow_free_healths = not not src.allow_free_healths
 	dst.mode = src.mode
 	dst.rate = src.rate
-	dst.difftables = src.difftables
 	dst.chartmeta_inputmode = src.chartmeta_inputmode
 	dst.chartdiff_inputmode = src.chartdiff_inputmode
 end
@@ -127,6 +128,7 @@ function Leaderboards:create(user, lb_values)
 	lb.created_at = os.time()
 
 	lb = self.leaderboards_repo:createLeaderboard(lb)
+	self:updateLeaderboardDifftables(lb.id, lb_values.leaderboard_difftables)
 
 	return lb
 end
@@ -156,6 +158,7 @@ function Leaderboards:update(user, id, lb_values)
 	safe_copy_lb(lb_values, lb)
 
 	self.leaderboards_repo:updateLeaderboard(lb)
+	self:updateLeaderboardDifftables(id, lb_values.leaderboard_difftables)
 
 	return lb
 end
@@ -173,6 +176,33 @@ function Leaderboards:delete(user, id)
 	self.leaderboards_repo:deleteLeaderboard(id)
 
 	return true
+end
+
+---@param leaderboard_id integer
+---@param lb_dts sea.LeaderboardDifftable[]
+---@return true?
+---@return string?
+function Leaderboards:updateLeaderboardDifftables(leaderboard_id, lb_dts)
+	local leaderboard_difftables = self.leaderboards_repo:getLeaderboardDifftables(leaderboard_id)
+
+	local function get_id(ld) return ld.difftable_id end
+	local new_difftable_ids, old_difftable_ids = table_util.array_update(
+		lb_dts,
+		leaderboard_difftables,
+		get_id,
+		get_id
+	)
+
+	for _, difftable_id in ipairs(old_difftable_ids) do
+		self.leaderboards_repo:deleteLeaderboardDifftable(leaderboard_id, difftable_id)
+	end
+
+	for _, difftable_id in ipairs(new_difftable_ids) do
+		local lb_dt = LeaderboardDifftable()
+		lb_dt.leaderboard_id = leaderboard_id
+		lb_dt.difftable_id = difftable_id
+		self.leaderboards_repo:createLeaderboardDifftable(lb_dt)
+	end
 end
 
 return Leaderboards

@@ -2,6 +2,7 @@ local http_util = require("web.http.util")
 local json = require("web.json")
 local IResource = require("web.framework.IResource")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 
 ---@class sea.LeaderboardsCreateResource: web.IResource
 ---@operator call: sea.LeaderboardsCreateResource
@@ -20,6 +21,7 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function LeaderboardsCreateResource:GET(req, res, ctx)
+	ctx.leaderboard = Leaderboard()
 	self.views:render_send(res, "sea/leaderboards/http/leaderboards_create.etlua", ctx, true)
 end
 
@@ -54,9 +56,19 @@ function LeaderboardsCreateResource:POST(req, res, ctx)
 	lb.allow_free_healths = body_params.allow_free_healths == "on"
 	lb.mode = body_params.mode
 	lb.rate = json.decode_safe(body_params.rate)
-	lb.difftables = json.decode_safe(body_params.difftables)
 	lb.chartmeta_inputmode = json.decode_safe(body_params.chartmeta_inputmode)
 	lb.chartdiff_inputmode = json.decode_safe(body_params.chartdiff_inputmode)
+
+	local difftable_ids = json.decode_safe(body_params.difftable_ids)
+	if type(difftable_ids) ~= "table" then
+		difftable_ids = {}
+	end
+	---@cast difftable_ids integer[]
+	for _, id in ipairs(difftable_ids) do
+		local lb_dt = LeaderboardDifftable()
+		lb_dt.difftable_id = id
+		table.insert(lb.leaderboard_difftables, lb_dt)
+	end
 
 	ctx.leaderboard = lb
 

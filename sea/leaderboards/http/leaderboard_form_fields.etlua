@@ -5,8 +5,6 @@
 <% local Result = require("sea.chart.Result") %>
 <% local Gamemode = require("sea.chart.Gamemode") %>
 
-<% local leaderboard = leaderboard or {} %>
-
 <div class="field">
 	<label class="label">Name</label>
 	<div class="control">
@@ -186,13 +184,6 @@
 </div>
 
 <div class="field">
-	<label class="label">Difftables integer[]</label>
-	<div class="control">
-		<input class="input" type="text" name="difftables" value="<%= json.encode(leaderboard.difftables or {}) %>">
-	</div>
-</div>
-
-<div class="field">
 	<label class="label">Chartmeta inputmode string[]</label>
 	<div class="control">
 		<input class="input" type="text" name="chartmeta_inputmode" value="<%= json.encode(leaderboard.chartmeta_inputmode or {}) %>">
@@ -203,5 +194,19 @@
 	<label class="label">Chartdiff inputmode string[]</label>
 	<div class="control">
 		<input class="input" type="text" name="chartdiff_inputmode" value="<%= json.encode(leaderboard.chartdiff_inputmode or {}) %>">
+	</div>
+</div>
+
+<%
+local difftable_ids = {}
+for _, lb_dt in ipairs(leaderboard.leaderboard_difftables) do
+	table.insert(difftable_ids, lb_dt.difftable_id)
+end
+%>
+
+<div class="field">
+	<label class="label">Difftable IDs integer[]</label>
+	<div class="control">
+		<input class="input" type="text" name="difftable_ids" value="<%= json.encode(difftable_ids) %>">
 	</div>
 </div>

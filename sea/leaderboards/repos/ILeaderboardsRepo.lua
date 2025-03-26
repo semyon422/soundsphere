@@ -79,4 +79,25 @@ function ILeaderboardsRepo:getLeaderboardUserRank(lb_user)
 	return 0
 end
 
+--------------------------------------------------------------------------------
+
+---@param leaderboard_id integer
+---@return sea.LeaderboardDifftable[]
+function ILeaderboardsRepo:getLeaderboardDifftables(leaderboard_id)
+	return {}
+end
+
+---@param leaderboard_difftable sea.LeaderboardDifftable
+---@return sea.LeaderboardDifftable
+function ILeaderboardsRepo:createLeaderboardDifftable(leaderboard_difftable)
+	return {}
+end
+
+---@param leaderboard_id integer
+---@param difftable_id integer
+---@return sea.LeaderboardDifftable
+function ILeaderboardsRepo:deleteLeaderboardDifftable(leaderboard_id, difftable_id)
+	return {}
+end
+
 return ILeaderboardsRepo

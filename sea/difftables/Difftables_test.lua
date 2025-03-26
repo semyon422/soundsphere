@@ -1,4 +1,5 @@
 local Difftables = require("sea.difftables.Difftables")
+local Difftable = require("sea.difftables.Difftable")
 local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
@@ -37,7 +38,12 @@ end
 function test.basic(t)
 	local ctx = create_test_ctx()
 
-	local difftable, err = ctx.difftables:create(ctx.user, "Difftable")
+	local dt_values = Difftable()
+	dt_values.name = "Difftable"
+	dt_values.description = "test"
+	dt_values.symbol = "*"
+
+	local difftable, err = ctx.difftables:create(ctx.user, dt_values)
 	if not t:assert(difftable, err) then
 		return
 	end

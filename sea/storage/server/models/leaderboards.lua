@@ -31,4 +31,9 @@ leaderboards.types = {
 	allow_free_healths = "boolean",
 }
 
+leaderboards.relations = {
+	leaderboard_difftables = {has_many = "leaderboard_difftables", key = "leaderboard_id"},
+	leaderboard_users = {has_many = "leaderboard_users", key = "leaderboard_id"},
+}
+
 return leaderboards

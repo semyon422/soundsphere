@@ -13,7 +13,7 @@ end
 ---@return sea.User[]
 function UsersRepo:getUsers()
 	local users = self.models.users:select()
-	relations.preload(self.models.users, users, "user_roles")
+	self.models.users:preload(users, "user_roles")
 	return users
 end
 
@@ -21,7 +21,7 @@ end
 ---@return sea.User?
 function UsersRepo:getUser(id)
 	local user = self.models.users:find({id = assert(id)})
-	relations.preload(self.models.users, {user}, "user_roles")
+	self.models.users:preload({user}, "user_roles")
 	return user
 end
 

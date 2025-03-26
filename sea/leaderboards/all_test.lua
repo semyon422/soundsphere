@@ -3,6 +3,7 @@ local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
 local Timings = require("sea.chart.Timings")
@@ -31,7 +32,8 @@ local function create_test_ctx()
 	leaderboard.name = "Leaderboard 1"
 
 	local leaderboards = Leaderboards(leaderboards_repo)
-	local leaderboard, err = leaderboards:create(user, leaderboard)
+	local leaderboard, err = assert(leaderboards:create(user, leaderboard))
+	leaderboard = leaderboards:getLeaderboard(leaderboard.id)
 
 	assert(leaderboard, err)
 
@@ -42,6 +44,11 @@ local function create_test_ctx()
 		leaderboard = leaderboard,
 		leaderboards = leaderboards,
 	}
+end
+
+local function lb_update_select(ctx)
+	ctx.leaderboards:update(ctx.user, ctx.leaderboard.id, ctx.leaderboard)
+	ctx.leaderboard = ctx.leaderboards:getLeaderboard(ctx.leaderboard.id)
 end
 
 ---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
@@ -102,13 +109,13 @@ function test.nearest_filter_single(t)
 	create_chartplay(ctx, {rating = 2, nearest = false, hash = ""})
 
 	ctx.leaderboard.nearest = "any"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 1)
 
 	ctx.leaderboard.nearest = "disabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -116,7 +123,7 @@ function test.nearest_filter_single(t)
 	end
 
 	ctx.leaderboard.nearest = "enabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -132,13 +139,13 @@ function test.nearest_filter_multiple(t)
 	create_chartplay(ctx, {rating = 2, nearest = false, hash = "2"})
 
 	ctx.leaderboard.nearest = "any"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.nearest = "disabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -146,7 +153,7 @@ function test.nearest_filter_multiple(t)
 	end
 
 	ctx.leaderboard.nearest = "enabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -169,7 +176,7 @@ function test.result_filter(t)
 
 	for _, c in ipairs(_chartplays) do
 		ctx.leaderboard.result = c.result
-		ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+		lb_update_select(ctx)
 
 		local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 		if t:eq(#chartplays, 1) then
@@ -186,13 +193,13 @@ function test.custom_filter(t)
 	create_chartplay(ctx, {rating = 2, custom = true, hash = "2"})
 
 	ctx.leaderboard.allow_custom = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.allow_custom = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -208,13 +215,13 @@ function test.pause_filter(t)
 	create_chartplay(ctx, {rating = 2, pause_count = 1, hash = "2"})
 
 	ctx.leaderboard.allow_pause = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.allow_pause = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -230,13 +237,13 @@ function test.reorder_filter(t)
 	create_chartplay(ctx, {rating = 2, columns_order = {4, 3, 2, 1}, hash = "2"})
 
 	ctx.leaderboard.allow_reorder = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.allow_reorder = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -252,13 +259,13 @@ function test.modifiers_filter(t)
 	create_chartplay(ctx, {rating = 2, modifiers = {"any data here"}, hash = "2"})
 
 	ctx.leaderboard.allow_modifiers = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.allow_modifiers = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -274,13 +281,13 @@ function test.tap_only_filter(t)
 	create_chartplay(ctx, {rating = 2, tap_only = true, hash = "2"})
 
 	ctx.leaderboard.allow_tap_only = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
 
 	ctx.leaderboard.allow_tap_only = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -302,7 +309,7 @@ function test.free_timings_filter(t)
 	create_chartplay(ctx, {rating = 2, timings = Timings("simple", 200)})
 
 	ctx.leaderboard.allow_free_timings = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -310,7 +317,7 @@ function test.free_timings_filter(t)
 	end
 
 	ctx.leaderboard.allow_free_timings = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -332,7 +339,7 @@ function test.free_healths_filter(t)
 	create_chartplay(ctx, {rating = 2, healths = Healths("simple", 20)})
 
 	ctx.leaderboard.allow_free_healths = true
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -340,7 +347,7 @@ function test.free_healths_filter(t)
 	end
 
 	ctx.leaderboard.allow_free_healths = false
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -362,7 +369,7 @@ function test.rate_filter(t)
 	create_chartplay(ctx, {rating = 3, rate = 1.2})
 
 	ctx.leaderboard.rate = "any"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -370,7 +377,7 @@ function test.rate_filter(t)
 	end
 
 	ctx.leaderboard.rate = {1, 1.1}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -378,7 +385,7 @@ function test.rate_filter(t)
 	end
 
 	ctx.leaderboard.rate = {min = 0.9, max = 1.15}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -413,13 +420,13 @@ function test.chartmeta_inputmode_filter(t)
 	create_chartplay(ctx, {rating = 3, hash = "3"})
 
 	ctx.leaderboard.chartmeta_inputmode = {}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 3)
 
 	ctx.leaderboard.chartmeta_inputmode = {"4key", "7key"}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
@@ -461,13 +468,13 @@ function test.chartdiff_inputmode_filter(t)
 	create_chartplay(ctx, {rating = 3, hash = "3"})
 
 	ctx.leaderboard.chartdiff_inputmode = {}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 3)
 
 	ctx.leaderboard.chartdiff_inputmode = {"4key", "7key"}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	t:eq(#chartplays, 2)
@@ -493,8 +500,8 @@ function test.difftable_filter_single(t)
 		level = 0,
 	})
 
-	ctx.leaderboard.difftables = {difftable.id}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable.id}}
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -527,8 +534,8 @@ function test.difftable_filter_multiple(t)
 		level = 2,
 	})
 
-	ctx.leaderboard.difftables = {difftable_1.id}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable_1.id}}
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -536,8 +543,8 @@ function test.difftable_filter_multiple(t)
 		t:eq(chartplays[1].difftable_level, 1)
 	end
 
-	ctx.leaderboard.difftables = {difftable_2.id}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable_2.id}}
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -545,8 +552,11 @@ function test.difftable_filter_multiple(t)
 		t:eq(chartplays[1].difftable_level, 2)
 	end
 
-	ctx.leaderboard.difftables = {difftable_1.id, difftable_2.id}
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	ctx.leaderboard.leaderboard_difftables = {
+		{id = 1, leaderboard_id = 1, difftable_id = difftable_1.id},
+		{id = 1, leaderboard_id = 1, difftable_id = difftable_2.id},
+	}
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 1) then
@@ -563,7 +573,7 @@ function test.rating_calc_filter(t)
 	create_chartplay(ctx, {rating = 2, rating_pp = 1, hash = "2"})
 
 	ctx.leaderboard.rating_calc = "enps"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 2) then
@@ -572,7 +582,7 @@ function test.rating_calc_filter(t)
 	end
 
 	ctx.leaderboard.rating_calc = "pp"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 	if t:eq(#chartplays, 2) then
@@ -591,19 +601,19 @@ function test.check_chartplay(t)
 	local cp2 = create_chartplay(ctx, {rating = 2, nearest = false, hash = ""})
 
 	ctx.leaderboard.nearest = "any"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	t:assert(ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp1))
 	t:assert(ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp2))
 
 	ctx.leaderboard.nearest = "disabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	t:assert(not ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp1))
 	t:assert(ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp2))
 
 	ctx.leaderboard.nearest = "enabled"
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	t:assert(ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp1))
 	t:assert(not ctx.leaderboards_repo:checkChartplay(ctx.leaderboard, cp2))
@@ -618,7 +628,7 @@ function test.total_rating(t)
 
 	ctx.leaderboard.scores_comb = "avg"
 	ctx.leaderboard.scores_comb_count = 10
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	ctx.leaderboards:addChartplay(cp1)
 
@@ -634,7 +644,7 @@ function test.rank(t)
 
 	ctx.leaderboard.scores_comb = "avg"
 	ctx.leaderboard.scores_comb_count = 1
-	ctx.leaderboards_repo:updateLeaderboard(ctx.leaderboard)
+	lb_update_select(ctx)
 
 	local cp1 = create_chartplay(ctx, {rating = 1, user_id = 1})
 	local cp2 = create_chartplay(ctx, {rating = 2, user_id = 2})
@@ -657,6 +667,37 @@ function test.rank(t)
 
 	t:eq(lb_user_2.total_rating, 2)
 	t:eq(lb_user_2.rank, 1)
+end
+
+---@param t testing.T
+function test.difftables_create(t)
+	local ctx = create_test_ctx()
+
+	local lb_dt_1 = LeaderboardDifftable()
+	lb_dt_1.difftable_id = 1
+	local lb_dt_2 = LeaderboardDifftable()
+	lb_dt_2.difftable_id = 2
+
+	ctx.leaderboard.leaderboard_difftables = {lb_dt_1, lb_dt_2}
+
+	ctx.leaderboards:update(ctx.user, ctx.leaderboard.id, ctx.leaderboard)
+	ctx.leaderboard = ctx.leaderboards:getLeaderboard(ctx.leaderboard.id)
+
+	t:eq(#ctx.leaderboard.leaderboard_difftables, 2)
+	t:eq(ctx.leaderboard.leaderboard_difftables[1].difftable_id, 1)
+	t:eq(ctx.leaderboard.leaderboard_difftables[2].difftable_id, 2)
+
+	local lb_dt_3 = LeaderboardDifftable()
+	lb_dt_3.difftable_id = 3
+
+	ctx.leaderboard.leaderboard_difftables = {lb_dt_2, lb_dt_3}
+
+	ctx.leaderboards:update(ctx.user, ctx.leaderboard.id, ctx.leaderboard)
+	ctx.leaderboard = ctx.leaderboards:getLeaderboard(ctx.leaderboard.id)
+
+	t:eq(#ctx.leaderboard.leaderboard_difftables, 2)
+	t:eq(ctx.leaderboard.leaderboard_difftables[1].difftable_id, 2)
+	t:eq(ctx.leaderboard.leaderboard_difftables[2].difftable_id, 3)
 end
 
 return test

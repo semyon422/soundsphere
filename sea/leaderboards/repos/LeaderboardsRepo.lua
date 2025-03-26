@@ -1,3 +1,4 @@
+local relations = require("rdb.relations")
 local Result = require("sea.chart.Result")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
@@ -13,13 +14,17 @@ end
 
 ---@return sea.Leaderboard[]
 function LeaderboardsRepo:getLeaderboards()
-	return self.models.leaderboards:select()
+	local lbs = self.models.leaderboards:select()
+	self.models.leaderboards:preload(lbs, "leaderboard_difftables")
+	return lbs
 end
 
 ---@param id integer
 ---@return sea.Leaderboard?
 function LeaderboardsRepo:getLeaderboard(id)
-	return self.models.leaderboards:find({id = assert(id)})
+	local lb = self.models.leaderboards:find({id = assert(id)})
+	self.models.leaderboards:preload({lb}, "leaderboard_difftables")
+	return lb
 end
 
 ---@param name string
@@ -105,9 +110,12 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		conds.chartdiff_inputmode__in = chartdiff_inputmode
 	end
 
-	local difftables = lb.difftables
-	if difftables[1] then
-		conds.difftable_id__in = difftables
+	local difftable_ids = {}
+	for _, lb_dt in ipairs(lb.leaderboard_difftables) do
+		table.insert(difftable_ids, lb_dt.difftable_id)
+	end
+	if difftable_ids[1] then
+		conds.difftable_id__in = difftable_ids
 	end
 
 	local rating_column = RatingCalc:column(lb.rating_calc)
@@ -171,6 +179,30 @@ function LeaderboardsRepo:getLeaderboardUserRank(lb_user)
 		leaderboard_id = assert(lb_user.leaderboard_id),
 		total_rating__gte = assert(lb_user.total_rating),
 	})
+end
+
+--------------------------------------------------------------------------------
+
+---@param leaderboard_id integer
+---@return sea.LeaderboardDifftable[]
+function LeaderboardsRepo:getLeaderboardDifftables(leaderboard_id)
+	return self.models.leaderboard_difftables:select({leaderboard_id = assert(leaderboard_id)})
+end
+
+---@param leaderboard_difftable sea.LeaderboardDifftable
+---@return sea.LeaderboardDifftable
+function LeaderboardsRepo:createLeaderboardDifftable(leaderboard_difftable)
+	return self.models.leaderboard_difftables:create(leaderboard_difftable)
+end
+
+---@param leaderboard_id integer
+---@param difftable_id integer
+---@return sea.LeaderboardDifftable
+function LeaderboardsRepo:deleteLeaderboardDifftable(leaderboard_id, difftable_id)
+	return self.models.leaderboard_difftables:delete({
+		leaderboard_id = assert(leaderboard_id),
+		difftable_id = assert(difftable_id),
+	})[1]
 end
 
 return LeaderboardsRepo

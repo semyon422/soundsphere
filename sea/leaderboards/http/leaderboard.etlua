@@ -73,9 +73,16 @@
 	</tr>
 </table>
 
+<%
+local difftable_ids = {}
+for _, lb_dt in ipairs(leaderboard.leaderboard_difftables) do
+	table.insert(difftable_ids, lb_dt.difftable_id)
+end
+%>
+
 <table class="table">
 	<tr>
-		TODO: Difftables
+		Difftables: <%= table.concat(difftable_ids, ", ") %>
 	</tr>
 </table>
 

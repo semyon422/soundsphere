@@ -215,6 +215,13 @@ CREATE TABLE IF NOT EXISTS `leaderboard_users` (
 	UNIQUE(`leaderboard_id`, `user_id`)
 );
 
+CREATE TABLE IF NOT EXISTS `leaderboard_difftables` (
+	`id` INTEGER PRIMARY KEY,
+	`leaderboard_id` INTEGER,
+	`difftable_id` INTEGER,
+	UNIQUE(`leaderboard_id`, `difftable_id`)
+);
+
 CREATE TABLE IF NOT EXISTS `difftables` (
 	`id` INTEGER PRIMARY KEY,
 	`name` TEXT,

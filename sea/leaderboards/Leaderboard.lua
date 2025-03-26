@@ -29,9 +29,9 @@ local Gamemode = require("sea.chart.Gamemode")
 ---@field allow_free_healths boolean
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
----@field difftables integer[]
 ---@field chartmeta_inputmode string[] allowed inputmodes, empty = allow all
 ---@field chartdiff_inputmode string[] allowed inputmodes, empty = allow all
+---@field leaderboard_difftables sea.LeaderboardDifftable[]
 local Leaderboard = class()
 
 function Leaderboard:new()
@@ -52,9 +52,9 @@ function Leaderboard:new()
 	self.allow_free_healths = true
 	self.mode = "mania"
 	self.rate = "any"
-	self.difftables = {}
 	self.chartmeta_inputmode = {}
 	self.chartdiff_inputmode = {}
+	self.leaderboard_difftables = {}
 end
 
 ---@param rate any
@@ -70,7 +70,7 @@ local function is_valid_rate(rate)
 		end
 	elseif next(rate) then
 		for k, v in pairs(rate) do
-			if k ~= "min" or k ~= "max" or type(v) ~= "number" then
+			if k ~= "min" and k ~= "max" or type(v) ~= "number" then
 				return false
 			end
 		end
@@ -81,6 +81,25 @@ end
 ---@param v any
 local function is_id(v)
 	return type(v) == "number" and v == math.floor(v) and v > 0
+end
+
+---@param lb_dt any
+local function is_leaderboard_difftable(lb_dt)
+	if type(lb_dt) ~= "table" then
+		return false
+	end
+	---@cast lb_dt {[any]: [any]}
+	local c = 0
+	for k, v in pairs(lb_dt) do
+		c = c + 1
+		if k ~= "difftable_id" or not is_id(v) then
+			return false
+		end
+	end
+	if c ~= 1 then
+		return false
+	end
+	return true
 end
 
 ---@return true?
@@ -142,14 +161,15 @@ function Leaderboard:validate()
 	if not is_valid_rate(self.rate) then
 		table.insert(errs, "invalid rate")
 	end
-	if not table_util.is_array_of(self.difftables, is_id) then
-		table.insert(errs, "invalid difftables")
-	end
 	if not table_util.is_array_of(self.chartmeta_inputmode, "string") then
 		table.insert(errs, "invalid chartmeta_inputmode")
 	end
 	if not table_util.is_array_of(self.chartdiff_inputmode, "string") then
 		table.insert(errs, "invalid chartdiff_inputmode")
+	end
+
+	if not table_util.is_array_of(self.leaderboard_difftables, is_leaderboard_difftable) then
+		table.insert(errs, "invalid leaderboard_difftables")
 	end
 
 	if #errs > 0 then

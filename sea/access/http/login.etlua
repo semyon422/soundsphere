@@ -41,11 +41,7 @@ function onSubmit(token) {
 										data-action="login"
 									>Log in</button>
 								</div>
-								<p class="help is-danger">
-									<% for _, err in ipairs(errors or {}) do %>
-										<%= err %><br>
-									<% end %>
-								</p>
+								<%- view:render("sea/shared/http/field_errors.etlua") %>
 							</div>
 						</div>
 					</form>
