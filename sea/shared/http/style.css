@@ -5,6 +5,10 @@ body {
 	margin: 0;
 }
 
+.icon-margin-right {
+	margin-right: 5px;
+}
+
 .center-form-vertical {
 	display: grid;
 	max-height: 80vh;

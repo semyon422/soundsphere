@@ -1,0 +1,45 @@
+.user__container {
+	margin-top: 20px;
+}
+
+.user__table-flag {
+	width: 24px;
+	height: 18px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	border-radius: 6px;
+}
+
+.user__avatar {
+	aspect-ratio: 1;
+	border-radius: 10%;
+}
+
+.user__username-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.user__username-container *:first-child {
+	margin-right: 6px;
+}
+
+.user__username-cell {
+	display: inline-block;
+}
+
+.user__separator {
+	display: block;
+	height: 1px;
+	border: 0;
+	border-top: 1px solid #ccc;
+	margin: 1em 0;
+	padding: 0;
+}
+
+.user__key-value {
+	display: flex;
+	justify-content: space-between;
+}

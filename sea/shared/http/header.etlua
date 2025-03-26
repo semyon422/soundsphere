@@ -36,13 +36,13 @@
 			</div>
 			<a class="navbar-item" href="/support">
 				<p>
-					<i class="fas fa-heart header__button-icon header__support-icon"></i>
+					<i class="fas fa-heart icon-margin-right header__support-icon"></i>
 					Donate
 				</p>
 			</a>
 			<a class="navbar-item" href="/download">
 				<p>
-					<i class="fas fa-download header__button-icon"></i>
+					<i class="fas fa-download icon-margin-right"></i>
 					Download
 				</p>
 			</a>
@@ -55,16 +55,16 @@
 					localStorage.setItem('theme', v)
 				},
 			}">
-				<a class="navbar-link"><p><i class="fas fa-palette header__button-icon"></i>Theme</p></a>
+				<a class="navbar-link"><p><i class="fas fa-palette icon-margin-right"></i>Theme</p></a>
 				<div class="navbar-dropdown is-right">
 					<a class="navbar-item" href="#" @click="setDataTheme('light')">
-						<p><i class="fas fa-sun header__button-icon"></i>Light</p>
+						<p><i class="fas fa-sun icon-margin-right"></i>Light</p>
 					</a>
 					<a class="navbar-item" href="#" @click="setDataTheme('dark')">
-						<p><i class="fas fa-moon header__button-icon"></i>Dark</p>
+						<p><i class="fas fa-moon icon-margin-right"></i>Dark</p>
 					</a>
 					<a class="navbar-item" href="#" @click="setDataTheme('system')">
-						<p><i class="fas fa-desktop header__button-icon"></i>OS Default</p>
+						<p><i class="fas fa-desktop icon-margin-right"></i>OS Default</p>
 					</a>
 				</div>
 			</div>
