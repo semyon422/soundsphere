@@ -1,5 +1,9 @@
-<p class="help is-danger">
-	<% for _, err in ipairs(errors or {}) do %>
-		<%= err %><br>
-	<% end %>
-</p>
+<ul>
+	<li>
+		<p class="help is-danger">
+			<% for _, err in ipairs(errors or {}) do %>
+				<%= err %><br>
+			<% end %>
+		</p>
+	</li>
+</ul>

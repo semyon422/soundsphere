@@ -41,8 +41,10 @@ function onSubmit(token) {
 										data-action="login"
 									>Log in</button>
 								</div>
-								<%- view:render("sea/shared/http/field_errors.etlua") %>
 							</div>
+						</div>
+						<div class="block">
+							<%- view:render("sea/shared/http/field_errors.etlua") %>
 						</div>
 					</form>
 				</div>

@@ -19,18 +19,19 @@
 		</style>
 	</head>
 	<body hx-boost="true">
-		<div class="body__container">
-			<%- view:render("sea/shared/http/header.etlua") %>
+		<%- view:render("sea/shared/http/header.etlua") %>
 
+		<% if ignore_main_container then %>
+			<%- inner %>
+		<% else %>
 			<main class="container">
 				<%- inner %>
 			</main>
+		<% end %>
 
-			<footer class="footer">
-				<div class="content">
-				</div>
-			</footer>
-		</div>
+		<footer class="footer">
+			<div class="content"></div>
+		</footer>
 
 		<script>
 			const theme = localStorage.getItem("theme");

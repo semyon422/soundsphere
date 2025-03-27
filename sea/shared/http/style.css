@@ -1,8 +1,12 @@
-.body__container {
+body {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
 	margin: 0;
+}
+
+.icon-margin-right {
+	margin-right: 5px;
 }
 
 .center-form-vertical {

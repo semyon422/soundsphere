@@ -1,10 +1,217 @@
-User: <%= user.name %>
-<br>
-<a href="/users/<%= user.id %>/sessions">Sessions</a>
-<br>
-<a href="/users/<%= user.id %>/settings">Settings</a>
-<br>
-<a href="/users/<%= user.id %>/teams">Teams</a>
-<br>
-<a hx-post="/logout">Logout</a>
-<br>
+<div class="is-hidden-mobile" style="position:relative;">
+	<div class="user__banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+</div>
+
+<main class="container">
+	<div class="block user__container">
+		<div class="columns">
+			<div class="column is-full-mobile is-two-fifths-tablet is-one-quarter-widescreen">
+				<div class="block">
+					<div class="box">
+						<div class="block">
+							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=300">
+						</div>
+						<div class="block">
+							<div class="user__username-container">
+								<div class="user__table-flag fi-gb user__username-cell"></div>
+								<h2 class="title is-4 user__username-cell"><%= session_user.name %></h2>
+							</div>
+							<h3 class="is-5" align="center">Front-end developer</h3>
+							<div class="user__separator"></div>
+						</div>
+						<div class="block" x-data="{ discord: 'discord_username' }">
+							<div class="block">
+								<div class="user__key-value">
+									<p>Playing since:</p>
+									<time datetime="2020-01-01"><strong>01.01.2020</strong></time>
+								</div>
+								<div class="user__key-value">
+									<p>Last seen:</p>
+									<time datetime="2025-03-25"><strong>1 day ago</strong></time>
+								</div>
+								<div class="user__key-value">
+									<p>Play count:</p>
+									<p><strong>3491</strong></p>
+								</div>
+								<div class="user__key-value">
+									<p>Play time:</p>
+									<p><strong>300 hours</strong></p>
+								</div>
+							</div>
+								<button class="button is-link is-fullwidth" @click="navigator.clipboard.writeText(discord)"><i class="fab fa-discord icon-margin-right"></i>Copy discord username</button>
+						</div>
+					</div>
+				</div>
+				<div class="block is-hidden-touch">
+					<div class="block">
+						<h1 class="title">Game mode</h1>
+						<aside class="menu">
+							<ul class="menu-list">
+								<li><a class="is-active">Mania</a></li>
+								<li><a>Taiko</a></li>
+								<li><a>osu!</a></li>
+							</ul>
+						</aside>
+					</div>
+					<div class="block">
+						<h1 class="title">Leaderboard</h1>
+						<aside class="menu">
+							<p class="menu-label">All ranked</p>
+							<ul class="menu-list">
+								<li><a class="is-active">All ranked</a></li>
+								<li><a>Hardcore</a></li>
+							</ul>
+							<p class="menu-label">Other games</p>
+							<ul class="menu-list">
+								<li><a>osu!</a></li>
+								<li><a>Etterna</a></li>
+								<li><a>Quaver</a></li>
+							</ul>
+							<p class="menu-label">Tables</p>
+							<ul class="menu-list">
+								<li><a>Normal 2</a></li>
+								<li><a>Insane 2</a></li>
+								<li><a>Overjoy</a></li>
+								<li><a>Satellite</a></li>
+								<li><a>Stella</a></li>
+							</ul>
+						</aside>
+					</div>
+					<div class="block">
+						<h1 class="title">Key mode</h1>
+						<aside class="menu">
+							<p class="menu-label">Filters</p>
+							<ul class="menu-list">
+								<li><a class="is-active">All</a></li>
+							</ul>
+							<p class="menu-label">Specific key modes</p>
+							<ul class="menu-list">
+								<li><a>4K</a></li>
+								<li><a>7K1S</a></li>
+								<li><a>10K</a></li>
+							</ul>
+						</aside>
+					</div>
+				</div>
+				<div class="block is-hidden-desktop user__options-menu-touch">
+					<p class="title">Stats Filter</p>
+					<p class="subtitle">Select game mode, leaderboard and other options to filter specific statistics.</p>
+					<div class="field">
+						<label class="label">Gamemode</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>Mania</option>
+									<option>Taiko</option>
+									<option>osu!</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Leaderboard</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>All ranked</option>
+									<option>Hardcore</option>
+									<hr class="dropdown-divider" />
+									<option>osu!</option>
+									<hr class="dropdown-divider" />
+									<option>Insane 2</option>
+									<option>Overjoy</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Key mode</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>All</option>
+									<option>4K</option>
+									<option>7K1S</option>
+									<option>10K</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="column">
+				<div class="user__banner-box is-hidden-mobile"></div>
+				<div class="block">
+					<nav class="level">
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">PP</p>
+								<p class="title">15028</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">MSD</p>
+								<p class="title">33.42</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Accuracy</p>
+								<p class="title">97.13%</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">4K Regular dan</p>
+								<p class="title">Delta</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Satellite</p>
+								<p class="title">Lv.6</p>
+							</div>
+						</div>
+					</nav>
+				</div>
+				<div class="block">
+					<div class="user__activity-container">
+						<table class="user__activity-table">
+							<%
+								local week_labels = page:getActivityWeekLabels()
+								local rows = page:getActivityRectangles()
+							%>
+							<thead>
+								<th style="width: 28px"></th>
+									<% for _, v in ipairs(week_labels) do %>
+										<th colspan="<%= v.span %>"><%= v.name %></th>
+									<% end %>
+							</thead>
+							<tbody>
+								<% for i, row in ipairs(rows) do %>
+									<tr>
+										<% local week_day_label = page:getActivityWeekDayLabel(i) %>
+										<% if week_day_label then %>
+											<td style="position: relative"><span class="user__activity-week-day"><%= week_day_label %></span></td>
+										<% else %>
+											<td></td>
+										<% end %>
+
+										<% for _, rect in ipairs(row) do %>
+											<td
+												class="user__activity-rect user__activity-color"
+												data-activity="<%= rect.activity %>"
+												title="<%= rect.date %>">
+											</td>
+										<% end %>
+									</tr>
+								 <% end %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>

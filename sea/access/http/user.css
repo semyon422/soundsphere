@@ -1,0 +1,116 @@
+.user__container {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.user__table-flag {
+	width: 24px;
+	height: 18px;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	border-radius: 6px;
+}
+
+.user__avatar {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	aspect-ratio: 1;
+	border-radius: 10%;
+}
+
+.user__username-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.user__username-container *:first-child {
+	margin-right: 6px;
+}
+
+.user__username-cell {
+	display: inline-block;
+}
+
+.user__separator {
+	display: block;
+	height: 1px;
+	border: 0;
+	border-top: 1px solid #ccc;
+	margin: 1em 0;
+	padding: 0;
+}
+
+.user__key-value {
+	display: flex;
+	justify-content: space-between;
+}
+
+.user__options-menu-touch {
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+.user__banner {
+	box-sizing: unset;
+	background-size: cover;
+	background-position: center;
+	width: 100%;
+	height: 400px;
+	box-shadow: 0px 10px 0px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+}
+
+.user__banner-box {
+	height: 410px;
+}
+
+.user__activity-container {
+	display: block;
+	width: min-content;
+	margin: auto;
+}
+
+.user__activity-table {
+	border-collapse: separate;
+	border-spacing: 3px;
+	width: max-content;
+	font-size: 12px;
+}
+
+.user__activity-rect {
+	shape-rendering: geometricPrecision;
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+}
+
+.user__activity-color[data-activity = "0"] {
+	background-color: var(--bulma-background);
+}
+
+.user__activity-color[data-activity = "1"] {
+	background-color: #4ac26b;
+}
+
+.user__activity-color[data-activity = "2"] {
+	background-color: #4ac26b;
+}
+
+.user__activity-color[data-activity = "3"] {
+	background-color: #2da44e;
+}
+
+.user__activity-color[data-activity = "4"] {
+	background-color: #116329;
+}
+
+.user__activity-week-day {
+	position: absolute;
+	bottom: -3px;
+}

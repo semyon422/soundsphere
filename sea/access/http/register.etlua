@@ -6,7 +6,7 @@ function onSubmit(token) {
 <div class="center-form-vertical">
 	<div></div>
 	<div class="columns is-centered">
-		<div class="column is-one-third">
+		<div class="column is-one-third-desktop">
 			<div class="card">
 				<div class="card-content">
 					<form id="register-form" action="/register" method="post">
@@ -55,8 +55,10 @@ function onSubmit(token) {
 										data-action="register"
 									>Sign up</button>
 								</div>
-								<%- view:render("sea/shared/http/field_errors.etlua") %>
 							</div>
+						</div>
+						<div class="block">
+							<%- view:render("sea/shared/http/field_errors.etlua") %>
 						</div>
 					</form>
 				</div>
