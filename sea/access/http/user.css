@@ -14,8 +14,8 @@
 
 .user__avatar {
 	display: block;
-	margin-left:auto;
-	margin-right:auto;
+	margin-left: auto;
+	margin-right: auto;
 	aspect-ratio: 1;
 	border-radius: 10%;
 }
@@ -51,7 +51,6 @@
 .user__options-menu-touch {
 	margin-left: 8px;
 	margin-right: 8px;
-	margin-bottom: 200px;
 }
 
 .user__banner {
@@ -68,5 +67,50 @@
 }
 
 .user__banner-box {
-	height: 400px;
+	height: 410px;
+}
+
+.user__activity-container {
+	display: block;
+	width: min-content;
+	margin: auto;
+}
+
+.user__activity-table {
+	border-collapse: separate;
+	border-spacing: 3px;
+	width: max-content;
+	font-size: 12px;
+}
+
+.user__activity-rect {
+	shape-rendering: geometricPrecision;
+	width: 10px;
+	height: 10px;
+	border-radius: 2px;
+}
+
+.user__activity-color[data-activity = "0"] {
+	background-color: var(--bulma-background);
+}
+
+.user__activity-color[data-activity = "1"] {
+	background-color: #4ac26b;
+}
+
+.user__activity-color[data-activity = "2"] {
+	background-color: #4ac26b;
+}
+
+.user__activity-color[data-activity = "3"] {
+	background-color: #2da44e;
+}
+
+.user__activity-color[data-activity = "4"] {
+	background-color: #116329;
+}
+
+.user__activity-week-day {
+	position: absolute;
+	bottom: -3px;
 }
