@@ -1,8 +1,8 @@
-local ISubmissionClientRemote = require("sea.remotes.ISubmissionClientRemote")
+local class = require("class")
 
----@class sea.FakeSubmissionClientRemote: sea.ISubmissionClientRemote
+---@class sea.FakeSubmissionClientRemote
 ---@operator call: sea.FakeSubmissionClientRemote
-local FakeSubmissionClientRemote = ISubmissionClientRemote + {}
+local FakeSubmissionClientRemote = class()
 
 ---@param chartfile_data string
 ---@param replayfile_data string

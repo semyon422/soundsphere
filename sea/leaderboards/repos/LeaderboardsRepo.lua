@@ -23,7 +23,7 @@ end
 ---@return sea.Leaderboard?
 function LeaderboardsRepo:getLeaderboard(id)
 	local lb = self.models.leaderboards:find({id = assert(id)})
-	self.models.leaderboards:preload({lb}, "leaderboard_difftables")
+	self.models.leaderboards:preload({lb}, {leaderboard_difftables = "difftable"})
 	return lb
 end
 
