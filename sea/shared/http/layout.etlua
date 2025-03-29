@@ -34,9 +34,12 @@
 		</footer>
 
 		<script>
-			const theme = localStorage.getItem("theme");
-			const html = document.querySelector("html");
-			html.setAttribute("data-theme", theme);
+			function setTheme() {
+				const theme = localStorage.getItem("theme");
+				const html = document.querySelector("html");
+				html.setAttribute("data-theme", theme);
+			}
+			setTheme()
 		</script>
 	</body>
 </html>

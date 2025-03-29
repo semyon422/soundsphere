@@ -9,12 +9,12 @@
 				<div class="block">
 					<div class="box">
 						<div class="block">
-							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=300">
+							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= user.name %>&size=300">
 						</div>
 						<div class="block">
 							<div class="user__username-container">
 								<div class="user__table-flag fi-gb user__username-cell"></div>
-								<h2 class="title is-4 user__username-cell"><%= session_user.name %></h2>
+								<h2 class="title is-4 user__username-cell"><%= user.name %></h2>
 							</div>
 							<h3 class="is-5" align="center">Front-end developer</h3>
 							<div class="user__separator"></div>
@@ -210,6 +210,90 @@
 							</tbody>
 						</table>
 					</div>
+				</div>
+				<div class="block">
+					<% if user.description ~= "" or owner then %>
+						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+						<div class="box">
+							<% if owner and (user.description == "" and not edit_description) then %>
+								<p align="center">Click edit to change your profile description!<p>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>">Edit</a>
+							<% elseif owner and edit_description then %>
+								<div class="block">
+									<div class="user__description-container" id="editorContainer"></div>
+								</div>
+								<a class="button" href="<%= ("/users/%i"):format(user.id) %>" id="saveButton">Save</a>
+							<% else %>
+								<div class="block">
+									<div class="user__description-container" id="editorContainer"></div>
+								</div>
+							<% end %>
+						</div>
+						<script>
+							function createQuill() {
+								const edit_description = <%= edit_description %>
+								const content = "<%- user.description %>"
+
+								const toolbar = [
+									["bold", "italic", "underline", "strike"],
+									["blockquote", "code-block"],
+									[{ "color": [] }, { "background": [] }],
+									[{ "font": [] }],
+									[{ "align": [] }],
+									["clean"],
+									["image"],
+									["video"]
+								]
+
+								function imageHandler() {
+									var range = this.quill.getSelection();
+									var value = prompt("Insert image URL here");
+									if (value) {
+										this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
+									}
+								}
+
+								const editor_params = {
+									modules: {
+										toolbar: {
+											container: toolbar,
+											handlers: {
+												image: imageHandler
+											}
+										},
+										history: true
+									},
+									readOnly: !edit_description,
+									theme: "snow",
+									placeholder: "I am good at..."
+								}
+
+								if (!edit_description) {
+									editor_params.modules.toolbar = false
+									editor_params.modules.history = false
+									editor_params.placeholder = false
+								}
+
+								const container = document.getElementById("editorContainer");
+								const editor = document.createElement("div");
+								container.appendChild(editor);
+								const quill = new Quill(editor, editor_params);
+
+								quill.setContents(content)
+
+								if (edit_description) {
+									const save_button = document.getElementById("saveButton")
+									save_button.addEventListener("click", function() {
+										const content = quill.getContents()
+										console.log(content)
+										// JSON.stringify(content) and send to the server
+									})
+								}
+							}
+							createQuill()
+						</script>
+					<% end %>
 				</div>
 			</div>
 		</div>
