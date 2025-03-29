@@ -120,7 +120,7 @@
 	max-width: 100%;
 	max-height: 380px;
 	overflow-x: hidden;
-	overflow-y: scroll;
+	overflow-y: auto;
 	word-break: break-all;
 	word-wrap: break-word;
 }
@@ -154,7 +154,6 @@
 	position: absolute;
 	right: 15px;
 }
-
 
 .ql-container.ql-snow {
 	border: none !important;

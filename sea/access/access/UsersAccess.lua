@@ -16,6 +16,14 @@ function UsersAccess:canUpdate(user, target_user, time)
 end
 
 ---@param user sea.User
+---@param target_user sea.User
+---@param time integer
+---@return boolean
+function UsersAccess:canUpdateSelf(user, target_user, time)
+	return user.id == target_user.id or self:canUpdate(user, target_user, time)
+end
+
+---@param user sea.User
 ---@param time integer
 ---@param role sea.Role
 ---@return boolean

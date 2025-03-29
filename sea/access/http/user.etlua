@@ -212,86 +212,62 @@
 					</div>
 				</div>
 				<div class="block">
-					<% if user.description ~= "" or owner then %>
+					<% local can_update = page:canUpdate() %>
+					<% if user.description ~= "" or can_update then %>
 						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="box">
-							<% if owner and (user.description == "" and not edit_description) then %>
+							<% if can_update and (user.description == "" and not edit_description) then %>
 								<p align="center">Click edit to change your profile description!<p>
 								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>">Edit</a>
-							<% elseif owner and edit_description then %>
+							<% elseif can_update and edit_description then %>
 								<div class="block">
 									<div class="user__description-container" id="editorContainer"></div>
 								</div>
-								<a class="button" href="<%= ("/users/%i"):format(user.id) %>" id="saveButton">Save</a>
+								<div class="columns">
+									<div class="column">
+										<a class="button"" id="saveButton">Save</a>
+									</div>
+									<div class="column is-full" style="align-content: center">
+										<p class="has-text-danger" id="descriptionStatus"></p>
+									</div>
+								</div>
 							<% else %>
 								<div class="block">
 									<div class="user__description-container" id="editorContainer"></div>
 								</div>
 							<% end %>
 						</div>
+						<script src="/static/scripts/user_resource.js"></script>
 						<script>
-							function createQuill() {
-								const edit_description = <%= edit_description %>
-								const content = "<%- user.description %>"
+							var quill = addQuillToElement(
+								document.getElementById("editorContainer"),
+								"<%- user.description %>",
+								<%= edit_description %>
+							)
 
-								const toolbar = [
-									["bold", "italic", "underline", "strike"],
-									["blockquote", "code-block"],
-									[{ "color": [] }, { "background": [] }],
-									[{ "font": [] }],
-									[{ "align": [] }],
-									["clean"],
-									["image"],
-									["video"]
-								]
+							if (<%= edit_description %>) {
+								const save_button = document.getElementById("saveButton")
+								const user_id = <%= user.id %>
+								const on_click = function() {
+									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
+										console.log(success)
+										const status_text = document.getElementById("descriptionStatus")
+										status_text.innerText = err
 
-								function imageHandler() {
-									var range = this.quill.getSelection();
-									var value = prompt("Insert image URL here");
-									if (value) {
-										this.quill.insertEmbed(range.index, 'image', value, Quill.sources.USER);
-									}
-								}
+										setTimeout(function() {
+											status_text.innerText = ""
+										}, "3000")
 
-								const editor_params = {
-									modules: {
-										toolbar: {
-											container: toolbar,
-											handlers: {
-												image: imageHandler
-											}
-										},
-										history: true
-									},
-									readOnly: !edit_description,
-									theme: "snow",
-									placeholder: "I am good at..."
-								}
-
-								if (!edit_description) {
-									editor_params.modules.toolbar = false
-									editor_params.modules.history = false
-									editor_params.placeholder = false
-								}
-
-								const container = document.getElementById("editorContainer");
-								const editor = document.createElement("div");
-								container.appendChild(editor);
-								const quill = new Quill(editor, editor_params);
-
-								quill.setContents(content)
-
-								if (edit_description) {
-									const save_button = document.getElementById("saveButton")
-									save_button.addEventListener("click", function() {
-										const content = quill.getContents()
-										console.log(content)
-										// JSON.stringify(content) and send to the server
+										if (success) {
+											// Opening the link in the same tab
+											window.open(`/users/${user_id}`, "_self")
+										}
 									})
 								}
+
+								save_button.addEventListener("click", on_click)
 							}
-							createQuill()
 						</script>
 					<% end %>
 				</div>
