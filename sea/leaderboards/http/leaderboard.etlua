@@ -73,17 +73,17 @@
 	</tr>
 </table>
 
-<%
-local difftable_ids = {}
-for _, lb_dt in ipairs(leaderboard.leaderboard_difftables) do
-	table.insert(difftable_ids, lb_dt.difftable_id)
-end
-%>
-
 <table class="table">
 	<tr>
-		Difftables: <%= table.concat(difftable_ids, ", ") %>
+		<th>Difftables</th>
 	</tr>
+	<% for _, lb_dt in ipairs(leaderboard.leaderboard_difftables) do %>
+		<tr>
+			<td>
+				<a href="/difftables/<%= lb_dt.difftable_id %>"><%= lb_dt.difftable and lb_dt.difftable.name or "id = " .. lb_dt.difftable_id %></a>
+			</td>
+		</tr>
+	<% end %>
 </table>
 
 </div>

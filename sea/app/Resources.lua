@@ -38,6 +38,8 @@ local ChartplayResource = require("sea.chart.http.ChartplayResource")
 local WebsocketClientResource = require("sea.shared.http.WebsocketClientResource")
 local WebsocketServerResource = require("sea.shared.http.WebsocketServerResource")
 
+local ServerRemoteHandler = require("sea.app.remotes.ServerRemoteHandler")
+
 ---@class sea.Resources
 ---@operator call: sea.Resources
 local Resources = class()
@@ -46,6 +48,8 @@ local Resources = class()
 ---@param views web.Views
 ---@param sessions web.Sessions
 function Resources:new(domain, views, sessions)
+	local server_remote_handler = ServerRemoteHandler(domain)
+
 	self.index = IndexResource(views)
 	self.style = StyleResource()
 
@@ -63,7 +67,7 @@ function Resources:new(domain, views, sessions)
 
 	self.leaderboards = LeaderboardsResource(domain.leaderboards, views)
 	self.leaderboards_create = LeaderboardsCreateResource(domain.leaderboards, views)
-	self.leaderboard = LeaderboardResource(domain.leaderboards, views)
+	self.leaderboard = LeaderboardResource(domain.leaderboards, domain.difftables, views)
 	self.leaderboard_edit = LeaderboardEditResource(domain.leaderboards, views)
 
 	self.teams = TeamsResource(domain.teams, views)
@@ -82,7 +86,7 @@ function Resources:new(domain, views, sessions)
 	self.chartplay = ChartplayResource(nil, views)
 
 	self.ws_client = WebsocketClientResource(views)
-	self.ws_server = WebsocketServerResource()
+	self.ws_server = WebsocketServerResource(server_remote_handler)
 end
 
 function Resources:getList()

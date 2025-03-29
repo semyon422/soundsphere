@@ -5,7 +5,7 @@ local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
-local FakeSubmissionClientRemote = require("sea.remotes.FakeSubmissionClientRemote")
+local FakeSubmissionClientRemote = require("sea.chart.remotes.FakeSubmissionClientRemote")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")

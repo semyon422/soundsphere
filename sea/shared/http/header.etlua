@@ -32,6 +32,7 @@
 				<a class="navbar-link">Admin</a>
 				<div class="navbar-dropdown">
 					<a class="navbar-item" href="/difftables">Difftables</a>
+					<a class="navbar-item" href="/charts">Charts</a>
 				</div>
 			</div>
 			<a class="navbar-item" href="/support">

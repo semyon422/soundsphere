@@ -33,7 +33,7 @@ function Chartplays:getChartplays()
 end
 
 ---@param user sea.User
----@param remote sea.ISubmissionClientRemote
+---@param remote sea.SubmissionClientRemote
 ---@param hash string
 ---@return sea.Chartfile?
 ---@return string?
@@ -71,7 +71,7 @@ function Chartplays:requireChartfile(user, remote, hash)
 end
 
 ---@param user sea.User
----@param remote sea.ISubmissionClientRemote
+---@param remote sea.SubmissionClientRemote
 ---@param chartplay_values sea.Chartplay
 ---@return sea.Chartplay?
 ---@return string?

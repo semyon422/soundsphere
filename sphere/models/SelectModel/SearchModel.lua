@@ -30,7 +30,7 @@ local number_fields = {
 	},
 	{
 		keys = {"bpm", "b", "tempo", "t"},
-		field = "bpm",
+		field = "tempo",
 	},
 	{
 		keys = {"notes_count", "nc", "obj"},

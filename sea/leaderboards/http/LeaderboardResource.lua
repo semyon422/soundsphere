@@ -7,9 +7,11 @@ local LeaderboardResource = IResource + {}
 LeaderboardResource.uri = "/leaderboards/:leaderboard_id"
 
 ---@param leaderboards sea.Leaderboards
+---@param difftables sea.Difftables
 ---@param views web.Views
-function LeaderboardResource:new(leaderboards, views)
+function LeaderboardResource:new(leaderboards, difftables, views)
 	self.leaderboards = leaderboards
+	self.difftables = difftables
 	self.views = views
 end
 
@@ -19,11 +21,13 @@ end
 function LeaderboardResource:GET(req, res, ctx)
 	local leaderboard_id = tonumber(ctx.path_params.leaderboard_id)
 	ctx.leaderboard = self.leaderboards:getLeaderboard(leaderboard_id)
+
 	if not ctx.leaderboard then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
+
 	self.views:render_send(res, "sea/leaderboards/http/leaderboard.etlua", ctx, true)
 end
 
