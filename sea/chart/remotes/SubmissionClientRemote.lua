@@ -4,23 +4,21 @@ local class = require("class")
 ---@operator call: sea.SubmissionClientRemote
 local SubmissionClientRemote = class()
 
----@param remote icc.Remote
-function SubmissionClientRemote:new(remote)
-	self.remote = remote
+function SubmissionClientRemote:new()
 end
 
+---@param remote icc.Remote
 ---@param hash string
 ---@return {name: string, data: string}?
 ---@return string?
-function SubmissionClientRemote:getChartfileData(hash)
-	return self.remote:getChartfileData(hash)
+function SubmissionClientRemote:getChartfileData(remote, hash)
 end
 
+---@param remote icc.Remote
 ---@param events_hash string
 ---@return string?
 ---@return string?
-function SubmissionClientRemote:getEventsData(events_hash)
-	return self.remote:getEventsData(events_hash)
+function SubmissionClientRemote:getEventsData(remote, events_hash)
 end
 
 return SubmissionClientRemote

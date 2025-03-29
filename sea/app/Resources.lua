@@ -38,7 +38,7 @@ local ChartplayResource = require("sea.chart.http.ChartplayResource")
 local WebsocketClientResource = require("sea.shared.http.WebsocketClientResource")
 local WebsocketServerResource = require("sea.shared.http.WebsocketServerResource")
 
-local ServerRemoteHandler = require("sea.app.remotes.ServerRemoteHandler")
+local ServerRemote = require("sea.app.remotes.ServerRemote")
 
 ---@class sea.Resources
 ---@operator call: sea.Resources
@@ -48,7 +48,7 @@ local Resources = class()
 ---@param views web.Views
 ---@param sessions web.Sessions
 function Resources:new(domain, views, sessions)
-	local server_remote_handler = ServerRemoteHandler(domain)
+	local server_remote_handler = ServerRemote(domain)
 
 	self.index = IndexResource(views)
 	self.style = StyleResource()
