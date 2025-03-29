@@ -6,9 +6,22 @@ local UserPage = class()
 
 UserPage.activityWeeks = 53
 
----@param activity {[string]: number}
---- activity should have %d-%m-%Y format
-function UserPage:new(activity)
+---@param users_access sea.UsersAccess
+---@param session_user sea.User
+---@param target_user sea.User
+function UserPage:new(users_access, session_user, target_user)
+	self.usersAccess = users_access
+	self.sessionUser = session_user
+	self.targetUser = target_user
+end
+
+---@return boolean
+function UserPage:canUpdate()
+	return self.usersAccess:canUpdateSelf(self.sessionUser, self.targetUser, os.time())
+end
+
+---@param activity {[string]: number} activity key should have %d-%m-%Y format
+function UserPage:setActivity(activity)
 	self.activity = activity
 
 	self.currentDate = os.date("*t", os.time())

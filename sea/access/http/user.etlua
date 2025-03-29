@@ -9,12 +9,12 @@
 				<div class="block">
 					<div class="box">
 						<div class="block">
-							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=300">
+							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= user.name %>&size=300">
 						</div>
 						<div class="block">
 							<div class="user__username-container">
 								<div class="user__table-flag fi-gb user__username-cell"></div>
-								<h2 class="title is-4 user__username-cell"><%= session_user.name %></h2>
+								<h2 class="title is-4 user__username-cell"><%= user.name %></h2>
 							</div>
 							<h3 class="is-5" align="center">Front-end developer</h3>
 							<div class="user__separator"></div>
@@ -210,6 +210,66 @@
 							</tbody>
 						</table>
 					</div>
+				</div>
+				<div class="block">
+					<% local can_update = page:canUpdate() %>
+					<% if user.description ~= "" or can_update then %>
+						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+						<div class="box">
+							<% if can_update and (user.description == "" and not edit_description) then %>
+								<p align="center">Click edit to change your profile description!<p>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>">Edit</a>
+							<% elseif can_update and edit_description then %>
+								<div class="block">
+									<div class="user__description-container" id="editorContainer"></div>
+								</div>
+								<div class="columns">
+									<div class="column">
+										<a class="button"" id="saveButton">Save</a>
+									</div>
+									<div class="column is-full" style="align-content: center">
+										<p class="has-text-danger" id="descriptionStatus"></p>
+									</div>
+								</div>
+							<% else %>
+								<div class="block">
+									<div class="user__description-container" id="editorContainer"></div>
+								</div>
+							<% end %>
+						</div>
+						<script src="/static/scripts/user_resource.js"></script>
+						<script>
+							var quill = addQuillToElement(
+								document.getElementById("editorContainer"),
+								"<%- user.description %>",
+								<%= edit_description %>
+							)
+
+							if (<%= edit_description %>) {
+								const save_button = document.getElementById("saveButton")
+								const user_id = <%= user.id %>
+								const on_click = function() {
+									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
+										console.log(success)
+										const status_text = document.getElementById("descriptionStatus")
+										status_text.innerText = err
+
+										setTimeout(function() {
+											status_text.innerText = ""
+										}, "3000")
+
+										if (success) {
+											// Opening the link in the same tab
+											window.open(`/users/${user_id}`, "_self")
+										}
+									})
+								}
+
+								save_button.addEventListener("click", on_click)
+							}
+						</script>
+					<% end %>
 				</div>
 			</div>
 		</div>
