@@ -14,31 +14,40 @@
 						<div class="block">
 							<div class="user__username-container">
 								<div class="user__table-flag fi-gb user__username-cell"></div>
-								<h2 class="title is-4 user__username-cell"><%= user.name %></h2>
+								<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
 							</div>
-							<h3 class="is-5" align="center">Front-end developer</h3>
+							<h3 class="is-5" align="center"><%= page:formatRole() %></h3>
 							<div class="user__separator"></div>
 						</div>
-						<div class="block" x-data="{ discord: 'discord_username' }">
+						<div class="block" x-data="{ discord: '<%= user.discord %>' }">
+							<%
+								local playing_since = os.date("%d.%m.%Y", user.created_at)
+								local playing_since_html = os.date("%Y-%m-%d", user.created_at)
+								local last_seen = page:formatLastSeen()
+								local last_seen_html = os.date("%d.%m.%Y", user.latest_activity)
+								local play_time = page:formatPlayTime()
+							%>
 							<div class="block">
 								<div class="user__key-value">
 									<p>Playing since:</p>
-									<time datetime="2020-01-01"><strong>01.01.2020</strong></time>
+									<time datetime="<%= playing_since_html %>"><strong><%= playing_since %></strong></time>
 								</div>
 								<div class="user__key-value">
 									<p>Last seen:</p>
-									<time datetime="2025-03-25"><strong>1 day ago</strong></time>
+									<time datetime="<%= last_seen_html %>"><strong><%= last_seen %></strong></time>
 								</div>
 								<div class="user__key-value">
 									<p>Play count:</p>
-									<p><strong>3491</strong></p>
+									<p><strong><%= user.chartplays_count%></strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>Play time:</p>
-									<p><strong>300 hours</strong></p>
+									<p><strong><%= play_time %></strong></p>
 								</div>
 							</div>
+							<% if user.discord and user.discord ~= "" then  %>
 								<button class="button is-link is-fullwidth" @click="navigator.clipboard.writeText(discord)"><i class="fab fa-discord icon-margin-right"></i>Copy discord username</button>
+							<% end %>
 						</div>
 					</div>
 				</div>
@@ -143,36 +152,17 @@
 				<div class="user__banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<nav class="level">
-						<div class="level-item has-text-centered">
-							<div>
-								<p class="heading">PP</p>
-								<p class="title">15028</p>
+						<%
+							local stats_cells = page:getGeneralStats()
+							for _, cell in ipairs(stats_cells) do
+						%>
+							<div class="level-item has-text-centered">
+								<div>
+									<p class="heading"><%= cell.label %></p>
+									<p class="title"><%= cell.value %></p>
+								</div>
 							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-								<p class="heading">MSD</p>
-								<p class="title">33.42</p>
-							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-								<p class="heading">Accuracy</p>
-								<p class="title">97.13%</p>
-							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-								<p class="heading">4K Regular dan</p>
-								<p class="title">Delta</p>
-							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-								<p class="heading">Satellite</p>
-								<p class="title">Lv.6</p>
-							</div>
-						</div>
+						<% end %>
 					</nav>
 				</div>
 				<div class="block">
@@ -185,7 +175,7 @@
 							<thead>
 								<th style="width: 28px"></th>
 									<% for _, v in ipairs(week_labels) do %>
-										<th colspan="<%= v.span %>"><%= v.name %></th>
+										<th colspan="<%= v.span %>"><%= v.span > 1 and v.name or "" %></th>
 									<% end %>
 							</thead>
 							<tbody>
@@ -246,14 +236,19 @@
 								<%= edit_description %>
 							)
 
+							var can_upload = true
+
 							if (<%= edit_description %>) {
 								const save_button = document.getElementById("saveButton")
+								const status_text = document.getElementById("descriptionStatus")
 								const user_id = <%= user.id %>
 								const on_click = function() {
+									can_upload = false
+									status_text.innerText = "Saving..."
+
 									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
-										console.log(success)
-										const status_text = document.getElementById("descriptionStatus")
 										status_text.innerText = err
+										can_upload = true
 
 										setTimeout(function() {
 											status_text.innerText = ""
@@ -261,6 +256,7 @@
 
 										if (success) {
 											// Opening the link in the same tab
+											can_upload = false
 											window.open(`/users/${user_id}`, "_self")
 										}
 									})
