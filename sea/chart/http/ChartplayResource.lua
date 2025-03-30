@@ -4,7 +4,11 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.ChartplayResource
 local ChartplayResource = IResource + {}
 
-ChartplayResource.uri = "/chartplays/:chartplay_id"
+ChartplayResource.routes = {
+	{"/chartplays/:chartplay_id", {
+		GET = "getChartplay",
+	}},
+}
 
 ---@param chartplays sea.Chartplays
 ---@param views web.Views
@@ -16,7 +20,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function ChartplayResource:GET(req, res, ctx)
+function ChartplayResource:getChartplay(req, res, ctx)
 	-- ctx.chartplay = self.chartplays:getChartplay(tonumber(ctx.path_params.chartplay_id))
 	-- if not ctx.chartplay then
 	-- 	res.status = 404

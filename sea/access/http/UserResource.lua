@@ -1,12 +1,31 @@
 local IResource = require("web.framework.IResource")
 local UserPage = require("sea.access.http.UserPage")
-local http_util = require("http_util")
+local http_util = require("web.http.util")
+local json = require("web.json")
 
 ---@class sea.UserResource: web.IResource
 ---@operator call: sea.UserResource
 local UserResource = IResource + {}
 
-UserResource.uri = "/users/:user_id"
+UserResource.routes = {
+	{"/users/:user_id", {
+		GET = "getUser",
+	}},
+	{"/users/:user_id/edit_description", {
+		POST = "updateDescription",
+	}},
+	{"/users/:user_id/sessions", {
+		GET = "getUserSessions",
+	}},
+	{"/users/:user_id/settings", {
+		GET = "getUserSettings",
+	}},
+	{"/users/:user_id/teams", {
+		GET = "getUserTeams",
+	}},
+}
+
+UserResource.descriptionLength = 4096
 
 ---@param users sea.Users
 ---@param views web.Views
@@ -24,7 +43,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function UserResource:GET(req, res, ctx)
+function UserResource:getUser(req, res, ctx)
 	local query = http_util.decode_query_string(ctx.parsed_uri.query)
 
 	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
@@ -43,6 +62,70 @@ function UserResource:GET(req, res, ctx)
 	ctx.ignore_main_container = true
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updateDescription(req, res, ctx)
+	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
+	local page = UserPage(self.users.users_access, ctx.session_user, user)
+
+	if not page:canUpdate() then
+		res.status = 403
+		res:send("forbidden")
+		return
+	end
+
+	---@type {[string]: any}?, string?
+	local description, _ = http_util.get_json(req)
+
+	if not description then
+		res.status = 400
+		res:send("invalid json")
+		return
+	end
+
+	local encoded = json.encode(description)
+
+	if encoded:len() > self.descriptionLength then
+		res.status = 400
+		res:send("description size limit reached")
+		return
+	end
+
+	if not description.ops then
+		encoded = ""
+	end
+
+	if #description.ops == 1 and description.ops[1].insert == "\n" then
+		encoded = ""
+	end
+
+	-- TODO: Replace user description with `encoded`
+	res.status = 200
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserSessions(req, res, ctx)
+	self.views:render_send(res, "sea/access/http/user_sessions.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserSettings(req, res, ctx)
+	ctx.user = self.users:getUser(tonumber(ctx.path_params.user_id))
+	self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserTeams(req, res, ctx)
+	self.views:render_send(res, "sea/access/http/user_teams.etlua", ctx, true)
 end
 
 return UserResource

@@ -42,8 +42,11 @@ function App:new(app_config)
 	self.domain.users.is_login_enabled = app_config.is_login_enabled
 	self.domain.users.is_register_enabled = app_config.is_register_enabled
 
-	self.resources.login:setRecaptcha(app_config.is_login_captcha_enabled, self.recaptcha)
-	self.resources.register:setRecaptcha(app_config.is_register_captcha_enabled, self.recaptcha)
+	self.resources.auth:setRecaptcha(
+		self.recaptcha,
+		app_config.is_login_captcha_enabled,
+		app_config.is_register_captcha_enabled
+	)
 end
 
 function App:load()
@@ -78,9 +81,9 @@ end
 function App:handle(req, res, ip)
 	local parsed_uri = socket_url.parse(req.uri)
 
-	local resource, path_params = self.router:getResource(parsed_uri.path)
+	local resource, path_params, methods = self.router:getResource(parsed_uri.path)
 
-	if not resource or not path_params then
+	if not resource or not path_params or not methods then
 		res.status = 404
 		res:set_chunked_encoding()
 		res:send("not found")
@@ -89,7 +92,9 @@ function App:handle(req, res, ip)
 	end
 
 	local method = req.method
-	if method ~= method:upper() or not resource[method] then
+	local _method = methods[method]
+
+	if method ~= method:upper() or not resource[_method] then
 		res.status = 403
 		res:set_chunked_encoding()
 		res:send("invalid method")
@@ -108,23 +113,7 @@ function App:handle(req, res, ip)
 
 	self:handleSession(req, ctx)
 
-	if resource.before then
-		local ok, err = xpcall(resource.before, debug.traceback, resource, req, res, ctx)
-		if not ok then
-			local body = ("<pre>%s</pre>"):format(err)
-			res.status = 500
-			res:set_chunked_encoding()
-			res:send(body)
-			res:send("")
-			return
-		end
-		if not err then
-			res:send("")
-			return
-		end
-	end
-
-	local ok, err = xpcall(resource[method], debug.traceback, resource, req, res, ctx)
+	local ok, err = xpcall(resource[_method], debug.traceback, resource, req, res, ctx)
 	if not ok then
 		local body = ("<pre>%s</pre>"):format(err)
 		res.status = 500

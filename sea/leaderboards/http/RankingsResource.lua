@@ -6,7 +6,12 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.RankingsResource
 local RankingsResource = IResource + {}
 
-RankingsResource.uri = "/rankings"
+RankingsResource.routes = {
+	{"/rankings", {
+		GET = "getRankings",
+	}},
+}
+
 RankingsResource.maxUsersPerPage = 50
 
 ---@param views web.Views
@@ -114,7 +119,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function RankingsResource:GET(req, res, ctx)
+function RankingsResource:getRankings(req, res, ctx)
 	local query = http_util.decode_query_string(ctx.parsed_uri.query)
 	local page_count = math.ceil(#self.testUsers / self.maxUsersPerPage)
 

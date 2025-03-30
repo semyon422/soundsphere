@@ -4,7 +4,11 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.ChartmetaResource
 local ChartmetaResource = IResource + {}
 
-ChartmetaResource.uri = "/chartmetas/:chartmeta_id"
+ChartmetaResource.routes = {
+	{"/chartmetas/:chartmeta_id", {
+		GET = "getChartmeta",
+	}},
+}
 
 ---@param chartmetas sea.Chartmetas
 ---@param views web.Views
@@ -16,7 +20,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function ChartmetaResource:GET(req, res, ctx)
+function ChartmetaResource:getChartmeta(req, res, ctx)
 	-- ctx.chartmeta = self.chartmetas:getChartmeta(tonumber(ctx.path_params.chartmeta_id))
 	-- if not ctx.chartmeta then
 	-- 	res.status = 404

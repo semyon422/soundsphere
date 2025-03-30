@@ -4,7 +4,11 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.ChartdiffResource
 local ChartdiffResource = IResource + {}
 
-ChartdiffResource.uri = "/chartdiffs/:chartdiff_id"
+ChartdiffResource.routes = {
+	{"/chartdiffs/:chartdiff_id", {
+		GET = "getChartdiff",
+	}},
+}
 
 ---@param chartdiffs sea.Chartdiffs
 ---@param views web.Views
@@ -16,7 +20,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function ChartdiffResource:GET(req, res, ctx)
+function ChartdiffResource:getChartdiff(req, res, ctx)
 	-- ctx.chartdiff = self.chartdiffs:getChartdiff(tonumber(ctx.path_params.chartdiff_id))
 	-- if not ctx.chartdiff then
 	-- 	res.status = 404

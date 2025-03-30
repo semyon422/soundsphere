@@ -4,7 +4,11 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.ChartsResource
 local ChartsResource = IResource + {}
 
-ChartsResource.uri = "/charts"
+ChartsResource.routes = {
+	{"/charts", {
+		GET = "getCharts",
+	}},
+}
 
 ---@param charts sea.Charts
 ---@param views web.Views
@@ -16,7 +20,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function ChartsResource:GET(req, res, ctx)
+function ChartsResource:getCharts(req, res, ctx)
 	-- ctx.charts = self.charts:getCharts()
 	self.views:render_send(res, "sea/chart/http/charts.etlua", ctx, true)
 end

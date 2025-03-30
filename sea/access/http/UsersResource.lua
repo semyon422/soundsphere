@@ -5,7 +5,11 @@ local UsersPage = require("sea.access.http.UsersPage")
 ---@operator call: sea.UsersResource
 local UsersResource = IResource + {}
 
-UsersResource.uri = "/users"
+UsersResource.routes = {
+	{"/users", {
+		GET = "getUsers",
+	}},
+}
 
 ---@param users sea.Users
 ---@param views web.Views
@@ -17,7 +21,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function UsersResource:GET(req, res, ctx)
+function UsersResource:getUsers(req, res, ctx)
 	ctx.users = self.users:getUsers()
 	ctx.page = UsersPage(ctx.session_user, os.time())
 	self.views:render_send(res, "sea/access/http/users.etlua", ctx, true)

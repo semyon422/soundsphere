@@ -4,7 +4,14 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.TeamsResource
 local TeamsResource = IResource + {}
 
-TeamsResource.uri = "/teams"
+TeamsResource.routes = {
+	{"/teams", {
+		GET = "getTeams",
+	}},
+	{"/teams/create", {
+		GET = "getCreateTeam",
+	}},
+}
 
 ---@param teams sea.Teams
 ---@param views web.Views
@@ -16,9 +23,16 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function TeamsResource:GET(req, res, ctx)
+function TeamsResource:getTeams(req, res, ctx)
 	ctx.teams = self.teams:getTeams()
 	self.views:render_send(res, "sea/teams/http/teams.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamsResource:getCreateTeam(req, res, ctx)
+	self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
 end
 
 return TeamsResource

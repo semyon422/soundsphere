@@ -4,7 +4,11 @@ local IResource = require("web.framework.IResource")
 ---@operator call: sea.StyleResource
 local StyleResource = IResource + {}
 
-StyleResource.uri = "/style.css"
+StyleResource.routes = {
+	{"/style.css", {
+		GET = "getStyle",
+	}},
+}
 
 local files = {
 	"sea/shared/http/style.css",
@@ -29,7 +33,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function StyleResource:GET(req, res, ctx)
+function StyleResource:getStyle(req, res, ctx)
 	local out = {}
 	for _, path in ipairs(files) do
 		table.insert(out, read_file(path))
