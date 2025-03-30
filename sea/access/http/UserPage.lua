@@ -1,4 +1,5 @@
 local class = require("class")
+local time_util = require("time_util")
 
 ---@class sea.UserPage
 ---@operator call: sea.UserPage
@@ -93,6 +94,57 @@ function UserPage:getActivityRectangles()
 	 end
 
 	return rows
+end
+
+---@return string
+function UserPage:formatLastSeen()
+	return time_util.time_ago_in_words(self.targetUser.latest_activity)
+end
+
+---@return string
+function UserPage:formatPlayTime()
+	local play_time = self.targetUser.play_time
+	local hours = math.floor(play_time / 3600)
+	local minutes = math.floor(play_time % 3600 / 60)
+
+	if minutes < 1 then
+		return ("No play time")
+	elseif hours < 1 then
+		return ("%i minutes"):format(minutes)
+	end
+
+	return ("%i hours"):format(hours)
+end
+
+---@return string
+function UserPage:formatRole()
+	if self.targetUser:hasRole("owner", os.time(), true) then
+		return "Project leader"
+	elseif self.targetUser:hasRole("admin", os.time(), true) then
+		return "Admin"
+	elseif self.targetUser:hasRole("moderator", os.time(), true) then
+		return "Moderator"
+	end
+
+	return ""
+end
+
+---@return {label: string, value: string}[]
+function UserPage:getGeneralStats()
+	local cells = {}
+	-- TODO: Get these values from the main leaderboard.
+	-- TODO: People have their preferences in rating calculators, let them choose one or two options in the settings. This is a personal option.
+	table.insert(cells, { label = "PP", value = "15028" })
+	table.insert(cells, { label = "MSD", value = "33.42" })
+
+	-- Accuracy should always be displayed
+	table.insert(cells, { label = "Accuracy", value = "90.81%" })
+
+	-- The owner of the profile decides which dans to display
+	table.insert(cells, { label = "4K Regular dan", value = "Delta" })
+	table.insert(cells, { label = "Satellite", value = "Lv.6" })
+
+	return cells
 end
 
 return UserPage
