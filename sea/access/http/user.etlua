@@ -228,7 +228,7 @@
 								</div>
 							<% end %>
 						</div>
-						<script src="/static/scripts/user_resource.js"></script>
+						<script src="/static/scripts/user_resource.js?v=<%= version %>"></script>
 						<script>
 							var quill = addQuillToElement(
 								document.getElementById("editorContainer"),

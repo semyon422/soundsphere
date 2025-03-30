@@ -18,6 +18,7 @@ local etlua_util = require("web.framework.page.etlua_util")
 ---@field path_params {[string]: string}
 ---@field session_user sea.User
 ---@field session sea.Session?
+---@field version any
 
 ---@class sea.App
 ---@operator call: sea.App
@@ -55,6 +56,32 @@ end
 
 function App:unload()
 	self.app_db:close()
+end
+
+---@param version any
+---@return any
+function App:setVersion(version)
+	self.version = version
+	return version
+end
+
+function App:getVersion()
+	if self.version then
+		return self.version
+	end
+
+	local p = io.popen("git log -1 --format=%H")
+	if not p then
+		return self:setVersion(os.time())
+	end
+
+	---@type string?
+	local hash = p:read("*a"):match("^%s*(.+)%s*\n.*$")
+	if not hash or #hash ~= 40 then
+		return self:setVersion(os.time())
+	end
+
+	return self:setVersion(hash)
 end
 
 ---@param req web.IRequest
@@ -109,6 +136,7 @@ function App:handle(req, res, ip)
 		ip = ip,
 		time = os.time(),
 		session_user = self.domain.users.anon_user,
+		version = self:getVersion(),
 	}
 
 	self:handleSession(req, ctx)
