@@ -70,16 +70,10 @@
 	height: 410px;
 }
 
-.user__activity-container {
-	display: block;
-	width: min-content;
-	margin: auto;
-}
-
 .user__activity-table {
+	margin: auto;
 	border-collapse: separate;
 	border-spacing: 3px;
-	width: max-content;
 	font-size: 12px;
 }
 

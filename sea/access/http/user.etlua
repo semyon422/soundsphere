@@ -166,40 +166,38 @@
 					</nav>
 				</div>
 				<div class="block">
-					<div class="user__activity-container">
-						<table class="user__activity-table">
-							<%
-								local week_labels = page:getActivityWeekLabels()
-								local rows = page:getActivityRectangles()
-							%>
-							<thead>
-								<th style="width: 28px"></th>
-									<% for _, v in ipairs(week_labels) do %>
-										<th colspan="<%= v.span %>"><%= v.span > 1 and v.name or "" %></th>
+					<table class="user__activity-table">
+						<%
+							local week_labels = page:getActivityWeekLabels()
+							local rows = page:getActivityRectangles()
+						%>
+						<thead>
+							<th style="width: 28px"></th>
+								<% for _, v in ipairs(week_labels) do %>
+									<th colspan="<%= v.span %>"><%= v.span > 1 and v.name or "" %></th>
+								<% end %>
+						</thead>
+						<tbody>
+							<% for i, row in ipairs(rows) do %>
+								<tr>
+									<% local week_day_label = page:getActivityWeekDayLabel(i) %>
+									<% if week_day_label then %>
+										<td style="position: relative"><span class="user__activity-week-day"><%= week_day_label %></span></td>
+									<% else %>
+										<td></td>
 									<% end %>
-							</thead>
-							<tbody>
-								<% for i, row in ipairs(rows) do %>
-									<tr>
-										<% local week_day_label = page:getActivityWeekDayLabel(i) %>
-										<% if week_day_label then %>
-											<td style="position: relative"><span class="user__activity-week-day"><%= week_day_label %></span></td>
-										<% else %>
-											<td></td>
-										<% end %>
 
-										<% for _, rect in ipairs(row) do %>
-											<td
-												class="user__activity-rect user__activity-color"
-												data-activity="<%= rect.activity %>"
-												title="<%= rect.date %>">
-											</td>
-										<% end %>
-									</tr>
-								 <% end %>
-							</tbody>
-						</table>
-					</div>
+									<% for _, rect in ipairs(row) do %>
+										<td
+											class="user__activity-rect user__activity-color"
+											data-activity="<%= rect.activity %>"
+											title="<%= rect.date %>">
+										</td>
+									<% end %>
+								</tr>
+							 <% end %>
+						</tbody>
+					</table>
 				</div>
 				<div class="block">
 					<% local can_update = page:canUpdate() %>
