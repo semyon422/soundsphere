@@ -38,6 +38,48 @@ function UserResource:new(users, views)
 		["24-03-2025"] = 40,
 		["25-03-2025"] = 10,
 	}
+
+	self.testScores = {
+		{
+			artist = "Artist",
+			title = "Not very long title but still it's long",
+			name = "Easy",
+			creator = "Someone",
+			timeRate = 1.05,
+			mods = "P2 AltK RD AM7 CH5 BS",
+			accuracy = 0.9013,
+			timeSince = "10 days ago",
+			grade = "S",
+			rating = "30.10",
+			ratingPostfix = "ENPS"
+		},
+		{
+			artist = "A",
+			title = "Short title!",
+			name = "Insane",
+			creator = "( ͡° ͜ʖ ͡°)",
+			timeRate = 1,
+			mods = "",
+			accuracy = 0.9459,
+			timeSince = "1 year ago",
+			grade = "A",
+			rating = "517",
+			ratingPostfix = "PP"
+		},
+		{
+			artist = "I hate short titles",
+			title = "This text means nothing this text means nothing this text means nothing this text means nothing this text means nothing",
+			name = "123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123",
+			creator = "( ͡° ͜ʖ ͡°)",
+			timeRate = 1,
+			mods = "P2 AltK RD AM7 CH5 BS",
+			accuracy = 0.9459,
+			timeSince = "1 year ago",
+			grade = "B",
+			rating = "34.34",
+			ratingPostfix = "MSD"
+		}
+	}
 end
 
 ---@param req web.IRequest
@@ -61,6 +103,8 @@ function UserResource:getUser(req, res, ctx)
 	ctx.user = user
 	ctx.ignore_main_container = true
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
+
+	ctx.scores = self.testScores
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 

@@ -265,6 +265,31 @@
 						</script>
 					<% end %>
 				</div>
+				<div class="block">
+					<% for _, v in ipairs(scores) do %>
+						<div class="user__score-panel">
+							<div class="user__score-line" data-grade="<%= v.grade %>"></div>
+							<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
+								<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
+								<div style="display: flex">
+									<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
+									<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods %></p>
+								</div>
+							</div>
+							<div style="display: flex; min-width: fit-content;">
+								<div class="user__score-rows" style="text-align: right;">
+									<p style="padding-left: 6px"><strong><%= v.accuracy * 100 %>%</strong></p>
+									<p class="has-text-grey"><%= v.timeSince %></p>
+								</div>
+								<p class="user__score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
+								<div class="user__score-rating-box has-background-gray-light">
+									<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
+									<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
+								</div>
+							</div>
+						</div>
+					<% end %>
+				</div>
 			</div>
 		</div>
 	</div>
