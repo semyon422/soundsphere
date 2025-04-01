@@ -5,7 +5,7 @@
 <main class="container">
 	<div class="block user__container">
 		<div class="columns">
-			<div class="column is-full-mobile is-two-fifths-tablet is-one-quarter-widescreen">
+			<div class="column">
 				<div class="block">
 					<div class="box">
 						<div class="block">
@@ -51,7 +51,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="block is-hidden-touch">
+				<div class="block is-hidden-mobile">
 					<div class="block">
 						<h1 class="title">Game mode</h1>
 						<aside class="menu">
@@ -102,53 +102,8 @@
 						</aside>
 					</div>
 				</div>
-				<div class="block is-hidden-desktop user__options-menu-touch">
-					<p class="title">Stats Filter</p>
-					<p class="subtitle">Select game mode, leaderboard and other options to filter specific statistics.</p>
-					<div class="field">
-						<label class="label">Gamemode</label>
-						<div class="control">
-							<div class="select is-fullwidth">
-								<select>
-									<option>Mania</option>
-									<option>Taiko</option>
-									<option>osu!</option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="field">
-						<label class="label">Leaderboard</label>
-						<div class="control">
-							<div class="select is-fullwidth">
-								<select>
-									<option>All ranked</option>
-									<option>Hardcore</option>
-									<hr class="dropdown-divider" />
-									<option>osu!</option>
-									<hr class="dropdown-divider" />
-									<option>Insane 2</option>
-									<option>Overjoy</option>
-								</select>
-							</div>
-						</div>
-					</div>
-					<div class="field">
-						<label class="label">Key mode</label>
-						<div class="control">
-							<div class="select is-fullwidth">
-								<select>
-									<option>All</option>
-									<option>4K</option>
-									<option>7K1S</option>
-									<option>10K</option>
-								</select>
-							</div>
-						</div>
-					</div>
-				</div>
 			</div>
-			<div class="column">
+			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
 				<div class="user__banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<nav class="level">
@@ -204,10 +159,10 @@
 					<% if user.description ~= "" or can_update then %>
 						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-						<div class="box">
+						<div class="border-box">
 							<% if can_update and (user.description == "" and not edit_description) then %>
 								<p align="center">Click edit to change your profile description!<p>
-								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>">Edit</a>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
 							<% elseif can_update and edit_description then %>
 								<div class="block">
 									<div class="user__description-container" id="editorContainer"></div>
@@ -265,30 +220,77 @@
 						</script>
 					<% end %>
 				</div>
-				<div class="block">
-					<% for _, v in ipairs(scores) do %>
-						<div class="user__score-panel">
-							<div class="user__score-line" data-grade="<%= v.grade %>"></div>
-							<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-								<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
-								<div style="display: flex">
-									<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
-									<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods %></p>
-								</div>
-							</div>
-							<div style="display: flex; min-width: fit-content;">
-								<div class="user__score-rows" style="text-align: right;">
-									<p style="padding-left: 6px"><strong><%= v.accuracy * 100 %>%</strong></p>
-									<p class="has-text-grey"><%= v.timeSince %></p>
-								</div>
-								<p class="user__score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
-								<div class="user__score-rating-box has-background-gray-light">
-									<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
-									<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
-								</div>
+				<div class="block is-hidden-tablet user__options-menu-touch">
+					<p class="title">Stats Filter</p>
+					<p class="subtitle">Select game mode, leaderboard and other options to filter specific statistics.</p>
+					<div class="field">
+						<label class="label">Gamemode</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>Mania</option>
+									<option>Taiko</option>
+									<option>osu!</option>
+								</select>
 							</div>
 						</div>
-					<% end %>
+					</div>
+					<div class="field">
+						<label class="label">Leaderboard</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>All ranked</option>
+									<option>Hardcore</option>
+									<hr class="dropdown-divider" />
+									<option>osu!</option>
+									<hr class="dropdown-divider" />
+									<option>Insane 2</option>
+									<option>Overjoy</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Key mode</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<option>All</option>
+									<option>4K</option>
+									<option>7K1S</option>
+									<option>10K</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="block">
+					<div class="user__score-container">
+						<% for _, v in ipairs(scores) do %>
+							<div class="user__score-panel">
+								<div class="user__score-line" data-grade="<%= v.grade %>"></div>
+								<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
+									<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
+									<div style="display: flex">
+										<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
+										<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods %></p>
+									</div>
+								</div>
+								<div style="display: flex; min-width: fit-content;">
+									<div class="user__score-rows" style="text-align: right;">
+										<p style="padding-left: 6px"><strong><%= v.accuracy * 100 %>%</strong></p>
+										<p class="has-text-grey"><%= v.timeSince %></p>
+									</div>
+									<p class="user__score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
+									<div class="user__score-rating-box has-background-gray-light">
+										<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
+										<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
+									</div>
+								</div>
+							</div>
+						<% end %>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -15,6 +15,12 @@ body {
 	grid-template-rows: repeat(3, 1fr);
 }
 
+.border-box {
+	border: 1px solid var(--bulma-border);
+	border-radius: 0.5em;
+	padding: 1.25rem;
+}
+
 .saira-regular {
   font-family: "Saira", sans-serif;
   font-optical-sizing: auto;
