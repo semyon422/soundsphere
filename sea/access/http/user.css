@@ -210,6 +210,10 @@
 	text-shadow: -1px -1px 0 #00000055, 1px -1px 0 #00000055, -1px 1px 0 #00000055, 1px 1px 0 #00000055;
 }
 
+.user__score-grade[data-grade="X"] {
+	color: paleturquoise;
+}
+
 .user__score-grade[data-grade="S"] {
 	color: gold;
 }
@@ -233,6 +237,10 @@
 .user__score-line {
 	min-width: 8px;
 	border-radius: 8px;
+}
+
+.user__score-line[data-grade="X"] {
+	background-color: paleturquoise;
 }
 
 .user__score-line[data-grade="S"] {

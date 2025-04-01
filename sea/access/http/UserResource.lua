@@ -75,7 +75,7 @@ function UserResource:new(users, views)
 			mods = "P2 AltK RD AM7 CH5 BS",
 			accuracy = 0.9459,
 			timeSince = "1 year ago",
-			grade = "B",
+			grade = "X",
 			rating = "34.34",
 			ratingPostfix = "MSD"
 		}
