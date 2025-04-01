@@ -70,16 +70,10 @@
 	height: 410px;
 }
 
-.user__activity-container {
-	display: block;
-	width: min-content;
-	margin: auto;
-}
-
 .user__activity-table {
+	margin: auto;
 	border-collapse: separate;
 	border-spacing: 3px;
-	width: max-content;
 	font-size: 12px;
 }
 
@@ -157,4 +151,145 @@
 
 .ql-container.ql-snow {
 	border: none !important;
+}
+
+.user__score-container {
+	margin: 0 auto;
+	max-width: 930px;
+	width: 100%;
+}
+
+.user__score-panel {
+	display: flex;
+	width: 100%;
+	height: 54px;
+	line-height: 54px;
+	background-color: var(--bulma-background);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.user__score-panel:hover {
+	background-color: var(--bulma-border);
+}
+
+.user__score-panel:hover * {
+	background-color: var(--bulma-border);
+}
+
+.user__score-panel:not(:last-child) {
+	margin-bottom: 4px;
+}
+
+.user__score-text {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.user__score-rows {
+	display: flex;
+	flex-direction: column;
+	padding-left: 10px;
+}
+
+.user__score-rows > :first-child {
+	margin-top: auto;
+	padding-bottom: 3px;
+	line-height: 100%;
+}
+
+.user__score-rows > :last-child {
+	margin-bottom: auto;
+	padding-top: 3px;
+	line-height: 100%;
+}
+
+.user__score-mods {
+	flex-grow: 1;
+}
+
+.user__score-grade {
+	width: 60px;
+	padding-left: 18px;
+	padding-right: 20px;
+	font-size: 42px;
+	line-height: 52px;
+	text-shadow: -1px -1px 0 #00000055, 1px -1px 0 #00000055, -1px 1px 0 #00000055, 1px 1px 0 #00000055;
+}
+
+.user__score-grade[data-grade="X"] {
+	color: paleturquoise;
+}
+
+.user__score-grade[data-grade="S"] {
+	color: gold;
+}
+
+.user__score-grade[data-grade="A"] {
+	color: greenyellow;
+}
+
+.user__score-grade[data-grade="B"] {
+	color: cornflowerblue;
+}
+
+.user__score-grade[data-grade="C"] {
+	color: magenta;
+}
+
+.user__score-grade[data-grade="D"] {
+	color: red;
+}
+
+.user__score-line {
+	min-width: 8px;
+	border-radius: 8px;
+}
+
+.user__score-line[data-grade="X"] {
+	background-color: paleturquoise;
+}
+
+.user__score-line[data-grade="S"] {
+	background-color: gold;
+}
+
+.user__score-line[data-grade="A"] {
+	background-color: greenyellow;
+}
+
+.user__score-line[data-grade="B"] {
+	background-color: cornflowerblue;
+}
+
+.user__score-line[data-grade="C"] {
+	background-color: magenta;
+}
+
+.user__score-line[data-grade="D"] {
+	background-color: red;
+}
+
+.user__score-rating-box {
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	width: 110px;
+	font-size: 21px;
+	background-color: var(--bulma-border-weak);
+	clip-path: polygon(
+		0% 0%,
+		100% 0%,
+		100% 100%,
+		0% 100%,
+		5px 80%,
+		5px 20%
+	);
+}
+
+.user__score-rating-postfix {
+	font-size: 12px;
+	line-height: 60px;
+	padding-left:2px
 }

@@ -14,3 +14,37 @@ body {
 	max-height: 80vh;
 	grid-template-rows: repeat(3, 1fr);
 }
+
+.border-box {
+	border: 1px solid var(--bulma-border);
+	border-radius: 0.5em;
+	padding: 1.25rem;
+}
+
+.saira-regular {
+  font-family: "Saira", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 95;
+}
+
+.saira-medium {
+  font-family: "Saira", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 95;
+}
+
+.saira-bold {
+  font-family: "Saira", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 95;
+}
+
