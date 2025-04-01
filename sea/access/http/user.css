@@ -169,6 +169,14 @@
 	overflow: hidden;
 }
 
+.user__score-panel:hover {
+	background-color: var(--bulma-border);
+}
+
+.user__score-panel:hover * {
+	background-color: var(--bulma-border);
+}
+
 .user__score-panel:not(:last-child) {
 	margin-bottom: 4px;
 }
