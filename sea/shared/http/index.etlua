@@ -1,1 +1,11 @@
-home page
+<div style="margin-top: 21%">
+	<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
+	<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM • FREEDOM</h3>
+
+	<div class="level" style="margin-top:25px">
+		<div class="level-item buttons are-medium">
+			<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+			<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+		</div>
+	</div>
+</div>

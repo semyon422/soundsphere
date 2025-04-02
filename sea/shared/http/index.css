@@ -1,0 +1,11 @@
+.welcome__game-name {
+	font-size: 70px;
+	color: var(--bulma-text-strong);
+	text-align: center;
+}
+
+.welcome__game-description {
+	font-size: 16px;
+	color: var(--bulma-text-strong);
+	text-align: center;
+}
