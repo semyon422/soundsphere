@@ -3,6 +3,7 @@ local urls = {
 	host = "",
 	update = "",
 	multiplayer = "",
+	websocket = "",
 	osu = {
 		background = "",
 		preview = "",
