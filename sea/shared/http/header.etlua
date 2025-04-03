@@ -41,12 +41,6 @@
 					Donate
 				</p>
 			</a>
-			<a class="navbar-item" href="/download">
-				<p>
-					<i class="fas fa-download icon-margin-right"></i>
-					Download
-				</p>
-			</a>
 		</div>
 		<div class="navbar-end">
 			<div class="navbar-item has-dropdown is-hoverable" x-data="{

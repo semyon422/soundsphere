@@ -13,6 +13,7 @@ StyleResource.routes = {
 local files = {
 	"sea/shared/http/style.css",
 	"sea/shared/http/header.css",
+	"sea/shared/http/index.css",
 	"sea/access/http/user.css",
 	"sea/access/http/users.css",
 	"sea/leaderboards/http/rankings.css"
