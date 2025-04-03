@@ -1,11 +1,22 @@
-<div style="margin-top: 21%">
-	<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
-	<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM • FREEDOM</h3>
+<div class="columns" style="height: 87vh">
+	<div class="column">
+		<div class="welcome__hero">
+			<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
+			<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
 
-	<div class="level" style="margin-top:25px">
-		<div class="level-item buttons are-medium">
-			<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
-			<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+			<div class="level" style="margin-top:26px">
+				<div class="level-item buttons are-medium">
+					<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+					<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="column">
+		<div class="welcome__canvas-container">
+			<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
 		</div>
 	</div>
 </div>
+
+<script src="static/scripts/index.js"></script>

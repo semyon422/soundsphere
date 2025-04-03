@@ -1,3 +1,10 @@
+.welcome__hero {
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	justify-content: center
+}
+
 .welcome__game-name {
 	font-size: 70px;
 	color: var(--bulma-text-strong);
@@ -8,4 +15,16 @@
 	font-size: 16px;
 	color: var(--bulma-text-strong);
 	text-align: center;
+}
+
+.welcome__canvas-container {
+	display: flex;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+}
+
+.welcome__canvas {
+	height: 60vh;
+	mask-image: linear-gradient(rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 1) 150px);
 }
