@@ -78,31 +78,7 @@ local function is_valid_rate(rate)
 	return true
 end
 
----@param v any
-local function is_id(v)
-	return type(v) == "number" and v == math.floor(v) and v > 0
-end
-
----@param lb_dt any
-local function is_leaderboard_difftable(lb_dt)
-	if type(lb_dt) ~= "table" then
-		return false
-	end
-	---@cast lb_dt {[any]: [any]}
-	local c = 0
-	for k, v in pairs(lb_dt) do
-		c = c + 1
-		if k ~= "difftable_id" or not is_id(v) then
-			return false
-		end
-	end
-	if c ~= 1 then
-		return false
-	end
-	return true
-end
-
-local validate_leaderboard = valid.create({
+local validate_leaderboard = valid.struct({
 	name = types.name,
 	description = types.description,
 	rating_calc = types.new_enum(RatingCalc),
@@ -120,9 +96,9 @@ local validate_leaderboard = valid.create({
 	allow_free_healths = types.boolean,
 	rate = is_valid_rate,
 	mode = types.new_enum(Gamemode),
-	chartmeta_inputmode = types.new_is_array_of("string"),
-	chartdiff_inputmode = types.new_is_array_of("string"),
-	leaderboard_difftables = types.new_is_array_of(is_leaderboard_difftable, "LeaderboardDifftable"),
+	chartmeta_inputmode = valid.array(types.name, 10),
+	chartdiff_inputmode = valid.array(types.name, 10),
+	leaderboard_difftables = valid.array(valid.struct({difftable_id = types.index}), 10),
 })
 
 ---@return true?

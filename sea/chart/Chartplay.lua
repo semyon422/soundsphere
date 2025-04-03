@@ -1,4 +1,10 @@
+local valid = require("valid")
+local types = require("sea.shared.types")
 local Chartkey = require("sea.chart.Chartkey")
+local RateType = require("sea.chart.RateType")
+local Gamemode = require("sea.chart.Gamemode")
+local ComputeState = require("sea.chart.ComputeState")
+local Result = require("sea.chart.Result")
 
 ---@class sea.Chartplay: sea.Chartkey
 ---@operator call: sea.Chartplay
@@ -55,6 +61,58 @@ function Chartplay:equalsComputed(values)
 		if self[key] ~= values[key] then
 			return false
 		end
+	end
+	return true
+end
+
+local is_timings_or_healths = valid.struct({
+	name = types.name,
+	data = valid.optional(types.count),
+})
+
+local is_modifier = valid.struct({})
+
+local validate_chartplay = valid.struct({
+	user_id = types.index,
+	events_hash = types.md5hash,
+	notes_hash = types.md5hash,
+	hash = types.md5hash,
+	index = types.index,
+	modifiers = valid.array(is_modifier, 10),
+	custom = types.boolean,
+	rate = types.number,
+	rate_type = types.new_enum(RateType),
+	mode = types.new_enum(Gamemode),
+	const = types.boolean,
+	nearest = types.boolean,
+	tap_only = types.boolean,
+	timings = is_timings_or_healths,
+	healths = is_timings_or_healths,
+	columns_order = valid.array(types.index, 100),
+	created_at = types.time,
+	submitted_at = types.time,
+	computed_at = types.time,
+	compute_state = types.new_enum(ComputeState),
+	pause_count = types.count,
+	result = types.new_enum(Result),
+	judges = valid.array(types.count, 10),
+	accuracy = types.number,
+	max_combo = types.count,
+	perfect_count = types.count,
+	miss_count = types.count,
+	rating = types.number,
+	accuracy_osu = types.number,
+	accuracy_etterna = types.number,
+	rating_pp = types.number,
+	rating_msd = types.number,
+})
+
+---@return true?
+---@return string[]?
+function Chartplay:validate()
+	local ok, errs = validate_chartplay(self)
+	if not ok then
+		return nil, valid.flatten(errs)
 	end
 	return true
 end

@@ -11,7 +11,7 @@ local types = require("sea.shared.types")
 ---@field created_at integer
 local Difftable = class()
 
-local validate_difftable = valid.create({
+local validate_difftable = valid.struct({
 	name = types.name,
 	description = types.description,
 	symbol = types.name,
