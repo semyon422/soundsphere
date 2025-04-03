@@ -104,7 +104,7 @@ function DifftableResource:updateDifftable(req, res, ctx)
 	end
 
 	res.status = 302
-	res.headers:set("Location", "/difftables/" .. difftable.id)
+	res.headers:set("Location", "/difftables/" .. difftable_id)
 end
 
 return DifftableResource

@@ -3,7 +3,7 @@
 <div class="columns">
 	<div class="column"></div>
 	<div class="column">
-		<form action="/leaderboards/<%= leaderboard.id %>/edit" method="post">
+		<form action="/leaderboards/<%= path_params.leaderboard_id %>/edit" method="post">
 			<h3 class="title is-3">Edit leaderboard</h3>
 
 			<%- view:render("sea/leaderboards/http/leaderboard_form_fields.etlua") %>
@@ -13,12 +13,12 @@
 					<button class="button is-link">Update</button>
 				</div>
 				<div class="control">
-					<a class="button is-link is-light" href="/leaderboards/<%= leaderboard.id %>">Cancel</a>
+					<a class="button is-link is-light" href="/leaderboards/<%= path_params.leaderboard_id %>">Cancel</a>
 				</div>
 				<div class="control">
 					<button
 						class="button is-danger"
-						hx-delete="/leaderboards/<%= leaderboard.id %>"
+						hx-delete="/leaderboards/<%= path_params.leaderboard_id %>"
 						hx-confirm="Delete leaderboard?"
 						hx-params="none"
 					>Delete</button>
