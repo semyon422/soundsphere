@@ -14,8 +14,8 @@ LeaderboardResource.routes = {
 		POST = "deleteLeaderboard",
 	}},
 	{"/leaderboards/:leaderboard_id/edit", {
-		GET = "getEditDifftable",
-		POST = "updateDifftable",
+		GET = "getEditLeaderboard",
+		POST = "updateLeaderboard",
 	}},
 }
 
@@ -61,7 +61,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function LeaderboardResource:getEditDifftable(req, res, ctx)
+function LeaderboardResource:getEditLeaderboard(req, res, ctx)
 	ctx.leaderboard = self.leaderboards:getLeaderboard(tonumber(ctx.path_params.leaderboard_id))
 	if not ctx.leaderboard then
 		res.status = 404
@@ -74,7 +74,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function LeaderboardResource:updateDifftable(req, res, ctx)
+function LeaderboardResource:updateLeaderboard(req, res, ctx)
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		res.status = 400
@@ -90,7 +90,6 @@ function LeaderboardResource:updateDifftable(req, res, ctx)
 
 	local lb = Leaderboard()
 
-	lb.id = leaderboard_id
 	lb.name = body_params.name
 	lb.description = body_params.description
 
@@ -141,7 +140,7 @@ function LeaderboardResource:updateDifftable(req, res, ctx)
 	end
 
 	res.status = 302
-	res.headers:set("Location", "/leaderboards/" .. leaderboard.id)
+	res.headers:set("Location", "/leaderboards/" .. leaderboard_id)
 end
 
 return LeaderboardResource

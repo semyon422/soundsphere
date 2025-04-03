@@ -1,4 +1,6 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
 
 ---@class sea.Difftable
 ---@operator call: sea.Difftable
@@ -9,25 +11,19 @@ local class = require("class")
 ---@field created_at integer
 local Difftable = class()
 
+local validate_difftable = valid.create({
+	name = types.name,
+	description = types.description,
+	symbol = types.name,
+})
+
 ---@return true?
 ---@return string[]?
 function Difftable:validate()
-	local errs = {}
-
-	if type(self.name) ~= "string" or #self.name == 0 then
-		table.insert(errs, "invalid name")
+	local ok, errs = validate_difftable(self)
+	if not ok then
+		return nil, valid.flatten(errs)
 	end
-	if type(self.description) ~= "string" then
-		table.insert(errs, "invalid description")
-	end
-	if type(self.symbol) ~= "string" then
-		table.insert(errs, "invalid symbol")
-	end
-
-	if #errs > 0 then
-		return nil, errs
-	end
-
 	return true
 end
 

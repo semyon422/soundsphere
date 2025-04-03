@@ -1,5 +1,7 @@
 local class = require("class")
 local table_util = require("table_util")
+local valid = require("valid")
+local types = require("sea.shared.types")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ScoreComb = require("sea.leaderboards.ScoreComb")
 local TernaryState = require("sea.chart.TernaryState")
@@ -35,8 +37,6 @@ local Gamemode = require("sea.chart.Gamemode")
 local Leaderboard = class()
 
 function Leaderboard:new()
-	self.created_at = os.time()
-
 	self.rating_calc = "enps"
 	self.scores_comb = "avg"
 	self.scores_comb_count = 20
@@ -102,80 +102,36 @@ local function is_leaderboard_difftable(lb_dt)
 	return true
 end
 
+local validate_leaderboard = valid.create({
+	name = types.name,
+	description = types.description,
+	rating_calc = types.new_enum(RatingCalc),
+	scores_comb = types.new_enum(ScoreComb),
+	scores_comb_count = types.count,
+	nearest = types.new_enum(TernaryState),
+	result = types.new_enum(Result),
+	allow_custom = types.boolean,
+	allow_const = types.boolean,
+	allow_pause = types.boolean,
+	allow_reorder = types.boolean,
+	allow_modifiers = types.boolean,
+	allow_tap_only = types.boolean,
+	allow_free_timings = types.boolean,
+	allow_free_healths = types.boolean,
+	rate = is_valid_rate,
+	mode = types.new_enum(Gamemode),
+	chartmeta_inputmode = types.new_is_array_of("string"),
+	chartdiff_inputmode = types.new_is_array_of("string"),
+	leaderboard_difftables = types.new_is_array_of(is_leaderboard_difftable, "LeaderboardDifftable"),
+})
+
 ---@return true?
 ---@return string[]?
 function Leaderboard:validate()
-	local errs = {}
-
-	if type(self.name) ~= "string" or #self.name == 0 then
-		table.insert(errs, "invalid name")
+	local ok, errs = validate_leaderboard(self)
+	if not ok then
+		return nil, valid.flatten(errs)
 	end
-	if type(self.description) ~= "string" then
-		table.insert(errs, "invalid description")
-	end
-
-	if not RatingCalc:encode_safe(self.rating_calc) then
-		table.insert(errs, "invalid rating_calc")
-	end
-	if not ScoreComb:encode_safe(self.scores_comb) then
-		table.insert(errs, "invalid scores_comb")
-	end
-	if type(self.scores_comb_count) ~= "number" or self.scores_comb_count <= 0 then
-		table.insert(errs, "invalid scores_comb_count")
-	end
-
-	if not TernaryState:encode_safe(self.nearest) then
-		table.insert(errs, "invalid nearest")
-	end
-	if not Result:encode_safe(self.result) then
-		table.insert(errs, "invalid result")
-	end
-	if type(self.allow_custom) ~= "boolean" then
-		table.insert(errs, "invalid allow_custom")
-	end
-	if type(self.allow_const) ~= "boolean" then
-		table.insert(errs, "invalid allow_const")
-	end
-	if type(self.allow_pause) ~= "boolean" then
-		table.insert(errs, "invalid allow_pause")
-	end
-	if type(self.allow_reorder) ~= "boolean" then
-		table.insert(errs, "invalid allow_reorder")
-	end
-	if type(self.allow_modifiers) ~= "boolean" then
-		table.insert(errs, "invalid allow_modifiers")
-	end
-	if type(self.allow_tap_only) ~= "boolean" then
-		table.insert(errs, "invalid allow_tap_only")
-	end
-	if type(self.allow_free_timings) ~= "boolean" then
-		table.insert(errs, "invalid allow_free_timings")
-	end
-	if type(self.allow_free_healths) ~= "boolean" then
-		table.insert(errs, "invalid allow_free_healths")
-	end
-	if not Gamemode:encode_safe(self.mode) then
-		table.insert(errs, "invalid mode " .. tostring(self.mode))
-	end
-
-	if not is_valid_rate(self.rate) then
-		table.insert(errs, "invalid rate")
-	end
-	if not table_util.is_array_of(self.chartmeta_inputmode, "string") then
-		table.insert(errs, "invalid chartmeta_inputmode")
-	end
-	if not table_util.is_array_of(self.chartdiff_inputmode, "string") then
-		table.insert(errs, "invalid chartdiff_inputmode")
-	end
-
-	if not table_util.is_array_of(self.leaderboard_difftables, is_leaderboard_difftable) then
-		table.insert(errs, "invalid leaderboard_difftables")
-	end
-
-	if #errs > 0 then
-		return nil, errs
-	end
-
 	return true
 end
 
