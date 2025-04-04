@@ -84,9 +84,10 @@ end
 ---@param user sea.User
 ---@param submission sea.SubmissionClientRemote
 ---@param chartplay_values sea.Chartplay
+---@param chartdiff_values sea.Chartdiff
 ---@return sea.Chartplay?
 ---@return string?
-function Chartplays:submit(user, submission, chartplay_values)
+function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	local can, err = self.chartplays_access:canSubmit(user)
 	if not can then
 		return nil, err
@@ -97,6 +98,7 @@ function Chartplays:submit(user, submission, chartplay_values)
 		chartplay_values.id = nil
 		chartplay_values.user_id = user.id
 		chartplay_values.created_at = os.time()
+		chartplay_values.compute_state = "new"
 
 		chartplay = self.charts_repo:createChartplay(chartplay_values)
 	end
@@ -127,28 +129,35 @@ function Chartplays:submit(user, submission, chartplay_values)
 	chartplay.submitted_at = os.time()
 	self.charts_repo:updateChartplay(chartplay)
 
-	if chartplay.custom then
-		return chartplay
-	end
+	---@type sea.Chartplay, sea.Chartdiff
+	local computed_chartplay, computed_chartdiff
 
-	local cpcd, err = self.chartplay_computer:compute(chartplay)
-	if not cpcd then
-		-- if something custom-related then set custom = true
-		-- if n/a or something else then compute_state = "invalid"
-		return nil, err
+	if chartplay.custom then
+		computed_chartplay = chartplay
+		computed_chartdiff = chartdiff_values
+		computed_chartdiff.custom_user_id = user.id
+	else
+		local cpcd, err = self.chartplay_computer:compute(chartplay)
+		if not cpcd then
+			chartplay.compute_state = "invalid"
+			self.charts_repo:updateChartplay(chartplay)
+			return nil, err
+		end
+
+		computed_chartplay, computed_chartdiff = cpcd[1], cpcd[2]
+
+		if not chartplay:equalsComputed(computed_chartplay) then
+			chartplay.compute_state = "invalid"
+			self.charts_repo:updateChartplay(chartplay)
+			return nil, "computed chartplay differs"
+		end
+
+		if not chartdiff_values:equalsComputed(computed_chartdiff) then
+			return nil, "computed values differs"
+		end
 	end
 
 	chartplay.compute_state = "valid"
-
-	local computed_chartplay, computed_chartdiff = cpcd[1], cpcd[2]
-
-	if not chartplay:equalsComputed(computed_chartplay) then
-		chartplay.custom = true
-		self.charts_repo:updateChartplay(chartplay)
-		-- client error?
-		return nil, "computed values differs"
-	end
-
 	self.charts_repo:updateChartplay(chartplay)
 
 	local chartdiff = self.charts_repo:getChartdiffByChartkey(computed_chartdiff)
@@ -160,7 +169,9 @@ function Chartplays:submit(user, submission, chartplay_values)
 		-- add a note on chartdiff page about this change
 	end
 
-	self.leaderboards:addChartplay(chartplay)
+	if not chartplay.custom then
+		self.leaderboards:addChartplay(chartplay)
+	end
 
 	return chartplay
 end

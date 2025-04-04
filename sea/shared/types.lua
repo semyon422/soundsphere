@@ -80,6 +80,18 @@ function types.number(v)
 	return true
 end
 
+function types.normalized(v)
+	if type(v) ~= "number" then
+		return nil, "not a number"
+	elseif v ~= v then
+		return nil, "NaN"
+	elseif v < 0 or v > 1 then
+		return nil, "out of range"
+	end
+
+	return true
+end
+
 function types.count(v)
 	if type(v) ~= "number" then
 		return nil, "not a number"

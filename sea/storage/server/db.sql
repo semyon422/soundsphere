@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`rate` INTEGER NOT NULL,
 	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER NOT NULL,
+	`custom_user_id` INTEGER,
 	`notes_hash` TEXT,
 	`inputmode` TEXT,
 	`notes_count` INTEGER,
@@ -131,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`msd_diff_data` TEXT,
 	`user_diff` REAL,
 	`user_diff_data` TEXT,
-	UNIQUE(`hash`, `index`, `modifiers`, `rate`)
+	UNIQUE(`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`)
 );
 
 CREATE INDEX IF NOT EXISTS chartdiffs_inputmode_idx ON chartdiffs (`inputmode`);

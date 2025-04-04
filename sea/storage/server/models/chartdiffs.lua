@@ -12,6 +12,9 @@ chartdiffs.types = {
 	modifiers = json,
 	rate = int_rates,
 	mode = Gamemode,
+	note_types_count = json,
+	density_data = json,
+	sv_data = json,
 }
 
 return chartdiffs

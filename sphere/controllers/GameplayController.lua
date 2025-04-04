@@ -6,6 +6,7 @@ local TempoRange = require("notechart.TempoRange")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Note = require("ncdk2.notes.Note")
 local Chartplay = require("sea.chart.Chartplay")
+local Chartdiff = require("sea.chart.Chartdiff")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 
@@ -454,12 +455,33 @@ function GameplayController:saveScore()
 	chartplay.rating_pp = 0
 	chartplay.rating_msd = 0
 
+	local _chartdiff = Chartdiff()
+
+	_chartdiff.hash = chartdiff.hash
+	_chartdiff.index = chartdiff.index
+	_chartdiff.modifiers = {}
+	_chartdiff.rate = chartdiff.rate
+	_chartdiff.rate_type = chartdiff.rate_type
+	_chartdiff.mode = "mania"
+	_chartdiff.inputmode = chartdiff.inputmode
+	_chartdiff.notes_count = 0
+	_chartdiff.judges_count = 0
+	_chartdiff.note_types_count = {}
+	_chartdiff.density_data = {}
+	_chartdiff.sv_data = {}
+	_chartdiff.enps_diff = 0
+	_chartdiff.osu_diff = 0
+	_chartdiff.msd_diff = 0
+	_chartdiff.msd_diff_data = ""
+	_chartdiff.user_diff = 0
+	_chartdiff.user_diff_data = ""
+
 	coroutine.wrap(function()
 		if not self.seaClient.connected then
 			return
 		end
 		print("submit")
-		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay)
+		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, _chartdiff)
 		print("got", ok, err)
 		if ok then
 			print(require("stbl").encode(ok))

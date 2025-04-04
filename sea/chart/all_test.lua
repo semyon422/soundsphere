@@ -1,5 +1,6 @@
 local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
+local Chartdiff = require("sea.chart.Chartdiff")
 local Chartplays = require("sea.chart.Chartplays")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
@@ -50,6 +51,7 @@ local function create_test_ctx()
 		leaderboards = leaderboards,
 		chartplays = chartplays,
 		user = user,
+		fakeChartplayComputer = fakeChartplayComputer,
 	}
 end
 
@@ -97,10 +99,38 @@ function test.submit_score(t)
 	local valid, errs = chartplay_values:validate()
 	t:tdeq({valid, errs}, {true})
 
+	local chartdiff_values = {
+		hash = md5.sumhexa(chartfile_data),
+		index = 1,
+		modifiers = {},
+		rate = 1,
+		rate_type = "exp",
+		mode = "mania",
+		inputmode = "4key",
+		notes_count = 100,
+		judges_count = 110,
+		note_types_count = {},
+		density_data = {},
+		sv_data = {},
+		enps_diff = 0,
+		osu_diff = 0,
+		msd_diff = 0,
+		msd_diff_data = "",
+		user_diff = 0,
+		user_diff_data = "",
+	}
+	setmetatable(chartdiff_values, Chartdiff)
+	---@cast chartdiff_values sea.Chartdiff
+
+	local valid, errs = chartdiff_values:validate()
+	t:tdeq({valid, errs}, {true})
+
+	ctx.fakeChartplayComputer.chartdiff = chartdiff_values
+
 	local user = User()
 	user.id = 1
 
-	local chartplay, err = ctx.chartplays:submit(user, remote, chartplay_values)
+	local chartplay, err = ctx.chartplays:submit(user, remote, chartplay_values, chartdiff_values)
 
 	if t:assert(chartplay, err) then
 		---@cast chartplay -?
