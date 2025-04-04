@@ -5,6 +5,9 @@ local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Note = require("ncdk2.notes.Note")
+local Chartplay = require("sea.chart.Chartplay")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -29,6 +32,7 @@ local GameplayController = class()
 ---@param offsetModel sphere.OffsetModel
 ---@param previewModel sphere.PreviewModel
 ---@param notificationModel sphere.NotificationModel
+---@param seaClient sphere.SeaClient
 function GameplayController:new(
 	rhythmModel,
 	selectModel,
@@ -48,7 +52,8 @@ function GameplayController:new(
 	pauseModel,
 	offsetModel,
 	previewModel,
-	notificationModel
+	notificationModel,
+	seaClient
 )
 	self.rhythmModel = rhythmModel
 	self.selectModel = selectModel
@@ -69,6 +74,7 @@ function GameplayController:new(
 	self.offsetModel = offsetModel
 	self.previewModel = previewModel
 	self.notificationModel = notificationModel
+	self.seaClient = seaClient
 end
 
 function GameplayController:load()
@@ -412,6 +418,53 @@ function GameplayController:saveScore()
 	if base.hitCount / base.notesCount >= 0.5 then
 		self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
 	end
+
+	local chartplay = Chartplay()
+
+	-- chartplay.user_id = 0
+	chartplay.events_hash = replayHash
+	-- chartplay.notes_hash = ""
+	chartplay.hash = chartdiff.hash
+	chartplay.index = chartdiff.index
+	chartplay.modifiers = {}
+	chartplay.custom = true
+	chartplay.rate = chartdiff.rate
+	chartplay.rate_type = chartdiff.rate_type
+	chartplay.mode = "mania"
+	chartplay.const = playContext.const
+	chartplay.nearest = playContext.timings.nearest
+	chartplay.tap_only = false -- like NoLongNote
+	chartplay.timings = Timings("simple", 100)
+	chartplay.healths = Healths("simple", 20)
+	chartplay.columns_order = nil
+	chartplay.created_at = os.time()
+	-- chartplay.submitted_at = integer
+	-- chartplay.computed_at = integer
+	-- chartplay.compute_state = sea.ComputeState
+	chartplay.pause_count = scoreEngine.pausesCount
+	chartplay.result = "pass"
+	chartplay.judges = {}
+	chartplay.accuracy = 0.020
+	chartplay.max_combo = 0
+	chartplay.perfect_count = judge.counters.perfect
+	chartplay.miss_count = scoreSystem.base.missCount
+	chartplay.rating = 0
+	chartplay.accuracy_osu = 0
+	chartplay.accuracy_etterna = 0
+	chartplay.rating_pp = 0
+	chartplay.rating_msd = 0
+
+	coroutine.wrap(function()
+		if not self.seaClient.connected then
+			return
+		end
+		print("submit")
+		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay)
+		print("got", ok, err)
+		if ok then
+			print(require("stbl").encode(ok))
+		end
+	end)()
 
 	self.playContext.scoreEntry = scoreEntry
 

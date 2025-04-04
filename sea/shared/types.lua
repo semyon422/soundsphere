@@ -40,6 +40,34 @@ function types.description(v)
 	return true
 end
 
+function types.file_name(v)
+	if type(v) ~= "string" then
+		return nil, "not a string"
+	end
+
+	---@type integer?
+	local len = utf8.len(v)
+	if not len then
+		return nil, "not a valid UTF-8 string"
+	end
+
+	if len == 0 then
+		return nil, "too short"
+	elseif len > 255 then
+		return nil, "too long"
+	end
+
+	return true
+end
+
+function types.binary(v)
+	if type(v) ~= "string" then
+		return nil, "not a string"
+	end
+
+	return true
+end
+
 function types.number(v)
 	if type(v) ~= "number" then
 		return nil, "not a number"

@@ -72,10 +72,27 @@ local is_timings_or_healths = valid.struct({
 
 local is_modifier = valid.struct({})
 
+---@param v integer[]
+local function is_columns_order(v)
+	local t = table.move(v, 1, #v, 1)
+	table.sort(t)
+	for i = 1, #v do
+		if i ~= v[i] then
+			return
+		end
+	end
+	return true
+end
+is_columns_order = valid.optional(valid.compose(valid.array(types.index, 100), is_columns_order))
+
+assert(is_columns_order())
+assert(is_columns_order({1, 3, 2}))
+assert(not is_columns_order({1, 3}))
+
 local validate_chartplay = valid.struct({
-	user_id = types.index,
+	-- user_id = types.index,
 	events_hash = types.md5hash,
-	notes_hash = types.md5hash,
+	-- notes_hash = types.md5hash,
 	hash = types.md5hash,
 	index = types.index,
 	modifiers = valid.array(is_modifier, 10),
@@ -88,11 +105,11 @@ local validate_chartplay = valid.struct({
 	tap_only = types.boolean,
 	timings = is_timings_or_healths,
 	healths = is_timings_or_healths,
-	columns_order = valid.array(types.index, 100),
+	columns_order = is_columns_order,
 	created_at = types.time,
-	submitted_at = types.time,
-	computed_at = types.time,
-	compute_state = types.new_enum(ComputeState),
+	-- submitted_at = types.time,
+	-- computed_at = types.time,
+	-- compute_state = types.new_enum(ComputeState),
 	pause_count = types.count,
 	result = types.new_enum(Result),
 	judges = valid.array(types.count, 10),

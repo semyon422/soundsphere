@@ -32,6 +32,14 @@ function ScoresRepo:updateScore(score)
 	return self.models.scores:update(score, {id = score.id})
 end
 
+---@param replay_hash string
+---@return table?
+function ScoresRepo:getScoreByReplayHash(replay_hash)
+	return self.models.scores:find({
+		replay_hash = assert(replay_hash),
+	})
+end
+
 ---@param chartview table
 ---@return table
 function ScoresRepo:getScores(chartview)

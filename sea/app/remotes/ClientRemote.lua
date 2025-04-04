@@ -5,8 +5,9 @@ local SubmissionClientRemote = require("sea.chart.remotes.SubmissionClientRemote
 ---@operator call: sea.ClientRemote
 local ClientRemote = class()
 
-function ClientRemote:new()
-	self.submission = SubmissionClientRemote()
+---@param game sphere.GameplayController
+function ClientRemote:new(game)
+	self.submission = SubmissionClientRemote(game.cacheModel)
 end
 
 return ClientRemote

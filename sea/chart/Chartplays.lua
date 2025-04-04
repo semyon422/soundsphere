@@ -1,4 +1,6 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
 local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
@@ -8,23 +10,23 @@ local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 local Chartplays = class()
 
 ---@param charts_repo sea.IChartsRepo
----@param chartplayComputer sea.IChartplayComputer
----@param chartsStorage sea.IKeyValueStorage
----@param replaysStorage sea.IKeyValueStorage
+---@param chartplay_computer sea.IChartplayComputer
+---@param charts_storage sea.IKeyValueStorage
+---@param replays_storage sea.IKeyValueStorage
 ---@param leaderboards sea.Leaderboards
 function Chartplays:new(
 	charts_repo,
-	chartplayComputer,
-	chartsStorage,
-	replaysStorage,
+	chartplay_computer,
+	charts_storage,
+	replays_storage,
 	leaderboards
 )
 	self.charts_repo = charts_repo
-	self.chartplayComputer = chartplayComputer
-	self.chartsStorage = chartsStorage
-	self.replaysStorage = replaysStorage
+	self.chartplay_computer = chartplay_computer
+	self.charts_storage = charts_storage
+	self.replays_storage = replays_storage
 	self.leaderboards = leaderboards
-	self.chartplaysAccess = ChartplaysAccess()
+	self.chartplays_access = ChartplaysAccess()
 end
 
 ---@return sea.Chartplay[]
@@ -32,12 +34,17 @@ function Chartplays:getChartplays()
 	return self.charts_repo:getChartplays()
 end
 
+local validate_chartfile_data = valid.struct({
+	name = types.file_name,
+	data = types.binary,
+})
+
 ---@param user sea.User
----@param remote sea.SubmissionClientRemote
+---@param submission sea.SubmissionClientRemote
 ---@param hash string
 ---@return sea.Chartfile?
 ---@return string?
-function Chartplays:requireChartfile(user, remote, hash)
+function Chartplays:requireChartfile(user, submission, hash)
 	local chartfile = self.charts_repo:getChartfileByHash(hash)
 	if not chartfile then
 		local chartfile_values = Chartfile()
@@ -48,16 +55,20 @@ function Chartplays:requireChartfile(user, remote, hash)
 		chartfile = self.charts_repo:createChartfile(chartfile_values)
 	end
 
-	local file, err = remote:getChartfileData(hash)
+	local file, err = submission:getChartfileData(hash)
 	if not file then
 		return nil, err or "missing error"
+	end
+
+	if not validate_chartfile_data(file) then
+		return nil, "invalid chartfile data"
 	end
 
 	if md5.sumhexa(file.data) ~= hash then
 		return nil, "invalid hash"
 	end
 
-	local ok, err = self.chartsStorage:set(hash, file.data)
+	local ok, err = self.charts_storage:set(hash, file.data)
 	if not ok then
 		return nil, err
 	end
@@ -71,12 +82,12 @@ function Chartplays:requireChartfile(user, remote, hash)
 end
 
 ---@param user sea.User
----@param remote sea.SubmissionClientRemote
+---@param submission sea.SubmissionClientRemote
 ---@param chartplay_values sea.Chartplay
 ---@return sea.Chartplay?
 ---@return string?
-function Chartplays:submit(user, remote, chartplay_values)
-	local can, err = self.chartplaysAccess:canSubmit(user)
+function Chartplays:submit(user, submission, chartplay_values)
+	local can, err = self.chartplays_access:canSubmit(user)
 	if not can then
 		return nil, err
 	end
@@ -90,21 +101,25 @@ function Chartplays:submit(user, remote, chartplay_values)
 		chartplay = self.charts_repo:createChartplay(chartplay_values)
 	end
 
-	local chartfile, err = self:requireChartfile(user, remote, chartplay.hash)
+	local chartfile, err = self:requireChartfile(user, submission, chartplay.hash)
 	if not chartfile then
 		return nil, err
 	end
 
-	local events_data, err = remote:getEventsData(chartplay.events_hash)
+	local events_data, err = submission:getEventsData(chartplay.events_hash)
 	if not events_data then
 		return nil, err or "missing error"
+	end
+
+	if type(events_data) ~= "string" then
+		return nil, "invalid events data"
 	end
 
 	if md5.sumhexa(events_data) ~= chartplay.events_hash then
 		return nil, "invalid replay hash"
 	end
 
-	local ok, err = self.replaysStorage:set(chartplay.events_hash, events_data)
+	local ok, err = self.replays_storage:set(chartplay.events_hash, events_data)
 	if not ok then
 		return nil, err
 	end
@@ -116,7 +131,7 @@ function Chartplays:submit(user, remote, chartplay_values)
 		return chartplay
 	end
 
-	local cpcd, err = self.chartplayComputer:compute(chartplay)
+	local cpcd, err = self.chartplay_computer:compute(chartplay)
 	if not cpcd then
 		-- if something custom-related then set custom = true
 		-- if n/a or something else then compute_state = "invalid"

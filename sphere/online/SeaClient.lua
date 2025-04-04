@@ -27,6 +27,13 @@ function SeaClient:new(game)
 	self.protocol = Subprotocol()
 	self.remote_handler = RemoteHandler(ClientRemote(self.game))
 
+	function self.remote_handler:transform(th, peer, obj, ...)
+		local _obj = setmetatable({}, {__index = obj})
+		_obj.remote = Remote(th, peer) --[[@as sea.ServerRemote]]
+		---@cast _obj +sea.IClientRemote
+		return _obj, ...
+	end
+
 	local server_peer = WebsocketPeer({send = function() end})
 	self.server_peer = server_peer
 
@@ -34,6 +41,7 @@ function SeaClient:new(game)
 	self.task_handler = task_handler
 
 	local remote = Remote(self.task_handler, self.server_peer)
+	---@cast remote -icc.Remote, +sea.ServerRemote
 	self.remote = remote
 
 	function self.protocol:text(payload, fin)
@@ -65,7 +73,7 @@ function SeaClient:load(url)
 		thread_remote:start(function(protocol)
 			local SphereWebsocket = require("sphere.online.SphereWebsocket")
 			local sphws = SphereWebsocket(url)
-			sphws.protocol = -protocol
+			sphws.protocol = -protocol --[[@as web.Subprotocol]]
 			return sphws
 		end)
 		local sphws = -thread_remote.remote
@@ -96,6 +104,17 @@ function SeaClient:load(url)
 		end
 	end)
 	assert(coroutine.resume(self.reconnect_thread))
+
+	self.ping_thread = coroutine.create(function()
+		while true do
+			local state = self.sphws_ret:getState()
+			if state == "open" then
+				self.sphws_ret.ws:send("ping")
+			end
+			delay.sleep(10)
+		end
+	end)
+	assert(coroutine.resume(self.ping_thread))
 end
 
 function SeaClient:update()

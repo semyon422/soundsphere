@@ -5,6 +5,8 @@ local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 local FakeSubmissionClientRemote = require("sea.chart.remotes.FakeSubmissionClientRemote")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 
@@ -59,15 +61,41 @@ function test.submit_score(t)
 	local replayfile_data = "replay"
 
 	local remote = FakeSubmissionClientRemote(chartfile_data, replayfile_data)
+	---@cast remote -sea.FakeSubmissionClientRemote, +sea.SubmissionClientRemote
 
-	local chartplay_values = Chartplay()
-	chartplay_values.hash = md5.sumhexa(chartfile_data)
-	chartplay_values.index = 1
-	chartplay_values.modifiers = {}
-	chartplay_values.rate = 1
-	chartplay_values.mode = "mania"
-	chartplay_values.events_hash = md5.sumhexa(replayfile_data)
-	chartplay_values.notes_hash = "notes_hash"
+	local chartplay_values = {
+		accuracy = 0.02,
+		accuracy_etterna = 0,
+		accuracy_osu = 0,
+		const = false,
+		created_at = os.time(),
+		custom = false,
+		events_hash = md5.sumhexa(replayfile_data),
+		hash = md5.sumhexa(chartfile_data),
+		healths = Healths("simple", 20),
+		index = 1,
+		judges = {},
+		max_combo = 0,
+		miss_count = 100,
+		mode = "mania",
+		modifiers = {},
+		nearest = false,
+		pause_count = 1,
+		perfect_count = 10,
+		rate = 1,
+		rate_type = "exp",
+		rating = 0,
+		rating_msd = 0,
+		rating_pp = 0,
+		result = "pass",
+		tap_only = false,
+		timings = Timings("simple", 20),
+	}
+	setmetatable(chartplay_values, Chartplay)
+	---@cast chartplay_values sea.Chartplay
+
+	local valid, errs = chartplay_values:validate()
+	t:tdeq({valid, errs}, {true})
 
 	local user = User()
 	user.id = 1

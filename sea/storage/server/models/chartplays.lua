@@ -18,6 +18,7 @@ chartplays.types = {
 	custom = "boolean",
 	columns_order = json,
 	modifiers = json,
+	judges = json,
 	tap_only = "boolean",
 	rate = int_rates,
 	timings = Timings,

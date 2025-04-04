@@ -3,7 +3,10 @@ local Users = require("sea.access.Users")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Teams = require("sea.teams.Teams")
 local Difftables = require("sea.difftables.Difftables")
+local Chartplays = require("sea.chart.Chartplays")
 local IPasswordHasher = require("sea.access.IPasswordHasher")
+local TableStorage = require("sea.chart.storage.TableStorage")
+local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
 
 ---@class sea.Domain
 ---@operator call: sea.Domain
@@ -15,6 +18,13 @@ function Domain:new(repos)
 	self.leaderboards = Leaderboards(repos.leaderboards_repo)
 	self.teams = Teams(repos.teams_repo)
 	self.difftables = Difftables(repos.difftables_repo)
+	self.chartplays = Chartplays(
+		repos.charts_repo,
+		FakeChartplayComputer(),
+		TableStorage(),
+		TableStorage(),
+		self.leaderboards
+	)
 end
 
 return Domain

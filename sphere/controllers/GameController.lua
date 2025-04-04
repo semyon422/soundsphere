@@ -34,6 +34,7 @@ local App = require("sphere.app.App")
 local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 
 local PackageManager = require("sphere.pkg.PackageManager")
+local SeaClient = require("sphere.online.SeaClient")
 
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
@@ -103,6 +104,8 @@ function GameController:new()
 	self.previewModel = PreviewModel(self.persistence.configModel)
 	self.chartPreviewModel = ChartPreviewModel(self.persistence.configModel, self.previewModel, self)
 
+	self.seaClient = SeaClient(self)
+
 	self.selectController = SelectController(
 		self.selectModel,
 		self.modifierSelectModel,
@@ -137,7 +140,8 @@ function GameController:new()
 		self.pauseModel,
 		self.offsetModel,
 		self.previewModel,
-		self.notificationModel
+		self.notificationModel,
+		self.seaClient
 	)
 	self.fastplayController = FastplayController(
 		self.rhythmModel,
@@ -205,6 +209,8 @@ function GameController:load()
 
 	self.backgroundModel:load()
 	self.previewModel:load()
+
+	self.seaClient:load(self.persistence.configModel.configs.urls.websocket)
 end
 
 function GameController:unload()
@@ -228,6 +234,8 @@ function GameController:update(dt)
 	self.chartPreviewModel:update()
 	self.ui:update(dt)
 	self.notificationModel:update()
+
+	self.seaClient:update()
 end
 
 function GameController:draw()
