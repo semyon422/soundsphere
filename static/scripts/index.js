@@ -21,8 +21,8 @@ arrow_image.src = "static/images/home/arrow.webp"
 const key_image = new Image()
 key_image.src = "static/images/home/key.webp"
 
-var iw = arrow_image.width
-var ih = arrow_image.height
+var iw = 128
+var ih = 128
 var ox = iw / 2
 var oy = ih / 2
 
@@ -33,8 +33,8 @@ const note_image_transform = [
 	{ x: iw * 3, r: Math.PI, ox: ox, oy: oy }
 ]
 
-iw = key_image.width
-ih = key_image.height
+iw = 128
+ih = 128
 ox = iw / 2
 oy = ih / 2
 
