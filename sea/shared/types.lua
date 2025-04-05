@@ -117,6 +117,16 @@ function types.index(v)
 	return true
 end
 
+function types.integer(v)
+	if type(v) ~= "number" then
+		return nil, "not a number"
+	elseif v ~= math.floor(v) then
+		return nil, "not an integer"
+	end
+
+	return true
+end
+
 function types.boolean(v)
 	if type(v) ~= "boolean" then
 		return nil, "not a boolean"

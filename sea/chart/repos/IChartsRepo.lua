@@ -54,6 +54,32 @@ end
 
 --------------------------------------------------------------------------------
 
+---@return sea.Chartmeta[]
+function IChartsRepo:getChartmetas()
+	return {}
+end
+
+---@param hash string
+---@param index integer
+---@return sea.Chartmeta?
+function IChartsRepo:getChartmetaByHashIndex(hash, index)
+	return {}
+end
+
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function IChartsRepo:createChartmeta(chartmeta)
+	return chartmeta
+end
+
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function IChartsRepo:updateChartmeta(chartmeta)
+	return chartmeta
+end
+
+--------------------------------------------------------------------------------
+
 ---@return sea.Chartplay[]
 function IChartsRepo:getChartplays()
 	return {}

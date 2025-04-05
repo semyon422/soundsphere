@@ -65,6 +65,35 @@ end
 
 --------------------------------------------------------------------------------
 
+---@return sea.Chartmeta[]
+function ChartsRepo:getChartmetas()
+	return self.models.chartmetas:select()
+end
+
+---@param hash string
+---@param index integer
+---@return sea.Chartmeta?
+function ChartsRepo:getChartmetaByHashIndex(hash, index)
+	return self.models.chartmetas:find({
+		hash = assert(hash),
+		index = assert(index),
+	})
+end
+
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function ChartsRepo:createChartmeta(chartmeta)
+	return self.models.chartmetas:create(chartmeta)
+end
+
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function ChartsRepo:updateChartmeta(chartmeta)
+	return self.models.chartmetas:update(chartmeta, {id = assert(chartmeta.id)})[1]
+end
+
+--------------------------------------------------------------------------------
+
 ---@param id integer
 ---@return sea.Chartplay?
 function ChartsRepo:getChartplay(id)

@@ -71,6 +71,10 @@ function SubmissionClientRemote:getEventsData(events_hash)
 		return nil, "replay file not found"
 	end
 
+	if md5.sumhexa(data) ~= events_hash then
+		return nil, "hash mismatch"
+	end
+
 	return data
 end
 
