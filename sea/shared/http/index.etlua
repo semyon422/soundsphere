@@ -1,22 +1,184 @@
-<div class="columns" style="height: 87vh">
-	<div class="column">
-		<div class="welcome__hero">
-			<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
-			<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
+<div style="height: 100vh">
+	<div class="columns" style="height: 88vh">
+		<div class="column">
+			<div class="welcome__hero">
+				<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
+				<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
 
-			<div class="level" style="margin-top:26px">
-				<div class="level-item buttons are-medium">
-					<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
-					<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+				<div class="level" style="margin-top:26px">
+					<div class="level-item buttons are-medium">
+						<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+						<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="column">
-		<div class="welcome__canvas-container">
-			<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
+		<div class="column">
+			<div class="welcome__canvas-container">
+				<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
+			</div>
+			<script src="static/scripts/index.js"></script>
 		</div>
+	</div>
+	<div style="display: flex; flex-direction: column; align-items:center" class="has-text-grey">
+		<p>See why soundsphere is a better choice</p>
+		<i style="margin-top: 8px" class="fas fa-chevron-down"></i>
 	</div>
 </div>
 
-<script src="static/scripts/index.js"></script>
+<div style="margin-left: 12px; margin-right: 12px">
+	<% local function Feature(title, description, image_light, image_dark) %>
+			<div class="block">
+				<div class="columns is-vcentered">
+					<div class="column">
+						<div class="content is-medium">
+							<h2><%= title %></h2>
+							<p><%= description %></p>
+						</div>
+					</div>
+					<div class="column">
+						<img
+							class="image is-5by3"
+							data-light="static/images/home/<%= image_light %>"
+							data-dark="static/images/home/<%= image_dark %>"
+							style="border-radius: 16px;"/>
+					</div>
+				</div>
+			</div>
+	<% end %>
+
+	<script>
+	function loadImages() {
+		const theme = localStorage.getItem("theme")
+		const images = document.querySelectorAll("img[data-dark][data-light]")
+		images.forEach((image) => {
+			if (theme === "dark") {
+				image.src = image.dataset.dark
+			} else if (theme === "light") {
+				image.src = image.dataset.light
+			}
+		})
+	}
+
+	window.onload = function() {
+		loadImages()
+	}
+
+	document.addEventListener("themeChanged", (event) => {
+		loadImages()
+	})
+	</script>
+
+	<div class="block">
+		<% Feature(
+			"Play songs from any popular game",
+			"Add songs from your computer and play anything you want.",
+			"chart-formats.svg",
+			"chart-formats-dark.svg")
+		%>
+
+		<% Feature(
+			"Advanced gameplay modifiers",
+			"Convert songs from anyK to anyK, add more density, apply full long note mode. There are an infinite number of modifier combinations.",
+			"mods.svg",
+			"mods-dark.svg")
+		%>
+
+		<% Feature(
+			"Supports osu! skins",
+			"You have a huge collection of skins to choose from, you are sure to find something interesting.",
+			"osu-skins.svg",
+			"osu-skins-dark.svg")
+		%>
+
+		<% Feature(
+			"BMS Tables and multiple leaderboards",
+			"Our website tracks each of your scores in several separate leaderboards. Each leaderboard has its own set of ranked songs and rules to keep the game fair.",
+			"leaderboards.svg",
+			"leaderboards-dark.svg")
+		%>
+
+		<% Feature(
+			"Use any popular scoring system",
+			"No need to get used to a new scoring system, just use the one you are most comfortable with.",
+			"scoring.svg",
+			"scoring-dark.svg")
+		%>
+
+		<% Feature(
+			"Dan courses",
+			"Track dan clears for each category and key mode. Show people how good you are.",
+			"dans.svg",
+			"dans-dark.svg")
+		%>
+
+		<% Feature(
+			"Plugin system",
+			"Customize your game by creating plugins. Our community makes amazing plugins, the system has direct access to the game code. You can create custom user interfaces, skins with custom logic, and do literally anything. Download and install new plugins right in the game.",
+			"plugins.webp",
+			"plugins-dark.webp")
+		%>
+	</div>
+
+	<div class="block">
+		<section class="section">
+			<h2 class="title">Full list of features</h2>
+			<div class="grid is-col-min-12">
+				<div class="cell border-box"><strong>Changing music speed (Rates)</strong></div>
+				<div class="cell border-box"><strong>osu! scroll speed</strong></div>
+				<div class="cell border-box"><strong>Threaded input</strong></div>
+				<div class="cell border-box">Music with/without pitch</div>
+				<div class="cell border-box">Constant scroll speed</div>
+				<div class="cell border-box">SV and negative SV</div>
+				<div class="cell border-box">Taiko SV</div>
+				<div class="cell border-box">osu! star rating</div>
+				<div class="cell border-box">osu! direct</div>
+				<div class="cell border-box">Instant chart preview</div>
+				<div class="cell border-box">Customizable hit/miss windows</div>
+				<div class="cell border-box">Nearest input</div>
+				<div class="cell border-box">Auto key sound</div>
+				<div class="cell border-box">Visual LN Shortening</div>
+				<div class="cell border-box">3D Camera</div>
+				<div class="cell border-box">Audio, visual and input offsets</div>
+				<div class="cell border-box">Mounting song directories</div>
+				<div class="cell border-box">Cross platform</div>
+				<div class="cell border-box">Automatic updates</div>
+				<div class="cell border-box">Multiplayer</div>
+				<div class="cell border-box">Chart editor</div>
+				<div class="cell border-box">Clear lamps</div>
+				<div class="cell border-box">Skin settings</div>
+				<div class="cell border-box">LN%</div>
+			</div>
+		</section>
+	</div>
+
+	<div class="block">
+		<section class="section">
+			<div class="content is-medium">
+				<h2>The easiest way to play BMS</h2>
+				<p>nstall the game, add your favorite BMS songs, choose a skin, and get ready to play! And the best part? You don't need to learn to configure old games in a language you don't know.</p>
+			</div>
+		</section>
+		<section class="section">
+			<div class="content is-medium">
+				<h2>The easiest way to play o2jam songs</h2>
+				<p>It's as easy as adding .ojn files to the song library and playing. Everything is in one place, so you won't have to deal with multiple game clients.</p>
+			</div>
+		</section>
+		<section class="section">
+			<div class="content is-medium">
+				<h2>Universal game for everything</h2>
+				<p>We are on a mission to create a platform where everyone feels comfortable and can play anything they want. We love giving players freedom and we won't ever restrict them.</p>
+			</div>
+		</section>
+	</div>
+
+
+	<div class="block" style="margin-top: 100px; margin-bottom: 150px">
+		<h2 align="center" class="title is-4">What are you waiting for? Download the game now and join our Discord server!</h2>
+		<div class="level-item buttons are-medium">
+			<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+			<a href="https://discord.gg/ubKMtTk" class="button is-rounded is-info">Our Discord server</a>
+		</div>
+	</div>
+</div>

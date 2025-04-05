@@ -48,6 +48,7 @@
 					const html = document.querySelector('html')
 					html.setAttribute('data-theme', v)
 					localStorage.setItem('theme', v)
+					document.dispatchEvent(new CustomEvent('themeChanged'))
 				},
 			}">
 				<a class="navbar-link"><p><i class="fas fa-palette icon-margin-right"></i>Theme</p></a>
