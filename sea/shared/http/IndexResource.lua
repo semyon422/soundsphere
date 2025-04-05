@@ -19,8 +19,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function IndexResource:getIndex(req, res, ctx)
-	ctx.ignore_footer = true
-	ctx.ignore_main_container = true
 	self.views:render_send(res, "sea/shared/http/index.etlua", ctx, true)
 end
 

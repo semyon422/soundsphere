@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="800"
+   height="480.00000000000006"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="leaderboards.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview2"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="384.31253"
+     inkscape:cy="245.01249"
+     inkscape:window-width="1900"
+     inkscape:window-height="1030"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g25"
+     showguides="false" />
+  <!-- Created with SVG-edit - https://github.com/SVG-Edit/svgedit-->
+  <defs
+     id="defs2">
+    <rect
+       x="257.38686"
+       y="338.70414"
+       width="288.49956"
+       height="111.01576"
+       id="rect21" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect5"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect4"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect3"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect2"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <linearGradient
+       fx="0.48"
+       fy="0.52"
+       id="svg_8"
+       x1="585.83274"
+       x2="878.74911"
+       y1="867.4831"
+       y2="574.56673"
+       gradientTransform="scale(1.1266014,0.88762536)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="jq_stop_2483"
+         offset="0"
+         stop-color="#ccf8ff"
+         style="stop-color:#dac5fe;stop-opacity:1;" />
+      <stop
+         id="jq_stop_7330"
+         offset="1"
+         stop-color="#dbc5ff"
+         stop-opacity="1"
+         style="stop-color:#cbf8ff;stop-opacity:1;" />
+    </linearGradient>
+    <filter
+       height="1.3692308"
+       id="svg_15_blur"
+       width="1.1411765"
+       x="-0.070588235"
+       y="-0.18461538">
+      <feGaussianBlur
+         in="SourceGraphic"
+         stdDeviation="4"
+         id="feGaussianBlur1" />
+    </filter>
+    <filter
+       height="1.4363636"
+       id="svg_32_blur"
+       width="1.16"
+       x="-0.08"
+       y="-0.21818182">
+      <feGaussianBlur
+         in="SourceGraphic"
+         stdDeviation="4"
+         id="feGaussianBlur2" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter17"
+       x="-0.028762644"
+       y="-0.059981593"
+       width="1.0575253"
+       height="1.1199632">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.5834402"
+         id="feGaussianBlur17" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter17-6"
+       x="-0.028762644"
+       y="-0.059981593"
+       width="1.0575253"
+       height="1.1199632">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.5834402"
+         id="feGaussianBlur17-7" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter17-9"
+       x="-0.028762644"
+       y="-0.059981593"
+       width="1.0575253"
+       height="1.1199632">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.5834402"
+         id="feGaussianBlur17-3" />
+    </filter>
+  </defs>
+  <g
+     class="layer"
+     display="inline"
+     id="g2"
+     transform="matrix(1.0007936,0,0,1.0006579,-0.3714946,0.02061355)">
+    <title
+       id="title2">Layer 1</title>
+    <rect
+       fill="url(#svg_8)"
+       height="260"
+       id="svg_4"
+       stroke="#000000"
+       stroke-dasharray="none"
+       stroke-linecap="null"
+       stroke-linejoin="null"
+       stroke-opacity="0"
+       stroke-width="0"
+       width="330"
+       x="660"
+       y="510"
+       style="fill:url(#svg_8)"
+       transform="matrix(2.42232,0,0,1.84494,-1598.36,-940.94)" />
+    <g
+       id="g25"
+       transform="translate(2.4728967,250.09346)">
+      <g
+         id="g19"
+         transform="translate(27.748389,31.183825)"
+         inkscape:label="g19">
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke-width:6.38586;filter:url(#filter17)"
+           id="rect16-3"
+           width="215.5663"
+           height="103.36932"
+           x="15.359283"
+           y="14.969533"
+           ry="10.640954"
+           inkscape:label="rect16-3" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:6.38586"
+           id="rect16"
+           width="215.5663"
+           height="103.36932"
+           x="15.359305"
+           y="14.969538"
+           ry="10.640954" />
+        <text
+           xml:space="preserve"
+           style="font-size:21.3179px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="123.1508"
+           y="40.252781"
+           id="text10"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan10"
+             style="font-size:21.3179px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="123.1508"
+             y="40.252781">Global Leaderboard</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:13.3237px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="123.1508"
+           y="64.532379"
+           id="text11"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan11"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="123.1508"
+             y="64.532379">No strict rules</tspan><tspan
+             sodipodi:role="line"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="123.1508"
+             y="79.188446"
+             id="tspan12">Any ranked song</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:18.6532px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#1ba300;fill-opacity:1;stroke-width:6.99492"
+           x="123.1508"
+           y="108.33738"
+           id="text17"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan17"
+             style="fill:#1ba300;fill-opacity:1;stroke-width:6.99492"
+             x="123.1508"
+             y="108.33738">ACCEPTED!</tspan></text>
+      </g>
+      <g
+         id="g20"
+         transform="translate(46.471858,31.183825)">
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke-width:6.38586;filter:url(#filter17-6)"
+           id="rect16-3-5"
+           width="215.5663"
+           height="103.36932"
+           x="243.3261"
+           y="14.969533"
+           ry="10.640954" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:6.38586"
+           id="rect16-35"
+           width="215.5663"
+           height="103.36932"
+           x="243.32611"
+           y="14.969537"
+           ry="10.640954" />
+        <text
+           xml:space="preserve"
+           style="font-size:21.3179px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="351.13306"
+           y="40.252781"
+           id="text10-6"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan10-2"
+             style="font-size:21.3179px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="351.13306"
+             y="40.252781">Etterna Leaderboard</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:13.3237px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="351.13306"
+           y="64.532379"
+           id="text11-9"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="351.13306"
+             y="64.532379"
+             id="tspan12-2">180ms hit windows</tspan><tspan
+             sodipodi:role="line"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="351.13306"
+             y="79.188446"
+             id="tspan18">Pauses are prohibited</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:18.6532px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#1ba300;fill-opacity:1;stroke-width:6.99492"
+           x="351.13306"
+           y="108.33738"
+           id="text17-7"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan17-0"
+             style="fill:#1ba300;fill-opacity:1;stroke-width:6.99492"
+             x="351.13306"
+             y="108.33738">ACCEPTED!</tspan></text>
+      </g>
+      <g
+         id="g21"
+         transform="translate(65.195327,31.183825)">
+        <rect
+           style="fill:#000000;fill-opacity:1;stroke-width:6.38586;filter:url(#filter17-9)"
+           id="rect16-3-6"
+           width="215.5663"
+           height="103.36932"
+           x="471.29291"
+           y="14.969533"
+           ry="10.640954" />
+        <rect
+           style="fill:#ffffff;fill-opacity:1;stroke-width:6.38586"
+           id="rect16-0"
+           width="215.5663"
+           height="103.36932"
+           x="471.29294"
+           y="14.969541"
+           ry="10.640954" />
+        <text
+           xml:space="preserve"
+           style="font-size:21.3179px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="579.1153"
+           y="40.252781"
+           id="text10-62"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan10-6"
+             style="font-size:21.3179px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="579.1153"
+             y="40.252781">osu! Leaderboard</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:13.3237px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+           x="579.1153"
+           y="64.532387"
+           id="text11-1"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="579.1153"
+             y="64.532387"
+             id="tspan12-7">Song specific timings</tspan><tspan
+             sodipodi:role="line"
+             style="font-size:13.3237px;text-align:center;text-anchor:middle;stroke-width:6.99492"
+             x="579.1153"
+             y="79.188454"
+             id="tspan19">Const. scroll speed is not allowed</tspan></text>
+        <text
+           xml:space="preserve"
+           style="font-size:18.6532px;line-height:1.1;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#a80000;fill-opacity:1;stroke-width:6.99492"
+           x="579.1153"
+           y="108.33738"
+           id="text17-9"
+           transform="scale(0.9999322,1.0000678)"><tspan
+             sodipodi:role="line"
+             id="tspan17-2"
+             style="fill:#a80000;fill-opacity:1;stroke-width:6.99492"
+             x="579.1153"
+             y="108.33738">Rejected.</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g24"
+       transform="translate(9.8916424,-218.40594)">
+      <text
+         xml:space="preserve"
+         style="font-size:31.9768px;line-height:0;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke-width:6.99492"
+         x="290.81128"
+         y="332.78519"
+         id="text2"
+         transform="scale(0.9999322,1.0000678)"><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           style="line-height:1.1;text-align:start;text-anchor:start;stroke-width:6.99492"
+           x="290.81128"
+           y="332.78519" /><tspan
+           sodipodi:role="line"
+           style="font-size:21.3179px;line-height:1.13;text-align:start;text-anchor:start;stroke-width:6.99492"
+           x="290.81128"
+           y="359.05643"
+           id="tspan3">• No pauses</tspan><tspan
+           sodipodi:role="line"
+           style="font-size:21.3179px;line-height:1.13;text-align:start;text-anchor:start;stroke-width:6.99492"
+           x="290.81128"
+           y="383.14566"
+           id="tspan4">• Constant scroll speed</tspan><tspan
+           sodipodi:role="line"
+           style="font-size:21.3179px;line-height:1.13;text-align:start;text-anchor:start;stroke-width:6.99492"
+           x="290.81128"
+           y="407.23489"
+           id="tspan5">• Etterna timings</tspan><tspan
+           sodipodi:role="line"
+           style="font-size:21.3179px;line-height:1.13;text-align:start;text-anchor:start;stroke-width:6.99492"
+           x="290.81128"
+           y="431.3241"
+           id="tspan8">• Etterna ranked song</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:26.6473px;line-height:1.13;font-family:Helvetica;-inkscape-font-specification:Helvetica;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#a80000;fill-opacity:1;stroke-width:6.99492"
+         x="272.60867"
+         y="317.94669"
+         id="text21"
+         transform="scale(0.9999322,1.0000678)"><tspan
+           sodipodi:role="line"
+           id="tspan21"
+           style="font-size:26.6473px;fill:#1a1a1a;stroke-width:6.99492"
+           x="272.60867"
+           y="317.94669">YOUR NEW SCORE:</tspan></text>
+    </g>
+  </g>
+</svg>
