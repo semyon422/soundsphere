@@ -129,22 +129,35 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	chartplay.submitted_at = os.time()
 	self.charts_repo:updateChartplay(chartplay)
 
-	---@type sea.Chartplay, sea.Chartdiff
-	local computed_chartplay, computed_chartdiff
+	---@type sea.Chartplay
+	local computed_chartplay
+	---@type sea.Chartdiff
+	local computed_chartdiff
+	---@type sea.Chartmeta
+	local computed_chartmeta
 
 	if chartplay.custom then
 		computed_chartplay = chartplay
 		computed_chartdiff = chartdiff_values
 		computed_chartdiff.custom_user_id = user.id
+
+		computed_chartmeta, err = self.chartplay_computer:computeChartmeta(chartfile, chartplay.index)
+		if not computed_chartmeta then
+			chartplay.compute_state = "invalid"
+			self.charts_repo:updateChartplay(chartplay)
+			return nil, err
+		end
 	else
-		local cpcd, err = self.chartplay_computer:compute(chartplay)
-		if not cpcd then
+		local ret, err = self.chartplay_computer:compute(chartplay, chartfile)
+		if not ret then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
 			return nil, err
 		end
 
-		computed_chartplay, computed_chartdiff = cpcd[1], cpcd[2]
+		computed_chartplay = ret.chartplay
+		computed_chartdiff = ret.chartdiff
+		computed_chartmeta = ret.chartmeta
 
 		if not chartplay:equalsComputed(computed_chartplay) then
 			chartplay.compute_state = "invalid"
@@ -167,6 +180,15 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		computed_chartdiff.id = chartdiff.id
 		self.charts_repo:updateChartdiff(computed_chartdiff)
 		-- add a note on chartdiff page about this change
+	end
+
+	local chartmeta = self.charts_repo:getChartmetaByHashIndex(computed_chartmeta.hash, computed_chartmeta.index)
+	if not chartmeta then
+		self.charts_repo:createChartmeta(computed_chartmeta)
+	elseif not chartmeta:equalsComputed(computed_chartmeta) then
+		computed_chartmeta.id = chartmeta.id
+		self.charts_repo:updateChartmeta(computed_chartmeta)
+		-- add a note on chartmeta page about this change
 	end
 
 	if not chartplay.custom then

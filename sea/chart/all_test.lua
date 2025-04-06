@@ -1,6 +1,7 @@
 local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
+local Chartmeta = require("sea.chart.Chartmeta")
 local Chartplays = require("sea.chart.Chartplays")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
@@ -125,7 +126,36 @@ function test.submit_score(t)
 	local valid, errs = chartdiff_values:validate()
 	t:tdeq({valid, errs}, {true})
 
+	local chartmeta_values = {
+		hash = md5.sumhexa(chartfile_data),
+		index = 1,
+		timings = Timings("simple", 100),
+		healths = Healths("simple", 20),
+		title = "Title",
+		title_unicode = "Title Unicode",
+		artist = "Artist",
+		artist_unicode = "Artist Unicode",
+		name = "Name",
+		creator = "Creator",
+		level = 10,
+		inputmode = "4key",
+		source = "",
+		tags = "",
+		format = "osu",
+		audio_path = "",
+		background_path = "",
+		preview_time = 10,
+		tempo = 120,
+		duration = 180,
+	}
+	setmetatable(chartmeta_values, Chartmeta)
+	---@cast chartmeta_values sea.Chartmeta
+
+	local valid, errs = chartmeta_values:validate()
+	t:tdeq({valid, errs}, {true})
+
 	ctx.fakeChartplayComputer.chartdiff = chartdiff_values
+	ctx.fakeChartplayComputer.chartmeta = chartmeta_values
 
 	local user = User()
 	user.id = 1

@@ -5,9 +5,18 @@ local class = require("class")
 local IChartplayComputer = class()
 
 ---@param chartplay sea.Chartplay
----@return {[1]: sea.Chartplay, [2]: sea.Chartdiff}?
+---@param chartfile sea.Chartfile
+---@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
-function IChartplayComputer:compute(chartplay)
+function IChartplayComputer:compute(chartplay, chartfile)
+	return nil, "not implemented"
+end
+
+---@param chartfile sea.Chartfile
+---@param index integer
+---@return sea.Chartmeta?
+---@return string?
+function IChartplayComputer:computeChartmeta(chartfile, index)
 	return nil, "not implemented"
 end
 
