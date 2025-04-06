@@ -22,7 +22,7 @@
 		"utf8": "enable"
 	},
 	"Lua.workspace.ignoreSubmodules": false,
-	"Lua.workspace.maxPreload": 1000,
+	"Lua.workspace.maxPreload": 2000,
 	"Lua.workspace.ignoreDir": [
 		".vscode",
 		"*/bench",
