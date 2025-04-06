@@ -78,6 +78,9 @@ function ChartplayComputer:compute(chartplay, chartfile)
 	-- 	modifiersString = ModifierModel:getString(replay.modifiers),
 	-- }
 
+	chart.chartmeta.hash = chartplay.hash
+	chart.chartmeta.index = chartplay.index
+
 	return {
 		chartplay = score,
 		chartdiff = chart.chartmeta,
@@ -99,6 +102,9 @@ function ChartplayComputer:computeChartmeta(chartfile, index)
 	if not chart then
 		return nil, "not found"
 	end
+
+	chart.chartmeta.hash = chartfile.hash
+	chart.chartmeta.index = index
 
 	return chart.chartmeta
 end
