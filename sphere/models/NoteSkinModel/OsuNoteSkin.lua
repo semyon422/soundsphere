@@ -1,3 +1,4 @@
+local string_util = require("string_util")
 local NoteSkinVsrg = require("sphere.models.NoteSkinModel.NoteSkinVsrg")
 local PlayfieldVsrg = require("sphere.models.NoteSkinModel.PlayfieldVsrg")
 local BasePlayfield = require("sphere.models.NoteSkinModel.BasePlayfield")
@@ -21,7 +22,7 @@ local function toarray(s, tn)
 	if not s then
 		return {}
 	end
-	local array = s:split(",")
+	local array = string_util.split(s, ",")
 	for i, v in ipairs(array) do
 		if tn then
 			array[i] = tonumber(v)

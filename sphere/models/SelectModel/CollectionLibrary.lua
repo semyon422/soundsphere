@@ -1,4 +1,5 @@
 local class = require("class")
+local string_util = require("string_util")
 local dpairs = require("dpairs")
 local table_util = require("table_util")
 local path_util = require("path_util")
@@ -18,7 +19,7 @@ local function process_chartfile_set(dir, tree, location_id)
 	if dir then
 		local tpath = {}
 		local depth = tree.depth
-		for i, k in ipairs(dir:split("/")) do
+		for i, k in ipairs(string_util.split(dir, "/")) do
 			depth = depth + 1
 			tpath[i] = k
 			local index = t.indexes[k]
@@ -139,7 +140,7 @@ function CollectionLibrary:setPathP(path)
 
 	local tree = self.tree
 
-	local keys = path:split("/")
+	local keys = string_util.split(path, "/")
 	for i = 1, #keys do
 		local index = tree.indexes[keys[i]]
 		if index then

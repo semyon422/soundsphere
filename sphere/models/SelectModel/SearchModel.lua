@@ -1,4 +1,5 @@
 local class = require("class")
+local string_util = require("string_util")
 local erfunc = require("libchart.erfunc")
 
 ---@class sphere.SearchModel
@@ -131,7 +132,7 @@ local flip_operators = {
 function SearchModel:transformSearchString(s, cond)
 	cond = cond or {}
 
-	for _, _s in ipairs(s:split(" ")) do
+	for _, _s in string_util.isplit(s, " ") do
 		local key, operator, value = _s:match("^(.-)([=><~!]+)(.+)$")
 		if _s == "!" or _s == "~" then
 			cond.accuracy__isnull = true

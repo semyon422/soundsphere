@@ -2,7 +2,7 @@
 ---@return table
 local function preload(mod)
 	return {
-		string = require("aqua.string")
+		string = require("string_util")
 	}
 end
 

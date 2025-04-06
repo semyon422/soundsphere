@@ -2,6 +2,7 @@ local class = require("class")
 local json = require("json")
 local stbl = require("stbl")
 local table_util = require("table_util")
+local string_util = require("string_util")
 local md5 = require("md5")
 local int_rates = require("libchart.int_rates")
 local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
@@ -228,7 +229,7 @@ function ModifierEncoder:decodeOld(score)
 		}
 	end
 
-	for _, mod in ipairs(mods:split(", ")) do
+	for _, mod in string_util.isplit(mods, ", ") do
 		local info = parse_mod_from_name(mod)
 		if info.rate then
 			rate = rate * info.rate

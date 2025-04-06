@@ -1,5 +1,6 @@
 local class = require("class")
 local path_util = require("path_util")
+local string_util = require("string_util")
 local ChartEncoder = require("sph.ChartEncoder")
 local ChartDecoder = require("sph.ChartDecoder")
 local OsuChartEncoder = require("osu.ChartEncoder")
@@ -399,7 +400,7 @@ function EditorController:exportBmsTemplate(columns_out)
 	do
 		local data = love.filesystem.read(path_util.join(real_dir, "bgm.txt"))
 		if data then
-			for _, line in ipairs(data:split("\n")) do
+			for _, line in string_util.isplit(data, "\n") do
 				line = line:trim()
 				always_bgm[line] = true
 				print("bgm", line)
@@ -563,7 +564,7 @@ function EditorController:saveToNanoChart()
 		end
 	end
 
-	local emptyHash = string.char(0):rep(16)
+	local emptyHash = string_util.char(0):rep(16)
 	local content = nanoChart:encode(emptyHash, editorModel.noteChart.inputMode.key, abs_notes)
 	local compressedContent = zlib.compress(content)
 

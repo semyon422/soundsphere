@@ -1,5 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
+local string_util = require("string_util")
 
 ---@class sphere.Version
 ---@operator call: sphere.Version
@@ -11,7 +12,7 @@ function Version:parse(ver_str)
 	if not ver_str then
 		return Version()
 	end
-	local num_strs = ver_str:split(".")
+	local num_strs = string_util.split(ver_str, ".")
 	---@type integer[]
 	local nums = {}
 	for i, num_str in ipairs(num_strs) do
