@@ -60,10 +60,9 @@
 		})
 	}
 
-	window.onload = function() {
+	document.addEventListener("htmx:load", function() {
 		loadImages()
-	}
-
+	})
 	document.addEventListener("themeChanged", (event) => {
 		loadImages()
 	})
@@ -156,7 +155,7 @@
 		<section class="section">
 			<div class="content is-medium">
 				<h2>The easiest way to play BMS</h2>
-				<p>nstall the game, add your favorite BMS songs, choose a skin, and get ready to play! And the best part? You don't need to learn to configure old games in a language you don't know.</p>
+				<p>Install the game, add your favorite BMS songs, choose a skin, and get ready to play! And the best part? You don't need to learn to configure old games in a language you don't know.</p>
 			</div>
 		</section>
 		<section class="section">
