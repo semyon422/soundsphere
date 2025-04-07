@@ -1,4 +1,5 @@
 local table_util = require("table_util")
+local digest = require("digest")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
 
 local test = {}
@@ -76,11 +77,11 @@ function test.all(t)
 	local fs = get_fs(items)
 
 	local chart_error
-	local function getCharts(path, content)
+	local function getCharts(_, path, content, hash)
 		if chart_error then
 			return nil, chart_error
 		end
-		return {{chartmeta = {}}}
+		return {{chart = {}, chartmeta = {hash = digest.hash("md5", content, true), index = 1}}}
 	end
 
 	local cg = ChartmetaGenerator(chartRepo, chartRepo, {getCharts = getCharts})

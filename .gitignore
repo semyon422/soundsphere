@@ -16,9 +16,7 @@ userdata/hitsounds
 userdata/testcharts
 !userdata/hitsounds/midi
 
-userdata/data.db
-userdata/charts.db
-userdata/scores.db
+userdata/*.db
 userdata/main.log
 userdata/input.lua
 userdata/modifier.lua

@@ -163,11 +163,15 @@ function RhythmModel:setAdjustRate(adjustRate)
 end
 
 ---@param chart ncdk2.Chart
-function RhythmModel:setNoteChart(chart)
+---@param chartmeta sea.Chartmeta
+function RhythmModel:setNoteChart(chart, chartmeta)
 	assert(chart)
 	self.chart = chart
+	self.chartmeta = chartmeta
 	self.timeEngine.noteChart = chart
+	self.timeEngine.chartmeta = chartmeta
 	self.scoreEngine.noteChart = chart
+	self.scoreEngine.chartmeta = chartmeta
 	self.logicEngine:setChart(chart)
 	self.graphicEngine:setChart(chart)
 end

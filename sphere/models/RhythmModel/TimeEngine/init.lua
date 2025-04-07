@@ -43,8 +43,8 @@ function TimeEngine:load()
 	self.visualTimeInfo.time = t
 	self.visualTimeInfo.rate = self.timeRate
 
-	self.minTime = self.noteChart.chartmeta.start_time
-	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
+	self.minTime = self.chartmeta.start_time
+	self.maxTime = self.minTime + self.chartmeta.duration
 end
 
 ---@param time number

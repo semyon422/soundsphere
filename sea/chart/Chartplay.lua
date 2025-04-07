@@ -1,5 +1,6 @@
 local valid = require("valid")
 local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
 local Chartkey = require("sea.chart.Chartkey")
 local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
@@ -65,13 +66,6 @@ function Chartplay:equalsComputed(values)
 	return true
 end
 
-local is_timings_or_healths = valid.struct({
-	name = types.name,
-	data = valid.optional(types.count),
-})
-
-local is_modifier = valid.struct({})
-
 ---@param v integer[]
 local function is_columns_order(v)
 	local t = table.move(v, 1, #v, 1)
@@ -95,7 +89,7 @@ local validate_chartplay = valid.struct({
 	-- notes_hash = types.md5hash,
 	hash = types.md5hash,
 	index = types.index,
-	modifiers = valid.array(is_modifier, 10),
+	modifiers = chart_types.modifiers,
 	custom = types.boolean,
 	rate = types.number,
 	rate_type = types.new_enum(RateType),
@@ -103,8 +97,8 @@ local validate_chartplay = valid.struct({
 	const = types.boolean,
 	nearest = types.boolean,
 	tap_only = types.boolean,
-	timings = is_timings_or_healths,
-	healths = is_timings_or_healths,
+	timings = chart_types.timings_or_healths,
+	healths = chart_types.timings_or_healths,
 	columns_order = is_columns_order,
 	created_at = types.time,
 	-- submitted_at = types.time,

@@ -184,8 +184,18 @@ function CacheManager:getChartsByHash(hash)
 	local full_path = path_util.join(prefix, chartfile.path)
 	local content = assert(love.filesystem.read(full_path))
 
-	local charts, err = ChartFactory:getCharts(chartfile.name, content)
-	return charts, err
+	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, content)
+	if not chart_chartmetas then
+		return nil, err
+	end
+
+	---@type ncdk2.Chart[]
+	local charts = {}
+	for i, t in ipairs(chart_chartmetas) do
+		charts[i] = t.chart
+	end
+
+	return charts
 end
 
 function CacheManager:computeChartdiffs()

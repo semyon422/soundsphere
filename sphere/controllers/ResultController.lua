@@ -108,8 +108,8 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	local chart = self.selectModel:loadChartAbsolute()
-	self.fastplayController:play(chart, replay)
+	local chart, chartmeta = self.selectModel:loadChartAbsolute()
+	self.fastplayController:play(chart, chartmeta, replay)
 
 	if self.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")

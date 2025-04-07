@@ -168,6 +168,7 @@ end
 
 ---@param settings table?
 ---@return ncdk2.Chart?
+---@return sea.Chartmeta?
 function SelectModel:loadChart(settings)
 	local chartview = self.chartview
 
@@ -176,22 +177,25 @@ function SelectModel:loadChart(settings)
 		return
 	end
 
-	local charts = assert(ChartFactory:getCharts(
+	local chart_chartmetas = assert(ChartFactory:getCharts(
 		chartview.chartfile_name,
 		content
 	))
-	return charts[chartview.index]
+	local t = chart_chartmetas[chartview.index]
+
+	return t.chart, t.chartmeta
 end
 
 ---@param settings table?
 ---@return ncdk2.Chart?
+---@return sea.Chartmeta?
 function SelectModel:loadChartAbsolute(settings)
-	local chart = self:loadChart(settings)
+	local chart, chartmeta = self:loadChart(settings)
 	if not chart then
 		return
 	end
 	chart.layers.main:toAbsolute()
-	return chart
+	return chart, chartmeta
 end
 
 ---@return boolean

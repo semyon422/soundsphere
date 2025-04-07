@@ -81,7 +81,7 @@ function ReplayModel:saveReplay(chartdiff, playContext)
 	return replayHash
 end
 
----@param chartmeta chartbase.Chartmeta
+---@param chartmeta sea.Chartmeta
 function ReplayModel:saveOsr(chartmeta)
 	local osr = self.replay:toOsr()
 	local data = osr:encode()

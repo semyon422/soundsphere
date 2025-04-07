@@ -147,6 +147,7 @@ function test.submit_score(t)
 		preview_time = 10,
 		tempo = 120,
 		duration = 180,
+		start_time = 0,
 	}
 	setmetatable(chartmeta_values, Chartmeta)
 	---@cast chartmeta_values sea.Chartmeta

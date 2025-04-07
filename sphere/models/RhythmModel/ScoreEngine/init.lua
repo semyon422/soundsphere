@@ -25,8 +25,8 @@ function ScoreEngine:load()
 	self.pausesCount = 0
 	self.paused = false
 
-	self.minTime = self.noteChart.chartmeta.start_time
-	self.maxTime = self.minTime + self.noteChart.chartmeta.duration
+	self.minTime = self.chartmeta.start_time
+	self.maxTime = self.minTime + self.chartmeta.duration
 
 	local judge = scoreSystem.judgements[self.judgement] or scoreSystem.judgements.soundsphere
 

@@ -1,4 +1,5 @@
 local IChartplayComputer = require("sea.chart.IChartplayComputer")
+local Chartdiff = require("sea.chart.Chartdiff")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
 
@@ -29,13 +30,13 @@ end
 ---@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function ChartplayComputer:compute(chartplay, chartfile)
-	local charts, err = self:getCharts(chartfile)
-	if not charts then
+	local chart_chartmetas, err = self:getCharts(chartfile)
+	if not chart_chartmetas then
 		return nil, err
 	end
 
-	local chart = charts[chartplay.index]
-	if not chart then
+	local t = chart_chartmetas[chartplay.index]
+	if not t then
 		return nil, "not found"
 	end
 
@@ -43,6 +44,8 @@ function ChartplayComputer:compute(chartplay, chartfile)
 	if not replay then
 		return nil, err
 	end
+
+	local chart, chartmeta, chartdiff = t.chart, t.chartmeta, t.chartdiff
 
 	local fastplayController = FastplayController()
 
@@ -64,7 +67,7 @@ function ChartplayComputer:compute(chartplay, chartfile)
 	rhythmModel:setTimings(replay.timings)
 	replayModel.replay = replay
 
-	fastplayController:play(chart, replay)
+	fastplayController:play(chart, chartmeta, replay)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
@@ -78,13 +81,10 @@ function ChartplayComputer:compute(chartplay, chartfile)
 	-- 	modifiersString = ModifierModel:getString(replay.modifiers),
 	-- }
 
-	chart.chartmeta.hash = chartplay.hash
-	chart.chartmeta.index = chartplay.index
-
 	return {
 		chartplay = score,
-		chartdiff = chart.chartmeta,
-		chartmeta = chart.chartmeta,
+		chartdiff = chartdiff,
+		chartmeta = chartmeta,
 	}
 end
 
@@ -103,16 +103,13 @@ function ChartplayComputer:computeChartmeta(chartfile, index)
 		return nil, "not found"
 	end
 
-	chart.chartmeta.hash = chartfile.hash
-	chart.chartmeta.index = index
-
 	return chart.chartmeta
 end
 
 --------------------------------------------------------------------------------
 
 ---@param chartfile sea.Chartfile
----@return ncdk2.Chart[]?
+---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta, chartdiff: sea.Chartdiff}[]?
 ---@return string?
 function ChartplayComputer:getCharts(chartfile)
 	local data, err = self.charts_storage:get(chartfile.hash)
@@ -120,16 +117,19 @@ function ChartplayComputer:getCharts(chartfile)
 		return nil, err
 	end
 
-	local charts, err = ChartFactory:getCharts(chartfile.name, data)
-	if not charts then
+	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, data)
+	if not chart_chartmetas then
 		return nil, err
 	end
 
-	for _, chart in ipairs(charts) do
-		self.difficultyModel:compute(chart.chartmeta, chart, 1)
+	---@cast chart_chartmetas {chart: ncdk2.Chart, chartmeta: sea.Chartmeta, chartdiff: sea.Chartdiff}[]
+
+	for _, t in ipairs(chart_chartmetas) do
+		t.chartdiff = Chartdiff()
+		self.difficultyModel:compute(t.chartdiff, t.chart, 1)
 	end
 
-	return charts
+	return chart_chartmetas
 end
 
 ---@param chartplay sea.Chartplay

@@ -98,7 +98,7 @@ function EditorModel:load()
 	}
 
 	self.metadata:new()
-	self.metadata:fromChartmeta(self.chart.chartmeta)
+	self.metadata:fromChartmeta(self.chartmeta)
 end
 
 function EditorModel:detectTempoOffset()
@@ -228,7 +228,7 @@ function EditorModel:unload()
 end
 
 function EditorModel:save()
-	self.chart.chartmeta = self.metadata:toChartmeta()
+	self.chartmeta = self.metadata:toChartmeta()
 	self.noteChartLoader:save()
 end
 

@@ -37,8 +37,9 @@ function FastplayController:applyModifiers(chart, replay)
 end
 
 ---@param chart ncdk2.Chart
+---@param chartmeta sea.Chartmeta
 ---@param replay sphere.Replay
-function FastplayController:play(chart, replay)
+function FastplayController:play(chart, chartmeta, replay)
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
 	local cacheModel = self.cacheModel
@@ -48,7 +49,7 @@ function FastplayController:play(chart, replay)
 
 	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart)
+	rhythmModel:setNoteChart(chart, chartmeta)
 
 	replayModel:setMode("replay")
 	rhythmModel.inputManager:setMode("internal")

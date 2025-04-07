@@ -58,7 +58,7 @@ function EditorController:load()
 	local configModel = self.configModel
 	local fileFinder = self.fileFinder
 
-	local chart = selectModel:loadChart()
+	local chart, chartmeta = selectModel:loadChart()
 
 	if love.keyboard.isDown("lshift") then
 		ModifierModel:apply(self.playContext.modifiers, chart)
@@ -72,6 +72,7 @@ function EditorController:load()
 
 	editorModel.noteSkin = noteSkin
 	editorModel.chart = chart
+	editorModel.chartmeta = chartmeta
 	editorModel:load()
 
 	self.previewModel:stop()

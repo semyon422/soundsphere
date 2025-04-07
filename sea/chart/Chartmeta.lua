@@ -1,6 +1,7 @@
 local class = require("class")
 local valid = require("valid")
 local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
 local BeatmapStatus = require("sea.osu.BeatmapStatus")
 
 ---@class sea.Chartmeta
@@ -82,39 +83,38 @@ function Chartmeta:equalsComputed(values)
 	return true
 end
 
-local is_timings_or_healths = valid.struct({
-	name = types.name,
-	data = valid.optional(types.count),
-})
-
 local text = types.description
 
 local validate_chartmeta = valid.struct({
 	hash = types.md5hash,
 	index = types.index,
-	timings = is_timings_or_healths,
-	healths = is_timings_or_healths,
+	timings = chart_types.timings_or_healths,
+	healths = chart_types.timings_or_healths,
 	title = text,
-	title_unicode = text,
+	title_unicode = valid.optional(text),
 	artist = text,
-	artist_unicode = text,
+	artist_unicode = valid.optional(text),
 	name = text,
 	creator = text,
-	level = types.number,
+	level = valid.optional(types.number),
 	inputmode = types.name,
-	source = text,
-	tags = text,
+	source = valid.optional(text),
+	tags = valid.optional(text),
 	format = types.name,
-	audio_path = text,
-	background_path = text,
-	preview_time = types.number,
-	-- osu_beatmap_id = types.integer,
-	-- osu_beatmapset_id = types.integer,
+	audio_path = valid.optional(text),
+	background_path = valid.optional(text),
+	preview_time = valid.optional(types.number),
+	osu_beatmap_id = valid.optional(types.integer),
+	osu_beatmapset_id = valid.optional(types.integer),
 	-- osu_od = types.number,
 	-- osu_hp = types.number,
 	-- osu_ranked_status = types.new_enum(BeatmapStatus),
 	tempo = types.number,
 	duration = types.number,
+	start_time = types.number,
+	tempo_avg = valid.optional(types.number),
+	tempo_max = valid.optional(types.number),
+	tempo_min = valid.optional(types.number),
 	-- has_video = types.boolean,
 	-- has_storyboard = types.boolean,
 	-- has_subtitles = types.boolean,

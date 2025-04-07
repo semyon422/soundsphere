@@ -3,6 +3,7 @@ local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
 local valid = require("valid")
 local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
 
 ---@class sea.Chartdiff: sea.Chartkey
 ---@operator call: sea.Chartdiff
@@ -59,14 +60,12 @@ function Chartdiff:equalsComputed(values)
 	return true
 end
 
-local is_modifier = valid.struct({})
-
 local note_types_count = valid.struct({})
 
 local validate_chartdiff = valid.struct({
 	hash = types.md5hash,
 	index = types.index,
-	modifiers = valid.array(is_modifier, 10),
+	modifiers = chart_types.modifiers,
 	rate = types.number,
 	rate_type = types.new_enum(RateType),
 	mode = types.new_enum(Gamemode),

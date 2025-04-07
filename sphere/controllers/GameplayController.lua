@@ -95,9 +95,11 @@ function GameplayController:load()
 	local config = configModel.configs.settings
 	local judgement = configModel.configs.select.judgements
 
-	local chart = selectModel:loadChartAbsolute(self:getImporterSettings())
+	local chart, chartmeta = selectModel:loadChartAbsolute(self:getImporterSettings())
+	assert(chart)
+	assert(chartmeta)
 
-	self:applyTempo(chart, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
+	self:applyTempo(chart, chartmeta, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
 		self:applyAutoKeysound(chart)
 	end
@@ -140,7 +142,7 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
-	rhythmModel:setNoteChart(chart)
+	rhythmModel:setNoteChart(chart, chartmeta)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
 
@@ -211,25 +213,28 @@ function GameplayController:swapVelocityType(chart)
 	end
 end
 
----@param tempoFactor string
-function GameplayController:applyTempo(noteChart, tempoFactor, primaryTempo)
+---@param chart ncdk2.Chart
+---@param chartmeta sea.Chartmeta
+---@param tempoFactor number
+---@param primaryTempo number
+function GameplayController:applyTempo(chart, chartmeta, tempoFactor, primaryTempo)
 	if tempoFactor == "primary" then
-		applyTempo(noteChart, primaryTempo)
+		applyTempo(chart, primaryTempo)
 		return
 	end
 
-	if tempoFactor == "average" and noteChart.chartmeta.tempo_avg then
-		applyTempo(noteChart, noteChart.chartmeta.tempo_avg)
+	if tempoFactor == "average" and chartmeta.tempo_avg then
+		applyTempo(chart, chartmeta.tempo_avg)
 		return
 	end
 
-	local minTime = noteChart.chartmeta.start_time
-	local maxTime = minTime + noteChart.chartmeta.duration
+	local minTime = chartmeta.start_time
+	local maxTime = minTime + chartmeta.duration
 
 	local t = {}
-	t.average, t.minimum, t.maximum = TempoRange:find(noteChart, minTime, maxTime)
+	t.average, t.minimum, t.maximum = TempoRange:find(chart, minTime, maxTime)
 
-	applyTempo(noteChart, t[tempoFactor])
+	applyTempo(chart, t[tempoFactor])
 end
 
 ---@param chart ncdk2.Chart
@@ -382,6 +387,7 @@ function GameplayController:saveScore()
 	local playContext = self.playContext
 
 	local chartview = self.selectModel.chartview
+	local chartmeta = self.rhythmModel.chartmeta
 
 	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
 
@@ -435,8 +441,8 @@ function GameplayController:saveScore()
 	chartplay.const = playContext.const
 	chartplay.nearest = playContext.timings.nearest
 	chartplay.tap_only = false -- like NoLongNote
-	chartplay.timings = Timings("simple", 100)
-	chartplay.healths = Healths("simple", 20)
+	chartplay.timings = chartmeta.timings
+	chartplay.healths = chartmeta.healths
 	chartplay.columns_order = nil
 	chartplay.created_at = os.time()
 	-- chartplay.submitted_at = integer

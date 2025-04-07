@@ -28,22 +28,19 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 		return "reused"
 	end
 
-	local charts, err = self.chartFactory:getCharts(chartfile.name, content)
-	if not charts then
+	local chart_chartmetas, err = self.chartFactory:getCharts(chartfile.name, content, hash)
+	if not chart_chartmetas then
 		return nil, err
 	end
 
-	for index, chart in ipairs(charts) do
-		local chartmeta = chart.chartmeta
-		chartmeta.hash = hash
-		chartmeta.index = index
-		self:setChartmeta(chartmeta)
+	for _, t in ipairs(chart_chartmetas) do
+		self:setChartmeta(t.chartmeta)
 	end
 
 	chartfile.hash = hash
 	self.chartfilesRepo:updateChartfile(chartfile)
 
-	return "cached", charts
+	return "cached", chart_chartmetas
 end
 
 ---@param chartmeta table
