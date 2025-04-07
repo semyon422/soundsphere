@@ -401,7 +401,7 @@ function EditorController:exportBmsTemplate(columns_out)
 		local data = love.filesystem.read(path_util.join(real_dir, "bgm.txt"))
 		if data then
 			for _, line in string_util.isplit(data, "\n") do
-				line = line:trim()
+				line = string_util.trim(line)
 				always_bgm[line] = true
 				print("bgm", line)
 			end
