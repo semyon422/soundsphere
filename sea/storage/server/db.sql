@@ -90,21 +90,11 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`osu_ranked_status` INTEGER,
 	`tempo` REAL,
 	`duration` REAL,
-	`has_video` INTEGER,
-	`has_storyboard` INTEGER,
-	`has_subtitles` INTEGER,
-	`has_negative_speed` INTEGER,
-	`has_stacked_notes` INTEGER,
-	`breaks_count` INTEGER,
 	`played_at` INTEGER,
 	`added_at` INTEGER,
 	`created_at` INTEGER,
-	`plays_count` INTEGER,
-	`pitch` REAL,
-	`audio_channels` INTEGER,
 	`used_columns` INTEGER,
 	`comment` TEXT,
-	`chart_preview` TEXT,
 	UNIQUE(`hash`, `index`)
 );
 
@@ -132,6 +122,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`msd_diff_data` TEXT,
 	`user_diff` REAL,
 	`user_diff_data` TEXT,
+	`notes_preview` BLOB,
 	UNIQUE(`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`)
 );
 

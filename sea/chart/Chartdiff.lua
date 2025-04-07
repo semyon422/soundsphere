@@ -28,6 +28,7 @@ local chart_types = require("sea.chart.types")
 ---@field msd_diff_data string
 ---@field user_diff number
 ---@field user_diff_data string
+---@field notes_preview string
 local Chartdiff = Chartkey + {}
 
 function Chartdiff:new()

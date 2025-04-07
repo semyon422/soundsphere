@@ -32,21 +32,11 @@ local BeatmapStatus = require("sea.osu.BeatmapStatus")
 ---@field osu_ranked_status integer
 ---@field tempo number
 ---@field duration number
----@field has_video boolean
----@field has_storyboard boolean
----@field has_subtitles boolean
----@field has_negative_speed boolean
----@field has_stacked_notes boolean
----@field breaks_count integer
 ---@field played_at integer
 ---@field added_at integer
 ---@field created_at integer
 ---@field plays_count integer
----@field pitch number
----@field audio_channels integer
----@field used_columns integer
 ---@field comment string
----@field chart_preview string
 local Chartmeta = class()
 
 local computed_keys = {
@@ -115,21 +105,11 @@ local validate_chartmeta = valid.struct({
 	tempo_avg = valid.optional(types.number),
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),
-	-- has_video = types.boolean,
-	-- has_storyboard = types.boolean,
-	-- has_subtitles = types.boolean,
-	-- has_negative_speed = types.boolean,
-	-- has_stacked_notes = types.boolean,
-	-- breaks_count = types.count,
 	-- played_at = types.time,
 	-- added_at = types.time,
 	-- created_at = types.time,
 	-- plays_count = types.count,
-	-- pitch = types.number,
-	-- audio_channels = types.count,
-	-- used_columns = types.count,
 	-- comment = text,
-	-- chart_preview = types.binary,
 })
 
 ---@return true?
