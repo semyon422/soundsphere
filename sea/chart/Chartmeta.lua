@@ -48,6 +48,40 @@ local BeatmapStatus = require("sea.osu.BeatmapStatus")
 ---@field chart_preview string
 local Chartmeta = class()
 
+local computed_keys = {
+	"hash",
+	"index",
+	"timings",
+	"healths",
+	"title",
+	"title_unicode",
+	"artist",
+	"artist_unicode",
+	"name",
+	"creator",
+	"level",
+	"inputmode",
+	"source",
+	"tags",
+	"format",
+	"audio_path",
+	"background_path",
+	"preview_time",
+	"tempo",
+	"duration",
+}
+
+---@param values sea.Chartdiff
+---@return boolean
+function Chartmeta:equalsComputed(values)
+	for _, key in ipairs(computed_keys) do
+		if self[key] ~= values[key] then
+			return false
+		end
+	end
+	return true
+end
+
 local is_timings_or_healths = valid.struct({
 	name = types.name,
 	data = valid.optional(types.count),
