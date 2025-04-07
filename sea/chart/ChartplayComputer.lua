@@ -37,7 +37,7 @@ function ChartplayComputer:compute(chartplay, chartfile)
 
 	local t = chart_chartmetas[chartplay.index]
 	if not t then
-		return nil, "not found"
+		return nil, "chart not found"
 	end
 
 	local replay, err = self:getReplay(chartplay)
@@ -136,7 +136,7 @@ end
 ---@return sphere.Replay?
 ---@return string?
 function ChartplayComputer:getReplay(chartplay)
-	local data, err = self.charts_storage:get(chartplay.events_hash)
+	local data, err = self.replays_storage:get(chartplay.events_hash)
 	if not data then
 		return nil, err
 	end
