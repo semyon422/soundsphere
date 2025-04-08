@@ -17,6 +17,8 @@ local chart_types = require("sea.chart.types")
 ---@field custom_user_id integer
 ---@field notes_hash string
 ---@field inputmode string
+---@field duration number not affected by rate
+---@field start_time number not affected by rate
 ---@field notes_count integer total object count
 ---@field judges_count integer total number of judgeable QTEs (long note = 2 qte)
 ---@field note_types_count {[notechart.NoteType]: integer} by type, sum = notes_count
@@ -36,10 +38,11 @@ function Chartdiff:new()
 end
 
 local computed_keys = {
-	"notes_hash",
+	-- "notes_hash",
 	"inputmode",
+	"duration",
+	"start_time",
 	"notes_count",
-	"long_notes_count",
 	"density_data",
 	"sv_data",
 	"enps_diff",
@@ -61,7 +64,7 @@ function Chartdiff:equalsComputed(values)
 	return true
 end
 
-local note_types_count = valid.struct({})
+local note_types_count = valid.map(types.name, types.count)
 
 local validate_chartdiff = valid.struct({
 	hash = types.md5hash,
@@ -72,6 +75,8 @@ local validate_chartdiff = valid.struct({
 	mode = types.new_enum(Gamemode),
 	-- notes_hash = types.md5hash,
 	inputmode = types.name,
+	duration = types.number,
+	start_time = types.number,
 	notes_count = types.count,
 	judges_count = types.count,
 	note_types_count = note_types_count,
@@ -83,6 +88,7 @@ local validate_chartdiff = valid.struct({
 	msd_diff_data = types.binary,
 	user_diff = types.number,
 	user_diff_data = types.binary,
+	notes_preview = types.binary,
 })
 
 ---@return true?

@@ -57,7 +57,7 @@ function Chartplays:requireChartfile(user, submission, hash)
 
 	local file, err = submission:getChartfileData(hash)
 	if not file then
-		return nil, err or "missing error"
+		return nil, "get chartfile data: " .. (err or "missing error")
 	end
 
 	if not validate_chartfile_data(file) then
@@ -70,7 +70,7 @@ function Chartplays:requireChartfile(user, submission, hash)
 
 	local ok, err = self.charts_storage:set(hash, file.data)
 	if not ok then
-		return nil, err
+		return nil, "storage set: " .. err
 	end
 
 	chartfile.name = file.name
@@ -90,7 +90,7 @@ end
 function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	local can, err = self.chartplays_access:canSubmit(user)
 	if not can then
-		return nil, err
+		return nil, "can submit: " .. err
 	end
 
 	local chartplay = self.charts_repo:getChartplayByEventsHash(chartplay_values.events_hash)
@@ -105,12 +105,12 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 
 	local chartfile, err = self:requireChartfile(user, submission, chartplay.hash)
 	if not chartfile then
-		return nil, err
+		return nil, "require chartfile: " .. err
 	end
 
 	local events_data, err = submission:getEventsData(chartplay.events_hash)
 	if not events_data then
-		return nil, err or "missing error"
+		return nil, "get events data: " .. (err or "missing error")
 	end
 
 	if type(events_data) ~= "string" then
@@ -123,7 +123,7 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 
 	local ok, err = self.replays_storage:set(chartplay.events_hash, events_data)
 	if not ok then
-		return nil, err
+		return nil, "storage set: " .. err
 	end
 
 	chartplay.submitted_at = os.time()
@@ -145,14 +145,14 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		if not computed_chartmeta then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
-			return nil, err
+			return nil, "compute chartmeta: " .. err
 		end
 	else
 		local ret, err = self.chartplay_computer:compute(chartplay, chartfile)
 		if not ret then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
-			return nil, err
+			return nil, "compute: " .. err
 		end
 
 		computed_chartplay = ret.chartplay

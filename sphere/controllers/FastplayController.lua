@@ -45,24 +45,25 @@ function FastplayController:play(chart, chartmeta, replay)
 	local cacheModel = self.cacheModel
 	local playContext = self.playContext
 
-	local state = self:applyModifiers(chart, replay)
-
-	rhythmModel:setTimeRate(playContext.rate)
-	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart, chartmeta)
-
-	replayModel:setMode("replay")
-	rhythmModel.inputManager:setMode("internal")
-	rhythmModel.inputManager.observable:add(replayModel)
-
-	rhythmModel:load()
-
 	local chartdiff = {
 		rate = playContext.rate,
 		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
 	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+
+	local state = self:applyModifiers(chart, replay)
+
+	rhythmModel:setTimeRate(playContext.rate)
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
+
+	replayModel:setMode("replay")
+	rhythmModel.inputManager:setMode("internal")
+	rhythmModel.inputManager.observable:add(replayModel)
+
+	rhythmModel:load()
 
 	chartdiff.modifiers = playContext.modifiers
 	playContext.chartdiff = chartdiff

@@ -1,6 +1,8 @@
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local int_rates = require("libchart.int_rates")
 local Enum = require("rdb.Enum")
+local Gamemode = require("sea.chart.Gamemode")
+local stbl = require("stbl")
 
 local modifiers = {}
 
@@ -35,6 +37,10 @@ chartdiffs.types = {
 	modifiers = modifiers,
 	rate = int_rates,
 	rate_type = rate_type,
+	mode = Gamemode,
+	note_types_count = stbl,
+	density_data = stbl,
+	sv_data = stbl,
 }
 
 chartdiffs.relations = {}

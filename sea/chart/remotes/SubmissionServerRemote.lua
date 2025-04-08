@@ -29,15 +29,20 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 
 	local ok, errs = chartplay_values:validate()
 	if not ok then
-		return nil, table.concat(errs, ", ")
+		return nil, "chartplay submit: " .. table.concat(errs, ", ")
 	end
 
 	local ok, errs = chartdiff_values:validate()
 	if not ok then
-		return nil, table.concat(errs, ", ")
+		return nil, "chartdiff submit: " .. table.concat(errs, ", ")
 	end
 
-	return self.chartplays:submit(self.user, self.remote.submission, chartplay_values, chartdiff_values)
+	local chartplay, err = self.chartplays:submit(self.user, self.remote.submission, chartplay_values, chartdiff_values)
+	if not chartplay then
+		return nil, "submit: " .. err
+	end
+
+	return chartplay
 end
 
 return SubmissionServerRemote

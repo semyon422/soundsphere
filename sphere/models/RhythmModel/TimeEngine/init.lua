@@ -42,9 +42,13 @@ function TimeEngine:load()
 	self.currentTime = t
 	self.visualTimeInfo.time = t
 	self.visualTimeInfo.rate = self.timeRate
+end
 
-	self.minTime = self.chartmeta.start_time
-	self.maxTime = self.minTime + self.chartmeta.duration
+---@param start_time number
+---@param duration number
+function TimeEngine:setPlayTime(start_time, duration)
+	self.minTime = start_time
+	self.maxTime = start_time + duration
 end
 
 ---@param time number

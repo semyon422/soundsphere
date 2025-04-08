@@ -31,7 +31,6 @@ local BeatmapStatus = require("sea.osu.BeatmapStatus")
 ---@field osu_hp number
 ---@field osu_ranked_status integer
 ---@field tempo number
----@field duration number
 ---@field played_at integer
 ---@field added_at integer
 ---@field created_at integer
@@ -59,7 +58,9 @@ local computed_keys = {
 	"background_path",
 	"preview_time",
 	"tempo",
-	"duration",
+	"tempo_avg",
+	"tempo_max",
+	"tempo_min",
 }
 
 ---@param values sea.Chartdiff
@@ -100,8 +101,6 @@ local validate_chartmeta = valid.struct({
 	-- osu_hp = types.number,
 	-- osu_ranked_status = types.new_enum(BeatmapStatus),
 	tempo = types.number,
-	duration = types.number,
-	start_time = types.number,
 	tempo_avg = valid.optional(types.number),
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),

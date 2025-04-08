@@ -1,5 +1,6 @@
 local class = require("class")
 local math_util = require("math_util")
+local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
@@ -114,17 +115,24 @@ function GameplayController:load()
 	ModifierModel:apply(playContext.modifiers, chart)
 
 	local chartdiff = {
+		mode = "mania",
 		rate = playContext.rate,
 		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
+	setmetatable(chartdiff, Chartdiff)
+	---@cast chartdiff sea.Chartdiff
 	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
 
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
 	chartdiff.rate_type = config.gameplay.rate_type
-	cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
+
+	assert(chartdiff:validate())
+
+	-- cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
+
 	playContext.chartdiff = chartdiff
 	chart.chartdiff = chartdiff
 
@@ -143,6 +151,7 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
 	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
 
@@ -392,6 +401,8 @@ function GameplayController:saveScore()
 	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
 
 	local chartdiff = self.playContext.chartdiff
+	local chartdiff_copy = table_util.deepcopy(chartdiff)
+
 	chartdiff.notes_preview = nil  -- fixes erasing
 	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local judge = scoreSystem.soundsphere.judges["soundsphere"]
@@ -461,33 +472,12 @@ function GameplayController:saveScore()
 	chartplay.rating_pp = 0
 	chartplay.rating_msd = 0
 
-	local _chartdiff = Chartdiff()
-
-	_chartdiff.hash = chartdiff.hash
-	_chartdiff.index = chartdiff.index
-	_chartdiff.modifiers = {}
-	_chartdiff.rate = chartdiff.rate
-	_chartdiff.rate_type = chartdiff.rate_type
-	_chartdiff.mode = "mania"
-	_chartdiff.inputmode = chartdiff.inputmode
-	_chartdiff.notes_count = 0
-	_chartdiff.judges_count = 0
-	_chartdiff.note_types_count = {}
-	_chartdiff.density_data = {}
-	_chartdiff.sv_data = {}
-	_chartdiff.enps_diff = 0
-	_chartdiff.osu_diff = 0
-	_chartdiff.msd_diff = 0
-	_chartdiff.msd_diff_data = ""
-	_chartdiff.user_diff = 0
-	_chartdiff.user_diff_data = ""
-
 	coroutine.wrap(function()
 		if not self.seaClient.connected then
 			return
 		end
 		print("submit")
-		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, _chartdiff)
+		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, chartdiff_copy)
 		print("got", ok, err)
 		if ok then
 			print(require("stbl").encode(ok))

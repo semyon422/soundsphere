@@ -169,11 +169,16 @@ function RhythmModel:setNoteChart(chart, chartmeta)
 	self.chart = chart
 	self.chartmeta = chartmeta
 	self.timeEngine.noteChart = chart
-	self.timeEngine.chartmeta = chartmeta
 	self.scoreEngine.noteChart = chart
-	self.scoreEngine.chartmeta = chartmeta
 	self.logicEngine:setChart(chart)
 	self.graphicEngine:setChart(chart)
+end
+
+---@param start_time number
+---@param duration number
+function RhythmModel:setPlayTime(start_time, duration)
+	self.timeEngine:setPlayTime(start_time, duration)
+	self.scoreEngine:setPlayTime(start_time, duration)
 end
 
 ---@param range table

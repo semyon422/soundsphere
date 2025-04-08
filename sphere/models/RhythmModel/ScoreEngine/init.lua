@@ -25,9 +25,6 @@ function ScoreEngine:load()
 	self.pausesCount = 0
 	self.paused = false
 
-	self.minTime = self.chartmeta.start_time
-	self.maxTime = self.minTime + self.chartmeta.duration
-
 	local judge = scoreSystem.judgements[self.judgement] or scoreSystem.judgements.soundsphere
 
 	local scoring = scoreSystem[judge.scoreSystemName]
@@ -38,6 +35,13 @@ function ScoreEngine:load()
 	self.accuracySource = metadata.hasAccuracy and scoring or normalscore
 	self.scoreSource = metadata.hasScore and scoring or normalscore
 	self.loaded = true
+end
+
+---@param start_time number
+---@param duration number
+function ScoreEngine:setPlayTime(start_time, duration)
+	self.minTime = start_time
+	self.maxTime = start_time + duration
 end
 
 function ScoreEngine:update()

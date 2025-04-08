@@ -108,6 +108,8 @@ function test.submit_score(t)
 		rate_type = "exp",
 		mode = "mania",
 		inputmode = "4key",
+		duration = 100,
+		start_time = 0,
 		notes_count = 100,
 		judges_count = 110,
 		note_types_count = {},
@@ -146,8 +148,6 @@ function test.submit_score(t)
 		background_path = "",
 		preview_time = 10,
 		tempo = 120,
-		duration = 180,
-		start_time = 0,
 	}
 	setmetatable(chartmeta_values, Chartmeta)
 	---@cast chartmeta_values sea.Chartmeta
