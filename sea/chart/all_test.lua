@@ -121,6 +121,7 @@ function test.submit_score(t)
 		msd_diff_data = "",
 		user_diff = 0,
 		user_diff_data = "",
+		notes_preview = "",
 	}
 	setmetatable(chartdiff_values, Chartdiff)
 	---@cast chartdiff_values sea.Chartdiff
