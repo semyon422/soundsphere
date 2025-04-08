@@ -64,7 +64,7 @@ function Chartdiff:equalsComputed(values)
 	return true
 end
 
-local note_types_count = valid.map(types.name, types.count)
+local note_types_count = valid.map(types.name, types.count, 10)
 
 local validate_chartdiff = valid.struct({
 	hash = types.md5hash,
@@ -74,7 +74,7 @@ local validate_chartdiff = valid.struct({
 	rate_type = types.new_enum(RateType),
 	mode = types.new_enum(Gamemode),
 	-- notes_hash = types.md5hash,
-	inputmode = types.name,
+	inputmode = chart_types.inputmode,
 	duration = types.number,
 	start_time = types.number,
 	notes_count = types.count,
