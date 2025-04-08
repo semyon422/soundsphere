@@ -119,13 +119,9 @@ local validate_chartplay = valid.struct({
 })
 
 ---@return true?
----@return string[]?
+---@return string|util.Errors?
 function Chartplay:validate()
-	local ok, errs = validate_chartplay(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return validate_chartplay(self)
 end
 
 return Chartplay

@@ -92,13 +92,9 @@ local validate_chartdiff = valid.struct({
 })
 
 ---@return true?
----@return string[]?
+---@return string|util.Errors?
 function Chartdiff:validate()
-	local ok, errs = validate_chartdiff(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return validate_chartdiff(self)
 end
 
 return Chartdiff

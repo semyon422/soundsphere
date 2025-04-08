@@ -1,4 +1,5 @@
 local class = require("class")
+local valid = require("valid")
 local math_util = require("math_util")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
@@ -129,7 +130,7 @@ function GameplayController:load()
 	chartdiff.index = chartview.index
 	chartdiff.rate_type = config.gameplay.rate_type
 
-	assert(chartdiff:validate())
+	assert(valid.format(chartdiff:validate()))
 
 	-- cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
 
@@ -471,6 +472,8 @@ function GameplayController:saveScore()
 	chartplay.accuracy_etterna = 0
 	chartplay.rating_pp = 0
 	chartplay.rating_msd = 0
+
+	assert(valid.format(chartplay:validate()))
 
 	coroutine.wrap(function()
 		if not self.seaClient.connected then

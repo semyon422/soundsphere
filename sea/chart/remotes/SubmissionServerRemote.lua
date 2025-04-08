@@ -1,4 +1,5 @@
 local class = require("class")
+local valid = require("valid")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 
@@ -16,26 +17,17 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_values)
-	if type(chartplay_values) ~= "table" then
-		return nil, "chartplay is not a table"
-	elseif type(chartdiff_values) ~= "table" then
-		return nil, "chartdiff is not a table"
+	local ok, err = valid.format(Chartplay.validate(chartplay_values))
+	if not ok then
+		return nil, "chartplay submit: " .. err
 	end
-
 	setmetatable(chartplay_values, Chartplay)
-	---@cast chartplay_values sea.Chartplay
+
+	local ok, err = valid.format(Chartdiff.validate(chartdiff_values))
+	if not ok then
+		return nil, "chartdiff submit: " .. err
+	end
 	setmetatable(chartdiff_values, Chartdiff)
-	---@cast chartdiff_values sea.Chartdiff
-
-	local ok, errs = chartplay_values:validate()
-	if not ok then
-		return nil, "chartplay submit: " .. table.concat(errs, ", ")
-	end
-
-	local ok, errs = chartdiff_values:validate()
-	if not ok then
-		return nil, "chartdiff submit: " .. table.concat(errs, ", ")
-	end
 
 	local chartplay, err = self.chartplays:submit(self.user, self.remote.submission, chartplay_values, chartdiff_values)
 	if not chartplay then

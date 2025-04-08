@@ -112,13 +112,9 @@ local validate_chartmeta = valid.struct({
 })
 
 ---@return true?
----@return string[]?
+---@return string|util.Errors?
 function Chartmeta:validate()
-	local ok, errs = validate_chartmeta(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return validate_chartmeta(self)
 end
 
 return Chartmeta
