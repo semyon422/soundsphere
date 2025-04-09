@@ -7,6 +7,7 @@ local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
 local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 
 local test = {}
@@ -63,6 +64,8 @@ local function create_chartplay(ctx, values)
 	chartplay.mode = values.mode or "mania"
 	chartplay.rating = values.rating or 0
 	chartplay.result = values.result or "fail"
+	chartplay.timings = values.timings or Timings("simple")
+	chartplay.subtimings = values.subtimings or Subtimings("window", 0.1)
 	return ctx.db.models.chartplays:create(chartplay)
 end
 
@@ -305,8 +308,8 @@ function test.free_timings_filter(t)
 		index = 1,
 	})
 
-	create_chartplay(ctx, {rating = 1, timings = Timings("simple")})
-	create_chartplay(ctx, {rating = 2, timings = Timings("osumania", 8)})
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple"), subtimings = Subtimings("window", 0.1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osumania", 8), subtimings = Subtimings("scorev", 1)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)
