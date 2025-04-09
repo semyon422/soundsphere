@@ -1,0 +1,24 @@
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Policies</p>
+		<p class="subtitle">Documents you agree to when you use our services</p>
+	</div>
+</section>
+
+<div class="tabs is-centered">
+	<ul>
+		<% for _, v in ipairs(policies) do %>
+			<% if v.key == selected_policy_key then %>
+				<li class="is-active"><a><%= v.name %></a></li>
+			<% else %>
+				<li><a href="?policy_key=<%= v.key %>"><%= v.name %></a></li>
+			<% end %>
+		<% end %>
+	</ul>
+</div>
+
+<div class="content" id="content"></div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+document.getElementById('content').innerHTML = marked.parse(`<%- view:render(policy_filename) %>`)
+</script>
