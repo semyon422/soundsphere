@@ -300,13 +300,13 @@ function test.free_timings_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
-		timings = Timings("simple", 100),
+		timings = Timings("simple"),
 		hash = "",
 		index = 1,
 	})
 
-	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 100)})
-	create_chartplay(ctx, {rating = 2, timings = Timings("simple", 200)})
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple")})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osumania", 8)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)

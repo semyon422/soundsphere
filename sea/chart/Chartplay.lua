@@ -6,6 +6,7 @@ local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
 local ComputeState = require("sea.chart.ComputeState")
 local Result = require("sea.chart.Result")
+local TimingValues = require("sea.chart.TimingValues")
 
 ---@class sea.Chartplay: sea.Chartkey
 ---@operator call: sea.Chartplay
@@ -25,6 +26,7 @@ local Result = require("sea.chart.Result")
 ---@field nearest boolean
 ---@field tap_only boolean - like NoLongNote
 ---@field timings sea.Timings
+---@field subtimings sea.Subtimings
 ---@field healths sea.Healths
 ---@field columns_order integer[]? nil - unchanged
 ---@field created_at integer
@@ -83,6 +85,17 @@ assert(is_columns_order())
 assert(is_columns_order({1, 3, 2}))
 assert(not is_columns_order({1, 3}))
 
+---@param chartplay sea.Chartplay
+---@return true?
+---@return string?
+local function subtimings_pair(chartplay)
+	local ok, err = TimingValues():fromTimings(chartplay.timings, chartplay.subtimings)
+	if not ok then
+		return nil, err
+	end
+	return true
+end
+
 local validate_chartplay = valid.struct({
 	-- user_id = types.index,
 	events_hash = types.md5hash,
@@ -98,6 +111,7 @@ local validate_chartplay = valid.struct({
 	nearest = types.boolean,
 	tap_only = types.boolean,
 	timings = chart_types.timings_or_healths,
+	subtimings = chart_types.timings_or_healths,
 	healths = chart_types.timings_or_healths,
 	columns_order = is_columns_order,
 	created_at = types.time,
@@ -117,6 +131,8 @@ local validate_chartplay = valid.struct({
 	rating_pp = types.number,
 	rating_msd = types.number,
 })
+
+validate_chartplay = valid.compose(validate_chartplay, subtimings_pair)
 
 ---@return true?
 ---@return string|util.Errors?

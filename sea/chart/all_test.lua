@@ -8,6 +8,7 @@ local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
 local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local FakeSubmissionClientRemote = require("sea.chart.remotes.FakeSubmissionClientRemote")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
@@ -92,7 +93,8 @@ function test.submit_score(t)
 		rating_pp = 0,
 		result = "pass",
 		tap_only = false,
-		timings = Timings("simple", 20),
+		timings = Timings("simple"),
+		subtimings = Subtimings("window", 0.160),
 	}
 	setmetatable(chartplay_values, Chartplay)
 	---@cast chartplay_values sea.Chartplay
@@ -132,7 +134,7 @@ function test.submit_score(t)
 	local chartmeta_values = {
 		hash = md5.sumhexa(chartfile_data),
 		index = 1,
-		timings = Timings("simple", 100),
+		timings = Timings("simple"),
 		healths = Healths("simple", 20),
 		title = "Title",
 		title_unicode = "Title Unicode",

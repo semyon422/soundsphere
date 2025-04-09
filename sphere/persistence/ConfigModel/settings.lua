@@ -185,6 +185,13 @@ local settings = {
 		diff_column = "enps_diff",
 		locations_in_collections = false,
 		chart_preview = true,
+	},
+	subtimings = { -- default subtimings
+		simple = {"window", 0.160},
+		osumania = {"scorev", 1},
+		stepmania = {"etternaj", 4},
+		quaver = {"none"},
+		bmsrank = {"none"},
 	}
 }
 

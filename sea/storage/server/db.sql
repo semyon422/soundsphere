@@ -149,6 +149,7 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`nearest` INTEGER,
 	`tap_only` INTEGER,
 	`timings` INTEGER,
+	`subtimings` INTEGER,
 	`healths` INTEGER,
 	`columns_order` BLOB,
 	`created_at` INTEGER,

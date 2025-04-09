@@ -11,6 +11,7 @@ local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
+local Subtimings = require("sea.chart.Subtimings")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -438,6 +439,8 @@ function GameplayController:saveScore()
 		self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
 	end
 
+	local subtimmings = Subtimings(unpack(self.configModel.configs.settings.subtimings[chartmeta.timings.name]))
+
 	local chartplay = Chartplay()
 
 	-- chartplay.user_id = 0
@@ -454,6 +457,7 @@ function GameplayController:saveScore()
 	chartplay.nearest = playContext.timings.nearest
 	chartplay.tap_only = false -- like NoLongNote
 	chartplay.timings = chartmeta.timings
+	chartplay.subtimings = subtimmings
 	chartplay.healths = chartmeta.healths
 	chartplay.columns_order = nil
 	chartplay.created_at = os.time()
