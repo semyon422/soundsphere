@@ -6,7 +6,7 @@ local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
 local ComputeState = require("sea.chart.ComputeState")
 local Result = require("sea.chart.Result")
-local TimingValues = require("sea.chart.TimingValues")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 ---@class sea.Chartplay: sea.Chartkey
 ---@operator call: sea.Chartplay
@@ -89,7 +89,7 @@ assert(not is_columns_order({1, 3}))
 ---@return true?
 ---@return string?
 local function subtimings_pair(chartplay)
-	local ok, err = TimingValues():fromTimings(chartplay.timings, chartplay.subtimings)
+	local ok, err = TimingValuesFactory:get(chartplay.timings, chartplay.subtimings)
 	if not ok then
 		return nil, err
 	end

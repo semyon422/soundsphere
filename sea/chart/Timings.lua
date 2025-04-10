@@ -1,6 +1,14 @@
 local class = require("class")
 
----@alias sea.TimingsName "unknown"|"simple"|"osumania"|"stepmania"|"quaver"|"bmsrank"
+---@alias sea.TimingsName
+---| "unknown"
+---| "arbitrary"
+---| "sphere"
+---| "simple"
+---| "osumania"
+---| "stepmania"
+---| "quaver"
+---| "bmsrank"
 
 ---@class sea.Timings
 ---@operator call: sea.Timings
@@ -24,7 +32,11 @@ function Timings:validate()
 	local v = self.data
 	local n = self.name
 
-	if n == "simple" then
+	if n == "arbitrary" then
+		return v == 0
+	elseif n == "sphere" then
+		return v == 0
+	elseif n == "simple" then
 		return v == 0
 	elseif n == "osumania" then
 		v = v * 10
@@ -47,7 +59,11 @@ end
 function Timings.decode(v)
 	assert(v, "missing timings value")
 
-	if v == 1000 then
+	if v == 0 then
+		return Timings("arbitrary")
+	elseif v == 100 then
+		return Timings("sphere")
+	elseif v == 1000 then
 		return Timings("simple")
 	elseif v >= 1100 and v <= 1200 then
 		return Timings("osumania", (v - 1100) / 10) -- OverallDifficulty
@@ -68,7 +84,11 @@ function Timings.encode(t)
 	local v = t.data
 	local n = t.name
 
-	if n == "simple" then
+	if n == "arbitrary" then
+		return 0
+	elseif n == "sphere" then
+		return 100
+	elseif n == "simple" then
 		return 1000
 	elseif n == "osumania" then
 		return 1100 + v * 10
@@ -81,6 +101,11 @@ function Timings.encode(t)
 	end
 
 	return v
+end
+
+---@param t sea.Timings
+function Timings:__eq(t)
+	return self.name == t.name and self.data == t.data
 end
 
 return Timings

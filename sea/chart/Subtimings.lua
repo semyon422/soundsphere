@@ -1,6 +1,11 @@
 local class = require("class")
 
----@alias sea.SubtimingsName "none"|"window"|"scorev"|"etternaj"
+---@alias sea.SubtimingsName
+---| "none"
+---| "window"
+---| "scorev"
+---| "etternaj"
+---| "lunatic"
 
 ---@class sea.Subtimings
 ---@operator call: sea.Subtimings
@@ -31,6 +36,8 @@ function Subtimings:validate()
 		return v == 1 or v == 2
 	elseif n == "etternaj" then
 		return v >= 1 and v <= 9
+	elseif n == "lunatic" then
+		return v == 0
 	elseif n == "none" then
 		return v == 0
 	end
@@ -54,6 +61,12 @@ function Subtimings.decode(v, tn)
 		end
 		error("invalid stepmania subtimings")
 		-- TODO: other stepmania judgements
+	elseif tn == "lunatic" then
+		if v == 0 then
+			return Subtimings("lunatic")
+		end
+		error("invalid bmsrank subtimings")
+		-- TODO: other bms judgements
 	end
 
 	return Subtimings("none")
@@ -70,6 +83,8 @@ function Subtimings.encode(t)
 	elseif n == "scorev" then
 		return v
 	elseif n == "etternaj" then
+		return v
+	elseif n == "lunatic" then
 		return v
 	end
 

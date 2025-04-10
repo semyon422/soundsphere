@@ -1,6 +1,6 @@
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
-local TimingValues = require("sea.chart.TimingValues")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 local test = {}
 
@@ -10,12 +10,22 @@ function test.timings(t)
 		t:eq(Timings.encode(Timings.decode(i)), i)
 	end
 
+	local unknown = Timings.decode(2000)
+	t:eq(unknown.name, "unknown")
+	t:eq(unknown.data, 2000)
+
+	Timings("unknown", 1)
+	Timings("arbitrary")
+	Timings("sphere")
 	Timings("simple")
 	Timings("osumania", 8.1)
 	Timings("stepmania")
 	Timings("quaver")
 	Timings("bmsrank")
 
+	t:has_error(Timings, "unknown", 0.1)
+	t:has_error(Timings, "arbitrary", 1)
+	t:has_error(Timings, "sphere", 1)
 	t:has_error(Timings, "simple", 1)
 	t:has_error(Timings, "osumania", 8.15)
 	t:has_error(Timings, "stepmania", 1)
@@ -25,6 +35,9 @@ end
 
 ---@param t testing.T
 function test.subtimings(t)
+	t:eq(Subtimings.encode(Subtimings.decode(0, "unknown")), 0)
+	t:eq(Subtimings.encode(Subtimings.decode(0, "arbitrary")), 0)
+	t:eq(Subtimings.encode(Subtimings.decode(0, "sphere")), 0)
 	t:eq(Subtimings.encode(Subtimings.decode(100, "simple")), 100)
 	t:eq(Subtimings.encode(Subtimings.decode(2, "osumania")), 2)
 	t:eq(Subtimings.encode(Subtimings.decode(4, "stepmania")), 4)
@@ -34,25 +47,36 @@ function test.subtimings(t)
 	Subtimings("window", 0.100)
 	Subtimings("scorev", 1)
 	Subtimings("etternaj", 4)
+	Subtimings("lunatic")
+	Subtimings("none")
 
 	t:has_error(Subtimings, "window", -1)
 	t:has_error(Subtimings, "scorev", 3)
 	t:has_error(Subtimings, "etternaj", 10)
+	t:has_error(Subtimings, "lunatic", 1)
+	t:has_error(Subtimings, "none", 1)
 end
 
 ---@param t testing.T
 function test.values(t)
-	t:assert(TimingValues():fromTimings(Timings("simple"), Subtimings("window", 0.100)))
-	t:assert(TimingValues():fromTimings(Timings("osumania", 8), Subtimings("scorev", 1)))
-	t:assert(TimingValues():fromTimings(Timings("stepmania"), Subtimings("etternaj", 4)))
-	t:assert(TimingValues():fromTimings(Timings("quaver"), Subtimings("none")))
-	t:assert(TimingValues():fromTimings(Timings("bmsrank", 3), Subtimings("none")))
+	local factory = TimingValuesFactory()
 
-	t:assert(not TimingValues():fromTimings(Timings("simple"), Subtimings("scorev", 1)))
-	t:assert(not TimingValues():fromTimings(Timings("osumania", 8), Subtimings("etternaj", 4)))
-	t:assert(not TimingValues():fromTimings(Timings("stepmania"), Subtimings("none")))
-	t:assert(not TimingValues():fromTimings(Timings("quaver"), Subtimings("scorev", 1)))
-	t:assert(not TimingValues():fromTimings(Timings("bmsrank"), Subtimings("scorev", 1)))
+	t:assert(factory:get(Timings("unknown"), Subtimings("none")))
+	t:tdeq({factory:get(Timings("arbitrary"), Subtimings("none"))}, {nil, "undefined for arbitrary timings"})
+
+	t:assert(factory:get(Timings("sphere"), Subtimings("none")))
+	t:assert(factory:get(Timings("simple"), Subtimings("window", 0.100)))
+	t:assert(factory:get(Timings("osumania", 8), Subtimings("scorev", 1)))
+	t:assert(factory:get(Timings("stepmania"), Subtimings("etternaj", 4)))
+	t:assert(factory:get(Timings("quaver"), Subtimings("none")))
+	t:assert(factory:get(Timings("bmsrank", 3), Subtimings("lunatic")))
+
+	t:assert(not factory:get(Timings("sphere"), Subtimings("scorev", 1)))
+	t:assert(not factory:get(Timings("simple"), Subtimings("scorev", 1)))
+	t:assert(not factory:get(Timings("osumania", 8), Subtimings("etternaj", 4)))
+	t:assert(not factory:get(Timings("stepmania"), Subtimings("none")))
+	t:assert(not factory:get(Timings("quaver"), Subtimings("scorev", 1)))
+	t:assert(not factory:get(Timings("bmsrank"), Subtimings("none")))
 end
 
 return test
