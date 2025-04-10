@@ -108,7 +108,6 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER NOT NULL,
 	`custom_user_id` INTEGER,
-	`notes_hash` TEXT,
 	`inputmode` TEXT,
 	`duration` REAL,
 	`start_time` REAL,
@@ -136,8 +135,7 @@ CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
-	`events_hash` TEXT NOT NULL DEFAULT "",
-	`notes_hash` TEXT NOT NULL DEFAULT "",
+	`replay_hash` TEXT NOT NULL DEFAULT "",
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`modifiers` TEXT NOT NULL,

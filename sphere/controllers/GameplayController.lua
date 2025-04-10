@@ -444,8 +444,7 @@ function GameplayController:saveScore()
 	local chartplay = Chartplay()
 
 	-- chartplay.user_id = 0
-	chartplay.events_hash = replayHash
-	-- chartplay.notes_hash = ""
+	chartplay.replay_hash = replayHash
 	chartplay.hash = chartdiff.hash
 	chartplay.index = chartdiff.index
 	chartplay.modifiers = {}

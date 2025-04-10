@@ -15,7 +15,6 @@ local chart_types = require("sea.chart.types")
 ---@field rate_type sea.RateType
 ---@field mode sea.Gamemode
 ---@field custom_user_id integer
----@field notes_hash string
 ---@field inputmode string
 ---@field duration number not affected by rate
 ---@field start_time number not affected by rate
@@ -38,7 +37,6 @@ function Chartdiff:new()
 end
 
 local computed_keys = {
-	-- "notes_hash",
 	"inputmode",
 	"duration",
 	"start_time",
@@ -73,7 +71,6 @@ local validate_chartdiff = valid.struct({
 	rate = types.number,
 	rate_type = types.new_enum(RateType),
 	mode = types.new_enum(Gamemode),
-	-- notes_hash = types.md5hash,
 	inputmode = chart_types.inputmode,
 	duration = types.number,
 	start_time = types.number,

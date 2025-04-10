@@ -5,44 +5,35 @@ local ChartFactory = require("notechart.ChartFactory")
 
 local FastplayController = require("sphere.controllers.FastplayController")
 
-local Replay = require("sphere.models.ReplayModel.Replay")
 local ReplayModel = require("sphere.models.ReplayModel")
 
 local ModifierModel = require("sphere.models.ModifierModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 local PlayContext = require("sphere.models.PlayContext")
-local ModifierEncoder = require("sphere.models.ModifierEncoder")
 
 ---@class sea.ChartplayComputer: sea.IChartplayComputer
 ---@operator call: sea.ChartplayComputer
 local ChartplayComputer = IChartplayComputer + {}
 
----@param charts_storage sea.IKeyValueStorage
----@param replays_storage sea.IKeyValueStorage
-function ChartplayComputer:new(charts_storage, replays_storage)
-	self.charts_storage = charts_storage
-	self.replays_storage = replays_storage
+function ChartplayComputer:new()
 	self.difficultyModel = DifficultyModel()
 end
 
----@param chartplay sea.Chartplay
----@param chartfile sea.Chartfile
+---@param chartfile_name string
+---@param chartfile_data string
+---@param index integer
+---@param replay sea.Replay
 ---@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
-function ChartplayComputer:compute(chartplay, chartfile)
-	local chart_chartmetas, err = self:getCharts(chartfile)
+function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
+	local chart_chartmetas, err = self:getCharts(chartfile_name, chartfile_data)
 	if not chart_chartmetas then
 		return nil, err
 	end
 
-	local t = chart_chartmetas[chartplay.index]
+	local t = chart_chartmetas[index]
 	if not t then
 		return nil, "chart not found"
-	end
-
-	local replay, err = self:getReplay(chartplay)
-	if not replay then
-		return nil, err
 	end
 
 	local chart, chartmeta, chartdiff = t.chart, t.chartmeta, t.chartdiff
@@ -71,16 +62,6 @@ function ChartplayComputer:compute(chartplay, chartfile)
 
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
-	-- return 200, {
-	-- 	score = score,
-	-- 	inputMode = tostring(chart.inputMode),
-	-- 	playContext = playContext,
-	-- 	modifiers = replay.modifiers,
-	-- 	modifiersEncoded = ModifierEncoder:encode(replay.modifiers),
-	-- 	modifiersHash = ModifierEncoder:hash(replay.modifiers),
-	-- 	modifiersString = ModifierModel:getString(replay.modifiers),
-	-- }
-
 	return {
 		chartplay = score,
 		chartdiff = chartdiff,
@@ -88,12 +69,13 @@ function ChartplayComputer:compute(chartplay, chartfile)
 	}
 end
 
----@param chartfile sea.Chartfile
+---@param name string
+---@param data string
 ---@param index integer
 ---@return sea.Chartmeta?
 ---@return string?
-function ChartplayComputer:computeChartmeta(chartfile, index)
-	local charts, err = self:getCharts(chartfile)
+function ChartplayComputer:computeChartmeta(name, data, index)
+	local charts, err = self:getCharts(name, data)
 	if not charts then
 		return nil, err
 	end
@@ -108,16 +90,12 @@ end
 
 --------------------------------------------------------------------------------
 
----@param chartfile sea.Chartfile
+---@param name string
+---@param data string
 ---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta, chartdiff: sea.Chartdiff}[]?
 ---@return string?
-function ChartplayComputer:getCharts(chartfile)
-	local data, err = self.charts_storage:get(chartfile.hash)
-	if not data then
-		return nil, err
-	end
-
-	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, data)
+function ChartplayComputer:getCharts(name, data)
+	local chart_chartmetas, err = ChartFactory:getCharts(name, data)
 	if not chart_chartmetas then
 		return nil, err
 	end
@@ -130,18 +108,6 @@ function ChartplayComputer:getCharts(chartfile)
 	end
 
 	return chart_chartmetas
-end
-
----@param chartplay sea.Chartplay
----@return sphere.Replay?
----@return string?
-function ChartplayComputer:getReplay(chartplay)
-	local data, err = self.replays_storage:get(chartplay.events_hash)
-	if not data then
-		return nil, err
-	end
-
-	return Replay():fromString(data)
 end
 
 return ChartplayComputer

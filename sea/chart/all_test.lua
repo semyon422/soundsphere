@@ -74,7 +74,7 @@ function test.submit_score(t)
 		const = false,
 		created_at = os.time(),
 		custom = false,
-		events_hash = md5.sumhexa(replayfile_data),
+		replay_hash = md5.sumhexa(replayfile_data),
 		hash = md5.sumhexa(chartfile_data),
 		healths = Healths("simple", 20),
 		index = 1,
@@ -158,6 +158,7 @@ function test.submit_score(t)
 	local valid, errs = chartmeta_values:validate()
 	t:tdeq({valid, errs}, {true})
 
+	ctx.fakeChartplayComputer.chartplay = chartplay_values
 	ctx.fakeChartplayComputer.chartdiff = chartdiff_values
 	ctx.fakeChartplayComputer.chartmeta = chartmeta_values
 

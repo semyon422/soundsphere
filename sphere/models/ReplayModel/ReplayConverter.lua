@@ -1,6 +1,10 @@
 local class = require("class")
 local ModifierModel = require("sphere.models.ModifierModel")
 local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
+local TimingsDefiner = require("sea.timings.TimingsDefiner")
+local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
+local SeaReplay = require("sea.chart.Replay")
 
 ---@class sphere.ReplayConverter
 ---@operator call: sphere.ReplayConverter
@@ -120,17 +124,53 @@ function ReplayConverter:convertModifiers(replay)
 	ModifierModel:fixOldFormat(replay.modifiers)
 end
 
----@param replay table
-function ReplayConverter:convert(replay)
-	replay.rate = replay.rate or 1
-	if not replay.const then
-		replay.const = false
+---@param obj table
+---@return sea.Replay
+function ReplayConverter:convert(obj)
+	if obj.version == 1 then
+		return (setmetatable(obj, SeaReplay))
 	end
-	if replay.modifiers then
-		self:convertModifiers(replay)
+
+	obj.rate = obj.rate or 1
+	if not obj.const then
+		obj.const = false
 	end
-	replay.modifiers = replay.modifiers or {}
-	self:convertTimings(replay)
+	if obj.modifiers then
+		self:convertModifiers(obj)
+	end
+	obj.modifiers = obj.modifiers or {}
+	self:convertTimings(obj)
+
+	local replay = SeaReplay()
+
+	replay.hash = obj.hash
+	replay.index = obj.index
+	replay.modifiers = obj.modifiers
+	replay.rate = obj.rate
+	replay.mode = obj.single and "taiko" or "mania"
+
+	replay.nearest = obj.timings.nearest
+	replay.tap_only = false
+
+	local timings, subtimings = TimingsDefiner:match(obj.timings)
+	if not timings or not subtimings then
+		timings = Timings("arbitrary")
+		subtimings = Subtimings("none")
+	end
+	replay.timings = timings
+	replay.subtimings = subtimings
+
+	-- replay.healths is not defined on this stage
+	replay.columns_order = nil
+
+	-- metadata
+	replay.custom = false
+	replay.const = obj.const
+	replay.pause_count = 0
+	replay.created_at = obj.time
+	replay.rate_type = "linear" -- maybe detect it?
+
+	return replay
 end
 
 return ReplayConverter

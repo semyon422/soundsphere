@@ -53,25 +53,25 @@ function SubmissionClientRemote:getChartfileData(hash)
 	}
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return string?
 ---@return string?
-function SubmissionClientRemote:getEventsData(events_hash)
-	if not types.md5hash(events_hash) then
+function SubmissionClientRemote:getReplayData(replay_hash)
+	if not types.md5hash(replay_hash) then
 		return nil, "invalid hash"
 	end
 
-	local score = self.cacheModel.scoresRepo:getScoreByReplayHash(events_hash)
+	local score = self.cacheModel.scoresRepo:getScoreByReplayHash(replay_hash)
 	if not score then
 		return nil, "score not found"
 	end
 
-	local data = love.filesystem.read("userdata/replays/" .. events_hash)
+	local data = love.filesystem.read("userdata/replays/" .. replay_hash)
 	if not data then
 		return nil, "replay file not found"
 	end
 
-	if md5.sumhexa(data) ~= events_hash then
+	if md5.sumhexa(data) ~= replay_hash then
 		return nil, "hash mismatch"
 	end
 

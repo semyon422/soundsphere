@@ -14,7 +14,7 @@ local function new_valid_chartplay()
 		const = false,
 		created_at = os.time(),
 		custom = false,
-		events_hash = "00000000000000000000000000000000",
+		replay_hash = "00000000000000000000000000000000",
 		hash = "00000000000000000000000000000000",
 		healths = Healths("simple", 20),
 		index = 1,

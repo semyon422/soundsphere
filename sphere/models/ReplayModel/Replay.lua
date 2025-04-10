@@ -95,7 +95,7 @@ function Replay:fromString(s)
 		return
 	end
 
-	self.replayConverter:convert(object)
+	local replay = self.replayConverter:convert(object)
 
 	self.hash = object.hash
 	self.index = object.index

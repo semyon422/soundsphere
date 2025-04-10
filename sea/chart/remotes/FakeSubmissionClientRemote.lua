@@ -18,10 +18,10 @@ function FakeSubmissionClientRemote:getChartfileData(hash)
 	return {name = "file.bms", data = self.chartfile_data}
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return string?
 ---@return string?
-function FakeSubmissionClientRemote:getEventsData(events_hash)
+function FakeSubmissionClientRemote:getReplayData(replay_hash)
 	return self.replayfile_data
 end
 
