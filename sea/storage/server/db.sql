@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`rate` INTEGER NOT NULL,
 	`mode` INTEGER NOT NULL,
 	`custom_user_id` INTEGER,
+	`created_at` INTEGER,
 	`inputmode` TEXT,
 	`duration` REAL,
 	`start_time` REAL,

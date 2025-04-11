@@ -1,4 +1,5 @@
 local md5 = require("md5")
+local json = require("json")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 local Chartmeta = require("sea.chart.Chartmeta")
@@ -10,6 +11,7 @@ local FakeChartplayComputer = require("sea.chart.FakeChartplayComputer")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local FakeSubmissionClientRemote = require("sea.chart.remotes.FakeSubmissionClientRemote")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 
@@ -57,44 +59,90 @@ local function create_test_ctx()
 	}
 end
 
+local chartfile_name = "chart.sph"
+local chartfile_data = [[
+# metadata
+title Title
+artist Artist
+name Name
+creator Creator
+audio audio.mp3
+input 4key
+
+# notes
+1000 =0
+0100
+0010
+0001
+1000 =0
+]]
+
+local replayfile_data_table = {
+	version = 1,
+	timing_values = TimingValuesFactory:get(Timings("sphere"), Subtimings("none")),
+	events = "",
+	created_at = 0,
+	--
+	hash = md5.sumhexa(chartfile_data),
+	index = 1,
+	modifiers = {},
+	rate = 1,
+	mode = "mania",
+	--
+	nearest = true,
+	tap_only = false,
+	timings = Timings("sphere"),
+	subtimings = Subtimings("none"),
+	healths = Healths("simple", 20),
+	columns_order = nil,
+	--
+	custom = false,
+	const = false,
+	pause_count = 0,
+	rate_type = "linear",
+}
+---@cast replayfile_data_table sea.Replay
+local replayfile_data = json.encode(replayfile_data_table)
+
 ---@param t testing.T
 function test.submit_score(t)
 	local ctx = create_test_ctx()
 
-	local chartfile_data = "chart"
-	local replayfile_data = "replay"
-
-	local remote = FakeSubmissionClientRemote(chartfile_data, replayfile_data)
+	local remote = FakeSubmissionClientRemote(chartfile_name, chartfile_data, replayfile_data)
 	---@cast remote -sea.FakeSubmissionClientRemote, +sea.SubmissionClientRemote
 
 	local chartplay_values = {
+		hash = replayfile_data_table.hash,
+		index = replayfile_data_table.index,
+		modifiers = replayfile_data_table.modifiers,
+		rate = replayfile_data_table.rate,
+		mode = replayfile_data_table.mode,
+		--
+		nearest = replayfile_data_table.nearest,
+		tap_only = replayfile_data_table.tap_only,
+		timings = replayfile_data_table.timings,
+		subtimings = replayfile_data_table.subtimings,
+		healths = replayfile_data_table.healths,
+		columns_order = replayfile_data_table.columns_order,
+		--
+		custom = replayfile_data_table.custom,
+		const = replayfile_data_table.const,
+		pause_count = replayfile_data_table.pause_count,
+		created_at = replayfile_data_table.created_at,
+		rate_type = replayfile_data_table.rate_type,
+		--
 		accuracy = 0.02,
 		accuracy_etterna = 0,
 		accuracy_osu = 0,
-		const = false,
-		created_at = os.time(),
-		custom = false,
 		replay_hash = md5.sumhexa(replayfile_data),
-		hash = md5.sumhexa(chartfile_data),
-		healths = Healths("simple", 20),
-		index = 1,
 		judges = {},
 		max_combo = 0,
 		miss_count = 100,
-		mode = "mania",
-		modifiers = {},
-		nearest = false,
-		pause_count = 1,
 		perfect_count = 10,
-		rate = 1,
-		rate_type = "exp",
 		rating = 0,
 		rating_msd = 0,
 		rating_pp = 0,
 		result = "pass",
-		tap_only = false,
-		timings = Timings("simple"),
-		subtimings = Subtimings("window", 0.160),
 	}
 	setmetatable(chartplay_values, Chartplay)
 	---@cast chartplay_values sea.Chartplay

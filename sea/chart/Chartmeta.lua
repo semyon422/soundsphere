@@ -38,42 +38,9 @@ local chart_types = require("sea.chart.types")
 ---@field tempo_min number
 local Chartmeta = class()
 
-local computed_keys = {
-	"hash",
-	"index",
-	"timings",
-	"healths",
-	"title",
-	"title_unicode",
-	"artist",
-	"artist_unicode",
-	"name",
-	"creator",
-	"level",
-	"inputmode",
-	"source",
-	"tags",
-	"format",
-	"audio_path",
-	"background_path",
-	"preview_time",
-	"osu_beatmap_id",
-	"osu_beatmapset_id",
-	"tempo",
-	"tempo_avg",
-	"tempo_max",
-	"tempo_min",
-}
-
----@param values sea.Chartmeta
----@return boolean
-function Chartmeta:equalsComputed(values)
-	return table_util.subequal(self, values, computed_keys, table_util.equal)
-end
-
 local text = types.description
 
-local validate_chartmeta = valid.struct({
+Chartmeta.struct = {
 	hash = types.md5hash,
 	index = types.index,
 	timings = chart_types.timings,
@@ -98,7 +65,17 @@ local validate_chartmeta = valid.struct({
 	tempo_avg = valid.optional(types.number),
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),
-})
+}
+
+local validate_chartmeta = valid.struct(Chartmeta.struct)
+
+local computed_keys = table_util.keys(Chartmeta.struct)
+
+---@param values sea.Chartmeta
+---@return boolean
+function Chartmeta:equalsComputed(values)
+	return table_util.subequal(self, values, computed_keys, table_util.equal)
+end
 
 ---@return true?
 ---@return string|util.Errors?

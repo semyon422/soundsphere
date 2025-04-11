@@ -21,6 +21,8 @@ Chartkey.struct = {
 	mode = types.new_enum(Gamemode),
 }
 
+assert(#table_util.keys(Chartkey.struct) == 5)
+
 ---@param key sea.Chartkey
 ---@return boolean
 function Chartkey:equalsChartkey(key)

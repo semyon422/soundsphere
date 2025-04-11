@@ -1,6 +1,13 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
 
 ---@alias sea.TimingObjectValues {hit: {[1]: number, [2]: number}, miss: {[1]: number, [2]: number}}
+
+local validate_timing_object_values = valid.struct({
+	hit = valid.struct({[1] = types.number, [2] = types.number}),
+	miss = valid.struct({[1] = types.number, [2] = types.number}),
+})
 
 local eps = 1e-9
 
@@ -53,6 +60,18 @@ function TimingValues:copyFrom(values)
 	self.LongNoteStart = values.LongNoteStart
 	self.LongNoteEnd = values.LongNoteEnd
 	return self
+end
+
+local validate_timing_values = valid.struct({
+	ShortNote = validate_timing_object_values,
+	LongNoteStart = validate_timing_object_values,
+	LongNoteEnd = validate_timing_object_values,
+})
+
+---@return true?
+---@return string|util.Errors?
+function TimingValues:validate()
+	return validate_timing_values(self)
 end
 
 return TimingValues

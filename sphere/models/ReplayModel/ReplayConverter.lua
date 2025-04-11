@@ -127,8 +127,11 @@ end
 ---@param obj table
 ---@return sea.Replay
 function ReplayConverter:convert(obj)
-	if obj.version == 1 then
-		return (setmetatable(obj, SeaReplay))
+	if obj.version then
+		if obj.version == 1 then
+			return (setmetatable(obj, SeaReplay))
+		end
+		error("invalid replay version")
 	end
 
 	obj.rate = obj.rate or 1

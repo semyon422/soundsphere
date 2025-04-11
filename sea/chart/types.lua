@@ -3,6 +3,7 @@ local types = require("sea.shared.types")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
+local TimingValues = require("sea.chart.TimingValues")
 local InputMode = require("ncdk.InputMode")
 local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
@@ -92,5 +93,9 @@ local function subtimings_pair(chartplay)
 	return true
 end
 chart_types.subtimings_pair = subtimings_pair
+
+function chart_types.timing_values(v)
+	return TimingValues.validate(v)
+end
 
 return chart_types

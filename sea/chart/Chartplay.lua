@@ -13,6 +13,7 @@ local ChartplayComputed = require("sea.chart.ChartplayComputed")
 ---@field compute_state sea.ComputeState
 ---@field submitted_at integer
 ---@field computed_at integer
+---@field created_at integer
 --- CLEINT defined fields
 ---@field online_id integer
 --- REPLAY HASH
@@ -24,9 +25,12 @@ local Chartplay = ChartplayBase + ChartplayComputed
 
 Chartplay.struct = {
 	replay_hash = types.md5hash,
+	created_at = types.time,
 }
 table_util.copy(ChartplayBase.struct, Chartplay.struct)
 table_util.copy(ChartplayComputed.struct, Chartplay.struct)
+
+assert(#table_util.keys(Chartplay.struct) == 28)
 
 local validate_chartplay = valid.compose(valid.struct(Chartplay.struct), chart_types.subtimings_pair)
 

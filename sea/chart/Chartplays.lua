@@ -4,6 +4,7 @@ local types = require("sea.shared.types")
 local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
 local Replay = require("sea.chart.Replay")
+local ReplayCoder = require("sea.chart.ReplayCoder")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
 ---@class sea.Chartplays
@@ -110,7 +111,7 @@ function Chartplays:requireReplay(submission, hash)
 		return nil, "invalid replay hash"
 	end
 
-	local replay, err = Replay.decode(replay_data)
+	local replay, err = ReplayCoder.decode(replay_data)
 	if not replay then
 		return nil, "can't decode replay: " .. err
 	end

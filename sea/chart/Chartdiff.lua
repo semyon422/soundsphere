@@ -6,9 +6,10 @@ local chart_types = require("sea.chart.types")
 
 ---@class sea.Chartdiff: sea.Chartkey
 ---@operator call: sea.Chartdiff
---- KEYS
+--- Server managed keys
 ---@field id integer
 ---@field custom_user_id integer
+---@field created_at integer
 --- Chartkey
 --- COMPUTED
 ---@field inputmode string
@@ -60,6 +61,8 @@ local computed_keys = table_util.keys(Chartdiff.struct)
 function Chartdiff:equalsComputed(values)
 	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
+
+assert(#table_util.keys(Chartdiff.struct) == 20)
 
 local validate_chartdiff = valid.struct(Chartdiff.struct)
 

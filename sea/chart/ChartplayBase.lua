@@ -19,7 +19,6 @@ local chart_types = require("sea.chart.types")
 ---@field custom boolean
 ---@field const boolean
 ---@field pause_count integer
----@field created_at integer
 ---@field rate_type sea.RateType
 local ChartplayBase = Chartkey + {}
 
@@ -35,9 +34,10 @@ ChartplayBase.struct = {
 	custom = types.boolean,
 	const = types.boolean,
 	pause_count = types.count,
-	created_at = types.time,
 	rate_type = types.new_enum(RateType),
 }
 table_util.copy(Chartkey.struct, ChartplayBase.struct)
+
+assert(#table_util.keys(ChartplayBase.struct) == 15)
 
 return ChartplayBase
