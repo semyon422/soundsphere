@@ -3,13 +3,13 @@ local TimingValues = require("sea.chart.TimingValues")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 
----@class sea.SoundsphereTimings_v1: sea.ITimingValuesPreset
----@operator call: sea.SoundsphereTimings_v1
+---@class sea.SoundsphereTimings_v2: sea.ITimingValuesPreset
+---@operator call: sea.SoundsphereTimings_v2
 local SoundsphereTimings = ITimingValuesPreset + {}
 
 ---@return sea.TimingValues
 function SoundsphereTimings:getTimingValues()
-	local a, b, c, d = -0.16, -0.12, 0.12, 0.12
+	local a, b, c, d = -0.16, -0.12, 0.12, 0.16
 
 	local tvs = TimingValues()
 	tvs.ShortNote = {hit = {b, c}, miss = {a, d}}
