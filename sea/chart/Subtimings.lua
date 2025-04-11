@@ -19,8 +19,8 @@ function Subtimings:new(name, data)
 	self.name = name
 	self.data = data or 0
 	local v = self:encode()
-	assert(v == math.floor(v))
-	assert(self:validate())
+	assert(v == math.floor(v), "invalid")
+	assert(self:validate(), "invalid")
 end
 
 ---@return true?

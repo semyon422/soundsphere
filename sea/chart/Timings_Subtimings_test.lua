@@ -23,14 +23,14 @@ function test.timings(t)
 	Timings("quaver")
 	Timings("bmsrank")
 
-	t:has_error(Timings, "unknown", 0.1)
-	t:has_error(Timings, "arbitrary", 1)
-	t:has_error(Timings, "sphere", 1)
-	t:has_error(Timings, "simple", 1)
-	t:has_error(Timings, "osumania", 8.15)
-	t:has_error(Timings, "stepmania", 1)
-	t:has_error(Timings, "quaver", 1)
-	t:has_error(Timings, "bmsrank", 4)
+	t:eq(t:has_error(Timings, "unknown", 0.1), "invalid")
+	t:eq(t:has_error(Timings, "arbitrary", 1), "invalid")
+	t:eq(t:has_error(Timings, "sphere", 1), "invalid")
+	t:eq(t:has_error(Timings, "simple", 1), "invalid")
+	t:eq(t:has_error(Timings, "osumania", 8.15), "invalid")
+	t:eq(t:has_error(Timings, "stepmania", 1), "invalid")
+	t:eq(t:has_error(Timings, "quaver", 1), "invalid")
+	t:eq(t:has_error(Timings, "bmsrank", 4), "invalid")
 end
 
 ---@param t testing.T
@@ -50,11 +50,11 @@ function test.subtimings(t)
 	Subtimings("lunatic")
 	Subtimings("none")
 
-	t:has_error(Subtimings, "window", -1)
-	t:has_error(Subtimings, "scorev", 3)
-	t:has_error(Subtimings, "etternaj", 10)
-	t:has_error(Subtimings, "lunatic", 1)
-	t:has_error(Subtimings, "none", 1)
+	t:eq(t:has_error(Subtimings, "window", -1), "invalid")
+	t:eq(t:has_error(Subtimings, "scorev", 3), "invalid")
+	t:eq(t:has_error(Subtimings, "etternaj", 10), "invalid")
+	t:eq(t:has_error(Subtimings, "lunatic", 1), "invalid")
+	t:eq(t:has_error(Subtimings, "none", 1), "invalid")
 end
 
 ---@param t testing.T
