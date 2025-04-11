@@ -39,9 +39,8 @@ chartplays.types = {
 
 ---@param chartplay sea.Chartplay
 function chartplays.from_db(chartplay)
-	local v = chartplay.subtimings
-	---@cast v -sea.Subtimings, +integer
-	chartplay.subtimings = Subtimings.decode(v, chartplay.timings.name)
+	---@diagnostic disable-next-line
+	chartplay.subtimings = Subtimings.decode(chartplay.subtimings, chartplay.timings.name)
 end
 
 return chartplays
