@@ -1,6 +1,5 @@
 local table_util = require("table_util")
 local Chartkey = require("sea.chart.Chartkey")
-local Gamemode = require("sea.chart.Gamemode")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
@@ -9,12 +8,8 @@ local chart_types = require("sea.chart.types")
 ---@operator call: sea.Chartdiff
 --- KEYS
 ---@field id integer
----@field hash string
----@field index integer
----@field modifiers sea.Modifier[]
----@field rate number
----@field mode sea.Gamemode
 ---@field custom_user_id integer
+--- Chartkey
 --- COMPUTED
 ---@field inputmode string
 ---@field duration number not affected by rate
@@ -37,38 +32,9 @@ function Chartdiff:new()
 	self.modifiers = {}
 end
 
-local computed_keys = {
-	"inputmode",
-	"duration",
-	"start_time",
-	"notes_count",
-	"judges_count",
-	"note_types_count",
-	"density_data",
-	"sv_data",
-	"enps_diff",
-	"osu_diff",
-	"msd_diff",
-	"msd_diff_data",
-	"user_diff",
-	"user_diff_data",
-	"notes_preview",
-}
-
----@param values sea.Chartdiff
----@return boolean
-function Chartdiff:equalsComputed(values)
-	return table_util.subequal(self, values, computed_keys, table_util.equal)
-end
-
 local note_types_count = valid.map(types.name, types.count, 10)
 
-local validate_chartdiff = valid.struct({
-	hash = types.md5hash,
-	index = types.index,
-	modifiers = chart_types.modifiers,
-	rate = types.number,
-	mode = types.new_enum(Gamemode),
+Chartdiff.struct = {
 	inputmode = chart_types.inputmode,
 	duration = types.number,
 	start_time = types.number,
@@ -84,7 +50,18 @@ local validate_chartdiff = valid.struct({
 	user_diff = types.number,
 	user_diff_data = types.binary,
 	notes_preview = types.binary,
-})
+}
+table_util.copy(Chartkey.struct, Chartdiff.struct)
+
+local computed_keys = table_util.keys(Chartdiff.struct)
+
+---@param values sea.Chartdiff
+---@return boolean
+function Chartdiff:equalsComputed(values)
+	return table_util.subequal(self, values, computed_keys, table_util.equal)
+end
+
+local validate_chartdiff = valid.struct(Chartdiff.struct)
 
 ---@return true?
 ---@return string|util.Errors?

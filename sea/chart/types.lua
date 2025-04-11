@@ -4,6 +4,10 @@ local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local InputMode = require("ncdk.InputMode")
+local RateType = require("sea.chart.RateType")
+local Gamemode = require("sea.chart.Gamemode")
+local Result = require("sea.chart.Result")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 local chart_types = {}
 
@@ -58,5 +62,35 @@ function chart_types.inputmode(v)
 
 	return tostring(InputMode(_t)) == v
 end
+
+---@param v integer[]
+local function is_columns_order(v)
+	local t = table.move(v, 1, #v, 1)
+	table.sort(t)
+	for i = 1, #v do
+		if i ~= v[i] then
+			return
+		end
+	end
+	return true
+end
+is_columns_order = valid.optional(valid.compose(valid.array(types.index, 100), is_columns_order))
+chart_types.columns_order = is_columns_order
+
+assert(is_columns_order())
+assert(is_columns_order({1, 3, 2}))
+assert(not is_columns_order({1, 3}))
+
+---@param chartplay sea.Chartplay
+---@return true?
+---@return string?
+local function subtimings_pair(chartplay)
+	local ok, err = TimingValuesFactory:get(chartplay.timings, chartplay.subtimings)
+	if not ok then
+		return nil, err
+	end
+	return true
+end
+chart_types.subtimings_pair = subtimings_pair
 
 return chart_types

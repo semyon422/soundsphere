@@ -1,4 +1,7 @@
 local class = require("class")
+local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
+local Gamemode = require("sea.chart.Gamemode")
 local table_util = require("table_util")
 
 ---@class sea.Chartkey
@@ -9,6 +12,14 @@ local table_util = require("table_util")
 ---@field rate number
 ---@field mode sea.Gamemode
 local Chartkey = class()
+
+Chartkey.struct = {
+	hash = types.md5hash,
+	index = types.index,
+	modifiers = chart_types.modifiers,
+	rate = types.number,
+	mode = types.new_enum(Gamemode),
+}
 
 ---@param key sea.Chartkey
 ---@return boolean
