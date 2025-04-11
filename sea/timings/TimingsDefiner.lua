@@ -1,5 +1,4 @@
 local class = require("class")
-local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 ---@type sea.ITimingValuesPreset[]
 local presets = {
@@ -17,6 +16,7 @@ local presets = {
 	require("sea.timings.sphere.SoundsphereTimings_v1"),
 	require("sea.timings.quaver.QuaverTimings_v1"),
 	require("sea.timings.bmsrank.LunaticRaveTimings_v1"),
+	require("sea.timings.simple.SimpleTimings_v1"),
 }
 
 ---@class sea.TimingsDefiner
