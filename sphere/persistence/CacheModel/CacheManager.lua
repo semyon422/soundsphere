@@ -245,7 +245,6 @@ function CacheManager:computeChartdiffs()
 			chartdiff.modifiers = score.modifiers
 			chartdiff.hash = score.hash
 			chartdiff.index = score.index
-			chartdiff.rate_type = score.rate_type
 
 			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
 		end

@@ -70,7 +70,7 @@ function ReplayModel:saveReplay(chartdiff, playContext)
 	replay.hash = chartdiff.hash
 	replay.index = chartdiff.index
 	replay.inputMode = self.rhythmModel.chart.inputMode
-	replay.rate_type = chartdiff.rate_type
+	replay.rate_type = error("need ratetype here")
 	playContext:save(replay)
 
 	local replayString = replay:toString()

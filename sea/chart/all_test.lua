@@ -107,7 +107,6 @@ function test.submit_score(t)
 		index = 1,
 		modifiers = {},
 		rate = 1,
-		rate_type = "exp",
 		mode = "mania",
 		inputmode = "4key",
 		duration = 100,

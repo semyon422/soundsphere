@@ -129,7 +129,6 @@ function GameplayController:load()
 	chartdiff.modifiers = playContext.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
-	chartdiff.rate_type = config.gameplay.rate_type
 
 	assert(valid.format(chartdiff:validate()))
 
@@ -396,6 +395,7 @@ function GameplayController:saveScore()
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
 	local playContext = self.playContext
+	local config = self.configModel.configs.settings
 
 	local chartview = self.selectModel.chartview
 	local chartmeta = self.rhythmModel.chartmeta
@@ -414,7 +414,7 @@ function GameplayController:saveScore()
 		index = chartdiff.index,
 		modifiers = chartdiff.modifiers,
 		rate = chartdiff.rate,
-		rate_type = chartdiff.rate_type,
+		rate_type = config.gameplay.rate_type,
 
 		const = playContext.const,
 		-- timings = playContext.timings,
@@ -450,7 +450,7 @@ function GameplayController:saveScore()
 	chartplay.modifiers = {}
 	chartplay.custom = true
 	chartplay.rate = chartdiff.rate
-	chartplay.rate_type = chartdiff.rate_type
+	chartplay.rate_type = config.gameplay.rate_type
 	chartplay.mode = "mania"
 	chartplay.const = playContext.const
 	chartplay.nearest = playContext.timings.nearest

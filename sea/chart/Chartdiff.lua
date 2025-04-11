@@ -12,7 +12,6 @@ local chart_types = require("sea.chart.types")
 ---@field index integer
 ---@field modifiers sea.Modifier[]
 ---@field rate number
----@field rate_type sea.RateType
 ---@field mode sea.Gamemode
 ---@field custom_user_id integer
 ---@field inputmode string
@@ -69,7 +68,6 @@ local validate_chartdiff = valid.struct({
 	index = types.index,
 	modifiers = chart_types.modifiers,
 	rate = types.number,
-	rate_type = types.new_enum(RateType),
 	mode = types.new_enum(Gamemode),
 	inputmode = chart_types.inputmode,
 	duration = types.number,
