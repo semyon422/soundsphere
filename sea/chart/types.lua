@@ -1,14 +1,20 @@
 local valid = require("valid")
 local types = require("sea.shared.types")
+local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
+local Healths = require("sea.chart.Healths")
 local InputMode = require("ncdk.InputMode")
 
 local chart_types = {}
 
--- TODO: better validation
-chart_types.timings_or_healths = valid.struct({
+local timings_or_healths = valid.struct({
 	name = types.name,
 	data = valid.optional(types.number),
 })
+
+chart_types.timings = valid.compose(timings_or_healths, Timings.validate)
+chart_types.subtimings = valid.compose(timings_or_healths, Subtimings.validate)
+chart_types.healths = valid.compose(timings_or_healths, Healths.validate)
 
 local function modifier_value(v)
 	if v == nil then

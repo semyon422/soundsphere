@@ -26,8 +26,7 @@ function Timings:new(name, data)
 	assert(self:validate(), "invalid")
 end
 
----@return true?
----@return string?
+---@return boolean
 function Timings:validate()
 	local v = self.data
 	local n = self.name
@@ -51,7 +50,7 @@ function Timings:validate()
 		return v == math.floor(v)
 	end
 
-	error("invalid timings name")
+	return false
 end
 
 ---@param v integer

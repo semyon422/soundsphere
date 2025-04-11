@@ -1,5 +1,5 @@
+local table_util = require("table_util")
 local Chartkey = require("sea.chart.Chartkey")
-local RateType = require("sea.chart.RateType")
 local Gamemode = require("sea.chart.Gamemode")
 local valid = require("valid")
 local types = require("sea.shared.types")
@@ -7,6 +7,7 @@ local chart_types = require("sea.chart.types")
 
 ---@class sea.Chartdiff: sea.Chartkey
 ---@operator call: sea.Chartdiff
+--- KEYS
 ---@field id integer
 ---@field hash string
 ---@field index integer
@@ -14,6 +15,7 @@ local chart_types = require("sea.chart.types")
 ---@field rate number
 ---@field mode sea.Gamemode
 ---@field custom_user_id integer
+--- COMPUTED
 ---@field inputmode string
 ---@field duration number not affected by rate
 ---@field start_time number not affected by rate
@@ -40,6 +42,8 @@ local computed_keys = {
 	"duration",
 	"start_time",
 	"notes_count",
+	"judges_count",
+	"note_types_count",
 	"density_data",
 	"sv_data",
 	"enps_diff",
@@ -48,17 +52,13 @@ local computed_keys = {
 	"msd_diff_data",
 	"user_diff",
 	"user_diff_data",
+	"notes_preview",
 }
 
 ---@param values sea.Chartdiff
 ---@return boolean
 function Chartdiff:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		if self[key] ~= values[key] then
-			return false
-		end
-	end
-	return true
+	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
 
 local note_types_count = valid.map(types.name, types.count, 10)

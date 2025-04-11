@@ -23,8 +23,7 @@ function Subtimings:new(name, data)
 	assert(self:validate(), "invalid")
 end
 
----@return true?
----@return string?
+---@return boolean
 function Subtimings:validate()
 	local v = self.data
 	local n = self.name
@@ -42,7 +41,7 @@ function Subtimings:validate()
 		return v == 0
 	end
 
-	error("invalid timings name")
+	return false
 end
 
 ---@param v integer

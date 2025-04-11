@@ -166,15 +166,12 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	chartplay.submitted_at = os.time()
 	self.charts_repo:updateChartplay(chartplay)
 
-	---@type sea.Chartplay
-	local computed_chartplay
 	---@type sea.Chartdiff
 	local computed_chartdiff
 	---@type sea.Chartmeta
 	local computed_chartmeta
 
 	if chartplay.custom then
-		computed_chartplay = chartplay
 		computed_chartdiff = chartdiff_values
 		computed_chartdiff.custom_user_id = user.id
 
@@ -194,11 +191,10 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 			return nil, "compute: " .. err
 		end
 
-		computed_chartplay = ret.chartplay
 		computed_chartdiff = ret.chartdiff
 		computed_chartmeta = ret.chartmeta
 
-		if not chartplay:equalsComputed(computed_chartplay) then
+		if not chartplay:equalsComputed(ret.chartplay_computed) then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
 			return nil, "computed chartplay differs"

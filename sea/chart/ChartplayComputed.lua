@@ -31,21 +31,10 @@ local computed_keys = {
 	"rating_msd",
 }
 
----@param values sea.Chartplay
+---@param values sea.ChartplayComputed
 ---@return boolean
 function ChartplayComputed:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		---@type any, any
-		local a, b = self[key], values[key]
-		if type(a) == "table" and type(b) == "table" then
-			if not table_util.deepequal(a, b) then
-				return false
-			end
-		elseif a ~= b then
-			return false
-		end
-	end
-	return true
+	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
 
 return ChartplayComputed

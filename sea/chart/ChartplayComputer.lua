@@ -23,7 +23,7 @@ end
 ---@param chartfile_data string
 ---@param index integer
 ---@param replay sea.Replay
----@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
 	local chart_chartmetas, err = self:getCharts(chartfile_name, chartfile_data)
@@ -63,7 +63,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
 
 	return {
-		chartplay = score,
+		chartplay_computed = score,
 		chartdiff = chartdiff,
 		chartmeta = chartmeta,
 	}

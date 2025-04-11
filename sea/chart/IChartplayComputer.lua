@@ -8,7 +8,7 @@ local IChartplayComputer = class()
 ---@param chartfile_data string
 ---@param index integer
 ---@param replay sea.Replay
----@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function IChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
 	return nil, "not implemented"

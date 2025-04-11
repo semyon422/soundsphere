@@ -17,11 +17,11 @@ end
 ---@param chartfile_data string
 ---@param index integer
 ---@param replay sea.Replay
----@return {chartplay: sea.Chartplay, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function FakeChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
 	return {
-		chartplay = assert(self.chartplay),
+		chartplay_computed = assert(self.chartplay),
 		chartdiff = assert(self.chartdiff),
 		chartmeta = assert(self.chartmeta),
 	}

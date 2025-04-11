@@ -20,6 +20,17 @@ local _lr2 = table_util.invert(lr2)
 function Healths:new(name, data)
 	self.name = name
 	self.data = data
+	local v = self:encode()
+	assert(v == math.floor(v), "invalid")
+	assert(self:validate(), "invalid")
+end
+
+---@return boolean
+function Healths:validate()
+	local v = self.data
+	local n = self.name
+
+	return true
 end
 
 ---@param t integer

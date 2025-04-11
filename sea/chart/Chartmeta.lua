@@ -1,14 +1,19 @@
 local class = require("class")
+local table_util = require("table_util")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
-local BeatmapStatus = require("sea.osu.BeatmapStatus")
 
 ---@class sea.Chartmeta
 ---@operator call: sea.Chartmeta
+--- EXTERNAL
 ---@field id integer
+---@field created_at integer
+---@field osu_ranked_status integer
+--- KEYS
 ---@field hash string
 ---@field index integer
+--- COMPUTED
 ---@field timings sea.Timings
 ---@field healths sea.Healths
 ---@field title string
@@ -27,15 +32,10 @@ local BeatmapStatus = require("sea.osu.BeatmapStatus")
 ---@field preview_time number
 ---@field osu_beatmap_id integer
 ---@field osu_beatmapset_id integer
----@field osu_od number
----@field osu_hp number
----@field osu_ranked_status integer
 ---@field tempo number
----@field played_at integer
----@field added_at integer
----@field created_at integer
----@field plays_count integer
----@field comment string
+---@field tempo_avg number
+---@field tempo_max number
+---@field tempo_min number
 local Chartmeta = class()
 
 local computed_keys = {
@@ -57,21 +57,18 @@ local computed_keys = {
 	"audio_path",
 	"background_path",
 	"preview_time",
+	"osu_beatmap_id",
+	"osu_beatmapset_id",
 	"tempo",
 	"tempo_avg",
 	"tempo_max",
 	"tempo_min",
 }
 
----@param values sea.Chartdiff
+---@param values sea.Chartmeta
 ---@return boolean
 function Chartmeta:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		if self[key] ~= values[key] then
-			return false
-		end
-	end
-	return true
+	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
 
 local text = types.description
@@ -79,8 +76,8 @@ local text = types.description
 local validate_chartmeta = valid.struct({
 	hash = types.md5hash,
 	index = types.index,
-	timings = chart_types.timings_or_healths,
-	healths = chart_types.timings_or_healths,
+	timings = chart_types.timings,
+	healths = chart_types.healths,
 	title = text,
 	title_unicode = valid.optional(text),
 	artist = text,
@@ -97,18 +94,10 @@ local validate_chartmeta = valid.struct({
 	preview_time = valid.optional(types.number),
 	osu_beatmap_id = valid.optional(types.integer),
 	osu_beatmapset_id = valid.optional(types.integer),
-	-- osu_od = types.number,
-	-- osu_hp = types.number,
-	-- osu_ranked_status = types.new_enum(BeatmapStatus),
 	tempo = types.number,
 	tempo_avg = valid.optional(types.number),
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),
-	-- played_at = types.time,
-	-- added_at = types.time,
-	-- created_at = types.time,
-	-- plays_count = types.count,
-	-- comment = text,
 })
 
 ---@return true?
