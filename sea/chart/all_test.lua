@@ -18,6 +18,8 @@ local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local User = require("sea.access.User")
+local Replay = require("sea.replays.Replay")
+local ReplayCoder = require("sea.replays.ReplayCoder")
 
 local test = {}
 
@@ -74,39 +76,42 @@ input 4key
 0100
 0010
 0001
-1000 =0
+1000 =1
 ]]
-
-local replayfile_data_table = {
-	version = 1,
-	timing_values = TimingValuesFactory:get(Timings("sphere"), Subtimings("none")),
-	events = "",
-	created_at = 0,
-	--
-	hash = md5.sumhexa(chartfile_data),
-	index = 1,
-	modifiers = {},
-	rate = 1,
-	mode = "mania",
-	--
-	nearest = true,
-	tap_only = false,
-	timings = Timings("sphere"),
-	subtimings = Subtimings("none"),
-	healths = Healths("simple", 20),
-	columns_order = nil,
-	--
-	custom = false,
-	const = false,
-	pause_count = 0,
-	rate_type = "linear",
-}
----@cast replayfile_data_table sea.Replay
-local replayfile_data = json.encode(replayfile_data_table)
 
 ---@param t testing.T
 function test.submit_score(t)
 	local ctx = create_test_ctx()
+
+	local replayfile_data_table = {
+		version = 1,
+		timing_values = TimingValuesFactory:get(Timings("sphere"), Subtimings("none")),
+		events = "hello",
+		created_at = 0,
+		--
+		hash = md5.sumhexa(chartfile_data),
+		index = 1,
+		modifiers = {},
+		rate = 1,
+		mode = "mania",
+		--
+		nearest = true,
+		tap_only = false,
+		timings = Timings("sphere"),
+		subtimings = Subtimings("none"),
+		healths = Healths("simple", 20),
+		columns_order = nil,
+		--
+		custom = false,
+		const = false,
+		pause_count = 0,
+		rate_type = "linear",
+	}
+	setmetatable(replayfile_data_table, Replay)
+	---@cast replayfile_data_table sea.Replay
+
+	t:assert(replayfile_data_table:validate())
+	local replayfile_data = ReplayCoder.encode(replayfile_data_table)
 
 	local remote = FakeSubmissionClientRemote(chartfile_name, chartfile_data, replayfile_data)
 	---@cast remote -sea.FakeSubmissionClientRemote, +sea.SubmissionClientRemote

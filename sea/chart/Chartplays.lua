@@ -3,8 +3,7 @@ local valid = require("valid")
 local types = require("sea.shared.types")
 local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
-local Replay = require("sea.chart.Replay")
-local ReplayCoder = require("sea.chart.ReplayCoder")
+local ReplayCoder = require("sea.replays.ReplayCoder")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
 ---@class sea.Chartplays

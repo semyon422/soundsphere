@@ -56,7 +56,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	ModifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel:setTimings(replay.timings)
-	replayModel.replay = replay
+	replayModel:decodeEvents(replay.events)
 
 	fastplayController:play(chart, chartmeta, replay)
 
