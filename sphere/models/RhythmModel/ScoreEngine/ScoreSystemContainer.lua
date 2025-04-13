@@ -1,7 +1,11 @@
 local class = require("class")
 local table_util = require("table_util")
 
-local ScoreSystems = {
+---@class sphere.ScoreSystemContainer
+---@operator call: sphere.ScoreSystemContainer
+local ScoreSystemContainer = class()
+
+ScoreSystemContainer.modules = {
 	require("sphere.models.RhythmModel.ScoreEngine.BaseScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.HpScoreSystem"),
 	require("sphere.models.RhythmModel.ScoreEngine.NormalscoreScoreSystem"),
@@ -15,17 +19,13 @@ local ScoreSystems = {
 	require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem"),
 }
 
----@class sphere.ScoreSystemContainer
----@operator call: sphere.ScoreSystemContainer
-local ScoreSystemContainer = class()
-
 function ScoreSystemContainer:load()
 	self.scoreSystems = {}
 	self.sequence = {}
 	self.judgements = {}
 
 	local scoreSystems = self.scoreSystems
-	for _, ScoreSystem in ipairs(ScoreSystems) do
+	for _, ScoreSystem in ipairs(ScoreSystemContainer.modules) do
 		local scoreSystem = ScoreSystem()
 		scoreSystem.container = self
 		scoreSystem.scoreEngine = self.scoreEngine
