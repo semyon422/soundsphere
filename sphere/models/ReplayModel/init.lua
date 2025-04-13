@@ -1,10 +1,16 @@
 local class = require("class")
-local Replay = require("sphere.models.ReplayModel.Replay")
+local valid = require("valid")
 local md5 = require("md5")
 local path_util = require("path_util")
+local Osr = require("osu.Osr")
+local Replay = require("sea.replays.Replay")
+local ReplayCoder = require("sea.replays.ReplayCoder")
+local ReplayEvents = require("sea.replays.ReplayEvents")
+local ReplayConverter = require("sea.replays.ReplayConverter")
 
 ---@class sphere.ReplayModel
 ---@operator call: sphere.ReplayModel
+---@field events sea.ReplayEvent[]
 local ReplayModel = class()
 
 ReplayModel.path = "userdata/replays"
@@ -13,16 +19,32 @@ ReplayModel.mode = "record"
 ---@param rhythmModel sphere.RhythmModel
 function ReplayModel:new(rhythmModel)
 	self.rhythmModel = rhythmModel
+	self.events = {}
+	self.eventOffset = 0
 end
 
 function ReplayModel:load()
 	if self.mode == "record" then
-		self.replay = Replay()
+		self.events = {}
 	elseif self.mode == "replay" then
-		self.replay:reset()
+		self.eventOffset = 0
 	end
-	self.replay.timeEngine = self.rhythmModel.timeEngine
-	self.replay.logicEngine = self.rhythmModel.logicEngine
+	self.inputsMap = self.rhythmModel.chart.inputMode:getInputMap()
+	self.inputs = self.rhythmModel.chart.inputMode:getInputs()
+end
+
+---@param data string
+function ReplayModel:decodeEvents(data)
+	self.events = assert(ReplayEvents.decode(data))
+end
+
+function ReplayModel:step()
+	self.eventOffset = math.min(self.eventOffset + 1, #self.events)
+end
+
+---@return sea.ReplayEvent?
+function ReplayModel:getNextEvent()
+	return self.events[self.eventOffset + 1]
 end
 
 ---@param mode string
@@ -33,7 +55,11 @@ end
 ---@param event table
 function ReplayModel:receive(event)
 	if self.mode == "record" and event.virtual then
-		self.replay:receive(event)
+		table.insert(self.events, {
+			event.time - self.rhythmModel.logicEngine.inputOffset,
+			self.inputsMap[event[1]],
+			not not event.name:find("pressed"),
+		})
 	end
 end
 
@@ -43,47 +69,77 @@ function ReplayModel:update()
 		return
 	end
 
-	local replay = self.replay
-	local nextEvent = replay:getNextEvent()
-	if not nextEvent then
+	local _event = self:getNextEvent()
+	if not _event then
 		return
 	end
+
+	local event = {
+		name = _event[3] and "keypressed" or "keyreleased",
+		time = _event[1],
+		virtual = true,
+		self.inputs[_event[2]]
+	}
 
 	local rhythmModel = self.rhythmModel
 	local timeEngine = rhythmModel.timeEngine
 	local logicEngine = rhythmModel.logicEngine
 
-	nextEvent.baseTime = nextEvent.baseTime or nextEvent.time
-	nextEvent.time = nextEvent.baseTime + logicEngine.inputOffset
-	if timeEngine.currentTime >= nextEvent.time then
-		rhythmModel:receive(nextEvent)
-		replay:step()
+	event.baseTime = event.baseTime or event.time
+	event.time = event.baseTime + logicEngine.inputOffset
+	if timeEngine.currentTime >= event.time then
+		rhythmModel:receive(event)
+		self:step()
 		return self:update()
 	end
 end
 
----@param chartdiff table
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 ---@return string
-function ReplayModel:saveReplay(chartdiff, playContext)
-	local replay = self.replay
-	replay.hash = chartdiff.hash
-	replay.index = chartdiff.index
-	replay.inputMode = self.rhythmModel.chart.inputMode
-	replay.rate_type = error("need ratetype here")
-	playContext:save(replay)
+function ReplayModel:saveReplay(replayBase)
+	local replay = Replay()
 
-	local replayString = replay:toString()
-	local replayHash = md5.sumhexa(replayString)
+	replayBase:export(replay)
 
-	assert(love.filesystem.write(self.path .. "/" .. replayHash, replayString))
+	replay.version = 1
+	replay.timing_values = replayBase.timing_values
+	replay.events = assert(ReplayEvents.encode(self.events))
+	replay.created_at = os.time()
 
-	return replayHash
+	replay.pause_count = 0 -- ?????
+
+	assert(valid.format(replay:validate()))
+
+	local data = assert(ReplayCoder.encode(replay))
+	local replay_hash = md5.sumhexa(data)
+
+	assert(love.filesystem.write(self.path .. "/" .. replay_hash, data))
+
+	return replay_hash
 end
 
 ---@param chartmeta sea.Chartmeta
 function ReplayModel:saveOsr(chartmeta)
-	local osr = self.replay:toOsr()
+	local replay = self.replay
+
+	local osr = Osr()
+
+	osr.beatmap_hash = assert(replay.hash)
+
+	local inputMap = replay.inputMode:getInputMap()
+
+	local mania_events = {}
+	for i, e in ipairs(replay.events) do
+		mania_events[i] = {
+			math.floor(e.time * 1000),
+			inputMap[e[1]],
+			not not e.name:find("pressed")
+		}
+	end
+	osr:encodeManiaEvents(mania_events)
+	osr:setTimestamp(replay.time)
+	osr.player_name = replay.player
+
 	local data = osr:encode()
 
 	local display_title = ("%s - %s [%s]"):format(
@@ -99,14 +155,23 @@ function ReplayModel:saveOsr(chartmeta)
 	love.filesystem.write(path_util.join("userdata", "export", name), data)
 end
 
----@param content string
----@return sphere.Replay?
-function ReplayModel:loadReplay(content)
-	if not content then
+---@param data string
+---@return sea.Replay?
+function ReplayModel:loadReplay(data)
+	if not data then
 		return
 	end
-	local replay = Replay()
-	return replay:fromString(content)
+
+	local replay = ReplayCoder.decode(data)
+	if not replay then
+		return
+	end
+
+	replay = ReplayConverter:convert(replay)
+
+	assert(valid.format(replay:validate()))
+
+	return replay
 end
 
 return ReplayModel

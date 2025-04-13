@@ -71,7 +71,7 @@ local function Cells(self)
 
 	local multiplayerModel = self.game.multiplayerModel
 
-	local baseTimeRate = self.game.playContext.rate
+	local baseTimeRate = self.game.replayBase.rate
 	local chartview = self.game.selectModel.chartview or multiplayerModel.notechart
 
 	local bpm = 0
@@ -179,7 +179,7 @@ local function Title(self)
 	end
 	TextCellImView(w, 52, "left", chartview.artist, chartview.title)
 
-	local baseTimeRate = self.game.playContext.rate
+	local baseTimeRate = self.game.replayBase.rate
 	local difficulty = Format.difficulty((chartview.difficulty or 0) * baseTimeRate)
 
 	TextCellImView(72, h, "right", Format.inputMode(chartview.inputmode), difficulty, true)
@@ -195,7 +195,7 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(21, 4)
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42, h, h - 8)
+	ModifierIconGridView:draw(self.game.replayBase.modifiers, w - 42, h, h - 8)
 end
 
 ---@param self table

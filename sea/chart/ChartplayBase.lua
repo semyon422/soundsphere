@@ -1,13 +1,13 @@
 local table_util = require("table_util")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKeyPart = require("sea.chart.ChartdiffKeyPart")
 local RateType = require("sea.chart.RateType")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 
----@class sea.ChartplayBase: sea.Chartkey
+---@class sea.ChartplayBase: sea.ChartdiffKeyPart
 ---@operator call: sea.ChartplayBase
 --- REQUIRED for computation
----   Chartkey: hash, index, modifiers, rate, mode
+---   ChartdiffKeyPart: modifiers, rate, mode
 ---   Other
 ---@field nearest boolean
 ---@field tap_only boolean - like NoLongNote
@@ -18,9 +18,8 @@ local chart_types = require("sea.chart.types")
 --- METADATA not for computation
 ---@field custom boolean
 ---@field const boolean
----@field pause_count integer
 ---@field rate_type sea.RateType
-local ChartplayBase = Chartkey + {}
+local ChartplayBase = ChartdiffKeyPart + {}
 
 ChartplayBase.struct = {
 	-- Other
@@ -33,11 +32,10 @@ ChartplayBase.struct = {
 	-- METADATA
 	custom = types.boolean,
 	const = types.boolean,
-	pause_count = types.count,
 	rate_type = types.new_enum(RateType),
 }
-table_util.copy(Chartkey.struct, ChartplayBase.struct)
+table_util.copy(ChartdiffKeyPart.struct, ChartplayBase.struct)
 
-assert(#table_util.keys(ChartplayBase.struct) == 15)
+assert(#table_util.keys(ChartplayBase.struct) == 12)
 
 return ChartplayBase

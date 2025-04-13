@@ -20,7 +20,7 @@ local Layout = require("ui.views.ResultView.Layout")
 ---@param self table
 ---@return boolean
 local function showLoadedScore(self)
-	local scoreEntry = self.game.playContext.scoreEntry
+	local scoreEntry = self.game.rhythmModel.scoreEntry
 	local scoreItem = self.game.selectModel.scoreItem
 	if not scoreEntry or not scoreItem then
 		return false
@@ -432,7 +432,7 @@ local function NotechartInfo(self)
 	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
 	local scoreEngine = rhythmModel.scoreEngine
-	local playContext = self.game.playContext
+	local replayBase = self.game.replayBase
 
 	if not scoreItem then
 		return
@@ -446,15 +446,15 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = playContext.scoreEntry
+	local scoreEntry = rhythmModel.scoreEntry
 	if not scoreEntry then
 		return
 	end
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and playContext.rate or scoreItem.rate
-	local const = show and playContext.const or scoreItem.const
+	local baseTimeRate = show and replayBase.rate or scoreItem.rate
+	local const = show and replayBase.const or scoreItem.const
 
 	local baseBpm = chartview.tempo
 	local baseLength = chartview.duration
@@ -463,7 +463,7 @@ local function NotechartInfo(self)
 
 	local bpm = scoreItem.tempo
 	local length = scoreItem.duration
-	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
+	local difficulty = show and rhythmModel.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.chart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
@@ -550,7 +550,7 @@ local function NotechartInfo(self)
 
 	if scoreEntry.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.chartdiff.enps_diff
+		rating = s * rhythmModel.chartdiff.enps_diff
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)
@@ -718,7 +718,7 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(36, 0)
 
 	local selectModel = self.game.selectModel
-	local modifiers = self.game.playContext.modifiers
+	local modifiers = self.game.replayBase.modifiers
 	if not showLoadedScore(self) and selectModel.scoreItem then
 		modifiers = selectModel.scoreItem.modifiers
 	end
@@ -739,7 +739,7 @@ local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEntry = self.game.playContext.scoreEntry
+	local scoreEntry = self.game.rhythmModel.scoreEntry
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)

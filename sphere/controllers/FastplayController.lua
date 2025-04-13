@@ -8,28 +8,24 @@ local FastplayController = class()
 
 ---@param rhythmModel sphere.RhythmModel
 ---@param replayModel sphere.ReplayModel
----@param cacheModel sphere.CacheModel
----@param playContext sphere.PlayContext
+---@param difficultyModel sphere.DifficultyModel
 function FastplayController:new(
 	rhythmModel,
 	replayModel,
-	cacheModel,
-	playContext
+	difficultyModel
 )
 	self.rhythmModel = rhythmModel
 	self.replayModel = replayModel
-	self.cacheModel = cacheModel
-	self.playContext = playContext
+	self.difficultyModel = difficultyModel
 end
 
 ---@param chart ncdk2.Chart
----@param replay sphere.Replay
+---@param modifiers sea.Modifier[]
 ---@return table
-function FastplayController:applyModifiers(chart, replay)
+function FastplayController:applyModifiers(chart, modifiers)
 	local state = {}
 	state.inputMode = InputMode(chart.inputMode)
 
-	local modifiers = self.playContext.modifiers
 	ModifierModel:applyMeta(modifiers, state)
 	ModifierModel:apply(modifiers, chart)
 
@@ -38,25 +34,23 @@ end
 
 ---@param chart ncdk2.Chart
 ---@param chartmeta sea.Chartmeta
----@param replay sphere.Replay
+---@param replay sea.Replay
 function FastplayController:play(chart, chartmeta, replay)
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
-	local cacheModel = self.cacheModel
-	local playContext = self.playContext
 
 	local chartdiff = {
-		rate = playContext.rate,
+		rate = replay.rate,
 		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
-	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+	self.difficultyModel:compute(chartdiff, chart, replay.rate)
 
-	local state = self:applyModifiers(chart, replay)
+	local state = self:applyModifiers(chart, replay.modifiers)
 
-	rhythmModel:setTimeRate(playContext.rate)
+	rhythmModel:setTimeRate(replay.rate)
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 
 	replayModel:setMode("replay")
@@ -65,9 +59,7 @@ function FastplayController:play(chart, chartmeta, replay)
 
 	rhythmModel:load()
 
-	chartdiff.modifiers = playContext.modifiers
-	playContext.chartdiff = chartdiff
-	chart.chartdiff = chartdiff
+	chartdiff.modifiers = replay.modifiers
 
 	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()

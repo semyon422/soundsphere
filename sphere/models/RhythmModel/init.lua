@@ -164,12 +164,15 @@ end
 
 ---@param chart ncdk2.Chart
 ---@param chartmeta sea.Chartmeta
-function RhythmModel:setNoteChart(chart, chartmeta)
+---@param chartdiff sea.Chartdiff
+function RhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	assert(chart)
 	self.chart = chart
 	self.chartmeta = chartmeta
+	self.chartdiff = chartdiff
 	self.timeEngine.noteChart = chart
 	self.scoreEngine.noteChart = chart
+	self.scoreEngine.chartdiff = chartdiff
 	self.logicEngine:setChart(chart)
 	self.graphicEngine:setChart(chart)
 end

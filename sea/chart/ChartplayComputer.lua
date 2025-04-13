@@ -6,10 +6,7 @@ local ChartFactory = require("notechart.ChartFactory")
 local FastplayController = require("sphere.controllers.FastplayController")
 
 local ReplayModel = require("sphere.models.ReplayModel")
-
-local ModifierModel = require("sphere.models.ModifierModel")
 local RhythmModel = require("sphere.models.RhythmModel")
-local PlayContext = require("sphere.models.PlayContext")
 
 ---@class sea.ChartplayComputer: sea.IChartplayComputer
 ---@operator call: sea.ChartplayComputer
@@ -38,22 +35,19 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 
 	local chart, chartmeta, chartdiff = t.chart, t.chartmeta, t.chartdiff
 
-	local fastplayController = FastplayController()
 
-	local playContext = PlayContext()
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
-	fastplayController.rhythmModel = rhythmModel
-	fastplayController.replayModel = replayModel
-	fastplayController.difficultyModel = self.difficultyModel
-	fastplayController.playContext = playContext
+
+	local fastplayController = FastplayController(
+		rhythmModel,
+		replayModel,
+		self.difficultyModel
+	)
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
-
-	playContext:load(replay)
-	ModifierModel:fixOldFormat(replay.modifiers)
 
 	rhythmModel:setTimings(replay.timings)
 	replayModel:decodeEvents(replay.events)

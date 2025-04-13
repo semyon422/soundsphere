@@ -2,10 +2,11 @@ local valid = require("valid")
 local table_util = require("table_util")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local ChartplayBase = require("sea.chart.ChartplayBase")
 local ChartplayComputed = require("sea.chart.ChartplayComputed")
 
----@class sea.Chartplay: sea.ChartplayBase, sea.ChartplayComputed
+---@class sea.Chartplay: sea.ChartmetaKey, sea.ChartplayBase, sea.ChartplayComputed
 ---@operator call: sea.Chartplay
 --- SERVER defined fields
 ---@field id integer
@@ -16,17 +17,20 @@ local ChartplayComputed = require("sea.chart.ChartplayComputed")
 ---@field created_at integer
 --- CLEINT defined fields
 ---@field online_id integer
---- REPLAY HASH
+--- METADATA
 ---@field replay_hash string
+---@field pause_count integer
 --- REQUIRED for computation: sea.ChartplayBase
 --- METADATA not for computation: sea.ChartplayBase
 --- COMPUTED: sea.ChartplayComputed
-local Chartplay = ChartplayBase + ChartplayComputed
+local Chartplay = ChartmetaKey + ChartplayBase + ChartplayComputed
 
 Chartplay.struct = {
 	replay_hash = types.md5hash,
+	pause_count = types.count,
 	created_at = types.time,
 }
+table_util.copy(ChartmetaKey.struct, Chartplay.struct)
 table_util.copy(ChartplayBase.struct, Chartplay.struct)
 table_util.copy(ChartplayComputed.struct, Chartplay.struct)
 

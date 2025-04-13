@@ -12,15 +12,13 @@ local ResultController = class()
 ---@param onlineModel sphere.OnlineModel
 ---@param configModel sphere.ConfigModel
 ---@param fastplayController sphere.FastplayController
----@param playContext sphere.PlayContext
 function ResultController:new(
 	selectModel,
 	replayModel,
 	rhythmModel,
 	onlineModel,
 	configModel,
-	fastplayController,
-	playContext
+	fastplayController
 )
 	self.selectModel = selectModel
 	self.replayModel = replayModel
@@ -28,7 +26,6 @@ function ResultController:new(
 	self.onlineModel = onlineModel
 	self.configModel = configModel
 	self.fastplayController = fastplayController
-	self.playContext = playContext
 end
 
 function ResultController:load()
@@ -89,17 +86,15 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 
 	local rhythmModel = self.rhythmModel
 
-	self.playContext:load(replay)
-
 	if mode == "retry" then
 		rhythmModel.inputManager:setMode("external")
 		replayModel:setMode("record")
 		return
 	end
 
-	self.playContext.scoreEntry = scoreEntry
-	rhythmModel:setTimings(replay.timings)
-	replayModel.replay = replay
+	rhythmModel.scoreEntry = scoreEntry
+	rhythmModel:setTimings(replay.timing_values)
+	replayModel:decodeEvents(replay.events)
 
 	rhythmModel.inputManager:setMode("internal")
 	replayModel:setMode("replay")

@@ -31,7 +31,7 @@ local GameplayController = class()
 ---@param speedModel sphere.SpeedModel
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 ---@param pauseModel sphere.PauseModel
 ---@param offsetModel sphere.OffsetModel
 ---@param previewModel sphere.PreviewModel
@@ -52,7 +52,7 @@ function GameplayController:new(
 	speedModel,
 	cacheModel,
 	fileFinder,
-	playContext,
+	replayBase,
 	pauseModel,
 	offsetModel,
 	previewModel,
@@ -73,7 +73,7 @@ function GameplayController:new(
 	self.speedModel = speedModel
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
-	self.playContext = playContext
+	self.replayBase = replayBase
 	self.pauseModel = pauseModel
 	self.offsetModel = offsetModel
 	self.previewModel = previewModel
@@ -92,7 +92,7 @@ function GameplayController:load()
 	local replayModel = self.replayModel
 	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
-	local playContext = self.playContext
+	local replayBase = self.replayBase
 
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
@@ -113,29 +113,26 @@ function GameplayController:load()
 	local state = {}
 	state.inputMode = InputMode(chart.inputMode)
 
-	ModifierModel:applyMeta(playContext.modifiers, state)
-	ModifierModel:apply(playContext.modifiers, chart)
+	ModifierModel:applyMeta(replayBase.modifiers, state)
+	ModifierModel:apply(replayBase.modifiers, chart)
 
 	local chartdiff = {
 		mode = "mania",
-		rate = playContext.rate,
+		rate = replayBase.rate,
 		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
 	setmetatable(chartdiff, Chartdiff)
 	---@cast chartdiff sea.Chartdiff
-	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, replayBase.rate)
 
-	chartdiff.modifiers = playContext.modifiers
+	chartdiff.modifiers = replayBase.modifiers
 	chartdiff.hash = chartview.hash
 	chartdiff.index = chartview.index
 
 	assert(valid.format(chartdiff:validate()))
 
 	-- cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
-
-	playContext.chartdiff = chartdiff
-	chart.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
@@ -151,16 +148,16 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
-	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
 
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setTimeRate(playContext.rate)
-	rhythmModel:setConstantSpeed(playContext.const)
-	rhythmModel:setTimings(playContext.timings)
-	rhythmModel:setSingleHandler(playContext.single)
+	rhythmModel:setTimeRate(replayBase.rate)
+	rhythmModel:setConstantSpeed(replayBase.const)
+	rhythmModel:setTimings(replayBase.timing_values)
+	rhythmModel:setSingleHandler(replayBase.mode == "taiko")
 
 	rhythmModel.inputManager.observable:add(replayModel)
 	rhythmModel:load()
@@ -394,15 +391,15 @@ function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
-	local playContext = self.playContext
+	local replayBase = self.replayBase
 	local config = self.configModel.configs.settings
 
 	local chartview = self.selectModel.chartview
 	local chartmeta = self.rhythmModel.chartmeta
 
-	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
+	local replayHash = self.replayModel:saveReplay(replayBase)
 
-	local chartdiff = self.playContext.chartdiff
+	local chartdiff = self.chartdiff
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
 	chartdiff.notes_preview = nil  -- fixes erasing
@@ -412,13 +409,12 @@ function GameplayController:saveScore()
 	local score = {
 		hash = chartdiff.hash,
 		index = chartdiff.index,
-		modifiers = chartdiff.modifiers,
-		rate = chartdiff.rate,
+		modifiers = replayBase.modifiers,
+		rate = replayBase.rate,
 		rate_type = config.gameplay.rate_type,
 
-		const = playContext.const,
-		-- timings = playContext.timings,
-		single = playContext.single,
+		const = replayBase.const,
+		single = replayBase.mode == "taiko",
 
 		time = os.time(),
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
@@ -447,22 +443,19 @@ function GameplayController:saveScore()
 	chartplay.replay_hash = replayHash
 	chartplay.hash = chartdiff.hash
 	chartplay.index = chartdiff.index
-	chartplay.modifiers = {}
-	chartplay.custom = true
-	chartplay.rate = chartdiff.rate
-	chartplay.rate_type = config.gameplay.rate_type
-	chartplay.mode = "mania"
-	chartplay.const = playContext.const
-	chartplay.nearest = playContext.timings.nearest
-	chartplay.tap_only = false -- like NoLongNote
-	chartplay.timings = chartmeta.timings
-	chartplay.subtimings = subtimmings
-	chartplay.healths = chartmeta.healths
-	chartplay.columns_order = nil
+	chartplay.modifiers = replayBase.modifiers
+	chartplay.custom = replayBase.custom
+	chartplay.rate = replayBase.rate
+	chartplay.rate_type = replayBase.rate_type
+	chartplay.mode = replayBase.mode
+	chartplay.const = replayBase.const
+	chartplay.nearest = replayBase.nearest
+	chartplay.tap_only = replayBase.tap_only
+	chartplay.timings = replayBase.timings
+	chartplay.subtimings = replayBase.subtimings
+	chartplay.healths = replayBase.healths
+	chartplay.columns_order = replayBase.columns_order
 	chartplay.created_at = os.time()
-	-- chartplay.submitted_at = integer
-	-- chartplay.computed_at = integer
-	-- chartplay.compute_state = sea.ComputeState
 	chartplay.pause_count = scoreEngine.pausesCount
 	chartplay.result = "pass"
 	chartplay.judges = {}
@@ -490,7 +483,7 @@ function GameplayController:saveScore()
 		end
 	end)()
 
-	self.playContext.scoreEntry = scoreEntry
+	self.rhythmModel.scoreEntry = scoreEntry
 
 	local config = self.configModel.configs.select
 	config.select_score_id = config.score_id

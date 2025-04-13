@@ -36,6 +36,8 @@ local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 local PackageManager = require("sphere.pkg.PackageManager")
 local SeaClient = require("sphere.online.SeaClient")
 
+local ReplayBase = require("sea.replays.ReplayBase")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
@@ -66,13 +68,14 @@ function GameController:new()
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
 	self.playContext = PlayContext()
-	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.playContext)
-	self.modifierSelectModel = ModifierSelectModel(self.playContext)
+	self.replayBase = ReplayBase()
+	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.replayBase)
+	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
 		self.persistence.cacheModel,
 		self.onlineModel,
-		self.playContext
+		self.replayBase
 	)
 	self.multiplayerModel = MultiplayerModel(
 		self.persistence.cacheModel,
@@ -81,7 +84,7 @@ function GameController:new()
 		self.selectModel,
 		self.onlineModel,
 		self.persistence.osudirectModel,
-		self.playContext
+		self.replayBase
 	)
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
@@ -116,7 +119,7 @@ function GameController:new()
 		self.cacheModel,
 		self.osudirectModel,
 		self.windowModel,
-		self.playContext,
+		self.replayBase,
 		self.backgroundModel,
 		self.previewModel,
 		self.chartPreviewModel
@@ -136,7 +139,7 @@ function GameController:new()
 		self.speedModel,
 		self.cacheModel,
 		self.fileFinder,
-		self.playContext,
+		self.replayBase,
 		self.pauseModel,
 		self.offsetModel,
 		self.previewModel,
@@ -146,8 +149,7 @@ function GameController:new()
 	self.fastplayController = FastplayController(
 		self.rhythmModel,
 		self.replayModel,
-		self.cacheModel,
-		self.playContext
+		self.cacheModel.chartdiffGenerator.difficultyModel
 	)
 	self.resultController = ResultController(
 		self.selectModel,
@@ -155,14 +157,13 @@ function GameController:new()
 		self.rhythmModel,
 		self.onlineModel,
 		self.configModel,
-		self.fastplayController,
-		self.playContext
+		self.fastplayController
 	)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
 		self.configModel,
 		self.selectModel,
-		self.playContext
+		self.replayBase
 	)
 	self.editorController = EditorController(
 		self.selectModel,
@@ -173,8 +174,7 @@ function GameController:new()
 		self.windowModel,
 		self.cacheModel,
 		self.fileFinder,
-		self.previewModel,
-		self.playContext
+		self.previewModel
 	)
 end
 
@@ -194,7 +194,7 @@ function GameController:load()
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.playContext:load(configModel.configs.play)
+	self.replayBase:import(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.onlineModel:load()

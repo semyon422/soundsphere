@@ -30,7 +30,7 @@ function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = self.game.playContext.scoreEntry
+	local scoreEntry = self.game.rhythmModel.scoreEntry
 	local loaded = scoreEntry and scoreEntry.replay_hash == item.replay_hash
 
 	if just.button(item, just.is_over(w, h)) then
@@ -45,14 +45,14 @@ function ScoreListView:drawItem(i, w, h)
 	local rating = item.rating
 	local timeRate = item.rate
 	local inputMode = item.inputmode
-	local playContext = self.game.playContext
+	local rhythmModel = self.game.rhythmModel
 
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scoreSystem.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.chartdiff.enps_diff
+		rating = s * rhythmModel.chartdiff.enps_diff
 
 		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
 		inputMode = tostring(self.game.rhythmModel.chart.inputMode) or inputMode

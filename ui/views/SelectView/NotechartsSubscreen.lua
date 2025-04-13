@@ -143,7 +143,7 @@ local function ChartCells(self)
 		return
 	end
 
-	local baseTimeRate = self.game.playContext.rate
+	local baseTimeRate = self.game.replayBase.rate
 
 	local bpm = 0
 	local length = 0
@@ -429,7 +429,7 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(21, 4)
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42 - right_w, h, (h - 8) / 2)
+	ModifierIconGridView:draw(self.game.replayBase.modifiers, w - 42 - right_w, h, (h - 8) / 2)
 
 	w, h = Layout:move("column1row2")
 	love.graphics.translate(21, 4)

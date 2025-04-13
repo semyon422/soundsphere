@@ -25,11 +25,11 @@ SelectModel.debounceTime = 0.5
 ---@param configModel sphere.ConfigModel
 ---@param cacheModel sphere.CacheModel
 ---@param onlineModel sphere.OnlineModel
----@param playContext sphere.PlayContext
-function SelectModel:new(configModel, cacheModel, onlineModel, playContext)
+---@param replayBase sea.ReplayBase
+function SelectModel:new(configModel, cacheModel, onlineModel, replayBase)
 	self.configModel = configModel
 	self.cacheModel = cacheModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 
 	self.noteChartLibrary = NoteChartLibrary(cacheModel)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
@@ -297,9 +297,9 @@ function SelectModel:setConfig(chartview)
 		return
 	end
 
-	local playContext = self.playContext
-	playContext.modifiers = chartview.modifiers or {}
-	playContext.rate = chartview.rate or 1
+	local replayBase = self.replayBase
+	replayBase.modifiers = chartview.modifiers or {}
+	replayBase.rate = chartview.rate or 1
 
 	local gameplay = self.configModel.configs.settings.gameplay
 	gameplay.rate_type = chartview.rate_type or gameplay.rate_type  -- no nil

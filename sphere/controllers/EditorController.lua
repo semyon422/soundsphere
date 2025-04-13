@@ -26,7 +26,7 @@ local EditorController = class()
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
 ---@param previewModel sphere.PreviewModel
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 function EditorController:new(
 	selectModel,
 	editorModel,
@@ -37,7 +37,7 @@ function EditorController:new(
 	cacheModel,
 	fileFinder,
 	previewModel,
-	playContext
+	replayBase
 )
 	self.selectModel = selectModel
 	self.editorModel = editorModel
@@ -48,7 +48,7 @@ function EditorController:new(
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
 	self.previewModel = previewModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 end
 
 function EditorController:load()
@@ -61,7 +61,7 @@ function EditorController:load()
 	local chart, chartmeta = selectModel:loadChart()
 
 	if love.keyboard.isDown("lshift") then
-		ModifierModel:apply(self.playContext.modifiers, chart)
+		ModifierModel:apply(self.replayBase.modifiers, chart)
 	end
 
 	local chartview = selectModel.chartview
