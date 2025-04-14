@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`inputmode` TEXT,
 	`source` TEXT,
 	`tags` TEXT,
-	`format` TEXT,
+	`format` INTEGER,
 	`audio_path` TEXT,
 	`background_path` TEXT,
 	`preview_time` REAL,

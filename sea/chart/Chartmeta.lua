@@ -3,6 +3,7 @@ local table_util = require("table_util")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
+local ChartFormat = require("sea.chart.ChartFormat")
 
 ---@class sea.Chartmeta
 ---@operator call: sea.Chartmeta
@@ -26,7 +27,7 @@ local chart_types = require("sea.chart.types")
 ---@field inputmode string
 ---@field source string
 ---@field tags string
----@field format string
+---@field format sea.ChartFormat
 ---@field audio_path string
 ---@field background_path string
 ---@field preview_time number
@@ -55,7 +56,7 @@ Chartmeta.struct = {
 	inputmode = chart_types.inputmode,
 	source = valid.optional(text),
 	tags = valid.optional(text),
-	format = types.name,
+	format = types.new_enum(ChartFormat),
 	audio_path = valid.optional(text),
 	background_path = valid.optional(text),
 	preview_time = valid.optional(types.number),
