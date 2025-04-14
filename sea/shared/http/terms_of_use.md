@@ -131,5 +131,5 @@ By using the Service, you acknowledge that you have read, understand, and agree 
 
 In order to resolve a complaint regarding the Service or to receive further information regarding use of the Service, please contact us at:
 
-[Name]
-[Email Address]
+<%= responsible_person_name %>  
+<%= responsible_person_email %>

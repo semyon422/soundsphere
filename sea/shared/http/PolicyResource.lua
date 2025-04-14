@@ -18,17 +18,17 @@ function PolicyResource:new(views)
 		{
 			key = "terms",
 			name = "Terms of Use",
-			filename = "sea/shared/http/terms_of_use.etlua"
+			filename = "sea/shared/http/terms_of_use.md"
 		},
 		{
 			key = "privacy",
 			name = "Privacy Policy",
-			filename = "sea/shared/http/privacy_policy.etlua"
+			filename = "sea/shared/http/privacy_policy.md"
 		},
 		{
 			key = "dmca",
 			name = "Copyright (DMCA)",
-			filename = "sea/shared/http/dmca.etlua",
+			filename = "sea/shared/http/dmca.md",
 		}
 	}
 end
@@ -48,6 +48,9 @@ function PolicyResource:getPage(req, res, ctx)
 			ctx.policy_filename = v.filename
 		end
 	end
+
+	ctx.responsible_person_name = "Semyon"
+	ctx.responsible_person_email = "semyon@email.com"
 
 	if not ctx.policy_filename then
 		ctx.policy_filename = self.policies[1].filename

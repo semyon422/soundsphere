@@ -54,11 +54,11 @@ We use cookies to save information about your session and to provide a better us
 
 ### Children Under 13
 
-Our services are not intended for children under the age of 13. If you are under 13, please do not provide any personal data to us. If we become aware that we have collected personal data from a child under 13, we will take steps to delete that data as soon as possible. Parents or guardians of children under 13 who believe that we have collected personal data from their child should contact us at [Your Email Address].
+Our services are not intended for children under the age of 13. If you are under 13, please do not provide any personal data to us. If we become aware that we have collected personal data from a child under 13, we will take steps to delete that data as soon as possible. Parents or guardians of children under 13 who believe that we have collected personal information from their child should contact us at the address listed at the bottom of this document.
 
 ### Account Deletion
 
-If you wish to delete your account, please contact us at [Your Email Address]. This process may take several days to complete.
+If you wish to delete your account, please contact us at <%= responsible_person_email %>. This process may take several days to complete.
 
 ### Changes to this Policy
 
@@ -66,6 +66,9 @@ We may update this Privacy Policy from time to time. We will post the updated po
 
 ### Contact Us
 
-If you have any questions or concerns about our Privacy Policy, please contact us at [Email Address].
-
 By using our services, you acknowledge that you have read, understood, and agree to this Privacy Policy.
+
+If you have any questions or concerns about our Privacy Policy, please contact us at:
+
+<%= responsible_person_name %>  
+<%= responsible_person_email %>
