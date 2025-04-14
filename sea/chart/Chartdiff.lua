@@ -52,15 +52,17 @@ Chartdiff.struct = {
 	user_diff_data = types.binary,
 	notes_preview = types.binary,
 }
-table_util.copy(Chartkey.struct, Chartdiff.struct)
 
 local computed_keys = table_util.keys(Chartdiff.struct)
+assert(#table_util.keys(Chartdiff.struct) == 15)
 
 ---@param values sea.Chartdiff
 ---@return boolean
 function Chartdiff:equalsComputed(values)
 	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
+
+table_util.copy(Chartkey.struct, Chartdiff.struct)
 
 assert(#table_util.keys(Chartdiff.struct) == 20)
 

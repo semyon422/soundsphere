@@ -1,6 +1,6 @@
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
-local TimingValues = require("sea.chart.TimingValues")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local Healths = require("sea.chart.Healths")
 
 local play = {
@@ -19,7 +19,7 @@ local play = {
 	const = false,
 	rate_type = "linear",
 
-	timing_values = TimingValues(Timings("sphere"), Subtimings("none")),
+	timing_values = assert(TimingValuesFactory:get(Timings("sphere"), Subtimings("none"))),
 }
 
 return play

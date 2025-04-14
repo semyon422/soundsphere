@@ -31,6 +31,7 @@ chartplays.types = {
 	modifiers = json,
 	judges = json,
 	tap_only = "boolean",
+	const = "boolean",
 	rate = int_rates,
 	timings = Timings,
 	subtimings = subtimings,

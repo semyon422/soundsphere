@@ -5,7 +5,7 @@ local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
-local TimingValues = require("sea.chart.TimingValues")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -90,7 +90,7 @@ return ModalImView(function(self, quit)
 		timings_data = timings_config[timings_name]
 		replayBase.timings = Timings(timings_name, timings_data)
 		replayBase.subtimings = Subtimings(next(subtimings_config[timings_name]))
-		replayBase.timing_values = TimingValues(replayBase.timings, replayBase.subtimings)
+		replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
 	end
 
 	if timings_name == "osumania" then
@@ -103,7 +103,7 @@ return ModalImView(function(self, quit)
 
 	if timings_data ~= replayBase.timings.data then
 		replayBase.timings = Timings(timings_name, timings_data)
-		replayBase.timing_values = TimingValues(replayBase.timings, replayBase.subtimings)
+		replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
 		timings_config[timings_name] = timings_data
 	end
 
@@ -121,7 +121,7 @@ return ModalImView(function(self, quit)
 
 	if subtimings_data ~= replayBase.subtimings.data then
 		replayBase.subtimings = Subtimings(subtimings_name, subtimings_data)
-		replayBase.timing_values = TimingValues(replayBase.timings, replayBase.subtimings)
+		replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
 		subtimings_config[timings_name][subtimings_name] = subtimings_data
 	end
 

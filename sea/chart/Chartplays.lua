@@ -3,6 +3,7 @@ local valid = require("valid")
 local types = require("sea.shared.types")
 local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local ReplayCoder = require("sea.replays.ReplayCoder")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
@@ -144,11 +145,13 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	if not chartplay then
 		chartplay_values.id = nil
 		chartplay_values.user_id = user.id
-		chartplay_values.created_at = os.time()
+		chartplay_values.submitted_at = os.time()
 		chartplay_values.compute_state = "new"
 
 		chartplay = self.charts_repo:createChartplay(chartplay_values)
 	end
+
+	assert(chartplay_values:equalsChartplay(chartplay))
 
 	local chartfile_and_data, err = self:requireChartfile(user, submission, chartplay.hash)
 	if not chartfile_and_data then
@@ -163,8 +166,11 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		return nil, "require replay: " .. err
 	end
 
-	chartplay.submitted_at = os.time()
-	self.charts_repo:updateChartplay(chartplay)
+	if not replay:equalsChartplayBase(chartplay) then
+		return nil, "chartplay base of replay differs"
+	elseif not replay:equalsChartmetaKey(chartplay) then
+		return nil, "chartmeta key of replay differs"
+	end
 
 	---@type sea.Chartdiff
 	local computed_chartdiff
@@ -203,6 +209,16 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		if not chartdiff_values:equalsComputed(computed_chartdiff) then
 			return nil, "computed values differs"
 		end
+	end
+
+	local timings = chartplay.timings or computed_chartmeta.timings
+	local subtimings = chartplay.subtimings
+
+	local timing_values = TimingValuesFactory:get(timings, subtimings)
+	if not timing_values then
+		chartplay.compute_state = "invalid"
+		self.charts_repo:updateChartplay(chartplay)
+		return nil, "timing values differs"
 	end
 
 	chartplay.compute_state = "valid"

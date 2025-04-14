@@ -1,5 +1,6 @@
 local IChartplayComputer = require("sea.chart.IChartplayComputer")
 local Chartdiff = require("sea.chart.Chartdiff")
+local ChartplayComputed = require("sea.chart.ChartplayComputed")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
 
@@ -35,7 +36,6 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 
 	local chart, chartmeta, chartdiff = t.chart, t.chartmeta, t.chartdiff
 
-
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
 
@@ -44,21 +44,44 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		replayModel,
 		self.difficultyModel
 	)
+	fastplayController.need_preview = true
 
 	rhythmModel.judgements = {}
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	rhythmModel:setTimings(replay.timings)
+	rhythmModel:setTimings(replay.timing_values)
 	replayModel:decodeEvents(replay.events)
 
 	fastplayController:play(chart, chartmeta, replay)
 
-	local score = rhythmModel.scoreEngine.scoreSystem:getSlice()
+	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
+	local score = scoreSystem:getSlice()
+	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+
+	local c = ChartplayComputed()
+	c.result = "pass" -- TODO: use hp
+	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
+	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
+	c.max_combo = scoreSystem.base.maxCombo
+	c.perfect_count = judge.counters.perfect
+	c.miss_count = scoreSystem.base.missCount
+	c.rating = 0
+	c.accuracy_osu = 0
+	c.accuracy_etterna = 0
+	c.rating_pp = 0
+	c.rating_msd = 0
+
+	chartdiff = rhythmModel.chartdiff
+	chartdiff.hash = replay.hash
+	chartdiff.index = replay.index
+	chartdiff.modifiers = replay.modifiers
+	chartdiff.rate = replay.rate
+	chartdiff.mode = replay.mode
 
 	return {
-		chartplay_computed = score,
-		chartdiff = chartdiff,
+		chartplay_computed = c,
+		chartdiff = rhythmModel.chartdiff,
 		chartmeta = chartmeta,
 	}
 end

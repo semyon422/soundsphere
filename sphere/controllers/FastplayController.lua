@@ -6,6 +6,8 @@ local ModifierModel = require("sphere.models.ModifierModel")
 ---@operator call: sphere.FastplayController
 local FastplayController = class()
 
+FastplayController.need_preview = false
+
 ---@param rhythmModel sphere.RhythmModel
 ---@param replayModel sphere.ReplayModel
 ---@param difficultyModel sphere.DifficultyModel
@@ -44,6 +46,9 @@ function FastplayController:play(chart, chartmeta, replay)
 		inputmode = tostring(chart.inputMode),
 		notes_preview = "",  -- do not generate preview
 	}
+	if self.need_preview then
+		chartdiff.notes_preview = nil
+	end
 	self.difficultyModel:compute(chartdiff, chart, replay.rate)
 
 	local state = self:applyModifiers(chart, replay.modifiers)

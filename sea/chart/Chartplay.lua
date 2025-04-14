@@ -14,12 +14,12 @@ local ChartplayComputed = require("sea.chart.ChartplayComputed")
 ---@field compute_state sea.ComputeState
 ---@field submitted_at integer
 ---@field computed_at integer
----@field created_at integer
 --- CLEINT defined fields
 ---@field online_id integer
 --- METADATA
 ---@field replay_hash string
 ---@field pause_count integer
+---@field created_at integer client-defined value
 --- REQUIRED for computation: sea.ChartplayBase
 --- METADATA not for computation: sea.ChartplayBase
 --- COMPUTED: sea.ChartplayComputed
@@ -42,6 +42,14 @@ local validate_chartplay = valid.compose(valid.struct(Chartplay.struct), chart_t
 ---@return string|util.Errors?
 function Chartplay:validate()
 	return validate_chartplay(self)
+end
+
+local keys = table_util.keys(Chartplay.struct)
+
+---@param values sea.Chartplay
+---@return boolean
+function Chartplay:equalsChartplay(values)
+	return table_util.subequal(self, values, keys, table_util.equal)
 end
 
 return Chartplay
