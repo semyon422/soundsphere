@@ -411,7 +411,7 @@ function GameplayController:saveScore()
 		index = chartdiff.index,
 		modifiers = replayBase.modifiers,
 		rate = replayBase.rate,
-		rate_type = config.gameplay.rate_type,
+		rate_type = replayBase.rate_type,
 
 		const = replayBase.const,
 		single = replayBase.mode == "taiko",

@@ -16,6 +16,16 @@ local class = require("class")
 ---@field data number
 local Timings = class()
 
+Timings.names = {
+	"arbitrary",
+	"sphere",
+	"simple",
+	"osumania",
+	"stepmania",
+	"quaver",
+	"bmsrank",
+}
+
 ---@param name sea.TimingsName
 ---@param data number?
 function Timings:new(name, data)

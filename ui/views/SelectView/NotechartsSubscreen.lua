@@ -400,12 +400,11 @@ local function ModifierIconGrid(self)
 
 	imgui.setSize(right_w, h - 8, right_w / 2, (h - 8) / 2)
 
-	local configs = self.game.configModel.configs
-	local g = configs.settings.gameplay
+	local replayBase = self.game.replayBase
 
 	local timeRateModel = self.game.timeRateModel
-	local range = timeRateModel.range[g.rate_type]
-	local format = timeRateModel.format[g.rate_type]
+	local range = timeRateModel.range[replayBase.rate_type]
+	local format = timeRateModel.format[replayBase.rate_type]
 	local newRate = imgui.knob(
 		"rate knob",
 		timeRateModel:get(),
@@ -461,6 +460,9 @@ local function NotechartsSubscreen(self)
 	end
 	if imgui.IconOnlyButton("packages", icons("apps"), h, 0.5) then
 		gameView:setModal(require("ui.views.PackagesView"))
+	end
+	if imgui.IconOnlyButton("playconfig", icons("more_vert"), h, 0.5) then
+		gameView:setModal(require("ui.views.SelectView.PlayConfigView"))
 	end
 	if imgui.TextOnlyButton("modifiers", "mods", w, h) then
 		gameView:setModal(require("ui.views.ModifierView"))

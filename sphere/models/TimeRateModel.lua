@@ -21,19 +21,16 @@ TimeRateModel.format = {
 	exp = "%0.f",
 }
 
----@param configModel sphere.ConfigModel
 ---@param replayBase sea.ReplayBase
-function TimeRateModel:new(configModel, replayBase)
-	self.configModel = configModel
+function TimeRateModel:new(replayBase)
 	self.replayBase = replayBase
 end
 
 ---@return number
 function TimeRateModel:get()
-	local gameplay = self.configModel.configs.settings.gameplay
 	local replayBase = self.replayBase
 
-	local rate_type = gameplay.rate_type
+	local rate_type = replayBase.rate_type
 	local rate = replayBase.rate
 
 	if rate_type == "exp" then
@@ -45,10 +42,9 @@ end
 
 ---@param newRate number
 function TimeRateModel:set(newRate)
-	local gameplay = self.configModel.configs.settings.gameplay
 	local replayBase = self.replayBase
 
-	local rate_type = gameplay.rate_type
+	local rate_type = replayBase.rate_type
 	local rate = newRate
 
 	local range = self.range[rate_type]
@@ -63,8 +59,7 @@ end
 
 ---@param delta number
 function TimeRateModel:increase(delta)
-	local gameplay = self.configModel.configs.settings.gameplay
-	local rate_type = gameplay.rate_type
+	local rate_type = self.replayBase.rate_type
 	local range = self.range[rate_type]
 	local rate = self:get() + delta * range[3]
 	rate = math_util.round(rate, range[3])

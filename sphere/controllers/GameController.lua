@@ -69,7 +69,7 @@ function GameController:new()
 	self.speedModel = SpeedModel(self.persistence.configModel)
 	self.playContext = PlayContext()
 	self.replayBase = ReplayBase()
-	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.replayBase)
+	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,

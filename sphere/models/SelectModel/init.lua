@@ -300,9 +300,7 @@ function SelectModel:setConfig(chartview)
 	local replayBase = self.replayBase
 	replayBase.modifiers = chartview.modifiers or {}
 	replayBase.rate = chartview.rate or 1
-
-	local gameplay = self.configModel.configs.settings.gameplay
-	gameplay.rate_type = chartview.rate_type or gameplay.rate_type  -- no nil
+	replayBase.rate_type = chartview.rate_type or "linear"
 end
 
 ---@param direction number?
