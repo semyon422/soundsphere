@@ -1,3 +1,4 @@
+local table_util = require("table_util")
 local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
@@ -77,17 +78,17 @@ input 4key
 1000 =4
 ]]
 
-local events = {
+local _events = {
 	{0.01, 1, true},
 	{0.1, 1, false},
 	{0.99, 2, true},
 	{1.1, 2, false},
 }
 
-local replayfile_data_table = {
+local _replayfile_data_table = {
 	version = 1,
 	timing_values = TimingValuesFactory:get(Timings("sphere"), Subtimings("none")),
-	events = ReplayEvents.encode(events),
+	events = ReplayEvents.encode(_events),
 	created_at = 0,
 	--
 	hash = md5.sumhexa(chartfile_data),
@@ -108,34 +109,34 @@ local replayfile_data_table = {
 	pause_count = 0,
 	rate_type = "linear",
 }
-setmetatable(replayfile_data_table, Replay)
----@cast replayfile_data_table sea.Replay
-local replayfile_data = ReplayCoder.encode(replayfile_data_table)
+setmetatable(_replayfile_data_table, Replay)
+---@cast _replayfile_data_table sea.Replay
+local _replayfile_data = ReplayCoder.encode(_replayfile_data_table)
 
-local chartplay_values = {
-	hash = replayfile_data_table.hash,
-	index = replayfile_data_table.index,
-	modifiers = replayfile_data_table.modifiers,
-	rate = replayfile_data_table.rate,
-	mode = replayfile_data_table.mode,
+local _chartplay_values = {
+	hash = _replayfile_data_table.hash,
+	index = _replayfile_data_table.index,
+	modifiers = _replayfile_data_table.modifiers,
+	rate = _replayfile_data_table.rate,
+	mode = _replayfile_data_table.mode,
 	--
-	nearest = replayfile_data_table.nearest,
-	tap_only = replayfile_data_table.tap_only,
-	timings = replayfile_data_table.timings,
-	subtimings = replayfile_data_table.subtimings,
-	healths = replayfile_data_table.healths,
-	columns_order = replayfile_data_table.columns_order,
+	nearest = _replayfile_data_table.nearest,
+	tap_only = _replayfile_data_table.tap_only,
+	timings = _replayfile_data_table.timings,
+	subtimings = _replayfile_data_table.subtimings,
+	healths = _replayfile_data_table.healths,
+	columns_order = _replayfile_data_table.columns_order,
 	--
-	custom = replayfile_data_table.custom,
-	const = replayfile_data_table.const,
-	pause_count = replayfile_data_table.pause_count,
-	created_at = replayfile_data_table.created_at,
-	rate_type = replayfile_data_table.rate_type,
+	custom = _replayfile_data_table.custom,
+	const = _replayfile_data_table.const,
+	pause_count = _replayfile_data_table.pause_count,
+	created_at = _replayfile_data_table.created_at,
+	rate_type = _replayfile_data_table.rate_type,
 	--
 	accuracy = 0.020270363958551557,
 	accuracy_etterna = 0,
 	accuracy_osu = 0,
-	replay_hash = md5.sumhexa(replayfile_data),
+	replay_hash = md5.sumhexa(_replayfile_data),
 	judges = {2, 0},
 	max_combo = 2,
 	miss_count = 3,
@@ -145,10 +146,10 @@ local chartplay_values = {
 	rating_pp = 0,
 	result = "pass",
 }
-setmetatable(chartplay_values, Chartplay)
----@cast chartplay_values sea.Chartplay
+setmetatable(_chartplay_values, Chartplay)
+---@cast _chartplay_values sea.Chartplay
 
-local chartdiff_values = {
+local _chartdiff_values = {
 	hash = md5.sumhexa(chartfile_data),
 	index = 1,
 	modifiers = {},
@@ -170,17 +171,22 @@ local chartdiff_values = {
 	user_diff_data = "",
 	notes_preview = string.char(1, 0, 0, 64, 0, 193, 64, 194, 64, 196, 64, 200, 64, 4, 193),
 }
-setmetatable(chartdiff_values, Chartdiff)
----@cast chartdiff_values sea.Chartdiff
+setmetatable(_chartdiff_values, Chartdiff)
+---@cast _chartdiff_values sea.Chartdiff
 
 ---@param t testing.T
 function test.submit_valid_score(t)
 	local ctx = create_test_ctx()
 
+	local replayfile_data_table = setmetatable(table_util.copy(_replayfile_data_table), Replay)
+	local replayfile_data = _replayfile_data
 	t:assert(replayfile_data_table:validate())
 
 	local remote = FakeSubmissionClientRemote(chartfile_name, chartfile_data, replayfile_data)
 	---@cast remote -sea.FakeSubmissionClientRemote, +sea.SubmissionClientRemote
+
+	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
+	local chartdiff_values = setmetatable(table_util.copy(_chartdiff_values), Chartdiff)
 
 	local valid, errs = chartplay_values:validate()
 	t:tdeq({valid, errs}, {true})
