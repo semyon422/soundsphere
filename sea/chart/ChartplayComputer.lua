@@ -24,7 +24,7 @@ end
 ---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
-	local chart_chartmetas, err = self:getCharts(chartfile_name, chartfile_data)
+	local chart_chartmetas, err = ChartFactory:getCharts(chartfile_name, chartfile_data)
 	if not chart_chartmetas then
 		return nil, err
 	end
@@ -34,7 +34,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		return nil, "chart not found"
 	end
 
-	local chart, chartmeta, chartdiff = t.chart, t.chartmeta, t.chartdiff
+	local chart, chartmeta = t.chart, t.chartmeta
 
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
@@ -72,7 +72,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	c.rating_pp = 0
 	c.rating_msd = 0
 
-	chartdiff = rhythmModel.chartdiff
+	local chartdiff = rhythmModel.chartdiff
 	chartdiff.hash = replay.hash
 	chartdiff.index = replay.index
 	chartdiff.modifiers = replay.modifiers
@@ -92,39 +92,17 @@ end
 ---@return sea.Chartmeta?
 ---@return string?
 function ChartplayComputer:computeChartmeta(name, data, index)
-	local charts, err = self:getCharts(name, data)
-	if not charts then
-		return nil, err
-	end
-
-	local chart = charts[index]
-	if not chart then
-		return nil, "not found"
-	end
-
-	return chart.chartmeta
-end
-
---------------------------------------------------------------------------------
-
----@param name string
----@param data string
----@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta, chartdiff: sea.Chartdiff}[]?
----@return string?
-function ChartplayComputer:getCharts(name, data)
 	local chart_chartmetas, err = ChartFactory:getCharts(name, data)
 	if not chart_chartmetas then
 		return nil, err
 	end
 
-	---@cast chart_chartmetas {chart: ncdk2.Chart, chartmeta: sea.Chartmeta, chartdiff: sea.Chartdiff}[]
-
-	for _, t in ipairs(chart_chartmetas) do
-		t.chartdiff = Chartdiff()
-		self.difficultyModel:compute(t.chartdiff, t.chart, 1)
+	local chart_chartmeta = chart_chartmetas[index]
+	if not chart_chartmeta then
+		return nil, "not found"
 	end
 
-	return chart_chartmetas
+	return chart_chartmeta.chartmeta
 end
 
 return ChartplayComputer
