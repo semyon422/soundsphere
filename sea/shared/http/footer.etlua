@@ -1,0 +1,21 @@
+<style>
+.footer__policies {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.footer__link {
+	padding: 0.5em;
+}
+</style>
+
+<footer class="footer">
+	<div class="footer__policies">
+		<a href="/policies?policy_key=terms" class="footer__link">Terms</a>
+		<p>•</p>
+		<a href="/policies?policy_key=privacy" class="footer__link">Privacy</a>
+		<p>•</p>
+		<a href="/policies?policy_key=dmca" class="footer__link">Copyright (DMCA)</a>
+	</div>
+</footer>
