@@ -35,14 +35,13 @@ end
 
 ---@param t testing.T
 function test.subtimings(t)
-	t:eq(Subtimings.encode(Subtimings.decode(0, "unknown")), 0)
-	t:eq(Subtimings.encode(Subtimings.decode(0, "arbitrary")), 0)
-	t:eq(Subtimings.encode(Subtimings.decode(0, "sphere")), 0)
-	t:eq(Subtimings.encode(Subtimings.decode(100, "simple")), 100)
-	t:eq(Subtimings.encode(Subtimings.decode(2, "osumania")), 2)
-	t:eq(Subtimings.encode(Subtimings.decode(4, "stepmania")), 4)
-	t:eq(Subtimings.encode(Subtimings.decode(0, "quaver")), 0)
-	t:eq(Subtimings.encode(Subtimings.decode(0, "bmsrank")), 0)
+	for i = -1, 3000 do
+		t:eq(Subtimings.encode(Subtimings.decode(i)), i)
+	end
+
+	local unknown = Subtimings.decode(3000)
+	t:eq(unknown.name, "unknown")
+	t:eq(unknown.data, 3000)
 
 	Subtimings("window", 0.100)
 	Subtimings("scorev", 1)

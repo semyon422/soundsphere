@@ -7,16 +7,6 @@ local Healths = require("sea.chart.Healths")
 local int_rates = require("libchart.int_rates")
 local json = require("web.json")
 
-local subtimings = {}
-
----@param s integer
----@return integer
-function subtimings.decode(s) return s end
-
----@param v sea.Subtimings
----@return integer
-function subtimings.encode(v) return Subtimings.encode(v) end
-
 ---@type rdb.ModelOptions
 local chartplays = {}
 
@@ -34,14 +24,8 @@ chartplays.types = {
 	const = "boolean",
 	rate = int_rates,
 	timings = Timings,
-	subtimings = subtimings,
+	subtimings = Subtimings,
 	healths = Healths,
 }
-
----@param chartplay sea.Chartplay
-function chartplays.from_db(chartplay)
-	---@diagnostic disable-next-line
-	chartplay.subtimings = Subtimings.decode(chartplay.subtimings, chartplay.timings.name)
-end
 
 return chartplays

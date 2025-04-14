@@ -1,6 +1,7 @@
 local class = require("class")
 
 ---@alias sea.SubtimingsName
+---| "unknown"
 ---| "none"
 ---| "window"
 ---| "scorev"
@@ -39,36 +40,31 @@ function Subtimings:validate()
 		return v == 0
 	elseif n == "none" then
 		return v == 0
+	elseif n == "unknown" then
+		return v == math.floor(v)
 	end
 
 	return false
 end
 
 ---@param v integer
----@param tn sea.TimingsName
 ---@return sea.Subtimings
-function Subtimings.decode(v, tn)
+function Subtimings.decode(v)
 	assert(v, "missing subtimings value")
 
-	if tn == "simple" then
-		return Subtimings("window", v / 1000) -- hit and miss window in seconds
-	elseif tn == "osumania" then
-		return Subtimings("scorev", v)
-	elseif tn == "stepmania" then
-		if v >= 1 and v <= 9 then
-			return Subtimings("etternaj", v)
-		end
-		error("invalid stepmania subtimings")
-		-- TODO: other stepmania judgements
-	elseif tn == "lunatic" then
-		if v == 0 then
-			return Subtimings("lunatic")
-		end
-		error("invalid bmsrank subtimings")
-		-- TODO: other bms judgements
+	if v == 0 then
+		return Subtimings("none")
+	elseif v >= 1000 and v <= 2000 then
+		return Subtimings("window", (v - 1000) / 1000)
+	elseif v >= 2101 and v <= 2102 then
+		return Subtimings("scorev", v - 2100)
+	elseif v >= 2201 and v <= 2209 then
+		return Subtimings("etternaj", v - 2200)
+	elseif v == 2300 then
+		return Subtimings("lunatic")
 	end
 
-	return Subtimings("none")
+	return Subtimings("unknown", v)
 end
 
 ---@param t sea.Subtimings
@@ -77,14 +73,16 @@ function Subtimings.encode(t)
 	local v = t.data
 	local n = t.name
 
-	if n == "window" then
-		return math.floor(v * 1000)
+	if n == "none" then
+		return 0
+	elseif n == "window" then
+		return 1000 + math.floor(v * 1000)
 	elseif n == "scorev" then
-		return v
+		return 2100 + v
 	elseif n == "etternaj" then
-		return v
+		return 2200 + v
 	elseif n == "lunatic" then
-		return v
+		return 2300
 	end
 
 	return v
