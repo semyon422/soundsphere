@@ -189,6 +189,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`allow_tap_only` INTEGER,
 	`allow_free_timings` INTEGER,
 	`allow_free_healths` INTEGER,
+	`timings` INTEGER,
+	`healths` INTEGER,
 	`mode` INTEGER,
 	`rate` BLOB,
 	`difftables` BLOB,

@@ -85,10 +85,18 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		conds.tap_only = false
 	end
 	if not lb.allow_free_timings then
-		conds.timings_ = "chartmeta_timings"
+		if lb.timings then
+			conds.timings = lb.timings
+		else
+			conds.timings_ = "chartmeta_timings"
+		end
 	end
 	if not lb.allow_free_healths then
-		conds.healths_ = "chartmeta_healths"
+		if lb.healths then
+			conds.healths = lb.healths
+		else
+			conds.healths_ = "chartmeta_healths"
+		end
 	end
 
 	local rate = lb.rate

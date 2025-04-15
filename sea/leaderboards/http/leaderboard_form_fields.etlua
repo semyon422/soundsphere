@@ -155,15 +155,6 @@
 </div>
 
 <div class="field">
-	<div class="control">
-		<label class="checkbox">
-			<input type="checkbox" name="allow_free_healths" <%= leaderboard.allow_free_healths and "checked" or "" %>>
-			Allow free healths
-		</label>
-	</div>
-</div>
-
-<div class="field">
 	<label class="label">Gamemode</label>
 	<div class="control">
 		<div class="select">
@@ -173,6 +164,20 @@
 				<% end %>
 			</select>
 		</div>
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Timings {name: string, data: number}?</label>
+	<div class="control">
+		<input class="input" type="text" name="timings" value="<%= leaderboard.timings and json.encode(leaderboard.timings) or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Healths {name: string, data: number}?</label>
+	<div class="control">
+		<input class="input" type="text" name="healths" value="<%= leaderboard.healths and json.encode(leaderboard.healths) or "" %>">
 	</div>
 </div>
 

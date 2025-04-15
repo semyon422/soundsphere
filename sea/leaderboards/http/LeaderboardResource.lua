@@ -111,6 +111,8 @@ function LeaderboardResource:updateLeaderboard(req, res, ctx)
 	lb.rate = json.decode_safe(body_params.rate)
 	lb.chartmeta_inputmode = json.decode_safe(body_params.chartmeta_inputmode)
 	lb.chartdiff_inputmode = json.decode_safe(body_params.chartdiff_inputmode)
+	lb.timings = json.decode_safe(body_params.timings)
+	lb.healths = json.decode_safe(body_params.healths)
 
 	local difftable_ids = json.decode_safe(body_params.difftable_ids)
 	if type(difftable_ids) ~= "table" then

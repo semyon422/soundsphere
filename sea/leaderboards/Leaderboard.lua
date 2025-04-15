@@ -2,6 +2,7 @@ local class = require("class")
 local table_util = require("table_util")
 local valid = require("valid")
 local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ScoreComb = require("sea.leaderboards.ScoreComb")
 local TernaryState = require("sea.chart.TernaryState")
@@ -29,6 +30,8 @@ local Gamemode = require("sea.chart.Gamemode")
 ---@field allow_tap_only boolean
 ---@field allow_free_timings boolean
 ---@field allow_free_healths boolean
+---@field timings sea.Timings?
+---@field healths sea.Healths?
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
 ---@field chartmeta_inputmode string[] allowed inputmodes, empty = allow all
@@ -44,6 +47,7 @@ function Leaderboard:new()
 	self.nearest = "any"
 	self.result = "fail"
 	self.allow_custom = true
+	self.allow_const = true
 	self.allow_pause = true
 	self.allow_reorder = true
 	self.allow_modifiers = true
@@ -94,6 +98,8 @@ local validate_leaderboard = valid.struct({
 	allow_tap_only = types.boolean,
 	allow_free_timings = types.boolean,
 	allow_free_healths = types.boolean,
+	timings = valid.optional(chart_types.timings),
+	healths = valid.optional(chart_types.healths),
 	rate = is_valid_rate,
 	mode = types.new_enum(Gamemode),
 	chartmeta_inputmode = valid.array(types.name, 10),

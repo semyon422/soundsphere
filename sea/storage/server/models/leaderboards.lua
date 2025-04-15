@@ -4,6 +4,8 @@ local RatingCalc = require("sea.leaderboards.RatingCalc")
 local Result = require("sea.chart.Result")
 local TernaryState = require("sea.chart.TernaryState")
 local Gamemode = require("sea.chart.Gamemode")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 local json = require("web.json")
 
 ---@type rdb.ModelOptions
@@ -21,6 +23,8 @@ leaderboards.types = {
 	difftables = json,
 	chartmeta_inputmode = json,
 	chartdiff_inputmode = json,
+	timings = Timings,
+	healths = Healths,
 	allow_custom = "boolean",
 	allow_const = "boolean",
 	allow_pause = "boolean",

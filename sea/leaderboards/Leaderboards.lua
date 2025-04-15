@@ -101,6 +101,8 @@ local function safe_copy_lb(src, dst)
 	dst.allow_tap_only = not not src.allow_tap_only
 	dst.allow_free_timings = not not src.allow_free_timings
 	dst.allow_free_healths = not not src.allow_free_healths
+	dst.timings = src.timings
+	dst.healths = src.healths
 	dst.mode = src.mode
 	dst.rate = src.rate
 	dst.chartmeta_inputmode = src.chartmeta_inputmode
@@ -157,7 +159,7 @@ function Leaderboards:update(user, id, lb_values)
 
 	safe_copy_lb(lb_values, lb)
 
-	self.leaderboards_repo:updateLeaderboard(lb)
+	lb = self.leaderboards_repo:updateLeaderboard(lb)
 	self:updateLeaderboardDifftables(id, lb_values.leaderboard_difftables)
 
 	return lb
