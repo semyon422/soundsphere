@@ -89,12 +89,21 @@ return ModalImView(function(self, quit)
 	if timings_name ~= replayBase.timings.name then
 		timings_data = timings_config[timings_name]
 		replayBase.timings = Timings(timings_name, timings_data)
-		replayBase.subtimings = Subtimings(next(subtimings_config[timings_name]))
-		replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
+
+		local st_config = subtimings_config[timings_name]
+		replayBase.subtimings = st_config and Subtimings(next(st_config)) or nil
+
+		if timings_name ~= "arbitrary" then
+			replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
+		end
 	end
 
-	if timings_name == "osumania" then
+	if timings_name == "simple" then
+		timings_data = math.floor(imgui.slider1("timings_data", timings_data, "%0.3f", 0, 0.5, 0.001) * 1000 + 0.5) / 1000
+	elseif timings_name == "osumania" then
 		timings_data = math.floor(imgui.slider1("timings_data", timings_data, "%0.1f", 0, 10, 0.1) * 10 + 0.5) / 10
+	elseif timings_name == "etternaj" then
+		timings_data = imgui.slider1("timings_data", timings_data, "%d", 1, 9, 1)
 	elseif timings_name == "bmsrank" then
 		timings_data = imgui.slider1("timings_data", timings_data, "%d", 0, 3, 1)
 	else
@@ -107,22 +116,24 @@ return ModalImView(function(self, quit)
 		timings_config[timings_name] = timings_data
 	end
 
-	local subtimings_name = replayBase.subtimings.name
-	local subtimings_data = replayBase.subtimings.data
-	imgui.text("Subtimings")
+	if replayBase.subtimings then
+		local subtimings_name = replayBase.subtimings.name
+		local subtimings_data = replayBase.subtimings.data
+		imgui.text("Subtimings")
 
-	if timings_name == "simple" then
-		subtimings_data = math.floor(imgui.slider1("subtimings_data", subtimings_data, "%0.3f", 0, 0.5, 0.001) * 1000 + 0.5) / 1000
-	elseif timings_name == "osumania" then
-		subtimings_data = imgui.combo("subtimings_data", subtimings_data, {1, 2}, function(v) return "score v" .. v end)
-	elseif timings_name == "stepmania" then
-		subtimings_data = imgui.slider1("subtimings_data", subtimings_data, "%d", 1, 9, 1, "Etterna judge")
+		if timings_name == "osumania" then
+			subtimings_data = imgui.combo("subtimings_data", subtimings_data, {1, 2}, function(v) return "score v" .. v end)
+		end
+
+		if subtimings_data ~= replayBase.subtimings.data then
+			replayBase.subtimings = Subtimings(subtimings_name, subtimings_data)
+			replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
+			subtimings_config[timings_name][subtimings_name] = subtimings_data
+		end
 	end
 
-	if subtimings_data ~= replayBase.subtimings.data then
-		replayBase.subtimings = Subtimings(subtimings_name, subtimings_data)
-		replayBase.timing_values = assert(TimingValuesFactory:get(replayBase.timings, replayBase.subtimings))
-		subtimings_config[timings_name][subtimings_name] = subtimings_data
+	if imgui.TextButton("open timings", "timings", w / 4, _h) then
+		self.game.ui.gameView:setModal(require("ui.views.TimingsModalView"))
 	end
 
 	-- healths = Healths("simple", 20),

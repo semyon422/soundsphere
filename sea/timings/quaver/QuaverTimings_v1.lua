@@ -36,7 +36,7 @@ function QuaverTimings:match(tvs)
 	if not _tvs:equals(tvs) then
 		return
 	end
-	return Timings("quaver"), Subtimings("none")
+	return Timings("quaver")
 end
 
 return QuaverTimings

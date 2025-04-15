@@ -13,7 +13,7 @@ local chart_types = require("sea.chart.types")
 ---@field nearest boolean
 ---@field tap_only boolean - like NoLongNote
 ---@field timings sea.Timings?
----@field subtimings sea.Subtimings
+---@field subtimings sea.Subtimings?
 ---@field healths sea.Healths?
 ---@field columns_order integer[]? nil - unchanged
 --- METADATA not for computation
@@ -27,7 +27,7 @@ ChartplayBase.struct = {
 	nearest = types.boolean,
 	tap_only = types.boolean,
 	timings = valid.optional(chart_types.timings),
-	subtimings = chart_types.subtimings,
+	subtimings = valid.optional(chart_types.subtimings),
 	healths = valid.optional(chart_types.healths),
 	columns_order = chart_types.columns_order,
 	-- METADATA

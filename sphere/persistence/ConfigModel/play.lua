@@ -11,7 +11,7 @@ local play = {
 	nearest = false,
 	tap_only = false,
 	timings = Timings("sphere"),
-	subtimings = Subtimings("none"),
+	subtimings = nil,
 	healths = Healths("simple", 20),
 	columns_order = nil,
 
@@ -19,7 +19,7 @@ local play = {
 	const = false,
 	rate_type = "linear",
 
-	timing_values = assert(TimingValuesFactory:get(Timings("sphere"), Subtimings("none"))),
+	timing_values = assert(TimingValuesFactory:get(Timings("sphere"))),
 }
 
 return play

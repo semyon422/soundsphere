@@ -27,7 +27,7 @@ function SoundsphereTimings:match(tvs)
 	if not _tvs:equals(tvs) then
 		return
 	end
-	return Timings("sphere"), Subtimings("none")
+	return Timings("sphere")
 end
 
 return SoundsphereTimings

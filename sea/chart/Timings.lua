@@ -21,7 +21,7 @@ Timings.names = {
 	"sphere",
 	"simple",
 	"osumania",
-	"stepmania",
+	"etternaj",
 	"quaver",
 	"bmsrank",
 }
@@ -46,12 +46,13 @@ function Timings:validate()
 	elseif n == "sphere" then
 		return v == 0
 	elseif n == "simple" then
-		return v == 0
+		v = v * 1000
+		return v >= 0 and v <= 1000 and v == math.floor(v)
 	elseif n == "osumania" then
 		v = v * 10
 		return v == math.floor(v)
-	elseif n == "stepmania" then
-		return v == 0
+	elseif n == "etternaj" then
+		return v >= 1 and v <= 9
 	elseif n == "quaver" then
 		return v == 0
 	elseif n == "bmsrank" then
@@ -72,16 +73,16 @@ function Timings.decode(v)
 		return Timings("arbitrary")
 	elseif v == 100 then
 		return Timings("sphere")
-	elseif v == 1000 then
-		return Timings("simple")
-	elseif v >= 1100 and v <= 1200 then
-		return Timings("osumania", (v - 1100) / 10) -- OverallDifficulty
-	elseif v == 1300 then
-		return Timings("stepmania")
-	elseif v == 1400 then
+	elseif v >= 1000 and v <= 2000 then
+		return Timings("simple", (v - 1000) / 1000)
+	elseif v >= 2100 and v <= 2200 then
+		return Timings("osumania", (v - 2100) / 10) -- OverallDifficulty
+	elseif v >= 2301 and v <= 2302 then
+		return Timings("etternaj", v - 2300)
+	elseif v == 2400 then
 		return Timings("quaver")
-	elseif v >= 1500 and v <= 1503 then
-		return Timings("bmsrank", v - 1500) -- #RANK
+	elseif v >= 2500 and v <= 2503 then
+		return Timings("bmsrank", v - 2500) -- #RANK
 	end
 
 	return Timings("unknown", v)
@@ -98,15 +99,15 @@ function Timings.encode(t)
 	elseif n == "sphere" then
 		return 100
 	elseif n == "simple" then
-		return 1000
+		return 1000 + v * 1000
 	elseif n == "osumania" then
-		return 1100 + v * 10
-	elseif n == "stepmania" then
-		return 1300
+		return 2100 + v * 10
+	elseif n == "etternaj" then
+		return 2300 + v
 	elseif n == "quaver" then
-		return 1400
+		return 2400
 	elseif n == "bmsrank" then
-		return 1500 + v
+		return 2500 + v
 	end
 
 	return v

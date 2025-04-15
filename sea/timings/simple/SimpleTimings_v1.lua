@@ -30,7 +30,7 @@ function SimpleTimings:match(tvs)
 	if not _tvs:equals(tvs) then
 		return
 	end
-	return Timings("simple"), Subtimings("window", w_ms / 1000)
+	return Timings("simple", w_ms / 1000)
 end
 
 return SimpleTimings

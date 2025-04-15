@@ -15,29 +15,32 @@ local TimingValuesFactory = class()
 local err_msg = "invalid timings-subtimings pair"
 
 ---@param t sea.Timings
----@param st sea.Subtimings
+---@param st sea.Subtimings?
 ---@return sea.TimingValues?
 ---@return string?
 function TimingValuesFactory:get(t, st)
 	local tn, tv = t.name, t.data
-	local stn, stv = st.name, st.data
 
 	if tn == "arbitrary" then
-		if stn == "none" then
+		if not st then
 			return nil, "undefined for arbitrary timings"
 		end
 		return nil, err_msg
 	elseif tn == "sphere" then
-		if stn == "none" then
+		if not st then
 			return SoundsphereTimings:getTimingValues()
 		end
 		return nil, err_msg
 	elseif tn == "simple" then
-		if stn == "window" then
-			return TimingValues():setSimple(stv)
+		if not st then
+			return TimingValues():setSimple(tv)
 		end
 		return nil, err_msg
 	elseif tn == "osumania" then
+		local stn, stv = "scorev", 1
+		if st then
+			stn, stv = st.name, st.data
+		end
 		if stn == "scorev" then
 			if stv == 1 then
 				return OsuManiaV1Timings:getTimingValues(tv)
@@ -46,23 +49,23 @@ function TimingValuesFactory:get(t, st)
 			end
 		end
 		return nil, err_msg
-	elseif tn == "stepmania" then
-		if stn == "etternaj" then
-			return EtternaTimings:getTimingValues(stv)
+	elseif tn == "etternaj" then
+		if not st then
+			return EtternaTimings:getTimingValues(tv)
 		end
 		return nil, err_msg
 	elseif tn == "quaver" then
-		if stn == "none" then
+		if not st then
 			return QuaverTimings:getTimingValues()
 		end
 		return nil, err_msg
 	elseif tn == "bmsrank" then
-		if stn == "lunatic" then
+		if not st then
 			return LunaticRaveTimings:getTimingValues()
 		end
 		return nil, err_msg
 	elseif tn == "unknown" then
-		if stn == "none" then
+		if not st then
 			return TimingValues():setSimple(0, 0)
 		end
 		return nil, err_msg

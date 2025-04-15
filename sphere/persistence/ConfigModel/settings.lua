@@ -188,20 +188,14 @@ local settings = {
 	timings = {
 		arbitrary = 0,
 		sphere = 0,
-		simple = 0,
+		simple = 0.160,
 		osumania = 10,
-		stepmania = 0,
+		etternaj = 4,
 		quaver = 0,
 		bmsrank = 3,
 	},
 	subtimings = {
-		arbitrary = {none = 0},
-		sphere = {none = 0},
-		simple = {window = 0.160},
 		osumania = {scorev = 1},
-		stepmania = {etternaj = 4},
-		quaver = {none = 0},
-		bmsrank = {none = 0},
 	},
 	replay_base = {
 		auto_timings = true,

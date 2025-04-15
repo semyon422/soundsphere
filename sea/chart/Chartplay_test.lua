@@ -33,8 +33,8 @@ local function new_valid_chartplay()
 		rating_pp = 0,
 		result = "pass",
 		tap_only = false,
-		timings = Timings("simple"),
-		subtimings = Subtimings("window", 0.160),
+		timings = Timings("simple", 0.160),
+		subtimings = nil,
 	}
 	return setmetatable(chartplay, Chartplay)
 end

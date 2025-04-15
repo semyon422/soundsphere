@@ -33,7 +33,7 @@ function test.all(t)
 
 	local replay = {
 		version = 1,
-		timing_values = TimingValuesFactory:get(Timings("sphere"), Subtimings("none")),
+		timing_values = TimingValuesFactory:get(Timings("sphere")),
 		events = ReplayEvents.encode(events),
 		created_at = 0,
 		--
@@ -46,7 +46,7 @@ function test.all(t)
 		nearest = true,
 		tap_only = false,
 		timings = Timings("sphere"),
-		subtimings = Subtimings("none"),
+		subtimings = nil,
 		healths = Healths("simple", 20),
 		columns_order = nil,
 		--

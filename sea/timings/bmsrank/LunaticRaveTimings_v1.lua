@@ -27,7 +27,7 @@ function LunaticRaveTimings:match(tvs)
 	if not _tvs:equals(tvs) then
 		return
 	end
-	return Timings("bmsrank", 3), Subtimings("lunatic")
+	return Timings("bmsrank", 3)
 end
 
 return LunaticRaveTimings

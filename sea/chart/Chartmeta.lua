@@ -15,8 +15,8 @@ local ChartFormat = require("sea.chart.ChartFormat")
 ---@field hash string
 ---@field index integer
 --- COMPUTED
----@field timings sea.Timings
----@field healths sea.Healths
+---@field timings sea.Timings?
+---@field healths sea.Healths?
 ---@field title string
 ---@field title_unicode string
 ---@field artist string
@@ -44,8 +44,8 @@ local text = types.description
 Chartmeta.struct = {
 	hash = types.md5hash,
 	index = types.index,
-	timings = chart_types.timings,
-	healths = chart_types.healths,
+	timings = valid.optional(chart_types.timings),
+	healths = valid.optional(chart_types.healths),
 	title = text,
 	title_unicode = valid.optional(text),
 	artist = text,

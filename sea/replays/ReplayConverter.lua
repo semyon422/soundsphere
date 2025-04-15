@@ -166,7 +166,7 @@ function ReplayConverter:convert(obj)
 	local timings, subtimings = TimingsDefiner:match(obj.timings)
 	if not timings or not subtimings then
 		timings = Timings("arbitrary")
-		subtimings = Subtimings("none")
+		subtimings = nil
 	end
 	replay.timings = timings
 	replay.subtimings = subtimings

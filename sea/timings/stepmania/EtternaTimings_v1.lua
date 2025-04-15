@@ -59,7 +59,7 @@ function EtternaTimings:match(tvs)
 		return
 	end
 
-	return Timings("stepmania"), Subtimings("etternaj", judge)
+	return Timings("etternaj", judge)
 end
 
 return EtternaTimings
