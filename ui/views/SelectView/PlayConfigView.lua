@@ -100,7 +100,7 @@ return ModalImView(function(self, quit)
 
 	if timings_name == "simple" then
 		timings_data = math.floor(imgui.slider1("timings_data", timings_data, "%0.3f", 0, 0.5, 0.001) * 1000 + 0.5) / 1000
-	elseif timings_name == "osumania" then
+	elseif timings_name == "osuod" then
 		timings_data = math.floor(imgui.slider1("timings_data", timings_data, "%0.1f", 0, 10, 0.1) * 10 + 0.5) / 10
 	elseif timings_name == "etternaj" then
 		timings_data = imgui.slider1("timings_data", timings_data, "%d", 1, 9, 1)
@@ -121,7 +121,7 @@ return ModalImView(function(self, quit)
 		local subtimings_data = replayBase.subtimings.data
 		imgui.text("Subtimings")
 
-		if timings_name == "osumania" then
+		if timings_name == "osuod" then
 			subtimings_data = imgui.combo("subtimings_data", subtimings_data, {1, 2}, function(v) return "score v" .. v end)
 		end
 

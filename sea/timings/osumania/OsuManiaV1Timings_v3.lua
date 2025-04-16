@@ -93,7 +93,7 @@ function OsuManiaV1Timings:match(tvs)
 		return
 	end
 
-	return Timings("osumania", od), Subtimings("scorev", 1)
+	return Timings("osuod", od), Subtimings("scorev", 1)
 end
 
 return OsuManiaV1Timings

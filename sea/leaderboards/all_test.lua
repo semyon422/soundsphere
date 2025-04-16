@@ -309,7 +309,7 @@ function test.free_timings_filter(t)
 	})
 
 	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
-	create_chartplay(ctx, {rating = 2, timings = Timings("osumania", 8), subtimings = Subtimings("scorev", 1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)
@@ -339,7 +339,7 @@ function test.free_timings_filter_specific(t)
 	})
 
 	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
-	create_chartplay(ctx, {rating = 2, timings = Timings("osumania", 8), subtimings = Subtimings("scorev", 1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)

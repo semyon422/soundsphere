@@ -36,7 +36,7 @@ function TimingValuesFactory:get(t, st)
 			return TimingValues():setSimple(tv)
 		end
 		return nil, err_msg
-	elseif tn == "osumania" then
+	elseif tn == "osuod" then
 		local stn, stv = "scorev", 1
 		if st then
 			stn, stv = st.name, st.data

@@ -5,8 +5,8 @@ local class = require("class")
 ---| "arbitrary"
 ---| "sphere"
 ---| "simple"
----| "osumania"
----| "stepmania"
+---| "osuod"
+---| "etternaj"
 ---| "quaver"
 ---| "bmsrank"
 
@@ -20,7 +20,7 @@ Timings.names = {
 	"arbitrary",
 	"sphere",
 	"simple",
-	"osumania",
+	"osuod",
 	"etternaj",
 	"quaver",
 	"bmsrank",
@@ -48,7 +48,7 @@ function Timings:validate()
 	elseif n == "simple" then
 		v = v * 1000
 		return v >= 0 and v <= 1000 and v == math.floor(v)
-	elseif n == "osumania" then
+	elseif n == "osuod" then
 		v = v * 10
 		return v == math.floor(v)
 	elseif n == "etternaj" then
@@ -76,7 +76,7 @@ function Timings.decode(v)
 	elseif v >= 1000 and v <= 2000 then
 		return Timings("simple", (v - 1000) / 1000)
 	elseif v >= 2100 and v <= 2200 then
-		return Timings("osumania", (v - 2100) / 10) -- OverallDifficulty
+		return Timings("osuod", (v - 2100) / 10) -- OverallDifficulty
 	elseif v >= 2301 and v <= 2302 then
 		return Timings("etternaj", v - 2300)
 	elseif v == 2400 then
@@ -100,7 +100,7 @@ function Timings.encode(t)
 		return 100
 	elseif n == "simple" then
 		return 1000 + v * 1000
-	elseif n == "osumania" then
+	elseif n == "osuod" then
 		return 2100 + v * 10
 	elseif n == "etternaj" then
 		return 2300 + v
