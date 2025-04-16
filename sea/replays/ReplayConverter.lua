@@ -1,4 +1,5 @@
 local class = require("class")
+local int_rates = require("libchart.int_rates")
 local ModifierModel = require("sphere.models.ModifierModel")
 local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
 local TimingsDefiner = require("sea.timings.TimingsDefiner")
@@ -180,7 +181,7 @@ function ReplayConverter:convert(obj)
 	replay.const = obj.const
 	replay.pause_count = 0
 	replay.created_at = obj.time
-	replay.rate_type = "linear" -- maybe detect it?
+	replay.rate_type = int_rates.is_q_rate(int_rates.round(obj.rate), 10) and "exp" or "linear"
 
 	return replay
 end
