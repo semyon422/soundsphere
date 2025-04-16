@@ -171,7 +171,6 @@ function ReplayConverter:convert(obj)
 	replay.timings = timings
 	replay.subtimings = subtimings
 	replay.timing_values = TimingValues():copyFrom(obj.timings)
-	replay.healths = Healths("simple", 20)
 
 	-- replay.healths is not defined on this stage
 	replay.columns_order = nil

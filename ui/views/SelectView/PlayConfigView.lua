@@ -136,7 +136,6 @@ return ModalImView(function(self, quit)
 		self.game.ui.gameView:setModal(require("ui.views.TimingsModalView"))
 	end
 
-	-- healths = Healths("simple", 20),
 	-- columns_order = nil,
 
 	scrollY = imgui.Container()

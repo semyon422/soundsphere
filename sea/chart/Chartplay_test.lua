@@ -16,7 +16,7 @@ local function new_valid_chartplay()
 		custom = false,
 		replay_hash = "00000000000000000000000000000000",
 		hash = "00000000000000000000000000000000",
-		healths = Healths("simple", 20),
+		healths = nil,
 		index = 1,
 		judges = {},
 		max_combo = 0,

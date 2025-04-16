@@ -101,7 +101,7 @@ local _replayfile_data_table = {
 	tap_only = false,
 	timings = Timings("sphere"),
 	subtimings = nil,
-	healths = Healths("simple", 20),
+	healths = nil,
 	columns_order = nil,
 	--
 	custom = false,
