@@ -29,6 +29,8 @@ WikiResource.routes = {
 local language_metadatas = {
 	require("sea.wiki.en_us.pages"),
 	require("sea.wiki.ru.pages"),
+	require("sea.wiki.jp_jp.pages"),
+	require("sea.wiki.zh_tw.pages")
 }
 
 ---@param views web.Views
