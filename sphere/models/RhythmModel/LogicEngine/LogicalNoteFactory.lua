@@ -4,7 +4,7 @@ local LongLogicalNote = require("sphere.models.RhythmModel.LogicEngine.LongLogic
 local LogicalNoteFactory = {}
 
 local notes = {
-	note = {ShortLogicalNote, true, true, true},
+	tap = {ShortLogicalNote, true, true, true},
 	hold = {LongLogicalNote, true, true, true},
 	laser = {LongLogicalNote, true, true, true},
 	drumroll = {LongLogicalNote, true, true, false},

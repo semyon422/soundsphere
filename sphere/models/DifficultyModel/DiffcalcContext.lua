@@ -15,7 +15,7 @@ function DiffcalcContext:new(chartdiff, chart, rate)
 	self.rate = rate
 end
 
-local note_types = {"note", "hold", "laser"}
+local note_types = {"tap", "hold", "laser"}
 
 ---@return table
 function DiffcalcContext:getSimplifiedNotes()

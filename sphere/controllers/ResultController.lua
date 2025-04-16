@@ -113,7 +113,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		local data = gif_result:create(
 			self.selectModel.chartview,
 			scoreEntry,
-			simplify_notechart(chart, {"note", "hold", "laser"}),
+			simplify_notechart(chart, {"tap", "hold", "laser"}),
 			chart.inputMode:getColumns()
 		)
 		love.filesystem.write("userdata/result.gif", data)

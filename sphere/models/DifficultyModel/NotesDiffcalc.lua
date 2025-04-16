@@ -37,7 +37,7 @@ function NotesDiffcalc:compute(ctx)
 
 	-- TODO: fix for other note types
 	chartdiff.note_types_count = {
-		note = short_notes_count,
+		tap = short_notes_count,
 		hold = long_notes_count,
 	}
 

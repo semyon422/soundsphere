@@ -247,7 +247,7 @@ end
 ---@param chart ncdk2.Chart
 function GameplayController:applyAutoKeysound(chart)
 	for _, note in chart.notes:iter() do
-		if note.type == "note" or note.type == "hold" then
+		if note.type == "tap" or note.type == "hold" then
 			local soundNote = chart.notes:get(note.visualPoint, "auto")
 			if not soundNote then
 				soundNote = Note(note.visualPoint, "auto", "sample")

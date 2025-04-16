@@ -203,7 +203,7 @@ function Automap:processReductor()
 		if n.long then
 			if n.startTime == n.endTime then
 				n.noteData:unlink()
-				n.noteData:setType("note")
+				n.noteData:setType("tap")
 			else
 				local p = layer:getPoint(n.endTime / 1000)
 				local vp = layer.visuals.main:newPoint(p)

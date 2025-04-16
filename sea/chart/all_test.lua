@@ -160,7 +160,7 @@ local _chartdiff_values = {
 	start_time = 0,
 	notes_count = 5,
 	judges_count = 5,
-	note_types_count = {hold = 0, note = 5},
+	note_types_count = {hold = 0, tap = 5},
 	density_data = {},
 	sv_data = {},
 	enps_diff = 0.0091578194443670893,

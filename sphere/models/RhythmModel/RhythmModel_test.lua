@@ -73,7 +73,7 @@ local function test(notes, events, states, graphicStates)
 
 			local note = Note(vp, 1)
 
-			note.type = "note"
+			note.type = "tap"
 			if isAuto then
 				note.type = "shade"
 			end

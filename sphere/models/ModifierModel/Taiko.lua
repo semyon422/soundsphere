@@ -39,7 +39,7 @@ function Taiko:apply(config, chart)
 		local inputType, inputIndex = InputMode:splitInput(_note:getColumn())
 		if inputType == "key" then
 			local note = _note.startNote
-			note.type = "note"
+			note.type = "tap"
 			note.column = "key" .. getKey(inputIndex)
 			local found_note = new_notes:get(note.visualPoint, note.column)
 			if not found_note then
