@@ -6,6 +6,7 @@ local Sph = require("sph.Sph")
 local ChartEncoder = require("osu.ChartEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
 local InputMode = require("ncdk.InputMode")
+local Path = require("Path")
 
 ---@class sphere.SelectController
 ---@operator call: sphere.SelectController
@@ -150,7 +151,18 @@ function SelectController:openDirectory()
 	if not location then
 		return
 	end
-	love.system.openURL(path_util.join(location.path, chartview.dir))
+
+	local dir_path = Path(location.path) .. Path(chartview.dir)
+
+	if not dir_path.absolute then
+		local source = love.filesystem.getSource()
+		if source:find("^.+%.love$") then
+			source = love.filesystem.getSourceBaseDirectory()
+		end
+		dir_path = Path(source) .. dir_path
+	end
+
+	love.system.openURL(tostring(dir_path))
 end
 
 function SelectController:openWebNotechart()
