@@ -1,0 +1,57 @@
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Wiki</p>
+		<p class="subtitle">The most important information you need to know, all in one place.</p>
+	</div>
+</section>
+<hr />
+<div class="columns">
+	<div class="column">
+		<div class="block">
+			<div class="field">
+				<label class="label">Language</label>
+				<div class="control">
+					<div class="select is-fullwidth">
+						<select onchange="changeWikiLanguage(this.value)">
+							<% for _, language in ipairs(language_metadatas) do %>
+								<% if language.code == selected_language_code then %>
+									<option selected value=""><%= language.name %></option>
+								<% else %>
+									<option value="<%= language.code %>"><%= language.name %></option>
+								<% end %>
+							<% end %>
+						</select>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="block">
+			<aside class="menu">
+				<% for _, category in ipairs(categories) do %>
+					<p class="menu-label"><%= category.name %></p>
+					<ul class="menu-list">
+						<% for _, page in ipairs(category.pages) do %>
+							<% if page.filename == selected_page then %>
+								<li><a class="is-active"><%= page.name %></a></li>
+							<% else %>
+								<li><a href="?language_code=<%= selected_language_code %>&page=<%= page.filename %>"><%= page.name %></a></li>
+							<% end %>
+						<% end %>
+					</ul>
+				<% end %>
+			</aside>
+		</div>
+	</div>
+	<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
+		<div class="content" id="content">
+		</div>
+	</div>
+</div>
+<script>
+function changeWikiLanguage(value) {
+	if (value !== "") {
+		window.location = `?language_code=${value}`
+	}
+}
+document.getElementById("content").innerHTML = marked.parse(`<%- view:render(markdown_file_path) %>`)
+</script>
