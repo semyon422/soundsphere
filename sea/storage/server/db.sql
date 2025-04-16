@@ -65,8 +65,12 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 
 CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`id` INTEGER PRIMARY KEY,
+	`created_at` INTEGER,
+	`osu_ranked_status` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+
 	`timings` INTEGER,
 	`healths` INTEGER,
 	`title` TEXT,
@@ -85,15 +89,10 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`preview_time` REAL,
 	`osu_beatmap_id` INTEGER,
 	`osu_beatmapset_id` INTEGER,
-	`osu_od` REAL,
-	`osu_hp` REAL,
-	`osu_ranked_status` INTEGER,
 	`tempo` REAL,
-	`played_at` INTEGER,
-	`added_at` INTEGER,
-	`created_at` INTEGER,
-	`used_columns` INTEGER,
-	`comment` TEXT,
+	`tempo_avg` REAL,
+	`tempo_max` REAL,
+	`tempo_min` REAL,
 	UNIQUE(`hash`, `index`)
 );
 
@@ -101,13 +100,15 @@ CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
+	`custom_user_id` INTEGER,
+	`created_at` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`modifiers` TEXT NOT NULL,
 	`rate` INTEGER NOT NULL,
 	`mode` INTEGER NOT NULL,
-	`custom_user_id` INTEGER,
-	`created_at` INTEGER,
+
 	`inputmode` TEXT,
 	`duration` REAL,
 	`start_time` REAL,
@@ -135,26 +136,32 @@ CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
-	`replay_hash` TEXT NOT NULL DEFAULT "",
+	`compute_state` INTEGER,
+	`submitted_at` INTEGER,
+	`computed_at` INTEGER,
+
+	`replay_hash` TEXT,
+	`pause_count` INTEGER,
+	`created_at` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+
 	`modifiers` TEXT NOT NULL,
-	`custom` INTEGER NOT NULL DEFAULT 0,
 	`rate` INTEGER NOT NULL,
-	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER,
-	`const` INTEGER,
+
 	`nearest` INTEGER,
 	`tap_only` INTEGER,
 	`timings` INTEGER,
 	`subtimings` INTEGER,
 	`healths` INTEGER,
 	`columns_order` BLOB,
-	`created_at` INTEGER,
-	`submitted_at` INTEGER,
-	`computed_at` INTEGER,
-	`compute_state` INTEGER,
-	`pause_count` INTEGER,
+
+	`custom` INTEGER,
+	`const` INTEGER,
+	`rate_type` INTEGER,
+
 	`result` INTEGER,
 	`judges` BLOB,
 	`accuracy` REAL,
