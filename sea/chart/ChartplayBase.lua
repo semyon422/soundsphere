@@ -47,4 +47,18 @@ function ChartplayBase:equalsChartplayBase(values)
 	return table_util.subequal(self, values, keys, table_util.equal)
 end
 
+---@param base sea.ChartplayBase
+function ChartplayBase:importChartplayBase(base)
+	for k in pairs(ChartplayBase.struct) do
+		self[k] = base[k] ---@diagnostic disable-line
+	end
+end
+
+---@param base sea.ChartplayBase
+function ChartplayBase:exportChartplayBase(base)
+	for k in pairs(ChartplayBase.struct) do
+		base[k] = self[k] ---@diagnostic disable-line
+	end
+end
+
 return ChartplayBase

@@ -30,8 +30,8 @@ function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = self.game.rhythmModel.scoreEntry
-	local loaded = scoreEntry and scoreEntry.replay_hash == item.replay_hash
+	local chartplay = self.game.computeContext.chartplay
+	local loaded = chartplay and chartplay.replay_hash == item.replay_hash
 
 	if just.button(item, just.is_over(w, h)) then
 		self.screenView:loadScore(i)

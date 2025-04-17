@@ -1,8 +1,7 @@
 local IChartplayComputer = require("sea.chart.IChartplayComputer")
-local Chartdiff = require("sea.chart.Chartdiff")
-local ChartplayComputed = require("sea.chart.ChartplayComputed")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
+local ComputeContext = require("sea.chart.ComputeContext")
 
 local FastplayController = require("sphere.controllers.FastplayController")
 
@@ -24,17 +23,8 @@ end
 ---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
-	local chart_chartmetas, err = ChartFactory:getCharts(chartfile_name, chartfile_data)
-	if not chart_chartmetas then
-		return nil, err
-	end
-
-	local t = chart_chartmetas[index]
-	if not t then
-		return nil, "chart not found"
-	end
-
-	local chart, chartmeta = t.chart, t.chartmeta
+	local computeContext = ComputeContext()
+	local chart, chartmeta = computeContext:fromFileData(chartfile_name, chartfile_data, index)
 
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
@@ -53,25 +43,11 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
-	fastplayController:play(chart, chartmeta, replay)
+	fastplayController:play(computeContext, replay)
 
-	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
-	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+	local c = rhythmModel:getChartplayComputed()
 
-	local c = ChartplayComputed()
-	c.result = "pass" -- TODO: use hp
-	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
-	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
-	c.max_combo = scoreSystem.base.maxCombo
-	c.perfect_count = judge.counters.perfect
-	c.miss_count = scoreSystem.base.missCount
-	c.rating = 0
-	c.accuracy_osu = 0
-	c.accuracy_etterna = 0
-	c.rating_pp = 0
-	c.rating_msd = 0
-
-	local chartdiff = rhythmModel.chartdiff
+	local chartdiff = assert(computeContext.chartdiff)
 	chartdiff.hash = replay.hash
 	chartdiff.index = replay.index
 	chartdiff.modifiers = replay.modifiers
@@ -80,7 +56,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 
 	return {
 		chartplay_computed = c,
-		chartdiff = rhythmModel.chartdiff,
+		chartdiff = chartdiff,
 		chartmeta = chartmeta,
 	}
 end

@@ -20,12 +20,12 @@ local Layout = require("ui.views.ResultView.Layout")
 ---@param self table
 ---@return boolean
 local function showLoadedScore(self)
-	local scoreEntry = self.game.rhythmModel.scoreEntry
+	local chartplay = self.game.computeContext.chartplay
 	local scoreItem = self.game.selectModel.scoreItem
-	if not scoreEntry or not scoreItem then
+	if not chartplay or not scoreItem then
 		return false
 	end
-	return scoreItem.id == scoreEntry.id
+	return scoreItem.id == chartplay.id
 end
 
 
@@ -446,8 +446,8 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = rhythmModel.scoreEntry
-	if not scoreEntry then
+	local chartplay = self.game.computeContext.chartplay
+	if not chartplay then
 		return
 	end
 
@@ -548,7 +548,7 @@ local function NotechartInfo(self)
 
 	local rating = scoreItem.rating
 
-	if scoreEntry.id == scoreItem.id then
+	if chartplay.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
 		rating = s * rhythmModel.chartdiff.enps_diff
 	end
@@ -739,7 +739,7 @@ local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEntry = self.game.rhythmModel.scoreEntry
+	local chartplay = self.game.computeContext.chartplay
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -754,7 +754,7 @@ local function BottomScreenMenu(self)
 	if imgui.TextOnlyButton("replay", "watch", 72 * 1.5, h) then
 		self:play("replay")
 	end
-	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
+	if scoreItem and chartplay and scoreItem.id == chartplay.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(self.game.selectModel.chartview, scoreItem.replay_hash)
 		end

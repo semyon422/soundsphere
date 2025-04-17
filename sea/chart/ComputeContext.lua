@@ -1,0 +1,146 @@
+local class = require("class")
+local valid = require("valid")
+local ChartFactory = require("notechart.ChartFactory")
+local DifficultyModel = require("sphere.models.DifficultyModel")
+local ModifierModel = require("sphere.models.ModifierModel")
+local Chartdiff = require("sea.chart.Chartdiff")
+local InputMode = require("ncdk.InputMode")
+local TempoRange = require("notechart.TempoRange")
+local Note = require("ncdk2.notes.Note")
+
+---@class sea.ComputeContext
+---@operator call: sea.ComputeContext
+---@field chart_chartmetas {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}[]?
+---@field chart ncdk2.Chart?
+---@field chartmeta sea.Chartmeta?
+---@field chartdiff sea.Chartdiff?
+---@field chartplay sea.Chartplay?
+local ComputeContext = class()
+
+function ComputeContext:new()
+	self.difficultyModel = DifficultyModel()
+end
+
+---@param name string
+---@param data string
+---@param index integer
+---@return ncdk2.Chart
+---@return sea.Chartmeta
+function ComputeContext:fromFileData(name, data, index)
+	self.chart_chartmetas = assert(ChartFactory:getCharts(name, data))
+	self.chart = self.chart_chartmetas[index].chart
+	self.chartmeta = self.chart_chartmetas[index].chartmeta
+	self:toAbsolute()
+	return self.chart, self.chartmeta
+end
+
+---@return ncdk2.Chart?
+---@return sea.Chartmeta?
+function ComputeContext:toAbsolute()
+	self.chart.layers.main:toAbsolute()
+end
+
+---@param replayBase sea.ReplayBase
+---@return sea.Chartdiff
+---@return table
+function ComputeContext:computeChartdiff(replayBase)
+	local chart = assert(self.chart)
+	local chartmeta = assert(self.chartmeta)
+
+	local state = {}
+	state.inputMode = InputMode(chart.inputMode)
+
+	ModifierModel:applyMeta(replayBase.modifiers, state)
+	ModifierModel:apply(replayBase.modifiers, chart)
+
+	local chartdiff = {
+		mode = "mania",
+		rate = replayBase.rate,
+		inputmode = tostring(chart.inputMode),
+		-- notes_preview = "",  -- do not generate preview
+	}
+	setmetatable(chartdiff, Chartdiff)
+	---@cast chartdiff sea.Chartdiff
+	self.difficultyModel:compute(chartdiff, chart, replayBase.rate)
+
+	chartdiff.modifiers = replayBase.modifiers
+	chartdiff.hash = chartmeta.hash
+	chartdiff.index = chartmeta.index
+
+	assert(valid.format(chartdiff:validate()))
+
+	self.chartdiff = chartdiff
+
+	return chartdiff, state
+end
+
+---@param chart ncdk2.Chart
+---@param tempo number
+local function applyTempo(chart, tempo)
+	for _, visual in ipairs(chart:getVisuals()) do
+		visual.primaryTempo = tempo
+		visual:compute()
+	end
+end
+
+function ComputeContext:swapVelocityType()
+	local chart = assert(self.chart)
+	for _, visual in ipairs(chart:getVisuals()) do
+		visual.tempoMultiplyTarget = "local"
+		for _, vp in ipairs(visual.points) do
+			local vel = vp._velocity
+			if vel then
+				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
+			end
+		end
+		visual:compute()
+	end
+end
+
+---@param tempoFactor string
+---@param primaryTempo number
+function ComputeContext:applyTempo(tempoFactor, primaryTempo)
+	local chart = assert(self.chart)
+	local chartmeta = assert(self.chartmeta)
+
+	if tempoFactor == "primary" then
+		applyTempo(chart, primaryTempo)
+		return
+	end
+
+	if tempoFactor == "average" and chartmeta.tempo_avg then
+		applyTempo(chart, chartmeta.tempo_avg)
+		return
+	end
+
+	local minTime = chartmeta.start_time
+	local maxTime = minTime + chartmeta.duration
+
+	local t = {}
+	t.average, t.minimum, t.maximum = TempoRange:find(chart, minTime, maxTime)
+
+	applyTempo(chart, t[tempoFactor])
+end
+
+function ComputeContext:applyAutoKeysound()
+	local chart = assert(self.chart)
+	for _, note in chart.notes:iter() do
+		if note.type == "tap" or note.type == "hold" then
+			local soundNote = chart.notes:get(note.visualPoint, "auto")
+			if not soundNote then
+				soundNote = Note(note.visualPoint, "auto", "sample")
+				chart.notes:insert(soundNote)
+				soundNote.sounds = {}
+			end
+
+			if note.sounds then
+				for _, t in ipairs(note.sounds) do
+					table.insert(soundNote.sounds, t)
+				end
+				note.sounds = {}
+			end
+		end
+	end
+end
+
+return ComputeContext

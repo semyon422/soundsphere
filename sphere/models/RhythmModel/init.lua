@@ -6,6 +6,7 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
+local ChartplayComputed = require("sea.chart.ChartplayComputed")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -119,6 +120,26 @@ function RhythmModel:hasResult()
 		base.hitCount > 0 and
 		accuracy > 0 and
 		accuracy < math.huge
+end
+
+function RhythmModel:getChartplayComputed()
+	local scoreSystem = self.scoreEngine.scoreSystem
+	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+
+	local c = ChartplayComputed()
+	c.result = "pass" -- TODO: use hp
+	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
+	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
+	c.max_combo = scoreSystem.base.maxCombo
+	c.perfect_count = judge.counters.perfect
+	c.miss_count = scoreSystem.base.missCount
+	c.rating = 0
+	c.accuracy_osu = 0
+	c.accuracy_etterna = 0
+	c.rating_pp = 0
+	c.rating_msd = 0
+
+	return c
 end
 
 ---@param replayBase sea.ReplayBase

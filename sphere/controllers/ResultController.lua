@@ -11,6 +11,7 @@ local ResultController = class()
 ---@param rhythmModel sphere.RhythmModel
 ---@param onlineModel sphere.OnlineModel
 ---@param configModel sphere.ConfigModel
+---@param computeContext sea.ComputeContext
 ---@param fastplayController sphere.FastplayController
 function ResultController:new(
 	selectModel,
@@ -18,6 +19,7 @@ function ResultController:new(
 	rhythmModel,
 	onlineModel,
 	configModel,
+	computeContext,
 	fastplayController
 )
 	self.selectModel = selectModel
@@ -25,6 +27,7 @@ function ResultController:new(
 	self.rhythmModel = rhythmModel
 	self.onlineModel = onlineModel
 	self.configModel = configModel
+	self.computeContext = computeContext
 	self.fastplayController = fastplayController
 end
 
@@ -48,31 +51,32 @@ end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
----@param scoreEntry table
+---@param chartplay sea.Chartplay
 ---@return string?
-function ResultController:getReplayDataAsync(scoreEntry)
+function ResultController:getReplayDataAsync(chartplay)
 	local replayModel = self.replayModel
 	local webApi = self.onlineModel.webApi
 
+	---@type string?
 	local content
-	if scoreEntry.file then
-		content = webApi.api.files[scoreEntry.file.id]:__get({download = true})
-	elseif scoreEntry.replay_hash then
-		content = readAsync(replayModel.path .. "/" .. scoreEntry.replay_hash)
+	if chartplay.file then
+		content = webApi.api.files[chartplay.file.id]:__get({download = true})
+	elseif chartplay.replay_hash then
+		content = readAsync(replayModel.path .. "/" .. chartplay.replay_hash)
 	end
 
 	return content
 end
 
 ---@param mode string
----@param scoreEntry table
+---@param chartplay sea.Chartplay
 ---@return boolean?
-function ResultController:replayNoteChartAsync(mode, scoreEntry)
-	if not scoreEntry or not self.selectModel:notechartExists() then
+function ResultController:replayNoteChartAsync(mode, chartplay)
+	if not chartplay or not self.selectModel:notechartExists() then
 		return
 	end
 
-	local content = self:getReplayDataAsync(scoreEntry)
+	local content = self:getReplayDataAsync(chartplay)
 	if not content then
 		return
 	end
@@ -92,7 +96,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	rhythmModel.scoreEntry = scoreEntry
+	self.computeContext.chartplay = chartplay
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
@@ -103,8 +107,12 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		return
 	end
 
-	local chart, chartmeta = self.selectModel:loadChartAbsolute()
-	self.fastplayController:play(chart, chartmeta, replay)
+	local chartview = self.selectModel.chartview
+
+	local data = assert(love.filesystem.read(chartview.location_path))
+	local chart, chartmeta = self.computeContext:fromFileData(chartview.chartfile_name, data, chartview.index)
+
+	self.fastplayController:play(self.computeContext, replay)
 
 	if self.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")
@@ -112,7 +120,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 		gif_result:setBackgroundData(love.filesystem.read(self.selectModel:getBackgroundPath()))
 		local data = gif_result:create(
 			self.selectModel.chartview,
-			scoreEntry,
+			chartplay,
 			simplify_notechart(chart, {"tap", "hold", "laser"}),
 			chart.inputMode:getColumns()
 		)

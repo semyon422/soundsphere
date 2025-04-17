@@ -1,6 +1,4 @@
 local class = require("class")
-local InputMode = require("ncdk.InputMode")
-local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.FastplayController
 ---@operator call: sphere.FastplayController
@@ -21,37 +19,15 @@ function FastplayController:new(
 	self.difficultyModel = difficultyModel
 end
 
----@param chart ncdk2.Chart
----@param modifiers sea.Modifier[]
----@return table
-function FastplayController:applyModifiers(chart, modifiers)
-	local state = {}
-	state.inputMode = InputMode(chart.inputMode)
-
-	ModifierModel:applyMeta(modifiers, state)
-	ModifierModel:apply(modifiers, chart)
-
-	return state
-end
-
----@param chart ncdk2.Chart
----@param chartmeta sea.Chartmeta
+---@param computeContext sea.ComputeContext
 ---@param replay sea.Replay
-function FastplayController:play(chart, chartmeta, replay)
+function FastplayController:play(computeContext, replay)
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
 
-	local chartdiff = {
-		rate = replay.rate,
-		inputmode = tostring(chart.inputMode),
-		notes_preview = "",  -- do not generate preview
-	}
-	if self.need_preview then
-		chartdiff.notes_preview = nil
-	end
-	self.difficultyModel:compute(chartdiff, chart, replay.rate)
-
-	local state = self:applyModifiers(chart, replay.modifiers)
+	local chart = assert(computeContext.chart)
+	local chartmeta = assert(computeContext.chartmeta)
+	local chartdiff, state = computeContext:computeChartdiff(replay)
 
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)

@@ -42,4 +42,18 @@ function ChartplayComputed:equalsComputed(values)
 	return table_util.subequal(self, values, computed_keys, table_util.equal)
 end
 
+---@param base sea.ChartplayComputed
+function ChartplayComputed:importChartplayComputed(base)
+	for k in pairs(ChartplayComputed.struct) do
+		self[k] = base[k] ---@diagnostic disable-line
+	end
+end
+
+---@param base sea.ChartplayComputed
+function ChartplayComputed:exportChartplayComputed(base)
+	for k in pairs(ChartplayComputed.struct) do
+		base[k] = self[k] ---@diagnostic disable-line
+	end
+end
+
 return ChartplayComputed

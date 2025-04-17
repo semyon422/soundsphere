@@ -35,6 +35,7 @@ local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 local PackageManager = require("sphere.pkg.PackageManager")
 local SeaClient = require("sphere.online.SeaClient")
 
+local ComputeContext = require("sea.chart.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
 
 ---@class sphere.GameController
@@ -66,6 +67,7 @@ function GameController:new()
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
+	self.computeContext = ComputeContext()
 	self.replayBase = ReplayBase()
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
@@ -138,6 +140,7 @@ function GameController:new()
 		self.cacheModel,
 		self.fileFinder,
 		self.replayBase,
+		self.computeContext,
 		self.pauseModel,
 		self.offsetModel,
 		self.previewModel,
@@ -155,6 +158,7 @@ function GameController:new()
 		self.rhythmModel,
 		self.onlineModel,
 		self.configModel,
+		self.computeContext,
 		self.fastplayController
 	)
 	self.multiplayerController = MultiplayerController(
