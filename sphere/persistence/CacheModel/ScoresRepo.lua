@@ -43,7 +43,7 @@ end
 ---@param chartview table
 ---@return table
 function ScoresRepo:getScores(chartview)
-	return self.models.scores_list:select({
+	return self.models.chartplays_list:select({
 		hash = assert(chartview.hash),
 		index = assert(chartview.index),
 	})
@@ -52,7 +52,7 @@ end
 ---@param chartview table
 ---@return table
 function ScoresRepo:getScoresExact(chartview)
-	return self.models.scores_list:select({
+	return self.models.chartplays_list:select({
 		hash = assert(chartview.hash),
 		index = assert(chartview.index),
 		modifiers = chartview.modifiers or {},
@@ -62,7 +62,7 @@ end
 
 ---@return table
 function ScoresRepo:getScoresWithMissingChartdiffs()
-	return self.models.scores_list:select({
+	return self.models.chartplays_list:select({
 		chartdiff_id__isnull = true,
 		chartmeta_id__isnotnull = true,
 	})

@@ -92,10 +92,11 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`tempo` REAL,
 	`tempo_avg` REAL,
 	`tempo_max` REAL,
-	`tempo_min` REAL,
-	UNIQUE(`hash`, `index`)
+	`tempo_min` REAL
 );
 
+CREATE INDEX IF NOT EXISTS chartmetas_hash_idx ON chartmetas (`hash`);
+CREATE UNIQUE INDEX IF NOT EXISTS chartmetas_hash_index_idx ON chartmetas (`hash`, `index`);
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
@@ -123,10 +124,10 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`msd_diff_data` TEXT,
 	`user_diff` REAL,
 	`user_diff_data` TEXT,
-	`notes_preview` BLOB,
-	UNIQUE(`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`)
+	`notes_preview` BLOB
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS chartdiffs_himrmc_idx ON chartdiffs (`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`);
 CREATE INDEX IF NOT EXISTS chartdiffs_inputmode_idx ON chartdiffs (`inputmode`);
 CREATE INDEX IF NOT EXISTS chartdiffs_enps_idx ON chartdiffs (`enps_diff`);
 CREATE INDEX IF NOT EXISTS chartdiffs_osu_idx ON chartdiffs (`osu_diff`);

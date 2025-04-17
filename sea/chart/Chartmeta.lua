@@ -29,6 +29,7 @@ local ChartmetaKey = require("sea.chart.ChartmetaKey")
 ---@field tags string
 ---@field format sea.ChartFormat
 ---@field audio_path string
+---@field audio_offset string
 ---@field background_path string
 ---@field preview_time number
 ---@field osu_beatmap_id integer
@@ -56,6 +57,7 @@ Chartmeta.struct = {
 	tags = valid.optional(text),
 	format = types.new_enum(ChartFormat),
 	audio_path = valid.optional(text),
+	audio_offset = valid.optional(types.number),
 	background_path = valid.optional(text),
 	preview_time = valid.optional(types.number),
 	osu_beatmap_id = valid.optional(types.integer),
@@ -67,7 +69,7 @@ Chartmeta.struct = {
 }
 table_util.copy(ChartmetaKey.struct, Chartmeta.struct)
 
-assert(#table_util.keys(Chartmeta.struct) == 24)
+assert(#table_util.keys(Chartmeta.struct) == 25)
 
 local validate_chartmeta = valid.struct(Chartmeta.struct)
 

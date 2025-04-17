@@ -15,7 +15,7 @@ function ChartviewsRepo:new(gdb)
 	self.set_id_to_global_index = {}
 	self.chartfile_id_to_global_index = {}
 	self.chartdiff_id_to_global_index = {}
-	self.score_id_to_global_index = {}
+	self.chartplay_id_to_global_index = {}
 	self.params = {}
 
 	self.models = gdb.models
@@ -29,7 +29,7 @@ ffi.cdef([[
 		int32_t chartfile_set_id;
 		int32_t chartmeta_id;
 		int32_t chartdiff_id;
-		int32_t score_id;
+		int32_t chartplay_id;
 		bool lamp;
 	} chartview_struct
 ]])
@@ -59,7 +59,7 @@ local _queryAsync = thread.async(function(params)
 		set_id_to_global_index = self.set_id_to_global_index,
 		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
 		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
-		score_id_to_global_index = self.score_id_to_global_index,
+		chartplay_id_to_global_index = self.chartplay_id_to_global_index,
 		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
 	}
 
@@ -81,7 +81,7 @@ function ChartviewsRepo:queryAsync(params)
 	self.set_id_to_global_index = t.set_id_to_global_index
 	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
 	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
-	self.score_id_to_global_index = t.score_id_to_global_index
+	self.chartplay_id_to_global_index = t.chartplay_id_to_global_index
 
 	local size = ffi.sizeof("chartview_struct")
 	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
@@ -96,7 +96,7 @@ function ChartviewsRepo:queryNoteChartSets()
 		"chartfile_set_id",
 		"chartmeta_id",
 		"chartdiff_id",
-		"score_id",
+		"chartplay_id",
 		params.difficulty .. " AS difficulty",
 	}
 
@@ -134,12 +134,12 @@ function ChartviewsRepo:queryNoteChartSets()
 	local noteChartSets = ffi.new("chartview_struct[?]", #objs)
 	local chartfile_id_to_global_index = {}
 	local chartdiff_id_to_global_index = {}
-	local score_id_to_global_index = {}
+	local chartplay_id_to_global_index = {}
 	local set_id_to_global_index = {}
 	self.chartviews = noteChartSets
 	self.chartfile_id_to_global_index = chartfile_id_to_global_index
 	self.chartdiff_id_to_global_index = chartdiff_id_to_global_index
-	self.score_id_to_global_index = score_id_to_global_index
+	self.chartplay_id_to_global_index = chartplay_id_to_global_index
 	self.set_id_to_global_index = set_id_to_global_index
 
 	local c = 0
@@ -149,12 +149,12 @@ function ChartviewsRepo:queryNoteChartSets()
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.score_id = row.score_id or 0
+		entry.chartplay_id = row.chartplay_id or 0
 		entry.lamp = row.lamp or 0
 		set_id_to_global_index[entry.chartfile_set_id] = i
 		chartfile_id_to_global_index[entry.chartfile_id] = i
 		chartdiff_id_to_global_index[entry.chartdiff_id] = i
-		score_id_to_global_index[entry.score_id] = i
+		chartplay_id_to_global_index[entry.chartplay_id] = i
 		c = c + 1
 	end
 
@@ -188,7 +188,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		"name",
 		"chartmeta_id",
 		"chartdiff_id",
-		"score_id",
+		"chartplay_id",
 	}
 
 	local model = self.models.chartviews
@@ -200,7 +200,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	elseif params.chartviews_table == "chartplayviews" then
 		model = self.models.chartplayviews
 		where.chartmeta_id = chartview.chartmeta_id
-		order = {"score_id"}
+		order = {"chartplay_id"}
 	end
 
 	local options = {
@@ -219,7 +219,7 @@ function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
 	local chartdiff_id = _chartview.chartdiff_id
-	local score_id = _chartview.score_id
+	local chartplay_id = _chartview.chartplay_id
 
 	local params = self.params
 	local model = self.models.chartviews
@@ -233,8 +233,8 @@ function ChartviewsRepo:getChartview(_chartview)
 
 	local obj = model:find({
 		chartfile_id = chartfile_id,
-		score_id = score_id,
-		score_id__isnull = not score_id,
+		chartplay_id = chartplay_id,
+		chartplay_id__isnull = not chartplay_id,
 	})
 	if obj then
 		return obj

@@ -137,9 +137,9 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 	self.items = scores
 end
 
----@param score_id number
+---@param chartplay_id number
 ---@return number
-function ScoreLibrary:getItemIndex(score_id)
+function ScoreLibrary:getItemIndex(chartplay_id)
 	local items = self.items
 
 	if not items then
@@ -148,7 +148,7 @@ function ScoreLibrary:getItemIndex(score_id)
 
 	for i = 1, #items do
 		local item = items[i]
-		if item.id == score_id then
+		if item.id == chartplay_id then
 			return i
 		end
 	end

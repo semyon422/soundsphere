@@ -8,7 +8,7 @@ local autoload = require("autoload")
 ---@operator call: sphere.GameDatabase
 local GameDatabase = class()
 
-local user_version = 4
+local user_version = 5
 
 ---@param migrations table?
 function GameDatabase:new(migrations)
@@ -24,10 +24,15 @@ end
 
 function GameDatabase:load()
 	self.db:open("userdata/data.db")
+
 	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
 	self.db:exec(sql)
+
 	self.db:exec("PRAGMA foreign_keys = ON;")
 	self:migrate()
+
+	sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
+	self.db:exec(sql)
 end
 
 function GameDatabase:unload()

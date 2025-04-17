@@ -46,7 +46,7 @@ end
 
 function ResultController:unload()
 	local config = self.configModel.configs.select
-	config.score_id = config.select_score_id
+	config.chartplay_id = config.select_chartplay_id
 end
 
 local readAsync = thread.async(function(...) return love.filesystem.read(...) end)

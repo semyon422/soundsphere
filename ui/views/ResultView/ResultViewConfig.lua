@@ -457,12 +457,12 @@ local function NotechartInfo(self)
 	local const = show and replayBase.const or scoreItem.const
 
 	local baseBpm = chartview.tempo
-	local baseLength = chartview.duration
+	local baseLength = chartview.duration or 0
 	local baseDifficulty = chartview.difficulty
 	local baseInputMode = chartview.inputmode
 
-	local bpm = scoreItem.tempo
-	local length = scoreItem.duration
+	local bpm = baseBpm * scoreItem.rate
+	local length = baseLength / scoreItem.rate
 	local difficulty = show and rhythmModel.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.chart.inputMode) or scoreItem.inputmode
 
@@ -684,7 +684,7 @@ local function NotechartInfo(self)
 
 	just.row(true)
 
-	local mean = show and normalscore.normalscore.mean or scoreItem.mean
+	local mean = show and normalscore.normalscore.mean or scoreItem.mean or 0
 	TextCellImView(w, 55, "right", "mean", ("%0.1f"):format(mean * 1000))
 
 	-- local earlylate = show and scoreEngine.scoreSystem.misc.earlylate or scoreItem.earlylate

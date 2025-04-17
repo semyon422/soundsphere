@@ -419,8 +419,8 @@ function GameplayController:saveScore()
 	chartplay.id = scoreEntry.id
 
 	local config = self.configModel.configs.select
-	config.select_score_id = config.score_id
-	config.score_id = scoreEntry.id
+	config.select_chartplay_id = config.chartplay_id
+	config.chartplay_id = scoreEntry.id
 end
 
 function GameplayController:skip()
