@@ -44,7 +44,7 @@ end
 function WikiResource:getPage(req, res, ctx)
 	local query = http_util.decode_query_string(ctx.parsed_uri.query)
 	local selected_language_code = query.language_code or "en_us"
-	local selected_page = query.page or "main_page"
+	local selected_page = query.page or "installation"
 
 	ctx.selected_language_code = selected_language_code
 	ctx.selected_page = selected_page

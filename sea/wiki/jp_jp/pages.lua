@@ -7,7 +7,6 @@ local t = {
 		{
 			name = "はじめに",
 			pages = {
-				{ name = "メインページ", filename = "main_page" },
 				{ name = "インストール", filename = "installation" },
 				{ name = "ヘルプセンター", filename = "help_center" }
 			}

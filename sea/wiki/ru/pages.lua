@@ -7,7 +7,6 @@ local t = {
 		{
 			name = "Знакомство",
 			pages = {
-				{ name = "Главная страница", filename = "main_page" },
 				{ name = "Установка", filename = "installation" },
 				{ name = "Помощь", filename = "help_center" }
 			}
