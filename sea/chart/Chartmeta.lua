@@ -11,6 +11,8 @@ local ChartFormat = require("sea.chart.ChartFormat")
 ---@field id integer
 ---@field created_at integer
 ---@field osu_ranked_status integer
+--- CLIENT-ONLY
+---@field offset number
 --- KEYS
 ---@field hash string
 ---@field index integer
