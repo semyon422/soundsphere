@@ -24,14 +24,14 @@ function ReplayBase:validate()
 end
 
 ---@param base sea.ReplayBase
-function ReplayBase:import(base)
+function ReplayBase:importReplayBase(base)
 	for k in pairs(ReplayBase.struct) do
 		self[k] = base[k] ---@diagnostic disable-line
 	end
 end
 
 ---@param base sea.ReplayBase
-function ReplayBase:export(base)
+function ReplayBase:exportReplayBase(base)
 	for k in pairs(ReplayBase.struct) do
 		base[k] = self[k] ---@diagnostic disable-line
 	end

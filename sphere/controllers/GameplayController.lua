@@ -343,11 +343,15 @@ function GameplayController:saveScore()
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
 	local replayBase = self.replayBase
+	local computeContext = self.computeContext
 	local config = self.configModel.configs.settings
 
-	local replayHash = self.replayModel:saveReplay(replayBase)
+	local chartmeta = assert(computeContext.chartmeta)
+	local created_at = os.time()
 
-	local chartdiff = self.chartdiff
+	local replayHash = self.replayModel:saveReplay(replayBase, chartmeta, created_at, scoreEngine.pausesCount)
+
+	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
 	chartdiff.notes_preview = nil  -- fixes erasing
@@ -355,8 +359,8 @@ function GameplayController:saveScore()
 	local judge = scoreSystem.soundsphere.judges["soundsphere"]
 
 	local score = {
-		hash = chartdiff.hash,
-		index = chartdiff.index,
+		hash = chartmeta.hash,
+		index = chartmeta.index,
 		modifiers = replayBase.modifiers,
 		rate = replayBase.rate,
 		rate_type = replayBase.rate_type,
@@ -364,7 +368,7 @@ function GameplayController:saveScore()
 		const = replayBase.const,
 		single = replayBase.mode == "taiko",
 
-		time = os.time(),
+		time = created_at,
 		accuracy = scoreSystem.normalscore.accuracyAdjusted,
 		max_combo = scoreSystem.base.maxCombo,
 		replay_hash = replayHash,
@@ -391,12 +395,12 @@ function GameplayController:saveScore()
 	chartplay:importChartplayBase(replayBase)
 	chartplay:importChartplayComputed(chartplay_computed)
 
-	chartplay.hash = chartdiff.hash
-	chartplay.index = chartdiff.index
+	chartplay.hash = chartmeta.hash
+	chartplay.index = chartmeta.index
 
 	chartplay.replay_hash = replayHash
 	chartplay.pause_count = scoreEngine.pausesCount
-	chartplay.created_at = os.time()
+	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
 

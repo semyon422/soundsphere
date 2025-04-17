@@ -1,11 +1,11 @@
-local class = require("class")
 local table_util = require("table_util")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 local ChartFormat = require("sea.chart.ChartFormat")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 
----@class sea.Chartmeta
+---@class sea.Chartmeta: sea.ChartmetaKey
 ---@operator call: sea.Chartmeta
 --- EXTERNAL
 ---@field id integer
@@ -13,9 +13,7 @@ local ChartFormat = require("sea.chart.ChartFormat")
 ---@field osu_ranked_status integer
 --- CLIENT-ONLY
 ---@field offset number
---- KEYS
----@field hash string
----@field index integer
+--- ChartmetaKey
 --- COMPUTED
 ---@field timings sea.Timings?
 ---@field healths sea.Healths?
@@ -39,13 +37,11 @@ local ChartFormat = require("sea.chart.ChartFormat")
 ---@field tempo_avg number
 ---@field tempo_max number
 ---@field tempo_min number
-local Chartmeta = class()
+local Chartmeta = ChartmetaKey + {}
 
 local text = types.description
 
 Chartmeta.struct = {
-	hash = types.md5hash,
-	index = types.index,
 	timings = valid.optional(chart_types.timings),
 	healths = valid.optional(chart_types.healths),
 	title = text,
@@ -69,6 +65,9 @@ Chartmeta.struct = {
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),
 }
+table_util.copy(ChartmetaKey.struct, Chartmeta.struct)
+
+assert(#table_util.keys(Chartmeta.struct) == 24)
 
 local validate_chartmeta = valid.struct(Chartmeta.struct)
 

@@ -95,18 +95,22 @@ function ReplayModel:update()
 end
 
 ---@param replayBase sea.ReplayBase
+---@param chartmetaKey sea.ChartmetaKey
+---@param created_at integer
+---@param pause_count integer
 ---@return string
-function ReplayModel:saveReplay(replayBase)
+function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count)
 	local replay = Replay()
 
-	replayBase:export(replay)
+	replay:importReplayBase(replayBase)
+	replay:importChartmetaKey(chartmetaKey)
 
 	replay.version = 1
 	replay.timing_values = replayBase.timing_values
 	replay.events = assert(ReplayEvents.encode(self.events))
-	replay.created_at = os.time()
+	replay.created_at = created_at
 
-	replay.pause_count = 0 -- ?????
+	replay.pause_count = pause_count
 
 	assert(valid.format(replay:validate()))
 

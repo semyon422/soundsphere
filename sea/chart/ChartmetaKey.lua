@@ -23,4 +23,18 @@ function ChartmetaKey:equalsChartmetaKey(key)
 		self.index == key.index
 end
 
+---@param chartmeta_key sea.ChartmetaKey
+function ChartmetaKey:importChartmetaKey(chartmeta_key)
+	for k in pairs(ChartmetaKey.struct) do
+		self[k] = chartmeta_key[k] ---@diagnostic disable-line
+	end
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+function ChartmetaKey:exportChartmetaKey(chartmeta_key)
+	for k in pairs(ChartmetaKey.struct) do
+		chartmeta_key[k] = self[k] ---@diagnostic disable-line
+	end
+end
+
 return ChartmetaKey

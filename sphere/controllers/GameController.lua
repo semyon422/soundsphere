@@ -196,7 +196,7 @@ function GameController:load()
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.replayBase:import(configModel.configs.play)
+	self.replayBase:importReplayBase(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.onlineModel:load()

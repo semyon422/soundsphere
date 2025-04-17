@@ -61,7 +61,7 @@ function SelectController:load()
 	local selectModel = self.selectModel
 
 	self.configModel:write()
-	self.replayBase:import(self.configModel.configs.play)
+	self.replayBase:importReplayBase(self.configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
@@ -93,7 +93,7 @@ function SelectController:beginUnload()
 end
 
 function SelectController:unload()
-	self.replayBase:export(self.configModel.configs.play)
+	self.replayBase:exportReplayBase(self.configModel.configs.play)
 	self.configModel:write()
 end
 
