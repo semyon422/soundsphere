@@ -50,13 +50,12 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
 	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
-	rhythmModel:setTimings(replay.timing_values)
+	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
 	fastplayController:play(chart, chartmeta, replay)
 
 	local scoreSystem = rhythmModel.scoreEngine.scoreSystem
-	local score = scoreSystem:getSlice()
 	local judge = scoreSystem.soundsphere.judges["soundsphere"]
 
 	local c = ChartplayComputed()

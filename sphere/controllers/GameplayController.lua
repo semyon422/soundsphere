@@ -95,6 +95,10 @@ function GameplayController:load()
 	local fileFinder = self.fileFinder
 	local replayBase = self.replayBase
 
+	if replayModel.mode == "replay" then
+		replayBase = rhythmModel.replayBase
+	end
+
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 	local judgement = configModel.configs.select.judgements
@@ -133,8 +137,6 @@ function GameplayController:load()
 
 	assert(valid.format(chartdiff:validate()))
 
-	-- cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
-
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 
@@ -157,10 +159,7 @@ function GameplayController:load()
 	self:actualizeReplayBase()
 
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setTimeRate(replayBase.rate)
-	rhythmModel:setConstantSpeed(replayBase.const)
-	rhythmModel:setTimings(replayBase.timing_values)
-	rhythmModel:setSingleHandler(replayBase.mode == "taiko")
+	rhythmModel:setReplayBase(replayBase)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 	rhythmModel:load()

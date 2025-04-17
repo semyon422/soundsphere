@@ -121,19 +121,19 @@ function RhythmModel:hasResult()
 		accuracy < math.huge
 end
 
----@param timings table?
-function RhythmModel:setTimings(timings)
-	self.logicEngine.timings = timings
+---@param replayBase sea.ReplayBase
+function RhythmModel:setReplayBase(replayBase)
+	self.replayBase = replayBase
+	self.logicEngine.timings = replayBase.timing_values
+	self.timeEngine:setBaseTimeRate(replayBase.rate)
+	self.graphicEngine.constant = replayBase.const
+	self.timeEngine.constant = replayBase.const
+	self.logicEngine.singleHandler = replayBase.mode == "taiko"
 end
 
 ---@param windUp table?
 function RhythmModel:setWindUp(windUp)
 	self.timeEngine.windUp = windUp
-end
-
----@param timeRate number
-function RhythmModel:setTimeRate(timeRate)
-	self.timeEngine:setBaseTimeRate(timeRate)
 end
 
 ---@param autoplay boolean
@@ -144,17 +144,6 @@ end
 ---@param promode boolean
 function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
-end
-
----@param singleHandler boolean
-function RhythmModel:setSingleHandler(singleHandler)
-	self.logicEngine.singleHandler = singleHandler
-end
-
----@param constant boolean
-function RhythmModel:setConstantSpeed(constant)
-	self.graphicEngine.constant = constant
-	self.timeEngine.constant = constant
 end
 
 ---@param adjustRate number

@@ -93,7 +93,7 @@ function ResultController:replayNoteChartAsync(mode, scoreEntry)
 	end
 
 	rhythmModel.scoreEntry = scoreEntry
-	rhythmModel:setTimings(replay.timing_values)
+	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
 	rhythmModel.inputManager:setMode("internal")

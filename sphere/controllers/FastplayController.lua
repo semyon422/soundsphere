@@ -53,7 +53,6 @@ function FastplayController:play(chart, chartmeta, replay)
 
 	local state = self:applyModifiers(chart, replay.modifiers)
 
-	rhythmModel:setTimeRate(replay.rate)
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
