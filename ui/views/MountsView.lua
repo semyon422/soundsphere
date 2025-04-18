@@ -192,6 +192,9 @@ function section_draw.database(self)
 	if imgui.button("compute incomplete cds pp", "compute incomplete, use preview when possible") then
 		cacheModel:computeIncompleteChartdiffs(true)
 	end
+	if imgui.button("compute chartplays", "compute chartplays") then
+		cacheModel:computeChartplays()
+	end
 
 	imgui.separator()
 	imgui.text("reset")

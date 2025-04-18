@@ -356,39 +356,8 @@ function GameplayController:saveScore()
 
 	chartdiff.notes_preview = nil  -- fixes erasing
 	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
-	local judge = scoreSystem.soundsphere.judges["soundsphere"]
-
-	local score = {
-		hash = chartmeta.hash,
-		index = chartmeta.index,
-		modifiers = replayBase.modifiers,
-		rate = replayBase.rate,
-		rate_type = replayBase.rate_type,
-
-		const = replayBase.const,
-		single = replayBase.mode == "taiko",
-
-		time = created_at,
-		accuracy = scoreSystem.normalscore.accuracyAdjusted,
-		max_combo = scoreSystem.base.maxCombo,
-		replay_hash = replayHash,
-		ratio = scoreSystem.misc.ratio,
-		perfect = judge.counters.perfect,
-		not_perfect = judge.counters["not perfect"],
-		miss = scoreSystem.base.missCount,
-		mean = scoreSystem.normalscore.normalscore.mean,
-		earlylate = scoreSystem.misc.earlylate,
-		pauses = scoreEngine.pausesCount,
-	}
-	local scoreEntry = self.cacheModel.scoresRepo:insertScore(score)
-
-	local base = scoreSystem.base
-	if base.hitCount / base.notesCount >= 0.5 then
-		-- self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
-	end
 
 	local chartplay = Chartplay()
-	self.computeContext.chartplay = chartplay
 
 	local chartplay_computed = rhythmModel:getChartplayComputed()
 
@@ -404,10 +373,20 @@ function GameplayController:saveScore()
 
 	assert(valid.format(chartplay:validate()))
 
+	local _chartplay = self.cacheModel.chartplaysRepo:createChartplay(chartplay)
+	self.computeContext.chartplay = _chartplay
+
 	coroutine.wrap(function()
 		if not self.seaClient.connected then
 			return
 		end
+
+		local base = scoreSystem.base
+		if base.hitCount / base.notesCount < 0.5 then
+			print("not submitted")
+			return
+		end
+
 		print("submit")
 		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, chartdiff_copy)
 		print("got", ok, err)
@@ -416,11 +395,9 @@ function GameplayController:saveScore()
 		end
 	end)()
 
-	chartplay.id = scoreEntry.id
-
 	local config = self.configModel.configs.select
 	config.select_chartplay_id = config.chartplay_id
-	config.chartplay_id = scoreEntry.id
+	config.chartplay_id = _chartplay.id
 end
 
 function GameplayController:skip()

@@ -10,7 +10,8 @@ local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
-local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
+local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
+local ChartplayComputer = require("sea.chart.ChartplayComputer")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local Sph = require("sph.Sph")
@@ -29,10 +30,11 @@ function CacheManager:new(gdb)
 
 	self.gdb = gdb
 	self.locationsRepo = LocationsRepo(gdb)
-	self.scoresRepo = ScoresRepo(gdb)
+	self.chartplaysRepo = ChartplaysRepo(gdb)
 	self.chartfilesRepo = ChartfilesRepo(gdb)
-	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, self.difficultyModel.registry.fields)
-	self.chartmetasRepo = ChartmetasRepo(self.gdb)
+	self.chartdiffsRepo = ChartdiffsRepo(gdb, self.difficultyModel.registry.fields)
+	self.chartmetasRepo = ChartmetasRepo(gdb)
+	self.chartplayComputer = ChartplayComputer()
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -201,10 +203,9 @@ end
 
 function CacheManager:computeChartdiffs()
 	local chartmetasRepo = self.chartmetasRepo
-	local scoresRepo = self.scoresRepo
-	local chartfilesRepo = self.chartfilesRepo
+	local chartplaysRepo = self.chartplaysRepo
 
-	local scores = scoresRepo:getScoresWithMissingChartdiffs()
+	local scores = chartplaysRepo:getChartplaysWithMissingChartdiffs()
 	local chartmetas = chartmetasRepo:getChartmetasWithMissingChartdiffs()
 
 	self.state = 2
@@ -317,6 +318,27 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 			break
 		end
 	end
+
+	self.state = 0
+	self:checkProgress()
+end
+
+function CacheManager:computeChartplays()
+	local chartplaysRepo = self.chartplaysRepo
+	local chartplayComputer = self.chartplayComputer
+
+	local chartplays = chartplaysRepo:getChartplaysNullComputeState()
+	print(#chartplays)
+
+	self.chartfiles_count = #chartplays
+	self.chartfiles_current = 0
+
+	for _, chartplay in ipairs(chartplays) do
+		-- chartplayComputer:compute()
+	end
+
+	self.state = 1
+	self:checkProgress()
 
 	self.state = 0
 	self:checkProgress()

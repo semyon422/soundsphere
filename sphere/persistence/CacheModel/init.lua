@@ -1,11 +1,14 @@
 local thread = require("thread")
 local class = require("class")
 local physfs = require("physfs")
+local path_util = require("path_util")
+local md5 = require("md5")
+local types = require("sea.shared.types")
 local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
 local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
-local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
+local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
@@ -31,7 +34,7 @@ function CacheModel:new(difficultyModel)
 	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, difficultyModel.registry.fields)
 	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
-	self.scoresRepo = ScoresRepo(self.gdb)
+	self.chartplaysRepo = ChartplaysRepo(self.gdb)
 	self.chartfilesRepo = ChartfilesRepo(self.gdb)
 	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartmetasRepo, self.chartdiffsRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, difficultyModel)
@@ -86,6 +89,12 @@ function CacheModel:computeIncompleteChartdiffs(prefer_preview)
 	})
 end
 
+function CacheModel:computeChartplays()
+	table.insert(self.tasks, {
+		type = "update_chartplays",
+	})
+end
+
 ---@param path string
 ---@param location_id number
 function CacheModel:startUpdateAsync(path, location_id)
@@ -127,6 +136,8 @@ local runTaskAsync = thread.async(function(task)
 		cacheManager:computeChartdiffs()
 	elseif task.type == "update_incomplete_chartdiffs" then
 		cacheManager:computeIncompleteChartdiffs(task.prefer_preview)
+	elseif task.type == "update_chartplays" then
+		cacheManager:computeChartplays()
 	end
 
 	gdb:unload()
@@ -159,5 +170,71 @@ function CacheModel:process()
 end
 
 CacheModel.process = thread.coro(CacheModel.process)
+
+---@param hash string
+---@return {name: string, data: string}?
+---@return string?
+function CacheModel:getChartfileData(hash)
+	if not types.md5hash(hash) then
+		return nil, "invalid hash"
+	end
+
+	local chartfile = self.chartfilesRepo:selectChartfileByHash(hash)
+	if not chartfile then
+		return nil, "chartfile not found"
+	end
+
+	local chartfile_set = self.chartfilesRepo:selectChartfileSetById(chartfile.set_id)
+	if not chartfile_set then
+		return nil, "chartfile_set not found"
+	end
+
+	local location = self.locationsRepo:selectLocationById(chartfile_set.location_id)
+	if not location then
+		return nil, "location not found"
+	end
+
+	local prefix = self.locationManager:getPrefix(location)
+	local path = path_util.join(prefix, chartfile_set.dir, chartfile_set.name, chartfile.name)
+
+	local data = love.filesystem.read(path)
+	if not data then
+		return nil, "file not found"
+	end
+
+	if md5.sumhexa(data) ~= hash then
+		return nil, "hash mismatch"
+	end
+
+	return {
+		name = chartfile.name,
+		data = data,
+	}
+end
+
+---@param replay_hash string
+---@return string?
+---@return string?
+function CacheModel:getReplayData(replay_hash)
+	if not types.md5hash(replay_hash) then
+		return nil, "invalid hash"
+	end
+
+	local chartplay = self.chartplaysRepo:getChartplayByReplayHash(replay_hash)
+	if not chartplay then
+		return nil, "chartplay not found"
+	end
+
+	local data = love.filesystem.read("userdata/replays/" .. replay_hash)
+	if not data then
+		return nil, "replay file not found"
+	end
+
+	if md5.sumhexa(data) ~= replay_hash then
+		return nil, "hash mismatch"
+	end
+
+	return data
+end
 
 return CacheModel
