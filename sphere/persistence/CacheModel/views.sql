@@ -82,10 +82,7 @@ chartmetas.`index` = chartplays.`index`
 GROUP BY
 chartfile_set_id,
 chartfile_id,
-chartmeta_id,
-chartdiff_id,
-chartplays.hash,
-chartplays.`index`
+chartmeta_id
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartviews_no_preview AS
@@ -141,10 +138,7 @@ chartmetas.`index` = chartplays.`index`
 GROUP BY
 chartfile_set_id,
 chartfile_id,
-chartmeta_id,
-chartdiff_id,
-chartplays.hash,
-chartplays.`index`
+chartmeta_id
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews AS
@@ -196,16 +190,13 @@ LEFT JOIN chartplays ON
 chartmetas.hash = chartplays.hash AND
 chartmetas.`index` = chartplays.`index` AND
 chartdiffs.modifiers = chartplays.modifiers AND
-chartdiffs.rate = chartplays.rate
+chartdiffs.rate = chartplays.rate AND
+chartdiffs.mode = chartplays.mode
 GROUP BY
 chartfile_set_id,
 chartfile_id,
 chartmeta_id,
-chartdiff_id,
-chartplays.hash,
-chartplays.`index`,
-chartplays.modifiers,
-chartplays.rate
+chartdiff_id
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartdiffviews_no_preview AS
@@ -257,16 +248,13 @@ LEFT JOIN chartplays ON
 chartmetas.hash = chartplays.hash AND
 chartmetas.`index` = chartplays.`index` AND
 chartdiffs.modifiers = chartplays.modifiers AND
-chartdiffs.rate = chartplays.rate
+chartdiffs.rate = chartplays.rate AND
+chartdiffs.mode = chartplays.mode
 GROUP BY
 chartfile_set_id,
 chartfile_id,
 chartmeta_id,
-chartdiff_id,
-chartplays.hash,
-chartplays.`index`,
-chartplays.modifiers,
-chartplays.rate
+chartdiff_id
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartplayviews AS
@@ -275,7 +263,7 @@ chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,
 chartdiffs.id AS chartdiff_id,
 chartfiles.set_id AS chartfile_set_id,
-MAX(chartplays.id) AS chartplay_id,
+chartplays.id AS chartplay_id,
 chartfile_sets.location_id,
 chartfile_sets.is_file AS set_is_file,
 chartfile_sets.dir AS set_dir,
@@ -319,7 +307,12 @@ chartmetas.hash = chartplays.hash AND
 chartmetas.`index` = chartplays.`index` AND
 chartdiffs.modifiers = chartplays.modifiers AND
 chartdiffs.rate = chartplays.rate
-GROUP BY chartfile_set_id, chartfile_id, chartmeta_id, chartdiff_id, chartplay_id
+GROUP BY
+chartfile_set_id,
+chartfile_id,
+chartmeta_id,
+chartdiff_id,
+chartplay_id
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartplayviews_no_preview AS
@@ -328,7 +321,7 @@ chartmetas.id AS chartmeta_id,
 chartfiles.id AS chartfile_id,
 chartdiffs.id AS chartdiff_id,
 chartfiles.set_id AS chartfile_set_id,
-MAX(chartplays.id) AS chartplay_id,
+chartplays.id AS chartplay_id,
 chartfile_sets.location_id,
 chartfile_sets.is_file AS set_is_file,
 chartfile_sets.dir AS set_dir,

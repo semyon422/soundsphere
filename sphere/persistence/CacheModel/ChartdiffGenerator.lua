@@ -17,20 +17,13 @@ function ChartdiffGenerator:compute(chart, rate)
 	local chartdiff = {
 		rate = rate,
 		inputmode = tostring(chart.inputMode),
+		modifiers = {},
+		mode = "mania",
 	}
 
 	self.difficultyModel:compute(chartdiff, chart, rate)
 
 	return chartdiff
-end
-
----@param chartdiff table
----@param chartmeta table
-function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
-	local rate = chartdiff.rate
-
-	chartdiff.tempo = (chartmeta.tempo or 0) * rate
-	chartdiff.duration = (chartmeta.duration or 0) / rate
 end
 
 ---@param chart ncdk2.Chart

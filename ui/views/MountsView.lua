@@ -267,6 +267,10 @@ function section_draw.database(self)
 		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
 	end
+
+	if imgui.button("vacuum", "vacuum") then
+		cacheModel.gdb.db:exec("VACUUM;")
+	end
 end
 
 return modal

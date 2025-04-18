@@ -18,7 +18,7 @@ end
 ---@param content string
 ---@param not_reuse boolean?
 ---@return string?
----@return table|string?
+---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}[]|string?
 function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 	local hash = md5.sumhexa(content)
 

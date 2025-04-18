@@ -124,7 +124,6 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 	end
 
 	for i, score in ipairs(scores) do
-		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 		self:fillScoreRating(score)
 	end
 	table.sort(scores, function(a, b)
@@ -183,7 +182,6 @@ function ScoreLibrary:transformOnlineScore(score, chartview)
 	}
 	for k, v in pairs(s) do
 		score[k] = v
-		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 	end
 	return score
 end

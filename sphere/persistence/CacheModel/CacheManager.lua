@@ -86,25 +86,26 @@ function CacheManager:checkProgress()
 	end
 end
 
+---@param chartfile table
+---@param location_prefix string
 function CacheManager:processChartfile(chartfile, location_prefix)
 	print(chartfile.path)
 
 	local full_path = path_util.join(location_prefix, chartfile.path)
 	local content = assert(love.filesystem.read(full_path))
 
-	local ok, notecharts = self.chartmetaGenerator:generate(chartfile, content, false)
+	local ok, chart_chartmetas = self.chartmetaGenerator:generate(chartfile, content, false)
 
 	if not ok then
-		print(notecharts)
 		return
 	end
 
-	if not notecharts then
+	if not chart_chartmetas then
 		return
 	end
 
-	for j, noteChart in ipairs(notecharts) do
-		local ok, err = self.chartdiffGenerator:create(noteChart, chartfile.hash, j)
+	for j, t in ipairs(chart_chartmetas) do
+		local ok, err = self.chartdiffGenerator:create(t.chart, chartfile.hash, j)
 		if not ok then
 			print(err)
 		end

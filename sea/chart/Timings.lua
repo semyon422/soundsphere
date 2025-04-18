@@ -56,7 +56,7 @@ function Timings:validate()
 	elseif n == "quaver" then
 		return v == 0
 	elseif n == "bmsrank" then
-		return v >= 0 and v <= 3 and v == math.floor(v)
+		return v >= 0 and v <= 4 and v == math.floor(v)
 	elseif n == "unknown" then
 		return v == math.floor(v)
 	end
@@ -81,7 +81,7 @@ function Timings.decode(v)
 		return Timings("etternaj", v - 2300)
 	elseif v == 2400 then
 		return Timings("quaver")
-	elseif v >= 2500 and v <= 2503 then
+	elseif v >= 2500 and v <= 2504 then
 		return Timings("bmsrank", v - 2500) -- #RANK
 	end
 

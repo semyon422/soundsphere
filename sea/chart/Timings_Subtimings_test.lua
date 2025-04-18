@@ -30,7 +30,7 @@ function test.timings(t)
 	t:eq(t:has_error(Timings, "osuod", 8.15), "invalid")
 	t:eq(t:has_error(Timings, "etternaj", 0), "invalid")
 	t:eq(t:has_error(Timings, "quaver", 1), "invalid")
-	t:eq(t:has_error(Timings, "bmsrank", 4), "invalid")
+	t:eq(t:has_error(Timings, "bmsrank", 5), "invalid")
 end
 
 ---@param t testing.T
