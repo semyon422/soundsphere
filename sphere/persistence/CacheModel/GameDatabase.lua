@@ -23,16 +23,27 @@ function GameDatabase:new(migrations)
 end
 
 function GameDatabase:load()
-	self.db:open("userdata/data.db")
+	local db = self.db
+	local orm = self.orm
 
-	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
-	self.db:exec(sql)
+	db:open("userdata/data.db")
+	db:exec("PRAGMA foreign_keys = ON;")
 
-	self.db:exec("PRAGMA foreign_keys = ON;")
-	self:migrate()
+	local ver = orm:user_version()
 
-	sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
-	self.db:exec(sql)
+	if ver == 0 then
+		local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
+		db:exec(sql)
+		orm:user_version(user_version)
+		ver = user_version
+	elseif ver == user_version - 1 then
+		self:migrate()
+	elseif ver ~= user_version then
+		error("outdated database")
+	end
+
+	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
+	db:exec(sql)
 end
 
 function GameDatabase:unload()

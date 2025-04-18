@@ -11,7 +11,6 @@ local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
-local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -26,9 +25,6 @@ function CacheModel:new(difficultyModel)
 		local data = love.filesystem.read(("sphere/persistence/CacheModel/migrate%s.sql"):format(k))
 		return data
 	end})
-	migrations[1] = function()
-		self.oldScoresMigrator:migrate()
-	end
 
 	self.gdb = GameDatabase(migrations)
 	self.chartviewsRepo = ChartviewsRepo(self.gdb)
@@ -46,8 +42,6 @@ function CacheModel:new(difficultyModel)
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"
 	)
-
-	self.oldScoresMigrator = OldScoresMigrator(self.gdb)
 end
 
 function CacheModel:load()
