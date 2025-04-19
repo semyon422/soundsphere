@@ -134,13 +134,10 @@ local _chartplay_values = {
 	rate_type = _replayfile_data_table.rate_type,
 	--
 	accuracy = 0.020270363958551557,
-	accuracy_etterna = 0,
-	accuracy_osu = 0,
 	replay_hash = md5.sumhexa(_replayfile_data),
 	judges = {2, 0},
 	max_combo = 2,
 	miss_count = 3,
-	perfect_count = 2,
 	rating = 0,
 	rating_msd = 0,
 	rating_pp = 0,

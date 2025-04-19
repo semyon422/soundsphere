@@ -167,11 +167,8 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`judges` BLOB,
 	`accuracy` REAL,
 	`max_combo` INTEGER,
-	`perfect_count` INTEGER,
 	`miss_count` INTEGER,
 	`rating` REAL,
-	`accuracy_osu` REAL,
-	`accuracy_etterna` REAL,
 	`rating_pp` REAL,
 	`rating_msd` REAL
 );

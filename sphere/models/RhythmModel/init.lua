@@ -131,11 +131,8 @@ function RhythmModel:getChartplayComputed()
 	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
 	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
 	c.max_combo = scoreSystem.base.maxCombo
-	c.perfect_count = judge.counters.perfect
 	c.miss_count = scoreSystem.base.missCount
 	c.rating = 0
-	c.accuracy_osu = 0
-	c.accuracy_etterna = 0
 	c.rating_pp = 0
 	c.rating_msd = 0
 

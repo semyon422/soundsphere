@@ -11,11 +11,8 @@ local types = require("sea.shared.types")
 ---@field judges integer[] computed always using chart's timings/judges
 ---@field accuracy number normalscore
 ---@field max_combo integer strictly timing-based
----@field perfect_count integer - [-0.016, 0.016] window hits
 ---@field miss_count integer strictly timing-based
 ---@field rating number enps normalscore 32
----@field accuracy_osu number
----@field accuracy_etterna number
 ---@field rating_pp number
 ---@field rating_msd number
 local ChartplayComputed = class()
@@ -25,11 +22,8 @@ ChartplayComputed.struct = {
 	judges = valid.array(types.count, 10),
 	accuracy = types.number,
 	max_combo = types.count,
-	perfect_count = types.count,
 	miss_count = types.count,
 	rating = types.number,
-	accuracy_osu = types.number,
-	accuracy_etterna = types.number,
 	rating_pp = types.number,
 	rating_msd = types.number,
 }

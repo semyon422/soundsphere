@@ -9,8 +9,6 @@ local test = {}
 local function new_valid_chartplay()
 	local chartplay = {
 		accuracy = 0.02,
-		accuracy_etterna = 0,
-		accuracy_osu = 0,
 		const = false,
 		created_at = os.time(),
 		custom = false,
@@ -25,7 +23,6 @@ local function new_valid_chartplay()
 		modifiers = {},
 		nearest = false,
 		pause_count = 1,
-		perfect_count = 10,
 		rate = 1,
 		rate_type = "exp",
 		rating = 0,
