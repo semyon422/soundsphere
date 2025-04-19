@@ -1,4 +1,5 @@
 local ChartFactory = require("notechart.ChartFactory")
+local ChartFormat = require("sea.chart.ChartFormat")
 
 local function newInputModeScoreFilter(name, inputMode)
 	return {
@@ -33,14 +34,14 @@ local filters = {
 			{name = "10K", conds = {chartdiff_inputmode__startswith = "10key"}},
 		},
 		(function()
-			local filter = {name = "format (used parser)"}
-			for i, format in ipairs({"osu", "qua", "sm", "ksh", "bms", "mid", "ojn", "sph"}) do
+			local filter = {name = "format"}
+			for i, format in ipairs(ChartFormat:list()) do
 				filter[i] = {name = format, conds = {format = format}}
 			end
 			return filter
 		end)(),
 		(function()
-			local filter = {name = "extension (file name)"}
+			local filter = {name = "extension"}
 			for i, ext in ipairs(ChartFactory.extensions) do
 				filter[i] = {name = ext, conds = {chartfile_name__endswith = "." .. ext}}
 			end
