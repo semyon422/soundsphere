@@ -47,7 +47,7 @@ end
 ---@param config table
 ---@param chart ncdk2.Chart
 function Automap:apply(config, chart)
-	self.old = config.old
+	self.old = config.version == -1
 	self.targetMode = config.value
 
 	self.chart = chart

@@ -16,7 +16,7 @@ end
 
 ---@return sea.Chartplay[]
 function ChartplaysRepo:getChartplaysNullComputeState()
-	return self.models.chartplays:select({
+	return self.models.chartplays_computable:select({
 		compute_state__isnull = true,
 	})
 end

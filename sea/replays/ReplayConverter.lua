@@ -69,12 +69,22 @@ end
 ---@param replay table
 ---@return boolean
 function ReplayConverter:convertModifier(c, replay)
+	c.version = c.version or 0
+
 	if c.value == nil then
 		for k, v in pairs(c) do
 			if k ~= "name" and k ~= "version" and k ~= "id" then
 				c.value = v
+				c[k] = nil
 			end
 		end
+	end
+
+-- 	{{id=11,keys=10,old=true,value=10,version=0}}
+-- validate replay: modifiers.1.keys is not nil, modifiers.1.old is not nil
+
+	if c.value == true then
+		c.value = nil
 	end
 
 	if c.name then
@@ -91,7 +101,7 @@ function ReplayConverter:convertModifier(c, replay)
 
 		if not replay.timings then
 			if c.name == "Automap" then
-				c.old = true
+				c.version = -1
 			elseif c.name == "MultiOverPlay" then
 				c.value = c.value + 1
 			elseif c.name == "MultiplePlay" then
@@ -104,6 +114,12 @@ function ReplayConverter:convertModifier(c, replay)
 			return false
 		end
 		c.name = nil
+
+		for k in pairs(c) do
+			if k ~= "value" and k ~= "version" and k ~= "id" then
+				c[k] = nil
+			end
+		end
 
 		return true
 	end
@@ -161,7 +177,7 @@ function ReplayConverter:convert(obj)
 	replay.rate = obj.rate
 	replay.mode = obj.single and "taiko" or "mania"
 
-	replay.nearest = obj.timings.nearest
+	replay.nearest = not not obj.timings.nearest
 	replay.tap_only = false
 
 	local timings, subtimings = TimingsDefiner:match(obj.timings)
@@ -180,7 +196,7 @@ function ReplayConverter:convert(obj)
 	replay.custom = false
 	replay.const = obj.const
 	replay.pause_count = 0
-	replay.created_at = obj.time
+	replay.created_at = obj.time or 0
 	replay.rate_type = int_rates.is_q_rate(int_rates.round(obj.rate), 10) and "exp" or "linear"
 
 	return replay

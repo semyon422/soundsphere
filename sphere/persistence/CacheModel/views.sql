@@ -410,3 +410,11 @@ LEFT JOIN chartmetas ON
 chartplays.hash = chartmetas.hash AND
 chartplays.`index` = chartmetas.`index`
 ;
+
+CREATE TEMP VIEW IF NOT EXISTS chartplays_computable AS
+SELECT
+chartplays.*
+FROM chartplays
+INNER JOIN chartfiles ON
+chartplays.hash = chartfiles.hash
+;

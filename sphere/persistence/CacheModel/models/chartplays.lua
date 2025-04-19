@@ -12,8 +12,6 @@ local json = require("web.json")
 ---@type rdb.ModelOptions
 local chartplays = {}
 
-chartplays.table_name = "chartplays"
-
 chartplays.metatable = Chartplay
 
 chartplays.types = {
