@@ -197,7 +197,7 @@ function GameplayController:setReplayBaseTimings(timings)
 end
 
 function GameplayController:actualizeReplayBaseTimings()
-	local chartmeta = self.computeContext.chartmeta
+	local chartmeta = assert(self.computeContext.chartmeta)
 	local settings = self.configModel.configs.settings
 
 	local timings = chartmeta.timings
@@ -349,7 +349,13 @@ function GameplayController:saveScore()
 	local chartmeta = assert(computeContext.chartmeta)
 	local created_at = os.time()
 
-	local replayHash = self.replayModel:saveReplay(replayBase, chartmeta, created_at, scoreEngine.pausesCount)
+	local replayHash = self.replayModel:saveReplay(
+		replayBase,
+		chartmeta,
+		created_at,
+		scoreEngine.pausesCount,
+		config.replay_base.auto_timings
+	)
 
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = table_util.deepcopy(chartdiff)

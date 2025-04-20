@@ -98,12 +98,19 @@ end
 ---@param chartmetaKey sea.ChartmetaKey
 ---@param created_at integer
 ---@param pause_count integer
+---@param auto_timings boolean
 ---@return string
-function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count)
+function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
 	local replay = Replay()
 
 	replay:importReplayBase(replayBase)
 	replay:importChartmetaKey(chartmetaKey)
+
+	if auto_timings then
+		replay.timings = nil
+	end
+
+	replay.healths = nil
 
 	replay.version = 1
 	replay.timing_values = replayBase.timing_values
