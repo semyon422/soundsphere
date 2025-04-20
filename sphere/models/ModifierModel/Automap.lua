@@ -221,12 +221,12 @@ function Automap:processReductor()
 		local snote = chart.notes:get(vp, "auto")
 		if not snote then
 			snote = Note(vp, "auto", "sample")
-			snote.sounds = {}
+			snote.data.sounds = {}
 			chart.notes:insert(snote)
 		end
-		if note.sounds then
-			for _, s in ipairs(note.sounds) do
-				table.insert(snote.sounds, s)
+		if note.data.sounds then
+			for _, s in ipairs(note.data.sounds) do
+				table.insert(snote.data.sounds, s)
 			end
 		end
 	end

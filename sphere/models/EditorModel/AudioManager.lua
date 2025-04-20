@@ -203,8 +203,8 @@ end
 function AudioManager:loadResources(chart, audioSettings)
 	for _, note in chart.notes:iter() do
 		local offset = note:getTime()
-		if note.column ~= "audio" and note.sounds then
-			for _, s in ipairs(note.sounds) do
+		if note.column ~= "audio" and note.data.sounds then
+			for _, s in ipairs(note.data.sounds) do
 				local soundData = self.resourceModel:getResource(s[1])
 				if soundData then
 					local mode = audioSettings.mode.secondary

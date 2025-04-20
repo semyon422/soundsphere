@@ -130,14 +130,14 @@ function ComputeContext:applyAutoKeysound()
 			if not soundNote then
 				soundNote = Note(note.visualPoint, "auto", "sample")
 				chart.notes:insert(soundNote)
-				soundNote.sounds = {}
+				soundNote.data.sounds = {}
 			end
 
-			if note.sounds then
-				for _, t in ipairs(note.sounds) do
-					table.insert(soundNote.sounds, t)
+			if note.data.sounds then
+				for _, t in ipairs(note.data.sounds) do
+					table.insert(soundNote.data.sounds, t)
 				end
-				note.sounds = {}
+				note.data.sounds = {}
 			end
 		end
 	end

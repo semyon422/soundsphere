@@ -212,7 +212,7 @@ function EditorController:sliceKeysounds()
 			---@cast p chartedit.Point
 
 			print(p, file_name)
-			note.sounds = {{path_util.join(chartview.name, file_name), 1}}
+			note.data.sounds = {{path_util.join(chartview.name, file_name), 1}}
 
 			local path = path_util.join(dir, file_name)
 			love.filesystem.write(path, wave:encode())
@@ -242,7 +242,7 @@ local function getPatternNotes(notes, sounds_map)
 			local p = note.visualPoint.point
 			---@cast p chartedit.Point
 
-			local sound = note.sounds and note.sounds[1] and note.sounds[1][1]
+			local sound = note.data.sounds and note.data.sounds[1] and note.data.sounds[1][1]
 
 			local time = p:getGlobalTime():tonumber()
 			pattern_notes[time] = pattern_notes[time] or {}

@@ -48,12 +48,12 @@ end
 ---@param note ncdk2.Note
 ---@param isBackground boolean?
 function AudioEngine:playNote(note, isBackground)
-	if not self.loaded or not note or not note.sounds then
+	if not self.loaded or not note or not note.data.sounds then
 		return
 	end
 
 	local is_stream = note.column == "audio"
-	self:playAudio(note.sounds, isBackground, is_stream, note:getTime())
+	self:playAudio(note.data.sounds, isBackground, is_stream, note:getTime())
 end
 
 ---@param sounds table
