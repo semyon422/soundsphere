@@ -15,7 +15,7 @@ chartplays.metatable = Chartplay
 
 chartplays.types = {
 	nearest = "boolean",
-	passed = "boolean",
+	pass = "boolean",
 	mode = Gamemode,
 	custom = "boolean",
 	columns_order = json,
