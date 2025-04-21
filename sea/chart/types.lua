@@ -86,6 +86,9 @@ assert(not is_columns_order({1, 3}))
 ---@return true?
 ---@return string?
 local function subtimings_pair(chartplay)
+	if not chartplay.timings then
+		return true
+	end
 	local ok, err = TimingValuesFactory:get(chartplay.timings, chartplay.subtimings)
 	if not ok then
 		return nil, err

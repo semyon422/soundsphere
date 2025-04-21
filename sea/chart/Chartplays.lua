@@ -212,6 +212,10 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 	end
 
 	local timings = chartplay.timings or computed_chartmeta.timings
+	if not timings then
+		return nil, "missing timings"
+	end
+
 	local subtimings = chartplay.subtimings
 
 	local timing_values = TimingValuesFactory:get(timings, subtimings)

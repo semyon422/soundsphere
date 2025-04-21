@@ -349,7 +349,7 @@ function GameplayController:saveScore()
 	local chartmeta = assert(computeContext.chartmeta)
 	local created_at = os.time()
 
-	local replayHash = self.replayModel:saveReplay(
+	local replay, replay_hash = self.replayModel:saveReplay(
 		replayBase,
 		chartmeta,
 		created_at,
@@ -367,13 +367,13 @@ function GameplayController:saveScore()
 
 	local chartplay_computed = rhythmModel:getChartplayComputed()
 
-	chartplay:importChartplayBase(replayBase)
+	chartplay:importChartplayBase(replay)
 	chartplay:importChartplayComputed(chartplay_computed)
 
 	chartplay.hash = chartmeta.hash
 	chartplay.index = chartmeta.index
 
-	chartplay.replay_hash = replayHash
+	chartplay.replay_hash = replay_hash
 	chartplay.pause_count = scoreEngine.pausesCount
 	chartplay.created_at = created_at
 

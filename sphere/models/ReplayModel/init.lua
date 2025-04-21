@@ -99,7 +99,7 @@ end
 ---@param created_at integer
 ---@param pause_count integer
 ---@param auto_timings boolean
----@return string
+---@return sea.Replay
 function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
 	local replay = Replay()
 
@@ -126,7 +126,7 @@ function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_coun
 
 	assert(love.filesystem.write(self.path .. "/" .. replay_hash, data))
 
-	return replay_hash
+	return replay, replay_hash
 end
 
 ---@param chartmeta sea.Chartmeta
