@@ -39,7 +39,7 @@ assert(#table_util.keys(Chartplay.struct) == 26)
 local validate_chartplay = valid.compose(valid.struct(Chartplay.struct), chart_types.subtimings_pair)
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function Chartplay:validate()
 	return validate_chartplay(self)
 end
@@ -47,9 +47,10 @@ end
 local keys = table_util.keys(Chartplay.struct)
 
 ---@param values sea.Chartplay
----@return boolean
+---@return boolean?
+---@return string?
 function Chartplay:equalsChartplay(values)
-	return table_util.subequal(self, values, keys, table_util.equal)
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
 end
 
 return Chartplay

@@ -76,13 +76,14 @@ local validate_chartmeta = valid.struct(Chartmeta.struct)
 local computed_keys = table_util.keys(Chartmeta.struct)
 
 ---@param values sea.Chartmeta
----@return boolean
+---@return boolean?
+---@return string?
 function Chartmeta:equalsComputed(values)
-	return table_util.subequal(self, values, computed_keys, table_util.equal)
+	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
 end
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function Chartmeta:validate()
 	return validate_chartmeta(self)
 end

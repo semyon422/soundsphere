@@ -18,7 +18,7 @@ assert(#table_util.keys(ReplayBase.struct) == 13)
 local validate_replay_base = valid.struct(ReplayBase.struct)
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function ReplayBase:validate()
 	return validate_replay_base(self)
 end

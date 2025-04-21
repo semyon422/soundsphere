@@ -69,7 +69,7 @@ local validate_timing_values = valid.struct({
 })
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function TimingValues:validate()
 	return validate_timing_values(self)
 end

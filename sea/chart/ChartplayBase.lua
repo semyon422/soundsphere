@@ -42,9 +42,10 @@ assert(#table_util.keys(ChartplayBase.struct) == 12)
 local keys = table_util.keys(ChartplayBase.struct)
 
 ---@param values sea.ChartplayBase
----@return boolean
+---@return boolean?
+---@return string?
 function ChartplayBase:equalsChartplayBase(values)
-	return table_util.subequal(self, values, keys, table_util.equal)
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
 end
 
 ---@param base sea.ChartplayBase

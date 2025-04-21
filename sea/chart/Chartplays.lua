@@ -166,10 +166,14 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		return nil, "require replay: " .. err
 	end
 
-	if not replay:equalsChartplayBase(chartplay) then
-		return nil, "chartplay base of replay differs"
-	elseif not replay:equalsChartmetaKey(chartplay) then
-		return nil, "chartmeta key of replay differs"
+	local eq, err = replay:equalsChartplayBase(chartplay)
+	if not eq then
+		return nil, "chartplay base of replay differs: " .. err
+	end
+
+	local eq, err = replay:equalsChartmetaKey(chartplay)
+	if not eq then
+		return nil, "chartmeta key of replay differs: " .. err
 	end
 
 	---@type sea.Chartdiff
@@ -200,14 +204,16 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		computed_chartdiff = ret.chartdiff
 		computed_chartmeta = ret.chartmeta
 
-		if not chartplay:equalsComputed(ret.chartplay_computed) then
+		local eq, err = chartplay:equalsComputed(ret.chartplay_computed)
+		if not eq then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
-			return nil, "computed chartplay differs"
+			return nil, "computed chartplay differs: " .. err
 		end
 
-		if not chartdiff_values:equalsComputed(computed_chartdiff) then
-			return nil, "computed values differs"
+		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff)
+		if not eq then
+			return nil, "computed values differs: " .. err
 		end
 	end
 

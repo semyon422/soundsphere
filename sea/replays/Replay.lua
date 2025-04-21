@@ -26,7 +26,7 @@ assert(#table_util.keys(Replay.struct) == 19)
 local validate_replay = valid.struct(Replay.struct)
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function Replay:validate()
 	return validate_replay(self)
 end

@@ -57,9 +57,10 @@ local computed_keys = table_util.keys(Chartdiff.struct)
 assert(#table_util.keys(Chartdiff.struct) == 15)
 
 ---@param values sea.Chartdiff
----@return boolean
+---@return boolean?
+---@return string?
 function Chartdiff:equalsComputed(values)
-	return table_util.subequal(self, values, computed_keys, table_util.equal)
+	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
 end
 
 table_util.copy(Chartkey.struct, Chartdiff.struct)
@@ -69,7 +70,7 @@ assert(#table_util.keys(Chartdiff.struct) == 20)
 local validate_chartdiff = valid.struct(Chartdiff.struct)
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function Chartdiff:validate()
 	return validate_chartdiff(self)
 end

@@ -32,9 +32,10 @@ ChartplayComputed.struct = {
 local computed_keys = table_util.keys(ChartplayComputed.struct)
 
 ---@param values sea.ChartplayComputed
----@return boolean
+---@return boolean?
+---@return string?
 function ChartplayComputed:equalsComputed(values)
-	return table_util.subequal(self, values, computed_keys, table_util.equal)
+	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
 end
 
 ---@param base sea.ChartplayComputed
