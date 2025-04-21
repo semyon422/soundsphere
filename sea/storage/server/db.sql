@@ -163,11 +163,12 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`const` INTEGER,
 	`rate_type` INTEGER,
 
-	`result` INTEGER,
 	`judges` BLOB,
 	`accuracy` REAL,
 	`max_combo` INTEGER,
 	`miss_count` INTEGER,
+	`not_perfect_count` INTEGER,
+	`pass` INTEGER,
 	`rating` REAL,
 	`rating_pp` REAL,
 	`rating_msd` REAL
@@ -185,7 +186,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`scores_comb` INTEGER,
 	`scores_comb_count` INTEGER,
 	`nearest` INTEGER,
-	`result` INTEGER,
+	`pass` INTEGER,
+	`judges` INTEGER,
 	`allow_custom` INTEGER,
 	`allow_const` INTEGER,
 	`allow_pause` INTEGER,

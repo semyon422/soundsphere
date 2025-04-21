@@ -1,28 +1,29 @@
 local class = require("class")
 local valid = require("valid")
 local table_util = require("table_util")
-local Result = require("sea.chart.Result")
 local types = require("sea.shared.types")
 
 ---@class sea.ChartplayComputed
 ---@operator call: sea.ChartplayComputed
 --- COMPUTED
----@field result sea.Result
 ---@field judges integer[] computed always using chart's timings/judges
 ---@field accuracy number normalscore
 ---@field max_combo integer strictly timing-based
 ---@field miss_count integer strictly timing-based
+---@field not_perfect_count integer sum of all judges except first
+---@field pass boolean
 ---@field rating number enps normalscore 32
 ---@field rating_pp number
 ---@field rating_msd number
 local ChartplayComputed = class()
 
 ChartplayComputed.struct = {
-	result = types.new_enum(Result),
 	judges = valid.array(types.count, 10),
 	accuracy = types.number,
 	max_combo = types.count,
 	miss_count = types.count,
+	not_perfect_count = types.count,
+	pass = types.boolean,
 	rating = types.number,
 	rating_pp = types.number,
 	rating_msd = types.number,

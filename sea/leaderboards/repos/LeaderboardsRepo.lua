@@ -1,5 +1,4 @@
-local relations = require("rdb.relations")
-local Result = require("sea.chart.Result")
+local JudgesResult = require("sea.chart.JudgesResult")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 
@@ -66,7 +65,6 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	local conds = {
 		user_id = assert(user_id),
 		nearest = nearest_cond[lb.nearest],
-		result__in = Result:condition(lb.result),
 		mode = lb.mode,
 	}
 	if not lb.allow_custom then
@@ -97,6 +95,15 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		else
 			conds.healths_ = "chartmeta_healths"
 		end
+	end
+	if lb.pass then
+		conds.pass = true
+	end
+	if lb.judges == "fc" then
+		conds.miss_count = 0
+	elseif lb.judges == "pfc" then
+		conds.miss_count = 0
+		conds.not_perfect_count = 0
 	end
 
 	local rate = lb.rate

@@ -216,11 +216,12 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`const` INTEGER,
 	`rate_type` INTEGER,
 
-	`result` INTEGER,
 	`judges` BLOB,
 	`accuracy` REAL,
 	`max_combo` INTEGER,
 	`miss_count` INTEGER,
+	`not_perfect_count` INTEGER,
+	`pass` INTEGER,
 	`rating` REAL,
 	`rating_pp` REAL,
 	`rating_msd` REAL
@@ -243,6 +244,7 @@ INSERT INTO chartplays (
 `rate_type`,
 `accuracy`,
 `max_combo`,
+`not_perfect_count`,
 `miss_count`
 )
 SELECT
@@ -259,6 +261,7 @@ SELECT
 `rate_type`,
 `accuracy`,
 `max_combo`,
+`not_perfect`,
 `miss`
 FROM scores;
 

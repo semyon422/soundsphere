@@ -127,11 +127,12 @@ function RhythmModel:getChartplayComputed()
 	local judge = scoreSystem.soundsphere.judges["soundsphere"]
 
 	local c = ChartplayComputed()
-	c.result = "pass" -- TODO: use hp
+	c.pass = true -- TODO: use hp
 	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
 	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
 	c.max_combo = scoreSystem.base.maxCombo
 	c.miss_count = scoreSystem.base.missCount
+	c.not_perfect_count = judge.counters["not perfect"]
 	c.rating = 0
 	c.rating_pp = 0
 	c.rating_msd = 0

@@ -141,7 +141,8 @@ local _chartplay_values = {
 	rating = 0,
 	rating_msd = 0,
 	rating_pp = 0,
-	result = "pass",
+	not_perfect_count = 0,
+	pass = true,
 }
 setmetatable(_chartplay_values, Chartplay)
 ---@cast _chartplay_values sea.Chartplay

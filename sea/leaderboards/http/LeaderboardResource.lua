@@ -98,7 +98,8 @@ function LeaderboardResource:updateLeaderboard(req, res, ctx)
 	lb.scores_comb_count = tonumber(body_params.scores_comb_count) or 0
 
 	lb.nearest = body_params.nearest
-	lb.result = body_params.result
+	lb.pass = body_params.pass == "on"
+	lb.judges = body_params.judges
 	lb.allow_custom = body_params.allow_custom == "on"
 	lb.allow_const = body_params.allow_const == "on"
 	lb.allow_pause = body_params.allow_pause == "on"

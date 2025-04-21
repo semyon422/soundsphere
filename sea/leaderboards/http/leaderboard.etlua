@@ -38,7 +38,8 @@
 <table class="table">
 	<tr>
 		<th>Nearest</td>
-		<th>Required result</td>
+		<th>Pass required</td>
+		<th>Judges result required</td>
 		<th>Game mode</td>
 		<th>Rate</td>
 		<th>Timings</td>
@@ -48,7 +49,8 @@
 	</tr>
 	<tr>
 		<td><%= leaderboard.nearest %></td>
-		<td><%= leaderboard.result %></td>
+		<td><%= leaderboard.pass %></td>
+		<td><%= leaderboard.judges %></td>
 		<td><%= leaderboard.mode %></td>
 		<td>
 			<% if leaderboard.rate == "any" then %>

@@ -5,9 +5,6 @@ local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local TimingValues = require("sea.chart.TimingValues")
 local InputMode = require("ncdk.InputMode")
-local RateType = require("sea.chart.RateType")
-local Gamemode = require("sea.chart.Gamemode")
-local Result = require("sea.chart.Result")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 local chart_types = {}

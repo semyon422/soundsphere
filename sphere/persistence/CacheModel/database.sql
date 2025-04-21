@@ -132,11 +132,12 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`const` INTEGER,
 	`rate_type` INTEGER,
 
-	`result` INTEGER,
 	`judges` BLOB,
 	`accuracy` REAL,
 	`max_combo` INTEGER,
 	`miss_count` INTEGER,
+	`not_perfect_count` INTEGER,
+	`pass` INTEGER,
 	`rating` REAL,
 	`rating_pp` REAL,
 	`rating_msd` REAL

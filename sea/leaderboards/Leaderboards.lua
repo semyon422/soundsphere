@@ -92,7 +92,8 @@ local function safe_copy_lb(src, dst)
 	dst.scores_comb = src.scores_comb
 	dst.scores_comb_count = src.scores_comb_count
 	dst.nearest = src.nearest
-	dst.result = src.result
+	dst.pass = src.pass
+	dst.judges = src.judges
 	dst.allow_custom = not not src.allow_custom
 	dst.allow_const = not not src.allow_const
 	dst.allow_pause = not not src.allow_pause

@@ -2,7 +2,7 @@
 <% local ScoreComb = require("sea.leaderboards.ScoreComb") %>
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
 <% local TernaryState = require("sea.chart.TernaryState") %>
-<% local Result = require("sea.chart.Result") %>
+<% local JudgesResult = require("sea.chart.JudgesResult") %>
 <% local Gamemode = require("sea.chart.Gamemode") %>
 
 <div class="field">
@@ -70,12 +70,21 @@
 </div>
 
 <div class="field">
-	<label class="label">Result</label>
+	<div class="control">
+		<label class="checkbox">
+			<input type="checkbox" name="pass" <%= leaderboard.pass and "checked" or "" %>>
+			Pass required
+		</label>
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Judges result</label>
 	<div class="control">
 		<div class="select">
-			<select name="result">
-				<% for _, v in ipairs(Result:list()) do %>
-					<option <%= leaderboard.result == v and "selected" or "" %>><%= v %></option>
+			<select name="judges">
+				<% for _, v in ipairs(JudgesResult:list()) do %>
+					<option <%= leaderboard.judges == v and "selected" or "" %>><%= v %></option>
 				<% end %>
 			</select>
 		</div>

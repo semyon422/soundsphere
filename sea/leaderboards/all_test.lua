@@ -63,9 +63,14 @@ local function create_chartplay(ctx, values)
 	chartplay.rate = values.rate or 1
 	chartplay.mode = values.mode or "mania"
 	chartplay.rating = values.rating or 0
-	chartplay.result = values.result or "fail"
+	chartplay.not_perfect_count = values.not_perfect_count or 0
 	chartplay.timings = values.timings or Timings("simple", 0.1)
 	chartplay.subtimings = values.subtimings
+	if values.pass ~= nil then
+		chartplay.pass = values.pass
+	else
+		chartplay.pass = false
+	end
 	return ctx.db.models.chartplays:create(chartplay)
 end
 
@@ -165,26 +170,59 @@ function test.nearest_filter_multiple(t)
 end
 
 ---@param t testing.T
-function test.result_filter(t)
+function test.pass_filter(t)
 	local ctx = create_test_ctx()
 
 	local _chartplays = {
-		create_chartplay(ctx, {rating = 1, result = "pfc"}),
-		create_chartplay(ctx, {rating = 2, result = "fc"}),
-		create_chartplay(ctx, {rating = 3, result = "pass"}),
-		create_chartplay(ctx, {rating = 4, result = "fail"}),
+		create_chartplay(ctx, {rating = 1, pass = true}),
+		create_chartplay(ctx, {rating = 2, pass = false}),
 	}
 
-	t:eq(#_chartplays, 4)
+	t:eq(#_chartplays, 2)
 
 	for _, c in ipairs(_chartplays) do
-		ctx.leaderboard.result = c.result
+		ctx.leaderboard.pass = c.pass
 		lb_update_select(ctx)
 
 		local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 		if t:eq(#chartplays, 1) then
 			t:eq(chartplays[1].rating, c.rating)
 		end
+	end
+end
+
+---@param t testing.T
+function test.judges_result_filter(t)
+	local ctx = create_test_ctx()
+
+	local _chartplays = {
+		create_chartplay(ctx, {rating = 1, miss_count = 0, not_perfect_count = 0}),
+		create_chartplay(ctx, {rating = 2, miss_count = 0, not_perfect_count = 1}),
+		create_chartplay(ctx, {rating = 3, miss_count = 1, not_perfect_count = 1}),
+	}
+
+	ctx.leaderboard.judges = "pfc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+
+	ctx.leaderboard.judges = "fc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.judges = "any"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 3)
 	end
 end
 

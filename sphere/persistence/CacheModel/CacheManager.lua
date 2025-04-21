@@ -116,12 +116,19 @@ function CacheManager:processChartfile(chartfile, location_prefix)
 	if not chart_chartmetas then
 		return
 	end
+	---@cast chart_chartmetas -string
 
 	for j, t in ipairs(chart_chartmetas) do
+		local ok, err = xpcall(t.chart.layers.main.toAbsolute, debug.traceback, t.chart.layers.main)
+		if not ok then
+			print("toAbsolute", err)
+			goto continue
+		end
 		local ok, err = self.chartdiffGenerator:create(t.chart, chartfile.hash, j)
 		if not ok then
 			print(err)
 		end
+		::continue::
 	end
 end
 
@@ -231,10 +238,16 @@ function CacheManager:computeChartdiffs()
 			print(err)
 		else
 			local chart = charts[chartmeta.index]
-			local chartdiff = self.chartdiffGenerator:compute(chart, 1)
-			chartdiff.hash = chartmeta.hash
-			chartdiff.index = chartmeta.index
-			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+
+			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
+			if ok then
+				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
+				chartdiff.hash = chartmeta.hash
+				chartdiff.index = chartmeta.index
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+			else
+				print("toAbsolute", err)
+			end
 		end
 
 		self.chartfiles_current = self.chartfiles_current + 1
@@ -251,15 +264,19 @@ function CacheManager:computeChartdiffs()
 			print(err)
 		else
 			local chart = charts[score.index]
-			chart.layers.main:toAbsolute()
-			ModifierModel:apply(score.modifiers, chart)
+			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
+			if ok then
+				ModifierModel:apply(score.modifiers, chart)
 
-			local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
-			chartdiff.modifiers = score.modifiers
-			chartdiff.hash = score.hash
-			chartdiff.index = score.index
+				local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
+				chartdiff.modifiers = score.modifiers
+				chartdiff.hash = score.hash
+				chartdiff.index = score.index
 
-			self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+			else
+				print("toAbsolute", err)
+			end
 		end
 
 		self.chartfiles_current = self.chartfiles_current + 1
@@ -311,6 +328,7 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 				local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
 				if not ok then
 					chart = nil
+					print("toAbsolute", err)
 				else
 					ModifierModel:apply(chartdiff.modifiers, chart)
 				end
