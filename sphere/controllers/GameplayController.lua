@@ -344,6 +344,7 @@ end
 
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
+	local pauseCounter = rhythmModel.pauseCounter
 	local scoreEngine = rhythmModel.scoreEngine
 	local scoreSystem = scoreEngine.scoreSystem
 	local replayBase = self.replayBase
@@ -357,7 +358,7 @@ function GameplayController:saveScore()
 		replayBase,
 		chartmeta,
 		created_at,
-		scoreEngine.pausesCount,
+		pauseCounter.count,
 		config.replay_base.auto_timings
 	)
 
@@ -378,7 +379,7 @@ function GameplayController:saveScore()
 	chartplay.index = chartmeta.index
 
 	chartplay.replay_hash = replay_hash
-	chartplay.pause_count = scoreEngine.pausesCount
+	chartplay.pause_count = pauseCounter.count
 	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
@@ -421,7 +422,6 @@ function GameplayController:skip()
 	timeEngine.currentTime = math.huge
 	self.replayModel:update()
 	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
 end
 
 function GameplayController:skipIntro()

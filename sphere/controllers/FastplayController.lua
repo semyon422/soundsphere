@@ -53,7 +53,6 @@ function FastplayController:play(computeContext, replay)
 	rhythmModel.timeEngine.currentTime = math.huge
 	replayModel:update()
 	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
 
 	rhythmModel:unloadAllEngines()
 end

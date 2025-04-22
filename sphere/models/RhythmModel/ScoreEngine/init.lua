@@ -22,9 +22,6 @@ function ScoreEngine:load()
 	scoreSystem.scoreEngine = self
 	scoreSystem:load()
 
-	self.pausesCount = 0
-	self.paused = false
-
 	local judge = scoreSystem.judgements[self.judgement] or scoreSystem.judgements.soundsphere
 
 	local scoring = scoreSystem[judge.scoreSystemName]
@@ -42,22 +39,6 @@ end
 function ScoreEngine:setPlayTime(start_time, duration)
 	self.minTime = start_time
 	self.maxTime = start_time + duration
-end
-
-function ScoreEngine:update()
-	local timeEngine = self.timeEngine
-	local timer = timeEngine.timer
-	local currentTime = timeEngine.currentTime
-
-	if currentTime < self.minTime or currentTime > self.maxTime then
-		return
-	end
-	if not timer.isPlaying and not self.paused then
-		self.paused = true
-		self.pausesCount = self.pausesCount + 1
-	elseif timer.isPlaying and self.paused then
-		self.paused = false
-	end
 end
 
 ---@return number

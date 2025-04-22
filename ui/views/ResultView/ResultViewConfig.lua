@@ -697,7 +697,7 @@ local function NotechartInfo(self)
 	-- end
 	-- TextCellImView(w, 55, "right", "early/late", earlylate)
 
-	TextCellImView(w, 55, "right", "pauses", scoreItem.pauses)
+	TextCellImView(w, 55, "right", "pauses", scoreItem.pause_count)
 
 	if show then
 		local adjustRatio = normalscore.adjustRatio

@@ -6,6 +6,7 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
+local PauseCounter = require("sphere.models.RhythmModel.PauseCounter")
 local ChartplayComputed = require("sea.chart.ChartplayComputed")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
@@ -25,6 +26,7 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
 	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
 	self.graphicEngine = GraphicEngine(self.timeEngine.visualTimeInfo, self.logicEngine)
+	self.pauseCounter = PauseCounter(self.timeEngine)
 	self.observable = Observable()
 
 	self.timeEngine.audioEngine = self.audioEngine
@@ -53,6 +55,7 @@ end
 function RhythmModel:loadLogicEngines()
 	self.timeEngine:load()
 	self.scoreEngine:load()
+	self.pauseCounter:load()
 	self.logicEngine:load()
 end
 
@@ -102,7 +105,7 @@ function RhythmModel:update()
 		self.logicEngine:update()
 	end
 	self.audioEngine:update()
-	self.scoreEngine:update()
+	self.pauseCounter:update()
 	self.graphicEngine:update()
 end
 
@@ -190,6 +193,7 @@ end
 function RhythmModel:setPlayTime(start_time, duration)
 	self.timeEngine:setPlayTime(start_time, duration)
 	self.scoreEngine:setPlayTime(start_time, duration)
+	self.pauseCounter:setPlayTime(start_time, duration)
 end
 
 ---@param range table
