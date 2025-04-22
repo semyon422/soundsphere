@@ -82,6 +82,7 @@ function LogicEngine:receive(event)
 	end
 
 	self.eventTime = event.time
+	self:update()
 	noteHandler:setKeyState(event.name == "keypressed", input)
 	self.eventTime = nil
 end

@@ -688,13 +688,15 @@ test(
 	}
 )
 
+
+assert(0.03125 - 0.015625 == 0.015625)
 test(
-	{0, 0.01, 0.02},
-	{{0.01, "ppp"}},
+	{0, 0.015625, 0.03125}, -- exact in the middle
+	{{0.015625, "ppp"}},
 	{
-		{0.01, "clear", "passed", 2},
-		{0.01, "clear", "passed", 1},
-		{0.01, "clear", "passed", 3},
+		{0.015625, "clear", "passed", 2},
+		{0.015625, "clear", "passed", 1},
+		{0.015625, "clear", "passed", 3},
 	}
 )
 
@@ -725,6 +727,18 @@ test(
 		{0.019, "clear", "passed", 3},
 		{0.019, "clear", "passed", 2},
 		{0.019, "clear", "passed", 1},
+	}
+)
+
+-- TODO: test multiple columns
+-- 3 notes wrong order - no bug in a single column
+test(
+	{0, 0.015625, 0.3},
+	{{0, "p"}, {0.3, "p"}},
+	{
+		{0, "clear", "passed", 1},
+		{0.215625, "clear", "missed", 2},
+		{0.3, "clear", "passed", 3},
 	}
 )
 
