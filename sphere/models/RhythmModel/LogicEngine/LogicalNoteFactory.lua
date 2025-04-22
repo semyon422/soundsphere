@@ -1,6 +1,8 @@
 local ShortLogicalNote = require("sphere.models.RhythmModel.LogicEngine.ShortLogicalNote")
 local LongLogicalNote = require("sphere.models.RhythmModel.LogicEngine.LongLogicalNote")
 
+---@class sphere.LogicalNoteFactory
+---@operator call: sphere.LogicalNoteFactory
 local LogicalNoteFactory = {}
 
 local notes = {

@@ -1,5 +1,6 @@
 local class = require("class")
 local valid = require("valid")
+local table_util = require("table_util")
 local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -74,6 +75,28 @@ function ComputeContext:computeChartdiff(replayBase)
 	self.chartdiff = chartdiff
 
 	return chartdiff, state
+end
+
+---@see sphere.LogicalNoteFactory
+function ComputeContext:applyTapOnly()
+	local chart = assert(self.chart)
+
+	local long_types = table_util.invert({
+		"hold",
+		"laser",
+		"drumroll",
+	})
+
+	for _, note in ipairs(chart.notes:getLinkedNotes()) do
+		local t = note:getType()
+		if long_types[t] then
+			if note.endNote then
+				note.endNote.type = "ignore"
+			end
+			note:unlink()
+			note:setType("tap")
+		end
+	end
 end
 
 ---@param columns_order integer[]?

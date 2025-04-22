@@ -111,6 +111,9 @@ function GameplayController:load()
 	local chart, chartmeta = computeContext:fromFileData(chartview.chartfile_name, data, chartview.index)
 	local chartdiff, state = computeContext:computeChartdiff(replayBase)
 	computeContext:applyColumnOrder(replayBase.columns_order)
+	if replayBase.tap_only then
+		computeContext:applyTapOnly()
+	end
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
