@@ -291,9 +291,9 @@ local function Judgements(self)
 	local judgementLists = judge.orderedCounters
 	local counters = judge.counters
 
-	local perfect = show and counters.perfect or scoreItem.perfect or 0
-	local notPerfect = show and counters["not perfect"] or scoreItem.not_perfect or 0
-	local miss = show and judge.counters.miss or scoreItem.miss or 0
+	local perfect = show and counters.perfect or scoreItem.judges and scoreItem.judges[1] or 0
+	local notPerfect = show and counters["not perfect"] or scoreItem.judges and scoreItem.judges[2] or 0
+	local miss = show and judge.counters.miss or scoreItem.miss_count or 0
 
 	local notes = perfect + notPerfect + miss
 
