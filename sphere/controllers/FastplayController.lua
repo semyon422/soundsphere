@@ -28,6 +28,7 @@ function FastplayController:play(computeContext, replay)
 	local chart = assert(computeContext.chart)
 	local chartmeta = assert(computeContext.chartmeta)
 	local chartdiff, state = computeContext:computeChartdiff(replay)
+	computeContext:applyColumnOrder(replay.columns_order)
 
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)

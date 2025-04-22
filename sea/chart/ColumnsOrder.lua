@@ -19,7 +19,7 @@ end
 ---@operator call: sea.ColumnsOrder
 local ColumnsOrder = class()
 
----@param inputmode string
+---@param inputmode string|ncdk.InputMode
 ---@param values integer[]? valid values
 function ColumnsOrder:new(inputmode, values)
 	self.inputMode = InputMode(inputmode)
@@ -37,7 +37,7 @@ function ColumnsOrder:import(values)
 	---@type {[ncdk2.Column]: ncdk2.Column}
 	local map = {}
 	for i = 1, columns do
-		map[inputs[i]] = inputs[values[i] or i]
+		map[inputs[values[i] or i]] = inputs[i]
 	end
 	self.map = map
 end
@@ -61,6 +61,11 @@ function ColumnsOrder:export()
 	end
 
 	return nil
+end
+
+---@return {[ncdk2.Column]: ncdk2.Column}
+function ColumnsOrder:getInverseMap()
+	return table_util.invert(self.map)
 end
 
 ---@param co sea.ColumnsOrder

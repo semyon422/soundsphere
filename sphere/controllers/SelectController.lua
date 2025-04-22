@@ -79,6 +79,7 @@ function SelectController:applyModifierMeta()
 
 	local chartview = self.selectModel.chartview
 	if not chartview then
+		replayBase.columns_order = nil
 		return
 	end
 
@@ -86,6 +87,10 @@ function SelectController:applyModifierMeta()
 	self.state.inputMode:set(chartview.inputmode)
 
 	ModifierModel:applyMeta(replayBase.modifiers, self.state)
+
+	if replayBase.columns_order and #replayBase.columns_order ~= self.state.inputMode:getColumns() then
+		replayBase.columns_order = nil
+	end
 end
 
 function SelectController:beginUnload()

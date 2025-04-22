@@ -63,10 +63,10 @@ end
 
 ---@param v integer[]
 local function is_columns_order(v)
-	local t = table.move(v, 1, #v, 1)
+	local t = table.move(v, 1, #v, 1, {})
 	table.sort(t)
-	for i = 1, #v do
-		if i ~= v[i] then
+	for i = 1, #t do
+		if i ~= t[i] then
 			return
 		end
 	end

@@ -67,4 +67,10 @@ function test.random(t)
 	t:eq(table.concat(values), "12345678910")
 end
 
+---@param t testing.T
+function test.import_export(t)
+	local co = ColumnsOrder("4key", {2, 3, 4, 1})
+	t:tdeq(co:export(), {2, 3, 4, 1})
+end
+
 return test

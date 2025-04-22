@@ -79,10 +79,10 @@ input 4key
 ]]
 
 local _events = {
-	{0.01, 1, true},
-	{0.1, 1, false},
-	{0.99, 2, true},
-	{1.1, 2, false},
+	{0.01, 2, true},
+	{0.1, 2, false},
+	{0.99, 3, true},
+	{1.1, 3, false},
 }
 
 local _replayfile_data_table = {
@@ -102,7 +102,7 @@ local _replayfile_data_table = {
 	timings = Timings("sphere"),
 	subtimings = nil,
 	healths = nil,
-	columns_order = nil,
+	columns_order = {4, 1, 2, 3},
 	--
 	custom = false,
 	const = false,

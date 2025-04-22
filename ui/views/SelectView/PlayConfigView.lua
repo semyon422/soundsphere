@@ -6,6 +6,7 @@ local spherefonts = require("sphere.assets.fonts")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local ColumnsOrder = require("sea.chart.ColumnsOrder")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -16,6 +17,9 @@ local _w, _h = w / 2, 55
 local r = 8
 local window_id = "PlayConfigView"
 
+---@type ncdk2.Column
+local swapping_column
+
 return ModalImView(function(self, quit)
 	if quit then
 		return true
@@ -23,6 +27,8 @@ return ModalImView(function(self, quit)
 
 	---@type sphere.GameController
 	local game = self.game
+
+	local state = game.selectController.state
 
 	imgui.setSize(w, h, _w, _h)
 
@@ -136,7 +142,58 @@ return ModalImView(function(self, quit)
 		self.game.ui.gameView:setModal(require("ui.views.TimingsModalView"))
 	end
 
-	-- columns_order = nil,
+	imgui.separator()
+
+	local co = ColumnsOrder(state.inputMode, replayBase.columns_order)
+
+	imgui.text("Columns order: " .. (co:getName() or "unchanged"))
+
+	just.row(true)
+	if imgui.button("order reset", "reset") then
+		co:import()
+	end
+	if imgui.button("order mirror", "mirror") then
+		co:mirror()
+	end
+	if imgui.button("order shift-", "shift-") then
+		co:shift(-1)
+	end
+	if imgui.button("order shift+", "shift+") then
+		co:shift(1)
+	end
+	if imgui.button("order bracketswap", "bracketswap") then
+		co:bracketswap()
+	end
+	if imgui.button("order random", "random") then
+		co:random()
+	end
+	just.row(false)
+
+	if not co.map[swapping_column] then
+		swapping_column = nil
+	end
+
+	just.row(true)
+	local inputs = state.inputMode:getInputs()
+	local inv_map = co:getInverseMap()
+	for i, c in ipairs(inputs) do
+		local t, n = inv_map[c]:match("^(.-)(%d+)$")
+		if t == "key" then
+			t = ""
+		end
+		if imgui.button("order column " .. i, t:sub(1, 1):upper() .. n, swapping_column == c) then
+			if not swapping_column then
+				swapping_column = c
+			else
+				co.map[inv_map[swapping_column]], co.map[inv_map[c]] = co.map[inv_map[c]], co.map[inv_map[swapping_column]]
+				swapping_column = nil
+			end
+		end
+		just.next(-14)
+	end
+	just.row(false)
+
+	replayBase.columns_order = co:export()
 
 	scrollY = imgui.Container()
 	just.pop()

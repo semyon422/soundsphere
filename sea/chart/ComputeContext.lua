@@ -4,9 +4,11 @@ local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Chartdiff = require("sea.chart.Chartdiff")
+local ColumnsOrder = require("sea.chart.ColumnsOrder")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local Note = require("ncdk2.notes.Note")
+local Notes = require("ncdk2.notes.Notes")
 
 ---@class sea.ComputeContext
 ---@operator call: sea.ComputeContext
@@ -72,6 +74,24 @@ function ComputeContext:computeChartdiff(replayBase)
 	self.chartdiff = chartdiff
 
 	return chartdiff, state
+end
+
+---@param columns_order integer[]?
+function ComputeContext:applyColumnOrder(columns_order)
+	if not columns_order then
+		return
+	end
+
+	local chart = assert(self.chart)
+	local co = ColumnsOrder(chart.inputMode, columns_order)
+	local map = co.map
+
+	local new_notes = Notes()
+	for _, note in chart.notes:iter() do
+		note.column = map[note.column] or note.column
+		new_notes:insert(note)
+	end
+	chart.notes = new_notes
 end
 
 ---@param chart ncdk2.Chart

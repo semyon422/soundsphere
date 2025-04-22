@@ -110,6 +110,7 @@ function GameplayController:load()
 	local data = assert(love.filesystem.read(chartview.location_path))
 	local chart, chartmeta = computeContext:fromFileData(chartview.chartfile_name, data, chartview.index)
 	local chartdiff, state = computeContext:computeChartdiff(replayBase)
+	computeContext:applyColumnOrder(replayBase.columns_order)
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
