@@ -105,7 +105,7 @@ local function test(notes, events, states, graphicStates)
 
 	local newStates = {}
 	logicEngine.scoreEngine = {
-		scoreSystem = {receive = function(self, event)
+		receive = function(self, event)
 			local eventCopy = {
 				currentTime = event.currentTime,
 				newState = event.newState,
@@ -114,7 +114,7 @@ local function test(notes, events, states, graphicStates)
 			}
 			-- print(require("inspect")(eventCopy))
 			table.insert(newStates, eventCopy)
-		end},
+		end,
 	}
 
 	graphicEngine.visualTimeRate = 1

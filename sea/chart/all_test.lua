@@ -135,7 +135,7 @@ local _chartplay_values = {
 	--
 	accuracy = 0.020270363958551557,
 	replay_hash = md5.sumhexa(_replayfile_data),
-	judges = {2, 0},
+	judges = {2, 0, 3},
 	max_combo = 2,
 	miss_count = 3,
 	rating = 0,
