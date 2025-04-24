@@ -2,27 +2,26 @@ local normalscore = require("libchart.normalscore3")
 local erfunc = require("libchart.erfunc")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
----@class sphere.NormalscoreScoreSystem: sphere.ScoreSystem
----@operator call: sphere.NormalscoreScoreSystem
-local NormalscoreScoreSystem = ScoreSystem + {}
+---@class sphere.NormalscoreScore: sphere.ScoreSystem
+---@operator call: sphere.NormalscoreScore
+local NormalscoreScore = ScoreSystem + {}
 
-NormalscoreScoreSystem.name = "normalscore"
-NormalscoreScoreSystem.metadata = {
-	hasAccuracy = true,
-	hasScore = true,
-	accuracyFormat = "%0.02f",
-	accuracyMultiplier = 1000,
-	scoreFormat = "%d",
-	scoreMultiplier = 1
-}
+NormalscoreScore.hasAccuracy = true
+NormalscoreScore.hasScore = true
 
-function NormalscoreScoreSystem:load()
+function NormalscoreScore:new()
 	self.normalscore = normalscore:new()
 	self.accuracyAdjusted = 0
+	self.adjustRatio = 1
+end
+
+---@return string
+function NormalscoreScore:getKey()
+	return "normalscore"
 end
 
 ---@param event table
-function NormalscoreScoreSystem:after(event)
+function NormalscoreScore:after(event)
 	local ns = self.normalscore
 
 	ns:update()
@@ -34,27 +33,30 @@ function NormalscoreScoreSystem:after(event)
 	self.adjustRatio = ns.score / score_not_adjusted
 end
 
-function NormalscoreScoreSystem:getAccuracy()
+function NormalscoreScore:getAccuracy()
 	return self.accuracyAdjusted
 end
 
-function NormalscoreScoreSystem:getScore()
-	local rating_hit_window = self.scoreEngine.ratingHitWindow
-	return erfunc.erf(rating_hit_window / ((self.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
+function NormalscoreScore:getAccuracyString()
+	return ("%0.2fms"):format(self:getAccuracy() * 1000)
+end
+
+function NormalscoreScore:getScore()
+	return erfunc.erf(0.032 / ((self.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
 end
 
 ---@param range_name string
 ---@param deltaTime number
-function NormalscoreScoreSystem:hit(range_name, deltaTime)
+function NormalscoreScore:hit(range_name, deltaTime)
 	self.normalscore:hit(range_name, deltaTime)
 end
 
 ---@param range_name string
-function NormalscoreScoreSystem:miss(range_name)
+function NormalscoreScore:miss(range_name)
 	self.normalscore:miss(range_name)
 end
 
-NormalscoreScoreSystem.notes = {
+NormalscoreScore.events = {
 	ShortNote = {
 		clear = {
 			passed = function(self, event) self:hit("ShortNote", event.deltaTime) end,
@@ -84,4 +86,4 @@ NormalscoreScoreSystem.notes = {
 	},
 }
 
-return NormalscoreScoreSystem
+return NormalscoreScore

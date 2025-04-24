@@ -95,7 +95,7 @@ end
 
 ---@param event table
 function LogicEngine:sendScore(event)
-	self.scoreEngine.scoreSystem:receive(event)
+	self.scoreEngine:receive(event)
 end
 
 ---@param note ncdk2.Note

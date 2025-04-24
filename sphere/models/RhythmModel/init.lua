@@ -22,7 +22,7 @@ function RhythmModel:new(inputModel, resourceModel)
 
 	self.timeEngine = TimeEngine()
 	self.inputManager = InputManager(self.timeEngine, inputModel)
-	self.scoreEngine = ScoreEngine(self.timeEngine)
+	self.scoreEngine = ScoreEngine()
 	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
 	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
 	self.graphicEngine = GraphicEngine(self.timeEngine.visualTimeInfo, self.logicEngine)
@@ -112,8 +112,8 @@ end
 ---@return boolean
 function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
-	local base = self.scoreEngine.scoreSystem.base
-	local accuracy = self.scoreEngine.scoreSystem.normalscore.accuracyAdjusted
+	local base = self.scoreEngine.scores.base
+	local accuracy = self.scoreEngine.scores.normalscore.accuracyAdjusted
 
 	return
 		not self.logicEngine.autoplay and
@@ -126,16 +126,16 @@ function RhythmModel:hasResult()
 end
 
 function RhythmModel:getChartplayComputed()
-	local scoreSystem = self.scoreEngine.scoreSystem
-	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+	local scoreEngine = self.scoreEngine
+	local scores = scoreEngine.scores
 
 	local c = ChartplayComputed()
-	c.pass = true -- TODO: use hp
-	c.judges = {judge.counters.perfect, judge.counters["not perfect"]}
-	c.accuracy = scoreSystem.normalscore.accuracyAdjusted
-	c.max_combo = scoreSystem.base.maxCombo
-	c.miss_count = scoreSystem.base.missCount
-	c.not_perfect_count = judge.counters["not perfect"]
+	c.pass = not scores.hp:isFailed()
+	c.judges = scoreEngine.judgesSource.judge_counter.judges
+	c.accuracy = scores.normalscore.accuracyAdjusted
+	c.max_combo = scores.base.maxCombo
+	c.miss_count = scores.base.missCount
+	c.not_perfect_count = scores.soundsphere.judge_counter:get(2)
 	c.rating = 0
 	c.rating_pp = 0
 	c.rating_msd = 0
@@ -192,7 +192,6 @@ end
 ---@param duration number
 function RhythmModel:setPlayTime(start_time, duration)
 	self.timeEngine:setPlayTime(start_time, duration)
-	self.scoreEngine:setPlayTime(start_time, duration)
 	self.pauseCounter:setPlayTime(start_time, duration)
 end
 

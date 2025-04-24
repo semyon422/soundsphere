@@ -59,4 +59,13 @@ function Subtimings.encode(t)
 	return v
 end
 
+---@param t sea.Timings
+function Subtimings:__eq(t)
+	return self.name == t.name and self.data == t.data
+end
+
+function Subtimings:__tostring(t)
+	return ("Subtimings(%s, %s)"):format(self.name, self.data)
+end
+
 return Subtimings

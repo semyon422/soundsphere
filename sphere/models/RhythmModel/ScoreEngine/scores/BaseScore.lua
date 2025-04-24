@@ -1,13 +1,13 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 local RingBuffer = require("RingBuffer")
 
----@class sphere.BaseScoreSystem: sphere.ScoreSystem
----@operator call: sphere.BaseScoreSystem
-local BaseScoreSystem = ScoreSystem + {}
+---@class sphere.BaseScore: sphere.ScoreSystem
+---@operator call: sphere.BaseScore
+local BaseScore = ScoreSystem + {}
 
-BaseScoreSystem.name = "base"
+function BaseScore:new()
+	self.meanRingBuffer = RingBuffer(10)
 
-function BaseScoreSystem:new()
 	self.hitCount = 0
 	self.missCount = 0
 	self.earlyHitCount = 0
@@ -21,16 +21,16 @@ function BaseScoreSystem:new()
 	self.isEarlyHit = false
 	self.isLongNoteComboBreak = false
 
-	self.counters = {}
-
 	self.lastMean = 0
 end
 
----@param event table
-function BaseScoreSystem:before(event)
-	local gameplay = self.scoreEngine.settings.gameplay
-	self.meanRingBuffer = self.meanRingBuffer or RingBuffer(gameplay.lastMeanValues)
+---@return string
+function BaseScore:getKey()
+	return "base"
+end
 
+---@param event table
+function BaseScore:before(event)
 	self.currentTime = event.currentTime
 	self.isMiss = false
 	self.isEarlyHit = false
@@ -40,47 +40,63 @@ function BaseScoreSystem:before(event)
 end
 
 ---@param event table
-function BaseScoreSystem:success(event)
+function BaseScore:success(event)
 	self.hitCount = self.hitCount + 1
 	self.combo = self.combo + 1
 	self.maxCombo = math.max(self.maxCombo, self.combo)
 end
 
 ---@param event table
-function BaseScoreSystem:breakCombo(event)
+function BaseScore:breakCombo(event)
 	self.combo = 0
 end
 
 ---@param event table
-function BaseScoreSystem:breakComboLongNote(event)
+function BaseScore:breakComboLongNote(event)
 	self.combo = 0
 	self.isLongNoteComboBreak = true
 end
 
 ---@param event table
-function BaseScoreSystem:miss(event)
+function BaseScore:miss(event)
 	self.missCount = self.missCount + 1
 	self.isMiss = true
 end
 
 ---@param event table
-function BaseScoreSystem:earlyHit(event)
+function BaseScore:earlyHit(event)
 	self.earlyHitCount = self.earlyHitCount + 1
 	self.isEarlyHit = true
 end
 
 ---@param event table
-function BaseScoreSystem:countLastMean(event)
+function BaseScore:countLastMean(event)
 	local rb = self.meanRingBuffer
 	rb:write(event.deltaTime)
 	local sum = 0
 	for i = 1, rb.size do
+		---@type number
 		sum = sum + rb:read()
 	end
 	self.lastMean = sum / rb.size
 end
 
-BaseScoreSystem.notes = {
+function BaseScore:getSlice()
+	return {
+		hitCount = self.hitCount,
+		missCount = self.missCount,
+		earlyHitCount = self.earlyHitCount,
+		notesCount = self.notesCount,
+		combo = self.combo,
+		maxCombo = self.maxCombo,
+		currentTime = self.currentTime,
+		isMiss = self.isMiss,
+		isEarlyHit = self.isEarlyHit,
+		isLongNoteComboBreak = self.isLongNoteComboBreak,
+	}
+end
+
+BaseScore.events = {
 	ShortNote = {
 		clear = {
 			passed = {"success", "countLastMean"},
@@ -112,4 +128,4 @@ BaseScoreSystem.notes = {
 	},
 }
 
-return BaseScoreSystem
+return BaseScore

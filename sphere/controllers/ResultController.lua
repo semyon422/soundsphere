@@ -1,6 +1,10 @@
 local class = require("class")
 local thread = require("thread")
 local simplify_notechart = require("libchart.simplify_notechart")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
+local Subtimings = require("sea.chart.Subtimings")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
@@ -20,6 +24,7 @@ function ResultController:new(
 	onlineModel,
 	configModel,
 	computeContext,
+	replayBase,
 	fastplayController
 )
 	self.selectModel = selectModel
@@ -28,6 +33,7 @@ function ResultController:new(
 	self.onlineModel = onlineModel
 	self.configModel = configModel
 	self.computeContext = computeContext
+	self.replayBase = replayBase
 	self.fastplayController = fastplayController
 end
 
@@ -114,6 +120,9 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	self.fastplayController:play(self.computeContext, replay)
 
+	self:actualizeReplayBase()
+	self.rhythmModel.scoreEngine:createAndSelectByTimings(self.replayBase.timings, self.replayBase.subtimings)
+
 	if self.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")
 		local gif_result = GifResult()
@@ -131,6 +140,38 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	replayModel:setMode("record")
 
 	return true
+end
+
+---@param timings sea.Timings
+function ResultController:setReplayBaseTimings(timings)
+	local replayBase = self.replayBase
+	local settings = self.configModel.configs.settings
+
+	local subtimings_config = settings.subtimings[timings.name]
+	local name = subtimings_config[1]
+	local value = subtimings_config[name]
+	local subtimings = Subtimings(name, value)
+
+	replayBase.timings = timings
+	replayBase.subtimings = subtimings
+	replayBase.timing_values = assert(TimingValuesFactory:get(timings, subtimings))
+end
+
+function ResultController:actualizeReplayBaseTimings()
+	local chartmeta = assert(self.computeContext.chartmeta)
+	local settings = self.configModel.configs.settings
+
+	local timings = chartmeta.timings
+	timings = timings or Timings(unpack(settings.format_timings[chartmeta.format]))
+	self:setReplayBaseTimings(timings)
+end
+
+function ResultController:actualizeReplayBase()
+	local config = self.configModel.configs.settings.replay_base
+
+	if config.auto_timings then
+		self:actualizeReplayBaseTimings()
+	end
 end
 
 return ResultController

@@ -56,4 +56,13 @@ function Healths.encode(t)
 	return v
 end
 
+---@param t sea.Timings
+function Healths:__eq(t)
+	return self.name == t.name and self.data == t.data
+end
+
+function Healths:__tostring(t)
+	return ("Healths(%s, %s)"):format(self.name, self.data)
+end
+
 return Healths

@@ -118,4 +118,8 @@ function Timings:__eq(t)
 	return self.name == t.name and self.data == t.data
 end
 
+function Timings:__tostring(t)
+	return ("Timings(%s, %s)"):format(self.name, self.data)
+end
+
 return Timings

@@ -159,6 +159,7 @@ function GameController:new()
 		self.onlineModel,
 		self.configModel,
 		self.computeContext,
+		self.replayBase,
 		self.fastplayController
 	)
 	self.multiplayerController = MultiplayerController(

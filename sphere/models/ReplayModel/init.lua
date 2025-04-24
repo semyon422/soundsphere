@@ -126,6 +126,8 @@ function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_coun
 
 	assert(love.filesystem.write(self.path .. "/" .. replay_hash, data))
 
+	self.replay = replay
+
 	return replay, replay_hash
 end
 
@@ -169,6 +171,8 @@ end
 ---@param data string
 ---@return sea.Replay?
 function ReplayModel:loadReplay(data)
+	self.replay = nil
+
 	if not data then
 		return
 	end
@@ -181,6 +185,8 @@ function ReplayModel:loadReplay(data)
 	replay = ReplayConverter:convert(replay)
 
 	assert(valid.format(replay:validate()))
+
+	self.replay = replay
 
 	return replay
 end

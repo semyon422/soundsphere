@@ -50,7 +50,7 @@ function ScoreListView:drawItem(i, w, h)
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-		local normalscore = scoreEngine.scoreSystem.normalscore
+		local normalscore = scoreEngine.scores.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
 		rating = s * rhythmModel.chartdiff.enps_diff
 

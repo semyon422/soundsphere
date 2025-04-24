@@ -3,12 +3,7 @@ local valid = require("valid")
 local math_util = require("math_util")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
-local InputMode = require("ncdk.InputMode")
-local TempoRange = require("notechart.TempoRange")
-local ModifierModel = require("sphere.models.ModifierModel")
-local Note = require("ncdk2.notes.Note")
 local Chartplay = require("sea.chart.Chartplay")
-local Chartdiff = require("sea.chart.Chartdiff")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 local Subtimings = require("sea.chart.Subtimings")
@@ -154,6 +149,8 @@ function GameplayController:load()
 	rhythmModel:loadAllEngines()
 	replayModel:load()
 	pauseModel:load()
+
+	self.rhythmModel.scoreEngine:createAndSelectByTimings(replayBase.timings, replayBase.subtimings)
 
 	self:updateOffsets()
 
@@ -346,7 +343,6 @@ function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
 	local pauseCounter = rhythmModel.pauseCounter
 	local scoreEngine = rhythmModel.scoreEngine
-	local scoreSystem = scoreEngine.scoreSystem
 	local replayBase = self.replayBase
 	local computeContext = self.computeContext
 	local config = self.configModel.configs.settings
@@ -392,7 +388,7 @@ function GameplayController:saveScore()
 			return
 		end
 
-		local base = scoreSystem.base
+		local base = scoreEngine.scores.base
 		if base.hitCount / base.notesCount < 0.5 then
 			print("not submitted")
 			return

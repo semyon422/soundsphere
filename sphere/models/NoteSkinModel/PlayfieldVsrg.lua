@@ -197,9 +197,9 @@ function PlayfieldVsrg:addHpBar(object)
 	if not getmetatable(object) then
 		object = RectangleProgressView(object)
 	end
-	function object:getMax() return self.game.rhythmModel.scoreEngine.scoreSystem.hp.max end
+	function object:getMax() return self.game.rhythmModel.scoreEngine.scores.hp.max end
 	function object:getCurrent()
-		local hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
+		local hp = self.game.rhythmModel.scoreEngine.scores.hp
 		return hp:getCurrent()
 	end
 	return self:add(object)
@@ -275,7 +275,7 @@ function PlayfieldVsrg:addCombo(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.base.combo"
+	object.key = "game.rhythmModel.scoreEngine.scores.base.combo"
 	object.format = object.format or "%d"
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)

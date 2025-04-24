@@ -3,6 +3,8 @@ local chartdiffs = require("sphere.persistence.CacheModel.models.chartdiffs")
 local int_rates = require("libchart.int_rates")
 local RateType = require("sea.chart.RateType")
 local ChartFormat = require("sea.chart.ChartFormat")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 
 local chartdiffviews = {}
 
@@ -15,6 +17,8 @@ chartdiffviews.types = {
 	rate = int_rates,
 	rate_type = RateType,
 	format = ChartFormat,
+	timings = Timings,
+	healths = Healths,
 }
 
 chartdiffviews.relations = {}

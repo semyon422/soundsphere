@@ -1,46 +1,58 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
----@class sphere.MiscScoreSystem: sphere.ScoreSystem
----@operator call: sphere.MiscScoreSystem
-local MiscScoreSystem = ScoreSystem + {}
+---@class sphere.MiscScore: sphere.ScoreSystem
+---@operator call: sphere.MiscScore
+local MiscScore = ScoreSystem + {}
 
-MiscScoreSystem.name = "misc"
-
-function MiscScoreSystem:new()
-	self.ratio = 0
+function MiscScore:new()
 	self.maxDeltaTime = 0
 	self.deltaTime = 0
-	self.earlylate = 0
+
+	self.earlyLate = {
+		early = 0,
+		late = 0,
+	}
+end
+
+---@return string
+function MiscScore:getKey()
+	return "misc"
 end
 
 ---@param event table
-function MiscScoreSystem:hit(event)
+function MiscScore:hit(event)
+	---@type number
 	local deltaTime = event.deltaTime
 	self.deltaTime = deltaTime
 	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
 		self.maxDeltaTime = deltaTime
 	end
 
-	local soundsphereJudge = self.container.soundsphere.judges["soundsphere"]
-	local earlyLate = soundsphereJudge.earlyLate
-	local counters = soundsphereJudge.counters
-	local notes = soundsphereJudge.notes
-
-	self.ratio = (counters.perfect or 0) / (notes or 1)
-	self.earlylate = (earlyLate.early or 0) / (earlyLate.late or 1)
+	if deltaTime < 0 then
+		self.earlyLate.early = self.earlyLate.early + 1
+	else
+		self.earlyLate.late = self.earlyLate.late + 1
+	end
 end
 
 ---@param event any
-function MiscScoreSystem:miss(event)
+function MiscScore:miss(event)
 	self.deltaTime = event.deltaTime
 end
 
 ---@param event any
-function MiscScoreSystem:early(event)
+function MiscScore:early(event)
 	self.deltaTime = -math.huge
 end
 
-MiscScoreSystem.notes = {
+function MiscScore:getSlice()
+	return {
+		maxDeltaTime = self.maxDeltaTime,
+		deltaTime = self.deltaTime,
+	}
+end
+
+MiscScore.events = {
 	ShortNote = {
 		clear = {
 			passed = "hit",
@@ -72,4 +84,4 @@ MiscScoreSystem.notes = {
 	},
 }
 
-return MiscScoreSystem
+return MiscScore

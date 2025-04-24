@@ -1,6 +1,6 @@
 local class = require("class")
 
-local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
+-- local JudgementScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.JudgementScoreSystem")
 
 ---@class sphere.DeltaTimeJudgementView
 ---@operator call: sphere.DeltaTimeJudgementView
@@ -13,14 +13,14 @@ function DeltaTimeJudgementView:load()
 end
 
 function DeltaTimeJudgementView:update()
-	local scoreSystem = self.game.rhythmModel.scoreEngine.scoreSystem
-	local judge = scoreSystem.soundsphere.judges["soundsphere"]
+	local scores = self.game.rhythmModel.scoreEngine.scores
+	local judge = scores.soundsphere.judges["soundsphere"]
 
 	if judge.notes == self.judgementCounter then
 		return
 	end
 	self.judgementCounter = judge.notes
-	self.deltaTime = scoreSystem.misc.deltaTime
+	self.deltaTime = scores.misc.deltaTime
 
 	local judgement = JudgementScoreSystem:getJudgement(self.judgements, self.deltaTime)
 	self.judgement = judgement

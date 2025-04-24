@@ -1,42 +1,49 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 
----@class sphere.HpScoreSystem: sphere.ScoreSystem
----@operator call: sphere.HpScoreSystem
-local HpScoreSystem = ScoreSystem + {}
+---@class sphere.HpScore: sphere.ScoreSystem
+---@operator call: sphere.HpScore
+local HpScore = ScoreSystem + {}
 
-HpScoreSystem.name = "hp"
+HpScore.max = 1000
 
-HpScoreSystem.max = 1000
+---@return string
+function HpScore:getKey()
+	return "hp"
+end
 
----@param notes number
-function HpScoreSystem:insertCounter(notes)
+---@param notes integer
+function HpScore:insertCounter(notes)
 	table.insert(self, {
 		notes = notes,
 		value = self.max / 2,
 	})
 end
 
-function HpScoreSystem:load()
+-- TODO: return back hp configuration
+
+function HpScore:new()
+	local notes = 20
+	local shift = false
+
 	for i in ipairs(self) do
 		self[i] = nil
 	end
 
-	local config = self.scoreEngine.hp
-	if not config.shift then
-		self:insertCounter(config.notes)
+	if not shift then
+		self:insertCounter(notes)
 		return
 	end
 
-	for i = 0, math.min(config.notes, 9) do
+	for i = 0, math.min(notes, 9) do
 		self:insertCounter(i)
 	end
-	for i = 10, config.notes, 5 do
+	for i = 10, notes, 5 do
 		self:insertCounter(i)
 	end
 end
 
 ---@return table
-function HpScoreSystem:getSlice()
+function HpScore:getSlice()
 	local slice = {}
 	for _, v in ipairs(self) do
 		table.insert(slice, {
@@ -49,7 +56,7 @@ end
 
 ---@return number
 ---@return number
-function HpScoreSystem:getCurrent()
+function HpScore:getCurrent()
 	for _, h in ipairs(self) do
 		if h.value > 0 then
 			return h.value, h.notes
@@ -59,7 +66,7 @@ function HpScoreSystem:getCurrent()
 end
 
 ---@return boolean
-function HpScoreSystem:isFailed()
+function HpScore:isFailed()
 	local _h
 	for _, h in ipairs(self) do
 		if h.value > 0 then
@@ -71,7 +78,7 @@ function HpScoreSystem:isFailed()
 end
 
 ---@param event table
-function HpScoreSystem:increase(event)
+function HpScore:increase(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
 			h.value = math.min(h.value + 1, self.max)
@@ -80,7 +87,7 @@ function HpScoreSystem:increase(event)
 end
 
 ---@param event table
-function HpScoreSystem:decrease(event)
+function HpScore:decrease(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
 			h.value = math.min(h.value - self.max / h.notes, self.max)
@@ -91,7 +98,7 @@ function HpScoreSystem:decrease(event)
 	end
 end
 
-HpScoreSystem.notes = {
+HpScore.events = {
 	ShortNote = {
 		clear = {
 			passed = "increase",
@@ -123,4 +130,4 @@ HpScoreSystem.notes = {
 	},
 }
 
-return HpScoreSystem
+return HpScore

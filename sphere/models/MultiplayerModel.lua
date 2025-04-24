@@ -55,14 +55,15 @@ function MultiplayerModel:refresh()
 
 	self.room = peer.getRoom()
 
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-	if not scoreSystem.base then
+	local scores = self.rhythmModel.scoreEngine.scores
+	if not scores then
 		return
 	end
+
 	peer._setScore({
-		accuracy = scoreSystem.normalscore.accuracyAdjusted,
-		combo = scoreSystem.base.combo,
-		failed = scoreSystem.hp:isFailed(),
+		accuracy = scores.normalscore.accuracyAdjusted,
+		combo = scores.base.combo,
+		failed = scores.hp:isFailed(),
 	})
 end
 
