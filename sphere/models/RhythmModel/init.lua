@@ -128,14 +128,15 @@ end
 function RhythmModel:getChartplayComputed()
 	local scoreEngine = self.scoreEngine
 	local scores = scoreEngine.scores
+	local judge_counter = assert(scoreEngine.judgesSource.judge_counter)
 
 	local c = ChartplayComputed()
 	c.pass = not scores.hp:isFailed()
-	c.judges = scoreEngine.judgesSource.judge_counter.judges
+	c.judges = judge_counter.judges
 	c.accuracy = scores.normalscore.accuracyAdjusted
 	c.max_combo = scores.base.maxCombo
 	c.miss_count = scores.base.missCount
-	c.not_perfect_count = scores.soundsphere.judge_counter:get(2)
+	c.not_perfect_count = judge_counter:getNotPerfect()
 	c.rating = 0
 	c.rating_pp = 0
 	c.rating_msd = 0

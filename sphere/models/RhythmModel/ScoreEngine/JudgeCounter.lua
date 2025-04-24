@@ -37,4 +37,14 @@ function JudgeCounter:get(index)
 	return assert(self.judges[index])
 end
 
+---@return integer
+function JudgeCounter:getNotPerfect()
+	local judges = self.judges
+	local sum = 0
+	for i = 2, self.size do
+		sum = sum + judges[i]
+	end
+	return sum
+end
+
 return JudgeCounter

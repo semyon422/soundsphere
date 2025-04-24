@@ -81,7 +81,7 @@ input 4key
 local _events = {
 	{0.01, 2, true},
 	{0.1, 2, false},
-	{0.99, 3, true},
+	{0.95, 3, true},
 	{1.1, 3, false},
 }
 
@@ -99,8 +99,8 @@ local _replayfile_data_table = {
 	--
 	nearest = true,
 	tap_only = false,
-	timings = Timings("sphere"),
-	subtimings = nil,
+	timings = Timings("osuod", 8),
+	subtimings = Subtimings("scorev", 1),
 	healths = nil,
 	columns_order = {4, 1, 2, 3},
 	--
@@ -133,15 +133,15 @@ local _chartplay_values = {
 	created_at = _replayfile_data_table.created_at,
 	rate_type = _replayfile_data_table.rate_type,
 	--
-	accuracy = 0.020270363958551557,
+	accuracy = 0.05984583644905697164,
 	replay_hash = md5.sumhexa(_replayfile_data),
-	judges = {2, 0, 3},
+	judges = {1, 0, 1, 0, 0, 3},
 	max_combo = 2,
 	miss_count = 3,
+	not_perfect_count = 4,
 	rating = 0,
 	rating_msd = 0,
 	rating_pp = 0,
-	not_perfect_count = 0,
 	pass = true,
 }
 setmetatable(_chartplay_values, Chartplay)

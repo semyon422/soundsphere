@@ -45,6 +45,9 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 
 	fastplayController:play(computeContext, replay)
 
+	local timings = assert(replay.timings or chartmeta.timings)
+	rhythmModel.scoreEngine:createAndSelectByTimings(timings, replay.subtimings)
+
 	local c = rhythmModel:getChartplayComputed()
 
 	local chartdiff = assert(computeContext.chartdiff)
