@@ -248,19 +248,8 @@ function PlayfieldVsrg:addAccuracy(object)
 		object = ValueView(object)
 	end
 
-	local base_load = object.load
-	function object:load()
-		base_load(self)
-		local score_engine = self.game.rhythmModel.scoreEngine
-		if not score_engine.loaded then
-			return
-		end
-		local scoring_metadata = self.game.rhythmModel.scoreEngine.accuracySource.metadata
-		object.format = scoring_metadata.accuracyFormat
-		object.multiplier = scoring_metadata.accuracyMultiplier
-	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine:getAccuracy()
+		return self.game.rhythmModel.scoreEngine:getAccuracyString()
 	end
 
 	object.color = object.color or {1, 1, 1, 1}

@@ -31,6 +31,10 @@ function ScoreEngine:new()
 end
 
 function ScoreEngine:load()
+	self.accuracySource = nil
+	self.scoreSource = nil
+	self.judgesSource = nil
+
 	self.events = {}
 	---@type sphere.ScoreSystem[]
 	self.scoreSystems = {}
