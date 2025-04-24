@@ -150,7 +150,8 @@ function GameplayController:load()
 	replayModel:load()
 	pauseModel:load()
 
-	self.rhythmModel.scoreEngine:createAndSelectByTimings(replayBase.timings, replayBase.subtimings)
+	local timings = assert(replayBase.timings or chartmeta.timings)
+	self.rhythmModel.scoreEngine:createAndSelectByTimings(timings, replayBase.subtimings)
 
 	self:updateOffsets()
 
