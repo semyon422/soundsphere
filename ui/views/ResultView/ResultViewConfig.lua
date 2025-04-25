@@ -80,6 +80,50 @@ local function Background(self)
 end
 
 ---@param self table
+local function ScoreSources(self)
+	local w, h = Layout:move("graphs")
+	local padding = 18 * math.sqrt(2)
+	love.graphics.translate(padding, h)
+
+	---@type sphere.GameController
+	local game = self.game
+	local scoreEngine = game.rhythmModel.scoreEngine
+	local replayModel = game.replayModel
+
+	local show = showLoadedScore(self)
+	local scoreItem = game.selectModel.scoreItem
+
+	if not scoreEngine.accuracySource then
+		return
+	end
+
+	local timings, subtimings = replayModel.replay.timings, replayModel.replay.subtimings
+	if not show then
+		timings, subtimings = scoreItem.timings, scoreItem.subtimings
+	end
+
+	love.graphics.setColor(0, 0, 0, 0.2)
+	love.graphics.rectangle("fill", 0, 0, w, 55)
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
+
+	imgui.text(("timings: %s, subtimings: %s"):format(timings, subtimings))
+
+	if not show then
+		return
+	end
+
+	imgui.text(("acc: %s, judges: %s, score: %s, combo: %s, healths: %s"):format(
+		scoreEngine.accuracySource:getKey(),
+		scoreEngine.judgesSource:getKey(),
+		scoreEngine.scoreSource:getKey(),
+		scoreEngine.comboSource:getKey(),
+		scoreEngine.healthsSource:getKey()
+	))
+end
+
+---@param self table
 local function drawGraph(self)
 	local w, h = Layout:move("graphs")
 	local padding = 18 * math.sqrt(2) / 2
@@ -760,6 +804,7 @@ return function(self)
 	HpGraph(self)
 	MissGraph(self)
 	EarlyHitGraph(self)
+	ScoreSources(self)
 	BottomScreenMenu(self)
 	Judgements(self)
 	JudgementsDropdown(self)
