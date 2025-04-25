@@ -1,6 +1,6 @@
 local http_util = require("web.http.util")
 local IResource = require("web.framework.IResource")
-local User = require("sea.access.User")
+local UserInsecure = require("sea.access.UserInsecure")
 
 ---@class sea.AuthResource: web.IResource
 ---@operator call: sea.AuthResource
@@ -58,7 +58,7 @@ function AuthResource:login(req, res, ctx)
 		return
 	end
 
-	local user = User()
+	local user = UserInsecure()
 	user.email = body_params.email
 	user.password = body_params.password
 
@@ -133,7 +133,7 @@ function AuthResource:register(req, res, ctx)
 		return
 	end
 
-	local user = User()
+	local user = UserInsecure()
 	user.email = body_params.email
 	user.name = body_params.name
 	user.password = body_params.password

@@ -3,6 +3,7 @@ local IPasswordHasher = require("sea.access.IPasswordHasher")
 local UsersRepo = require("sea.access.repos.UsersRepo")
 local Users = require("sea.access.Users")
 local User = require("sea.access.User")
+local UserInsecure = require("sea.access.UserInsecure")
 local UserRole = require("sea.access.UserRole")
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -87,7 +88,7 @@ function test.register_email_password(t)
 
 	local users = Users(ctx.users_repo, IPasswordHasher())
 
-	local user_values = User()
+	local user_values = UserInsecure()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"
@@ -101,6 +102,8 @@ function test.register_email_password(t)
 
 	t:eq(su.session.id, 1)
 	t:eq(su.session.user_id, 1)
+	t:eq(su.user.email, nil)
+	t:eq(su.user.password, nil)
 
 	---@type any
 	local _
@@ -141,7 +144,7 @@ function test.login_email_password(t)
 
 	local users = Users(ctx.users_repo, IPasswordHasher())
 
-	local user_values = User()
+	local user_values = UserInsecure()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"
@@ -154,8 +157,10 @@ function test.login_email_password(t)
 	---@cast su -?
 
 	t:eq(su.user.id, 1)
+	t:eq(su.user.email, nil)
+	t:eq(su.user.password, nil)
 
-	local user_values = User()
+	local user_values = UserInsecure()
 	user_values.email = "user@example.com"
 	user_values.password = "password"
 
@@ -167,6 +172,8 @@ function test.login_email_password(t)
 	---@cast su -?
 
 	t:eq(su.session.user_id, su.user.id)
+	t:eq(su.user.email, nil)
+	t:eq(su.user.password, nil)
 
 	---@type any
 	local _
@@ -216,7 +223,7 @@ function test.ban(t)
 
 	local users = Users(ctx.users_repo, IPasswordHasher())
 
-	local user_values = User()
+	local user_values = UserInsecure()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"

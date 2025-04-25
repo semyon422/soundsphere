@@ -31,6 +31,12 @@ function UsersRepo:findUserByEmail(email)
 	return self.models.users:find({email = assert(email)})
 end
 
+---@param email string
+---@return sea.UserInsecure?
+function UsersRepo:findUserInsecureByEmail(email)
+	return self.models.users_insecure:find({email = assert(email)})
+end
+
 ---@param name string
 ---@return sea.User?
 function UsersRepo:findUserByName(name)
