@@ -450,7 +450,7 @@ local function NotechartInfo(self)
 	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
 	local scoreEngine = rhythmModel.scoreEngine
-	local replayBase = self.game.replayBase
+	local replay = self.game.replayModel.replay
 
 	if not scoreItem then
 		return
@@ -471,8 +471,8 @@ local function NotechartInfo(self)
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and replayBase.rate or scoreItem.rate
-	local const = show and replayBase.const or scoreItem.const
+	local baseTimeRate = show and replay.rate or scoreItem.rate
+	local const = show and replay.const or scoreItem.const
 
 	local baseBpm = chartview.tempo
 	local baseLength = chartview.duration or 0
@@ -736,9 +736,16 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(36, 0)
 
 	local selectModel = self.game.selectModel
-	local modifiers = self.game.replayBase.modifiers
+	local replay = self.game.replayModel.replay
+
+	local modifiers = replay and replay.modifiers
+
 	if not showLoadedScore(self) and selectModel.scoreItem then
 		modifiers = selectModel.scoreItem.modifiers
+	end
+
+	if not modifiers then
+		return
 	end
 
 	ModifierIconGridView.game = self.game
