@@ -103,7 +103,9 @@ function GameplayController:load()
 	local judgement = configModel.configs.select.judgements
 
 	local data = assert(love.filesystem.read(chartview.location_path))
-	local chart, chartmeta = computeContext:fromFileData(chartview.chartfile_name, data, chartview.index)
+	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
+	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
+
 	local chartdiff, state = computeContext:computeChartdiff(replayBase)
 	computeContext:applyColumnOrder(replayBase.columns_order)
 	if replayBase.tap_only then

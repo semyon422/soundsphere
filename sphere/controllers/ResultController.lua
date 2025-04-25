@@ -116,7 +116,8 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	local chartview = self.selectModel.chartview
 
 	local data = assert(love.filesystem.read(chartview.location_path))
-	local chart, chartmeta = self.computeContext:fromFileData(chartview.chartfile_name, data, chartview.index)
+	local chart_chartmeta = assert(self.computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
+	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
 	self.fastplayController:play(self.computeContext, replay)
 

@@ -27,14 +27,21 @@ end
 ---@param name string
 ---@param data string
 ---@param index integer
----@return ncdk2.Chart
----@return sea.Chartmeta
+---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}?
+---@return string?
 function ComputeContext:fromFileData(name, data, index)
-	self.chart_chartmetas = assert(ChartFactory:getCharts(name, data))
-	self.chart = self.chart_chartmetas[index].chart
-	self.chartmeta = self.chart_chartmetas[index].chartmeta
+	local ccm, err = ChartFactory:getCharts(name, data)
+	if not ccm then
+		return nil, "get charts: " .. err
+	end
+	self.chart_chartmetas = ccm
+	self.chart = ccm[index].chart
+	self.chartmeta = ccm[index].chartmeta
 	self:toAbsolute()
-	return self.chart, self.chartmeta
+	return {
+		chart = self.chart,
+		chartmeta = self.chartmeta,
+	}
 end
 
 ---@return ncdk2.Chart?

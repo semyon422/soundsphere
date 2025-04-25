@@ -24,7 +24,10 @@ end
 ---@return string?
 function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
 	local computeContext = ComputeContext()
-	local chart, chartmeta = computeContext:fromFileData(chartfile_name, chartfile_data, index)
+	local chart_chartmeta, err = computeContext:fromFileData(chartfile_name, chartfile_data, index)
+	if not chart_chartmeta then
+		return nil, "from file data: " .. err
+	end
 
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
@@ -60,7 +63,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	return {
 		chartplay_computed = c,
 		chartdiff = chartdiff,
-		chartmeta = chartmeta,
+		chartmeta = chart_chartmeta.chartmeta,
 	}
 end
 
