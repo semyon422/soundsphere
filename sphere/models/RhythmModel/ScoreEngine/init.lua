@@ -79,7 +79,7 @@ end
 function ScoreEngine:createAndSelectByTimings(t, st)
 	local systems, err = ScoreEngineFactory:get(t, st)
 	if not systems then
-		print("createAndSelectByTimings error", t, st, err)
+		self:selectDefault()
 		return
 	end
 

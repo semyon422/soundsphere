@@ -13,6 +13,7 @@ local presets = {
 	require("sea.timings.stepmania.EtternaTimings_v2"),
 	require("sea.timings.stepmania.EtternaTimings_v1"),
 
+	require("sea.timings.sphere.SoundsphereTimings_v2"),
 	require("sea.timings.sphere.SoundsphereTimings_v1"),
 	require("sea.timings.quaver.QuaverTimings_v1"),
 	require("sea.timings.bmsrank.LunaticRaveTimings_v1"),
@@ -29,7 +30,7 @@ local TimingsDefiner = class()
 function TimingsDefiner:match(tvs)
 	for _, preset in ipairs(presets) do
 		local timings, subtimings = preset:match(tvs)
-		if timings and subtimings then
+		if timings then
 			return timings, subtimings
 		end
 	end

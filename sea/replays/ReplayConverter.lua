@@ -76,12 +76,10 @@ function ReplayConverter:convertModifier(c, replay)
 			if k ~= "name" and k ~= "version" and k ~= "id" then
 				c.value = v
 				c[k] = nil
+				break
 			end
 		end
 	end
-
--- 	{{id=11,keys=10,old=true,value=10,version=0}}
--- validate replay: modifiers.1.keys is not nil, modifiers.1.old is not nil
 
 	if c.value == true then
 		c.value = nil
@@ -190,7 +188,7 @@ function ReplayConverter:convert(obj)
 	replay.tap_only = false
 
 	local timings, subtimings = TimingsDefiner:match(obj.timings)
-	if not timings or not subtimings then
+	if not timings then
 		timings = Timings("arbitrary")
 		subtimings = nil
 	end

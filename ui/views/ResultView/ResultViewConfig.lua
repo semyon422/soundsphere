@@ -341,17 +341,17 @@ local function Judgements(self)
 	local judgementLists = judgesSource:getJudgeNames()
 	local counters = judgesSource:getJudges()
 
-	local perfect = show and counters.perfect or scoreItem.judges and scoreItem.judges[1] or 0
-	local notPerfect = show and counters["not perfect"] or scoreItem.judges and scoreItem.judges[2] or 0
+	if not show then
+		counters = scoreItem.judges
+	end
+
+	counters = counters or {}
+
 	local miss = show and scoreEngine.scores.base.missCount or scoreItem.miss_count or 0
 
-	local notes = perfect + notPerfect + miss
-
-	if show then -- LR2 mash can be higher than total count of notes
-		notes = 0
-		for _, n in ipairs(counters) do
-			notes = notes + n
-		end
+	local notes = 0
+	for _, n in ipairs(counters) do
+		notes = notes + n
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -366,9 +366,10 @@ local function Judgements(self)
 			just.emptyline(interval)
 		end
 	else
-		imgui.ValueBar(w, lineHeight, perfect / notes, "perfect", perfect)
-		just.emptyline(interval)
-		imgui.ValueBar(w, lineHeight, notPerfect / notes, "not perfect", notPerfect)
+		for i, v in ipairs(counters) do
+			imgui.ValueBar(w, lineHeight, v / notes, "", v)
+			just.emptyline(interval)
+		end
 	end
 
 	Layout:move("column1row2")

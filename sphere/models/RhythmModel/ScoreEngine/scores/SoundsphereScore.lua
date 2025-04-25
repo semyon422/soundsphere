@@ -9,11 +9,9 @@ local Timings = require("sea.chart.Timings")
 ---@operator call: sphere.SoundsphereScore
 local SoundsphereScore = ScoreSystem + SimpleJudgesSource
 
-SoundsphereScore.hasJudges = true
+SoundsphereScore.judge_names = {"perfect", "good", "miss"}
 
-SoundsphereScore.judge_names = {"perfect", "not perfect", "miss"}
-
-local windows = {0.016, math.huge}
+local windows = {0.016, 0.120, 0.160}
 
 function SoundsphereScore:new()
 	self.timings = Timings("sphere")
@@ -27,7 +25,7 @@ function SoundsphereScore:getKey()
 end
 
 function SoundsphereScore:hit(event)
-	local index = assert(self.judge_windows:get(event.deltaTime))
+	local index = self.judge_windows:get(event.deltaTime) or -1
 	self.judge_counter:add(index)
 end
 

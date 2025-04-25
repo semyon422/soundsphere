@@ -95,4 +95,16 @@ function test.osumania_v2_v2(t)
 	t:tdeq({match(tvs)}, {Timings("osuod", 0.4), Subtimings("scorev", 2)})
 end
 
+--- soundsphere_v1 -------------------------------------------------------------
+
+---@param t testing.T
+function test.soundsphere_v1(t)
+	local tvs = {
+		ShortNote = {hit = {-0.12, 0.12}, miss = {-0.16, 0.12}},
+		LongNoteStart = {hit = {-0.12, 0.12}, miss = {-0.16, 0.12}},
+		LongNoteEnd = {hit = {-0.12, 0.12}, miss = {-0.16, 0.12}},
+	}
+	t:tdeq({match(tvs)}, {Timings("sphere"), nil})
+end
+
 return test
