@@ -39,17 +39,14 @@ function FastplayController:play(computeContext, replay)
 
 	replayModel:setMode("replay")
 	rhythmModel.inputManager:setMode("internal")
-	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
 
 	chartdiff.modifiers = replay.modifiers
 
-	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()
 	replayModel:load()
 
-	rhythmModel.timeEngine:play()
 	rhythmModel.timeEngine.currentTime = math.huge
 	replayModel:update()
 	rhythmModel.logicEngine:update()
