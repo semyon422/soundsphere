@@ -6,7 +6,7 @@ local class = require("class")
 ---@field hash string
 ---@field name string
 ---@field size integer
----@field set_id integer
+---@field set_id integer TODO
 ---@field compute_state sea.ComputeState
 ---@field creator_id integer
 ---@field submitted_at integer

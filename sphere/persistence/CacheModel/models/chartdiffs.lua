@@ -1,6 +1,7 @@
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local int_rates = require("libchart.int_rates")
 local Gamemode = require("sea.chart.Gamemode")
+local Chartdiff = require("sea.chart.Chartdiff")
 local stbl = require("stbl")
 
 local modifiers = {}
@@ -25,7 +26,7 @@ end
 
 local chartdiffs = {}
 
-chartdiffs.table_name = "chartdiffs"
+chartdiffs.metatable = Chartdiff
 
 chartdiffs.types = {
 	modifiers = modifiers,

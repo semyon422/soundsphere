@@ -14,20 +14,20 @@ function ChartdiffsRepo:new(gdb, diffcalc_fields)
 end
 
 ---@param chartdiff table
----@return table
+---@return sea.Chartdiff
 function ChartdiffsRepo:insertChartdiff(chartdiff)
 	return self.models.chartdiffs:create(chartdiff)
 end
 
 ---@param chartdiff table
----@return table?
+---@return sea.Chartdiff?
 function ChartdiffsRepo:updateChartdiff(chartdiff)
 	return self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})[1]
 end
 
 ---@param hash string
 ---@param index number
----@return table?
+---@return sea.Chartdiff?
 function ChartdiffsRepo:selectDefaultChartdiff(hash, index)
 	return self.models.chartdiffs:find({
 		hash = assert(hash),
@@ -38,7 +38,7 @@ function ChartdiffsRepo:selectDefaultChartdiff(hash, index)
 end
 
 ---@param chartdiff table
----@return table?
+---@return sea.Chartdiff?
 function ChartdiffsRepo:selectChartdiff(chartdiff)
 	return self.models.chartdiffs:find({
 		hash = assert(chartdiff.hash),
@@ -49,7 +49,7 @@ function ChartdiffsRepo:selectChartdiff(chartdiff)
 end
 
 ---@param id number
----@return table?
+---@return sea.Chartdiff?
 function ChartdiffsRepo:selectChartdiffById(id)
 	return self.models.chartdiffs:find({id = assert(id)})
 end
@@ -73,6 +73,7 @@ function ChartdiffsRepo:deleteModifiedChartdiffs()
 end
 
 ---@param chartdiff table
+---@return sea.Chartdiff?
 function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
 	local _chartdiff = self:selectChartdiff(chartdiff)
 	if not _chartdiff then
@@ -82,6 +83,7 @@ function ChartdiffsRepo:createUpdateChartdiff(chartdiff)
 	return self:updateChartdiff(chartdiff)
 end
 
+---@return sea.Chartdiff[]
 function ChartdiffsRepo:getIncompleteChartdiffs()
 	local conds = {}
 	for _, field in ipairs(self.diffcalc_fields) do
