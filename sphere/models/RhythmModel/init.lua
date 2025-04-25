@@ -8,6 +8,7 @@ local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
 local PauseCounter = require("sphere.models.RhythmModel.PauseCounter")
 local ChartplayComputed = require("sea.chart.ChartplayComputed")
+local osu_pp = require("libchart.osu_pp")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -128,17 +129,20 @@ end
 function RhythmModel:getChartplayComputed()
 	local scoreEngine = self.scoreEngine
 	local scores = scoreEngine.scores
-	local judge_counter = assert(scoreEngine.judgesSource.judge_counter)
+	local judgesSource = assert(scoreEngine.judgesSource)
+
+	local ns_score = scores.normalscore:getScore()
+	local chartdiff = self.chartdiff
 
 	local c = ChartplayComputed()
 	c.pass = not scores.hp:isFailed()
-	c.judges = judge_counter.judges
+	c.judges = judgesSource:getJudges()
 	c.accuracy = scores.normalscore.accuracyAdjusted
 	c.max_combo = scores.base.maxCombo
 	c.miss_count = scores.base.missCount
-	c.not_perfect_count = judge_counter:getNotPerfect()
-	c.rating = 0
-	c.rating_pp = 0
+	c.not_perfect_count = judgesSource:getNotPerfect()
+	c.rating = ns_score * chartdiff.enps_diff
+	c.rating_pp = osu_pp.calc(ns_score, chartdiff.osu_diff, chartdiff.notes_count, 0)
 	c.rating_msd = 0
 
 	return c
