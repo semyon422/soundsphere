@@ -4,14 +4,13 @@ local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
 local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter")
 local JudgeAccuracy = require("sphere.models.RhythmModel.ScoreEngine.JudgeAccuracy")
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
 local Timings = require("sea.chart.Timings")
 
----@class sphere.LunaticRaveScore: sphere.ScoreSystem
+---@class sphere.LunaticRaveScore: sphere.ScoreSystem, sphere.SimpleJudgesSource, sphere.IAccuracySource
 ---@operator call: sphere.LunaticRaveScore
-local LunaticRaveScore = ScoreSystem + {}
-
-LunaticRaveScore.hasAccuracy = true
-LunaticRaveScore.hasJudges = true
+local LunaticRaveScore = ScoreSystem + SimpleJudgesSource + IAccuracySource
 
 LunaticRaveScore.judge_names = {"pgreat", "great", "good", "bad", "miss"}
 
@@ -64,7 +63,10 @@ function LunaticRaveScore:miss(event)
 end
 
 function LunaticRaveScore:getSlice()
-	return {accuracy = self:getAccuracy()}
+	return {
+		accuracy = self:getAccuracy(),
+		last_judge = self:getLastJudge(),
+	}
 end
 
 LunaticRaveScore.events = {

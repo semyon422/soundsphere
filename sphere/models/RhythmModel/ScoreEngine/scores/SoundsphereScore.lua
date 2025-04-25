@@ -2,11 +2,12 @@ local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
 local Timings = require("sea.chart.Timings")
 
----@class sphere.SoundsphereScore: sphere.ScoreSystem
+---@class sphere.SoundsphereScore: sphere.ScoreSystem, sphere.SimpleJudgesSource
 ---@operator call: sphere.SoundsphereScore
-local SoundsphereScore = ScoreSystem + {}
+local SoundsphereScore = ScoreSystem + SimpleJudgesSource
 
 SoundsphereScore.hasJudges = true
 
@@ -32,10 +33,6 @@ end
 
 function SoundsphereScore:miss(event)
 	self.judge_counter:add(-1)
-end
-
-function SoundsphereScore:getSlice()
-	return {}
 end
 
 SoundsphereScore.events = {

@@ -1,17 +1,16 @@
 -- SOURCE: https://github.com/Quaver/Quaver.API/blob/43e800efb079e9c099315c4b365490e357e2380c/Quaver.API/Maps/Processors/Scoring/ScoreProcessorKeys.cs
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
 local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter")
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
 local JudgeAccuracy = require("sphere.models.RhythmModel.ScoreEngine.JudgeAccuracy")
 local Timings = require("sea.chart.Timings")
 
----@class sphere.QuaverScore : sphere.ScoreSystem
+---@class sphere.QuaverScore :sphere.ScoreSystem, sphere.IAccuracySource, sphere.SimpleJudgesSource
 ---@operator call: sphere.QuaverScore
-local QuaverScore = ScoreSystem + {}
-
-QuaverScore.hasAccuracy = true
-QuaverScore.hasJudges = true
+local QuaverScore = ScoreSystem + IAccuracySource + SimpleJudgesSource
 
 QuaverScore.judge_names = {"marvelous", "perfect", "great", "good", "okay", "miss"}
 
@@ -61,7 +60,10 @@ function QuaverScore:getAccuracyString()
 end
 
 function QuaverScore:getSlice()
-	return {accuracy = self:getAccuracy()}
+	return {
+		accuracy = self:getAccuracy(),
+		last_judge = self:getLastJudge(),
+	}
 end
 
 QuaverScore.events = {

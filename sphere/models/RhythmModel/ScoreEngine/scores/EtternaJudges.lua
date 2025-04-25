@@ -2,6 +2,7 @@
 --- SOURCE: https://github.com/etternagame/etterna/blob/master/Themes/_fallback/Scripts/10%20Scores.lua
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
 local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter")
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
 local Timings = require("sea.chart.Timings")
@@ -18,11 +19,9 @@ local judgeTimingWindows = {
 	{4.5, 9, 18, 27, 180},
 }
 
----@class sphere.EtternaJudges: sphere.ScoreSystem
+---@class sphere.EtternaJudges: sphere.ScoreSystem, sphere.SimpleJudgesSource
 ---@operator call: sphere.EtternaJudges
-local EtternaJudges = ScoreSystem + {}
-
-EtternaJudges.hasJudges = true
+local EtternaJudges = ScoreSystem + SimpleJudgesSource
 
 EtternaJudges.judge_names = {"marvelous", "perfect", "great", "bad", "boo", "miss"}
 

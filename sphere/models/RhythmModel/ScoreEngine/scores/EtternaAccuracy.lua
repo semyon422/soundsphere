@@ -4,13 +4,12 @@
 local erfunc = require("libchart.erfunc")
 local math_util = require("math_util")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
 local Timings = require("sea.chart.Timings")
 
----@class sphere.EtternaAccuracy: sphere.ScoreSystem
+---@class sphere.EtternaAccuracy: sphere.ScoreSystem, sphere.IAccuracySource
 ---@operator call: sphere.EtternaAccuracy
-local EtternaAccuracy = ScoreSystem + {}
-
-EtternaAccuracy.hasAccuracy = true
+local EtternaAccuracy = ScoreSystem + IAccuracySource
 
 local judgeDifficulty = {0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20}
 

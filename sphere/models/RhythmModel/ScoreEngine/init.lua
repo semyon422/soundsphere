@@ -12,16 +12,22 @@ local EtternaAccuracy = require("sphere.models.RhythmModel.ScoreEngine.scores.Et
 local EtternaJudges = require("sphere.models.RhythmModel.ScoreEngine.scores.EtternaJudges")
 local LunaticRaveScore = require("sphere.models.RhythmModel.ScoreEngine.scores.LunaticRaveScore")
 
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
+local IComboSource = require("sphere.models.RhythmModel.ScoreEngine.IComboSource")
+local IHealthsSource = require("sphere.models.RhythmModel.ScoreEngine.IHealthsSource")
+local IJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.IJudgesSource")
+local IScoreSource = require("sphere.models.RhythmModel.ScoreEngine.IScoreSource")
+
 local ScoreEngineFactory = require("sphere.models.RhythmModel.ScoreEngine.ScoreEngineFactory")
 
 ---@class sphere.ScoreEngine
 ---@operator call: sphere.ScoreEngine
 ---@field judgement string
----@field ratingHitWindow number
----@field selectedScoring sphere.ScoreSystem
----@field accuracySource sphere.ScoreSystem
----@field scoreSource sphere.ScoreSystem
----@field judgesSource sphere.ScoreSystem
+---@field accuracySource sphere.IAccuracySource
+---@field comboSource sphere.IComboSource
+---@field healthsSource sphere.IHealthsSource
+---@field judgesSource sphere.IJudgesSource
+---@field scoreSource sphere.IScoreSource
 local ScoreEngine = class()
 
 function ScoreEngine:new()
@@ -31,10 +37,6 @@ function ScoreEngine:new()
 end
 
 function ScoreEngine:load()
-	self.accuracySource = nil
-	self.scoreSource = nil
-	self.judgesSource = nil
-
 	self.events = {}
 	---@type sphere.ScoreSystem[]
 	self.scoreSystems = {}
@@ -48,34 +50,27 @@ function ScoreEngine:load()
 	}
 	self.scores = by_name
 
-	---@type {[string]: sphere.ScoreSystem}
-	self.scoreSystemsByName = {}
-
-	for k, v in pairs(by_name) do
-		self:addScoreSystem(v)
-	end
+	self:selectDefault()
 
 	---@type {[string]: sphere.ScoreSystem}
 	self.scoreSystemsByName = by_name
 
-	-- self:addScoreSystem(QuaverScore())
-	-- for i = 0, 10 do
-	-- 	self:addScoreSystem(OsuManiaV1Score(i))
-	-- end
-	-- for i = 0, 10 do
-	-- 	self:addScoreSystem(OsuManiaV2Score(i))
-	-- end
-	-- for i = 1, 9 do
-	-- 	self:addScoreSystem(EtternaAccuracy(i))
-	-- 	self:addScoreSystem(EtternaJudges(i))
-	-- end
-	-- for i = 0, 3 do
-	-- 	self:addScoreSystem(LunaticRaveScore(i))
-	-- end
+	for _, v in pairs(by_name) do
+		table.insert(self.scoreSystems, v)
+	end
 
 	self:select(self.judgement)
 
 	self.sequence = {}
+end
+
+function ScoreEngine:selectDefault()
+	local scores = self.scores
+	self.accuracySource = scores.normalscore
+	self.comboSource = scores.base
+	self.healthsSource = scores.hp
+	self.judgesSource = scores.soundsphere
+	self.scoreSource = scores.normalscore
 end
 
 ---@param t sea.Timings
@@ -96,14 +91,18 @@ end
 
 ---@param key string
 function ScoreEngine:select(key)
-	local soundsphere = assert(self:getScoreSystem("soundsphere"))
-	local normalscore = assert(self:getScoreSystem("normalscore"))
+	local score = self:getScoreSystem(key)
+	if not score then
+		self:selectDefault()
+		return
+	end
+	---@cast score any
 
-	local score = self:getScoreSystem(key) or soundsphere
-	self.selectedScoring = score
-	self.accuracySource = score.hasAccuracy and score or self.accuracySource or normalscore
-	self.scoreSource = score.hasScore and score or self.scoreSource or normalscore
-	self.judgesSource = score.hasJudges and score or self.judgesSource or soundsphere
+	self.accuracySource = IAccuracySource * score and score or self.accuracySource
+	self.comboSource = IComboSource * score and score or self.comboSource
+	self.healthsSource = IHealthsSource * score and score or self.healthsSource
+	self.judgesSource = IJudgesSource * score and score or self.judgesSource
+	self.scoreSource = IScoreSource * score and score or self.scoreSource
 end
 
 ---@param key string
@@ -157,31 +156,6 @@ function ScoreEngine:receive(event)
 	local slice = self:getSlice()
 	self.slice = slice
 	table.insert(self.sequence, slice)
-end
-
----@return number
-function ScoreEngine:getAccuracy()
-	return self.accuracySource:getAccuracy()
-end
-
----@return string
-function ScoreEngine:getAccuracyString()
-	return self.accuracySource:getAccuracyString()
-end
-
----@return number
-function ScoreEngine:getScore()
-	return self.scoreSource:getScore()
-end
-
----@return string
-function ScoreEngine:getScoreString()
-	return self.scoreSource:getScoreString()
-end
-
----@return sphere.JudgeCounter
-function ScoreEngine:getJudgeCounter()
-	return assert(self.judgesSource.judge_counter)
 end
 
 return ScoreEngine

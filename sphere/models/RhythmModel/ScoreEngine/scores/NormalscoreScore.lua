@@ -1,13 +1,12 @@
 local normalscore = require("libchart.normalscore3")
 local erfunc = require("libchart.erfunc")
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
+local IScoreSource = require("sphere.models.RhythmModel.ScoreEngine.IScoreSource")
 
----@class sphere.NormalscoreScore: sphere.ScoreSystem
+---@class sphere.NormalscoreScore: sphere.ScoreSystem, sphere.IAccuracySource, sphere.IScoreSource
 ---@operator call: sphere.NormalscoreScore
-local NormalscoreScore = ScoreSystem + {}
-
-NormalscoreScore.hasAccuracy = true
-NormalscoreScore.hasScore = true
+local NormalscoreScore = ScoreSystem + IAccuracySource + IScoreSource
 
 function NormalscoreScore:new()
 	self.normalscore = normalscore:new()
@@ -42,7 +41,11 @@ function NormalscoreScore:getAccuracyString()
 end
 
 function NormalscoreScore:getScore()
-	return erfunc.erf(0.032 / ((self.accuracyAdjusted or math.huge) * math.sqrt(2))) * 10000
+	return erfunc.erf(0.032 / ((self.accuracyAdjusted or math.huge) * math.sqrt(2)))
+end
+
+function NormalscoreScore:getScoreString()
+	return ("%d"):format(self:getScore() * 10000)
 end
 
 ---@param range_name string

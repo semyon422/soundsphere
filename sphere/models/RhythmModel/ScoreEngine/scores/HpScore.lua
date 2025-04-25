@@ -1,8 +1,9 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IHealthsSource = require("sphere.models.RhythmModel.ScoreEngine.IHealthsSource")
 
----@class sphere.HpScore: sphere.ScoreSystem
+---@class sphere.HpScore: sphere.ScoreSystem, sphere.IHealthsSource
 ---@operator call: sphere.HpScore
-local HpScore = ScoreSystem + {}
+local HpScore = ScoreSystem + IHealthsSource
 
 HpScore.max = 1000
 
@@ -44,14 +45,18 @@ end
 
 ---@return table
 function HpScore:getSlice()
-	local slice = {}
-	for _, v in ipairs(self) do
-		table.insert(slice, {
-			notes = v.notes,
-			value = v.value,
-		})
-	end
-	return slice
+	-- local slice = {}
+	-- for _, v in ipairs(self) do
+	-- 	table.insert(slice, {
+	-- 		notes = v.notes,
+	-- 		value = v.value,
+	-- 	})
+	-- end
+	-- return slice
+	return {
+		healths = self:getHealths(),
+		max_healths = self:getMaxHealths(),
+	}
 end
 
 ---@return number
@@ -63,6 +68,16 @@ function HpScore:getCurrent()
 		end
 	end
 	return 0, 1
+end
+
+---@return number
+function HpScore:getHealths()
+	return (self:getCurrent())
+end
+
+---@return number
+function HpScore:getMaxHealths()
+	return self.max
 end
 
 ---@return boolean

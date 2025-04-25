@@ -1,9 +1,10 @@
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IComboSource = require("sphere.models.RhythmModel.ScoreEngine.IComboSource")
 local RingBuffer = require("RingBuffer")
 
----@class sphere.BaseScore: sphere.ScoreSystem
+---@class sphere.BaseScore: sphere.ScoreSystem, sphere.IComboSource
 ---@operator call: sphere.BaseScore
-local BaseScore = ScoreSystem + {}
+local BaseScore = ScoreSystem + IComboSource
 
 function BaseScore:new()
 	self.meanRingBuffer = RingBuffer(10)
@@ -27,6 +28,16 @@ end
 ---@return string
 function BaseScore:getKey()
 	return "base"
+end
+
+---@return integer
+function BaseScore:getCombo()
+	return self.combo
+end
+
+---@return integer
+function BaseScore:getMaxCombo()
+	return self.maxCombo
 end
 
 ---@param event table

@@ -184,14 +184,17 @@ local _HpGraph = PointGraphView({
 	backgroundRadius = 4,
 	point = function(self, point)
 		local value = 0
-		local _hp = self.game.rhythmModel.scoreEngine.scores.hp
-		local hp = point.hp
-		for _, h in ipairs(hp) do
-			if h.value > 0 then
-				value = h.value / _hp.max
-				break
-			end
-		end
+		local healthsSource = self.game.rhythmModel.scoreEngine.healthsSource
+		local slice = point[healthsSource:getKey()]
+		value = slice.healths / slice.max_healths
+
+		-- local hp = point.hp
+		-- for _, h in ipairs(hp) do
+		-- 	if h.value > 0 then
+		-- 		value = h.value / _hp.max
+		-- 		break
+		-- 	end
+		-- end
 
 		return 1 - value, 0.25, 1, 0.5, 1
 	end,
@@ -271,9 +274,9 @@ local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreSystem = scoreEngine.judgesSource
+	local judgesSource = scoreEngine.judgesSource
 
-	if not scoreSystem or not scoreItem then
+	if not judgesSource or not scoreItem then
 		return
 	end
 
@@ -291,8 +294,8 @@ local function Judgements(self)
 
 	w = w - padding * 2
 
-	local judgementLists = assert(scoreSystem.judge_names)
-	local counters = scoreSystem.judge_counter.judges
+	local judgementLists = judgesSource:getJudgeNames()
+	local counters = judgesSource:getJudges()
 
 	local perfect = show and counters.perfect or scoreItem.judges and scoreItem.judges[1] or 0
 	local notPerfect = show and counters["not perfect"] or scoreItem.judges and scoreItem.judges[2] or 0
@@ -388,7 +391,7 @@ local function JudgementsAccuracy(self)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-	imgui.Label("j.acc", scoreEngine:getAccuracyString(), h)
+	imgui.Label("j.acc", scoreEngine.accuracySource:getAccuracyString(), h)
 end
 
 ---@param self table

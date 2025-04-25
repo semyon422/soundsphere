@@ -1,18 +1,17 @@
 -- SOURCE: https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu!mania
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
 local JudgeAccuracy = require("sphere.models.RhythmModel.ScoreEngine.JudgeAccuracy")
 local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter")
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 
----@class sphere.OsuManiaV2Score: sphere.ScoreSystem
+---@class sphere.OsuManiaV2Score: sphere.ScoreSystem, sphere.IAccuracySource, sphere.SimpleJudgesSource
 ---@operator call: sphere.OsuManiaV2Score
-local OsuManiaV2Score = ScoreSystem + {}
-
-OsuManiaV2Score.hasAccuracy = true
-OsuManiaV2Score.hasJudges = true
+local OsuManiaV2Score = ScoreSystem + IAccuracySource + SimpleJudgesSource
 
 OsuManiaV2Score.judge_names = {"perfect", "great", "good", "ok", "meh", "miss"}
 
@@ -76,7 +75,10 @@ function OsuManiaV2Score:getAccuracyString()
 end
 
 function OsuManiaV2Score:getSlice()
-	return {accuracy = self:getAccuracy()}
+	return {
+		accuracy = self:getAccuracy(),
+		last_judge = self:getLastJudge(),
+	}
 end
 
 OsuManiaV2Score.events = {

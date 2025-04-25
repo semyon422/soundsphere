@@ -22,7 +22,7 @@ function test.qwe(t)
 	t:eq(se.accuracySource, osu_od85_v2)
 	t:eq(se.judgesSource, osu_od85_v2)
 
-	t:eq(se:getAccuracyString(), "0.00%")
+	t:eq(se.accuracySource:getAccuracyString(), "0.00%")
 
 	-- local acc = se:getAccuracy()
 	-- local score = se:getScore()

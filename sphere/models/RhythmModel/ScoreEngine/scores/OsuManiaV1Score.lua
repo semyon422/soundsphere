@@ -3,19 +3,18 @@
 local math_util = require("math_util")
 
 local ScoreSystem = require("sphere.models.RhythmModel.ScoreEngine.ScoreSystem")
+local IAccuracySource = require("sphere.models.RhythmModel.ScoreEngine.IAccuracySource")
+local IScoreSource = require("sphere.models.RhythmModel.ScoreEngine.IScoreSource")
+local SimpleJudgesSource = require("sphere.models.RhythmModel.ScoreEngine.SimpleJudgesSource")
 local JudgeAccuracy = require("sphere.models.RhythmModel.ScoreEngine.JudgeAccuracy")
 local JudgeCounter = require("sphere.models.RhythmModel.ScoreEngine.JudgeCounter")
 local JudgeWindows = require("sphere.models.RhythmModel.ScoreEngine.JudgeWindows")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 
----@class sphere.OsuManiaV1Score: sphere.ScoreSystem
+---@class sphere.OsuManiaV1Score: sphere.ScoreSystem, sphere.IAccuracySource, sphere.IScoreSource, sphere.SimpleJudgesSource
 ---@operator call: sphere.OsuManiaV1Score
-local OsuManiaV1Score = ScoreSystem + {}
-
-OsuManiaV1Score.hasAccuracy = true
-OsuManiaV1Score.hasScore = true
-OsuManiaV1Score.hasJudges = true
+local OsuManiaV1Score = ScoreSystem + IAccuracySource + IScoreSource + SimpleJudgesSource
 
 OsuManiaV1Score.judge_names = {"perfect", "great", "good", "ok", "meh", "miss"}
 
@@ -190,7 +189,8 @@ end
 function OsuManiaV1Score:getSlice()
 	return {
 		accuracy = self:getAccuracy(),
-		score = self.score,
+		last_judge = self:getLastJudge(),
+		score = self:getScore(),
 	}
 end
 

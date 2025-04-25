@@ -61,26 +61,6 @@ function ScoreSystem:receive(event)
 	self:after(event)
 end
 
----@return number
-function ScoreSystem:getAccuracy()
-	error("not implemented")
-end
-
----@return string
-function ScoreSystem:getAccuracyString()
-	return tostring(self:getAccuracy())
-end
-
----@return number
-function ScoreSystem:getScore()
-	error("not implemented")
-end
-
----@return string
-function ScoreSystem:getScoreString()
-	return tostring(self:getScore())
-end
-
 ---@return table
 function ScoreSystem:getSlice()
 	return {}

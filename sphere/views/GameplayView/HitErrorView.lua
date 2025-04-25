@@ -53,10 +53,11 @@ local miss = { 1, 0, 0, 1 }
 
 ---@param value any
 ---@param unit any
----@param judgesSource sphere.ScoreSystem
+---@param judgesSource sphere.IJudgesSource
+---@param slice table
 ---@return table
-function HitErrorView.color(value, unit, judgesSource)
-	local index = judgesSource.judge_windows:get(value)
+function HitErrorView.color(value, unit, judgesSource, slice)
+	local index = slice.last_judge
 	return HitErrorView.colors[judgesSource.timings.name][index] or miss
 end
 
@@ -127,7 +128,11 @@ function HitErrorView:drawPoint(point, fade)
 	end
 
 	if type(color) == "function" then
-		color = color(value, unit, self.judgesSource)
+		local scoreSystem = self.judgesSource
+		---@cast scoreSystem +sphere.ScoreSystem, -sphere.IJudgesSource
+		local slice = point[scoreSystem:getKey()]
+
+		color = color(value, unit, self.judgesSource, slice)
 	end
 	local alpha = color[4]
 	color[4] = color[4] * map(fade, 0, self.count, 1, 0)
