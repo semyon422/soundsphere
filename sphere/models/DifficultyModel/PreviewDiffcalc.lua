@@ -1,4 +1,6 @@
 local IDiffcalc = require("sphere.models.DifficultyModel.IDiffcalc")
+local RefChart = require("refchart.RefChart")
+local Restorer = require("refchart.Restorer")
 local ChartEncoder = require("sph.ChartEncoder")
 local SphPreview = require("sph.SphPreview")
 local LinesCleaner = require("sph.lines.LinesCleaner")
@@ -13,7 +15,9 @@ PreviewDiffcalc.chartdiff_field = "notes_preview"
 
 ---@param ctx sphere.DiffcalcContext
 function PreviewDiffcalc:compute(ctx)
-	local chart = ctx.chart
+	-- make a copy because code below mutates chart
+	local refchart = RefChart(ctx.chart)
+	local chart = Restorer():restore(refchart)
 
 	local ok, err = pcall(function()
 		chart.layers.main:toInterval()

@@ -1,5 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
+local AbsoluteLayer = require("ncdk2.layers.AbsoluteLayer")
 local DiffcalcRegistry = require("sphere.models.DifficultyModel.DiffcalcRegistry")
 local DiffcalcContext = require("sphere.models.DifficultyModel.DiffcalcContext")
 
@@ -25,10 +26,12 @@ end
 ---@param chart ncdk2.Chart
 ---@param rate number
 function DifficultyModel:compute(chartdiff, chart, rate)
+	assert(AbsoluteLayer * chart.layers.main)
 	local context = self.context
 	table_util.clear(context)
 	context:new(chartdiff, chart, rate)
 	self.registry:compute(context, false)
+	assert(AbsoluteLayer * chart.layers.main)
 end
 
 return DifficultyModel

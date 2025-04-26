@@ -7,6 +7,7 @@ local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
 local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 
 local test = {}
@@ -62,7 +63,14 @@ local function create_chartplay(ctx, values)
 	chartplay.rate = values.rate or 1
 	chartplay.mode = values.mode or "mania"
 	chartplay.rating = values.rating or 0
-	chartplay.result = values.result or "fail"
+	chartplay.not_perfect_count = values.not_perfect_count or 0
+	chartplay.timings = values.timings or Timings("simple", 0.1)
+	chartplay.subtimings = values.subtimings
+	if values.pass ~= nil then
+		chartplay.pass = values.pass
+	else
+		chartplay.pass = false
+	end
 	return ctx.db.models.chartplays:create(chartplay)
 end
 
@@ -162,26 +170,59 @@ function test.nearest_filter_multiple(t)
 end
 
 ---@param t testing.T
-function test.result_filter(t)
+function test.pass_filter(t)
 	local ctx = create_test_ctx()
 
 	local _chartplays = {
-		create_chartplay(ctx, {rating = 1, result = "pfc"}),
-		create_chartplay(ctx, {rating = 2, result = "fc"}),
-		create_chartplay(ctx, {rating = 3, result = "pass"}),
-		create_chartplay(ctx, {rating = 4, result = "fail"}),
+		create_chartplay(ctx, {rating = 1, pass = true}),
+		create_chartplay(ctx, {rating = 2, pass = false}),
 	}
 
-	t:eq(#_chartplays, 4)
+	t:eq(#_chartplays, 2)
 
 	for _, c in ipairs(_chartplays) do
-		ctx.leaderboard.result = c.result
+		ctx.leaderboard.pass = c.pass
 		lb_update_select(ctx)
 
 		local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 		if t:eq(#chartplays, 1) then
 			t:eq(chartplays[1].rating, c.rating)
 		end
+	end
+end
+
+---@param t testing.T
+function test.judges_result_filter(t)
+	local ctx = create_test_ctx()
+
+	local _chartplays = {
+		create_chartplay(ctx, {rating = 1, miss_count = 0, not_perfect_count = 0}),
+		create_chartplay(ctx, {rating = 2, miss_count = 0, not_perfect_count = 1}),
+		create_chartplay(ctx, {rating = 3, miss_count = 1, not_perfect_count = 1}),
+	}
+
+	ctx.leaderboard.judges = "pfc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+
+	ctx.leaderboard.judges = "fc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.judges = "any"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 3)
 	end
 end
 
@@ -300,13 +341,13 @@ function test.free_timings_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
-		timings = Timings("simple", 100),
+		timings = Timings("simple", 0.1),
 		hash = "",
 		index = 1,
 	})
 
-	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 100)})
-	create_chartplay(ctx, {rating = 2, timings = Timings("simple", 200)})
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)
@@ -323,6 +364,61 @@ function test.free_timings_filter(t)
 	if t:eq(#chartplays, 1) then
 		t:eq(chartplays[1].rating, 1)
 	end
+end
+
+---@param t testing.T
+function test.free_timings_filter_specific(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		timings = Timings("simple", 0.2),
+		hash = "",
+		index = 1,
+	})
+
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.allow_free_timings = false
+	ctx.leaderboard.timings = Timings("simple", 0.1)
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+end
+
+---@param t testing.T
+function test.free_timings_filter_undefined(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		hash = "",
+		index = 1,
+	})
+
+	create_chartplay(ctx, {rating = 1})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+
+	ctx.leaderboard.allow_free_timings = false
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 0)
 end
 
 ---@param t testing.T

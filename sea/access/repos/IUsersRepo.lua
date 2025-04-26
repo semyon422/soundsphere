@@ -21,6 +21,12 @@ function IUsersRepo:findUserByEmail(email)
 	return {}
 end
 
+---@param email string
+---@return sea.UserInsecure?
+function IUsersRepo:findUserInsecureByEmail(email)
+	return {}
+end
+
 ---@param name string
 ---@return sea.User?
 function IUsersRepo:findUserByName(name)

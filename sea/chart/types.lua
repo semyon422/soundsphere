@@ -1,14 +1,22 @@
 local valid = require("valid")
 local types = require("sea.shared.types")
+local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
+local Healths = require("sea.chart.Healths")
+local TimingValues = require("sea.chart.TimingValues")
 local InputMode = require("ncdk.InputMode")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 local chart_types = {}
 
--- TODO: better validation
-chart_types.timings_or_healths = valid.struct({
+local timings_or_healths = valid.struct({
 	name = types.name,
 	data = valid.optional(types.number),
 })
+
+chart_types.timings = valid.compose(timings_or_healths, Timings.validate)
+chart_types.subtimings = valid.compose(timings_or_healths, Subtimings.validate)
+chart_types.healths = valid.compose(timings_or_healths, Healths.validate)
 
 local function modifier_value(v)
 	if v == nil then
@@ -51,6 +59,43 @@ function chart_types.inputmode(v)
 	end
 
 	return tostring(InputMode(_t)) == v
+end
+
+---@param v integer[]
+local function is_columns_order(v)
+	local t = table.move(v, 1, #v, 1, {})
+	table.sort(t)
+	for i = 1, #t do
+		if i ~= t[i] then
+			return
+		end
+	end
+	return true
+end
+is_columns_order = valid.optional(valid.compose(valid.array(types.index, 100), is_columns_order))
+chart_types.columns_order = is_columns_order
+
+assert(is_columns_order())
+assert(is_columns_order({1, 3, 2}))
+assert(not is_columns_order({1, 3}))
+
+---@param chartplay sea.Chartplay
+---@return true?
+---@return string?
+local function subtimings_pair(chartplay)
+	if not chartplay.timings then
+		return true
+	end
+	local ok, err = TimingValuesFactory:get(chartplay.timings, chartplay.subtimings)
+	if not ok then
+		return nil, err
+	end
+	return true
+end
+chart_types.subtimings_pair = subtimings_pair
+
+function chart_types.timing_values(v)
+	return TimingValues.validate(v)
 end
 
 return chart_types

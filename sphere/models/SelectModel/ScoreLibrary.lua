@@ -118,13 +118,12 @@ end
 function ScoreLibrary:updateItemsLocal(chartview, exact)
 	local scores
 	if exact then
-		scores = self.cacheModel.scoresRepo:getScoresExact(chartview)
+		scores = self.cacheModel.chartplaysRepo:getChartplaysForChartdiff(chartview)
 	else
-		scores = self.cacheModel.scoresRepo:getScores(chartview)
+		scores = self.cacheModel.chartplaysRepo:getChartplaysForChartmeta(chartview)
 	end
 
 	for i, score in ipairs(scores) do
-		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 		self:fillScoreRating(score)
 	end
 	table.sort(scores, function(a, b)
@@ -137,9 +136,9 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 	self.items = scores
 end
 
----@param score_id number
+---@param chartplay_id number
 ---@return number
-function ScoreLibrary:getItemIndex(score_id)
+function ScoreLibrary:getItemIndex(chartplay_id)
 	local items = self.items
 
 	if not items then
@@ -148,7 +147,7 @@ function ScoreLibrary:getItemIndex(score_id)
 
 	for i = 1, #items do
 		local item = items[i]
-		if item.id == score_id then
+		if item.id == chartplay_id then
 			return i
 		end
 	end
@@ -183,7 +182,6 @@ function ScoreLibrary:transformOnlineScore(score, chartview)
 	}
 	for k, v in pairs(s) do
 		score[k] = v
-		self.cacheModel.chartdiffGenerator:fillMeta(score, chartview)
 	end
 	return score
 end

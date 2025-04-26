@@ -52,11 +52,11 @@ function NoteChartSetLibrary:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id
 	local chartdiff_id = chartview.chartdiff_id
 	local set_id = chartview.chartfile_set_id
-	local score_id = chartview.score_id
+	local chartplay_id = chartview.chartplay_id
 
 	local cdb = self.cacheModel.chartviewsRepo
 	return
-		cdb.score_id_to_global_index[score_id] or
+		cdb.chartplay_id_to_global_index[chartplay_id] or
 		cdb.chartdiff_id_to_global_index[chartdiff_id] or
 		cdb.chartfile_id_to_global_index[chartfile_id] or
 		cdb.set_id_to_global_index[set_id] or

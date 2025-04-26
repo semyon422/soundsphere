@@ -26,7 +26,7 @@ local EditorController = class()
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
 ---@param previewModel sphere.PreviewModel
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 function EditorController:new(
 	selectModel,
 	editorModel,
@@ -37,7 +37,7 @@ function EditorController:new(
 	cacheModel,
 	fileFinder,
 	previewModel,
-	playContext
+	replayBase
 )
 	self.selectModel = selectModel
 	self.editorModel = editorModel
@@ -48,7 +48,7 @@ function EditorController:new(
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
 	self.previewModel = previewModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 end
 
 function EditorController:load()
@@ -61,7 +61,7 @@ function EditorController:load()
 	local chart, chartmeta = selectModel:loadChart()
 
 	if love.keyboard.isDown("lshift") then
-		ModifierModel:apply(self.playContext.modifiers, chart)
+		ModifierModel:apply(self.replayBase.modifiers, chart)
 	end
 
 	local chartview = selectModel.chartview
@@ -212,7 +212,7 @@ function EditorController:sliceKeysounds()
 			---@cast p chartedit.Point
 
 			print(p, file_name)
-			note.sounds = {{path_util.join(chartview.name, file_name), 1}}
+			note.data.sounds = {{path_util.join(chartview.name, file_name), 1}}
 
 			local path = path_util.join(dir, file_name)
 			love.filesystem.write(path, wave:encode())
@@ -242,7 +242,7 @@ local function getPatternNotes(notes, sounds_map)
 			local p = note.visualPoint.point
 			---@cast p chartedit.Point
 
-			local sound = note.sounds and note.sounds[1] and note.sounds[1][1]
+			local sound = note.data.sounds and note.data.sounds[1] and note.data.sounds[1][1]
 
 			local time = p:getGlobalTime():tonumber()
 			pattern_notes[time] = pattern_notes[time] or {}

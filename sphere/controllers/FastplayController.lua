@@ -1,83 +1,55 @@
 local class = require("class")
-local InputMode = require("ncdk.InputMode")
-local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sphere.FastplayController
 ---@operator call: sphere.FastplayController
 local FastplayController = class()
 
+FastplayController.need_preview = false
+
 ---@param rhythmModel sphere.RhythmModel
 ---@param replayModel sphere.ReplayModel
----@param cacheModel sphere.CacheModel
----@param playContext sphere.PlayContext
+---@param difficultyModel sphere.DifficultyModel
 function FastplayController:new(
 	rhythmModel,
 	replayModel,
-	cacheModel,
-	playContext
+	difficultyModel
 )
 	self.rhythmModel = rhythmModel
 	self.replayModel = replayModel
-	self.cacheModel = cacheModel
-	self.playContext = playContext
+	self.difficultyModel = difficultyModel
 end
 
----@param chart ncdk2.Chart
----@param replay sphere.Replay
----@return table
-function FastplayController:applyModifiers(chart, replay)
-	local state = {}
-	state.inputMode = InputMode(chart.inputMode)
-
-	local modifiers = self.playContext.modifiers
-	ModifierModel:applyMeta(modifiers, state)
-	ModifierModel:apply(modifiers, chart)
-
-	return state
-end
-
----@param chart ncdk2.Chart
----@param chartmeta sea.Chartmeta
----@param replay sphere.Replay
-function FastplayController:play(chart, chartmeta, replay)
+---@param computeContext sea.ComputeContext
+---@param replay sea.Replay
+function FastplayController:play(computeContext, replay)
 	local rhythmModel = self.rhythmModel
 	local replayModel = self.replayModel
-	local cacheModel = self.cacheModel
-	local playContext = self.playContext
 
-	local chartdiff = {
-		rate = playContext.rate,
-		inputmode = tostring(chart.inputMode),
-		notes_preview = "",  -- do not generate preview
-	}
-	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
+	local chart = assert(computeContext.chart)
+	local chartmeta = assert(computeContext.chartmeta)
+	local chartdiff, state = computeContext:computeChartdiff(replay)
+	computeContext:applyColumnOrder(replay.columns_order)
+	if replay.tap_only then
+		computeContext:applyTapOnly()
+	end
 
-	local state = self:applyModifiers(chart, replay)
-
-	rhythmModel:setTimeRate(playContext.rate)
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 
 	replayModel:setMode("replay")
 	rhythmModel.inputManager:setMode("internal")
-	rhythmModel.inputManager.observable:add(replayModel)
 
 	rhythmModel:load()
 
-	chartdiff.modifiers = playContext.modifiers
-	playContext.chartdiff = chartdiff
-	chart.chartdiff = chartdiff
+	chartdiff.modifiers = replay.modifiers
 
-	rhythmModel.timeEngine:sync(0)
 	rhythmModel:loadLogicEngines()
 	replayModel:load()
 
-	rhythmModel.timeEngine:play()
 	rhythmModel.timeEngine.currentTime = math.huge
 	replayModel:update()
 	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
 
 	rhythmModel:unloadAllEngines()
 end

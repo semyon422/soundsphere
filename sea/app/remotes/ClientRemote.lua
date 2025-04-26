@@ -7,7 +7,7 @@ local ClientRemote = class()
 
 ---@param game sphere.GameplayController
 function ClientRemote:new(game)
-	self.submission = SubmissionClientRemote(game.cacheModel)
+	self.submission = SubmissionClientRemote(game.cacheModel.computeDataProvider)
 end
 
 return ClientRemote

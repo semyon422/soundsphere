@@ -1,58 +1,91 @@
 local class = require("class")
-local odhp = require("osu.odhp")
-local TimingValues = require("sea.chart.TimingValues")
+
+---@alias sea.TimingsName
+---| "unknown"
+---| "arbitrary"
+---| "sphere"
+---| "simple"
+---| "osuod"
+---| "etternaj"
+---| "quaver"
+---| "bmsrank"
 
 ---@class sea.Timings
 ---@operator call: sea.Timings
----@field name string
----@field data number?
+---@field name sea.TimingsName
+---@field data number
 local Timings = class()
 
----@param name string
----@param data any?
+Timings.names = {
+	"arbitrary",
+	"sphere",
+	"simple",
+	"osuod",
+	"etternaj",
+	"quaver",
+	"bmsrank",
+}
+
+---@param name sea.TimingsName
+---@param data number?
 function Timings:new(name, data)
 	self.name = name
-	self.data = data
+	self.data = data or 0
 	local v = self:encode()
-	assert(v == math.floor(v))
+	assert(v == math.floor(v), "invalid")
+	assert(self:validate(), "invalid")
 end
 
----@return sea.TimingValues
-function Timings:getTimingValues()
-	local n = self.name
+---@return boolean
+function Timings:validate()
 	local v = self.data
-	---@cast v number
-	if n == "simple" then
-		return TimingValues():setSimple(v, v)
-	elseif n == "osumania" then
-		local od3 = odhp.od3(v)
-		return TimingValues():setSimple((151 - od3) / 1000, (188 - od3) / 1000)
-	elseif n == "etterna" then
-		return TimingValues():setSimple(0.18, 0.18)
+	local n = self.name
+
+	if n == "arbitrary" then
+		return v == 0
+	elseif n == "sphere" then
+		return v == 0
+	elseif n == "simple" then
+		v = v * 1000
+		return v >= 0 and v <= 1000 and v == math.floor(v)
+	elseif n == "osuod" then
+		v = v * 10
+		return v == math.floor(v)
+	elseif n == "etternaj" then
+		return v >= 1 and v <= 9
 	elseif n == "quaver" then
-		return TimingValues():setSimple(0.127, 0.164)
+		return v == 0
 	elseif n == "bmsrank" then
-		return TimingValues():setSimple(0.2, 0.2)
+		return v >= 0 and v <= 4 and v == math.floor(v)
+	elseif n == "unknown" then
+		return v == math.floor(v)
 	end
-	return TimingValues():setSimple(0, 0)
+
+	return false
 end
 
----@param t integer
+---@param v integer
 ---@return sea.Timings
-function Timings.decode(t)
-	assert(t, "missing timings value")
-	if t >= 0 and t <= 500 then
-		return Timings("simple", t / 1000)
-	elseif t >= 1100 and t <= 1200 then
-		return Timings("osumania", (t - 1100) / 10)
-	elseif t >= 1304 and t <= 1309 then
-		return Timings("etterna", t - 1300)
-	elseif t == 1400 then
+function Timings.decode(v)
+	assert(v, "missing timings value")
+
+	if v == 0 then
+		return Timings("arbitrary")
+	elseif v == 100 then
+		return Timings("sphere")
+	elseif v >= 1000 and v <= 2000 then
+		return Timings("simple", (v - 1000) / 1000)
+	elseif v >= 2100 and v <= 2200 then
+		return Timings("osuod", (v - 2100) / 10) -- OverallDifficulty
+	elseif v >= 2301 and v <= 2302 then
+		return Timings("etternaj", v - 2300)
+	elseif v == 2400 then
 		return Timings("quaver")
-	elseif t >= 1500 and t <= 1503 then
-		return Timings("bmsrank", t - 1500)
+	elseif v >= 2500 and v <= 2504 then
+		return Timings("bmsrank", v - 2500) -- #RANK
 	end
-	return Timings("unknown", t)
+
+	return Timings("unknown", v)
 end
 
 ---@param t sea.Timings
@@ -60,19 +93,33 @@ end
 function Timings.encode(t)
 	local v = t.data
 	local n = t.name
-	---@cast v number
-	if n == "simple" then
-		return v * 1000
-	elseif n == "osumania" then
-		return v * 10 + 1100
-	elseif n == "etterna" then
-		return v + 1300
+
+	if n == "arbitrary" then
+		return 0
+	elseif n == "sphere" then
+		return 100
+	elseif n == "simple" then
+		return 1000 + v * 1000
+	elseif n == "osuod" then
+		return 2100 + v * 10
+	elseif n == "etternaj" then
+		return 2300 + v
 	elseif n == "quaver" then
-		return 1400
+		return 2400
 	elseif n == "bmsrank" then
-		return v + 1500
+		return 2500 + v
 	end
+
 	return v
+end
+
+---@param t sea.Timings
+function Timings:__eq(t)
+	return self.name == t.name and self.data == t.data
+end
+
+function Timings:__tostring(t)
+	return ("Timings(%s, %s)"):format(self.name, self.data)
 end
 
 return Timings

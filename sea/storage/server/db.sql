@@ -65,8 +65,12 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 
 CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`id` INTEGER PRIMARY KEY,
+	`created_at` INTEGER,
+	`osu_ranked_status` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+
 	`timings` INTEGER,
 	`healths` INTEGER,
 	`title` TEXT,
@@ -79,36 +83,33 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`inputmode` TEXT,
 	`source` TEXT,
 	`tags` TEXT,
-	`format` TEXT,
+	`format` INTEGER,
 	`audio_path` TEXT,
 	`background_path` TEXT,
 	`preview_time` REAL,
 	`osu_beatmap_id` INTEGER,
 	`osu_beatmapset_id` INTEGER,
-	`osu_od` REAL,
-	`osu_hp` REAL,
-	`osu_ranked_status` INTEGER,
 	`tempo` REAL,
-	`played_at` INTEGER,
-	`added_at` INTEGER,
-	`created_at` INTEGER,
-	`used_columns` INTEGER,
-	`comment` TEXT,
-	UNIQUE(`hash`, `index`)
+	`tempo_avg` REAL,
+	`tempo_max` REAL,
+	`tempo_min` REAL
 );
 
+CREATE INDEX IF NOT EXISTS chartmetas_hash_idx ON chartmetas (`hash`);
+CREATE UNIQUE INDEX IF NOT EXISTS chartmetas_hash_index_idx ON chartmetas (`hash`, `index`);
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
+	`custom_user_id` INTEGER,
+	`created_at` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`modifiers` TEXT NOT NULL,
 	`rate` INTEGER NOT NULL,
-	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER NOT NULL,
-	`custom_user_id` INTEGER,
-	`notes_hash` TEXT,
+
 	`inputmode` TEXT,
 	`duration` REAL,
 	`start_time` REAL,
@@ -123,10 +124,10 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`msd_diff_data` TEXT,
 	`user_diff` REAL,
 	`user_diff_data` TEXT,
-	`notes_preview` BLOB,
-	UNIQUE(`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`)
+	`notes_preview` BLOB
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS chartdiffs_himrmc_idx ON chartdiffs (`hash`, `index`, `modifiers`, `rate`, `mode`, `custom_user_id`);
 CREATE INDEX IF NOT EXISTS chartdiffs_inputmode_idx ON chartdiffs (`inputmode`);
 CREATE INDEX IF NOT EXISTS chartdiffs_enps_idx ON chartdiffs (`enps_diff`);
 CREATE INDEX IF NOT EXISTS chartdiffs_osu_idx ON chartdiffs (`osu_diff`);
@@ -136,35 +137,39 @@ CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
-	`events_hash` TEXT NOT NULL DEFAULT "",
-	`notes_hash` TEXT NOT NULL DEFAULT "",
+	`compute_state` INTEGER,
+	`submitted_at` INTEGER,
+	`computed_at` INTEGER,
+
+	`replay_hash` TEXT,
+	`pause_count` INTEGER,
+	`created_at` INTEGER,
+
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
+
 	`modifiers` TEXT NOT NULL,
-	`custom` INTEGER NOT NULL DEFAULT 0,
 	`rate` INTEGER NOT NULL,
-	`rate_type` INTEGER NOT NULL DEFAULT 0,
 	`mode` INTEGER,
-	`const` INTEGER,
+
 	`nearest` INTEGER,
 	`tap_only` INTEGER,
 	`timings` INTEGER,
+	`subtimings` INTEGER,
 	`healths` INTEGER,
 	`columns_order` BLOB,
-	`created_at` INTEGER,
-	`submitted_at` INTEGER,
-	`computed_at` INTEGER,
-	`compute_state` INTEGER,
-	`pause_count` INTEGER,
-	`result` INTEGER,
+
+	`custom` INTEGER,
+	`const` INTEGER,
+	`rate_type` INTEGER,
+
 	`judges` BLOB,
 	`accuracy` REAL,
 	`max_combo` INTEGER,
-	`perfect_count` INTEGER,
 	`miss_count` INTEGER,
+	`not_perfect_count` INTEGER,
+	`pass` INTEGER,
 	`rating` REAL,
-	`accuracy_osu` REAL,
-	`accuracy_etterna` REAL,
 	`rating_pp` REAL,
 	`rating_msd` REAL
 );
@@ -181,7 +186,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`scores_comb` INTEGER,
 	`scores_comb_count` INTEGER,
 	`nearest` INTEGER,
-	`result` INTEGER,
+	`pass` INTEGER,
+	`judges` INTEGER,
 	`allow_custom` INTEGER,
 	`allow_const` INTEGER,
 	`allow_pause` INTEGER,
@@ -190,6 +196,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`allow_tap_only` INTEGER,
 	`allow_free_timings` INTEGER,
 	`allow_free_healths` INTEGER,
+	`timings` INTEGER,
+	`healths` INTEGER,
 	`mode` INTEGER,
 	`rate` BLOB,
 	`difftables` BLOB,

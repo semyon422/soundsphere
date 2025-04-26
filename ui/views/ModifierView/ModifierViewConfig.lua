@@ -64,25 +64,6 @@ local function Buttons(self)
 
 	imgui.setSize(454, 792, 454 / 2, 55)
 
-	local configs = self.game.configModel.configs
-	local g = configs.settings.gameplay
-
-	local timeRateModel = self.game.timeRateModel
-	local range = timeRateModel.range[g.rate_type]
-	local format = timeRateModel.format[g.rate_type]
-	local newRate = imgui.slider1("rate", timeRateModel:get(), format, range[1], range[2], range[3], "play rate")
-
-	if newRate ~= timeRateModel:get() then
-		self.game.modifierSelectModel:change()
-	end
-	timeRateModel:set(newRate)
-
-	g.rate_type = imgui.combo("rate_type", g.rate_type, timeRateModel.types, nil, "rate type")
-
-	local playContext = self.game.playContext
-	playContext.const = imgui.checkbox("const", playContext.const, "const")
-	playContext.single = imgui.checkbox("single", playContext.single, "single handler mode (taiko)")
-
 	love.graphics.replaceTransform(gfx_util.transform(transform))
 	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)
 

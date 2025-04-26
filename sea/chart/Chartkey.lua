@@ -1,24 +1,22 @@
 local class = require("class")
 local table_util = require("table_util")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
+local ChartdiffKeyPart = require("sea.chart.ChartdiffKeyPart")
 
----@class sea.Chartkey
+---@class sea.Chartkey: sea.ChartmetaKey, sea.ChartdiffKeyPart
 ---@operator call: sea.Chartkey
----@field hash string
----@field index integer
----@field modifiers sea.Modifier[]
----@field rate number
----@field mode sea.Gamemode
 local Chartkey = class()
+
+Chartkey.struct = {}
+table_util.copy(ChartmetaKey.struct, Chartkey.struct)
+table_util.copy(ChartdiffKeyPart.struct, Chartkey.struct)
+
+assert(#table_util.keys(Chartkey.struct) == 5)
 
 ---@param key sea.Chartkey
 ---@return boolean
 function Chartkey:equalsChartkey(key)
-	return
-		self.hash == key.hash and
-		self.index == key.index and
-		table_util.deepequal(self.modifiers, key.modifiers) and
-		self.rate == key.rate and
-		self.mode == key.mode
+	return self:equalsChartmetaKey(key) and self:equalsChartdiffKeyPart(key)
 end
 
 return Chartkey

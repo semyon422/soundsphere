@@ -91,9 +91,9 @@ function IChartsRepo:getChartplay(id)
 	return {}
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return sea.Chartplay?
-function IChartsRepo:getChartplayByEventsHash(events_hash)
+function IChartsRepo:getChartplayByReplayHash(replay_hash)
 	return {}
 end
 

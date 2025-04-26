@@ -13,4 +13,10 @@ users.relations = {
 	user_roles = {has_many = "user_roles", key = "user_id"},
 }
 
+---@param user sea.User
+function users.from_db(user)
+	user.email = nil
+	user.password = nil
+end
+
 return users

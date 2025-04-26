@@ -8,17 +8,17 @@ local MultiplayerController = class()
 ---@param multiplayerModel sphere.MultiplayerModel
 ---@param configModel sphere.ConfigModel
 ---@param selectModel sphere.SelectModel
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 function MultiplayerController:new(
 	multiplayerModel,
 	configModel,
 	selectModel,
-	playContext
+	replayBase
 )
 	self.multiplayerModel = multiplayerModel
 	self.configModel = configModel
 	self.selectModel = selectModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 end
 
 function MultiplayerController:load()
@@ -31,13 +31,13 @@ function MultiplayerController:load()
 				if not mpModel:isHost() then
 					self:findNotechart()
 					if not room.is_free_modifiers then
-						self.playContext.modifiers = room.modifiers
+						self.replayBase.modifiers = room.modifiers
 					end
 					if not room.is_free_const then
-						self.playContext.const = room.const
+						self.replayBase.const = room.const
 					end
 					if not room.is_free_rate then
-						self.playContext.rate = room.rate
+						self.replayBase.rate = room.rate
 					end
 				end
 			end
@@ -52,13 +52,13 @@ function MultiplayerController:load()
 					self.selectModel:setConfig(mpModel.chartview)
 				end
 				if not room.is_free_modifiers then
-					self.playContext.modifiers = room.modifiers
+					self.replayBase.modifiers = room.modifiers
 				end
 				if not room.is_free_const then
-					self.playContext.const = room.const
+					self.replayBase.const = room.const
 				end
 				if not room.is_free_rate then
-					self.playContext.rate = room.rate
+					self.replayBase.rate = room.rate
 				end
 			end
 			mpModel:setIsPlaying(true)

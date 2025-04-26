@@ -36,7 +36,7 @@ function MinLnLength:apply(config, chart)
 				note.endNote.type = "ignore"
 			end
 			note:unlink()
-			note:setType("note")
+			note:setType("tap")
 		end
 	end
 end

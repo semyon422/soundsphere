@@ -63,7 +63,7 @@ end
 
 ---@param self table
 local function FailedText(self)
-	if not self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed() then
+	if not self.game.rhythmModel.scoreEngine.healthsSource:isFailed() then
 		return
 	end
 	local w, h = Layout:move("base")

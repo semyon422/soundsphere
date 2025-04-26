@@ -3,6 +3,8 @@ local valid = require("valid")
 local types = require("sea.shared.types")
 local md5 = require("md5")
 local Chartfile = require("sea.chart.Chartfile")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local ReplayCoder = require("sea.replays.ReplayCoder")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
 ---@class sea.Chartplays
@@ -42,7 +44,7 @@ local validate_chartfile_data = valid.struct({
 ---@param user sea.User
 ---@param submission sea.SubmissionClientRemote
 ---@param hash string
----@return sea.Chartfile?
+---@return {chartfile: sea.Chartfile, data: string}?
 ---@return string?
 function Chartplays:requireChartfile(user, submission, hash)
 	local chartfile = self.charts_repo:getChartfileByHash(hash)
@@ -53,6 +55,16 @@ function Chartplays:requireChartfile(user, submission, hash)
 		chartfile_values.compute_state = "new"
 		chartfile_values.submitted_at = os.time()
 		chartfile = self.charts_repo:createChartfile(chartfile_values)
+	end
+
+	---@type string?
+	local file_data
+	if chartfile.name then
+		file_data = self.charts_storage:get(hash)
+	end
+
+	if file_data then
+		return {chartfile = chartfile, data = file_data}
 	end
 
 	local file, err = submission:getChartfileData(hash)
@@ -76,9 +88,45 @@ function Chartplays:requireChartfile(user, submission, hash)
 	chartfile.name = file.name
 	chartfile.size = #file.data
 	chartfile.submitted_at = os.time()
-	self.charts_repo:updateChartfile(chartfile)
+	chartfile = self.charts_repo:updateChartfile(chartfile)
 
-	return chartfile
+	return {chartfile = chartfile, data = file.data}
+end
+
+---@param submission sea.SubmissionClientRemote
+---@param hash string
+---@return sea.Replay?
+---@return string?
+function Chartplays:requireReplay(submission, hash)
+	local replay_data, err = submission:getReplayData(hash)
+	if not replay_data then
+		return nil, "get replay data: " .. (err or "missing error")
+	end
+
+	if type(replay_data) ~= "string" then
+		return nil, "invalid replay data"
+	end
+
+	if md5.sumhexa(replay_data) ~= hash then
+		return nil, "invalid replay hash"
+	end
+
+	local replay, err = ReplayCoder.decode(replay_data)
+	if not replay then
+		return nil, "can't decode replay: " .. err
+	end
+
+	local ok, err = valid.format(replay:validate())
+	if not ok then
+		return nil, "invalid replay: " .. err
+	end
+
+	local ok, err = self.replays_storage:set(hash, replay_data)
+	if not ok then
+		return nil, "storage set: " .. err
+	end
+
+	return replay
 end
 
 ---@param user sea.User
@@ -93,81 +141,94 @@ function Chartplays:submit(user, submission, chartplay_values, chartdiff_values)
 		return nil, "can submit: " .. err
 	end
 
-	local chartplay = self.charts_repo:getChartplayByEventsHash(chartplay_values.events_hash)
+	local chartplay = self.charts_repo:getChartplayByReplayHash(chartplay_values.replay_hash)
 	if not chartplay then
 		chartplay_values.id = nil
 		chartplay_values.user_id = user.id
-		chartplay_values.created_at = os.time()
+		chartplay_values.submitted_at = os.time()
 		chartplay_values.compute_state = "new"
 
 		chartplay = self.charts_repo:createChartplay(chartplay_values)
 	end
 
-	local chartfile, err = self:requireChartfile(user, submission, chartplay.hash)
-	if not chartfile then
+	assert(chartplay_values:equalsChartplay(chartplay))
+
+	local chartfile_and_data, err = self:requireChartfile(user, submission, chartplay.hash)
+	if not chartfile_and_data then
 		return nil, "require chartfile: " .. err
 	end
 
-	local events_data, err = submission:getEventsData(chartplay.events_hash)
-	if not events_data then
-		return nil, "get events data: " .. (err or "missing error")
+	local chartfile = chartfile_and_data.chartfile
+	local chartfile_data = chartfile_and_data.data
+
+	local replay, err = self:requireReplay(submission, chartplay.replay_hash)
+	if not replay then
+		return nil, "require replay: " .. err
 	end
 
-	if type(events_data) ~= "string" then
-		return nil, "invalid events data"
+	local eq, err = replay:equalsChartplayBase(chartplay)
+	if not eq then
+		return nil, "chartplay base of replay differs: " .. err
 	end
 
-	if md5.sumhexa(events_data) ~= chartplay.events_hash then
-		return nil, "invalid replay hash"
+	local eq, err = replay:equalsChartmetaKey(chartplay)
+	if not eq then
+		return nil, "chartmeta key of replay differs: " .. err
 	end
 
-	local ok, err = self.replays_storage:set(chartplay.events_hash, events_data)
-	if not ok then
-		return nil, "storage set: " .. err
-	end
-
-	chartplay.submitted_at = os.time()
-	self.charts_repo:updateChartplay(chartplay)
-
-	---@type sea.Chartplay
-	local computed_chartplay
 	---@type sea.Chartdiff
 	local computed_chartdiff
 	---@type sea.Chartmeta
 	local computed_chartmeta
 
 	if chartplay.custom then
-		computed_chartplay = chartplay
 		computed_chartdiff = chartdiff_values
 		computed_chartdiff.custom_user_id = user.id
 
-		computed_chartmeta, err = self.chartplay_computer:computeChartmeta(chartfile, chartplay.index)
+		computed_chartmeta, err = self.chartplay_computer:computeChartmeta(chartfile.name, chartfile_data, chartplay.index)
 		if not computed_chartmeta then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
 			return nil, "compute chartmeta: " .. err
 		end
 	else
-		local ret, err = self.chartplay_computer:compute(chartplay, chartfile)
+		local ret, err = self.chartplay_computer:compute(
+			chartfile.name, chartfile_data, chartplay.index, replay
+		)
 		if not ret then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
 			return nil, "compute: " .. err
 		end
 
-		computed_chartplay = ret.chartplay
 		computed_chartdiff = ret.chartdiff
 		computed_chartmeta = ret.chartmeta
 
-		if not chartplay:equalsComputed(computed_chartplay) then
+		local eq, err = chartplay:equalsComputed(ret.chartplay_computed)
+		if not eq then
 			chartplay.compute_state = "invalid"
 			self.charts_repo:updateChartplay(chartplay)
-			return nil, "computed chartplay differs"
+			return nil, "computed chartplay differs: " .. err
 		end
 
-		if not chartdiff_values:equalsComputed(computed_chartdiff) then
-			return nil, "computed values differs"
+		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff)
+		if not eq then
+			return nil, "computed values differs: " .. err
 		end
+	end
+
+	local timings = chartplay.timings or computed_chartmeta.timings
+	if not timings then
+		return nil, "missing timings"
+	end
+
+	local subtimings = chartplay.subtimings
+
+	local timing_values = TimingValuesFactory:get(timings, subtimings)
+	if not timing_values then
+		chartplay.compute_state = "invalid"
+		self.charts_repo:updateChartplay(chartplay)
+		return nil, "timing values differs"
 	end
 
 	chartplay.compute_state = "valid"

@@ -1,6 +1,7 @@
 local class = require("class")
 local UsersAccess = require("sea.access.access.UsersAccess")
 local User = require("sea.access.User")
+local UserInsecure = require("sea.access.UserInsecure")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
 
@@ -25,11 +26,7 @@ end
 
 ---@return sea.User[]
 function Users:getUsers()
-	local users = self.users_repo:getUsers()
-	for _, user in ipairs(users) do
-		user:hideConfidential()
-	end
-	return users
+	return self.users_repo:getUsers()
 end
 
 ---@param id integer?
@@ -43,14 +40,13 @@ function Users:getUser(id)
 	if not user then
 		return anon_user
 	end
-	user:hideConfidential()
 	return user
 end
 
 ---@param _ sea.User
 ---@param ip string
 ---@param time integer
----@param user_values sea.User
+---@param user_values sea.UserInsecure
 ---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"rate_exceeded"|"email_taken"|"name_taken"?
 function Users:register(_, ip, time, user_values)
@@ -75,7 +71,7 @@ function Users:register(_, ip, time, user_values)
 		return nil, "name_taken"
 	end
 
-	user = User()
+	user = UserInsecure()
 	user.name = user_values.name
 	user.email = email
 	user.password = self.password_hasher:digest(user_values.password)
@@ -109,7 +105,7 @@ end
 ---@param _ sea.User
 ---@param ip string
 ---@param time integer
----@param user_values sea.User
+---@param user_values sea.UserInsecure
 ---@return {session: sea.Session, user: sea.User}?
 ---@return "disabled"|"invalid_credentials"?
 function Users:login(_, ip, time, user_values)
@@ -117,7 +113,7 @@ function Users:login(_, ip, time, user_values)
 		return nil, "disabled"
 	end
 
-	local user = self.users_repo:findUserByEmail(user_values.email)
+	local user = self.users_repo:findUserInsecureByEmail(user_values.email)
 	if not user then
 		return nil, "invalid_credentials"
 	end
@@ -126,6 +122,8 @@ function Users:login(_, ip, time, user_values)
 	if not valid then
 		return nil, "invalid_credentials"
 	end
+
+	user = user:hideCredentials()
 
 	local session = Session()
 	session.active = true

@@ -139,11 +139,6 @@ function LongLogicalNote:getNoteTime(side)
 	error("Wrong side")
 end
 
-local scoreEvent = {
-	name = "NoteState",
-	noteType = "LongNote",
-}
-
 ---@param newState string
 ---@param reachableNote sphere.LogicalNote?
 function LongLogicalNote:switchState(newState, reachableNote)
@@ -180,6 +175,11 @@ function LongLogicalNote:switchState(newState, reachableNote)
 		currentTime = math.min(currentTime, time)
 		deltaTime = self:getLastTimeFromConfig(timings.LongNoteEnd)
 	end
+
+	local scoreEvent = {
+		name = "NoteState",
+		noteType = "LongNote",
+	}
 
 	scoreEvent.noteIndex = self.index
 	scoreEvent.noteIndexType = self.index .. self.column -- required for osu!legacy LN's to track their state

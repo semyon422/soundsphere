@@ -2,7 +2,6 @@ local just = require("just")
 local imgui = require("imgui")
 local thread = require("thread")
 local ModalImView = require("ui.imviews.ModalImView")
-local TimingsModalView = require("ui.views.TimingsModalView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
@@ -96,12 +95,6 @@ function drawSection:gameplay()
 	speedModel:set(newSpeed)
 
 	g.speedType = imgui.combo("speedType", g.speedType, speedModel.types, nil, "speed type")
-
-	if imgui.TextButton("open timings", "timings", w / 4, _h) then
-		self.game.ui.gameView:setModal(TimingsModalView)
-	end
-	just.sameline()
-	p.timings.nearest = imgui.checkbox("nearest", p.timings.nearest, "nearest input")
 
 	g.actionOnFail = imgui.combo("actionOnFail", g.actionOnFail, {"none", "pause", "quit"}, nil, "action on fail")
 	g.scaleSpeed = imgui.checkbox("scaleSpeed", g.scaleSpeed, "scale scroll speed with rate")

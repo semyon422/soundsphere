@@ -5,13 +5,13 @@ local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
 local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
-local ScoresRepo = require("sphere.persistence.CacheModel.ScoresRepo")
+local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
-local OldScoresMigrator = require("sphere.persistence.CacheModel.OldScoresMigrator")
+local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -26,16 +26,13 @@ function CacheModel:new(difficultyModel)
 		local data = love.filesystem.read(("sphere/persistence/CacheModel/migrate%s.sql"):format(k))
 		return data
 	end})
-	migrations[1] = function()
-		self.oldScoresMigrator:migrate()
-	end
 
 	self.gdb = GameDatabase(migrations)
 	self.chartviewsRepo = ChartviewsRepo(self.gdb)
 	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, difficultyModel.registry.fields)
 	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
-	self.scoresRepo = ScoresRepo(self.gdb)
+	self.chartplaysRepo = ChartplaysRepo(self.gdb)
 	self.chartfilesRepo = ChartfilesRepo(self.gdb)
 	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartmetasRepo, self.chartdiffsRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, difficultyModel)
@@ -47,7 +44,12 @@ function CacheModel:new(difficultyModel)
 		"mounted_charts"
 	)
 
-	self.oldScoresMigrator = OldScoresMigrator(self.gdb)
+	self.computeDataProvider = ComputeDataProvider(
+		self.chartfilesRepo,
+		self.chartplaysRepo,
+		self.locationsRepo,
+		self.locationManager
+	)
 end
 
 function CacheModel:load()
@@ -92,6 +94,12 @@ function CacheModel:computeIncompleteChartdiffs(prefer_preview)
 	})
 end
 
+function CacheModel:computeChartplays()
+	table.insert(self.tasks, {
+		type = "update_chartplays",
+	})
+end
+
 ---@param path string
 ---@param location_id number
 function CacheModel:startUpdateAsync(path, location_id)
@@ -133,6 +141,8 @@ local runTaskAsync = thread.async(function(task)
 		cacheManager:computeChartdiffs()
 	elseif task.type == "update_incomplete_chartdiffs" then
 		cacheManager:computeIncompleteChartdiffs(task.prefer_preview)
+	elseif task.type == "update_chartplays" then
+		cacheManager:computeChartplays()
 	end
 
 	gdb:unload()

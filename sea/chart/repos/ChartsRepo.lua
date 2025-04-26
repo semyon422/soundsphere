@@ -105,10 +105,10 @@ function ChartsRepo:getChartplays()
 	return self.models.chartplays:select()
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return sea.Chartplay?
-function ChartsRepo:getChartplayByEventsHash(events_hash)
-	return self.models.chartplays:find({events_hash = assert(events_hash)})
+function ChartsRepo:getChartplayByReplayHash(replay_hash)
+	return self.models.chartplays:find({replay_hash = assert(replay_hash)})
 end
 
 ---@param chartplay sea.Chartplay

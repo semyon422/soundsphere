@@ -30,7 +30,7 @@ end
 
 ---@type {[notechart.NoteType]: {[1]: table, [2]: sphere.GraphicalNoteType}}
 local notes = {
-	note = {ShortGraphicalNote, "ShortNote"},
+	tap = {ShortGraphicalNote, "ShortNote"},
 	hold = {LongGraphicalNote, "LongNote"},
 	laser = {LongGraphicalNote, "LongNote"},
 	drumroll = {LongGraphicalNote, "LongNote"},

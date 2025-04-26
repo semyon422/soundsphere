@@ -1,21 +1,17 @@
+local table_util = require("table_util")
 local Chartkey = require("sea.chart.Chartkey")
-local RateType = require("sea.chart.RateType")
-local Gamemode = require("sea.chart.Gamemode")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 
 ---@class sea.Chartdiff: sea.Chartkey
 ---@operator call: sea.Chartdiff
+--- Server managed keys
 ---@field id integer
----@field hash string
----@field index integer
----@field modifiers sea.Modifier[]
----@field rate number
----@field rate_type sea.RateType
----@field mode sea.Gamemode
 ---@field custom_user_id integer
----@field notes_hash string
+---@field created_at integer
+--- Chartkey
+--- COMPUTED
 ---@field inputmode string
 ---@field duration number not affected by rate
 ---@field start_time number not affected by rate
@@ -37,43 +33,9 @@ function Chartdiff:new()
 	self.modifiers = {}
 end
 
-local computed_keys = {
-	-- "notes_hash",
-	"inputmode",
-	"duration",
-	"start_time",
-	"notes_count",
-	"density_data",
-	"sv_data",
-	"enps_diff",
-	"osu_diff",
-	"msd_diff",
-	"msd_diff_data",
-	"user_diff",
-	"user_diff_data",
-}
-
----@param values sea.Chartdiff
----@return boolean
-function Chartdiff:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		if self[key] ~= values[key] then
-			return false
-		end
-	end
-	return true
-end
-
 local note_types_count = valid.map(types.name, types.count, 10)
 
-local validate_chartdiff = valid.struct({
-	hash = types.md5hash,
-	index = types.index,
-	modifiers = chart_types.modifiers,
-	rate = types.number,
-	rate_type = types.new_enum(RateType),
-	mode = types.new_enum(Gamemode),
-	-- notes_hash = types.md5hash,
+Chartdiff.struct = {
 	inputmode = chart_types.inputmode,
 	duration = types.number,
 	start_time = types.number,
@@ -89,10 +51,26 @@ local validate_chartdiff = valid.struct({
 	user_diff = types.number,
 	user_diff_data = types.binary,
 	notes_preview = types.binary,
-})
+}
+
+local computed_keys = table_util.keys(Chartdiff.struct)
+assert(#table_util.keys(Chartdiff.struct) == 15)
+
+---@param values sea.Chartdiff
+---@return boolean?
+---@return string?
+function Chartdiff:equalsComputed(values)
+	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
+end
+
+table_util.copy(Chartkey.struct, Chartdiff.struct)
+
+assert(#table_util.keys(Chartdiff.struct) == 20)
+
+local validate_chartdiff = valid.struct(Chartdiff.struct)
 
 ---@return true?
----@return string|util.Errors?
+---@return string|valid.Errors?
 function Chartdiff:validate()
 	return validate_chartdiff(self)
 end

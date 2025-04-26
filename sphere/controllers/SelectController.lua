@@ -20,7 +20,7 @@ local SelectController = class()
 ---@param cacheModel sphere.CacheModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
 ---@param backgroundModel sphere.BackgroundModel
 ---@param previewModel sphere.PreviewModel
 ---@param chartPreviewModel sphere.ChartPreviewModel
@@ -34,7 +34,7 @@ function SelectController:new(
 	cacheModel,
 	osudirectModel,
 	windowModel,
-	playContext,
+	replayBase,
 	backgroundModel,
 	previewModel,
 	chartPreviewModel
@@ -48,7 +48,7 @@ function SelectController:new(
 	self.cacheModel = cacheModel
 	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 	self.backgroundModel = backgroundModel
 	self.previewModel = previewModel
 	self.chartPreviewModel = chartPreviewModel
@@ -61,7 +61,7 @@ function SelectController:load()
 	local selectModel = self.selectModel
 
 	self.configModel:write()
-	self.playContext:load(self.configModel.configs.play)
+	self.replayBase:importReplayBase(self.configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
 	self.selectModel:setLock(false)
@@ -75,17 +75,22 @@ end
 function SelectController:applyModifierMeta()
 	self.state.inputMode = InputMode()
 
-	local playContext = self.playContext
+	local replayBase = self.replayBase
 
 	local chartview = self.selectModel.chartview
 	if not chartview then
+		replayBase.columns_order = nil
 		return
 	end
 
-	self.previewModel:setRate(playContext.rate)
+	self.previewModel:setRate(replayBase.rate)
 	self.state.inputMode:set(chartview.inputmode)
 
-	ModifierModel:applyMeta(playContext.modifiers, self.state)
+	ModifierModel:applyMeta(replayBase.modifiers, self.state)
+
+	if replayBase.columns_order and #replayBase.columns_order ~= self.state.inputMode:getColumns() then
+		replayBase.columns_order = nil
+	end
 end
 
 function SelectController:beginUnload()
@@ -93,7 +98,7 @@ function SelectController:beginUnload()
 end
 
 function SelectController:unload()
-	self.playContext:save(self.configModel.configs.play)
+	self.replayBase:exportReplayBase(self.configModel.configs.play)
 	self.configModel:write()
 end
 
@@ -263,7 +268,7 @@ function SelectController:exportToOsu()
 	local encoder = ChartEncoder()
 
 	local chart = selectModel:loadChartAbsolute()
-	ModifierModel:apply(self.playContext.modifiers, chart)
+	ModifierModel:apply(self.replayBase.modifiers, chart)
 
 	local data = encoder:encode({chart})
 

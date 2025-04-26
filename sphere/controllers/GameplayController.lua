@@ -3,14 +3,11 @@ local valid = require("valid")
 local math_util = require("math_util")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
-local InputMode = require("ncdk.InputMode")
-local TempoRange = require("notechart.TempoRange")
-local ModifierModel = require("sphere.models.ModifierModel")
-local Note = require("ncdk2.notes.Note")
 local Chartplay = require("sea.chart.Chartplay")
-local Chartdiff = require("sea.chart.Chartdiff")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
+local Subtimings = require("sea.chart.Subtimings")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -30,7 +27,8 @@ local GameplayController = class()
 ---@param speedModel sphere.SpeedModel
 ---@param cacheModel sphere.CacheModel
 ---@param fileFinder sphere.FileFinder
----@param playContext sphere.PlayContext
+---@param replayBase sea.ReplayBase
+---@param computeContext sea.ComputeContext
 ---@param pauseModel sphere.PauseModel
 ---@param offsetModel sphere.OffsetModel
 ---@param previewModel sphere.PreviewModel
@@ -51,7 +49,8 @@ function GameplayController:new(
 	speedModel,
 	cacheModel,
 	fileFinder,
-	playContext,
+	replayBase,
+	computeContext,
 	pauseModel,
 	offsetModel,
 	previewModel,
@@ -72,7 +71,8 @@ function GameplayController:new(
 	self.speedModel = speedModel
 	self.cacheModel = cacheModel
 	self.fileFinder = fileFinder
-	self.playContext = playContext
+	self.replayBase = replayBase
+	self.computeContext = computeContext
 	self.pauseModel = pauseModel
 	self.offsetModel = offsetModel
 	self.previewModel = previewModel
@@ -91,51 +91,34 @@ function GameplayController:load()
 	local replayModel = self.replayModel
 	local pauseModel = self.pauseModel
 	local fileFinder = self.fileFinder
-	local playContext = self.playContext
+	local replayBase = self.replayBase
+	local computeContext = self.computeContext
+
+	if replayModel.mode == "replay" then
+		replayBase = rhythmModel.replayBase
+	end
 
 	local chartview = self.selectModel.chartview
 	local config = configModel.configs.settings
 	local judgement = configModel.configs.select.judgements
 
-	local chart, chartmeta = selectModel:loadChartAbsolute(self:getImporterSettings())
-	assert(chart)
-	assert(chartmeta)
+	local data = assert(love.filesystem.read(chartview.location_path))
+	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
+	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
-	self:applyTempo(chart, chartmeta, config.gameplay.tempoFactor, config.gameplay.primaryTempo)
+	local chartdiff, state = computeContext:computeChartdiff(replayBase)
+	computeContext:applyColumnOrder(replayBase.columns_order)
+	if replayBase.tap_only then
+		computeContext:applyTapOnly()
+	end
+
+	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
-		self:applyAutoKeysound(chart)
+		computeContext:applyAutoKeysound()
 	end
 	if config.gameplay.swapVelocityType then
-		self:swapVelocityType(chart)
+		computeContext:swapVelocityType()
 	end
-
-	local state = {}
-	state.inputMode = InputMode(chart.inputMode)
-
-	ModifierModel:applyMeta(playContext.modifiers, state)
-	ModifierModel:apply(playContext.modifiers, chart)
-
-	local chartdiff = {
-		mode = "mania",
-		rate = playContext.rate,
-		inputmode = tostring(chart.inputMode),
-		notes_preview = "",  -- do not generate preview
-	}
-	setmetatable(chartdiff, Chartdiff)
-	---@cast chartdiff sea.Chartdiff
-	cacheModel.chartdiffGenerator.difficultyModel:compute(chartdiff, chart, playContext.rate)
-
-	chartdiff.modifiers = playContext.modifiers
-	chartdiff.hash = chartview.hash
-	chartdiff.index = chartview.index
-	chartdiff.rate_type = config.gameplay.rate_type
-
-	assert(valid.format(chartdiff:validate()))
-
-	-- cacheModel.chartdiffGenerator:fillMeta(chartdiff, chartview)
-
-	playContext.chartdiff = chartdiff
-	chart.chartdiff = chartdiff
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
@@ -151,16 +134,15 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
-	rhythmModel:setNoteChart(chart, chartmeta)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
 
+	self:actualizeReplayBase()
+
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setTimeRate(playContext.rate)
-	rhythmModel:setConstantSpeed(playContext.const)
-	rhythmModel:setTimings(playContext.timings)
-	rhythmModel:setSingleHandler(playContext.single)
+	rhythmModel:setReplayBase(replayBase)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 	rhythmModel:load()
@@ -169,6 +151,9 @@ function GameplayController:load()
 	rhythmModel:loadAllEngines()
 	replayModel:load()
 	pauseModel:load()
+
+	local timings = assert(replayBase.timings or chartmeta.timings)
+	self.rhythmModel.scoreEngine:createAndSelectByTimings(timings, replayBase.subtimings)
 
 	self:updateOffsets()
 
@@ -200,71 +185,35 @@ function GameplayController:load()
 	self.previewModel:stop()
 end
 
----@param chart ncdk2.Chart
----@param tempo number
-local function applyTempo(chart, tempo)
-	for _, visual in ipairs(chart:getVisuals()) do
-		visual.primaryTempo = tempo
-		visual:compute()
-	end
+---@param timings sea.Timings
+function GameplayController:setReplayBaseTimings(timings)
+	local replayBase = self.replayBase
+	local settings = self.configModel.configs.settings
+
+	local subtimings_config = settings.subtimings[timings.name]
+	local name = subtimings_config[1]
+	local value = subtimings_config[name]
+	local subtimings = Subtimings(name, value)
+
+	replayBase.timings = timings
+	replayBase.subtimings = subtimings
+	replayBase.timing_values = assert(TimingValuesFactory:get(timings, subtimings))
 end
 
----@param chart ncdk2.Chart
-function GameplayController:swapVelocityType(chart)
-	for _, visual in ipairs(chart:getVisuals()) do
-		visual.tempoMultiplyTarget = "local"
-		for _, vp in ipairs(visual.points) do
-			local vel = vp._velocity
-			if vel then
-				vel.localSpeed, vel.currentSpeed = vel.currentSpeed, vel.localSpeed
-			end
-		end
-		visual:compute()
-	end
+function GameplayController:actualizeReplayBaseTimings()
+	local chartmeta = assert(self.computeContext.chartmeta)
+	local settings = self.configModel.configs.settings
+
+	local timings = chartmeta.timings
+	timings = timings or Timings(unpack(settings.format_timings[chartmeta.format]))
+	self:setReplayBaseTimings(timings)
 end
 
----@param chart ncdk2.Chart
----@param chartmeta sea.Chartmeta
----@param tempoFactor number
----@param primaryTempo number
-function GameplayController:applyTempo(chart, chartmeta, tempoFactor, primaryTempo)
-	if tempoFactor == "primary" then
-		applyTempo(chart, primaryTempo)
-		return
-	end
+function GameplayController:actualizeReplayBase()
+	local config = self.configModel.configs.settings.replay_base
 
-	if tempoFactor == "average" and chartmeta.tempo_avg then
-		applyTempo(chart, chartmeta.tempo_avg)
-		return
-	end
-
-	local minTime = chartmeta.start_time
-	local maxTime = minTime + chartmeta.duration
-
-	local t = {}
-	t.average, t.minimum, t.maximum = TempoRange:find(chart, minTime, maxTime)
-
-	applyTempo(chart, t[tempoFactor])
-end
-
----@param chart ncdk2.Chart
-function GameplayController:applyAutoKeysound(chart)
-	for _, note in chart.notes:iter() do
-		if note.type == "note" or note.type == "hold" then
-			local soundNote = chart.notes:get(note.visualPoint, "auto")
-			if not soundNote then
-				soundNote = Note(note.visualPoint, "auto", "sample")
-				chart.notes:insert(soundNote)
-				soundNote.sounds = {}
-			end
-
-			if note.sounds then
-				for _, t in ipairs(note.sounds) do
-					table.insert(soundNote.sounds, t)
-				end
-				note.sounds = {}
-			end
-		end
+	if config.auto_timings then
+		self:actualizeReplayBaseTimings()
 	end
 end
 
@@ -305,23 +254,26 @@ function GameplayController:update(dt)
 end
 
 function GameplayController:discordPlay()
-	local chartview = self.selectModel.chartview
 	local rhythmModel = self.rhythmModel
-	local length = math.min(chartview.duration, 3600 * 24)
+	local computeContext = self.computeContext
+	local chartdiff = assert(computeContext.chartdiff)
+	local chartmeta = assert(computeContext.chartmeta)
+
+	local length = math.min(chartdiff.duration, 3600 * 24)
 
 	local timeEngine = rhythmModel.timeEngine
 	self.discordModel:setPresence({
 		state = "Playing",
-		details = ("%s - %s [%s]"):format(chartview.artist, chartview.title, chartview.name),
+		details = ("%s - %s [%s]"):format(chartmeta.artist, chartmeta.title, chartmeta.name),
 		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate),
 	})
 end
 
 function GameplayController:discordPause()
-	local chartview = self.selectModel.chartview
+	local chartmeta = assert(self.computeContext.chartmeta)
 	self.discordModel:setPresence({
 		state = "Playing (paused)",
-		details = ("%s - %s [%s]"):format(chartview.artist, chartview.title, chartview.name),
+		details = ("%s - %s [%s]"):format(chartmeta.artist, chartmeta.title, chartmeta.name),
 	})
 end
 
@@ -392,93 +344,59 @@ end
 
 function GameplayController:saveScore()
 	local rhythmModel = self.rhythmModel
+	local pauseCounter = rhythmModel.pauseCounter
 	local scoreEngine = rhythmModel.scoreEngine
-	local scoreSystem = scoreEngine.scoreSystem
-	local playContext = self.playContext
+	local replayBase = self.replayBase
+	local computeContext = self.computeContext
+	local config = self.configModel.configs.settings
 
-	local chartview = self.selectModel.chartview
-	local chartmeta = self.rhythmModel.chartmeta
+	local chartmeta = assert(computeContext.chartmeta)
+	local created_at = os.time()
 
-	local replayHash = self.replayModel:saveReplay(self.playContext.chartdiff, playContext)
+	local replay, replay_hash = self.replayModel:saveReplay(
+		replayBase,
+		chartmeta,
+		created_at,
+		pauseCounter.count,
+		config.replay_base.auto_timings
+	)
 
-	local chartdiff = self.playContext.chartdiff
+	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
 	chartdiff.notes_preview = nil  -- fixes erasing
 	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
-	local judge = scoreSystem.soundsphere.judges["soundsphere"]
-
-	local score = {
-		hash = chartdiff.hash,
-		index = chartdiff.index,
-		modifiers = chartdiff.modifiers,
-		rate = chartdiff.rate,
-		rate_type = chartdiff.rate_type,
-
-		const = playContext.const,
-		-- timings = playContext.timings,
-		single = playContext.single,
-
-		time = os.time(),
-		accuracy = scoreSystem.normalscore.accuracyAdjusted,
-		max_combo = scoreSystem.base.maxCombo,
-		replay_hash = replayHash,
-		ratio = scoreSystem.misc.ratio,
-		perfect = judge.counters.perfect,
-		not_perfect = judge.counters["not perfect"],
-		miss = scoreSystem.base.missCount,
-		mean = scoreSystem.normalscore.normalscore.mean,
-		earlylate = scoreSystem.misc.earlylate,
-		pauses = scoreEngine.pausesCount,
-	}
-	local scoreEntry = self.cacheModel.scoresRepo:insertScore(score)
-
-	local base = scoreSystem.base
-	if base.hitCount / base.notesCount >= 0.5 then
-		self.onlineModel.onlineScoreManager:submit(chartview, replayHash)
-	end
 
 	local chartplay = Chartplay()
 
-	-- chartplay.user_id = 0
-	chartplay.events_hash = replayHash
-	-- chartplay.notes_hash = ""
-	chartplay.hash = chartdiff.hash
-	chartplay.index = chartdiff.index
-	chartplay.modifiers = {}
-	chartplay.custom = true
-	chartplay.rate = chartdiff.rate
-	chartplay.rate_type = chartdiff.rate_type
-	chartplay.mode = "mania"
-	chartplay.const = playContext.const
-	chartplay.nearest = playContext.timings.nearest
-	chartplay.tap_only = false -- like NoLongNote
-	chartplay.timings = chartmeta.timings
-	chartplay.healths = chartmeta.healths
-	chartplay.columns_order = nil
-	chartplay.created_at = os.time()
-	-- chartplay.submitted_at = integer
-	-- chartplay.computed_at = integer
-	-- chartplay.compute_state = sea.ComputeState
-	chartplay.pause_count = scoreEngine.pausesCount
-	chartplay.result = "pass"
-	chartplay.judges = {}
-	chartplay.accuracy = 0.020
-	chartplay.max_combo = 0
-	chartplay.perfect_count = judge.counters.perfect
-	chartplay.miss_count = scoreSystem.base.missCount
-	chartplay.rating = 0
-	chartplay.accuracy_osu = 0
-	chartplay.accuracy_etterna = 0
-	chartplay.rating_pp = 0
-	chartplay.rating_msd = 0
+	local chartplay_computed = rhythmModel:getChartplayComputed()
+
+	chartplay:importChartplayBase(replay)
+	chartplay:importChartplayComputed(chartplay_computed)
+
+	chartplay.hash = chartmeta.hash
+	chartplay.index = chartmeta.index
+
+	chartplay.replay_hash = replay_hash
+	chartplay.pause_count = pauseCounter.count
+	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
+
+	local _chartplay = self.cacheModel.chartplaysRepo:createChartplay(chartplay)
+	self.computeContext.chartplay = _chartplay
 
 	coroutine.wrap(function()
 		if not self.seaClient.connected then
 			return
 		end
+
+		local base = scoreEngine.scores.base
+		if base.hitCount / base.notesCount < 0.5 then
+			print("not submitted")
+			return
+		end
+
 		print("submit")
 		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, chartdiff_copy)
 		print("got", ok, err)
@@ -487,11 +405,9 @@ function GameplayController:saveScore()
 		end
 	end)()
 
-	self.playContext.scoreEntry = scoreEntry
-
 	local config = self.configModel.configs.select
-	config.select_score_id = config.score_id
-	config.score_id = scoreEntry.id
+	config.select_chartplay_id = config.chartplay_id
+	config.chartplay_id = _chartplay.id
 end
 
 function GameplayController:skip()
@@ -505,7 +421,6 @@ function GameplayController:skip()
 	timeEngine.currentTime = math.huge
 	self.replayModel:update()
 	rhythmModel.logicEngine:update()
-	rhythmModel.scoreEngine:update()
 end
 
 function GameplayController:skipIntro()
@@ -531,26 +446,26 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
-	local chartview = self.selectModel.chartview
+	local chartmeta = assert(self.computeContext.chartmeta)
 
-	chartview.offset = chartview.offset or self.offsetModel:getDefaultLocal()
-	chartview.offset = math_util.round(chartview.offset + delta, delta)
+	chartmeta.offset = chartmeta.offset or self.offsetModel:getDefaultLocal()
+	chartmeta.offset = math_util.round(chartmeta.offset + delta, delta)
 
 	self.cacheModel.chartmetasRepo:updateChartmeta({
-		id = chartview.chartmeta_id,
-		offset = chartview.offset,
+		id = chartmeta.id,
+		offset = chartmeta.offset,
 	})
 
-	self.notificationModel:notify("local offset: " .. chartview.offset * 1000 .. "ms")
+	self.notificationModel:notify("local offset: " .. chartmeta.offset * 1000 .. "ms")
 	self:updateOffsets()
 end
 
 function GameplayController:resetLocalOffset()
-	local chartview = self.selectModel.chartview
+	local chartmeta = assert(self.computeContext.chartmeta)
 
-	chartview.offset = nil
+	chartmeta.offset = nil
 	self.cacheModel.chartmetasRepo:updateChartmeta({
-		id = chartview.chartmeta_id,
+		id = chartmeta.id,
 		offset = sql_util.NULL,
 	})
 

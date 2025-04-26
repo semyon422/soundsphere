@@ -98,7 +98,8 @@ function LeaderboardResource:updateLeaderboard(req, res, ctx)
 	lb.scores_comb_count = tonumber(body_params.scores_comb_count) or 0
 
 	lb.nearest = body_params.nearest
-	lb.result = body_params.result
+	lb.pass = body_params.pass == "on"
+	lb.judges = body_params.judges
 	lb.allow_custom = body_params.allow_custom == "on"
 	lb.allow_const = body_params.allow_const == "on"
 	lb.allow_pause = body_params.allow_pause == "on"
@@ -111,6 +112,8 @@ function LeaderboardResource:updateLeaderboard(req, res, ctx)
 	lb.rate = json.decode_safe(body_params.rate)
 	lb.chartmeta_inputmode = json.decode_safe(body_params.chartmeta_inputmode)
 	lb.chartdiff_inputmode = json.decode_safe(body_params.chartdiff_inputmode)
+	lb.timings = json.decode_safe(body_params.timings)
+	lb.healths = json.decode_safe(body_params.healths)
 
 	local difftable_ids = json.decode_safe(body_params.difftable_ids)
 	if type(difftable_ids) ~= "table" then

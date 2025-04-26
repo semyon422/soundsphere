@@ -83,30 +83,6 @@ function Leaderboards:addChartplay(chartplay)
 	end
 end
 
----@param src sea.Leaderboard
----@param dst sea.Leaderboard
-local function safe_copy_lb(src, dst)
-	dst.name = src.name
-	dst.description = src.description
-	dst.rating_calc = src.rating_calc
-	dst.scores_comb = src.scores_comb
-	dst.scores_comb_count = src.scores_comb_count
-	dst.nearest = src.nearest
-	dst.result = src.result
-	dst.allow_custom = not not src.allow_custom
-	dst.allow_const = not not src.allow_const
-	dst.allow_pause = not not src.allow_pause
-	dst.allow_reorder = not not src.allow_reorder
-	dst.allow_modifiers = not not src.allow_modifiers
-	dst.allow_tap_only = not not src.allow_tap_only
-	dst.allow_free_timings = not not src.allow_free_timings
-	dst.allow_free_healths = not not src.allow_free_healths
-	dst.mode = src.mode
-	dst.rate = src.rate
-	dst.chartmeta_inputmode = src.chartmeta_inputmode
-	dst.chartdiff_inputmode = src.chartdiff_inputmode
-end
-
 ---@param user sea.User
 ---@param lb_values sea.Leaderboard
 ---@return sea.Leaderboard?
@@ -122,12 +98,9 @@ function Leaderboards:create(user, lb_values)
 		return nil, "name_taken"
 	end
 
-	lb = Leaderboard()
+	lb_values.created_at = os.time()
 
-	safe_copy_lb(lb_values, lb)
-	lb.created_at = os.time()
-
-	lb = self.leaderboards_repo:createLeaderboard(lb)
+	lb = self.leaderboards_repo:createLeaderboard(lb_values)
 	self:updateLeaderboardDifftables(lb.id, lb_values.leaderboard_difftables)
 
 	return lb
@@ -155,9 +128,9 @@ function Leaderboards:update(user, id, lb_values)
 		return nil, "not_found"
 	end
 
-	safe_copy_lb(lb_values, lb)
+	lb_values.id = lb.id
 
-	self.leaderboards_repo:updateLeaderboard(lb)
+	lb = self.leaderboards_repo:updateLeaderboard(lb_values)
 	self:updateLeaderboardDifftables(id, lb_values.leaderboard_difftables)
 
 	return lb

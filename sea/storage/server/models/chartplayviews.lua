@@ -1,4 +1,3 @@
-local Result = require("sea.chart.Result")
 local Gamemode = require("sea.chart.Gamemode")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
@@ -10,7 +9,7 @@ local chartplayviews = {}
 
 chartplayviews.types = {
 	nearest = "boolean",
-	result = Result,
+	pass = "boolean",
 	mode = Gamemode,
 	custom = "boolean",
 	columns_order = json,

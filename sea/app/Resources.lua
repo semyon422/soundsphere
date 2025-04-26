@@ -4,6 +4,7 @@ local IndexResource = require("sea.shared.http.IndexResource")
 local StyleResource = require("sea.shared.http.StyleResource")
 local DownloadResource = require("sea.shared.http.DownloadResource")
 local PolicyResource = require("sea.shared.http.PolicyResource")
+local WikiResource = require("sea.shared.http.WikiResource")
 
 local AuthResource = require("sea.access.http.AuthResource")
 
@@ -44,6 +45,7 @@ function Resources:new(domain, views, sessions)
 	self.style = StyleResource()
 	self.download = DownloadResource(views)
 	self.policy = PolicyResource(views)
+	self.wiki = WikiResource(views)
 
 	self.auth = AuthResource(sessions, domain.users, views)
 
@@ -75,6 +77,7 @@ function Resources:getList()
 		self.style,
 		self.download,
 		self.policy,
+		self.wiki,
 
 		self.auth,
 

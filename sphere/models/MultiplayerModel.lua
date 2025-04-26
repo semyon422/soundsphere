@@ -16,15 +16,15 @@ local MultiplayerModel = class()
 ---@param selectModel sphere.SelectModel
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
----@param playContext sphere.PlayContext
-function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel, onlineModel, osudirectModel, playContext)
+---@param replayBase sphere.ReplayBase
+function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel, onlineModel, osudirectModel, replayBase)
 	self.cacheModel = cacheModel
 	self.rhythmModel = rhythmModel
 	self.configModel = configModel
 	self.selectModel = selectModel
 	self.onlineModel = onlineModel
 	self.osudirectModel = osudirectModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 
 	self.status = "disconnected"
 	self.rooms = {}
@@ -55,14 +55,15 @@ function MultiplayerModel:refresh()
 
 	self.room = peer.getRoom()
 
-	local scoreSystem = self.rhythmModel.scoreEngine.scoreSystem
-	if not scoreSystem.base then
+	local scores = self.rhythmModel.scoreEngine.scores
+	if not scores then
 		return
 	end
+
 	peer._setScore({
-		accuracy = scoreSystem.normalscore.accuracyAdjusted,
-		combo = scoreSystem.base.combo,
-		failed = scoreSystem.hp:isFailed(),
+		accuracy = scores.normalscore.accuracyAdjusted,
+		combo = scores.base.combo,
+		failed = scores.hp:isFailed(),
 	})
 end
 
@@ -174,7 +175,7 @@ MultiplayerModel.createRoom = remote.wrap(function(self, name, password)
 		return
 	end
 	self.selectedRoom = nil
-	self.peer._setModifiers(self.playContext.modifiers)
+	self.peer._setModifiers(self.replayBase.modifiers)
 	self:pushNotechart()
 end)
 
@@ -195,9 +196,9 @@ end)
 
 MultiplayerModel.pushPlayContext = remote.wrap(function(self)
 	if not self.peer then return end
-	self.peer._setModifiers(self.playContext.modifiers)
-	self.peer._setRate(self.playContext.rate)
-	self.peer._setConst(self.playContext.const)
+	self.peer._setModifiers(self.replayBase.modifiers)
+	self.peer._setRate(self.replayBase.rate)
+	self.peer._setConst(self.replayBase.const)
 end)
 
 local async_read = thread.async(function(...) return love.filesystem.read(...) end)

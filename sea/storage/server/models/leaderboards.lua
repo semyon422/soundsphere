@@ -1,9 +1,11 @@
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 local ScoreComb = require("sea.leaderboards.ScoreComb")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
-local Result = require("sea.chart.Result")
+local JudgesResult = require("sea.chart.JudgesResult")
 local TernaryState = require("sea.chart.TernaryState")
 local Gamemode = require("sea.chart.Gamemode")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
 local json = require("web.json")
 
 ---@type rdb.ModelOptions
@@ -15,12 +17,15 @@ leaderboards.types = {
 	score_comb = ScoreComb,
 	rating_calc = RatingCalc,
 	nearest = TernaryState,
-	result = Result,
+	pass = "boolean",
+	judges = JudgesResult,
 	mode = Gamemode,
 	rate = json,
 	difftables = json,
 	chartmeta_inputmode = json,
 	chartdiff_inputmode = json,
+	timings = Timings,
+	healths = Healths,
 	allow_custom = "boolean",
 	allow_const = "boolean",
 	allow_pause = "boolean",

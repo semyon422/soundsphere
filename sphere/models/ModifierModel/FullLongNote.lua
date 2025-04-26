@@ -40,7 +40,7 @@ end
 ---@param n ncdk2.Note
 ---@param max_n integer
 function FullLongNote:processNote(i, n, max_n)
-	if n.type ~= "note" then
+	if n.type ~= "tap" then
 		return
 	end
 

@@ -38,15 +38,19 @@
 <table class="table">
 	<tr>
 		<th>Nearest</td>
-		<th>Required result</td>
+		<th>Pass required</td>
+		<th>Judges result required</td>
 		<th>Game mode</td>
 		<th>Rate</td>
+		<th>Timings</td>
+		<th>Healths</td>
 		<th>Allowed</td>
 		<th>Disallowed</td>
 	</tr>
 	<tr>
 		<td><%= leaderboard.nearest %></td>
-		<td><%= leaderboard.result %></td>
+		<td><%= leaderboard.pass %></td>
+		<td><%= leaderboard.judges %></td>
 		<td><%= leaderboard.mode %></td>
 		<td>
 			<% if leaderboard.rate == "any" then %>
@@ -57,6 +61,8 @@
 				From <%= leaderboard.rate.min %> to <%= leaderboard.rate.max %>
 			<% end %>
 		</td>
+		<td><%= leaderboard.timings and ("%s: %s"):format(leaderboard.timings.name, leaderboard.timings.data) or "-" %></td>
+		<td><%= leaderboard.healths and ("%s: %s"):format(leaderboard.healths.name, leaderboard.healths.data) or "-" %></td>
 		<td><%= table.concat(allowed, ", ") %></td>
 		<td><%= table.concat(disallowed, ", ") %></td>
 	</tr>

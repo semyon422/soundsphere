@@ -10,7 +10,7 @@ function ChartmetasRepo:new(gdb)
 end
 
 ---@param chartmeta table
----@return table
+---@return sea.Chartmeta
 function ChartmetasRepo:insertChartmeta(chartmeta)
 	return self.models.chartmetas:create(chartmeta)
 end
@@ -21,19 +21,19 @@ function ChartmetasRepo:updateChartmeta(chartmeta)
 end
 
 ---@param hash string
----@param index number
----@return table?
+---@param index integer
+---@return sea.Chartmeta?
 function ChartmetasRepo:selectChartmeta(hash, index)
 	return self.models.chartmetas:find({hash = assert(hash), index = assert(index)})
 end
 
----@param id number
----@return table?
+---@param id integer
+---@return sea.Chartmeta?
 function ChartmetasRepo:selectChartmetaById(id)
 	return self.models.chartmetas:find({id = assert(id)})
 end
 
----@return number
+---@return integer
 function ChartmetasRepo:countChartmetas()
 	return self.models.chartmetas:count()
 end
@@ -43,7 +43,7 @@ function ChartmetasRepo:deleteChartmetas(conds)
 	self.models.chartmetas:delete(conds)
 end
 
----@return table
+---@return sea.Chartmeta[]
 function ChartmetasRepo:getChartmetasWithMissingChartdiffs()
 	return self.models.chartmetas_diffs_missing:select()
 end

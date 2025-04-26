@@ -75,7 +75,6 @@ local settings = {
 		actionOnFail = "none",
 		ratingHitTimingWindow = 0.032,
 		scaleSpeed = false,
-		rate_type = "linear",
 		speedType = "default",
 		speed = 1,
 		tempoFactor = "average",  -- "average", "primary", "minimum", "maximum"
@@ -185,6 +184,34 @@ local settings = {
 		diff_column = "enps_diff",
 		locations_in_collections = false,
 		chart_preview = true,
+	},
+	format_timings = {
+		sphere = {"sphere"},
+		osu = {"osuod", 10},
+		o2jam = {"sphere"},
+		bms = {"bmsrank", 3},
+		stepmania = {"etternaj", 4},
+		quaver = {"quaver"},
+		midi = {"sphere"},
+		ksm = {"sphere"},
+	},
+	timings = {
+		arbitrary = 0,
+		sphere = 0,
+		simple = 0.160,
+		osuod = 10,
+		etternaj = 4,
+		quaver = 0,
+		bmsrank = 3,
+	},
+	subtimings = {
+		osuod = {"scorev", scorev = 1},
+	},
+	replay_base = {
+		auto_timings = true,
+		auto_healths = true,
+		auto_const = false,
+		auto_tap_only = false,
 	}
 }
 

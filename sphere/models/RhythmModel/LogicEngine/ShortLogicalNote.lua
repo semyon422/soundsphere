@@ -47,11 +47,6 @@ function ShortLogicalNote:processTimeState(timeState)
 	end
 end
 
-local scoreEvent = {
-	name = "NoteState",
-	noteType = "ShortNote",
-}
-
 ---@param newState string
 function ShortLogicalNote:switchState(newState)
 	local oldState = self.state
@@ -71,6 +66,11 @@ function ShortLogicalNote:switchState(newState)
 
 	local currentTime = math.min(eventTime, time)
 	local deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
+
+	local scoreEvent = {
+		name = "NoteState",
+		noteType = "ShortNote",
+	}
 
 	scoreEvent.noteIndex = self.index  -- required for tests
 	scoreEvent.currentTime = currentTime

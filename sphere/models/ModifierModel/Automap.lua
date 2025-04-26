@@ -47,7 +47,7 @@ end
 ---@param config table
 ---@param chart ncdk2.Chart
 function Automap:apply(config, chart)
-	self.old = config.old
+	self.old = config.version == -1
 	self.targetMode = config.value
 
 	self.chart = chart
@@ -203,7 +203,7 @@ function Automap:processReductor()
 		if n.long then
 			if n.startTime == n.endTime then
 				n.noteData:unlink()
-				n.noteData:setType("note")
+				n.noteData:setType("tap")
 			else
 				local p = layer:getPoint(n.endTime / 1000)
 				local vp = layer.visuals.main:newPoint(p)
@@ -221,12 +221,12 @@ function Automap:processReductor()
 		local snote = chart.notes:get(vp, "auto")
 		if not snote then
 			snote = Note(vp, "auto", "sample")
-			snote.sounds = {}
+			snote.data.sounds = {}
 			chart.notes:insert(snote)
 		end
-		if note.sounds then
-			for _, s in ipairs(note.sounds) do
-				table.insert(snote.sounds, s)
+		if note.data.sounds then
+			for _, s in ipairs(note.data.sounds) do
+				table.insert(snote.data.sounds, s)
 			end
 		end
 	end

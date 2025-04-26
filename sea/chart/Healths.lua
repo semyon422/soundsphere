@@ -1,60 +1,68 @@
 local class = require("class")
-local table_util = require("table_util")
+
+---@alias sea.HealthsName
+---| "unknown"
+---| "simple"
 
 ---@class sea.Healths
 ---@operator call: sea.Healths
----@field name string
----@field data any?
+---@field name sea.HealthsName
+---@field data number
 local Healths = class()
 
-local lr2 = {
-	[0] = "easy",
-	[1] = "normal",
-	[2] = "hard",
-	[3] = "veryhard",
-}
-local _lr2 = table_util.invert(lr2)
-
----@param name string
+---@param name sea.HealthsName
 ---@param data any?
 function Healths:new(name, data)
 	self.name = name
 	self.data = data
+	local v = self:encode()
+	assert(v == math.floor(v), "invalid")
+	assert(self:validate(), "invalid")
 end
 
----@param t integer
----@return sea.Healths
-function Healths.decode(t)
-	if t >= 0 and t <= 500 then
-		return Healths("simple", t)
-	elseif t >= 1100 and t <= 1200 then
-		return Healths("osumania", (t - 1100) / 10)
-	elseif t >= 1304 and t <= 1309 then
-		return Healths("etterna", t - 1300)
-	elseif t == 1400 then
-		return Healths("quaver")
-	elseif t >= 1500 and t <= 1503 then
-		return Healths("lr2", lr2[t - 1500])
+---@return boolean
+function Healths:validate()
+	local v = self.data
+	local n = self.name
+
+	if n == "simple" then
+		return v >= 0 and v <= 100 and v == math.floor(v)
 	end
-	return Healths("unknown", t)
+
+	return false
+end
+
+---@param v integer
+---@return sea.Healths
+function Healths.decode(v)
+	assert(v, "missing healths value")
+
+	if v >= 0 and v <= 100 then
+		return Healths("simple", v)
+	end
+
+	return Healths("unknown", v)
 end
 
 ---@param t sea.Healths
 ---@return integer
 function Healths.encode(t)
 	local v = t.data
+
 	if t.name == "simple" then
 		return v
-	elseif t.name == "osumania" then
-		return v * 10 + 1100
-	elseif t.name == "etterna" then
-		return v + 1300
-	elseif t.name == "quaver" then
-		return 1400
-	elseif t.name == "lr2" then
-		return _lr2[v] + 1500
 	end
+
 	return v
+end
+
+---@param t sea.Timings
+function Healths:__eq(t)
+	return self.name == t.name and self.data == t.data
+end
+
+function Healths:__tostring(t)
+	return ("Healths(%s, %s)"):format(self.name, self.data)
 end
 
 return Healths

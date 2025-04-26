@@ -4,9 +4,11 @@ local class = require("class")
 ---@operator call: sea.FakeSubmissionClientRemote
 local FakeSubmissionClientRemote = class()
 
+---@param chartfile_name string
 ---@param chartfile_data string
 ---@param replayfile_data string
-function FakeSubmissionClientRemote:new(chartfile_data, replayfile_data)
+function FakeSubmissionClientRemote:new(chartfile_name, chartfile_data, replayfile_data)
+	self.chartfile_name = chartfile_name
 	self.chartfile_data = chartfile_data
 	self.replayfile_data = replayfile_data
 end
@@ -15,13 +17,16 @@ end
 ---@return {name: string, data: string}?
 ---@return string?
 function FakeSubmissionClientRemote:getChartfileData(hash)
-	return {name = "file.bms", data = self.chartfile_data}
+	return {
+		name = self.chartfile_name,
+		data = self.chartfile_data,
+	}
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return string?
 ---@return string?
-function FakeSubmissionClientRemote:getEventsData(events_hash)
+function FakeSubmissionClientRemote:getReplayData(replay_hash)
 	return self.replayfile_data
 end
 

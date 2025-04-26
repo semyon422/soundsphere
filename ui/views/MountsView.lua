@@ -192,6 +192,9 @@ function section_draw.database(self)
 	if imgui.button("compute incomplete cds pp", "compute incomplete, use preview when possible") then
 		cacheModel:computeIncompleteChartdiffs(true)
 	end
+	if imgui.button("compute chartplays", "compute chartplays") then
+		cacheModel:computeChartplays()
+	end
 
 	imgui.separator()
 	imgui.text("reset")
@@ -266,6 +269,10 @@ function section_draw.database(self)
 		local chart = self.game.selectModel:loadChartAbsolute()
 		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
+	end
+
+	if imgui.button("vacuum", "vacuum") then
+		cacheModel.gdb.db:exec("VACUUM;")
 	end
 end
 
