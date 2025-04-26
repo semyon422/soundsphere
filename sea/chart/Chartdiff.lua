@@ -10,6 +10,7 @@ local chart_types = require("sea.chart.types")
 ---@field id integer
 ---@field custom_user_id integer
 ---@field created_at integer
+---@field computed_at integer
 --- Chartkey
 --- COMPUTED
 ---@field inputmode string

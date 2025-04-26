@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `chartmetas_new` (
 	`id` INTEGER PRIMARY KEY,
 	`created_at` INTEGER,
+	`computed_at` INTEGER,
 	`osu_ranked_status` INTEGER,
 
 	`hash` TEXT NOT NULL,
@@ -102,6 +103,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs_new` (
 	`id` INTEGER PRIMARY KEY,
 	`custom_user_id` INTEGER,
 	`created_at` INTEGER,
+	`computed_at` INTEGER,
 
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,

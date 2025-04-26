@@ -10,6 +10,7 @@ local ChartmetaKey = require("sea.chart.ChartmetaKey")
 --- EXTERNAL
 ---@field id integer
 ---@field created_at integer
+---@field computed_at integer
 ---@field osu_ranked_status integer
 --- CLIENT-ONLY
 ---@field offset number

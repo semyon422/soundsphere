@@ -58,6 +58,7 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`name` TEXT,
 	`size` INTEGER,
 	`compute_state` INTEGER NOT NULL,
+	`computed_at` INTEGER,
 	`creator_id` INTEGER NOT NULL,
 	`submitted_at` INTEGER NOT NULL,
 	UNIQUE(`hash`)
@@ -66,6 +67,7 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`id` INTEGER PRIMARY KEY,
 	`created_at` INTEGER,
+	`computed_at` INTEGER,
 	`osu_ranked_status` INTEGER,
 
 	`hash` TEXT NOT NULL,
@@ -103,6 +105,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
 	`custom_user_id` INTEGER,
 	`created_at` INTEGER,
+	`computed_at` INTEGER,
 
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
@@ -138,8 +141,8 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER,
 	`compute_state` INTEGER,
-	`submitted_at` INTEGER,
 	`computed_at` INTEGER,
+	`submitted_at` INTEGER,
 
 	`replay_hash` TEXT,
 	`pause_count` INTEGER,

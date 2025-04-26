@@ -12,8 +12,8 @@ local ChartplayComputed = require("sea.chart.ChartplayComputed")
 ---@field id integer
 ---@field user_id integer
 ---@field compute_state sea.ComputeState
----@field submitted_at integer
 ---@field computed_at integer
+---@field submitted_at integer
 --- CLEINT defined fields
 ---@field online_id integer
 --- METADATA
