@@ -15,7 +15,6 @@ local WikiResource = IResource + {}
 ---@class sea.Wiki.LanguageMetadata
 ---@field name string Language name
 ---@field code string ISO 639-1. Add country code after - if required
----@field flag string Country code
 ---@field categories sea.Wiki.CategoryMetadata[]
 
 WikiResource.routes = {

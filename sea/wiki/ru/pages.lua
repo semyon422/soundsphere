@@ -2,7 +2,6 @@
 local t = {
 	name = "Русский",
 	code = "ru",
-	flag = "ru",
 	categories = {
 		{
 			name = "Знакомство",

@@ -2,7 +2,6 @@
 local t = {
 	name = "繁體中文",
 	code = "zh-tw",
-	flag = "ch",
 	categories = {
 		{
 			name = "開始使用",

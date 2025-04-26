@@ -2,7 +2,6 @@
 local t = {
 	name = "日本語",
 	code = "ja",
-	flag = "ja",
 	categories = {
 		{
 			name = "はじめに",

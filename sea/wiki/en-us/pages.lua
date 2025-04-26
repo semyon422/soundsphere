@@ -2,7 +2,6 @@
 local t = {
 	name = "English",
 	code = "en-us",
-	flag = "us",
 	categories = {
 		{
 			name = "Getting started",
