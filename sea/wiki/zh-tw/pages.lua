@@ -1,7 +1,7 @@
 ---@type sea.Wiki.LanguageMetadata
 local t = {
 	name = "繁體中文",
-	code = "zh_tw",
+	code = "zh-tw",
 	flag = "ch",
 	categories = {
 		{

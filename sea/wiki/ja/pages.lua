@@ -1,8 +1,8 @@
 ---@type sea.Wiki.LanguageMetadata
 local t = {
 	name = "日本語",
-	code = "jp_jp",
-	flag = "jp",
+	code = "ja",
+	flag = "ja",
 	categories = {
 		{
 			name = "はじめに",

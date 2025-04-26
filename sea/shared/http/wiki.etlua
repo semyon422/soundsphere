@@ -34,7 +34,7 @@
 							<% if page.filename == selected_page then %>
 								<li><a class="is-active"><%= page.name %></a></li>
 							<% else %>
-								<li><a href="?language_code=<%= selected_language_code %>&page=<%= page.filename %>"><%= page.name %></a></li>
+								<li><a href="/wiki/<%= selected_language_code %>/<%= page.filename %>"><%= page.name %></a></li>
 							<% end %>
 						<% end %>
 					</ul>
@@ -50,7 +50,7 @@
 <script>
 function changeWikiLanguage(value) {
 	if (value !== "") {
-		window.location = `?language_code=${value}`
+		window.location = `/wiki/${value}`
 	}
 }
 document.getElementById("content").innerHTML = marked.parse(`<%- view:render(markdown_file_path):gsub("`", "\\`") %>`)

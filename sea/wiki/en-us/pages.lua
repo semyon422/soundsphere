@@ -1,7 +1,7 @@
 ---@type sea.Wiki.LanguageMetadata
 local t = {
 	name = "English",
-	code = "en_us",
+	code = "en-us",
 	flag = "us",
 	categories = {
 		{
