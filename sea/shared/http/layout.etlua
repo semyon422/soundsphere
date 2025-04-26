@@ -37,9 +37,7 @@
 		<% end %>
 
 		<% if not ignore_footer then %>
-			<footer class="footer">
-				<div class="content"></div>
-			</footer>
+			<%- view:render("sea/shared/http/footer.etlua") %>
 		<% end %>
 
 		<script>
