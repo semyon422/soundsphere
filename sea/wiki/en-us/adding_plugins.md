@@ -29,7 +29,3 @@ Basically plugins are divided into several types:
 
 ### Using plugins that modify the UI
 After installing such a plugin, go to the game settings. In the `themes` tab you will be able to select one of the installed themes.
-
-### Use plugins that add a hit scoring system. 
-On the results screen after passing the map, you will be able to select the system by clicking on the button to the right of the accuracy of hits
-TODO: it doesn't work in default UI, fix pls

@@ -34,6 +34,7 @@ local language_metadatas = {
 	require("sea.wiki.en-us.pages"),
 	require("sea.wiki.ru.pages"),
 	require("sea.wiki.ja.pages"),
+	require("sea.wiki.zh.pages"),
 	require("sea.wiki.zh-tw.pages")
 }
 

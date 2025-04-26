@@ -13,7 +13,7 @@ local t = {
 		{
 			name = "遊戲客戶端",
 			pages = {
-				{ name = "Adding songs/charts", filename = "adding_charts" },
+				{ name = "新增歌曲", filename = "adding_charts" },
 				{ name = "新增皮膚", filename = "adding_skins" },
 				{ name = "添加插件", filename = "adding_plugins" }
 			}
