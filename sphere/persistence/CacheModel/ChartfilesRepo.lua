@@ -109,7 +109,7 @@ function ChartfilesRepo:selectChartfileById(id)
 end
 
 ---@param hash string
----@return table?
+---@return sea.ClientChartfile?
 function ChartfilesRepo:selectChartfileByHash(hash)
 	return self.models.located_chartfiles:find({hash = assert(hash)})
 end

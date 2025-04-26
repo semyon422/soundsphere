@@ -1,11 +1,11 @@
-local class = require("class")
+local IComputeDataProvider = require("sea.chart.IComputeDataProvider")
 local path_util = require("path_util")
 local md5 = require("md5")
 local types = require("sea.shared.types")
 
----@class sphere.ComputeDataProvider
+---@class sphere.ComputeDataProvider: sea.IComputeDataProvider
 ---@operator call: sphere.ComputeDataProvider
-local ComputeDataProvider = class()
+local ComputeDataProvider = IComputeDataProvider + {}
 
 ---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param chartplaysRepo sphere.ChartplaysRepo
@@ -21,7 +21,7 @@ end
 ---@param hash string
 ---@return {name: string, data: string}?
 ---@return string?
-function ComputeDataProvider:getChartfileData(hash)
+function ComputeDataProvider:getChartData(hash)
 	if not types.md5hash(hash) then
 		return nil, "invalid hash"
 	end

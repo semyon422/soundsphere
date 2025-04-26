@@ -5,6 +5,7 @@ local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Resources = require("sea.app.Resources")
 local Repos = require("sea.app.Repos")
 local Domain = require("sea.app.Domain")
+local ServerRemote = require("sea.app.remotes.ServerRemote")
 local Views = require("web.framework.page.Views")
 local Router = require("web.framework.router.Router")
 local Sessions = require("web.framework.Sessions")
@@ -32,9 +33,10 @@ function App:new(app_config)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
+	self.server_remote = ServerRemote(self.domain, self.repos)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
-	self.resources = Resources(self.domain, views, self.sessions)
+	self.resources = Resources(self.domain, self.server_remote, views, self.sessions)
 
 	local router = Router()
 	self.router = router

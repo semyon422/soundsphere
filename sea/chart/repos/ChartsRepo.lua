@@ -9,31 +9,6 @@ function ChartsRepo:new(models)
 	self.models = models
 end
 
----@return sea.Chartfile[]
-function ChartsRepo:getChartfiles()
-	return self.models.chartfiles:select()
-end
-
----@param hash string
----@return sea.Chartfile?
-function ChartsRepo:getChartfileByHash(hash)
-	return self.models.chartfiles:find({hash = assert(hash)})
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function ChartsRepo:createChartfile(chartfile)
-	return self.models.chartfiles:create(chartfile)
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function ChartsRepo:updateChartfile(chartfile)
-	return self.models.chartfiles:update(chartfile, {id = assert(chartfile.id)})[1]
-end
-
---------------------------------------------------------------------------------
-
 ---@return sea.Chartdiff[]
 function ChartsRepo:getChartdiffs()
 	return self.models.chartdiffs:select()
@@ -121,6 +96,30 @@ end
 ---@return sea.Chartplay
 function ChartsRepo:updateChartplay(chartplay)
 	return self.models.chartplays:update(chartplay, {id = assert(chartplay.id)})[1]
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function ChartsRepo:getChartplaysComputedCount(computed_at, state)
+	return self.models.chartplays:count({
+		computed_at__lt = assert(computed_at),
+		compute_state = assert(state),
+	})
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@param limit integer?
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
+	return self.models.chartplays:select({
+		computed_at__lt = assert(computed_at),
+		compute_state = assert(state),
+	}, {
+		order = {"computed_at ASC"},
+		limit = limit or 1,
+	})
 end
 
 return ChartsRepo

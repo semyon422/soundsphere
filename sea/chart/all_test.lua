@@ -11,8 +11,10 @@ local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
-local FakeSubmissionClientRemote = require("sea.chart.remotes.FakeSubmissionClientRemote")
+local FakeComputeDataProvider = require("sea.chart.FakeComputeDataProvider")
+local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
+local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -36,16 +38,20 @@ local function create_test_ctx()
 	local models = db.models
 
 	local charts_repo = ChartsRepo(models)
+	local chartfiles_repo = ChartfilesRepo(models)
 
 	local chartplayComputer = ChartplayComputer()
 	local leaderboards = Leaderboards(ILeaderboardsRepo())
 
+	local charts_storage = TableStorage()
+	local replays_storage = TableStorage()
+
 	local chartplays = Chartplays(
 		charts_repo,
 		chartplayComputer,
-		TableStorage(),
-		TableStorage(),
-		leaderboards
+		leaderboards,
+		charts_storage,
+		replays_storage
 	)
 
 	local user = User()
@@ -54,6 +60,7 @@ local function create_test_ctx()
 	return {
 		db = db,
 		charts_repo = charts_repo,
+		chartfiles_repo = chartfiles_repo,
 		leaderboards = leaderboards,
 		chartplays = chartplays,
 		user = user,
@@ -180,8 +187,8 @@ function test.submit_valid_score(t)
 	local replayfile_data = _replayfile_data
 	t:assert(replayfile_data_table:validate())
 
-	local remote = FakeSubmissionClientRemote(chartfile_name, chartfile_data, replayfile_data)
-	---@cast remote -sea.FakeSubmissionClientRemote, +sea.SubmissionClientRemote
+	local compute_data_provider = FakeComputeDataProvider(chartfile_name, chartfile_data, replayfile_data)
+	local compute_data_loader = ComputeDataLoader(ctx.chartfiles_repo, compute_data_provider)
 
 	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
 	local chartdiff_values = setmetatable(table_util.copy(_chartdiff_values), Chartdiff)
@@ -195,7 +202,7 @@ function test.submit_valid_score(t)
 	local user = User()
 	user.id = 1
 
-	local chartplay, err = ctx.chartplays:submit(user, remote, chartplay_values, chartdiff_values)
+	local chartplay, err = ctx.chartplays:submit(user, compute_data_loader, chartplay_values, chartdiff_values)
 
 	if t:assert(chartplay, err) then
 		---@cast chartplay -?

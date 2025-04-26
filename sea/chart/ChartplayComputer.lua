@@ -29,6 +29,8 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		return nil, "from file data: " .. err
 	end
 
+	local chartmeta = chart_chartmeta.chartmeta
+
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
 
@@ -38,10 +40,6 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		self.difficultyModel
 	)
 	fastplayController.need_preview = true
-
-	rhythmModel.judgements = {}
-	rhythmModel.settings = require("sphere.persistence.ConfigModel.settings")
-	rhythmModel.hp = rhythmModel.settings.gameplay.hp
 
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
@@ -63,7 +61,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 	return {
 		chartplay_computed = c,
 		chartdiff = chartdiff,
-		chartmeta = chart_chartmeta.chartmeta,
+		chartmeta = chartmeta,
 	}
 end
 

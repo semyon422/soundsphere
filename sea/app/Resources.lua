@@ -36,11 +36,10 @@ local ServerRemote = require("sea.app.remotes.ServerRemote")
 local Resources = class()
 
 ---@param domain sea.Domain
+---@param server_remote sea.ServerRemote
 ---@param views web.Views
 ---@param sessions web.Sessions
-function Resources:new(domain, views, sessions)
-	local server_remote_handler = ServerRemote(domain)
-
+function Resources:new(domain, server_remote, views, sessions)
 	self.index = IndexResource(views)
 	self.style = StyleResource()
 	self.download = DownloadResource(views)
@@ -68,7 +67,7 @@ function Resources:new(domain, views, sessions)
 	self.chartdiff = ChartdiffResource(nil, views)
 	self.chartplay = ChartplayResource(nil, views)
 
-	self.websocket = WebsocketResource(server_remote_handler, views)
+	self.websocket = WebsocketResource(server_remote, views)
 end
 
 function Resources:getList()

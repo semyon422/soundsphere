@@ -358,7 +358,7 @@ function CacheManager:computeChartplay(chartplay)
 	local chartplayComputer = self.chartplayComputer
 	local computeDataProvider = self.computeDataProvider
 
-	local chartfile_data, err = computeDataProvider:getChartfileData(chartplay.hash)
+	local chartfile_data, err = computeDataProvider:getChartData(chartplay.hash)
 	if not chartfile_data then
 		return nil, "get chart data: " .. err
 	end

@@ -180,6 +180,16 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 CREATE INDEX IF NOT EXISTS chartplays_user_id_idx ON chartplays (`user_id`);
 CREATE INDEX IF NOT EXISTS chartplays_himr_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`);
 
+CREATE TABLE IF NOT EXISTS `compute_processes` (
+	`id` INTEGER PRIMARY KEY,
+	`created_at` INTEGER NOT NULL,
+	`completed_at` INTEGER,
+	`state` INTEGER NOT NULL,
+	`target` INTEGER NOT NULL,
+	`current` INTEGER NOT NULL,
+	`total` INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`id` INTEGER PRIMARY KEY,
 	`name` TEXT,

@@ -4,31 +4,6 @@ local class = require("class")
 ---@operator call: sea.IChartsRepo
 local IChartsRepo = class()
 
----@return sea.Chartfile[]
-function IChartsRepo:getChartfiles()
-	return {}
-end
-
----@param hash string
----@return sea.Chartfile?
-function IChartsRepo:getChartfileByHash(hash)
-	return {}
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function IChartsRepo:createChartfile(chartfile)
-	return chartfile
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function IChartsRepo:updateChartfile(chartfile)
-	return chartfile
-end
-
---------------------------------------------------------------------------------
-
 ---@return sea.Chartdiff[]
 function IChartsRepo:getChartdiffs()
 	return {}
@@ -107,6 +82,21 @@ end
 ---@return sea.Chartplay
 function IChartsRepo:updateChartplay(chartplay)
 	return chartplay
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function IChartsRepo:getChartplaysComputedCount(computed_at, state)
+	return 0
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@param limit integer
+---@return sea.Chartplay[]
+function IChartsRepo:getChartplaysComputed(computed_at, state, limit)
+	return {}
 end
 
 return IChartsRepo
