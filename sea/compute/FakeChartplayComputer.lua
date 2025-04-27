@@ -1,4 +1,4 @@
-local IChartplayComputer = require("sea.chart.IChartplayComputer")
+local IChartplayComputer = require("sea.compute.IChartplayComputer")
 
 ---@class sea.FakeChartplayComputer: sea.IChartplayComputer
 ---@operator call: sea.FakeChartplayComputer

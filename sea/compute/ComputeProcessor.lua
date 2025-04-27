@@ -1,5 +1,5 @@
 local class = require("class")
-local ComputeProcess = require("sea.chart.ComputeProcess")
+local ComputeProcess = require("sea.compute.ComputeProcess")
 
 ---@class sea.ComputeProcessor
 ---@operator call: sea.ComputeProcessor

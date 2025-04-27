@@ -6,9 +6,9 @@ local Difftables = require("sea.difftables.Difftables")
 local Chartplays = require("sea.chart.Chartplays")
 local IPasswordHasher = require("sea.access.IPasswordHasher")
 local TableStorage = require("sea.chart.storage.TableStorage")
-local ChartplayComputer = require("sea.chart.ChartplayComputer")
-local ComputeDataProvider = require("sea.chart.ComputeDataProvider")
-local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
+local ChartplayComputer = require("sea.compute.ChartplayComputer")
+local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
+local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 
 ---@class sea.Domain
 ---@operator call: sea.Domain

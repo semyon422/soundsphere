@@ -35,7 +35,7 @@ local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 local PackageManager = require("sphere.pkg.PackageManager")
 local SeaClient = require("sphere.online.SeaClient")
 
-local ComputeContext = require("sea.chart.ComputeContext")
+local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
 
 ---@class sphere.GameController

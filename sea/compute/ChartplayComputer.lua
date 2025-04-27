@@ -1,7 +1,7 @@
-local IChartplayComputer = require("sea.chart.IChartplayComputer")
+local IChartplayComputer = require("sea.compute.IChartplayComputer")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
-local ComputeContext = require("sea.chart.ComputeContext")
+local ComputeContext = require("sea.compute.ComputeContext")
 
 local FastplayController = require("sphere.controllers.FastplayController")
 

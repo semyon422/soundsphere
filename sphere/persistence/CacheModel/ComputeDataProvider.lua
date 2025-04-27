@@ -1,4 +1,4 @@
-local IComputeDataProvider = require("sea.chart.IComputeDataProvider")
+local IComputeDataProvider = require("sea.compute.IComputeDataProvider")
 local path_util = require("path_util")
 local md5 = require("md5")
 local types = require("sea.shared.types")

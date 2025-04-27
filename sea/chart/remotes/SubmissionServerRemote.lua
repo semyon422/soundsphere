@@ -2,7 +2,7 @@ local class = require("class")
 local valid = require("valid")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
-local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
+local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 
 ---@class sea.SubmissionServerRemote: sea.IServerRemote
 ---@operator call: sea.SubmissionServerRemote

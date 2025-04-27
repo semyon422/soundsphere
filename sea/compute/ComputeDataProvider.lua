@@ -1,4 +1,4 @@
-local IComputeDataProvider = require("sea.chart.IComputeDataProvider")
+local IComputeDataProvider = require("sea.compute.IComputeDataProvider")
 
 ---@class sea.ComputeDataProvider: sea.IComputeDataProvider
 ---@operator call: sea.ComputeDataProvider

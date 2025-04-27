@@ -1,6 +1,6 @@
-local ComputeProcess = require("sea.chart.ComputeProcess")
-local ComputeState = require("sea.chart.ComputeState")
-local ComputeTarget = require("sea.chart.ComputeTarget")
+local ComputeProcess = require("sea.compute.ComputeProcess")
+local ComputeState = require("sea.compute.ComputeState")
+local ComputeTarget = require("sea.compute.ComputeTarget")
 
 ---@type rdb.ModelOptions
 local compute_processes = {}
