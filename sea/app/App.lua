@@ -33,7 +33,7 @@ function App:new(app_config)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
-	self.server_remote = ServerRemote(self.domain, self.repos)
+	self.server_remote = ServerRemote(self.domain)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions)

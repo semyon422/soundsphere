@@ -1,5 +1,6 @@
 local class = require("class")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local Chartfile = require("sea.chart.Chartfile")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 
 ---@class sea.Chartplays
@@ -7,19 +8,25 @@ local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 local Chartplays = class()
 
 ---@param charts_repo sea.IChartsRepo
+---@param chartfiles_repo sea.IChartfilesRepo
 ---@param chartplay_computer sea.IChartplayComputer
+---@param compute_data_loader sea.ComputeDataLoader
 ---@param leaderboards sea.Leaderboards
 ---@param charts_storage sea.IKeyValueStorage
 ---@param replays_storage sea.IKeyValueStorage
 function Chartplays:new(
 	charts_repo,
+	chartfiles_repo,
 	chartplay_computer,
+	compute_data_loader,
 	leaderboards,
 	charts_storage,
 	replays_storage
 )
 	self.charts_repo = charts_repo
+	self.chartfiles_repo = chartfiles_repo
 	self.chartplay_computer = chartplay_computer
+	self.compute_data_loader = compute_data_loader
 	self.leaderboards = leaderboards
 	self.charts_storage = charts_storage
 	self.replays_storage = replays_storage
@@ -55,20 +62,31 @@ function Chartplays:submit(user, compute_data_loader, chartplay_values, chartdif
 
 	assert(chartplay_values:equalsChartplay(chartplay))
 
-	local chartfile_and_data, err = compute_data_loader:requireChartfile(chartplay.hash, user.id)
-	if not chartfile_and_data then
-		return nil, "require chartfile: " .. err
+	local save_chart, save_replay = false, false
+
+	local chart_file_data, err = self.compute_data_loader:requireChart(chartplay.hash)
+	if not chart_file_data then
+		chart_file_data, err = compute_data_loader:requireChart(chartplay.hash)
+		if not chart_file_data then
+			return nil, "require chart: " .. err
+		end
+		save_chart = true
 	end
 
-	local chartfile = chartfile_and_data.chartfile
-	local chartfile_data = chartfile_and_data.data
+	local chartfile_name = chart_file_data.name
+	local chartfile_data = chart_file_data.data
 
-	local replay_and_data, err = compute_data_loader:requireReplay(chartplay.replay_hash)
+	local replay_and_data, err = self.compute_data_loader:requireReplay(chartplay.replay_hash)
 	if not replay_and_data then
-		return nil, "require replay: " .. err
+		replay_and_data, err = compute_data_loader:requireReplay(chartplay.replay_hash)
+		if not replay_and_data then
+			return nil, "require replay: " .. err
+		end
+		save_replay = true
 	end
 
 	local replay = replay_and_data.replay
+	local replay_data = replay_and_data.data
 
 	local eq, err = replay:equalsChartplayBase(chartplay)
 	if not eq then
@@ -80,14 +98,33 @@ function Chartplays:submit(user, compute_data_loader, chartplay_values, chartdif
 		return nil, "chartmeta key of replay differs: " .. err
 	end
 
-	local ok, err = self.charts_storage:set(chartplay.hash, chartfile_and_data.data)
-	if not ok then
-		return nil, "charts storage set: " .. err
+	---@type sea.Chartfile
+	local chartfile
+
+	if save_chart then
+		chartfile = self.chartfiles_repo:getChartfileByHash(chartplay.hash)
+		if not chartfile then
+			local chartfile_values = Chartfile()
+			chartfile_values.hash = chartplay.hash
+			chartfile_values.creator_id = user.id
+			chartfile_values.compute_state = "new"
+			chartfile_values.submitted_at = os.time()
+			chartfile_values.name = chartfile_name
+			chartfile_values.size = #chartfile_data
+			chartfile = self.chartfiles_repo:createChartfile(chartfile_values)
+		end
+
+		local ok, err = self.charts_storage:set(chartplay.hash, chartfile_data)
+		if not ok then
+			return nil, "charts storage set: " .. err
+		end
 	end
 
-	local ok, err = self.replays_storage:set(chartplay.replay_hash, replay_and_data.data)
-	if not ok then
-		return nil, "replays storage set: " .. err
+	if save_replay then
+		local ok, err = self.replays_storage:set(chartplay.replay_hash, replay_data)
+		if not ok then
+			return nil, "replays storage set: " .. err
+		end
 	end
 
 	---@type sea.Chartdiff

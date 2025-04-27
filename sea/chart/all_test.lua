@@ -12,6 +12,7 @@ local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local FakeComputeDataProvider = require("sea.chart.FakeComputeDataProvider")
+local ComputeDataProvider = require("sea.chart.ComputeDataProvider")
 local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
@@ -46,9 +47,14 @@ local function create_test_ctx()
 	local charts_storage = TableStorage()
 	local replays_storage = TableStorage()
 
+	local compute_data_provider = ComputeDataProvider(chartfiles_repo, charts_storage, replays_storage)
+	local compute_data_loader = ComputeDataLoader(compute_data_provider)
+
 	local chartplays = Chartplays(
 		charts_repo,
+		chartfiles_repo,
 		chartplayComputer,
+		compute_data_loader,
 		leaderboards,
 		charts_storage,
 		replays_storage
@@ -188,7 +194,7 @@ function test.submit_valid_score(t)
 	t:assert(replayfile_data_table:validate())
 
 	local compute_data_provider = FakeComputeDataProvider(chartfile_name, chartfile_data, replayfile_data)
-	local compute_data_loader = ComputeDataLoader(ctx.chartfiles_repo, compute_data_provider)
+	local compute_data_loader = ComputeDataLoader(compute_data_provider)
 
 	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
 	local chartdiff_values = setmetatable(table_util.copy(_chartdiff_values), Chartdiff)

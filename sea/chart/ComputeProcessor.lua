@@ -41,9 +41,9 @@ function ComputeProcessor:computeChartplay(chartplay)
 	local compute_data_loader = self.compute_data_loader
 	local chartplay_computer = self.chartplay_computer
 
-	local chartfile_and_data, err = compute_data_loader:requireChartfile(chartplay.hash, chartplay.user_id)
-	if not chartfile_and_data then
-		return nil, "require chartfile: " .. err
+	local chart_file_data, err = compute_data_loader:requireChart(chartplay.hash)
+	if not chart_file_data then
+		return nil, "require chart: " .. err
 	end
 
 	local replay_and_data, err = compute_data_loader:requireReplay(chartplay.replay_hash)
@@ -54,8 +54,8 @@ function ComputeProcessor:computeChartplay(chartplay)
 	local replay = replay_and_data.replay
 
 	local ret, err = chartplay_computer:compute(
-		chartfile_and_data.chartfile.name,
-		chartfile_and_data.data,
+		chart_file_data.name,
+		chart_file_data.data,
 		chartplay.index,
 		replay
 	)

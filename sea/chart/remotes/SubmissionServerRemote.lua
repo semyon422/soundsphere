@@ -9,10 +9,8 @@ local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
 local SubmissionServerRemote = class()
 
 ---@param chartplays sea.Chartplays
----@param chartfiles_repo sea.IChartfilesRepo
-function SubmissionServerRemote:new(chartplays, chartfiles_repo)
+function SubmissionServerRemote:new(chartplays)
 	self.chartplays = chartplays
-	self.chartfiles_repo = chartfiles_repo
 end
 
 ---@param chartplay_values sea.Chartplay
@@ -32,7 +30,7 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 	end
 	setmetatable(chartdiff_values, Chartdiff)
 
-	local compute_data_loader = ComputeDataLoader(self.chartfiles_repo, self.remote.compute_data_provider)
+	local compute_data_loader = ComputeDataLoader(self.remote.compute_data_provider)
 
 	local chartplay, err = self.chartplays:submit(self.user, compute_data_loader, chartplay_values, chartdiff_values)
 	if not chartplay then

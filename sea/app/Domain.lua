@@ -7,6 +7,7 @@ local Chartplays = require("sea.chart.Chartplays")
 local IPasswordHasher = require("sea.access.IPasswordHasher")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local ChartplayComputer = require("sea.chart.ChartplayComputer")
+local ComputeDataProvider = require("sea.chart.ComputeDataProvider")
 local ComputeDataLoader = require("sea.chart.ComputeDataLoader")
 
 ---@class sea.Domain
@@ -17,7 +18,8 @@ local Domain = class()
 function Domain:new(repos)
 	self.charts_storage = TableStorage()
 	self.replays_storage = TableStorage()
-	self.compute_data_loader = ComputeDataLoader(repos.chartfiles_repo)
+	self.compute_data_provider = ComputeDataProvider(repos.chartfiles_repo, self.charts_storage, self.replays_storage)
+	self.compute_data_loader = ComputeDataLoader(self.compute_data_provider)
 	self.chartplay_computer = ChartplayComputer(self.charts_storage, self.replays_storage)
 
 	self.users = Users(repos.users_repo, IPasswordHasher())
@@ -26,7 +28,9 @@ function Domain:new(repos)
 	self.difftables = Difftables(repos.difftables_repo)
 	self.chartplays = Chartplays(
 		repos.charts_repo,
+		repos.chartfiles_repo,
 		self.chartplay_computer,
+		self.compute_data_loader,
 		self.leaderboards,
 		self.charts_storage,
 		self.replays_storage

@@ -1,7 +1,6 @@
 local class = require("class")
 local valid = require("valid")
 local md5 = require("md5")
-local Chartfile = require("sea.chart.Chartfile")
 local ReplayCoder = require("sea.replays.ReplayCoder")
 
 ---@class sea.ComputeDataLoader
@@ -9,27 +8,14 @@ local ReplayCoder = require("sea.replays.ReplayCoder")
 local ComputeDataLoader = class()
 
 ---@param compute_data_provider sea.IComputeDataProvider
----@param chartfiles_repo sea.IChartfilesRepo
-function ComputeDataLoader:new(chartfiles_repo, compute_data_provider)
-	self.chartfiles_repo = chartfiles_repo
+function ComputeDataLoader:new(compute_data_provider)
 	self.compute_data_provider = compute_data_provider
 end
 
 ---@param hash string
----@param user_id integer
----@return {chartfile: sea.Chartfile, data: string}?
+---@return {name: string, data: string}?
 ---@return string?
-function ComputeDataLoader:requireChartfile(hash, user_id)
-	local chartfile = self.chartfiles_repo:getChartfileByHash(hash)
-	if not chartfile then
-		local chartfile_values = Chartfile()
-		chartfile_values.hash = hash
-		chartfile_values.creator_id = user_id
-		chartfile_values.compute_state = "new"
-		chartfile_values.submitted_at = os.time()
-		chartfile = self.chartfiles_repo:createChartfile(chartfile_values)
-	end
-
+function ComputeDataLoader:requireChart(hash)
 	local file, err = self.compute_data_provider:getChartData(hash)
 	if not file then
 		return nil, "get chartfile data: " .. err
@@ -39,11 +25,10 @@ function ComputeDataLoader:requireChartfile(hash, user_id)
 		return nil, "invalid hash"
 	end
 
-	chartfile.name = file.name
-	chartfile.size = #file.data
-	chartfile = self.chartfiles_repo:updateChartfile(chartfile)
-
-	return {chartfile = chartfile, data = file.data}
+	return {
+		name = file.name,
+		data = file.data,
+	}
 end
 
 ---@param hash string
@@ -53,10 +38,6 @@ function ComputeDataLoader:requireReplay(hash)
 	local replay_data, err = self.compute_data_provider:getReplayData(hash)
 	if not replay_data then
 		return nil, "get replay data: " .. (err or "missing error")
-	end
-
-	if type(replay_data) ~= "string" then
-		return nil, "invalid replay data"
 	end
 
 	if md5.sumhexa(replay_data) ~= hash then

@@ -6,9 +6,8 @@ local SubmissionServerRemote = require("sea.chart.remotes.SubmissionServerRemote
 local ServerRemote = class()
 
 ---@param domain sea.Domain
----@param repos sea.Repos
-function ServerRemote:new(domain, repos)
-	self.submission = SubmissionServerRemote(domain.chartplays, repos.chartfiles_repo)
+function ServerRemote:new(domain)
+	self.submission = SubmissionServerRemote(domain.chartplays)
 end
 
 ---@param msg string
