@@ -100,7 +100,9 @@ end
 ---@param pause_count integer
 ---@param auto_timings boolean
 ---@return sea.Replay
-function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
+---@return string
+---@return string
+function ReplayModel:createReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
 	local replay = Replay()
 
 	replay:importReplayBase(replayBase)
@@ -124,11 +126,22 @@ function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_coun
 	local data = assert(ReplayCoder.encode(replay))
 	local replay_hash = md5.sumhexa(data)
 
-	assert(love.filesystem.write(self.path .. "/" .. replay_hash, data))
-
 	self.replay = replay
 
-	return replay, replay_hash
+	return replay, data, replay_hash
+end
+
+---@param replayBase sea.ReplayBase
+---@param chartmetaKey sea.ChartmetaKey
+---@param created_at integer
+---@param pause_count integer
+---@param auto_timings boolean
+---@return sea.Replay
+---@return string
+function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
+	local replay, data, hash = self:createReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
+	assert(love.filesystem.write(self.path .. "/" .. hash, data))
+	return replay, hash
 end
 
 ---@param chartmeta sea.Chartmeta
