@@ -1,4 +1,4 @@
-local IComputeProcessesRepo = require("sea.chart.repos.IComputeProcessesRepo")
+local IComputeProcessesRepo = require("sea.compute.repos.IComputeProcessesRepo")
 
 ---@class sea.ComputeProcessesRepo: sea.IComputeProcessesRepo
 ---@operator call: sea.ComputeProcessesRepo

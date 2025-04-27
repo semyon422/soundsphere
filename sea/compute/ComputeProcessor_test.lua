@@ -4,7 +4,7 @@ local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
-local ComputeProcessesRepo = require("sea.chart.repos.ComputeProcessesRepo")
+local ComputeProcessesRepo = require("sea.compute.repos.ComputeProcessesRepo")
 
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
