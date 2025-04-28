@@ -32,7 +32,7 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 
 	local compute_data_loader = ComputeDataLoader(self.remote.compute_data_provider)
 
-	local chartplay, err = self.chartplays:submit(self.user, compute_data_loader, chartplay_values, chartdiff_values)
+	local chartplay, err = self.chartplays:submit(self.user, os.time(), compute_data_loader, chartplay_values, chartdiff_values)
 	if not chartplay then
 		return nil, "submit: " .. err
 	end

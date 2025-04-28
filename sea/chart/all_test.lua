@@ -208,7 +208,7 @@ function test.submit_valid_score(t)
 	local user = User()
 	user.id = 1
 
-	local chartplay, err = ctx.chartplays:submit(user, compute_data_loader, chartplay_values, chartdiff_values)
+	local chartplay, err = ctx.chartplays:submit(user, 0, compute_data_loader, chartplay_values, chartdiff_values)
 
 	if t:assert(chartplay, err) then
 		---@cast chartplay -?
