@@ -71,11 +71,7 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 	local chart_chartmeta = assert(computeContext:fromFileData(chartfile_name, chartfile_data, index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
-	local chartdiff, state = computeContext:computeChartdiff(replayBase)
-	computeContext:applyColumnOrder(replayBase.columns_order)
-	if replayBase.tap_only then
-		computeContext:applyTapOnly()
-	end
+	local chartdiff, state = computeContext:computeBase(replayBase)
 
 	local events = self:createFakeEvents(chart, self.accuracy, self.miss_ratio)
 	replayModel.events = events

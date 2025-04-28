@@ -3,8 +3,6 @@ local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
 local ComputeContext = require("sea.compute.ComputeContext")
 
-local FastplayController = require("sphere.controllers.FastplayController")
-
 local ReplayModel = require("sphere.models.ReplayModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 
@@ -24,39 +22,25 @@ end
 ---@return string?
 function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay)
 	local computeContext = ComputeContext()
+
 	local chart_chartmeta, err = computeContext:fromFileData(chartfile_name, chartfile_data, index)
 	if not chart_chartmeta then
 		return nil, "from file data: " .. err
 	end
 
-	local chartmeta = chart_chartmeta.chartmeta
-
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
-
-	local fastplayController = FastplayController(
-		rhythmModel,
-		replayModel,
-		self.difficultyModel
-	)
-	fastplayController.need_preview = true
 
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
-	fastplayController:play(computeContext, replay)
+	local chartdiff, state = computeContext:computeBase(replay)
+	computeContext:computePlay(rhythmModel, replayModel)
 
-	local timings = assert(replay.timings or chartmeta.timings)
+	local timings = assert(replay.timings or chart_chartmeta.chartmeta.timings)
 	rhythmModel.scoreEngine:createAndSelectByTimings(timings, replay.subtimings)
 
 	local c = rhythmModel:getChartplayComputed()
-
-	local chartdiff = assert(computeContext.chartdiff)
-	chartdiff.hash = replay.hash
-	chartdiff.index = replay.index
-	chartdiff.modifiers = replay.modifiers
-	chartdiff.rate = replay.rate
-	chartdiff.mode = replay.mode
 
 	return {
 		chartplay_computed = c,

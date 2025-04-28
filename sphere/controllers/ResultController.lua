@@ -16,7 +16,6 @@ local ResultController = class()
 ---@param onlineModel sphere.OnlineModel
 ---@param configModel sphere.ConfigModel
 ---@param computeContext sea.ComputeContext
----@param fastplayController sphere.FastplayController
 function ResultController:new(
 	selectModel,
 	replayModel,
@@ -24,8 +23,7 @@ function ResultController:new(
 	onlineModel,
 	configModel,
 	computeContext,
-	replayBase,
-	fastplayController
+	replayBase
 )
 	self.selectModel = selectModel
 	self.replayModel = replayModel
@@ -34,7 +32,6 @@ function ResultController:new(
 	self.configModel = configModel
 	self.computeContext = computeContext
 	self.replayBase = replayBase
-	self.fastplayController = fastplayController
 end
 
 function ResultController:load()
@@ -119,7 +116,8 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	local chart_chartmeta = assert(self.computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
-	self.fastplayController:play(self.computeContext, replay)
+	self.computeContext:computeBase(replay)
+	self.computeContext:computePlay(rhythmModel, replayModel)
 
 	self:actualizeReplayBase()
 	self.rhythmModel.scoreEngine:createAndSelectByTimings(self.replayBase.timings, self.replayBase.subtimings)

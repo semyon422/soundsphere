@@ -39,14 +39,6 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.logicEngine.observable:add(self.audioEngine)
 end
 
-function RhythmModel:load()
-	local scoreEngine = self.scoreEngine
-
-	scoreEngine.judgements = self.judgements
-	scoreEngine.hp = self.hp
-	scoreEngine.settings = self.settings
-end
-
 function RhythmModel:loadAllEngines()
 	self:loadLogicEngines()
 	self.audioEngine:load()

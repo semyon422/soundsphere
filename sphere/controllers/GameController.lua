@@ -18,7 +18,6 @@ local OffsetModel = require("sphere.models.OffsetModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
-local FastplayController = require("sphere.controllers.FastplayController")
 local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
@@ -147,11 +146,6 @@ function GameController:new()
 		self.notificationModel,
 		self.seaClient
 	)
-	self.fastplayController = FastplayController(
-		self.rhythmModel,
-		self.replayModel,
-		self.cacheModel.chartdiffGenerator.difficultyModel
-	)
 	self.resultController = ResultController(
 		self.selectModel,
 		self.replayModel,
@@ -159,8 +153,7 @@ function GameController:new()
 		self.onlineModel,
 		self.configModel,
 		self.computeContext,
-		self.replayBase,
-		self.fastplayController
+		self.replayBase
 	)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,

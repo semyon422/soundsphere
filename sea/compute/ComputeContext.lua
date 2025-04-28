@@ -53,7 +53,7 @@ end
 ---@param replayBase sea.ReplayBase
 ---@return sea.Chartdiff
 ---@return table
-function ComputeContext:computeChartdiff(replayBase)
+function ComputeContext:computeBase(replayBase)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
 
@@ -67,7 +67,6 @@ function ComputeContext:computeChartdiff(replayBase)
 		mode = "mania",
 		rate = replayBase.rate,
 		inputmode = tostring(chart.inputMode),
-		-- notes_preview = "",  -- do not generate preview
 	}
 	setmetatable(chartdiff, Chartdiff)
 	---@cast chartdiff sea.Chartdiff
@@ -80,8 +79,39 @@ function ComputeContext:computeChartdiff(replayBase)
 	assert(valid.format(chartdiff:validate()))
 
 	self.chartdiff = chartdiff
+	self.state = state
+
+	self:applyColumnOrder(replayBase.columns_order)
+	if replayBase.tap_only then
+		self:applyTapOnly()
+	end
 
 	return chartdiff, state
+end
+
+---@param rhythmModel sphere.RhythmModel
+---@param replayModel sphere.ReplayModel
+function ComputeContext:computePlay(rhythmModel, replayModel)
+	local chart = assert(self.chart)
+	local chartmeta = assert(self.chartmeta)
+	local chartdiff = assert(self.chartdiff)
+	local state = assert(self.state)
+
+	rhythmModel:setWindUp(state.windUp)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
+	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
+
+	replayModel:setMode("replay")
+	rhythmModel.inputManager:setMode("internal")
+
+	rhythmModel:loadLogicEngines()
+	replayModel:load()
+
+	rhythmModel.timeEngine.currentTime = math.huge
+	replayModel:update()
+	rhythmModel.logicEngine:update()
+
+	rhythmModel:unloadAllEngines()
 end
 
 ---@see sphere.LogicalNoteFactory

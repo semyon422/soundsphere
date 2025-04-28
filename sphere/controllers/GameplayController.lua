@@ -105,12 +105,7 @@ function GameplayController:load()
 	local data = assert(love.filesystem.read(chartview.location_path))
 	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
-
-	local chartdiff, state = computeContext:computeChartdiff(replayBase)
-	computeContext:applyColumnOrder(replayBase.columns_order)
-	if replayBase.tap_only then
-		computeContext:applyTapOnly()
-	end
+	local chartdiff, state = computeContext:computeBase(replayBase)
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
@@ -145,7 +140,6 @@ function GameplayController:load()
 	rhythmModel:setReplayBase(replayBase)
 
 	rhythmModel.inputManager.observable:add(replayModel)
-	rhythmModel:load()
 
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
@@ -304,7 +298,6 @@ function GameplayController:retry()
 	self.replayModel:setMode("record")
 
 	rhythmModel:unloadAllEngines()
-	rhythmModel:load()
 	rhythmModel.timeEngine:sync(love.timer.getTime())
 	rhythmModel:loadAllEngines()
 	self.pauseModel:load()
