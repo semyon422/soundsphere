@@ -2,6 +2,7 @@ local table_util = require("table_util")
 local valid = require("valid")
 local ChartdiffKeyPart = require("sea.chart.ChartdiffKeyPart")
 local RateType = require("sea.chart.RateType")
+local Timings = require("sea.chart.Timings")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 
@@ -21,6 +22,21 @@ local chart_types = require("sea.chart.types")
 ---@field const boolean
 ---@field rate_type sea.RateType
 local ChartplayBase = ChartdiffKeyPart + {}
+
+function ChartplayBase:new()
+	ChartdiffKeyPart.new(self)
+
+	self.nearest = false
+	self.tap_only = false
+	self.timings = Timings("sphere")
+	self.subtimings = nil
+	self.healths = nil
+	self.columns_order = nil
+
+	self.custom = false
+	self.const = false
+	self.rate_type = "linear"
+end
 
 ChartplayBase.struct = {
 	-- Other

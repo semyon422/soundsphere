@@ -2,11 +2,17 @@ local table_util = require("table_util")
 local valid = require("valid")
 local chart_types = require("sea.chart.types")
 local ChartplayBase = require("sea.chart.ChartplayBase")
+local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 
 ---@class sea.ReplayBase: sea.ChartplayBase
 ---@operator call: sea.ReplayBase
 ---@field timing_values sea.TimingValues for backward compatibility
 local ReplayBase = ChartplayBase + {}
+
+function ReplayBase:new()
+	ChartplayBase.new(self)
+	self.timing_values = assert(TimingValuesFactory:get(self.timings))
+end
 
 ReplayBase.struct = {
 	timing_values = chart_types.timing_values,

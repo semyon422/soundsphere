@@ -11,6 +11,12 @@ local table_util = require("table_util")
 ---@field mode sea.Gamemode
 local ChartdiffKeyPart = class()
 
+function ChartdiffKeyPart:new()
+	self.modifiers = {}
+	self.rate = 1
+	self.mode = "mania"
+end
+
 ChartdiffKeyPart.struct = {
 	modifiers = chart_types.modifiers,
 	rate = types.number,
