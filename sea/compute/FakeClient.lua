@@ -71,7 +71,7 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 	local chart_chartmeta = assert(computeContext:fromFileData(chartfile_name, chartfile_data, index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
-	local chartdiff, state = computeContext:computeBase(replayBase)
+	computeContext:computeBase(replayBase)
 
 	local events = self:createFakeEvents(chart, self.accuracy, self.miss_ratio)
 	replayModel.events = events
@@ -84,7 +84,7 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 		auto_timings
 	)
 
-	local ret = assert(self.chartplayComputer:compute(chartfile_name, chartfile_data, index, replay))
+	local ret = assert(self.chartplayComputer:computeFromContext(computeContext, replay))
 
 	local chartplay = Chartplay()
 

@@ -28,23 +28,35 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		return nil, "from file data: " .. err
 	end
 
+	computeContext:computeBase(replay)
+
+	return self:computeFromContext(computeContext, replay)
+end
+
+---@param computeContext sea.ComputeContext
+---@param replay sea.Replay
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
+---@return string?
+function ChartplayComputer:computeFromContext(computeContext, replay)
+	local chartmeta = assert(computeContext.chartmeta)
+	assert(computeContext.chartdiff)
+
 	local rhythmModel = RhythmModel()
 	local replayModel = ReplayModel(rhythmModel)
 
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
-	local chartdiff, state = computeContext:computeBase(replay)
 	computeContext:computePlay(rhythmModel, replayModel)
 
-	local timings = assert(replay.timings or chart_chartmeta.chartmeta.timings)
+	local timings = assert(replay.timings or chartmeta.timings)
 	rhythmModel.scoreEngine:createAndSelectByTimings(timings, replay.subtimings)
 
 	local c = rhythmModel:getChartplayComputed()
 
 	return {
 		chartplay_computed = c,
-		chartdiff = chartdiff,
+		chartdiff = computeContext.chartdiff,
 		chartmeta = chartmeta,
 	}
 end
