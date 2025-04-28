@@ -2,11 +2,19 @@ local class = require("class")
 local valid = require("valid")
 local math_util = require("math_util")
 local Chartplay = require("sea.chart.Chartplay")
+local Chartfile = require("sea.chart.Chartfile")
 local ComputeContext = require("sea.compute.ComputeContext")
 local ChartplayComputer = require("sea.compute.ChartplayComputer")
+local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
+local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
+local TableStorage = require("sea.chart.storage.TableStorage")
 local ReplayBase = require("sea.replays.ReplayBase")
+local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 local simplify_notechart = require("libchart.simplify_notechart")
 local ReplayModel = require("sphere.models.ReplayModel")
+
+local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 ---@class sea.FakeClient
 ---@operator call: sea.FakeClient
@@ -22,6 +30,19 @@ function FakeClient:new(accuracy, miss_ratio)
 	self.replayBase = ReplayBase()
 	self.replayModel = ReplayModel()
 	self.chartplayComputer = ChartplayComputer()
+
+	local db = ServerSqliteDatabase(LjsqliteDatabase())
+	db.path = ":memory:"
+	db:open()
+
+	local models = db.models
+
+	self.chartfiles_repo = ChartfilesRepo(models)
+	self.charts_storage = TableStorage()
+	self.replays_storage = TableStorage()
+
+	self.compute_data_provider = ComputeDataProvider(self.chartfiles_repo, self.charts_storage, self.replays_storage)
+	self.compute_data_loader = ComputeDataLoader(self.compute_data_provider)
 end
 
 ---@param chart ncdk2.Chart
@@ -84,6 +105,7 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 		auto_timings
 	)
 
+	self.chartplayComputer:computeFromContext(computeContext, replay)
 	local ret = assert(self.chartplayComputer:computeFromContext(computeContext, replay))
 
 	local chartplay = Chartplay()
@@ -99,6 +121,23 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 	assert(valid.format(chartplay:validate()))
 
 	self.computeContext.chartplay = chartplay
+
+	if not self.chartfiles_repo:getChartfileByHash(chartplay.hash) then
+		local chartfile = Chartfile()
+		chartfile.hash = chartplay.hash
+		chartfile.name = chartfile_name
+		chartfile.size = #chartfile_data
+		chartfile.compute_state = "valid"
+		chartfile.computed_at = created_at
+		chartfile.creator_id = 1
+		chartfile.submitted_at = created_at
+
+		self.chartfiles_repo:createChartfile(chartfile)
+
+		self.charts_storage:set(chartplay.hash, chartfile_data)
+	end
+
+	self.replays_storage:set(replay_hash, replay_data)
 
 	return {
 		chartplay = chartplay,

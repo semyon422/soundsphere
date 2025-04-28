@@ -103,7 +103,7 @@ end
 ---@return integer
 function ChartsRepo:getChartplaysComputedCount(computed_at, state)
 	return self.models.chartplays:count({
-		computed_at__lt = assert(computed_at),
+		computed_at__lte = assert(computed_at),
 		compute_state = assert(state),
 	})
 end
@@ -114,7 +114,7 @@ end
 ---@return sea.Chartplay[]
 function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
 	return self.models.chartplays:select({
-		computed_at__lt = assert(computed_at),
+		computed_at__lte = assert(computed_at),
 		compute_state = assert(state),
 	}, {
 		order = {"computed_at ASC"},
