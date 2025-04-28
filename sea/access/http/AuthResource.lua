@@ -1,4 +1,5 @@
 local http_util = require("web.http.util")
+local json = require("web.json")
 local IResource = require("web.framework.IResource")
 local UserInsecure = require("sea.access.UserInsecure")
 
@@ -10,6 +11,9 @@ AuthResource.routes = {
 	{"/login", {
 		GET = "getLogin",
 		POST = "login",
+	}},
+	{"/api/v2/auth/login", {
+		POST = "loginJson",
 	}},
 	{"/logout", {
 		POST = "logout",
@@ -95,6 +99,43 @@ function AuthResource:login(req, res, ctx)
 
 	res.status = 302
 	res.headers:set("Location", "/")
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function AuthResource:loginJson(req, res, ctx)
+	local body_params, err = http_util.get_json(req)
+	if not body_params then
+		res.status = 400
+		res:send(assert(err))
+		return
+	end
+
+	local user = UserInsecure()
+	user.email = body_params.email
+	user.password = body_params.password
+
+	ctx.user = user
+
+	local valid, errs = user:validateLogin()
+	if not valid then
+		res:send(json.encode({errors = errs}))
+		return
+	end
+
+	local su, err = self.users:login(ctx.session_user, ctx.ip, ctx.time, user)
+
+	if not su then
+		res:send(json.encode({errors = {err}}))
+		return
+	end
+
+	res:send(json.encode({
+		user = su.user,
+		session = su.session,
+		token = self.sessions:encode({id = su.session.id}),
+	}))
 end
 
 ---@param req web.IRequest

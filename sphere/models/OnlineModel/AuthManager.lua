@@ -147,11 +147,11 @@ end
 ---@param password string
 function AuthManager:loginAsync(email, password)
 	print("login")
-	local api = self.webApi.api
+	local api = self.webApi.api.v2.auth
 	local config = self.config
 
-	print("POST " .. api.auth.login)
-	local response, code, headers = api.auth.login:_post({
+	print("POST " .. api.login)
+	local response, code, headers = api.login:post({
 		email = email,
 		password = password,
 	})
@@ -161,7 +161,12 @@ function AuthManager:loginAsync(email, password)
 	end
 
 	if code ~= 200 then
-		print(code, response.message)
+		print(code)
+		return
+	end
+
+	if not response.token then
+		print(table.concat(response.errors, ", "))
 		return
 	end
 
