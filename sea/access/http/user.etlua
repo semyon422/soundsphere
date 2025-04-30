@@ -1,5 +1,5 @@
 <div class="is-hidden-mobile" style="position:relative;">
-	<div class="user__banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+	<div class="page-banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
 </div>
 
 <main class="container">
@@ -17,7 +17,7 @@
 								<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
 							</div>
 							<h3 class="is-5" align="center"><%= page:formatRole() %></h3>
-							<div class="user__separator"></div>
+							<div class="separator"></div>
 						</div>
 						<div class="block" x-data="{ discord: '<%= user.discord %>' }">
 							<%
@@ -104,7 +104,7 @@
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
-				<div class="user__banner-box is-hidden-mobile"></div>
+				<div class="page-banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<nav class="level">
 						<%

@@ -25,11 +25,14 @@ end
 ---@param ctx sea.RequestContext
 function TeamResource:getTeam(req, res, ctx)
 	ctx.team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+	--[[
 	if not ctx.team then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
+	]]
+	ctx.ignore_main_container = true
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
 end
 
