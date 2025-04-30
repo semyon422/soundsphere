@@ -4,6 +4,7 @@ local User = require("sea.access.User")
 local UserInsecure = require("sea.access.UserInsecure")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
+local SessionInsecure = require("sea.access.SessionInsecure")
 
 ---@class sea.Users
 ---@operator call: sea.Users
@@ -84,7 +85,7 @@ function Users:register(_, ip, time, user_values)
 
 	user = self.users_repo:createUser(user)
 
-	local session = Session()
+	local session = SessionInsecure()
 	session.user_id = user.id
 	session.active = true
 	session.ip = ip
@@ -129,7 +130,7 @@ function Users:login(_, ip, time, user_values)
 
 	user = user:hideCredentials()
 
-	local session = Session()
+	local session = SessionInsecure()
 	session.active = true
 	session.created_at = time
 	session.user_id = user.id

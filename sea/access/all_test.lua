@@ -102,6 +102,7 @@ function test.register_email_password(t)
 
 	t:eq(su.session.id, 1)
 	t:eq(su.session.user_id, 1)
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
 
@@ -156,6 +157,7 @@ function test.login_email_password(t)
 	end
 	---@cast su -?
 
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.id, 1)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
@@ -172,6 +174,7 @@ function test.login_email_password(t)
 	---@cast su -?
 
 	t:eq(su.session.user_id, su.user.id)
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
 

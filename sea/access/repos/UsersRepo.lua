@@ -132,6 +132,12 @@ function UsersRepo:getSession(id)
 	return self.models.sessions:find({id = assert(id)})
 end
 
+---@param id integer
+---@return sea.SessionInsecure?
+function UsersRepo:getSessionInsecure(id)
+	return self.models.sessions_insecure:find({id = assert(id)})
+end
+
 ---@param session sea.Session
 ---@return sea.Session?
 function UsersRepo:createSession(session)

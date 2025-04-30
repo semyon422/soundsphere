@@ -112,6 +112,12 @@ function IUsersRepo:getSession(id)
 	return {}
 end
 
+---@param id integer
+---@return sea.SessionInsecure?
+function IUsersRepo:getSessionInsecure(id)
+	return {}
+end
+
 ---@param session sea.Session
 ---@return sea.Session?
 function IUsersRepo:createSession(session)
