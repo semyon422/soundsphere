@@ -90,7 +90,7 @@ function UserResource:getUser(req, res, ctx)
 
 	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
 
-	if user.id == 0 then
+	if user:isAnon() then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return

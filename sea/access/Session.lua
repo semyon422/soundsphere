@@ -9,4 +9,9 @@ local class = require("class")
 ---@field updated_at integer
 local Session = class()
 
+---@return boolean
+function Session:isAnon()
+	return not self.id
+end
+
 return Session

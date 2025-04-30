@@ -89,14 +89,14 @@ end
 ---@param req web.IRequest
 ---@param ctx sea.RequestContext
 function App:handleSession(req, ctx)
-	---@type {id: integer}?
-	local t = self.sessions:get(req.headers)
-	if not t or not t.id then
+	---@type sea.Session?
+	local req_session = self.sessions:get(req.headers)
+	if not req_session or not req_session.id then
 		return
 	end
 
-	local session = self.domain.users:getSession(t.id)
-	if not session or not session.active then
+	local session = self.domain.users:checkSession(req_session)
+	if not session then
 		return
 	end
 

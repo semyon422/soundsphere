@@ -22,11 +22,7 @@ function Users:new(users_repo, password_hasher)
 	self.users_access = UsersAccess()
 
 	self.anon_user = User()
-	self.anon_user.id = 0
-
 	self.anon_session = Session()
-	self.anon_session.id = 0
-	self.anon_session.user_id = 0
 end
 
 ---@return sea.User[]
@@ -209,6 +205,41 @@ end
 ---@return sea.Session?
 function Users:getSession(id)
 	return self.users_repo:getSession(id)
+end
+
+---@param req_session sea.Session
+---@return sea.Session?
+function Users:checkSession(req_session)
+	local session = self:getSession(req_session.id)
+	if not session or not session.active then
+		return
+	end
+
+	if session.updated_at ~= req_session.updated_at then
+		session.active = false
+		self.users_repo:updateSession(session)
+		return
+	end
+
+	return session
+end
+
+---@param user sea.User
+---@param session sea.Session
+---@return sea.Session?
+function Users:updateSession(user, session)
+	if user:isAnon() then
+		return
+	end
+
+	if session.user_id ~= user.id then
+		return
+	end
+
+	session.updated_at = os.time()
+	session = self.users_repo:updateSession(session)
+
+	return session
 end
 
 return Users
