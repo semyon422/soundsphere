@@ -36,6 +36,8 @@ function SeaClient:new(client_remote)
 	local task_handler = TaskHandler(self.remote_handler)
 	self.task_handler = task_handler
 
+	task_handler.timeout = 60
+
 	local remote = Remote(self.task_handler, self.server_peer)
 	---@cast remote -icc.Remote, +sea.ServerRemote
 	self.remote = remote
@@ -51,6 +53,8 @@ function SeaClient:new(client_remote)
 		else
 			task_handler:handleCall(server_peer, msg)
 		end
+
+		task_handler:update()
 	end
 
 	self.connected = false

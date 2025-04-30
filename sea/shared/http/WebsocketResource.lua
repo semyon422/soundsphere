@@ -43,6 +43,8 @@ function WebsocketResource:server(req, res, ctx)
 	local peer = WebsocketPeer(ws)
 	local task_handler = TaskHandler(self.remote_handler)
 
+	task_handler.timeout = 60
+
 	---@param msg icc.Message
 	local function handle_msg(msg)
 		if msg.ret then
@@ -52,6 +54,7 @@ function WebsocketResource:server(req, res, ctx)
 			msg:insert(ctx.session, 4)
 			task_handler:handleCall(peer, msg)
 		end
+		task_handler:update()
 	end
 
 	function ws.protocol:text(payload, fin)
