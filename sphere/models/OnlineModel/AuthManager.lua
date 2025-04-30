@@ -7,80 +7,28 @@ local inspect = require("inspect")
 ---@field config table
 local AuthManager = class()
 
----@param webApi sphere.WebApi
-function AuthManager:new(webApi)
-	self.webApi = webApi
+---@param sea_client sphere.SeaClient
+function AuthManager:new(sea_client)
+	self.sea_client = sea_client
 end
 
 function AuthManager:checkUserAsync()
-	local webApi = self.webApi
-	local api = webApi.api
-	local config = self.config
-
-	webApi.token = config.token
-	if not config.session.user_id then
-		return
-	end
-
-	print("GET " .. api.users[config.session.user_id])
-	local user = api.users[config.session.user_id]:get()
-	config.user = user or {}
+	print("check user")
+	local server_remote = self.sea_client.remote
+	self.config.user = server_remote:getUser()
+	print("user", inspect(self.config.user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 
 function AuthManager:checkSessionAsync()
-	local webApi = self.webApi
-	local api = webApi.api
-	local config = self.config
-
-	webApi.token = config.token
-
 	print("check session")
-	print("GET " .. api.auth.check)
-	local response, code, headers = api.auth.check:_get()
-	if not response then
-		print(code, headers)
-		return
-	end
-	print(inspect(response))
-	config.session = response.session or {}
-	if not config.session.active then
-		config.session = {}
-		config.token = ""
-	end
+	local server_remote = self.sea_client.remote
+	self.config.session = server_remote:getSession()
+	print("session", inspect(self.config.session))
 
 	self:checkUserAsync()
 end
 AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
-
-function AuthManager:updateSessionAsync()
-	local webApi = self.webApi
-	local api = webApi.api
-	local config = self.config
-
-	webApi.token = config.token
-
-	print("update session")
-	print("POST " .. api.auth.update)
-	local response, code, headers = api.auth.update:_post()
-	if not response then
-		print(code, headers)
-		return
-	end
-
-	if code ~= 200 then
-		print(code, response.message)
-		return
-	end
-
-	config.session = response.session
-	config.token = response.token
-
-	print("updated")
-
-	self:checkUserAsync()
-end
-AuthManager.updateSession = thread.coro(AuthManager.updateSessionAsync)
 
 function AuthManager:quickGetKeyAsync()
 	local api = self.webApi.api

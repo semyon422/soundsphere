@@ -22,6 +22,10 @@ function Users:new(users_repo, password_hasher)
 
 	self.anon_user = User()
 	self.anon_user.id = 0
+
+	self.anon_session = Session()
+	self.anon_session.id = 0
+	self.anon_session.user_id = 0
 end
 
 ---@return sea.User[]

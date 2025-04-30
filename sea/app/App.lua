@@ -137,6 +137,7 @@ function App:handle(req, res, ip)
 		path_params = path_params,
 		ip = ip,
 		time = os.time(),
+		session = self.domain.users.anon_session,
 		session_user = self.domain.users.anon_user,
 		version = self:getVersion(),
 	}

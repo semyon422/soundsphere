@@ -10,6 +10,16 @@ function ServerRemote:new(domain)
 	self.submission = SubmissionServerRemote(domain.chartplays)
 end
 
+---@return sea.User
+function ServerRemote:getUser()
+	return self.user
+end
+
+---@return sea.Session
+function ServerRemote:getSession()
+	return self.session
+end
+
 ---@param msg string
 ---@return string
 function ServerRemote:ping(msg)
