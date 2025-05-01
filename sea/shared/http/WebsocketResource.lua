@@ -19,12 +19,17 @@ WebsocketResource.routes = {
 }
 
 local function remote_handler_transform(_, th, peer, obj, ...)
-	local _obj = setmetatable({}, {__index = obj}) --[[@as sea.IServerRemote]]
+	---@type sea.IServerRemote
+	local _obj = setmetatable({}, {__index = obj})
 	_obj.remote = Remote(th, peer) --[[@as sea.ClientRemote]]
-	_obj.user = select(1, ...) --[[@as sea.User]]
-	_obj.session = select(2, ...) --[[@as sea.Session]]
-	---@cast _obj +sea.IServerRemote
-	return _obj, select(3, ...)
+
+	---@type sea.RequestContext
+	local ctx = ...
+	_obj.user = ctx.session_user
+	_obj.session = ctx.session
+	_obj.ip = ctx.ip
+
+	return _obj, select(2, ...)
 end
 
 ---@param server_handler sea.ServerRemote
@@ -50,8 +55,7 @@ function WebsocketResource:server(req, res, ctx)
 		if msg.ret then
 			task_handler:handleReturn(msg)
 		else
-			msg:insert(ctx.session_user, 3)
-			msg:insert(ctx.session, 4)
+			msg:insert(ctx, 3)
 			task_handler:handleCall(peer, msg)
 		end
 		task_handler:update()

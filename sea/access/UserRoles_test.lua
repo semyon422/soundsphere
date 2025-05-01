@@ -3,6 +3,7 @@ local IPasswordHasher = require("sea.access.IPasswordHasher")
 local UsersRepo = require("sea.access.repos.UsersRepo")
 local Users = require("sea.access.Users")
 local User = require("sea.access.User")
+local UserInsecure = require("sea.access.UserInsecure")
 local UserRole = require("sea.access.UserRole")
 local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -21,7 +22,6 @@ local function create_test_ctx()
 	local users_repo = UsersRepo(models)
 
 	local anon_user = User()
-	anon_user.id = 0
 
 	return {
 		db = db,
@@ -38,7 +38,7 @@ function test.all(t)
 
 	local users = Users(ctx.users_repo, IPasswordHasher())
 
-	local user_values = User()
+	local user_values = UserInsecure()
 	user_values.name = "user"
 	user_values.email = "user@example.com"
 	user_values.password = "password"

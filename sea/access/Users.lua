@@ -20,9 +20,6 @@ function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
 	self.users_access = UsersAccess()
-
-	self.anon_user = User()
-	self.anon_session = Session()
 end
 
 ---@return sea.User[]
@@ -33,13 +30,12 @@ end
 ---@param id integer?
 ---@return sea.User
 function Users:getUser(id)
-	local anon_user = self.anon_user
 	if not id then
-		return anon_user
+		return User()
 	end
 	local user = self.users_repo:getUser(id)
 	if not user then
-		return anon_user
+		return User()
 	end
 	return user
 end
@@ -201,10 +197,17 @@ function Users:ban(user, time, target_user_id)
 	return target_user
 end
 
----@param id integer
+---@param id integer?
 ---@return sea.Session?
 function Users:getSession(id)
-	return self.users_repo:getSession(id)
+	if not id then
+		return Session()
+	end
+	local session = self.users_repo:getSession(id)
+	if not session then
+		return Session()
+	end
+	return session
 end
 
 ---@param req_session sea.Session

@@ -33,7 +33,7 @@ function App:new(app_config)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
-	self.server_remote = ServerRemote(self.domain)
+	self.server_remote = ServerRemote(self.domain, self.sessions)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions)
@@ -137,8 +137,8 @@ function App:handle(req, res, ip)
 		path_params = path_params,
 		ip = ip,
 		time = os.time(),
-		session = self.domain.users.anon_session,
-		session_user = self.domain.users.anon_user,
+		session = self.domain.users:getSession(),
+		session_user = self.domain.users:getUser(),
 		version = self:getVersion(),
 	}
 

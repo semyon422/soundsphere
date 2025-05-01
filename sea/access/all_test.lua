@@ -24,7 +24,6 @@ local function create_test_ctx()
 	local users_repo = UsersRepo(models)
 
 	local anon_user = User()
-	anon_user.id = 0
 
 	return {
 		db = db,
