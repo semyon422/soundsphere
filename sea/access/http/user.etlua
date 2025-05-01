@@ -53,6 +53,18 @@
 				</div>
 				<div class="block is-hidden-mobile">
 					<div class="block">
+						<h1 class="title">Leaderboard</h1>
+						<aside class="menu">
+							<ul class="menu-list">
+								<% for _, lb in ipairs(leaderboards) do %>
+									<li><a href="?lb=<%= lb.id %>"><%= lb.name %></a></li>
+								<% end %>
+							</ul>
+						</aside>
+					</div>
+<%
+--[[%>
+					<div class="block">
 						<h1 class="title">Game mode</h1>
 						<aside class="menu">
 							<ul class="menu-list">
@@ -101,6 +113,8 @@
 							</ul>
 						</aside>
 					</div>
+<%
+]]%>
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
@@ -224,6 +238,20 @@
 					<p class="title">Stats Filter</p>
 					<p class="subtitle">Select game mode, leaderboard and other options to filter specific statistics.</p>
 					<div class="field">
+						<label class="label">Leaderboard</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<% for _, lb in ipairs(leaderboards) do %>
+										<option><%= lb.name %></option>
+									<% end %>
+								</select>
+							</div>
+						</div>
+					</div>
+<%
+--[[%>
+					<div class="field">
 						<label class="label">Gamemode</label>
 						<div class="control">
 							<div class="select is-fullwidth">
@@ -264,6 +292,8 @@
 							</div>
 						</div>
 					</div>
+<%
+]]%>
 				</div>
 				<div class="block border-box">
 					<p class="title is-4">Global Leaderboard 14K2S</p>
@@ -330,12 +360,12 @@
 									</div>
 									<div style="display: flex; min-width: fit-content;">
 										<div class="user__score-rows" style="text-align: right;">
-											<p style="padding-left: 6px"><strong><%= v.accuracy * 100 %>%</strong></p>
+											<p style="padding-left: 6px"><strong><%= ("%0.2f"):format(v.norm_accuracy * 100) %>%</strong></p>
 											<p class="has-text-grey"><%= v.timeSince %></p>
 										</div>
 										<p class="user__score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
 										<div class="user__score-rating-box has-background-gray-light">
-											<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
+											<p class="saira-bold" style="padding-left: 5px"><strong><%= ("%0.2f"):format(v.rating) %></strong></p>
 											<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
 										</div>
 									</div>
@@ -347,6 +377,8 @@
 						</div>
 					</div>
 				</div>
+<%
+--[[%>
 				<div class="block border-box">
 					<p class="title is-4">Dan course clears</p>
 					<table class="table is-fullwidth is-striped">
@@ -414,6 +446,8 @@
 						</tbody>
 					</table>
 				</div>
+<%
+]]%>
 			</div>
 		</div>
 	</div>

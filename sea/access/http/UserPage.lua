@@ -1,5 +1,6 @@
 local class = require("class")
 local time_util = require("time_util")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sea.UserPage
 ---@operator call: sea.UserPage
@@ -10,10 +11,12 @@ UserPage.activityWeeks = 53
 ---@param users_access sea.UsersAccess
 ---@param session_user sea.User
 ---@param target_user sea.User
-function UserPage:new(users_access, session_user, target_user)
+---@param leaderboards sea.Leaderboards
+function UserPage:new(users_access, session_user, target_user, leaderboards)
 	self.usersAccess = users_access
 	self.sessionUser = session_user
 	self.targetUser = target_user
+	self.leaderboards = leaderboards
 end
 
 ---@return boolean
@@ -145,6 +148,34 @@ function UserPage:getGeneralStats()
 	table.insert(cells, { label = "Satellite", value = "Lv.6" })
 
 	return cells
+end
+
+---@param lb sea.Leaderboard
+---@return table
+function UserPage:getScores(lb)
+	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, self.sessionUser.id)
+
+	local scores = {}
+
+	for i, cpv in ipairs(chartplayviews) do
+		scores[i] = {
+			artist = cpv.chartmeta.artist,
+			title = cpv.chartmeta.title,
+			name = cpv.chartmeta.name,
+			creator = cpv.chartmeta.creator,
+			timeRate = cpv.chartdiff.rate,
+			mods = ModifierModel:getString(cpv.modifiers),
+			accuracy = cpv.accuracy,
+			norm_accuracy = cpv:getNormAccuracy(),
+			exscore = cpv:getExScore(),
+			timeSince = time_util.time_ago_in_words(cpv.created_at),
+			grade = cpv:getGrade(),
+			rating = cpv.rating,
+			ratingPostfix = "ENPS",
+		}
+	end
+
+	return scores
 end
 
 return UserPage

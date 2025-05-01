@@ -163,6 +163,15 @@ function LeaderboardsRepo:getBestChartplays(lb, user_id)
 	return self.models.chartplayviews:select(conds, options)
 end
 
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function LeaderboardsRepo:getBestChartplaysFull(lb, user_id)
+	local chartplayviews = self:getBestChartplays(lb, user_id)
+	self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
+	return chartplayviews
+end
+
 --------------------------------------------------------------------------------
 
 ---@param leaderboard_id integer

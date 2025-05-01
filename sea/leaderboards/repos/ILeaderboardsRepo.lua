@@ -52,6 +52,13 @@ function ILeaderboardsRepo:getBestChartplays(lb, user_id)
 	return {}
 end
 
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function ILeaderboardsRepo:getBestChartplaysFull(lb, user_id)
+	return {}
+end
+
 --------------------------------------------------------------------------------
 
 ---@param leaderboard_id integer

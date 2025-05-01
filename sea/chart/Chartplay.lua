@@ -1,5 +1,6 @@
 local valid = require("valid")
 local table_util = require("table_util")
+local erfunc = require("libchart.erfunc")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
@@ -51,6 +52,44 @@ local keys = table_util.keys(Chartplay.struct)
 ---@return string?
 function Chartplay:equalsChartplay(values)
 	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
+end
+
+---@return number
+function Chartplay:getNormAccuracy()
+	return erfunc.erf(0.032 / (self.accuracy * math.sqrt(2)))
+end
+
+---@return number
+function Chartplay:getExScore()
+	local judges = self.judges
+
+	local total = 0
+	for _, c in ipairs(judges) do
+		total = total + c
+	end
+
+	return (2 * judges[1] + judges[2]) / (2 * total)
+end
+
+---@return string
+function Chartplay:getGrade()
+	local exscore = self:getExScore() * 9
+	if exscore == 9 then
+		return "X"
+	elseif exscore >= 8 then
+		return "S"
+	elseif exscore >= 7 then
+		return "A"
+	elseif exscore >= 6 then
+		return "B"
+	elseif exscore >= 5 then
+		return "C"
+	elseif exscore >= 4 then
+		return "D"
+	elseif exscore >= 3 then
+		return "E"
+	end
+	return "F"
 end
 
 return Chartplay

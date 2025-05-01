@@ -30,6 +30,13 @@ function Leaderboards:getLeaderboard(id)
 	return self.leaderboards_repo:getLeaderboard(id)
 end
 
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function Leaderboards:getBestChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getBestChartplaysFull(lb, user_id)
+end
+
 ---@param chartplay sea.Chartplayview
 ---@param rating_calc sea.RatingCalc
 local function get_rating(chartplay, rating_calc)
