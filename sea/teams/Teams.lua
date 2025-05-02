@@ -286,4 +286,11 @@ function Teams:getUserUnacceptedTeamUsers(user)
 	return self.teams_repo:getUserUnacceptedTeamUsers(user.id)
 end
 
+---@param user sea.User
+---@param team sea.Team
+---@return boolean
+function Teams:canUpdate(user, team)
+	return self.teams_access:canUpdate(user, team)
+end
+
 return Teams

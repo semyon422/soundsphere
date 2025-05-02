@@ -1,7 +1,11 @@
 <style>
 .team__container {
-	margin-top: 130px;
+	margin-top: 20px;
 	margin-bottom: 20px;
+}
+
+.team__card-spacing {
+	margin-top: 110px;
 }
 
 .team__avatar {
@@ -22,58 +26,102 @@
 <div class="is-hidden-mobile" style="position:relative;">
 	<div class="page-banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
 </div>
-
 <main class="container">
-	<div class="columns">
-		<div class="column">
-			<div class="block">
-				<div class="box team__container">
-					<div class="block">
-						<figure class="image is-2by1 is-fullwidth">
-							<img class="team__avatar" src="https://cdn.discordapp.com/attachments/742425118331895870/1367081806494568468/waaah.png?ex=681349a5&is=6811f825&hm=c96dee84bba52037aedb7bde5ebf441096cad96229df46fb92813bc191d9de38&">
-						</figure>
-					</div>
-					<div class="block">
-						<h1 class="title is-4 is-spaced" align="center">Bread team 🍞🥖🇫🇷</h1>
-						<h2 class="subtitle is-6" align="center">[BRED]</h2>
-						<div class="separator"></div>
-					</div>
-					<div class="block">
-						<%
-							local together_since = os.date("%d.%m.%Y", 0)
-							local together_since_html = os.date("%Y-%m-%d", 0)
-						%>
-						<div class="team__key-value">
-							<p>Together since:</p>
-							<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
+	<div class="team__container">
+		<div class="columns">
+			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
+				<div class="page-banner-box is-hidden-mobile"></div>
+				<div class="block">
+					<% if team.description ~= "" or can_update then %>
+						<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
+						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+						<div class="border-box">
+							<% if not edit_description and team.description == "" then %>
+								<p align="center">Click edit to change team description!<p>
+							<% end %>
+
+							<% if team.description ~= "" or edit_description then %>
+								<div class="block">
+									<div class="description-container" id="editorContainer"></div>
+								</div>
+							<% end %>
+
+							<% if edit_description then %>
+								<div class="columns">
+									<div class="column">
+										<a class="button"" id="saveButton">Save</a>
+									</div>
+									<div class="column is-full" style="align-content: center">
+										<p class="has-text-danger" id="descriptionStatus"></p>
+									</div>
+								</div>
+							<% end %>
+
+							<% if can_update and not edit_description then %>
+								<a class="button" href="<%= ("/teams/%i?edit_description=true"):format(team.id) %>"><i class="fas fa-edit"></i></a>
+							<% end %>
 						</div>
-						<div class="team__key-value">
-							<p>Recent activity:</p>
-							<p><strong>200 hours</strong></p>
+						<script>
+							var quill = addQuillToElement(
+								document.getElementById("editorContainer"),
+								document.getElementById("saveButton"),
+								document.getElementById("descriptionStatus"),
+								"/teams/<%= team.id %>",
+								String.raw`<%- team.description %>`,
+								<%= edit_description %>
+							)
+						</script>
+					<% end %>
+				</div>
+			</div>
+			<div class="column">
+				<div class="block">
+					<div class="box team__card-spacing">
+						<div class="block">
+							<figure class="image is-2by1 is-fullwidth">
+								<img class="team__avatar" src="">
+							</figure>
 						</div>
-						<div class="team__key-value">
-							<p>Players:</p>
-							<p><strong>10 people</strong></p>
+						<div class="block">
+							<h1 class="title is-4 is-spaced" align="center">Bread team 🍞🥖🇫🇷</h1>
+							<h2 class="subtitle is-6" align="center">[BRED]</h2>
+							<div class="separator"></div>
 						</div>
-						<div class="team__key-value">
-							<p>ENPS:</p>
-							<p><strong>28.18</strong></p>
+						<div class="block">
+							<%
+								local together_since = os.date("%d.%m.%Y", 0)
+								local together_since_html = os.date("%Y-%m-%d", 0)
+							%>
+							<div class="team__key-value">
+								<p>Together since:</p>
+								<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
+							</div>
+							<div class="team__key-value">
+								<p>Recent activity:</p>
+								<p><strong>200 hours</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>Members:</p>
+								<p><strong>10/12</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>ENPS:</p>
+								<p><strong>28.18</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>PP:</p>
+								<p><strong>13817</strong></p>
+							</div>
 						</div>
-						<div class="team__key-value">
-							<p>PP:</p>
-							<p><strong>13817</strong></p>
+						<div class="block">
+							<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
+							<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
+							<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
 						</div>
-					</div>
-					<div class="block">
-						<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
-						<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
-						<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
-			<p>hello</p>
 		</div>
 	</div>
 </main>

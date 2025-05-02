@@ -1,11 +1,7 @@
-async function sendDescriptionToServer(quill, user_id) {
+async function sendDescriptionToServer(quill, endpoint) {
 	const json_content = JSON.stringify(quill.getContents())
 	const json_length = json_content.length
 	const json_length_limit = 4096
-
-	if (quill.getLength() === 1) {
-		return [false, "Description is empty"]
-	}
 
 	if (json_length > json_length_limit) {
 		return [false, `Too many characters! ${json_length}/${json_length_limit}`]
@@ -14,7 +10,7 @@ async function sendDescriptionToServer(quill, user_id) {
 	const headers = new Headers()
 	headers.append("Content-Type", "application/json")
 
-	const req = new Request(`/users/${user_id}/edit_description`, {
+	const req = new Request(endpoint, {
 		method: "POST",
 		headers: headers,
 		body: json_content,
@@ -29,8 +25,15 @@ async function sendDescriptionToServer(quill, user_id) {
 	}
 }
 
-function addQuillToElement(parent_element, content, edit_mode) {
-	if (parent_element === null) {
+function updateStatus(status_label, text) {
+	if (status_label === null) {
+		return
+	}
+	status_label.innerText = text
+}
+
+function addQuillToElement(editor_container, save_button, status_label, endpoint, content, edit_mode) {
+	if (editor_container === null) {
 		return
 	}
 
@@ -79,9 +82,45 @@ function addQuillToElement(parent_element, content, edit_mode) {
 	}
 
 	const editor = document.createElement("div")
-	parent_element.appendChild(editor)
+	editor_container.appendChild(editor)
 
 	const quill = new Quill(editor, editor_params)
-	quill.setContents(content)
+
+	if (content == "") {
+		content = "{}"
+	}
+
+	quill.setContents(JSON.parse(content))
+
+	var can_upload = true
+
+	const on_click = function() {
+		if (!can_upload) {
+			return
+		}
+
+		can_upload = false
+		updateStatus(status_label, "Saving...")
+
+		sendDescriptionToServer(quill, endpoint + "/update_description").then(function([success, err]) {
+			updateStatus(status_label, err)
+			can_upload = true
+
+			setTimeout(function() {
+				updateStatus(status_label, "")
+			}, "3000")
+
+			if (success) {
+				// Opening the link in the same tab
+				can_upload = false
+				window.open(endpoint, "_self")
+			}
+		})
+	}
+
+	if (save_button) {
+		save_button.addEventListener("click", on_click)
+	}
+
 	return quill
 }

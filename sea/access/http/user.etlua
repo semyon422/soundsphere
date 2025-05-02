@@ -155,18 +155,22 @@
 					</table>
 				</div>
 				<div class="block">
-					<% local can_update = page:canUpdate() %>
 					<% if user.description ~= "" or can_update then %>
+						<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
 						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="border-box">
-							<% if can_update and (user.description == "" and not edit_description) then %>
-								<p align="center">Click edit to change your profile description!<p>
-								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
-							<% elseif can_update and edit_description then %>
+							<% if not edit_description and user.description == "" then %>
+								<p align="center">Click edit to change profile description!<p>
+							<% end %>
+
+							<% if user.description ~= "" or edit_description then %>
 								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
+									<div class="description-container" id="editorContainer"></div>
 								</div>
+							<% end %>
+
+							<% if edit_description then %>
 								<div class="columns">
 									<div class="column">
 										<a class="button"" id="saveButton">Save</a>
@@ -175,48 +179,21 @@
 										<p class="has-text-danger" id="descriptionStatus"></p>
 									</div>
 								</div>
-							<% else %>
-								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
-								</div>
+							<% end %>
+
+							<% if can_update and not edit_description then %>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
 							<% end %>
 						</div>
-						<script src="/static/scripts/user_resource.js?v=<%= version %>"></script>
 						<script>
 							var quill = addQuillToElement(
 								document.getElementById("editorContainer"),
-								"<%- user.description %>",
+								document.getElementById("saveButton"),
+								document.getElementById("descriptionStatus"),
+								"/users/<%= user.id %>",
+								String.raw`<%- user.description %>`,
 								<%= edit_description %>
 							)
-
-							var can_upload = true
-
-							if (<%= edit_description %>) {
-								const save_button = document.getElementById("saveButton")
-								const status_text = document.getElementById("descriptionStatus")
-								const user_id = <%= user.id %>
-								const on_click = function() {
-									can_upload = false
-									status_text.innerText = "Saving..."
-
-									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
-										status_text.innerText = err
-										can_upload = true
-
-										setTimeout(function() {
-											status_text.innerText = ""
-										}, "3000")
-
-										if (success) {
-											// Opening the link in the same tab
-											can_upload = false
-											window.open(`/users/${user_id}`, "_self")
-										}
-									})
-								}
-
-								save_button.addEventListener("click", on_click)
-							}
 						</script>
 					<% end %>
 				</div>

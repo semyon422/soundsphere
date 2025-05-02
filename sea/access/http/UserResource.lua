@@ -11,7 +11,7 @@ UserResource.routes = {
 	{"/users/:user_id", {
 		GET = "getUser",
 	}},
-	{"/users/:user_id/edit_description", {
+	{"/users/:user_id/update_description", {
 		POST = "updateDescription",
 	}},
 	{"/users/:user_id/sessions", {
@@ -101,10 +101,12 @@ function UserResource:getUser(req, res, ctx)
 
 	ctx.page = page
 	ctx.user = user
-	ctx.ignore_main_container = true
-	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
-
 	ctx.scores = self.testScores
+
+	ctx.can_update = page:canUpdate()
+	ctx.edit_description = ctx.can_update and query.edit_description == "true"
+
+	ctx.ignore_main_container = true
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 

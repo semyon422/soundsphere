@@ -87,3 +87,48 @@ body {
   font-weight: 650;
   font-style: normal;
 }
+
+.description-container {
+	width: 100%;
+	max-width: 100%;
+	max-height: 380px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.ql-toolbar.ql-snow {
+	border: none !important;
+}
+
+.ql-picker {
+	color: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-stroke {
+	stroke: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill {
+	stroke: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-fill {
+	stroke: var(--bulma-border-light) !important;
+}
+
+.ql-editor.ql-blank::before {
+	color: var(--bulma-text) !important;
+	content: attr(data-placeholder);
+	font-style: italic;
+	left: 15px;
+	pointer-events: none;
+	position: absolute;
+	right: 15px;
+}
+
+.ql-container.ql-snow {
+	border: none !important;
+}
+
