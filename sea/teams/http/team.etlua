@@ -28,7 +28,54 @@
 </div>
 <main class="container">
 	<div class="team__container">
-		<div class="columns">
+		<div class="columns is-flex-direction-row-reverse">
+			<div class="column">
+				<div class="block">
+					<div class="box team__card-spacing">
+						<div class="block">
+							<figure class="image is-2by1 is-fullwidth">
+								<img class="team__avatar" src="https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300">
+							</figure>
+						</div>
+						<div class="block">
+							<h1 class="title is-4 is-spaced" align="center">Bread team 🍞🥖🇫🇷</h1>
+							<h2 class="subtitle is-6" align="center">[BRED]</h2>
+							<div class="separator"></div>
+						</div>
+						<div class="block">
+							<%
+								local together_since = os.date("%d.%m.%Y", 0)
+								local together_since_html = os.date("%Y-%m-%d", 0)
+							%>
+							<div class="team__key-value">
+								<p>Together since:</p>
+								<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
+							</div>
+							<div class="team__key-value">
+								<p>Recent activity:</p>
+								<p><strong>200 hours</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>Members:</p>
+								<p><strong>10/12</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>ENPS:</p>
+								<p><strong>28.18</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>PP:</p>
+								<p><strong>13817</strong></p>
+							</div>
+						</div>
+						<div class="block">
+							<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
+							<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
+							<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
 				<div class="page-banner-box is-hidden-mobile"></div>
 				<div class="block">
@@ -74,52 +121,36 @@
 						</script>
 					<% end %>
 				</div>
-			</div>
-			<div class="column">
 				<div class="block">
-					<div class="box team__card-spacing">
-						<div class="block">
-							<figure class="image is-2by1 is-fullwidth">
-								<img class="team__avatar" src="">
-							</figure>
-						</div>
-						<div class="block">
-							<h1 class="title is-4 is-spaced" align="center">Bread team 🍞🥖🇫🇷</h1>
-							<h2 class="subtitle is-6" align="center">[BRED]</h2>
-							<div class="separator"></div>
-						</div>
-						<div class="block">
-							<%
-								local together_since = os.date("%d.%m.%Y", 0)
-								local together_since_html = os.date("%Y-%m-%d", 0)
-							%>
-							<div class="team__key-value">
-								<p>Together since:</p>
-								<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
-							</div>
-							<div class="team__key-value">
-								<p>Recent activity:</p>
-								<p><strong>200 hours</strong></p>
-							</div>
-							<div class="team__key-value">
-								<p>Members:</p>
-								<p><strong>10/12</strong></p>
-							</div>
-							<div class="team__key-value">
-								<p>ENPS:</p>
-								<p><strong>28.18</strong></p>
-							</div>
-							<div class="team__key-value">
-								<p>PP:</p>
-								<p><strong>13817</strong></p>
-							</div>
-						</div>
-						<div class="block">
-							<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
-							<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
-							<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
-						</div>
+					<div class="tabs is-centered">
+						<ul>
+							<li class="is-active"><a>Members</a></li>
+							<li><a>Performance</a></li>
+							<li><a>Accuracy</a></li>
+						</ul>
 					</div>
+				</div>
+				<div class="block">
+					<table class="ranking-table">
+						<thead>
+							<th>Rank</th>
+							<th></th>
+							<th></th>
+							<th>Join date</th>
+							<th>Scores</th>
+						</thead>
+						<tbody>
+							<tr class="has-text">
+								<td>#1</td>
+								<td class="ranking-table__flag-cell">
+									<div class="fi-gb"></div>
+								</td>
+								<td align="left" style="width: 100%">Username</td>
+								<td class="ranking-table__more-padding">02.05.2025</td>
+								<td class="ranking-table__more-padding">84716</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

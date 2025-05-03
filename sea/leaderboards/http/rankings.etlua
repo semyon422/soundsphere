@@ -150,10 +150,9 @@ end
 			</div>
 		<% end %>
 		<div class="block">
-			<table class="rankings__table">
+			<table class="ranking-table">
 				<thead>
 					<th>Rank</th>
-					<th></th>
 					<th></th>
 					<th></th>
 					<th></th>
@@ -164,26 +163,29 @@ end
 				<tbody>
 					<% for _, user in ipairs(users) do %>
 						<tr class="has-text">
-							<td class="rankings__table-left-cell has-background">#<%= user.rank %></td>
+							<td>#<%= user.rank %></td>
 							<% if user.rankChange > 0 then %>
-								<td class="rankings__table-left-cell fa fa-solid fa-arrow-up has-text-success has-background"></td>
-								<td class="rankings__table-left-cell has-text-success has-background"><%= user.rankChange %></td>
+								<td class="ranking-table__rank-change-cell has-text-success">
+									<i class="fa fa-solid fa-arrow-up"></i>
+									<%= user.rankChange %>
+								</td>
 							<% elseif user.rankChange < 0 then %>
-								<td class="rankings__table-left-cell fa fa-solid fa-arrow-down has-text-danger has-background "></td>
-								<td class="rankings__table-left-cell has-text-danger has-background"><%= math.abs(user.rankChange) %></td>
+								<td class="ranking-table__rank-change-cell has-text-danger">
+									<i class="fa fa-solid fa-arrow-down"></i>
+									<%= math.abs(user.rankChange) %>
+								</td>
 							<% else %>
-								<td class="rankings__table-left-cell has-background"></td>
-								<td class="rankings__table-left-cell has-background"></td>
+								<td></td>
 							<% end %>
-							<td class="rankings__table-left-cell rankings__table-flag-cell has-background">
-								<div class="rankings__table-flag fi-<%= user.flag %>"></div>
+							<td class="ranking-table__flag-cell">
+								<div class="fi-<%= user.flag %>"></div>
 							</td>
-							<td align="left" class="has-background"><%= user.username %></td>
+							<td align="left" class="ranking-table__main-cell"><%= user.username %></td>
 							<% for _, v in ipairs(user.cellValues) do %>
 								<% if v.dimmed then %>
-									<td class="rankings__table-right-cell has-background has-text-grey"><%= v.label %></td>
+									<td class="ranking-table__more-padding has-text-grey"><%= v.label %></td>
 								<% else %>
-									<td class="rankings__table-right-cell has-background"><%= v.label %></td>
+									<td class="ranking-table__more-padding has-background"><%= v.label %></td>
 								<% end %>
 							<% end %>
 						</tr>

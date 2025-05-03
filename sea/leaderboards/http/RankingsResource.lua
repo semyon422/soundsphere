@@ -23,7 +23,7 @@ function RankingsResource:new(views)
 	for i = 1, 500, 1 do
 		table.insert(self.testUsers, {
 			rank = i,
-			rankChange = math.random(-5, 5),
+			rankChange = math.random(-30, 30),
 			username = ("User %i"):format(i),
 			pr = 30 - (i * 0.039),
 			pp = 10000 - (i * 12.3),
