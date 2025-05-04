@@ -76,15 +76,30 @@ end
 ---@param ctx sea.RequestContext
 function TeamResource:getTeam(req, res, ctx)
 	local query = http_util.decode_query_string(ctx.parsed_uri.query)
-	ctx.team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
 
-	if not ctx.team then
+	if not team then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
 
-	local can_update = self.teams:canUpdate(ctx.session_user, ctx.team)
+	local can_update = self.teams:canUpdate(ctx.session_user, team)
+	local team_users = self.teams:getTeamUsers(team.id)
+
+	for _, team_user in ipairs(team_users) do
+		if team_user.id == ctx.session_user.id then
+			ctx.is_accepted = team_user.is_accepted
+			ctx.is_invitation = team_user.is_invitation
+			break
+		end
+	end
+
+	if team.owner_id == ctx.session_user.id then
+		ctx.can_manage = true
+	end
+
+	ctx.team = team
 	ctx.can_update = can_update
 	ctx.edit_description = can_update and query.edit_description == "true"
 

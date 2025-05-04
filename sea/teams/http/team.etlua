@@ -9,7 +9,13 @@
 }
 
 .team__avatar {
+	display: inline-block;
+	width: 100%;
+	aspect-ratio: 2;
 	border-radius: 40px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 
 .team__key-value {
@@ -33,19 +39,17 @@
 				<div class="block">
 					<div class="box team__card-spacing">
 						<div class="block">
-							<figure class="image is-2by1 is-fullwidth">
-								<img class="team__avatar" src="https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300">
-							</figure>
+							<span class="team__avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></span>
 						</div>
 						<div class="block">
-							<h1 class="title is-4 is-spaced" align="center">Bread team 🍞🥖🇫🇷</h1>
-							<h2 class="subtitle is-6" align="center">[BRED]</h2>
+							<h1 class="title is-4 is-spaced" align="center"><%= team.name %></h1>
+							<h2 class="subtitle is-6" align="center">[<%= team.alias %>]</h2>
 							<div class="separator"></div>
 						</div>
 						<div class="block">
 							<%
-								local together_since = os.date("%d.%m.%Y", 0)
-								local together_since_html = os.date("%Y-%m-%d", 0)
+								local together_since = os.date("%d.%m.%Y", team.created_at)
+								local together_since_html = os.date("%Y-%m-%d", team.created_at)
 							%>
 							<div class="team__key-value">
 								<p>Together since:</p>
@@ -57,7 +61,7 @@
 							</div>
 							<div class="team__key-value">
 								<p>Members:</p>
-								<p><strong>10/12</strong></p>
+								<p><strong><%= team.users_count %>/12</strong></p>
 							</div>
 							<div class="team__key-value">
 								<p>ENPS:</p>
@@ -68,11 +72,23 @@
 								<p><strong>13817</strong></p>
 							</div>
 						</div>
-						<div class="block">
-							<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
-							<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
-							<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
-						</div>
+						<% if not is_accepted and not is_invitation and not session_user.id == 0 then %>
+							<div class="block">
+								<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
+							</div>
+						<% end %>
+
+						<% if can_manage then %>
+							<div class="block">
+								<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
+							</div>
+						<% end %>
+
+						<% if is_accepted and not can_manage then %>
+							<div class="block">
+								<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
+							</div>
+						<% end %>
 					</div>
 				</div>
 			</div>
@@ -80,9 +96,6 @@
 				<div class="page-banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<% if team.description ~= "" or can_update then %>
-						<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
-						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="border-box">
 							<% if not edit_description and team.description == "" then %>
 								<p align="center">Click edit to change team description!<p>
@@ -145,7 +158,7 @@
 								<td class="ranking-table__flag-cell">
 									<div class="fi-gb"></div>
 								</td>
-								<td align="left" style="width: 100%">Username</td>
+								<td align="left" class="ranking-table__main-cell">Username</td>
 								<td class="ranking-table__more-padding">02.05.2025</td>
 								<td class="ranking-table__more-padding">84716</td>
 							</tr>

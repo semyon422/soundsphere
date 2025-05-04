@@ -156,9 +156,6 @@
 				</div>
 				<div class="block">
 					<% if user.description ~= "" or can_update then %>
-						<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
-						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="border-box">
 							<% if not edit_description and user.description == "" then %>
 								<p align="center">Click edit to change profile description!<p>
