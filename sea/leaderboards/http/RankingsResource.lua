@@ -24,7 +24,7 @@ function RankingsResource:new(views)
 		table.insert(self.testUsers, {
 			rank = i,
 			rankChange = math.random(-30, 30),
-			username = ("User %i"):format(i),
+			name = ("User %i"):format(i),
 			pr = 30 - (i * 0.039),
 			pp = 10000 - (i * 12.3),
 			msd = 32 - (i * 0.032),
@@ -148,10 +148,11 @@ function RankingsResource:getRankings(req, res, ctx)
 	for i = first, last - 1 do
 		local user = self.testUsers[i + 1]
 		local t = {
+			id = user.rank,
 			rank = user.rank,
 			rankChange = user.rankChange,
 			flag = user.flag,
-			username = user.username,
+			name = user.name,
 			cellValues = { -- We can put here as many values as we want. Don't forget to add a name for a column to ctx.table_cell_names
 				{
 					label = ("%i"):format(user.pp),

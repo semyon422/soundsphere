@@ -180,7 +180,9 @@ end
 							<td class="ranking-table__flag-cell">
 								<div class="fi-<%= user.flag %>"></div>
 							</td>
-							<td align="left" class="ranking-table__main-cell"><%= user.username %></td>
+							<td align="left" class="ranking-table__main-cell">
+								<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+							</td>
 							<% for _, v in ipairs(user.cellValues) do %>
 								<% if v.dimmed then %>
 									<td class="ranking-table__more-padding has-text-grey"><%= v.label %></td>

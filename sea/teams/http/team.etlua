@@ -27,6 +27,10 @@
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
+
+.team__role {
+	padding-left: 5px;
+}
 </style>
 
 <div class="is-hidden-mobile" style="position:relative;">
@@ -158,7 +162,15 @@
 									<td class="ranking-table__flag-cell">
 										<div class="fi-gb"></div>
 									</td>
-									<td align="left" class="ranking-table__main-cell"><a class="has-text-primary-35" href="/users/<%= user.id %>"><%= user.name %></a></td>
+									<td align="left" class="ranking-table__main-cell">
+										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+										<% if user.id == team.owner_id then %>
+											<span class="team__role">
+												<i class="fas fa-fist-raised"></i>
+												Leader
+											</span>
+										<% end %>
+									</td>
 									<td class="ranking-table__more-padding"><%= os.date("%d.%m.%Y", user.created_at) %></td>
 									<td class="ranking-table__more-padding"><%= user.chartplays_count %></td>
 								</tr>
