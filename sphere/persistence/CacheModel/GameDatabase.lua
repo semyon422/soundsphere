@@ -1,5 +1,5 @@
 local class = require("class")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
@@ -29,7 +29,7 @@ function GameDatabase:load()
 	db:open("userdata/data.db")
 	db:exec("PRAGMA foreign_keys = ON;")
 
-	local ver = orm:user_version()
+	local ver = db:user_version()
 
 	if ver == 0 then
 		local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))

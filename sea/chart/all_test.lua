@@ -17,7 +17,7 @@ local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local User = require("sea.access.User")
 local Replay = require("sea.replays.Replay")

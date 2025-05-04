@@ -13,7 +13,7 @@ local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 local simplify_notechart = require("libchart.simplify_notechart")
 local ReplayModel = require("sphere.models.ReplayModel")
 
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 ---@class sea.FakeClient

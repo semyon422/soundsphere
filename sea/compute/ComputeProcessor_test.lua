@@ -12,7 +12,7 @@ local Leaderboards = require("sea.leaderboards.Leaderboards")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local User = require("sea.access.User")
 
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 local chart_samples = require("sea.chart.samples")

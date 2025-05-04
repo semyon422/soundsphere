@@ -1,6 +1,6 @@
 local class = require("class")
 local socket_url = require("socket.url")
-local LsqliteDatabase = require("rdb.LsqliteDatabase")
+local LsqliteDatabase = require("rdb.db.LsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Resources = require("sea.app.Resources")
 local Repos = require("sea.app.Repos")

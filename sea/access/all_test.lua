@@ -5,7 +5,7 @@ local Users = require("sea.access.Users")
 local User = require("sea.access.User")
 local UserInsecure = require("sea.access.UserInsecure")
 local UserRole = require("sea.access.UserRole")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 local test = {}

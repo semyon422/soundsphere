@@ -1,5 +1,5 @@
 local table_util = require("table_util")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
