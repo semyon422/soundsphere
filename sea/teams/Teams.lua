@@ -248,6 +248,12 @@ function Teams:getTeamUsers(team_id)
 	return self.teams_repo:getTeamUsers(team_id)
 end
 
+---@param team_id integer
+---@return sea.TeamUser[]
+function Teams:getTeamUsersFull(team_id)
+	return self.teams_repo:getTeamUsersFull(team_id)
+end
+
 ---@param user sea.User
 ---@param team sea.Team
 ---@return sea.TeamUser[]?

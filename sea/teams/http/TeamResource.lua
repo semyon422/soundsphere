@@ -85,7 +85,7 @@ function TeamResource:getTeam(req, res, ctx)
 	end
 
 	local can_update = self.teams:canUpdate(ctx.session_user, team)
-	local team_users = self.teams:getTeamUsers(team.id)
+	local team_users = self.teams:getTeamUsersFull(team.id)
 
 	for _, team_user in ipairs(team_users) do
 		if team_user.id == ctx.session_user.id then
@@ -100,6 +100,7 @@ function TeamResource:getTeam(req, res, ctx)
 	end
 
 	ctx.team = team
+	ctx.team_users = team_users
 	ctx.can_update = can_update
 	ctx.edit_description = can_update and query.edit_description == "true"
 

@@ -146,22 +146,23 @@
 				<div class="block">
 					<table class="ranking-table">
 						<thead>
-							<th>Rank</th>
 							<th></th>
 							<th></th>
 							<th>Join date</th>
 							<th>Scores</th>
 						</thead>
 						<tbody>
-							<tr class="has-text">
-								<td>#1</td>
-								<td class="ranking-table__flag-cell">
-									<div class="fi-gb"></div>
-								</td>
-								<td align="left" class="ranking-table__main-cell">Username</td>
-								<td class="ranking-table__more-padding">02.05.2025</td>
-								<td class="ranking-table__more-padding">84716</td>
-							</tr>
+							<% for i, team_user in ipairs(team_users) do %>
+								<% local user = team_user.user %>
+								<tr class="has-text">
+									<td class="ranking-table__flag-cell">
+										<div class="fi-gb"></div>
+									</td>
+									<td align="left" class="ranking-table__main-cell"><a class="has-text-primary-35" href="/users/<%= user.id %>"><%= user.name %></a></td>
+									<td class="ranking-table__more-padding"><%= os.date("%d.%m.%Y", user.created_at) %></td>
+									<td class="ranking-table__more-padding"><%= user.chartplays_count %></td>
+								</tr>
+							<% end %>
 						</tbody>
 					</table>
 				</div>
