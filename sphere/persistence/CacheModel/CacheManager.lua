@@ -12,14 +12,12 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
 local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
+local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local ChartplayComputer = require("sea.compute.ChartplayComputer")
-local ReplayCoder = require("sea.replays.ReplayCoder")
-local ReplayConverter = require("sea.replays.ReplayConverter")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local Sph = require("sph.Sph")
 local class = require("class")
-local valid = require("valid")
 local path_util = require("path_util")
 
 ---@class sphere.CacheManager
@@ -66,6 +64,7 @@ function CacheManager:new(gdb)
 		self.locationsRepo,
 		self.locationManager
 	)
+	self.computeDataLoader = ComputeDataLoader(self.computeDataProvider)
 end
 
 function CacheManager:begin()
@@ -356,36 +355,23 @@ end
 function CacheManager:computeChartplay(chartplay)
 	local chartplaysRepo = self.chartplaysRepo
 	local chartplayComputer = self.chartplayComputer
-	local computeDataProvider = self.computeDataProvider
+	local computeDataLoader = self.computeDataLoader
 
-	local chartfile_data, err = computeDataProvider:getChartData(chartplay.hash)
-	if not chartfile_data then
+	local chart_data, err = computeDataLoader:requireChart(chartplay.hash)
+	if not chart_data then
 		return nil, "get chart data: " .. err
 	end
 
-	local replay_data, err = computeDataProvider:getReplayData(chartplay.replay_hash)
+	local replay_data, err = computeDataLoader:requireReplay(chartplay.replay_hash)
 	if not replay_data then
 		return nil, "get replay data: " .. err
 	end
 
-	local replay, err = ReplayCoder.decode(replay_data)
-	if not replay then
-		return nil, "can't decode replay: " .. err
-	end
-
-	replay = ReplayConverter:convert(replay)
-
-	local ok, err = valid.format(replay:validate())
-	if not ok then
-		-- print(require("stbl").encode(replay.modifiers))
-		return nil, "validate replay: " .. err
-	end
-
 	local ret, err = chartplayComputer:compute(
-		chartfile_data.name,
-		chartfile_data.data,
+		chart_data.name,
+		chart_data.data,
 		chartplay.index,
-		replay
+		replay_data.replay
 	)
 	if not ret then
 		print(err)
