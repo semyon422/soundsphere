@@ -181,7 +181,7 @@ function ReplayConverter:convert(obj)
 	replay.hash = obj.hash
 	replay.index = obj.index
 	replay.modifiers = obj.modifiers
-	replay.rate = obj.rate
+	replay.rate = int_rates.round(obj.rate)
 	replay.mode = obj.single and "taiko" or "mania"
 
 	replay.nearest = not not obj.timings.nearest

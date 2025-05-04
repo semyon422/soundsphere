@@ -14,7 +14,7 @@ function ChartsComputer:new(compute_data_loader, chartplay_computer, charts_repo
 end
 
 ---@param chartplay sea.Chartplay
----@return true?
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?
 function ChartsComputer:computeChartplay(chartplay)
 	local charts_repo = self.charts_repo
@@ -28,7 +28,7 @@ function ChartsComputer:computeChartplay(chartplay)
 
 	local replay_and_data, err = compute_data_loader:requireReplay(chartplay.replay_hash)
 	if not replay_and_data then
-		return nil, "require replay" .. err
+		return nil, "require replay: " .. err
 	end
 
 	local replay = replay_and_data.replay
@@ -59,7 +59,7 @@ function ChartsComputer:computeChartplay(chartplay)
 
 	-- update chartdiffs, chartmetas, leaderboards
 
-	return true
+	return ret
 end
 
 return ChartsComputer

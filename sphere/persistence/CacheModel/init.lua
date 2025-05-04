@@ -2,16 +2,15 @@ local thread = require("thread")
 local class = require("class")
 local physfs = require("physfs")
 local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
-local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
-local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
-local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local CacheStatus = require("sphere.persistence.CacheModel.CacheStatus")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
+
+local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -28,14 +27,14 @@ function CacheModel:new(difficultyModel)
 	end})
 
 	self.gdb = GameDatabase(migrations)
+
+	self.chartsRepo = ChartsRepo(self.gdb.models, ChartsRepo)
+
 	self.chartviewsRepo = ChartviewsRepo(self.gdb)
-	self.chartdiffsRepo = ChartdiffsRepo(self.gdb, difficultyModel.registry.fields)
-	self.chartmetasRepo = ChartmetasRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)
-	self.chartplaysRepo = ChartplaysRepo(self.gdb)
 	self.chartfilesRepo = ChartfilesRepo(self.gdb)
-	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartmetasRepo, self.chartdiffsRepo)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, difficultyModel)
+	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartsRepo)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, difficultyModel)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
 		self.chartfilesRepo,
@@ -46,7 +45,7 @@ function CacheModel:new(difficultyModel)
 
 	self.computeDataProvider = ComputeDataProvider(
 		self.chartfilesRepo,
-		self.chartplaysRepo,
+		self.chartsRepo,
 		self.locationsRepo,
 		self.locationManager
 	)

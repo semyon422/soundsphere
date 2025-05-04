@@ -177,6 +177,17 @@ function ChartsRepo:getChartmetasMissingChartdiffs()
 	return self.models.chartmetas_diffs_missing:select()
 end
 
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function ChartsRepo:createUpdateChartmeta(chartmeta)
+	local _chartmeta = self:getChartmetaByHashIndex(chartmeta.hash, chartmeta.index)
+	if not _chartmeta then
+		return self:createChartmeta(chartmeta)
+	end
+	chartmeta.id = _chartmeta.id
+	return self:updateChartmeta(chartmeta)
+end
+
 --------------------------------------------------------------------------------
 
 ---@param id integer
@@ -230,6 +241,13 @@ function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
 	}, {
 		order = {"computed_at ASC"},
 		limit = limit or 1,
+	})
+end
+
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysComputedNull()
+	return self.models.chartplays_computable:select({
+		compute_state__isnull = true,
 	})
 end
 

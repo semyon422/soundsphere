@@ -4,16 +4,15 @@ local FileCacheGenerator = require("sphere.persistence.CacheModel.FileCacheGener
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
 local ChartdiffGenerator = require("sphere.persistence.CacheModel.ChartdiffGenerator")
 local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
-local ChartdiffsRepo = require("sphere.persistence.CacheModel.ChartdiffsRepo")
-local ChartmetasRepo = require("sphere.persistence.CacheModel.ChartmetasRepo")
 local ChartFactory = require("notechart.ChartFactory")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
-local ChartplaysRepo = require("sphere.persistence.CacheModel.ChartplaysRepo")
 local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
+local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local ChartplayComputer = require("sea.compute.ChartplayComputer")
+local ChartsComputer = require("sea.compute.ChartsComputer")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local Sph = require("sph.Sph")
@@ -31,12 +30,11 @@ function CacheManager:new(gdb)
 	self.difficultyModel = DifficultyModel()
 
 	self.gdb = gdb
+
+	self.chartsRepo = ChartsRepo(gdb.models, self.difficultyModel.registry.fields)
+
 	self.locationsRepo = LocationsRepo(gdb)
-	self.chartplaysRepo = ChartplaysRepo(gdb)
 	self.chartfilesRepo = ChartfilesRepo(gdb)
-	self.chartdiffsRepo = ChartdiffsRepo(gdb, self.difficultyModel.registry.fields)
-	self.chartmetasRepo = ChartmetasRepo(gdb)
-	self.chartplayComputer = ChartplayComputer()
 
 	self.noteChartFinder = NoteChartFinder(love.filesystem)
 
@@ -47,8 +45,8 @@ function CacheManager:new(gdb)
 		end
 	end
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartdiffsRepo, self.difficultyModel)
-	self.chartmetaGenerator = ChartmetaGenerator(self.chartmetasRepo, self.chartfilesRepo, ChartFactory)
+	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, self.difficultyModel)
+	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -60,11 +58,14 @@ function CacheManager:new(gdb)
 
 	self.computeDataProvider = ComputeDataProvider(
 		self.chartfilesRepo,
-		self.chartplaysRepo,
+		self.chartsRepo,
 		self.locationsRepo,
 		self.locationManager
 	)
 	self.computeDataLoader = ComputeDataLoader(self.computeDataProvider)
+
+	self.chartplayComputer = ChartplayComputer()
+	self.chartsComputer = ChartsComputer(self.computeDataLoader, self.chartplayComputer, self.chartsRepo)
 end
 
 function CacheManager:begin()
@@ -219,11 +220,10 @@ function CacheManager:getChartsByHash(hash)
 end
 
 function CacheManager:computeChartdiffs()
-	local chartmetasRepo = self.chartmetasRepo
-	local chartplaysRepo = self.chartplaysRepo
+	local chartsRepo = self.chartsRepo
 
-	local scores = chartplaysRepo:getChartplaysWithMissingChartdiffs()
-	local chartmetas = chartmetasRepo:getChartmetasWithMissingChartdiffs()
+	local scores = chartsRepo:getChartplaysMissingChartdiffs()
+	local chartmetas = chartsRepo:getChartmetasMissingChartdiffs()
 
 	self.state = 2
 	self.chartfiles_count = #chartmetas + #scores
@@ -243,7 +243,7 @@ function CacheManager:computeChartdiffs()
 				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
 				chartdiff.hash = chartmeta.hash
 				chartdiff.index = chartmeta.index
-				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+				chartsRepo:createUpdateChartdiff(chartdiff)
 			else
 				print("toAbsolute", err)
 			end
@@ -272,7 +272,7 @@ function CacheManager:computeChartdiffs()
 				chartdiff.hash = score.hash
 				chartdiff.index = score.index
 
-				self.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+				chartsRepo:createUpdateChartdiff(chartdiff)
 			else
 				print("toAbsolute", err)
 			end
@@ -291,9 +291,9 @@ end
 
 ---@param prefer_preview boolean
 function CacheManager:computeIncompleteChartdiffs(prefer_preview)
-	local chartdiffsRepo = self.chartdiffsRepo
+	local chartsRepo = self.chartsRepo
 
-	local chartdiffs = chartdiffsRepo:getIncompleteChartdiffs()
+	local chartdiffs = chartsRepo:getIncompleteChartdiffs()
 	print(#chartdiffs)
 
 	self.state = 2
@@ -336,7 +336,7 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 
 		if chart then
 			self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
-			chartdiffsRepo:updateChartdiff(chartdiff)
+			chartsRepo:updateChartdiff(chartdiff)
 		end
 
 		self.chartfiles_current = i
@@ -351,42 +351,11 @@ function CacheManager:computeIncompleteChartdiffs(prefer_preview)
 	self:checkProgress()
 end
 
----@param chartplay sea.Chartplay
-function CacheManager:computeChartplay(chartplay)
-	local chartplaysRepo = self.chartplaysRepo
-	local chartplayComputer = self.chartplayComputer
-	local computeDataLoader = self.computeDataLoader
-
-	local chart_data, err = computeDataLoader:requireChart(chartplay.hash)
-	if not chart_data then
-		return nil, "get chart data: " .. err
-	end
-
-	local replay_data, err = computeDataLoader:requireReplay(chartplay.replay_hash)
-	if not replay_data then
-		return nil, "get replay data: " .. err
-	end
-
-	local ret, err = chartplayComputer:compute(
-		chart_data.name,
-		chart_data.data,
-		chartplay.index,
-		replay_data.replay
-	)
-	if not ret then
-		print(err)
-		return
-	end
-
-	print(require("stbl").encode(ret.chartplay_computed))
-
-	return true
-end
-
 function CacheManager:computeChartplays()
-	local chartplaysRepo = self.chartplaysRepo
+	local chartsRepo = self.chartsRepo
+	local chartsComputer = self.chartsComputer
 
-	local chartplays = chartplaysRepo:getChartplaysNullComputeState()
+	local chartplays = chartsRepo:getChartplaysComputedNull()
 	print(#chartplays)
 
 	self.chartfiles_count = #chartplays
@@ -396,9 +365,11 @@ function CacheManager:computeChartplays()
 	self:checkProgress()
 
 	for i, chartplay in ipairs(chartplays) do
-		local ok, err = self:computeChartplay(chartplay)
-		if not ok then
+		local ret, err = chartsComputer:computeChartplay(chartplay)
+		if not ret then
 			print(chartplay.replay_hash .. ": " .. err)
+		else
+			print(require("stbl").encode(ret.chartplay_computed))
 		end
 
 		self.chartfiles_current = i

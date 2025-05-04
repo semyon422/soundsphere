@@ -358,7 +358,7 @@ function GameplayController:saveScore()
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
 	chartdiff.notes_preview = nil  -- fixes erasing
-	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff)
 
 	local chartplay = Chartplay()
 
@@ -376,7 +376,7 @@ function GameplayController:saveScore()
 
 	assert(valid.format(chartplay:validate()))
 
-	local _chartplay = self.cacheModel.chartplaysRepo:createChartplay(chartplay)
+	local _chartplay = self.cacheModel.chartsRepo:createChartplay(chartplay)
 	self.computeContext.chartplay = _chartplay
 
 	coroutine.wrap(function()
@@ -444,10 +444,10 @@ function GameplayController:increaseLocalOffset(delta)
 	chartmeta.offset = chartmeta.offset or self.offsetModel:getDefaultLocal()
 	chartmeta.offset = math_util.round(chartmeta.offset + delta, delta)
 
-	self.cacheModel.chartmetasRepo:updateChartmeta({
+	self.cacheModel.chartsRepo:updateChartmeta({
 		id = chartmeta.id,
 		offset = chartmeta.offset,
-	})
+	} --[[@as table]])
 
 	self.notificationModel:notify("local offset: " .. chartmeta.offset * 1000 .. "ms")
 	self:updateOffsets()
@@ -457,10 +457,10 @@ function GameplayController:resetLocalOffset()
 	local chartmeta = assert(self.computeContext.chartmeta)
 
 	chartmeta.offset = nil
-	self.cacheModel.chartmetasRepo:updateChartmeta({
+	self.cacheModel.chartsRepo:updateChartmeta({
 		id = chartmeta.id,
 		offset = sql_util.NULL,
-	})
+	} --[[@as table]])
 
 	self.notificationModel:notify("local offset reseted: " .. self.offsetModel:getDefaultLocal() * 1000 .. "ms")
 

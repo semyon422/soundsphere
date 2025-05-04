@@ -14,34 +14,17 @@ end
 local function get_fake_chartRepo(actions, chartfiles, chartmetas)
 	local chartRepo = {}
 
-	function chartRepo:selectUnhashedChartfiles()
-		local cfs = {}
-		for _, cf in pairs(chartfiles) do
-			if not cf.hash then
-				table.insert(cfs, cf)
-			end
-		end
-		table.sort(cfs, function(a, b)
-			return a.path < b.path
-		end)
-		return cfs
-	end
 	function chartRepo:updateChartfile(chartfile)
-		table.insert(actions, {"uc", table_util.deepcopy(chartfile)})
+		table.insert(actions, {"ucf", table_util.deepcopy(chartfile)})
 		chartfiles[chartfile.path] = chartfile
 		return chartfile
 	end
-	function chartRepo:selectChartmeta(hash, index)
-		table.insert(actions, {"sm", hash, index})
+	function chartRepo:getChartmetaByHashIndex(hash, index)
+		table.insert(actions, {"gcm", hash, index})
 		return chartmetas[get_hi(hash, index)]
 	end
-	function chartRepo:insertChartmeta(chartmeta)
-		table.insert(actions, {"im", table_util.deepcopy(chartmeta)})
-		chartmetas[get_hi(chartmeta)] = chartmeta
-		return chartmeta
-	end
-	function chartRepo:updateChartmeta(chartmeta)
-		table.insert(actions, {"um", table_util.deepcopy(chartmeta)})
+	function chartRepo:createUpdateChartmeta(chartmeta)
+		table.insert(actions, {"cucm", table_util.deepcopy(chartmeta)})
 		chartmetas[get_hi(chartmeta)] = chartmeta
 		return chartmeta
 	end
@@ -58,7 +41,7 @@ local function get_fs(items)
 end
 
 function test.all(t)
-	local chartfiles = {  -- unhashed_chartfiles
+	local chartfiles = { -- unhashed_chartfiles
 		["charts/a"] = {
 			path = "charts/a",
 		},
@@ -106,34 +89,32 @@ function test.all(t)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"im", {
+		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
+		{"cucm", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			index = 1,
 		}},
-		{"uc", {
+		{"ucf", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			path = "charts/a",
 		}},
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"uc", {
+		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
+		{"ucf", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			path = "charts/b",
 		}},
 
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"uc", {
+		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
+		{"ucf", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			path = "charts/a",
 		}},
 
-		{"sm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"um", {
+		{"cucm", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			index = 1,
 		}},
-		{"uc", {
+		{"ucf", {
 			hash = "9a0364b9e99bb480dd25e1f0284c8555",
 			path = "charts/a",
 		}},

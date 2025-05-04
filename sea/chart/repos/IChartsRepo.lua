@@ -127,6 +127,12 @@ function IChartsRepo:getChartmetasMissingChartdiffs()
 	return {}
 end
 
+---@param chartmeta sea.Chartmeta
+---@return sea.Chartmeta
+function IChartsRepo:createUpdateChartmeta(chartmeta)
+	return {}
+end
+
 --------------------------------------------------------------------------------
 
 ---@return sea.Chartplay[]
@@ -170,6 +176,11 @@ end
 ---@param limit integer
 ---@return sea.Chartplay[]
 function IChartsRepo:getChartplaysComputed(computed_at, state, limit)
+	return {}
+end
+
+---@return sea.Chartplay[]
+function IChartsRepo:getChartplaysComputedNull()
 	return {}
 end
 
