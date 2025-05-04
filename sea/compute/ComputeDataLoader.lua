@@ -2,6 +2,7 @@ local class = require("class")
 local valid = require("valid")
 local md5 = require("md5")
 local ReplayCoder = require("sea.replays.ReplayCoder")
+local ReplayConverter = require("sea.replays.ReplayConverter")
 
 ---@class sea.ComputeDataLoader
 ---@operator call: sea.ComputeDataLoader
@@ -48,6 +49,8 @@ function ComputeDataLoader:requireReplay(hash)
 	if not replay then
 		return nil, "can't decode replay: " .. err
 	end
+
+	replay = ReplayConverter:convert(replay)
 
 	local ok, err = valid.format(replay:validate())
 	if not ok then
