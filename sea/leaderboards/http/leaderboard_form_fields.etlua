@@ -191,6 +191,20 @@
 </div>
 
 <div class="field">
+	<label class="label">Starts at integer?</label>
+	<div class="control">
+		<input class="input" type="number" name="starts_at" value="<%= leaderboard.starts_at and leaderboard.starts_at or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Ends at integer?</label>
+	<div class="control">
+		<input class="input" type="number" name="ends_at" value="<%= leaderboard.ends_at and leaderboard.ends_at or "" %>">
+	</div>
+</div>
+
+<div class="field">
 	<label class="label">Rate "any"|number[]|{min: number, max: number}</label>
 	<div class="control">
 		<input class="input" type="text" name="rate" value="<%= json.encode(leaderboard.rate or "any") %>">

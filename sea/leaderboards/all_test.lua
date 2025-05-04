@@ -14,10 +14,7 @@ local test = {}
 
 local function create_test_ctx()
 	local db = ServerSqliteDatabase(LjsqliteDatabase())
-
 	db.path = ":memory:"
-
-	db:remove()
 	db:open()
 
 	-- db.orm:debug(true)
@@ -55,6 +52,7 @@ end
 ---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
 ---@param values {[string]: any}
 local function create_chartplay(ctx, values)
+	---@type sea.Chartplay
 	local chartplay = table_util.copy(values)
 	chartplay.user_id = values.user_id or ctx.user.id
 	chartplay.hash = values.hash or ""
@@ -66,6 +64,7 @@ local function create_chartplay(ctx, values)
 	chartplay.not_perfect_count = values.not_perfect_count or 0
 	chartplay.timings = values.timings or Timings("simple", 0.1)
 	chartplay.subtimings = values.subtimings
+	chartplay.submitted_at = values.submitted_at
 	if values.pass ~= nil then
 		chartplay.pass = values.pass
 	else
@@ -794,6 +793,27 @@ function test.difftables_create(t)
 	t:eq(#ctx.leaderboard.leaderboard_difftables, 2)
 	t:eq(ctx.leaderboard.leaderboard_difftables[1].difftable_id, 2)
 	t:eq(ctx.leaderboard.leaderboard_difftables[2].difftable_id, 3)
+end
+
+---@param t testing.T
+function test.submit_time(t)
+	local ctx = create_test_ctx()
+
+	ctx.leaderboard.starts_at = 5
+	ctx.leaderboard.ends_at = 25
+	lb_update_select(ctx)
+
+	assert(ctx.leaderboard.starts_at)
+
+	create_chartplay(ctx, {rating = 1, submitted_at = 0})
+	create_chartplay(ctx, {rating = 2, submitted_at = 10})
+	create_chartplay(ctx, {rating = 3, submitted_at = 20})
+	create_chartplay(ctx, {rating = 4, submitted_at = 30})
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, 1)
+	t:eq(#chartplays, 1)
+
+	t:eq(chartplays[1].rating, 3)
 end
 
 return test

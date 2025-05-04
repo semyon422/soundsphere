@@ -211,6 +211,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`allow_free_healths` INTEGER,
 	`timings` INTEGER,
 	`healths` INTEGER,
+	`starts_at` INTEGER,
+	`ends_at` INTEGER,
 	`mode` INTEGER,
 	`rate` BLOB,
 	`difftables` BLOB,

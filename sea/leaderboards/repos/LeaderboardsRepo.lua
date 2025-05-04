@@ -1,6 +1,7 @@
-local JudgesResult = require("sea.chart.JudgesResult")
+local sql_util = require("rdb.sql_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
+local Leaderboard = require("sea.leaderboards.Leaderboard")
 
 ---@class sea.LeaderboardsRepo: sea.ILeaderboardsRepo
 ---@operator call: sea.LeaderboardsRepo
@@ -41,7 +42,14 @@ end
 ---@param leaderboard sea.Leaderboard
 ---@return sea.Leaderboard
 function LeaderboardsRepo:updateLeaderboard(leaderboard)
-	return self.models.leaderboards:update(leaderboard, {id = assert(leaderboard.id)})[1]
+	local values = {}
+	for k in pairs(Leaderboard.struct) do
+		values[k] = sql_util.NULL
+	end
+	for k, v in pairs(leaderboard) do
+		values[k] = v
+	end
+	return self.models.leaderboards:update(values, {id = assert(leaderboard.id)})[1]
 end
 
 ---@param id integer
@@ -115,6 +123,13 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		conds.rate__gte, conds.rate__lte = rate.min, rate.max
 	end
 
+	if lb.starts_at then
+		conds.submitted_at__gte = lb.starts_at
+	end
+	if lb.ends_at then
+		conds.submitted_at__lte = lb.ends_at
+	end
+
 	local chartmeta_inputmode = lb.chartmeta_inputmode
 	if chartmeta_inputmode[1] then
 		conds.chartmeta_inputmode__in = chartmeta_inputmode
@@ -137,7 +152,7 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 
 	---@type rdb.Options
 	local options = {
-		group = {"hash", "user_id"},
+		group = {"hash"},
 		limit = lb.scores_comb_count,
 		order = {rating_column .. " DESC"}, -- TODO: rating_calculator
 		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column), "MAX(difftable_level) AS _difftable_level"}
