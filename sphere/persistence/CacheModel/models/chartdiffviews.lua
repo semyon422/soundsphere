@@ -14,6 +14,7 @@ chartdiffviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
 	modifiers = chartdiffs.types.modifiers,
+	mode = chartdiffs.types.mode,
 	rate = int_rates,
 	rate_type = RateType,
 	format = ChartFormat,

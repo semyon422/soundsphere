@@ -1,5 +1,4 @@
 local chartdiffs = require("sphere.persistence.CacheModel.models.chartdiffs")
-local Gamemode = require("sea.chart.Gamemode")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
@@ -14,7 +13,7 @@ chartplays_list.table_name = "chartplays_list"
 chartplays_list.types = {
 	nearest = "boolean",
 	pass = "boolean",
-	mode = Gamemode,
+	mode = chartdiffs.types.mode,
 	custom = "boolean",
 	columns_order = json,
 	modifiers = chartdiffs.types.modifiers,
