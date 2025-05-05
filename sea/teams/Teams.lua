@@ -138,12 +138,42 @@ end
 ---@param target_user_id integer
 ---@return sea.TeamUser[]?
 ---@return string?
+function Teams:kickUser(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	if team.owner_id == target_user_id then
+		return nil, "can't kick owner"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
+	if not team_user then
+		return nil, "team user not found"
+	end
+
+	return self.teams_repo:deleteTeamUser(team_user)
+end
+
+---@param user sea.User
+---@param team_id integer
+---@param target_user_id integer
+---@return sea.TeamUser[]?
+---@return string?
 function Teams:acceptJoinRequest(user, team_id, target_user_id)
 	local team = self.teams_repo:getTeam(team_id)
 
 	if not team then
 		return nil, "team not found"
 	end
+
 	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
 		return nil, err

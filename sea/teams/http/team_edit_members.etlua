@@ -1,9 +1,36 @@
 <table class="ranking-table">
 	<tbody>
-		<tr>
-			<td align="left" class="ranking-table__main-cell"><p class="is-size-4">User</p></td>
-			<td><a class="button is-danger">Transfer leader role</a></td>
-			<td><a class="button is-warning">Kick</a></td>
-		</tr>
+		<% for _, v in ipairs(users) do %>
+			<tr>
+				<td align="left" class="ranking-table__main-cell">
+					<a href="/users/<%= v.user.id %>" class="is-size-4"><%= v.user.name %></a>
+				</td>
+				<% if team.owner_id == v.user.id then %>
+					<td></td>
+					<td></td>
+				<% else %>
+					<td><a class="button is-danger">Transfer leader role</a></td>
+					<td>
+						<button
+							hx-post="/teams/<%= team.id %>/kick_user/<%= v.user.id %>"
+							hx-target="body"
+							hx-trigger="confirmed"
+							onClick="Swal.fire({
+									...sweet_alert_params,
+									title: 'Kick <%= v.user.name %>?',
+									text: 'Are you sure you want to kick your buddy?',
+									showDenyButton: true,
+								}).then((result)=>{
+								if (result.isConfirmed) {
+									htmx.trigger(this, 'confirmed')
+								}
+							})"
+							class="button is-warning">
+							Kick
+						</button>
+					</td>
+				<% end %>
+			</tr>
+		<% end %>
 	</tbody>
 </table>

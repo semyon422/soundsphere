@@ -26,16 +26,19 @@ TeamResource.routes = {
 		POST = "cancelJoinRequest",
 	}},
 	{"/teams/:team_id/accept_join_request/:user_id", {
-		POST = "acceptJoinRequest"
+		POST = "acceptJoinRequest",
 	}},
 	{"/teams/:team_id/revoke_join_request/:user_id", {
-		POST = "revokeJoinRequest"
+		POST = "revokeJoinRequest",
+	}},
+	{"/teams/:team_id/kick_user/:user_id", {
+		POST = "kickUser",
 	}},
 	{"/teams/:team_id/update_description", {
 		POST = "updateDescription",
 	}},
 	{"/teams/:team_id/update_settings", {
-		POST = "updateSettings"
+		POST = "updateSettings",
 	}},
 }
 
@@ -156,6 +159,30 @@ function TeamResource:leave(req, res, ctx)
 
 	res.status = 302
 	res.headers:set("Location", ("/teams/%i"):format(team.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:kickUser(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not team_id or not user_id then
+		res.status = 400
+		return
+	end
+
+	local team_user, err = self.teams:kickUser(ctx.session_user, team_id, user_id)
+
+	if not team_user then
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/edit/members"):format(team_id))
 end
 
 ---@param req web.IRequest
