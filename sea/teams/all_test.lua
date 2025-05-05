@@ -178,6 +178,29 @@ function test.join_request(t)
 end
 
 ---@param t testing.T
+function test.join_double_request(t)
+	local ctx = create_test_ctx()
+	local teams = ctx.teams
+
+	local team = Team()
+	team.type = "request"
+	team = teams:update(ctx.user, team)
+	---@cast team -?
+
+	local new_user = User()
+	new_user.id = 2
+	t:assert(teams:join(new_user, team))
+	t:assert(teams:join(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:eq(#teams:getUserAcceptedTeamUsers(new_user.id), 0)
+	t:eq(#teams:getUserUnacceptedTeamUsers(new_user), 1)
+end
+
+---@param t testing.T
 function test.join_request_revoke(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
@@ -262,6 +285,55 @@ function test.join_invite_revoke(t)
 
 	t:tdeq({teams:revokeJoinRequest(new_user, team)}, {nil, "is not request"})
 	t:assert(teams:revokeJoinInvite(ctx.user, team, new_user.id))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+end
+
+--------------------------------------------------------------------------------
+--- leaving
+--------------------------------------------------------------------------------
+
+---@param t testing.T
+function test.leave(t)
+	local ctx = create_test_ctx()
+	local teams = ctx.teams
+
+	local team = Team()
+	team.type = "open"
+	team = teams:update(ctx.user, team)
+
+	local new_user = User()
+	new_user.id = 2
+
+	t:assert(teams:join(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 2)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:assert(teams:leave(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	team.type = "request"
+
+	t:assert(teams:join(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:assert(teams:leave(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	teams:revokeJoinRequest(new_user, team)
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)

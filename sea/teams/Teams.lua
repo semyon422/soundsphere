@@ -100,6 +100,10 @@ function Teams:join(user, team)
 		if team_user.is_accepted then
 			return nil, "already joined"
 		end
+		if team.type == "open" then
+			team_user.is_accepted = true
+			team_user = self.teams_repo:updateTeamUser(team_user)
+		end
 		return team_user
 	end
 
