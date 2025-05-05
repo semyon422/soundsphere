@@ -11,8 +11,13 @@ end
 
 ---@param user sea.User
 ---@param team sea.Team
+---@return boolean
+---@return string? error
 function TeamAccess:canUpdate(user, team)
-	return team.owner_id == user.id
+	if team.owner_id == user.id then
+		return true
+	end
+	return false, "not allowed"
 end
 
 ---@param user sea.User

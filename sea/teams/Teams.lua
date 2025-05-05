@@ -90,21 +90,25 @@ end
 ---@return sea.TeamUser?
 ---@return string?
 function Teams:join(user, team)
-	local can, err = self.teams_access:canJoin(user, team)
+	local can = self.teams_access:canJoin(user, team)
 	if not can then
-		return nil, err
+		return nil, "not an owner"
 	end
 
 	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+
 	if team_user then
 		if team_user.is_accepted then
 			return nil, "already joined"
 		end
+
 		if team.type == "open" then
 			team_user.is_accepted = true
 			team_user = self.teams_repo:updateTeamUser(team_user)
+			return team_user
 		end
-		return team_user
+
+		return nil, "already sent join request"
 	end
 
 	team_user = TeamUser()
@@ -125,8 +129,12 @@ end
 ---@return string? error
 function Teams:leave(user, team)
 	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
-	if not team_user or not team_user.is_accepted then
-		return team_user, "not in a team"
+	if not team_user then
+		return nil, "not in a team"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
 	end
 
 	if team_user.user_id == team.owner_id then
@@ -161,6 +169,10 @@ function Teams:kickUser(user, team_id, target_user_id)
 	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "team user not found"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
 	end
 
 	return self.teams_repo:deleteTeamUser(team_user)
@@ -286,9 +298,9 @@ function Teams:revokeJoinRequest(user, team_id, target_user_id)
 		return nil, "team not found"
 	end
 
-	local can = self.teams_access:canUpdate(user, team)
+	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
-		return nil, "not an owner"
+		return nil, err
 	end
 
 	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
@@ -333,6 +345,10 @@ function Teams:transferOwner(user, team_id, target_user_id)
 	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "team user not found"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
 	end
 
 	team.owner_id = team_user.user_id
