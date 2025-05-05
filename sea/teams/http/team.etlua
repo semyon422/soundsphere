@@ -150,6 +150,7 @@
 								document.getElementById("saveButton"),
 								document.getElementById("descriptionStatus"),
 								"/teams/<%= team.id %>",
+								"/teams/<%= team.id %>/update_description",
 								String.raw`<%- team.description %>`,
 								<%= edit_description %>
 							)

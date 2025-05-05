@@ -32,7 +32,7 @@ function updateStatus(status_label, text) {
 	status_label.innerText = text
 }
 
-function addQuillToElement(editor_container, save_button, status_label, endpoint, content, edit_mode) {
+function addQuillToElement(editor_container, save_button, status_label, endpoint, post_endpoint, content, edit_mode) {
 	if (editor_container === null) {
 		return
 	}
@@ -106,7 +106,7 @@ function addQuillToElement(editor_container, save_button, status_label, endpoint
 		can_upload = false
 		updateStatus(status_label, "Saving...")
 
-		sendDescriptionToServer(quill, endpoint + "/update_description").then(function([success, err]) {
+		sendDescriptionToServer(quill, post_endpoint).then(function([success, err]) {
 			updateStatus(status_label, err)
 			can_upload = true
 

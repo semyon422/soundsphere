@@ -1,4 +1,4 @@
-<form action="/teams/<%= path_params.team_id %>/edit" method="post">
+<form action="/teams/<%= path_params.team_id %>/update_settings" method="post">
 	<div class="field">
 		<label class="label">Name</label>
 		<div class="control">
@@ -15,15 +15,15 @@
 		<div class="control">
 			<label class="label">Team type</label>
 			<label class="radio">
-				<input type="radio" name="answer" />
+				<input type="radio" <%- team.type == "open" and "checked" or "" %> name="type" value="open" />
 				Public
 			</label>
 			<label class="radio">
-				<input type="radio" name="answer" />
+				<input type="radio" <%- team.type == "request" and "checked" or "" %> name="type" value="request" />
 				Request to join
 			</label>
 			<label class="radio">
-				<input type="radio" name="answer" />
+				<input type="radio" <%- team.type == "invite" and "checked" or "" %> name="type" value="invite" />
 				Invite only
 			</label>
 		</div>

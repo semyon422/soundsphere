@@ -188,6 +188,7 @@
 								document.getElementById("saveButton"),
 								document.getElementById("descriptionStatus"),
 								"/users/<%= user.id %>",
+								"/users/<%= user.id %>/update_description",
 								String.raw`<%- user.description %>`,
 								<%= edit_description %>
 							)

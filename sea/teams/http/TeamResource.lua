@@ -10,19 +10,19 @@ TeamResource.routes = {
 	{"/teams/:team_id", {
 		GET = "getTeam",
 	}},
-	{"/teams/:team_id/update_description", {
-		POST = "updateDescription",
-	}},
 	{"/teams/:team_id/edit", {
 		GET = "redirectToSettings",
-		POST = "updateTeam",
 	}},
 	{"/teams/:team_id/edit/:tab", {
 		GET = "getEditTeam",
-	}}
+	}},
+	{"/teams/:team_id/update_description", {
+		POST = "updateDescription",
+	}},
+	{"/teams/:team_id/update_settings", {
+		POST = "updateSettings"
+	}},
 }
-
-TeamResource.descriptionLimit = 4096
 
 ---@param teams sea.Teams
 ---@param views web.Views
@@ -57,11 +57,6 @@ function TeamResource:updateDescription(req, res, ctx)
 
 	local encoded = json.encode(description)
 
-	if encoded:len() > self.descriptionLimit then
-		res.status = 400
-		return
-	end
-
 	if not description.ops then
 		encoded = ""
 	end
@@ -71,6 +66,13 @@ function TeamResource:updateDescription(req, res, ctx)
 	end
 
 	team.description = encoded
+	local success, err = team:validate()
+
+	if not success then
+		res.status = 400
+		return
+	end
+
 	self.teams:update(ctx.session_user, team)
 	res.status = 200
 end
@@ -138,7 +140,7 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function TeamResource:updateTeam(req, res, ctx)
+function TeamResource:updateSettings(req, res, ctx)
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		res.status = 400
@@ -154,8 +156,19 @@ function TeamResource:updateTeam(req, res, ctx)
 		return
 	end
 
-	res.status = 302
-	res.headers:set("Location", ("/teams/%i"):format(team_id))
+	team.name = body_params.name
+	team.alias = body_params.alias
+	team.type = body_params.type
+
+	local success, err = team:validate()
+
+	if not success then
+		res.status = 400
+		return
+	end
+
+	self.teams:update(ctx.session_user, team)
+	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
 end
 
 return TeamResource
