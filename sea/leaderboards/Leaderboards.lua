@@ -137,7 +137,7 @@ function Leaderboards:update(user, id, lb_values)
 
 	lb_values.id = lb.id
 
-	lb = self.leaderboards_repo:updateLeaderboard(lb_values)
+	lb = self.leaderboards_repo:updateLeaderboardFull(lb_values)
 	self:updateLeaderboardDifftables(id, lb_values.leaderboard_difftables)
 
 	return lb

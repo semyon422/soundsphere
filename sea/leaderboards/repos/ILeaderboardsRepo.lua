@@ -33,6 +33,12 @@ function ILeaderboardsRepo:updateLeaderboard(leaderboard)
 	return leaderboard
 end
 
+---@param leaderboard sea.Leaderboard
+---@return sea.Leaderboard
+function ILeaderboardsRepo:updateLeaderboardFull(leaderboard)
+	return leaderboard
+end
+
 ---@param id integer
 ---@return sea.Leaderboard?
 function ILeaderboardsRepo:deleteLeaderboard(id)

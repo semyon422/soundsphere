@@ -1,4 +1,5 @@
 local sql_util = require("rdb.sql_util")
+local table_util = require("table_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
@@ -42,13 +43,14 @@ end
 ---@param leaderboard sea.Leaderboard
 ---@return sea.Leaderboard
 function LeaderboardsRepo:updateLeaderboard(leaderboard)
-	local values = {}
-	for k in pairs(Leaderboard.struct) do
-		values[k] = sql_util.NULL
-	end
-	for k, v in pairs(leaderboard) do
-		values[k] = v
-	end
+	return self.models.leaderboards:update(leaderboard, {id = assert(leaderboard.id)})[1]
+end
+
+---@param leaderboard sea.Leaderboard
+---@return sea.Leaderboard
+function LeaderboardsRepo:updateLeaderboardFull(leaderboard)
+	local values = sql_util.null_keys(Leaderboard.struct)
+	table_util.copy(leaderboard, values)
 	return self.models.leaderboards:update(values, {id = assert(leaderboard.id)})[1]
 end
 
