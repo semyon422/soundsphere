@@ -1,5 +1,6 @@
 local class = require("class")
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
+local SqliteMigrator = require("rdb.db.SqliteMigrator")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
@@ -20,6 +21,8 @@ function GameDatabase:new(migrations)
 	local _models = autoload("sphere.persistence.CacheModel.models")
 	self.orm = TableOrm(db)
 	self.models = Models(_models, self.orm)
+
+	self.migrator = SqliteMigrator(db)
 end
 
 function GameDatabase:load()
@@ -51,7 +54,7 @@ function GameDatabase:unload()
 end
 
 function GameDatabase:migrate()
-	local count = self.orm:migrate(user_version, self.migrations)
+	local count = self.migrator:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
 	end
