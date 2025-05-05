@@ -129,6 +129,10 @@ function Teams:leave(user, team)
 		return team_user, "not in a team"
 	end
 
+	if team_user.user_id == team.owner_id then
+		return nil, "owner can't leave"
+	end
+
 	team_user = self.teams_repo:deleteTeamUser(team_user)
 	return team_user
 end
@@ -282,9 +286,9 @@ function Teams:revokeJoinRequest(user, team_id, target_user_id)
 		return nil, "team not found"
 	end
 
-	local can, err = self.teams_access:canUpdate(user, team)
+	local can = self.teams_access:canUpdate(user, team)
 	if not can then
-		return nil, err
+		return nil, "not an owner"
 	end
 
 	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
@@ -303,6 +307,36 @@ function Teams:revokeJoinRequest(user, team_id, target_user_id)
 	team_user = self.teams_repo:deleteTeamUser(team_user)
 
 	return team_user
+end
+
+---@param user sea.User
+---@param team_id integer
+---@param target_user_id integer
+---@return sea.Team?
+---@return string?
+function Teams:transferOwner(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if user.id == target_user_id then
+		return nil, "can't transfer to self"
+	end
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
+	if not team_user then
+		return nil, "team user not found"
+	end
+
+	team.owner_id = team_user.user_id
+	return self.teams_repo:updateTeam(team)
 end
 
 ---@param user sea.User

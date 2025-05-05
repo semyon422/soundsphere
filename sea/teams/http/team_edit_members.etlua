@@ -9,7 +9,25 @@
 					<td></td>
 					<td></td>
 				<% else %>
-					<td><a class="button is-danger">Transfer leader role</a></td>
+					<td>
+						<button
+							hx-post="/teams/<%= team.id %>/transfer_owner/<%= v.user.id %>"
+							hx-target="body"
+							hx-trigger="confirmed"
+							onClick="Swal.fire({
+									...sweet_alert_params,
+									title: 'Transfer leader to <%= v.user.name %>?',
+									text: 'ARE YOU REALLY SURE?',
+									showDenyButton: true,
+								}).then((result)=>{
+								if (result.isConfirmed) {
+									htmx.trigger(this, 'confirmed')
+								}
+							})"
+							class="button is-danger">
+							Transfer leader role
+						</button>
+					</td>
 					<td>
 						<button
 							hx-post="/teams/<%= team.id %>/kick_user/<%= v.user.id %>"

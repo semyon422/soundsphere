@@ -34,6 +34,9 @@ TeamResource.routes = {
 	{"/teams/:team_id/kick_user/:user_id", {
 		POST = "kickUser",
 	}},
+	{"/teams/:team_id/transfer_owner/:user_id", {
+		POST = "transferOwner",
+	}},
 	{"/teams/:team_id/update_description", {
 		POST = "updateDescription",
 	}},
@@ -90,7 +93,8 @@ function TeamResource:getEditTeam(req, res, ctx)
 	end
 
 	if not self.teams:canUpdate(ctx.session_user, team) then
-		res.status = 403
+		res.status = 302
+		res.headers:set("Location", ("/teams/%i"):format(team.id))
 		return
 	end
 
@@ -254,6 +258,31 @@ function TeamResource:revokeJoinRequest(req, res, ctx)
 
 	res.status = 302
 	res.headers:set("Location", ("/teams/%i/edit/requests"):format(team_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:transferOwner(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not team_id or not user_id then
+		res.status = 400
+		return
+	end
+
+	local team, err = self.teams:transferOwner(ctx.session_user, team_id, user_id)
+
+	if not team then
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team_id))
+	return team
 end
 
 ---@param req web.IRequest
