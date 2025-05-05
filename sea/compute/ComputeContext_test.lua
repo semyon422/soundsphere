@@ -14,7 +14,8 @@ function test.modifier_reorder(t)
 		{id = 14, value = "key", version = 0}, -- alternate
 		{id = 16, value = "all", version = 0}, -- mirror all
 		{id = 11, value = 4, version = 0}, -- automap 4
-		{id = 15, value = 1, version = 0}, -- shift 4
+		{id = 15, value = 2, version = 0}, -- shift 2
+		{id = 15, value = -1, version = 0}, -- shift -1
 	}
 	rb.columns_order = {4, 3, 2, 1}
 

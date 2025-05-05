@@ -44,9 +44,7 @@ end
 
 ---@param modifierConfig table
 ---@param state sea.ModifiersMetaState
-function Modifier:applyMeta(modifierConfig, state)
-	state:resetOrder()
-end
+function Modifier:applyMeta(modifierConfig, state) end
 
 ---@param modifierConfig table
 function Modifier:apply(modifierConfig) end
