@@ -31,6 +31,8 @@ function ChartsComputer:computeChartplay(chartplay)
 		return nil, "require replay: " .. err
 	end
 
+	local time = os.time()
+
 	local replay = replay_and_data.replay
 
 	local ret, err = chartplay_computer:compute(
@@ -41,7 +43,7 @@ function ChartsComputer:computeChartplay(chartplay)
 	)
 	if not ret then
 		chartplay.compute_state = "invalid"
-		chartplay.computed_at = os.time()
+		chartplay.computed_at = time
 		charts_repo:updateChartplay(chartplay)
 		return
 	end
@@ -54,10 +56,18 @@ function ChartsComputer:computeChartplay(chartplay)
 	chartplay:importChartplayComputed(chartplay_computed)
 
 	chartplay.compute_state = "valid"
-	chartplay.computed_at = os.time()
+	chartplay.computed_at = time
 	charts_repo:updateChartplay(chartplay)
 
-	-- update chartdiffs, chartmetas, leaderboards
+	computed_chartdiff.computed_at = time
+	computed_chartmeta.computed_at = time
+
+	local chartdiff = charts_repo:createUpdateChartdiff(computed_chartdiff)
+	local chartmeta = charts_repo:createUpdateChartmeta(computed_chartmeta)
+
+	if #chartdiff.modifiers > 0 or chartdiff.rate ~= 1 then
+		-- create default chartdiff if missing
+	end
 
 	return ret
 end
