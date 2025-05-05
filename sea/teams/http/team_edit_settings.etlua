@@ -1,0 +1,36 @@
+<form action="/teams/<%= path_params.team_id %>/edit" method="post">
+	<div class="field">
+		<label class="label">Name</label>
+		<div class="control">
+			<input class="input" type="text" name="name" maxlength="22" required value="<%= team.name or "" %>">
+		</div>
+	</div>
+	<div class="field">
+		<label class="label">Team tag</label>
+		<div class="control">
+			<input class="input" type="text" name="alias" maxlength="4" required value="<%= team.alias or "" %>">
+		</div>
+	</div>
+	<div class="field">
+		<div class="control">
+			<label class="label">Team type</label>
+			<label class="radio">
+				<input type="radio" name="answer" />
+				Public
+			</label>
+			<label class="radio">
+				<input type="radio" name="answer" />
+				Request to join
+			</label>
+			<label class="radio">
+				<input type="radio" name="answer" />
+				Invite only
+			</label>
+		</div>
+	</div>
+	<div class="field">
+		<div class="control">
+			<button class="button is-link">Update</button>
+		</div>
+	</div>
+</form>

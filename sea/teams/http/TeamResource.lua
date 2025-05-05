@@ -14,8 +14,12 @@ TeamResource.routes = {
 		POST = "updateDescription",
 	}},
 	{"/teams/:team_id/edit", {
-		GET = "getEditTeam",
+		GET = "redirectToSettings",
+		POST = "updateTeam",
 	}},
+	{"/teams/:team_id/edit/:tab", {
+		GET = "getEditTeam",
+	}}
 }
 
 TeamResource.descriptionLimit = 4096
@@ -118,7 +122,40 @@ function TeamResource:getEditTeam(req, res, ctx)
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
+
 	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:redirectToSettings(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/edit/settings"):format(team_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:updateTeam(req, res, ctx)
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		res.status = 400
+		return
+	end
+
+	local team_id = tonumber(ctx.path_params.team_id)
+	local team = self.teams:getTeam(team_id)
+
+	if not team then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team_id))
 end
 
 return TeamResource

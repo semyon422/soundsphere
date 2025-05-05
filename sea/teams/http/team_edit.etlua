@@ -1,1 +1,42 @@
-Edit team
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Team management</p>
+		<p class="subtitle">Manage your team</p>
+	</div>
+</section>
+
+<div class="columns">
+	<div class="column">
+		<aside class="menu">
+			<p class="menu-label">Administration</p>
+				<%
+					local url = ("/teams/%i/edit/"):format(team.id)
+					local function addClass(tab)
+						return path_params.tab == tab and [[class=is-active]] or ""
+					end
+				%>
+				<ul class="menu-list">
+					<li><a href="<%= url %>settings" <%= addClass("settings") %>>Settings</a></li>
+					<li><a href="<%= url %>members" <%= addClass("members") %>>Members</a></li>
+					<li><a href="<%= url %>invites" <%= addClass("invites") %>>Invites</a></li>
+				</ul>
+			</p>
+		</aside>
+	</div>
+	<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
+		<%
+			local tab = path_params.tab
+			local html
+
+			if tab == "settings" then
+				html = view:render("sea/teams/http/team_edit_settings.etlua")
+			elseif tab == "members" then
+				html = view:render("sea/teams/http/team_edit_members.etlua")
+			elseif tab == "invites" then
+				html = view:render("sea/teams/http/team_edit_invites.etlua")
+			end
+		%>
+		<%- html %>
+	</div>
+</div>
+

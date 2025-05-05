@@ -81,6 +81,10 @@ function addQuillToElement(editor_container, save_button, status_label, endpoint
 		editor_params.placeholder = false
 	}
 
+	while (editor_container.firstChild) { // Removing previously created editor
+		editor_container.removeChild(editor_container.lastChild)
+	}
+
 	const editor = document.createElement("div")
 	editor_container.appendChild(editor)
 

@@ -5,7 +5,7 @@
 }
 
 .team__card-spacing {
-	margin-top: 110px;
+	margin-top: 105px;
 }
 
 .team__avatar {
@@ -60,10 +60,6 @@
 								<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
 							</div>
 							<div class="team__key-value">
-								<p>Recent activity:</p>
-								<p><strong>200 hours</strong></p>
-							</div>
-							<div class="team__key-value">
 								<p>Members:</p>
 								<p><strong><%= team.users_count %>/12</strong></p>
 							</div>
@@ -84,7 +80,7 @@
 
 						<% if can_manage then %>
 							<div class="block">
-								<button class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</button>
+								<a href="/teams/<%= team.id %>/edit/settings" class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</a>
 							</div>
 						<% end %>
 
@@ -98,6 +94,28 @@
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
 				<div class="page-banner-box is-hidden-mobile"></div>
+				<div class="block">
+					<nav class="level">
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Monthly activity</p>
+								<p class="title">200 hours</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Rank</p>
+								<p class="title">#1</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Scores this month</p>
+								<p class="title">1041</p>
+							</div>
+						</div>
+					</nav>
+				</div>
 				<div class="block">
 					<% if team.description ~= "" or can_update then %>
 						<div class="border-box">

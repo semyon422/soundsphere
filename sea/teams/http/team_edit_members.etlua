@@ -1,0 +1,9 @@
+<table class="ranking-table">
+	<tbody>
+		<tr>
+			<td align="left" class="ranking-table__main-cell"><p class="is-size-4">User</p></td>
+			<td><a class="button is-danger">Transfer leader role</a></td>
+			<td><a class="button is-warning">Kick</a></td>
+		</tr>
+	</tbody>
+</table>
