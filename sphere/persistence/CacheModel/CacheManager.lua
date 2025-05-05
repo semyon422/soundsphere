@@ -150,6 +150,18 @@ function CacheManager:computeCacheLocation(path, location_id)
 	self.fileCacheGenerator:lookup(path, location_id, location_prefix)
 	self:commit()
 
+	local tdirs = self.chartfilesRepo:selectChartfileSetsDirs(location_id)
+	for _, tdir in ipairs(tdirs) do
+		if tdir.dir then
+			local dir = path_util.join(location_prefix, tdir.dir)
+			print("check " .. dir)
+			if not love.filesystem.getInfo(dir) then
+				print("deleted from cache")
+				self.chartfilesRepo:deleteChartfileSets({dir = tdir.dir})
+			end
+		end
+	end
+
 	self.state = 2
 	self:checkProgress()
 
