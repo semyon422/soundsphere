@@ -45,7 +45,7 @@ function ChartsComputer:computeChartplay(chartplay)
 		chartplay.compute_state = "invalid"
 		chartplay.computed_at = time
 		charts_repo:updateChartplay(chartplay)
-		return
+		return nil, "compute: " .. err
 	end
 
 	local computed_chartdiff = ret.chartdiff
