@@ -77,6 +77,22 @@ function ComputeContext:applyModifierReorder(replayBase, inputMode)
 	replayBase.columns_order = co:export()
 end
 
+---@param chart ncdk2.Chart
+---@param rate number
+---@return sea.Chartdiff
+function ComputeContext:computeChartdiff(chart, rate)
+	local chartdiff = {
+		mode = "mania",
+		rate = rate,
+		inputmode = tostring(chart.inputMode),
+	}
+	setmetatable(chartdiff, Chartdiff)
+	---@cast chartdiff sea.Chartdiff
+	self.difficultyModel:compute(chartdiff, chart, rate)
+
+	return chartdiff
+end
+
 ---@param replayBase sea.ReplayBase
 ---@return sea.Chartdiff
 ---@return table
@@ -91,14 +107,7 @@ function ComputeContext:computeBase(replayBase)
 
 	assert(state.reorders == 0, "ending reorder modifiers")
 
-	local chartdiff = {
-		mode = "mania",
-		rate = replayBase.rate,
-		inputmode = tostring(chart.inputMode),
-	}
-	setmetatable(chartdiff, Chartdiff)
-	---@cast chartdiff sea.Chartdiff
-	self.difficultyModel:compute(chartdiff, chart, replayBase.rate)
+	local chartdiff = self:computeChartdiff(chart, replayBase.rate)
 
 	chartdiff.modifiers = replayBase.modifiers
 	chartdiff.hash = chartmeta.hash
