@@ -18,7 +18,8 @@
 				<ul class="menu-list">
 					<li><a href="<%= url %>settings" <%= addClass("settings") %>>Settings</a></li>
 					<li><a href="<%= url %>members" <%= addClass("members") %>>Members</a></li>
-					<li><a href="<%= url %>requests" <%= addClass("requests") %>>Requests</a></li>
+					<li><a href="<%= url %>requests" <%= addClass("requests") %>>Incoming join requests</a></li>
+					<li><a href="<%= url %>requests" <%= addClass("invites") %>>Outgoing invitations</a></li>
 				</ul>
 			</p>
 		</aside>

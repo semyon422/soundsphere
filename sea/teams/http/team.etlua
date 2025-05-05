@@ -90,7 +90,7 @@
 							</button>
 						<% else %>
 							<% if not team_user.is_accepted then %>
-								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/revoke_join_request" hx-target="body">
+								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/cancel_join_request" hx-target="body">
 									<i class="fas fa-user-slash icon-margin-right"></i>Cancel join request
 								</button>
 							<% elseif team_user.is_accepted and not can_manage then %>

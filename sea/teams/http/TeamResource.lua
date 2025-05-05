@@ -22,8 +22,14 @@ TeamResource.routes = {
 	{"/teams/:team_id/leave", {
 		POST = "leave",
 	}},
-	{"/teams/:team_id/revoke_join_request", {
-		POST = "revokeJoinRequest",
+	{"/teams/:team_id/cancel_join_request", {
+		POST = "cancelJoinRequest",
+	}},
+	{"/teams/:team_id/accept_join_request/:user_id", {
+		POST = "acceptJoinRequest"
+	}},
+	{"/teams/:team_id/revoke_join_request/:user_id", {
+		POST = "revokeJoinRequest"
 	}},
 	{"/teams/:team_id/update_description", {
 		POST = "updateDescription",
@@ -121,6 +127,7 @@ function TeamResource:join(req, res, ctx)
 
 	if not user then
 		res.status = 400
+		res:send(err)
 		return
 	end
 
@@ -143,6 +150,7 @@ function TeamResource:leave(req, res, ctx)
 
 	if not user then
 		res.status = 400
+		res:send(err)
 		return
 	end
 
@@ -153,23 +161,72 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
-function TeamResource:revokeJoinRequest(req, res, ctx)
-	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+function TeamResource:cancelJoinRequest(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
 
-	if not team then
+	if not team_id then
 		res.status = 400
 		return
 	end
 
-	local user, err = self.teams:revokeJoinRequest(ctx.session_user, team)
+	local user, err = self.teams:revokeJoinRequest(ctx.session_user, team_id, ctx.session_user.id)
 
 	if not user then
 		res.status = 400
+		res:send(err)
 		return
 	end
 
 	res.status = 302
-	res.headers:set("Location", ("/teams/%i"):format(team.id))
+	res.headers:set("Location", ("/teams/%i"):format(team_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:acceptJoinRequest(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not team_id or not user_id then
+		res.status = 400
+		return
+	end
+
+	local team_user, err = self.teams:acceptJoinRequest(ctx.session_user, team_id, user_id)
+
+	if not team_user then
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/edit/requests"):format(team_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:revokeJoinRequest(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not team_id or not user_id then
+		res.status = 400
+		return
+	end
+
+	local team_user, err = self.teams:revokeJoinRequest(ctx.session_user, team_id, user_id)
+
+	if not team_user then
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/edit/requests"):format(team_id))
 end
 
 ---@param req web.IRequest
@@ -211,13 +268,13 @@ function TeamResource:updateDescription(req, res, ctx)
 
 	if not success then
 		res.status = 400
+		res:send(err)
 		return
 	end
 
 	self.teams:update(ctx.session_user, team)
 	res.status = 200
 end
-
 
 ---@param req web.IRequest
 ---@param res web.IResponse
@@ -226,6 +283,7 @@ function TeamResource:updateSettings(req, res, ctx)
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		res.status = 400
+		res:send(err)
 		return
 	end
 
@@ -246,6 +304,7 @@ function TeamResource:updateSettings(req, res, ctx)
 
 	if not success then
 		res.status = 400
+		res:send(err)
 		return
 	end
 

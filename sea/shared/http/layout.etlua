@@ -50,6 +50,11 @@
 				html.setAttribute("data-theme", theme);
 			}
 			setTheme()
+
+			document.addEventListener("htmx:responseError", (event) => {
+				const error_message = event.detail.xhr.responseText
+				alert(error_message)
+			})
 		</script>
 	</body>
 </html>

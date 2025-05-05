@@ -134,17 +134,22 @@ function Teams:leave(user, team)
 end
 
 ---@param user sea.User
----@param team sea.Team
----@param user_id integer
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser[]?
 ---@return string?
-function Teams:acceptJoinRequest(user, team, user_id)
+function Teams:acceptJoinRequest(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
 	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
 		return nil, err
 	end
 
-	local team_user = self.teams_repo:getTeamUser(team.id, user_id)
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing request"
 	end
@@ -236,11 +241,23 @@ function Teams:revokeJoinInvite(user, team, user_id)
 end
 
 ---@param user sea.User
----@param team sea.Team
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser?
 ---@return string?
-function Teams:revokeJoinRequest(user, team)
-	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+function Teams:revokeJoinRequest(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing request"
 	end
