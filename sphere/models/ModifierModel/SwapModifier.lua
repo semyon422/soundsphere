@@ -9,16 +9,16 @@ local SwapModifier = Modifier + {}
 SwapModifier.name = "SwapModifier"
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return {[ncdk2.Column]: ncdk2.Column}
-function SwapModifier:getMap(config)
+function SwapModifier:getMap(config, inputMode)
 	return {}
 end
 
 ---@param config table
 ---@param chart ncdk2.Chart
 function SwapModifier:apply(config, chart)
-	self.chart = chart
-	local map = self:getMap(config)
+	local map = self:getMap(config, chart.inputMode)
 
 	local new_notes = Notes()
 	for _, note in chart.notes:iter() do

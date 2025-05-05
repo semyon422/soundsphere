@@ -92,6 +92,7 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 	local chart_chartmeta = assert(computeContext:fromFileData(chartfile_name, chartfile_data, index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
+	computeContext:applyModifierReorder(replayBase)
 	computeContext:computeBase(replayBase)
 
 	local events = self:createFakeEvents(chart, self.accuracy, self.miss_ratio)

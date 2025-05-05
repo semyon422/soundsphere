@@ -28,6 +28,7 @@ function ChartplayComputer:compute(chartfile_name, chartfile_data, index, replay
 		return nil, "from file data: " .. err
 	end
 
+	computeContext:applyModifierReorder(replay)
 	computeContext:computeBase(replay)
 
 	return self:computeFromContext(computeContext, replay)

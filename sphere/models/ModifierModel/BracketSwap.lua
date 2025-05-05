@@ -22,9 +22,10 @@ for _, t in pairs(hardcodedMaps) do
 end
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return table
-function BracketSwap:getMap(config)
-	local keyCount = self.chart.inputMode.key
+function BracketSwap:getMap(config, inputMode)
+	local keyCount = inputMode.key
 
 	if keyCount <= 5 then
 		return hardcodedMaps[keyCount] or {}

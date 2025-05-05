@@ -1,6 +1,9 @@
 local class = require("class")
 local table_util = require("table_util")
 local ModifierRegistry = require("sphere.models.ModifierModel.ModifierRegistry")
+local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
+local ColumnsOrder = require("sea.chart.ColumnsOrder")
+local ModifiersMetaState = require("sea.compute.ModifiersMetaState")
 
 ---@class sphere.ModifierModel
 ---@operator call: sphere.ModifierModel
@@ -71,7 +74,7 @@ function ModifierModel:apply(modifiers, chart)
 end
 
 ---@param modifiers table
----@param state table
+---@param state sea.ModifiersMetaState
 function ModifierModel:applyMeta(modifiers, state)
 	local obj = {}
 	for _, modifier in ipairs(modifiers) do
@@ -80,6 +83,12 @@ function ModifierModel:applyMeta(modifiers, state)
 			table_util.clear(obj)
 			setmetatable(obj, mod)
 			obj:applyMeta(modifier, state)
+			if SwapModifier * obj then
+				local map = obj:getMap(modifier, state.inputMode)
+				state:applyOrder(map)
+			else
+				state:resetOrder()
+			end
 		end
 	end
 end
@@ -111,6 +120,26 @@ function ModifierModel:fixOldFormat(modifiers)
 			end
 		end
 	end
+end
+
+---@param replayBase sea.ReplayBase
+---@param inputMode ncdk.InputMode
+---@return ncdk2.Chart?
+---@return sea.Chartmeta?
+function ModifierModel:applyModifierReorder(replayBase, inputMode)
+	local state = ModifiersMetaState(inputMode)
+	self:applyMeta(replayBase.modifiers, state)
+
+	local modifiers = table_util.copy(replayBase.modifiers)
+	for i = #modifiers, #modifiers - state.reorders + 1, -1 do
+		table.remove(modifiers, i)
+	end
+	replayBase.modifiers = modifiers
+
+	local co = ColumnsOrder(state.inputMode, replayBase.columns_order)
+	co:apply(state.columns_order.map)
+
+	replayBase.columns_order = co:export()
 end
 
 return ModifierModel

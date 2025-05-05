@@ -99,7 +99,9 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		return
 	end
 
-	self.computeContext.chartplay = chartplay
+	local computeContext = self.computeContext
+
+	computeContext.chartplay = chartplay
 	rhythmModel:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
@@ -113,11 +115,12 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	local chartview = self.selectModel.chartview
 
 	local data = assert(love.filesystem.read(chartview.location_path))
-	local chart_chartmeta = assert(self.computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
+	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 
-	self.computeContext:computeBase(replay)
-	self.computeContext:computePlay(rhythmModel, replayModel)
+	computeContext:applyModifierReorder(replay)
+	computeContext:computeBase(replay)
+	computeContext:computePlay(rhythmModel, replayModel)
 
 	self:actualizeReplayBase()
 	self.rhythmModel.scoreEngine:createAndSelectByTimings(self.replayBase.timings, self.replayBase.subtimings)

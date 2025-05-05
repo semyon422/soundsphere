@@ -19,12 +19,10 @@ function Random:getString(config)
 end
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return table
-function Random:getMap(config)
-	local chart = self.chart
+function Random:getMap(config, inputMode)
 	local value = config.value
-
-	local inputMode = chart.inputMode
 
 	local inputs = {}
 	for inputType, inputCount in pairs(inputMode) do

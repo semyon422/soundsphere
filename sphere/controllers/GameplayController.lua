@@ -105,6 +105,7 @@ function GameplayController:load()
 	local data = assert(love.filesystem.read(chartview.location_path))
 	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
+	computeContext:applyModifierReorder(replayBase)
 	local chartdiff, state = computeContext:computeBase(replayBase)
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
