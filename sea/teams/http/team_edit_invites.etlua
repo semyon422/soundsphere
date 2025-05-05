@@ -1,9 +1,0 @@
-<table class="ranking-table">
-	<tbody>
-		<tr>
-			<td align="left" class="ranking-table__main-cell"><p class="is-size-4">User</p></td>
-			<td><a class="button">Accept</a></td>
-			<td><a class="button">Decline</a></td>
-		</tr>
-	</tbody>
-</table>

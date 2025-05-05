@@ -48,6 +48,12 @@ end
 
 ---@param team_id integer
 ---@return sea.TeamUser[]
+function ITeamsRepo:getRequestTeamUsersFull(team_id)
+	return {}
+end
+
+---@param team_id integer
+---@return sea.TeamUser[]
 function ITeamsRepo:getTeamUsersFull(team_id)
 	return {}
 end

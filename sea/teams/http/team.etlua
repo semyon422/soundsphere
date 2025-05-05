@@ -61,32 +61,48 @@
 							</div>
 							<div class="team__key-value">
 								<p>Members:</p>
-								<p><strong><%= team.users_count %>/12</strong></p>
+								<p><strong><%= team.users_count %>/1024</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>Accuracy:</p>
+								<p><strong>84.69%</strong></p>
 							</div>
 							<div class="team__key-value">
 								<p>ENPS:</p>
 								<p><strong>28.18</strong></p>
 							</div>
 							<div class="team__key-value">
+								<p>MSD:</p>
+								<p><strong>32.93</strong></p>
+							</div>
+							<div class="team__key-value">
 								<p>PP:</p>
 								<p><strong>13817</strong></p>
 							</div>
 						</div>
-						<% if not is_accepted and not is_invitation and not session_user.id == 0 then %>
-							<div class="block">
-								<button class="team__button button is-info is-fullwidth"><i class="fas fa-user-plus icon-margin-right"></i>Join</button>
-							</div>
+						<% if session_user.id == 0 and team.type ~= "invite" then %>
+							<p align="center">Log in to join</p>
+						<% elseif team.type == "invite" then %>
+							<p align="center">Join requests are disabled</p>
+						<% elseif not team_user then %>
+							<button class="team__button button is-info is-fullwidth" hx-post="/teams/<%= team.id %>/join" hx-target="body">
+								<i class="fas fa-user-plus icon-margin-right"></i>Join
+							</button>
+						<% else %>
+							<% if not team_user.is_accepted then %>
+								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/revoke_join_request" hx-target="body">
+									<i class="fas fa-user-slash icon-margin-right"></i>Cancel join request
+								</button>
+							<% elseif team_user.is_accepted and not can_manage then %>
+								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/leave" hx-target="body">
+									<i class="fas fa-user-slash icon-margin-right"></i>Leave
+								</button>
+							<% end %>
 						<% end %>
 
 						<% if can_manage then %>
 							<div class="block">
 								<a href="/teams/<%= team.id %>/edit/settings" class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</a>
-							</div>
-						<% end %>
-
-						<% if is_accepted and not can_manage then %>
-							<div class="block">
-								<button class="team__button button is-info is-light is-fullwidth"><i class="fas fa-user-slash icon-margin-right"></i>Leave</button>
 							</div>
 						<% end %>
 					</div>
@@ -176,23 +192,25 @@
 						</thead>
 						<tbody>
 							<% for i, team_user in ipairs(team_users) do %>
-								<% local user = team_user.user %>
-								<tr class="has-text">
-									<td class="ranking-table__flag-cell">
-										<div class="fi-gb"></div>
-									</td>
-									<td align="left" class="ranking-table__main-cell">
-										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
-										<% if user.id == team.owner_id then %>
-											<span class="team__role">
-												<i class="fas fa-fist-raised"></i>
-												Leader
-											</span>
-										<% end %>
-									</td>
-									<td class="ranking-table__more-padding"><%= os.date("%d.%m.%Y", user.created_at) %></td>
-									<td class="ranking-table__more-padding"><%= user.chartplays_count %></td>
-								</tr>
+								<% if team_user.is_accepted then %>
+									<% local user = team_user.user %>
+									<tr class="has-text">
+										<td class="ranking-table__flag-cell">
+											<div class="fi-gb"></div>
+										</td>
+										<td align="left" class="ranking-table__main-cell">
+											<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+											<% if user.id == team.owner_id then %>
+												<span class="team__role">
+													<i class="fas fa-fist-raised"></i>
+													Leader
+												</span>
+											<% end %>
+										</td>
+										<td class="ranking-table__more-padding"><%= os.date("%d.%m.%Y", user.created_at) %></td>
+										<td class="ranking-table__more-padding"><%= user.chartplays_count %></td>
+									</tr>
+								<% end %>
 							<% end %>
 						</tbody>
 					</table>

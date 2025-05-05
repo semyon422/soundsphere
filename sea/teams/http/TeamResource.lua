@@ -16,6 +16,15 @@ TeamResource.routes = {
 	{"/teams/:team_id/edit/:tab", {
 		GET = "getEditTeam",
 	}},
+	{"/teams/:team_id/join", {
+		POST = "join",
+	}},
+	{"/teams/:team_id/leave", {
+		POST = "leave",
+	}},
+	{"/teams/:team_id/revoke_join_request", {
+		POST = "revokeJoinRequest",
+	}},
 	{"/teams/:team_id/update_description", {
 		POST = "updateDescription",
 	}},
@@ -29,6 +38,138 @@ TeamResource.routes = {
 function TeamResource:new(teams, views)
 	self.teams = teams
 	self.views = views
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:getTeam(req, res, ctx)
+	local query = http_util.decode_query_string(ctx.parsed_uri.query)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+
+	if not team then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	if team.owner_id == ctx.session_user.id then
+		ctx.can_manage = true
+	end
+
+	local can_update = self.teams:canUpdate(ctx.session_user, team)
+
+	ctx.team = team
+	ctx.team_user = self.teams:getTeamUser(ctx.session_user, team)
+	ctx.team_users = self.teams:getTeamUsersFull(team.id)
+	ctx.can_update = can_update
+	ctx.edit_description = can_update and query.edit_description == "true"
+
+	ctx.ignore_main_container = true
+	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:getEditTeam(req, res, ctx)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+	if not team then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	if not self.teams:canUpdate(ctx.session_user, team) then
+		res.status = 403
+		return
+	end
+
+	local tab = ctx.path_params.tab
+
+	if tab == "requests" then
+		ctx.request_users = self.teams:getRequestTeamUsersFull(ctx.session_user, team)
+	elseif tab == "members" then
+		ctx.users = self.teams:getTeamUsersFull(team.id)
+	end
+
+	ctx.team = team
+	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:redirectToSettings(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/edit/settings"):format(team_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:join(req, res, ctx)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+
+	if not team then
+		res.status = 400
+		return
+	end
+
+	local user, err = self.teams:join(ctx.session_user, team)
+
+	if not user then
+		res.status = 400
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:leave(req, res, ctx)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+
+	if not team then
+		res.status = 400
+		return
+	end
+
+	local user, err = self.teams:leave(ctx.session_user, team)
+
+	if not user then
+		res.status = 400
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:revokeJoinRequest(req, res, ctx)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+
+	if not team then
+		res.status = 400
+		return
+	end
+
+	local user, err = self.teams:revokeJoinRequest(ctx.session_user, team)
+
+	if not user then
+		res.status = 400
+		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team.id))
 end
 
 ---@param req web.IRequest
@@ -77,65 +218,6 @@ function TeamResource:updateDescription(req, res, ctx)
 	res.status = 200
 end
 
----@param req web.IRequest
----@param res web.IResponse
----@param ctx sea.RequestContext
-function TeamResource:getTeam(req, res, ctx)
-	local query = http_util.decode_query_string(ctx.parsed_uri.query)
-	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
-
-	if not team then
-		res.status = 404
-		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
-		return
-	end
-
-	local can_update = self.teams:canUpdate(ctx.session_user, team)
-	local team_users = self.teams:getTeamUsersFull(team.id)
-
-	for _, team_user in ipairs(team_users) do
-		if team_user.id == ctx.session_user.id then
-			ctx.is_accepted = team_user.is_accepted
-			ctx.is_invitation = team_user.is_invitation
-			break
-		end
-	end
-
-	if team.owner_id == ctx.session_user.id then
-		ctx.can_manage = true
-	end
-
-	ctx.team = team
-	ctx.team_users = team_users
-	ctx.can_update = can_update
-	ctx.edit_description = can_update and query.edit_description == "true"
-
-	ctx.ignore_main_container = true
-	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
-end
-
----@param req web.IRequest
----@param res web.IResponse
----@param ctx sea.RequestContext
-function TeamResource:getEditTeam(req, res, ctx)
-	ctx.team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
-	if not ctx.team then
-		res.status = 404
-		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
-		return
-	end
-
-	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
-end
-
----@param req web.IRequest
----@param res web.IResponse
----@param ctx sea.RequestContext
-function TeamResource:redirectToSettings(req, res, ctx)
-	local team_id = tonumber(ctx.path_params.team_id)
-	res.status = 302
-	res.headers:set("Location", ("/teams/%i/edit/settings"):format(team_id))
-end
 
 ---@param req web.IRequest
 ---@param res web.IResponse

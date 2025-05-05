@@ -18,7 +18,7 @@
 				<ul class="menu-list">
 					<li><a href="<%= url %>settings" <%= addClass("settings") %>>Settings</a></li>
 					<li><a href="<%= url %>members" <%= addClass("members") %>>Members</a></li>
-					<li><a href="<%= url %>invites" <%= addClass("invites") %>>Invites</a></li>
+					<li><a href="<%= url %>requests" <%= addClass("requests") %>>Requests</a></li>
 				</ul>
 			</p>
 		</aside>
@@ -32,8 +32,8 @@
 				html = view:render("sea/teams/http/team_edit_settings.etlua")
 			elseif tab == "members" then
 				html = view:render("sea/teams/http/team_edit_members.etlua")
-			elseif tab == "invites" then
-				html = view:render("sea/teams/http/team_edit_invites.etlua")
+			elseif tab == "requests" then
+				html = view:render("sea/teams/http/team_edit_requests.etlua")
 			end
 		%>
 		<%- html %>

@@ -1,0 +1,16 @@
+<% if not request_users or #request_users == 0 then %>
+	<p>Empty. No one sent a request to join.</p>
+<% else %>
+	<table class="ranking-table">
+		<tbody>
+			<% for _, v in ipairs(request_users) do %>
+				<tr>
+					<td align="left" class="ranking-table__main-cell"><p class="is-size-4"><%= v.user.name %></p></td>
+					<td><a class="button">Accept</a></td>
+					<td><a class="button">Decline</a></td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>
+

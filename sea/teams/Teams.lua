@@ -100,8 +100,6 @@ function Teams:join(user, team)
 		if team_user.is_accepted then
 			return nil, "already joined"
 		end
-		team_user.is_accepted = true
-		team_user = self.teams_repo:updateTeamUser(team_user)
 		return team_user
 	end
 
@@ -114,6 +112,20 @@ function Teams:join(user, team)
 
 	team_user = self.teams_repo:createTeamUser(team_user)
 
+	return team_user
+end
+
+---@param user sea.User
+---@param team sea.Team
+---@return sea.TeamUser?
+---@return string? error
+function Teams:leave(user, team)
+	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+	if not team_user or not team_user.is_accepted then
+		return team_user, "not in a team"
+	end
+
+	team_user = self.teams_repo:deleteTeamUser(team_user)
 	return team_user
 end
 
@@ -242,6 +254,13 @@ function Teams:revokeJoinRequest(user, team)
 	return team_user
 end
 
+---@param user sea.User
+---@param team sea.Team
+---@return sea.TeamUser?
+function Teams:getTeamUser(user, team)
+	return self.teams_repo:getTeamUser(team.id, user.id)
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function Teams:getTeamUsers(team_id)
@@ -264,6 +283,18 @@ function Teams:getRequestTeamUsers(user, team)
 		return nil, err
 	end
 	return self.teams_repo:getRequestTeamUsers(team.id)
+end
+
+---@param user sea.User
+---@param team sea.Team
+---@return sea.TeamUser[]?
+---@return string?
+function Teams:getRequestTeamUsersFull(user, team)
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+	return self.teams_repo:getRequestTeamUsersFull(team.id)
 end
 
 ---@param user sea.User

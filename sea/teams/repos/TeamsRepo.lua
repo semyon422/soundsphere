@@ -70,6 +70,16 @@ function TeamsRepo:getRequestTeamUsers(team_id)
 	})
 end
 
+function TeamsRepo:getRequestTeamUsersFull(team_id)
+	local team_users = self.models.team_users:select({
+		team_id = team_id,
+		is_accepted = false,
+		is_invitation = false,
+	})
+	self.models.team_users:preload(team_users, "user")
+	return team_users
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function TeamsRepo:getInviteTeamUsers(team_id)
