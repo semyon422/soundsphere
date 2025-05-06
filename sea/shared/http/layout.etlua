@@ -52,19 +52,28 @@
 			}
 			setTheme()
 
-			document.addEventListener("htmx:responseError", (event) => {
-				const error_message = event.detail.xhr.responseText
-				alert(error_message)
-			})
-
 			// Default params for sweetalert
 			var sweet_alert_params = {
 				animation: false,
 				customClass: {
 					confirmButton: "button is-danger",
-					denyButton: "button"
+					denyButton: "button",
 				}
 			}
+
+			document.addEventListener("htmx:responseError", (event) => {
+				Swal.fire({
+					...sweet_alert_params,
+					title: "Server Error",
+					confirmButtonText: "Reload page",
+					width: "70em",
+					html: "<div align='left'>" + event.detail.xhr.responseText + "</div>",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						window.location.reload();
+					}
+				})
+			})
 		</script>
 	</body>
 </html>
