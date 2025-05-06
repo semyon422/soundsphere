@@ -18,6 +18,7 @@ local LeaderboardResource = require("sea.leaderboards.http.LeaderboardResource")
 
 local TeamsResource = require("sea.teams.http.TeamsResource")
 local TeamResource = require("sea.teams.http.TeamResource")
+local TeamEditResource = require("sea.teams.http.TeamEditResource")
 
 local DifftablesResource = require("sea.difftables.http.DifftablesResource")
 local DifftableResource = require("sea.difftables.http.DifftableResource")
@@ -58,6 +59,7 @@ function Resources:new(domain, server_remote, views, sessions)
 
 	self.teams = TeamsResource(domain.teams, views)
 	self.team = TeamResource(domain.teams, views)
+	self.team_edit = TeamEditResource(domain.teams, domain.users, views)
 
 	self.difftables = DifftablesResource(domain.difftables, views)
 	self.difftable = DifftableResource(domain.difftables, views)
@@ -90,6 +92,7 @@ function Resources:getList()
 
 		self.teams,
 		self.team,
+		self.team_edit,
 
 		self.difftables,
 		self.difftable,

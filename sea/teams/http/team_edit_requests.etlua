@@ -1,6 +1,3 @@
-<script>
-</script>
-
 <% if not request_users or #request_users == 0 then %>
 	<p>Empty. No one sent a request to join.</p>
 <% else %>
