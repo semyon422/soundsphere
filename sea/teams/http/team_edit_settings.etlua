@@ -32,5 +32,8 @@
 		<div class="control">
 			<button class="button is-link">Update</button>
 		</div>
+		<% if settings_updated then %>
+			<p class="help is-success">Settings updated</p>
+		<% end %>
 	</div>
 </form>

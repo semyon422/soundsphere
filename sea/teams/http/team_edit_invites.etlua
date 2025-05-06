@@ -1,0 +1,34 @@
+<div class="block">
+	<div class="border-box">
+		<div class="block">
+			<div class="content">
+				<h2>Invite a person</h2>
+				<p>After you send an invitation, give the person a link to your team page and they can join.<p>
+			</div>
+		</div>
+		<form action="/teams/<%= path_params.team_id %>/invite_user" method="post">
+			<div class="field">
+				<label class="label">Username</label>
+				<div class="control has-icons-left">
+					<input class="input" type="text" placeholder="Type username here" name="username">
+					<span class="icon is-small is-left">
+						<i class="fas fa-user"></i>
+					</span>
+					<% if user_not_found_error then %>
+						<p class="help is-danger"><%= user_not_found_error %></p>
+					<% end %>
+					<% if user_invited_message then %>
+						<p class="help is-success"><%= user_invited_message %></p>
+					<% end %>
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">Invite</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="block">
+</div>

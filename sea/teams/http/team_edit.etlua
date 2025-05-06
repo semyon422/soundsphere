@@ -10,23 +10,22 @@
 		<aside class="menu">
 			<p class="menu-label">Administration</p>
 				<%
-					local url = ("/teams/%i/edit/"):format(team.id)
-					local function addClass(tab)
-						return path_params.tab == tab and [[class=is-active]] or ""
+					local url = ("/teams/%i/"):format(team.id)
+					local function addClass(button)
+						return tab == button and "class=is-active" or ""
 					end
 				%>
 				<ul class="menu-list">
-					<li><a href="<%= url %>settings" <%= addClass("settings") %>>Settings</a></li>
-					<li><a href="<%= url %>members" <%= addClass("members") %>>Members</a></li>
-					<li><a href="<%= url %>requests" <%= addClass("requests") %>>Incoming join requests</a></li>
-					<li><a href="<%= url %>requests" <%= addClass("invites") %>>Outgoing invitations</a></li>
+					<li><a href="<%= url %>update_settings" <%- addClass("settings") %>>Settings</a></li>
+					<li><a href="<%= url %>members" <%- addClass("members") %>>Members</a></li>
+					<li><a href="<%= url %>requests" <%- addClass("requests") %>>Incoming join requests</a></li>
+					<li><a href="<%= url %>invite_user" <%- addClass("invites") %>>Outgoing invitations</a></li>
 				</ul>
 			</p>
 		</aside>
 	</div>
 	<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
 		<%
-			local tab = path_params.tab
 			local html
 
 			if tab == "settings" then
@@ -35,6 +34,8 @@
 				html = view:render("sea/teams/http/team_edit_members.etlua")
 			elseif tab == "requests" then
 				html = view:render("sea/teams/http/team_edit_requests.etlua")
+			elseif tab == "invites" then
+				html = view:render("sea/teams/http/team_edit_invites.etlua")
 			end
 		%>
 		<%- html %>

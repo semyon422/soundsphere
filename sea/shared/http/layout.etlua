@@ -58,7 +58,7 @@
 			})
 
 			// Default params for sweetalert
-			const sweet_alert_params = {
+			var sweet_alert_params = {
 				animation: false,
 				customClass: {
 					confirmButton: "button is-danger",
