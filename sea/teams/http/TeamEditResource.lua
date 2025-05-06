@@ -214,9 +214,6 @@ function TeamEditResource:inviteUser(req, res, ctx)
 	ctx.team = team
 	ctx.tab = "invites"
 
-	local invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
-	ctx.invite_users = invite_users and self.teams:preloadUsers(invite_users)
-
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		---@cast err string
@@ -239,6 +236,8 @@ function TeamEditResource:inviteUser(req, res, ctx)
 	if not team_user then
 		ctx.invitation_error = ("Failed to invite '%s'. %s"):format(username, err)
 	else
+		local invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
+		ctx.invite_users = invite_users and self.teams:preloadUsers(invite_users)
 		ctx.invitation_success  = ("Successfully sent an invitation to '%s'"):format(username)
 	end
 
@@ -260,7 +259,7 @@ function TeamEditResource:revokeJoinInvite(req, res, ctx)
 	self.teams:revokeJoinInvite(ctx.session_user, team_id, user_id)
 
 	res.status = 302
-	res.headers:set("Location", ("/teams/%i/requests"):format(team_id))
+	res.headers:set("Location", ("/teams/%i/invite_user"):format(team_id))
 end
 
 ---@param req web.IRequest

@@ -16,6 +16,9 @@ TeamResource.routes = {
 	{"/teams/:team_id/leave", {
 		POST = "leave",
 	}},
+	{"/teams/:team_id/accept_join_invite", {
+		POST = "acceptJoinInvite",
+	}},
 	{"/teams/:team_id/cancel_join_request", {
 		POST = "cancelJoinRequest",
 	}},
@@ -80,6 +83,29 @@ function TeamResource:join(req, res, ctx)
 		res.status = 400
 		res:send(err)
 		return
+	end
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i"):format(team.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:acceptJoinInvite(req, res, ctx)
+	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
+
+	if not team then
+		res.status = 400
+		return
+	end
+
+	local team_user, err = self.teams:acceptJoinInvite(ctx.session_user, team)
+
+	if not team_user then
+		---@cast err string
+		res.status = 400
+		res:send(err)
 	end
 
 	res.status = 302

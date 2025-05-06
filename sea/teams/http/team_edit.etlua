@@ -7,6 +7,9 @@
 
 <div class="columns">
 	<div class="column">
+		<div class="block">
+			<a class="button is-fullwidth" href="/teams/<%= team.id %>">Return to team page</a>
+		</div>
 		<aside class="menu">
 			<p class="menu-label">Administration</p>
 				<%

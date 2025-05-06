@@ -1,39 +1,44 @@
-<form action="/teams/<%= path_params.team_id %>/update_settings" method="post">
-	<div class="field">
-		<label class="label">Name</label>
-		<div class="control">
-			<input class="input" type="text" name="name" maxlength="22" required value="<%= team.name or "" %>">
-		</div>
+<div class="border-box">
+	<div class="content">
+		<h2><%= team.name %> settings</h2>
 	</div>
-	<div class="field">
-		<label class="label">Team tag</label>
-		<div class="control">
-			<input class="input" type="text" name="alias" maxlength="4" required value="<%= team.alias or "" %>">
+	<form action="/teams/<%= path_params.team_id %>/update_settings" method="post">
+		<div class="field">
+			<label class="label">Name</label>
+			<div class="control">
+				<input class="input" type="text" name="name" maxlength="22" required value="<%= team.name or "" %>">
+			</div>
 		</div>
-	</div>
-	<div class="field">
-		<div class="control">
-			<label class="label">Team type</label>
-			<label class="radio">
-				<input type="radio" <%- team.type == "open" and "checked" or "" %> name="type" value="open" />
-				Public
-			</label>
-			<label class="radio">
-				<input type="radio" <%- team.type == "request" and "checked" or "" %> name="type" value="request" />
-				Request to join
-			</label>
-			<label class="radio">
-				<input type="radio" <%- team.type == "invite" and "checked" or "" %> name="type" value="invite" />
-				Invite only
-			</label>
+		<div class="field">
+			<label class="label">Team tag</label>
+			<div class="control">
+				<input class="input" type="text" name="alias" maxlength="4" required value="<%= team.alias or "" %>">
+			</div>
 		</div>
-	</div>
-	<div class="field">
-		<div class="control">
-			<button class="button is-link">Update</button>
+		<div class="field">
+			<div class="control">
+				<label class="label">Team type</label>
+				<label class="radio">
+					<input type="radio" <%- team.type == "open" and "checked" or "" %> name="type" value="open" />
+					Public
+				</label>
+				<label class="radio">
+					<input type="radio" <%- team.type == "request" and "checked" or "" %> name="type" value="request" />
+					Request to join
+				</label>
+				<label class="radio">
+					<input type="radio" <%- team.type == "invite" and "checked" or "" %> name="type" value="invite" />
+					Invite only
+				</label>
+			</div>
 		</div>
-		<% if settings_updated then %>
-			<p class="help is-success">Settings updated</p>
-		<% end %>
-	</div>
-</form>
+		<div class="field">
+			<div class="control">
+				<button class="button is-link">Update</button>
+			</div>
+			<% if settings_updated then %>
+				<p class="help is-success">Settings updated</p>
+			<% end %>
+		</div>
+	</form>
+</div>

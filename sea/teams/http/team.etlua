@@ -80,23 +80,67 @@
 								<p><strong>13817</strong></p>
 							</div>
 						</div>
-						<% if session_user.id == 0 and team.type ~= "invite" then %>
-							<p align="center">Log in to join</p>
-						<% elseif team.type == "invite" then %>
-							<p align="center">Join requests are disabled</p>
-						<% elseif not team_user then %>
-							<button class="team__button button is-info is-fullwidth" hx-post="/teams/<%= team.id %>/join" hx-target="body">
-								<i class="fas fa-user-plus icon-margin-right"></i>Join
-							</button>
-						<% else %>
-							<% if not team_user.is_accepted then %>
-								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/cancel_join_request" hx-target="body">
+						<%
+							local join_button = ([[
+								<button
+									class="team__button button is-info is-fullwidth"
+									hx-post="/teams/%i/join"
+									hx-target="body">
+									<i class="fas fa-user-plus icon-margin-right"></i>Join
+								</button>
+							]]):format(team.id)
+
+							local accept_invite_button = ([[
+								<button
+									class="team__button button is-info is-fullwidth"
+									hx-post="/teams/%i/accept_join_invite"
+									hx-target="body">
+									<i class="fas fa-user-plus icon-margin-right"></i>Accept invitation
+								</button>
+							]]):format(team.id)
+
+							local cancel_join_button = ([[
+								<button
+									class="team__button button is-info is-light is-fullwidth"
+									hx-post="/teams/%i/cancel_join_request"
+									hx-target="body">
 									<i class="fas fa-user-slash icon-margin-right"></i>Cancel join request
 								</button>
-							<% elseif team_user.is_accepted and not can_manage then %>
-								<button class="team__button button is-info is-light is-fullwidth" hx-post="/teams/<%= team.id %>/leave" hx-target="body">
+							]]):format(team.id)
+
+							local leave_button = ([[
+								<button
+									class="team__button button is-info is-light is-fullwidth"
+									hx-post="/teams/%i/leave"
+									hx-target="body">
 									<i class="fas fa-user-slash icon-margin-right"></i>Leave
 								</button>
+							]]):format(team.id)
+						%>
+
+						<% if session_user.id == 0 then %>
+							<% if team.type == "open" then %>
+								<p align="center">Login to join</p>
+							<% elseif team.type == "request" then %>
+								<p align="center">Login to send a join request</p>
+							<% else %>
+								<p align="center">Join requests are disabled</p>
+							<% end %>
+						<% elseif team_user and not can_manage then %>
+							<% if team_user.is_accepted then %>
+								<%- leave_button %>
+							<% elseif team_user.is_invitation then %>
+								<%- accept_invite_button %>
+							<% else %>
+								<%- cancel_join_button %>
+							<% end %>
+						<% elseif not team_user then %>
+							<% if team.type == "open" then %>
+								<%- join_button %>
+							<% elseif team.type == "request" then %>
+								<%- join_button %>
+							<% elseif team.type == "invite" then %>
+								<p align="center">Join requests are disabled</p>
 							<% end %>
 						<% end %>
 
