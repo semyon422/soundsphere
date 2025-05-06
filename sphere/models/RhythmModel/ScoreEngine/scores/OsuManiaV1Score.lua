@@ -127,7 +127,7 @@ end
 ---@param event table
 function OsuManiaV1Score:shortNoteHit(event)
 	local index = self.note_judge_windows:get(event.deltaTime) or 6
-	self.judge_counter:add(index)
+	self:addCounter(index)
 end
 
 ---@param event table
