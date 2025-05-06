@@ -34,6 +34,12 @@ end
 
 --------------------------------------------------------------------------------
 
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function ITeamsRepo:preloadUsers(team_users)
+	return team_users
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function ITeamsRepo:getTeamUsers(team_id)
@@ -43,18 +49,6 @@ end
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function ITeamsRepo:getRequestTeamUsers(team_id)
-	return {}
-end
-
----@param team_id integer
----@return sea.TeamUser[]
-function ITeamsRepo:getRequestTeamUsersFull(team_id)
-	return {}
-end
-
----@param team_id integer
----@return sea.TeamUser[]
-function ITeamsRepo:getTeamUsersFull(team_id)
 	return {}
 end
 

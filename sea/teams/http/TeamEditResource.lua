@@ -38,6 +38,7 @@ TeamEditResource.routes = {
 }
 
 ---@param teams sea.Teams
+---@param users sea.Users
 ---@param views web.Views
 function TeamEditResource:new(teams, users, views)
 	self.teams = teams
@@ -99,7 +100,8 @@ function TeamEditResource:getMembers(req, res, ctx)
 	end
 
 	---@cast team sea.Team
-	ctx.users = self.teams:getTeamUsersFull(team.id)
+	local team_users = self.teams:getTeamUsers(team.id)
+	ctx.users = team_users and self.teams:preloadUsers(team_users)
 
 	ctx.team = team
 	ctx.tab = "members"
@@ -121,7 +123,8 @@ function TeamEditResource:getRequests(req, res, ctx)
 	end
 
 	---@cast team sea.Team
-	ctx.request_users = self.teams:getRequestTeamUsersFull(ctx.session_user, team)
+	local request_users = self.teams:getRequestTeamUsers(ctx.session_user, team)
+	ctx.request_users = request_users and self.teams:preloadUsers(request_users)
 
 	ctx.team = team
 	ctx.tab = "requests"
@@ -143,7 +146,8 @@ function TeamEditResource:getInvites(req, res, ctx)
 	end
 
 	---@cast team sea.Team
-	ctx.invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
+	local invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
+	ctx.invite_users = invite_users and self.teams:preloadUsers(invite_users)
 
 	ctx.team = team
 	ctx.tab = "invites"
@@ -192,7 +196,6 @@ function TeamEditResource:updateSettings(req, res, ctx)
 	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
 end
 
-
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
@@ -206,9 +209,13 @@ function TeamEditResource:inviteUser(req, res, ctx)
 	if self:redirectNotOwners(team, ctx, res) then
 		return
 	end
+	---@cast team sea.Team
 
 	ctx.team = team
 	ctx.tab = "invites"
+
+	local invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
+	ctx.invite_users = invite_users and self.teams:preloadUsers(invite_users)
 
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
@@ -219,14 +226,41 @@ function TeamEditResource:inviteUser(req, res, ctx)
 	end
 
 	local username = body_params.username ---@type string
+	local user = self.users:findUserByName(username)
 
-	if username == "404" then
-		ctx.user_not_found_error = ("User '%s' not found"):format(username)
-	elseif username == "200" then
-		ctx.user_invited_message = ("Successfully sent an invitation to '%s'"):format(username)
+	if not user then
+		ctx.invitation_error = ("User '%s' not found"):format(username)
+		self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
+		return
 	end
 
-	self:getInvites(req, res, ctx)
+	local team_user, err = self.teams:inviteUser(ctx.session_user, team, user.id)
+
+	if not team_user then
+		ctx.invitation_error = ("Failed to invite '%s'. %s"):format(username, err)
+	else
+		ctx.invitation_success  = ("Successfully sent an invitation to '%s'"):format(username)
+	end
+
+	self.views:render_send(res, "sea/teams/http/team_edit.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamEditResource:revokeJoinInvite(req, res, ctx)
+	local team_id = tonumber(ctx.path_params.team_id)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not team_id or not user_id then
+		res.status = 400
+		return
+	end
+
+	self.teams:revokeJoinInvite(ctx.session_user, team_id, user_id)
+
+	res.status = 302
+	res.headers:set("Location", ("/teams/%i/requests"):format(team_id))
 end
 
 ---@param req web.IRequest
@@ -251,7 +285,7 @@ function TeamEditResource:kickUser(req, res, ctx)
 	end
 
 	res.status = 302
-	res.headers:set("Location", ("/teams/%i/edit/members"):format(team_id))
+	res.headers:set("Location", ("/teams/%i/members"):format(team_id))
 end
 
 ---@param req web.IRequest
@@ -276,7 +310,7 @@ function TeamEditResource:acceptJoinRequest(req, res, ctx)
 	end
 
 	res.status = 302
-	res.headers:set("Location", ("/teams/%i/edit/requests"):format(team_id))
+	res.headers:set("Location", ("/teams/%i/requests"):format(team_id))
 end
 
 ---@param req web.IRequest
@@ -301,7 +335,7 @@ function TeamEditResource:revokeJoinRequest(req, res, ctx)
 	end
 
 	res.status = 302
-	res.headers:set("Location", ("/teams/%i/edit/requests"):format(team_id))
+	res.headers:set("Location", ("/teams/%i/requests"):format(team_id))
 end
 
 ---@param req web.IRequest

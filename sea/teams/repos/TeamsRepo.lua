@@ -40,6 +40,13 @@ end
 
 --------------------------------------------------------------------------------
 
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function TeamsRepo:preloadUsers(team_users)
+	self.models.team_users:preload(team_users, "user")
+	return team_users
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function TeamsRepo:getTeamUsers(team_id)
@@ -51,33 +58,12 @@ end
 
 ---@param team_id integer
 ---@return sea.TeamUser[]
-function TeamsRepo:getTeamUsersFull(team_id)
-	local team_users = self.models.team_users:select({
-		team_id = team_id,
-		is_accepted = true,
-	})
-	self.models.team_users:preload(team_users, "user")
-	return team_users
-end
-
----@param team_id integer
----@return sea.TeamUser[]
 function TeamsRepo:getRequestTeamUsers(team_id)
 	return self.models.team_users:select({
 		team_id = team_id,
 		is_accepted = false,
 		is_invitation = false,
 	})
-end
-
-function TeamsRepo:getRequestTeamUsersFull(team_id)
-	local team_users = self.models.team_users:select({
-		team_id = team_id,
-		is_accepted = false,
-		is_invitation = false,
-	})
-	self.models.team_users:preload(team_users, "user")
-	return team_users
 end
 
 ---@param team_id integer

@@ -92,7 +92,7 @@ end
 function Teams:join(user, team)
 	local can = self.teams_access:canJoin(user, team)
 	if not can then
-		return nil, "not an owner"
+		return nil, "can't join"
 	end
 
 	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
@@ -258,17 +258,23 @@ function Teams:acceptJoinInvite(user, team)
 end
 
 ---@param user sea.User
----@param team sea.Team
----@param user_id integer
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser?
 ---@return string?
-function Teams:revokeJoinInvite(user, team, user_id)
+function Teams:revokeJoinInvite(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
 	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
 		return nil, err
 	end
 
-	local team_user = self.teams_repo:getTeamUser(team.id, user_id)
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing invite"
 	end
@@ -355,6 +361,13 @@ function Teams:transferOwner(user, team_id, target_user_id)
 	return self.teams_repo:updateTeam(team)
 end
 
+
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function Teams:preloadUsers(team_users)
+	return self.teams_repo:preloadUsers(team_users)
+end
+
 ---@param user sea.User
 ---@param team sea.Team
 ---@return sea.TeamUser?
@@ -368,12 +381,6 @@ function Teams:getTeamUsers(team_id)
 	return self.teams_repo:getTeamUsers(team_id)
 end
 
----@param team_id integer
----@return sea.TeamUser[]
-function Teams:getTeamUsersFull(team_id)
-	return self.teams_repo:getTeamUsersFull(team_id)
-end
-
 ---@param user sea.User
 ---@param team sea.Team
 ---@return sea.TeamUser[]?
@@ -384,18 +391,6 @@ function Teams:getRequestTeamUsers(user, team)
 		return nil, err
 	end
 	return self.teams_repo:getRequestTeamUsers(team.id)
-end
-
----@param user sea.User
----@param team sea.Team
----@return sea.TeamUser[]?
----@return string?
-function Teams:getRequestTeamUsersFull(user, team)
-	local can, err = self.teams_access:canUpdate(user, team)
-	if not can then
-		return nil, err
-	end
-	return self.teams_repo:getRequestTeamUsersFull(team.id)
 end
 
 ---@param user sea.User

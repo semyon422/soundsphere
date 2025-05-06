@@ -50,9 +50,11 @@ function TeamResource:getTeamPage(req, res, ctx)
 
 	local can_update = self.teams:canUpdate(ctx.session_user, team)
 
+	local team_users = self.teams:getTeamUsers(team.id)
+	ctx.team_users = team_users and self.teams:preloadUsers(team_users)
+
 	ctx.team = team
 	ctx.team_user = self.teams:getTeamUser(ctx.session_user, team)
-	ctx.team_users = self.teams:getTeamUsersFull(team.id)
 	ctx.can_update = can_update
 	ctx.edit_description = can_update and query.edit_description == "true"
 

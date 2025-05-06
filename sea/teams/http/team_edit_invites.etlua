@@ -14,11 +14,11 @@
 					<span class="icon is-small is-left">
 						<i class="fas fa-user"></i>
 					</span>
-					<% if user_not_found_error then %>
-						<p class="help is-danger"><%= user_not_found_error %></p>
+					<% if invitation_error then %>
+						<p class="help is-danger"><%= invitation_error %></p>
 					<% end %>
-					<% if user_invited_message then %>
-						<p class="help is-success"><%= user_invited_message %></p>
+					<% if invitation_success then %>
+						<p class="help is-success"><%= invitation_success %></p>
 					<% end %>
 				</div>
 			</div>
@@ -31,4 +31,25 @@
 	</div>
 </div>
 <div class="block">
+	<% if invite_users and #invite_users > 0 then %>
+		<table class="ranking-table">
+			<tbody>
+				<% for _, v in ipairs(invite_users) do %>
+					<tr>
+						<td align="left" class="ranking-table__main-cell">
+							<a href="/users/<%= v.user.id %>" class="is-size-4"><%= v.user.name %></a>
+						</td>
+						<td>
+							<button
+								hx-post="/teams/<%= team.id %>/revoke_join_invite/<%= v.user.id %>"
+								hx-target="body"
+								class="button">
+								Cancel invitation
+							</button>
+						</td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+	<% end %>
 </div>
