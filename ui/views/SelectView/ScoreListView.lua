@@ -43,7 +43,7 @@ function ScoreListView:drawItem(i, w, h)
 	TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
 	TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 	if just.mouse_over(i .. "pr", just.is_over(-w, h), "mouse") then
-		self.game.ui.gameView.tooltip = ("%dpp"):format(item.rating_pp)
+		self.game.ui.gameView.tooltip = ("%dpp"):format(item.rating_pp or 0)
 	end
 	TextCellImView(w, h, "right", i == 1 and "time rate" or "", Format.timeRate(item.rate))
 	if just.mouse_over(i .. "a", just.is_over(-w, h), "mouse") then
