@@ -149,10 +149,14 @@ function ResultController:setReplayBaseTimings(timings)
 	local replayBase = self.replayBase
 	local settings = self.configModel.configs.settings
 
+	---@type sea.Subtimings?
+	local subtimings
 	local subtimings_config = settings.subtimings[timings.name]
-	local name = subtimings_config[1]
-	local value = subtimings_config[name]
-	local subtimings = Subtimings(name, value)
+	if subtimings_config then
+		local name = subtimings_config[1]
+		local value = subtimings_config[name]
+		subtimings = Subtimings(name, value)
+	end
 
 	replayBase.timings = timings
 	replayBase.subtimings = subtimings
