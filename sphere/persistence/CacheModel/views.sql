@@ -419,7 +419,7 @@ chartplays.`index` = chartmetas.`index`
 ;
 
 CREATE TEMP VIEW IF NOT EXISTS chartplays_computable AS
-SELECT
+SELECT DISTINCT
 chartplays.*
 FROM chartplays
 INNER JOIN chartfiles ON
