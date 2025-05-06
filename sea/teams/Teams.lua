@@ -305,7 +305,8 @@ function Teams:revokeJoinRequest(user, team_id, target_user_id)
 	end
 
 	local can, err = self.teams_access:canUpdate(user, team)
-	if not can then
+	-- Owners can revoke, and people can revoke their own requests
+	if not can and user.id ~= target_user_id then
 		return nil, err
 	end
 
