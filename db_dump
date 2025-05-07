@@ -1,0 +1,2 @@
+#!/bin/bash
+mariadb-dump --defaults-file=my.cnf --result-file="$(date -u +'backups/dump_%Y-%m-%d_%H-%M-%S.sql')" backend

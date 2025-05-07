@@ -1,0 +1,3 @@
+#!/bin/bash
+[ -f "$1" ] && echo "Restoring $1"
+[ -f "$1" ] && mariadb --defaults-file=my.cnf backend < "$1"
