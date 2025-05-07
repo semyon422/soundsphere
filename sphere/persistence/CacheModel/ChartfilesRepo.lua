@@ -15,7 +15,7 @@ end
 ---@param dir string?
 ---@param name string
 ---@param location_id integer
----@return sea.ClientChartfile?
+---@return sea.ClientChartfileSet?
 function ChartfilesRepo:selectChartfileSet(dir, name, location_id)
 	return self.models.chartfile_sets:find({
 		dir = dir,
@@ -26,7 +26,7 @@ function ChartfilesRepo:selectChartfileSet(dir, name, location_id)
 end
 
 ---@param chartfile_set table
----@return sea.ClientChartfile
+---@return sea.ClientChartfileSet
 function ChartfilesRepo:insertChartfileSet(chartfile_set)
 	return self.models.chartfile_sets:create(chartfile_set)
 end
@@ -48,7 +48,7 @@ function ChartfilesRepo:selectChartfileSetById(id)
 end
 
 ---@param location_id integer?
----@return sea.ClientChartfile[]
+---@return sea.ClientChartfileSet[]
 function ChartfilesRepo:selectChartfileSetsAtLocation(location_id)
 	return self.models.chartfile_sets:select({location_id = location_id})
 end
@@ -100,6 +100,12 @@ function ChartfilesRepo:selectUnhashedChartfiles(path, location_id, set_id)
 		set_dir__startswith = path,
 		location_id = assert(location_id),
 	})
+end
+
+---@param location_id integer
+---@return {dir: string}[]
+function ChartfilesRepo:selectChartfileSetsDirs(location_id)
+	return self.models.chartfile_set_dirs:select({location_id = assert(location_id)})
 end
 
 ---@param id integer

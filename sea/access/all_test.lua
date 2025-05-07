@@ -5,7 +5,7 @@ local Users = require("sea.access.Users")
 local User = require("sea.access.User")
 local UserInsecure = require("sea.access.UserInsecure")
 local UserRole = require("sea.access.UserRole")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
 local test = {}
@@ -24,7 +24,6 @@ local function create_test_ctx()
 	local users_repo = UsersRepo(models)
 
 	local anon_user = User()
-	anon_user.id = 0
 
 	return {
 		db = db,
@@ -102,6 +101,7 @@ function test.register_email_password(t)
 
 	t:eq(su.session.id, 1)
 	t:eq(su.session.user_id, 1)
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
 
@@ -156,6 +156,7 @@ function test.login_email_password(t)
 	end
 	---@cast su -?
 
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.id, 1)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
@@ -172,6 +173,7 @@ function test.login_email_password(t)
 	---@cast su -?
 
 	t:eq(su.session.user_id, su.user.id)
+	t:eq(su.session.ip, nil)
 	t:eq(su.user.email, nil)
 	t:eq(su.user.password, nil)
 

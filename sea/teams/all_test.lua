@@ -1,5 +1,5 @@
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local TeamsRepo = require("sea.teams.repos.TeamsRepo")
 local Teams = require("sea.teams.Teams")
 local Team = require("sea.teams.Team")

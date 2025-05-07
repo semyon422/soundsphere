@@ -11,8 +11,6 @@ local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
 
-local ClientRemote = require("sea.app.remotes.ClientRemote")
-
 ---@class sphere.SeaClient
 ---@operator call: sphere.SeaClient
 local SeaClient = class()
@@ -20,12 +18,10 @@ local SeaClient = class()
 SeaClient.threaded = true
 SeaClient.reconnect_interval = 30
 
----@param game sphere.GameController
-function SeaClient:new(game)
-	self.game = game
-
+---@param client_remote sea.ClientRemote
+function SeaClient:new(client_remote)
 	self.protocol = Subprotocol()
-	self.remote_handler = RemoteHandler(ClientRemote(self.game))
+	self.remote_handler = RemoteHandler(client_remote)
 
 	function self.remote_handler:transform(th, peer, obj, ...)
 		local _obj = setmetatable({}, {__index = obj})
@@ -34,11 +30,13 @@ function SeaClient:new(game)
 		return _obj, ...
 	end
 
-	local server_peer = WebsocketPeer({send = function() end})
+	local server_peer = WebsocketPeer({send = function() return nil, "not connected" end})
 	self.server_peer = server_peer
 
 	local task_handler = TaskHandler(self.remote_handler)
 	self.task_handler = task_handler
+
+	task_handler.timeout = 60
 
 	local remote = Remote(self.task_handler, self.server_peer)
 	---@cast remote -icc.Remote, +sea.ServerRemote
@@ -55,12 +53,16 @@ function SeaClient:new(game)
 		else
 			task_handler:handleCall(server_peer, msg)
 		end
+
+		task_handler:update()
 	end
 
 	self.connected = false
 end
 
-function SeaClient:load(url)
+---@param url string
+---@param on_connect function
+function SeaClient:load(url, on_connect)
 	self.url = url
 
 	if not self.threaded then
@@ -96,8 +98,9 @@ function SeaClient:load(url)
 					delay.sleep(self.reconnect_interval)
 				else
 					self.connected = true
-					self.server_peer.ws = self.sphws.ws
+					self.server_peer.ws = self.sphws_ret.ws
 					print("connected")
+					on_connect()
 				end
 			end
 			delay.sleep(1)

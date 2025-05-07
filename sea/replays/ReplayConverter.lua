@@ -7,7 +7,7 @@ local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local TimingValues = require("sea.chart.TimingValues")
 local Healths = require("sea.chart.Healths")
-local SeaReplay = require("sea.replays.Replay")
+local Replay = require("sea.replays.Replay")
 
 -- LEGACY CODE
 -- tests for every replay version are required
@@ -158,7 +158,7 @@ function ReplayConverter:convert(obj)
 			if obj.healths then
 				setmetatable(obj.healths, Healths)
 			end
-			return (setmetatable(obj, SeaReplay))
+			return (setmetatable(obj, Replay))
 		end
 		error("invalid replay version")
 	end
@@ -173,7 +173,7 @@ function ReplayConverter:convert(obj)
 	obj.modifiers = obj.modifiers or {}
 	self:convertTimings(obj)
 
-	local replay = SeaReplay()
+	local replay = Replay()
 
 	replay.version = 0
 	replay.events = obj.events
@@ -181,7 +181,7 @@ function ReplayConverter:convert(obj)
 	replay.hash = obj.hash
 	replay.index = obj.index
 	replay.modifiers = obj.modifiers
-	replay.rate = obj.rate
+	replay.rate = int_rates.round(obj.rate)
 	replay.mode = obj.single and "taiko" or "mania"
 
 	replay.nearest = not not obj.timings.nearest

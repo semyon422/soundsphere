@@ -5,6 +5,7 @@ local fs_util = require("fs_util")
 local Sph = require("sph.Sph")
 local ChartEncoder = require("osu.ChartEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ModifiersMetaState = require("sea.compute.ModifiersMetaState")
 local InputMode = require("ncdk.InputMode")
 
 ---@class sphere.SelectController
@@ -52,9 +53,7 @@ function SelectController:new(
 	self.backgroundModel = backgroundModel
 	self.previewModel = previewModel
 	self.chartPreviewModel = chartPreviewModel
-	self.state = {
-		inputMode = InputMode(),
-	}
+	self.state = ModifiersMetaState()
 end
 
 function SelectController:load()
@@ -85,6 +84,7 @@ function SelectController:applyModifierMeta()
 
 	self.previewModel:setRate(replayBase.rate)
 	self.state.inputMode:set(chartview.inputmode)
+	self.state:resetOrder()
 
 	ModifierModel:applyMeta(replayBase.modifiers, self.state)
 

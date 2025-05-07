@@ -105,6 +105,7 @@ function GameplayController:load()
 	local data = assert(love.filesystem.read(chartview.location_path))
 	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
+	computeContext:applyModifierReorder(replayBase)
 	local chartdiff, state = computeContext:computeBase(replayBase)
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
@@ -184,10 +185,14 @@ function GameplayController:setReplayBaseTimings(timings)
 	local replayBase = self.replayBase
 	local settings = self.configModel.configs.settings
 
+	---@type sea.Subtimings?
+	local subtimings
 	local subtimings_config = settings.subtimings[timings.name]
-	local name = subtimings_config[1]
-	local value = subtimings_config[name]
-	local subtimings = Subtimings(name, value)
+	if subtimings_config then
+		local name = subtimings_config[1]
+		local value = subtimings_config[name]
+		subtimings = Subtimings(name, value)
+	end
 
 	replayBase.timings = timings
 	replayBase.subtimings = subtimings
@@ -358,7 +363,7 @@ function GameplayController:saveScore()
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
 	chartdiff.notes_preview = nil  -- fixes erasing
-	chartdiff = self.cacheModel.chartdiffsRepo:createUpdateChartdiff(chartdiff)
+	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff)
 
 	local chartplay = Chartplay()
 
@@ -376,7 +381,7 @@ function GameplayController:saveScore()
 
 	assert(valid.format(chartplay:validate()))
 
-	local _chartplay = self.cacheModel.chartplaysRepo:createChartplay(chartplay)
+	local _chartplay = self.cacheModel.chartsRepo:createChartplay(chartplay)
 	self.computeContext.chartplay = _chartplay
 
 	coroutine.wrap(function()
@@ -444,10 +449,10 @@ function GameplayController:increaseLocalOffset(delta)
 	chartmeta.offset = chartmeta.offset or self.offsetModel:getDefaultLocal()
 	chartmeta.offset = math_util.round(chartmeta.offset + delta, delta)
 
-	self.cacheModel.chartmetasRepo:updateChartmeta({
+	self.cacheModel.chartsRepo:updateChartmeta({
 		id = chartmeta.id,
 		offset = chartmeta.offset,
-	})
+	} --[[@as table]])
 
 	self.notificationModel:notify("local offset: " .. chartmeta.offset * 1000 .. "ms")
 	self:updateOffsets()
@@ -457,10 +462,10 @@ function GameplayController:resetLocalOffset()
 	local chartmeta = assert(self.computeContext.chartmeta)
 
 	chartmeta.offset = nil
-	self.cacheModel.chartmetasRepo:updateChartmeta({
+	self.cacheModel.chartsRepo:updateChartmeta({
 		id = chartmeta.id,
 		offset = sql_util.NULL,
-	})
+	} --[[@as table]])
 
 	self.notificationModel:notify("local offset reseted: " .. self.offsetModel:getDefaultLocal() * 1000 .. "ms")
 

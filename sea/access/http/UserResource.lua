@@ -28,9 +28,11 @@ UserResource.routes = {
 UserResource.descriptionLength = 4096
 
 ---@param users sea.Users
+---@param leaderboards sea.Leaderboards
 ---@param views web.Views
-function UserResource:new(users, views)
+function UserResource:new(users, leaderboards, views)
 	self.users = users
+	self.leaderboards = leaderboards
 	self.views = views
 
 	self.testActivity = {
@@ -90,23 +92,26 @@ function UserResource:getUser(req, res, ctx)
 
 	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
 
-	if user.id == 0 then
+	if user:isAnon() then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
 
-	local page = UserPage(self.users.users_access, ctx.session_user, user)
+	local leaderboard_id = tonumber(query.lb) or 1
+	ctx.leaderboard = assert(self.leaderboards:getLeaderboard(leaderboard_id))
+
+	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards)
 	page:setActivity(self.testActivity)
 
 	ctx.page = page
 	ctx.user = user
-	ctx.scores = self.testScores
-
-	ctx.can_update = page:canUpdate()
-	ctx.edit_description = ctx.can_update and query.edit_description == "true"
 
 	ctx.ignore_main_container = true
+	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
+	ctx.leaderboards = self.leaderboards:getLeaderboards()
+	ctx.scores = page:getScores(ctx.leaderboard, user.id)
+
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 

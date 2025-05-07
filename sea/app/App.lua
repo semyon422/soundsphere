@@ -1,6 +1,6 @@
 local class = require("class")
 local socket_url = require("socket.url")
-local LsqliteDatabase = require("rdb.LsqliteDatabase")
+local LsqliteDatabase = require("rdb.db.LsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Resources = require("sea.app.Resources")
 local Repos = require("sea.app.Repos")
@@ -33,7 +33,7 @@ function App:new(app_config)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
-	self.server_remote = ServerRemote(self.domain)
+	self.server_remote = ServerRemote(self.domain, self.sessions)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions)
@@ -89,14 +89,14 @@ end
 ---@param req web.IRequest
 ---@param ctx sea.RequestContext
 function App:handleSession(req, ctx)
-	---@type {id: integer}?
-	local t = self.sessions:get(req.headers)
-	if not t or not t.id then
+	---@type sea.Session?
+	local req_session = self.sessions:get(req.headers)
+	if not req_session or not req_session.id then
 		return
 	end
 
-	local session = self.domain.users:getSession(t.id)
-	if not session or not session.active then
+	local session = self.domain.users:checkSession(req_session)
+	if not session then
 		return
 	end
 
@@ -137,7 +137,8 @@ function App:handle(req, res, ip)
 		path_params = path_params,
 		ip = ip,
 		time = os.time(),
-		session_user = self.domain.users.anon_user,
+		session = self.domain.users:getSession(),
+		session_user = self.domain.users:getUser(),
 		version = self:getVersion(),
 	}
 

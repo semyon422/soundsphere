@@ -19,6 +19,7 @@ chartviews.types = {
 	format = ChartFormat,
 	timings = Timings,
 	healths = Healths,
+	mode = chartdiffs.types.mode,
 }
 
 chartviews.relations = {}

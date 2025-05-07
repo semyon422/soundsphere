@@ -73,4 +73,11 @@ function test.import_export(t)
 	t:tdeq(co:export(), {2, 3, 4, 1})
 end
 
+---@param t testing.T
+function test.partial_apply(t)
+	local co = ColumnsOrder("4key")
+	co:apply({key1 = "key4", key4 = "key1"})
+	t:tdeq(co:export() or {}, {4, 2, 3, 1})
+end
+
 return test

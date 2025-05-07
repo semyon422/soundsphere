@@ -72,9 +72,13 @@ function LeaderboardsResource:createLeaderboard(req, res, ctx)
 	lb.allow_free_timings = body_params.allow_free_timings == "on"
 	lb.allow_free_healths = body_params.allow_free_healths == "on"
 	lb.mode = body_params.mode
-	lb.rate = json.decode_safe(body_params.rate)
+	lb.rate = json.decode_safe(body_params.rate) or "any"
 	lb.chartmeta_inputmode = json.decode_safe(body_params.chartmeta_inputmode)
 	lb.chartdiff_inputmode = json.decode_safe(body_params.chartdiff_inputmode)
+	lb.timings = json.decode_safe(body_params.timings)
+	lb.healths = json.decode_safe(body_params.healths)
+	lb.starts_at = tonumber(body_params.starts_at)
+	lb.ends_at = tonumber(body_params.ends_at)
 
 	local difftable_ids = json.decode_safe(body_params.difftable_ids)
 	if type(difftable_ids) ~= "table" then

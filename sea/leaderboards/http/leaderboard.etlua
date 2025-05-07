@@ -44,6 +44,7 @@
 		<th>Rate</td>
 		<th>Timings</td>
 		<th>Healths</td>
+		<th>Date</td>
 		<th>Allowed</td>
 		<th>Disallowed</td>
 	</tr>
@@ -63,6 +64,7 @@
 		</td>
 		<td><%= leaderboard.timings and ("%s: %s"):format(leaderboard.timings.name, leaderboard.timings.data) or "-" %></td>
 		<td><%= leaderboard.healths and ("%s: %s"):format(leaderboard.healths.name, leaderboard.healths.data) or "-" %></td>
+		<td>from <%= leaderboard.starts_at or "-" %> to <%= leaderboard.ends_at or "-" %></td>
 		<td><%= table.concat(allowed, ", ") %></td>
 		<td><%= table.concat(disallowed, ", ") %></td>
 	</tr>

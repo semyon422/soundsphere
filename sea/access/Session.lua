@@ -5,9 +5,13 @@ local class = require("class")
 ---@field id integer
 ---@field user_id integer
 ---@field active boolean
----@field ip string
 ---@field created_at integer
 ---@field updated_at integer
 local Session = class()
+
+---@return boolean
+function Session:isAnon()
+	return not self.id
+end
 
 return Session

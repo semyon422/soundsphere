@@ -118,9 +118,9 @@ end
 function ScoreLibrary:updateItemsLocal(chartview, exact)
 	local scores
 	if exact then
-		scores = self.cacheModel.chartplaysRepo:getChartplaysForChartdiff(chartview)
+		scores = self.cacheModel.chartsRepo:getChartplaysForChartdiff(chartview)
 	else
-		scores = self.cacheModel.chartplaysRepo:getChartplaysForChartmeta(chartview)
+		scores = self.cacheModel.chartsRepo:getChartplaysForChartmeta(chartview)
 	end
 
 	for i, score in ipairs(scores) do

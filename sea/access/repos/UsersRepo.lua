@@ -17,6 +17,13 @@ function UsersRepo:getUsers()
 	return users
 end
 
+---@return sea.UserInsecure[]
+function UsersRepo:getUsersInsecure()
+	local users = self.models.users_insecure:select()
+	self.models.users:preload(users, "user_roles")
+	return users
+end
+
 ---@param id integer
 ---@return sea.User?
 function UsersRepo:getUser(id)
@@ -64,6 +71,14 @@ end
 --------------------------------------------------------------------------------
 
 ---@param user_id integer
+---@return sea.UserRole[]
+function UsersRepo:getUserRoles(user_id)
+	return self.models.user_roles:select({
+		user_id = assert(user_id),
+	})
+end
+
+---@param user_id integer
 ---@param role sea.Role
 ---@return sea.UserRole?
 function UsersRepo:getUserRole(user_id, role)
@@ -92,6 +107,14 @@ function UsersRepo:deleteUserRole(user_role)
 end
 
 --------------------------------------------------------------------------------
+
+---@param user_id integer
+---@return sea.UserLocation[]
+function UsersRepo:getUserLocations(user_id)
+	return self.models.user_locations:select({
+		user_id = assert(user_id),
+	})
+end
 
 ---@param user_id integer
 ---@param ip string
@@ -126,10 +149,28 @@ end
 
 --------------------------------------------------------------------------------
 
+---@param user_id integer
+---@return sea.Session[]
+function UsersRepo:getSessions(user_id)
+	return self.models.sessions:select({user_id = assert(user_id)})
+end
+
+---@param user_id integer
+---@return sea.Session[]
+function UsersRepo:getSessionsInsecure(user_id)
+	return self.models.sessions_insecure:select({user_id = assert(user_id)})
+end
+
 ---@param id integer
 ---@return sea.Session?
 function UsersRepo:getSession(id)
 	return self.models.sessions:find({id = assert(id)})
+end
+
+---@param id integer
+---@return sea.SessionInsecure?
+function UsersRepo:getSessionInsecure(id)
+	return self.models.sessions_insecure:find({id = assert(id)})
 end
 
 ---@param session sea.Session

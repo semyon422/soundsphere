@@ -78,7 +78,7 @@ end
 ---@return sea.ColumnsOrder
 function ColumnsOrder:apply(map)
 	for a, b in pairs(self.map) do
-		self.map[a] = map[b]
+		self.map[a] = map[b] or b
 	end
 	return self
 end

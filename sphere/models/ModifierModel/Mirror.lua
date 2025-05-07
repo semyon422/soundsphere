@@ -19,12 +19,9 @@ function Mirror:getString(config)
 end
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return table
-function Mirror:getMap(config)
-	local chart = self.chart
-
-	local inputMode = chart.inputMode
-
+function Mirror:getMap(config, inputMode)
 	---@type {[ncdk2.Column]: ncdk2.Column}
 	local map = {}
 

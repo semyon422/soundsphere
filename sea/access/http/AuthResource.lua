@@ -95,7 +95,7 @@ function AuthResource:login(req, res, ctx)
 		return
 	end
 
-	self.sessions:set(res.headers, {id = su.session.id})
+	self.sessions:set(res.headers, su.session)
 
 	res.status = 302
 	res.headers:set("Location", "/")
@@ -134,7 +134,7 @@ function AuthResource:loginJson(req, res, ctx)
 	res:send(json.encode({
 		user = su.user,
 		session = su.session,
-		token = self.sessions:encode({id = su.session.id}),
+		token = self.sessions:encode(su.session),
 	}))
 end
 
@@ -142,11 +142,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function AuthResource:logout(req, res, ctx)
-	if not ctx.session then
-		res.status = 400
-		return
-	end
-
 	self.users:logout(ctx.session_user, ctx.session.id)
 	self.sessions:set(res.headers, {})
 
@@ -214,7 +209,7 @@ function AuthResource:register(req, res, ctx)
 		return
 	end
 
-	self.sessions:set(res.headers, {id = su.session.id})
+	self.sessions:set(res.headers, su.session)
 
 	res.status = 302
 	res.headers:set("Location", "/")

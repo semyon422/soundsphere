@@ -4,9 +4,9 @@ local class = require("class")
 ---@operator call: sea.ClientRemote
 local ClientRemote = class()
 
----@param game sphere.GameplayController
-function ClientRemote:new(game)
-	self.compute_data_provider = game.cacheModel.computeDataProvider
+---@param cacheModel sphere.CacheModel
+function ClientRemote:new(cacheModel)
+	self.compute_data_provider = cacheModel.computeDataProvider
 end
 
 return ClientRemote

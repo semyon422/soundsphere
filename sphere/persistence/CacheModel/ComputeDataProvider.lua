@@ -8,12 +8,12 @@ local types = require("sea.shared.types")
 local ComputeDataProvider = IComputeDataProvider + {}
 
 ---@param chartfilesRepo sphere.ChartfilesRepo
----@param chartplaysRepo sphere.ChartplaysRepo
+---@param chartsRepo sea.ChartsRepo
 ---@param locationsRepo sphere.LocationsRepo
 ---@param locationManager sphere.LocationManager
-function ComputeDataProvider:new(chartfilesRepo, chartplaysRepo, locationsRepo, locationManager)
+function ComputeDataProvider:new(chartfilesRepo, chartsRepo, locationsRepo, locationManager)
 	self.chartfilesRepo = chartfilesRepo
-	self.chartplaysRepo = chartplaysRepo
+	self.chartsRepo = chartsRepo
 	self.locationsRepo = locationsRepo
 	self.locationManager = locationManager
 end
@@ -67,7 +67,7 @@ function ComputeDataProvider:getReplayData(replay_hash)
 		return nil, "invalid hash"
 	end
 
-	local chartplay = self.chartplaysRepo:getChartplayByReplayHash(replay_hash)
+	local chartplay = self.chartsRepo:getChartplayByReplayHash(replay_hash)
 	if not chartplay then
 		return nil, "chartplay not found"
 	end

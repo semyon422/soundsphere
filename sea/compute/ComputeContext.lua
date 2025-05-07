@@ -6,6 +6,7 @@ local DifficultyModel = require("sphere.models.DifficultyModel")
 local ModifierModel = require("sphere.models.ModifierModel")
 local Chartdiff = require("sea.chart.Chartdiff")
 local ColumnsOrder = require("sea.chart.ColumnsOrder")
+local ModifiersMetaState = require("sea.compute.ModifiersMetaState")
 local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local Note = require("ncdk2.notes.Note")
@@ -51,26 +52,62 @@ function ComputeContext:toAbsolute()
 end
 
 ---@param replayBase sea.ReplayBase
+---@param inputMode ncdk.InputMode?
+---@return ncdk2.Chart?
+---@return sea.Chartmeta?
+function ComputeContext:applyModifierReorder(replayBase, inputMode)
+	if not inputMode then
+		local chart = assert(self.chart)
+		inputMode = chart.inputMode
+	end
+
+	local state = ModifiersMetaState(inputMode)
+	ModifierModel:applyMeta(replayBase.modifiers, state)
+
+	local modifiers = table_util.copy(replayBase.modifiers)
+	for i = #modifiers, #modifiers - state.reorders + 1, -1 do
+		table.remove(modifiers, i)
+	end
+	replayBase.modifiers = modifiers
+
+	local co = ColumnsOrder(state.inputMode)
+	co:apply(state.columns_order.map)
+	co:apply(ColumnsOrder(state.inputMode, replayBase.columns_order).map)
+
+	replayBase.columns_order = co:export()
+end
+
+---@param chart ncdk2.Chart
+---@param rate number
+---@return sea.Chartdiff
+function ComputeContext:computeChartdiff(chart, rate)
+	local chartdiff = {
+		mode = "mania",
+		rate = rate,
+		inputmode = tostring(chart.inputMode),
+	}
+	setmetatable(chartdiff, Chartdiff)
+	---@cast chartdiff sea.Chartdiff
+	self.difficultyModel:compute(chartdiff, chart, rate)
+
+	return chartdiff
+end
+
+---@param replayBase sea.ReplayBase
 ---@return sea.Chartdiff
 ---@return table
 function ComputeContext:computeBase(replayBase)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
 
-	local state = {}
-	state.inputMode = InputMode(chart.inputMode)
+	local state = ModifiersMetaState(chart.inputMode)
 
 	ModifierModel:applyMeta(replayBase.modifiers, state)
 	ModifierModel:apply(replayBase.modifiers, chart)
 
-	local chartdiff = {
-		mode = "mania",
-		rate = replayBase.rate,
-		inputmode = tostring(chart.inputMode),
-	}
-	setmetatable(chartdiff, Chartdiff)
-	---@cast chartdiff sea.Chartdiff
-	self.difficultyModel:compute(chartdiff, chart, replayBase.rate)
+	assert(state.reorders == 0, "ending reorder modifiers")
+
+	local chartdiff = self:computeChartdiff(chart, replayBase.rate)
 
 	chartdiff.modifiers = replayBase.modifiers
 	chartdiff.hash = chartmeta.hash

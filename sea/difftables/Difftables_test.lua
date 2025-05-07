@@ -2,7 +2,7 @@ local Difftables = require("sea.difftables.Difftables")
 local Difftable = require("sea.difftables.Difftable")
 local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local User = require("sea.access.User")
 

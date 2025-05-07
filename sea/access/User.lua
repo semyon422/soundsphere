@@ -46,4 +46,9 @@ function User:hasRole(role, time, exact)
 	return Roles:hasRole(roles, role, exact)
 end
 
+---@return boolean
+function User:isAnon()
+	return not self.id
+end
+
 return User

@@ -33,6 +33,7 @@ local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 
 local PackageManager = require("sphere.pkg.PackageManager")
 local SeaClient = require("sphere.online.SeaClient")
+local ClientRemote = require("sea.app.remotes.ClientRemote")
 
 local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
@@ -48,7 +49,10 @@ function GameController:new()
 	self.app = App(self.persistence)
 	self.uiModel = UserInterfaceModel(self)
 
-	self.onlineModel = OnlineModel(self.persistence.configModel)
+	self.client_remote = ClientRemote(self.persistence.cacheModel)
+	self.seaClient = SeaClient(self.client_remote)
+
+	self.onlineModel = OnlineModel(self.persistence.configModel, self.seaClient)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel, self.packageManager)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.resourceModel = ResourceModel(
@@ -105,8 +109,6 @@ function GameController:new()
 	self.notificationModel = NotificationModel()
 	self.previewModel = PreviewModel(self.persistence.configModel)
 	self.chartPreviewModel = ChartPreviewModel(self.persistence.configModel, self.previewModel, self)
-
-	self.seaClient = SeaClient(self)
 
 	self.selectController = SelectController(
 		self.selectModel,
@@ -193,20 +195,21 @@ function GameController:load()
 	self.replayBase:importReplayBase(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
-	self.onlineModel:load()
+	self.seaClient:load(self.persistence.configModel.configs.urls.websocket, function()
+		self.onlineModel:load()
+		self.onlineModel.authManager:checkSession()
+	end)
+
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
 	self.selectModel:load()
 
 	self.multiplayerController:load()
 
-	self.onlineModel.authManager:checkSession()
 	self.multiplayerModel:connect()
 
 	self.backgroundModel:load()
 	self.previewModel:load()
-
-	self.seaClient:load(self.persistence.configModel.configs.urls.websocket)
 end
 
 function GameController:unload()

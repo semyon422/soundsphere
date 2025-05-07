@@ -1,5 +1,6 @@
 local class = require("class")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
+local SqliteMigrator = require("rdb.db.SqliteMigrator")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
@@ -20,6 +21,8 @@ function GameDatabase:new(migrations)
 	local _models = autoload("sphere.persistence.CacheModel.models")
 	self.orm = TableOrm(db)
 	self.models = Models(_models, self.orm)
+
+	self.migrator = SqliteMigrator(db)
 end
 
 function GameDatabase:load()
@@ -29,7 +32,7 @@ function GameDatabase:load()
 	db:open("userdata/data.db")
 	db:exec("PRAGMA foreign_keys = ON;")
 
-	local ver = orm:user_version()
+	local ver = db:user_version()
 
 	if ver == 0 then
 		local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
@@ -51,7 +54,7 @@ function GameDatabase:unload()
 end
 
 function GameDatabase:migrate()
-	local count = self.orm:migrate(user_version, self.migrations)
+	local count = self.migrator:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
 	end

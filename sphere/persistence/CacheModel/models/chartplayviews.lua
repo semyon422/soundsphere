@@ -5,6 +5,7 @@ local RateType = require("sea.chart.RateType")
 local ChartFormat = require("sea.chart.ChartFormat")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
+local Gamemode = require("sea.chart.Gamemode")
 
 local chartplayviews = {}
 
@@ -19,6 +20,7 @@ chartplayviews.types = {
 	format = ChartFormat,
 	timings = Timings,
 	healths = Healths,
+	mode = chartdiffs.types.mode,
 }
 
 chartplayviews.relations = {}

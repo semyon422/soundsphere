@@ -30,8 +30,6 @@ local ChartplayResource = require("sea.chart.http.ChartplayResource")
 
 local WebsocketResource = require("sea.shared.http.WebsocketResource")
 
-local ServerRemote = require("sea.app.remotes.ServerRemote")
-
 ---@class sea.Resources
 ---@operator call: sea.Resources
 local Resources = class()
@@ -50,7 +48,7 @@ function Resources:new(domain, server_remote, views, sessions)
 	self.auth = AuthResource(sessions, domain.users, views)
 
 	self.users = UsersResource(domain.users, views)
-	self.user = UserResource(domain.users, views)
+	self.user = UserResource(domain.users, domain.leaderboards, views)
 
 	self.rankings = RankingsResource(views)
 

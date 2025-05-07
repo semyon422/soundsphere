@@ -218,7 +218,7 @@ local function ScoreCells(self)
 		score = scoreItem.score or 0
 		difficulty = scoreItem.difficulty or 0
 		accuracy = scoreItem.accuracy or 0
-		missCount = scoreItem.miss or 0
+		missCount = scoreItem.miss_count or 0
 		rate = scoreItem.rate or 1
 		const = scoreItem.const or false
 		if score ~= score then

@@ -211,6 +211,8 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`allow_free_healths` INTEGER,
 	`timings` INTEGER,
 	`healths` INTEGER,
+	`starts_at` INTEGER,
+	`ends_at` INTEGER,
 	`mode` INTEGER,
 	`rate` BLOB,
 	`difftables` BLOB,
@@ -278,37 +280,3 @@ CREATE TABLE IF NOT EXISTS `team_users` (
 	`created_at` INTEGER,
 	UNIQUE(`team_id`, `user_id`)
 );
-
-CREATE TEMP VIEW IF NOT EXISTS `chartplayviews` AS
-SELECT
-chartplays.id AS chartplay_id,
-chartdiffs.id AS chartdiff_id,
-chartmetas.id AS chartmeta_id,
-difftable_chartmetas.difftable_id AS difftable_id,
-difftable_chartmetas.level AS difftable_level,
-chartmetas.level AS chartmeta_level,
-chartmetas.timings AS chartmeta_timings,
-chartmetas.healths AS chartmeta_healths,
-chartmetas.inputmode AS chartmeta_inputmode,
-chartdiffs.inputmode AS chartdiff_inputmode,
-chartdiffs.notes_count,
-chartplays.*
-FROM chartplays
-LEFT JOIN chartmetas ON
-chartmetas.hash = chartplays.hash
-LEFT JOIN chartdiffs ON
-chartdiffs.hash = chartplays.hash AND
-chartdiffs.`index` = chartplays.`index` AND
-chartdiffs.mode = chartplays.mode AND
-chartdiffs.modifiers = chartplays.modifiers AND
-chartdiffs.rate = chartplays.rate
-LEFT JOIN difftable_chartmetas ON
-difftable_chartmetas.hash = chartplays.hash
-;
-
-CREATE TEMP VIEW IF NOT EXISTS `leaderboard_users_ranked` AS
-SELECT
-ROW_NUMBER() OVER (PARTITION BY leaderboard_id ORDER BY total_rating DESC) row_number,
-leaderboard_users.*
-FROM leaderboard_users
-;

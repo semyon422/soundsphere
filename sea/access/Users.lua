@@ -4,6 +4,7 @@ local User = require("sea.access.User")
 local UserInsecure = require("sea.access.UserInsecure")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
+local SessionInsecure = require("sea.access.SessionInsecure")
 
 ---@class sea.Users
 ---@operator call: sea.Users
@@ -19,9 +20,6 @@ function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
 	self.users_access = UsersAccess()
-
-	self.anon_user = User()
-	self.anon_user.id = 0
 end
 
 ---@return sea.User[]
@@ -32,13 +30,12 @@ end
 ---@param id integer?
 ---@return sea.User
 function Users:getUser(id)
-	local anon_user = self.anon_user
 	if not id then
-		return anon_user
+		return User()
 	end
 	local user = self.users_repo:getUser(id)
 	if not user then
-		return anon_user
+		return User()
 	end
 	return user
 end
@@ -86,7 +83,7 @@ function Users:register(_, ip, time, user_values)
 
 	user = self.users_repo:createUser(user)
 
-	local session = Session()
+	local session = SessionInsecure()
 	session.user_id = user.id
 	session.active = true
 	session.ip = ip
@@ -131,7 +128,7 @@ function Users:login(_, ip, time, user_values)
 
 	user = user:hideCredentials()
 
-	local session = Session()
+	local session = SessionInsecure()
 	session.active = true
 	session.created_at = time
 	session.user_id = user.id
@@ -206,10 +203,52 @@ function Users:ban(user, time, target_user_id)
 	return target_user
 end
 
----@param id integer
+---@param id integer?
 ---@return sea.Session?
 function Users:getSession(id)
-	return self.users_repo:getSession(id)
+	if not id then
+		return Session()
+	end
+	local session = self.users_repo:getSession(id)
+	if not session then
+		return Session()
+	end
+	return session
+end
+
+---@param req_session sea.Session
+---@return sea.Session?
+function Users:checkSession(req_session)
+	local session = self:getSession(req_session.id)
+	if not session or not session.active then
+		return
+	end
+
+	if session.updated_at ~= req_session.updated_at then
+		session.active = false
+		self.users_repo:updateSession(session)
+		return
+	end
+
+	return session
+end
+
+---@param user sea.User
+---@param session sea.Session
+---@return sea.Session?
+function Users:updateSession(user, session)
+	if user:isAnon() then
+		return
+	end
+
+	if session.user_id ~= user.id then
+		return
+	end
+
+	session.updated_at = os.time()
+	session = self.users_repo:updateSession(session)
+
+	return session
 end
 
 return Users

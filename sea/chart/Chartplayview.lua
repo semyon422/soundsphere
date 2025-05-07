@@ -13,6 +13,8 @@ local Chartplay = require("sea.chart.Chartplay")
 ---@field chartmeta_inputmode string
 ---@field chartdiff_inputmode string
 ---@field notes_count integer
+---@field chartdiff sea.Chartdiff?
+---@field chartmeta sea.Chartmeta?
 local Chartplayview = Chartplay + {}
 
 return Chartplayview

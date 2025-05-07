@@ -33,6 +33,8 @@ local Gamemode = require("sea.chart.Gamemode")
 ---@field allow_free_healths boolean
 ---@field timings sea.Timings?
 ---@field healths sea.Healths?
+---@field starts_at integer?
+---@field ends_at integer?
 ---@field mode sea.Gamemode
 ---@field rate "any"|number[]|{min: number, max: number} any, values, range
 ---@field chartmeta_inputmode string[] allowed inputmodes, empty = allow all
@@ -84,7 +86,7 @@ local function is_valid_rate(rate)
 	return true
 end
 
-local validate_leaderboard = valid.struct({
+Leaderboard.struct = {
 	name = types.name,
 	description = types.description,
 	rating_calc = types.new_enum(RatingCalc),
@@ -103,12 +105,16 @@ local validate_leaderboard = valid.struct({
 	allow_free_healths = types.boolean,
 	timings = valid.optional(chart_types.timings),
 	healths = valid.optional(chart_types.healths),
+	starts_at = valid.optional(types.time),
+	ends_at = valid.optional(types.time),
 	rate = is_valid_rate,
 	mode = types.new_enum(Gamemode),
 	chartmeta_inputmode = valid.array(types.name, 10),
 	chartdiff_inputmode = valid.array(types.name, 10),
 	leaderboard_difftables = valid.array(valid.struct({difftable_id = types.index}), 10),
-})
+}
+
+local validate_leaderboard = valid.struct(Leaderboard.struct)
 
 ---@return true?
 ---@return string[]?

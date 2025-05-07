@@ -7,80 +7,37 @@ local inspect = require("inspect")
 ---@field config table
 local AuthManager = class()
 
----@param webApi sphere.WebApi
-function AuthManager:new(webApi)
-	self.webApi = webApi
+---@param sea_client sphere.SeaClient
+function AuthManager:new(sea_client)
+	self.sea_client = sea_client
 end
 
 function AuthManager:checkUserAsync()
-	local webApi = self.webApi
-	local api = webApi.api
-	local config = self.config
-
-	webApi.token = config.token
-	if not config.session.user_id then
-		return
-	end
-
-	print("GET " .. api.users[config.session.user_id])
-	local user = api.users[config.session.user_id]:get()
-	config.user = user or {}
+	print("check user")
+	local server_remote = self.sea_client.remote
+	self.config.user = server_remote:getUser()
+	print("user", inspect(self.config.user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 
 function AuthManager:checkSessionAsync()
-	local webApi = self.webApi
-	local api = webApi.api
+	print("check session")
+
+	local server_remote = self.sea_client.remote
 	local config = self.config
 
-	webApi.token = config.token
-
-	print("check session")
-	print("GET " .. api.auth.check)
-	local response, code, headers = api.auth.check:_get()
-	if not response then
-		print(code, headers)
+	local ok = server_remote.auth:loginSession(config.session)
+	if not ok then
+		print("invalid session")
 		return
 	end
-	print(inspect(response))
-	config.session = response.session or {}
-	if not config.session.active then
-		config.session = {}
-		config.token = ""
-	end
+
+	self.config.session = server_remote:getSession()
+	print("session", inspect(self.config.session))
 
 	self:checkUserAsync()
 end
 AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
-
-function AuthManager:updateSessionAsync()
-	local webApi = self.webApi
-	local api = webApi.api
-	local config = self.config
-
-	webApi.token = config.token
-
-	print("update session")
-	print("POST " .. api.auth.update)
-	local response, code, headers = api.auth.update:_post()
-	if not response then
-		print(code, headers)
-		return
-	end
-
-	if code ~= 200 then
-		print(code, response.message)
-		return
-	end
-
-	config.session = response.session
-	config.token = response.token
-
-	print("updated")
-
-	self:checkUserAsync()
-end
-AuthManager.updateSession = thread.coro(AuthManager.updateSessionAsync)
 
 function AuthManager:quickGetKeyAsync()
 	local api = self.webApi.api
@@ -147,49 +104,33 @@ end
 ---@param password string
 function AuthManager:loginAsync(email, password)
 	print("login")
-	local api = self.webApi.api.v2.auth
+
+	local server_remote = self.sea_client.remote
 	local config = self.config
 
-	print("POST " .. api.login)
-	local response, code, headers = api.login:post({
-		email = email,
-		password = password,
-	})
-	if not response then
-		print(code, headers)
+	local ret, err = server_remote.auth:login(email, password)
+	if not ret then
+		print(err)
 		return
 	end
 
-	if code ~= 200 then
-		print(code)
-		return
-	end
-
-	if not response.token then
-		print(table.concat(response.errors, ", "))
-		return
-	end
-
-	config.token = response.token
-	config.session = response.session
-
-	self:checkUserAsync()
+	config.session = ret.session
+	config.user = ret.user
+	config.token = ret.token
 end
 AuthManager.login = thread.coro(AuthManager.loginAsync)
 
 function AuthManager:logoutAsync()
-	local webApi = self.webApi
-	local api = webApi.api
+	print("logout")
+
+	local server_remote = self.sea_client.remote
 	local config = self.config
+
+	server_remote.auth:logout()
 
 	config.session = {}
 	config.user = {}
 	config.token = ""
-
-	webApi.token = config.token
-
-	print("POST " .. api.auth.logout)
-	api.auth.update:post()
 end
 AuthManager.logout = thread.coro(AuthManager.logoutAsync)
 
