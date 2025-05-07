@@ -9,6 +9,11 @@ function IUsersRepo:getUsers()
 	return {}
 end
 
+---@return sea.UserInsecure[]
+function IUsersRepo:getUsersInsecure()
+	return {}
+end
+
 ---@param id integer
 ---@return sea.User?
 function IUsersRepo:getUser(id)
@@ -53,6 +58,12 @@ end
 --------------------------------------------------------------------------------
 
 ---@param user_id integer
+---@return sea.UserRole[]
+function IUsersRepo:getUserRoles(user_id)
+	return {}
+end
+
+---@param user_id integer
 ---@param role sea.Role
 ---@return sea.UserRole?
 function IUsersRepo:getUserRole(user_id, role)
@@ -78,6 +89,24 @@ function IUsersRepo:deleteUserRole(user_role)
 end
 
 --------------------------------------------------------------------------------
+
+---@param user_id integer
+---@return sea.Session[]
+function IUsersRepo:getSessions(user_id)
+	return {}
+end
+
+---@param user_id integer
+---@return sea.Session[]
+function IUsersRepo:getSessionsInsecure(user_id)
+	return {}
+end
+
+---@param user_id integer
+---@return sea.UserLocation[]
+function IUsersRepo:getUserLocations(user_id)
+	return {}
+end
 
 ---@param user_id integer
 ---@param ip string
