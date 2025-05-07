@@ -1,5 +1,5 @@
 <div class="is-hidden-mobile" style="position:relative;">
-	<div class="user__banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+	<div class="page-banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
 </div>
 
 <main class="container">
@@ -17,7 +17,7 @@
 								<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
 							</div>
 							<h3 class="is-5" align="center"><%= page:formatRole() %></h3>
-							<div class="user__separator"></div>
+							<div class="separator"></div>
 						</div>
 						<div class="block" x-data="{ discord: '<%= user.discord %>' }">
 							<%
@@ -118,7 +118,7 @@
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
-				<div class="user__banner-box is-hidden-mobile"></div>
+				<div class="page-banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<nav class="level">
 						<%
@@ -169,18 +169,19 @@
 					</table>
 				</div>
 				<div class="block">
-					<% local can_update = page:canUpdate() %>
 					<% if user.description ~= "" or can_update then %>
-						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="border-box">
-							<% if can_update and (user.description == "" and not edit_description) then %>
-								<p align="center">Click edit to change your profile description!<p>
-								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
-							<% elseif can_update and edit_description then %>
+							<% if not edit_description and user.description == "" then %>
+								<p align="center">Click edit to change profile description!<p>
+							<% end %>
+
+							<% if user.description ~= "" or edit_description then %>
 								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
+									<div class="description-container" id="editorContainer"></div>
 								</div>
+							<% end %>
+
+							<% if edit_description then %>
 								<div class="columns">
 									<div class="column">
 										<a class="button"" id="saveButton">Save</a>
@@ -189,48 +190,22 @@
 										<p class="has-text-danger" id="descriptionStatus"></p>
 									</div>
 								</div>
-							<% else %>
-								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
-								</div>
+							<% end %>
+
+							<% if can_update and not edit_description then %>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
 							<% end %>
 						</div>
-						<script src="/static/scripts/user_resource.js?v=<%= version %>"></script>
 						<script>
 							var quill = addQuillToElement(
 								document.getElementById("editorContainer"),
-								"<%- user.description %>",
+								document.getElementById("saveButton"),
+								document.getElementById("descriptionStatus"),
+								"/users/<%= user.id %>",
+								"/users/<%= user.id %>/update_description",
+								String.raw`<%- user.description %>`,
 								<%= edit_description %>
 							)
-
-							var can_upload = true
-
-							if (<%= edit_description %>) {
-								const save_button = document.getElementById("saveButton")
-								const status_text = document.getElementById("descriptionStatus")
-								const user_id = <%= user.id %>
-								const on_click = function() {
-									can_upload = false
-									status_text.innerText = "Saving..."
-
-									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
-										status_text.innerText = err
-										can_upload = true
-
-										setTimeout(function() {
-											status_text.innerText = ""
-										}, "3000")
-
-										if (success) {
-											// Opening the link in the same tab
-											can_upload = false
-											window.open(`/users/${user_id}`, "_self")
-										}
-									})
-								}
-
-								save_button.addEventListener("click", on_click)
-							}
 						</script>
 					<% end %>
 				</div>

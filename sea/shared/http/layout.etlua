@@ -10,11 +10,15 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@95,100..900&display=swap" rel="stylesheet">
+		<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 		<script src="https://unpkg.com/htmx.org@2.0.0"></script>
 		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<script src="https://kit.fontawesome.com/dbaf22a3a8.js?v=1.0"></script>
 		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
 		<% if is_captcha_enabled then %>
 			<script src="https://www.google.com/recaptcha/api.js"></script>
 		<% end %>
@@ -47,6 +51,29 @@
 				html.setAttribute("data-theme", theme);
 			}
 			setTheme()
+
+			// Default params for sweetalert
+			var sweet_alert_params = {
+				animation: false,
+				customClass: {
+					confirmButton: "button is-danger",
+					denyButton: "button",
+				}
+			}
+
+			document.addEventListener("htmx:responseError", (event) => {
+				Swal.fire({
+					...sweet_alert_params,
+					title: "Server Error",
+					confirmButtonText: "Reload page",
+					width: "70em",
+					html: "<div align='left'>" + event.detail.xhr.responseText + "</div>",
+				}).then((result) => {
+					if (result.isConfirmed) {
+						window.location.reload();
+					}
+				})
+			})
 		</script>
 	</body>
 </html>

@@ -40,6 +40,13 @@ end
 
 --------------------------------------------------------------------------------
 
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function TeamsRepo:preloadUsers(team_users)
+	self.models.team_users:preload(team_users, "user")
+	return team_users
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function TeamsRepo:getTeamUsers(team_id)

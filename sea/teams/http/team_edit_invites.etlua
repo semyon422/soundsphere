@@ -1,0 +1,55 @@
+<div class="block">
+	<div class="border-box">
+		<div class="block">
+			<div class="content">
+				<h2>Invite a person</h2>
+				<p>After you send an invitation, give the person a link to your team page and they can join.<p>
+			</div>
+		</div>
+		<form action="/teams/<%= path_params.team_id %>/invite_user" method="post">
+			<div class="field">
+				<label class="label">Username</label>
+				<div class="control has-icons-left">
+					<input class="input" type="text" placeholder="Enter username here" name="username">
+					<span class="icon is-small is-left">
+						<i class="fas fa-user"></i>
+					</span>
+					<% if invitation_error then %>
+						<p class="help is-danger"><%= invitation_error %></p>
+					<% end %>
+					<% if invitation_success then %>
+						<p class="help is-success"><%= invitation_success %></p>
+					<% end %>
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">Invite</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="block">
+	<% if invite_users and #invite_users > 0 then %>
+		<table class="ranking-table">
+			<tbody>
+				<% for _, v in ipairs(invite_users) do %>
+					<tr>
+						<td align="left" class="ranking-table__main-cell">
+							<a href="/users/<%= v.user.id %>" class="is-size-4"><%= v.user.name %></a>
+						</td>
+						<td>
+							<button
+								hx-post="/teams/<%= team.id %>/revoke_join_invite/<%= v.user.id %>"
+								hx-target="body"
+								class="button">
+								Cancel invitation
+							</button>
+						</td>
+					</tr>
+				<% end %>
+			</tbody>
+		</table>
+	<% end %>
+</div>

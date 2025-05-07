@@ -90,19 +90,25 @@ end
 ---@return sea.TeamUser?
 ---@return string?
 function Teams:join(user, team)
-	local can, err = self.teams_access:canJoin(user, team)
+	local can = self.teams_access:canJoin(user, team)
 	if not can then
-		return nil, err
+		return nil, "can't join"
 	end
 
 	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+
 	if team_user then
 		if team_user.is_accepted then
 			return nil, "already joined"
 		end
-		team_user.is_accepted = true
-		team_user = self.teams_repo:updateTeamUser(team_user)
-		return team_user
+
+		if team.type == "open" then
+			team_user.is_accepted = true
+			team_user = self.teams_repo:updateTeamUser(team_user)
+			return team_user
+		end
+
+		return nil, "already sent join request"
 	end
 
 	team_user = TeamUser()
@@ -119,16 +125,77 @@ end
 
 ---@param user sea.User
 ---@param team sea.Team
----@param user_id integer
+---@return sea.TeamUser?
+---@return string? error
+function Teams:leave(user, team)
+	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+	if not team_user then
+		return nil, "not in a team"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
+	end
+
+	if team_user.user_id == team.owner_id then
+		return nil, "owner can't leave"
+	end
+
+	team_user = self.teams_repo:deleteTeamUser(team_user)
+	return team_user
+end
+
+---@param user sea.User
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser[]?
 ---@return string?
-function Teams:acceptJoinRequest(user, team, user_id)
+function Teams:kickUser(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	if team.owner_id == target_user_id then
+		return nil, "can't kick owner"
+	end
+
 	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
 		return nil, err
 	end
 
-	local team_user = self.teams_repo:getTeamUser(team.id, user_id)
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
+	if not team_user then
+		return nil, "team user not found"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
+	end
+
+	return self.teams_repo:deleteTeamUser(team_user)
+end
+
+---@param user sea.User
+---@param team_id integer
+---@param target_user_id integer
+---@return sea.TeamUser[]?
+---@return string?
+function Teams:acceptJoinRequest(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing request"
 	end
@@ -191,17 +258,23 @@ function Teams:acceptJoinInvite(user, team)
 end
 
 ---@param user sea.User
----@param team sea.Team
----@param user_id integer
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser?
 ---@return string?
-function Teams:revokeJoinInvite(user, team, user_id)
+function Teams:revokeJoinInvite(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
 	local can, err = self.teams_access:canUpdate(user, team)
 	if not can then
 		return nil, err
 	end
 
-	local team_user = self.teams_repo:getTeamUser(team.id, user_id)
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing invite"
 	end
@@ -220,11 +293,24 @@ function Teams:revokeJoinInvite(user, team, user_id)
 end
 
 ---@param user sea.User
----@param team sea.Team
+---@param team_id integer
+---@param target_user_id integer
 ---@return sea.TeamUser?
 ---@return string?
-function Teams:revokeJoinRequest(user, team)
-	local team_user = self.teams_repo:getTeamUser(team.id, user.id)
+function Teams:revokeJoinRequest(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	-- Owners can revoke, and people can revoke their own requests
+	if not can and user.id ~= target_user_id then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
 	if not team_user then
 		return nil, "missing request"
 	end
@@ -240,6 +326,54 @@ function Teams:revokeJoinRequest(user, team)
 	team_user = self.teams_repo:deleteTeamUser(team_user)
 
 	return team_user
+end
+
+---@param user sea.User
+---@param team_id integer
+---@param target_user_id integer
+---@return sea.Team?
+---@return string?
+function Teams:transferOwner(user, team_id, target_user_id)
+	local team = self.teams_repo:getTeam(team_id)
+
+	if user.id == target_user_id then
+		return nil, "can't transfer to self"
+	end
+
+	if not team then
+		return nil, "team not found"
+	end
+
+	local can, err = self.teams_access:canUpdate(user, team)
+	if not can then
+		return nil, err
+	end
+
+	local team_user = self.teams_repo:getTeamUser(team.id, target_user_id)
+	if not team_user then
+		return nil, "team user not found"
+	end
+
+	if not team_user.is_accepted then
+		return nil, "team user is not accepted"
+	end
+
+	team.owner_id = team_user.user_id
+	return self.teams_repo:updateTeam(team)
+end
+
+
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function Teams:preloadUsers(team_users)
+	return self.teams_repo:preloadUsers(team_users)
+end
+
+---@param user sea.User
+---@param team sea.Team
+---@return sea.TeamUser?
+function Teams:getTeamUser(user, team)
+	return self.teams_repo:getTeamUser(team.id, user.id)
 end
 
 ---@param team_id integer
@@ -284,6 +418,13 @@ end
 ---@return string?
 function Teams:getUserUnacceptedTeamUsers(user)
 	return self.teams_repo:getUserUnacceptedTeamUsers(user.id)
+end
+
+---@param user sea.User
+---@param team sea.Team
+---@return boolean
+function Teams:canUpdate(user, team)
+	return self.teams_access:canUpdate(user, team)
 end
 
 return Teams

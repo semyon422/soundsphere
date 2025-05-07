@@ -11,7 +11,7 @@ UserResource.routes = {
 	{"/users/:user_id", {
 		GET = "getUser",
 	}},
-	{"/users/:user_id/edit_description", {
+	{"/users/:user_id/update_description", {
 		POST = "updateDescription",
 	}},
 	{"/users/:user_id/sessions", {
@@ -106,6 +106,7 @@ function UserResource:getUser(req, res, ctx)
 
 	ctx.page = page
 	ctx.user = user
+
 	ctx.ignore_main_container = true
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()

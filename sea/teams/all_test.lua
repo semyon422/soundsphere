@@ -167,7 +167,7 @@ function test.join_request(t)
 	t:eq(#teams:getUserAcceptedTeamUsers(new_user.id), 0)
 	t:eq(#teams:getUserUnacceptedTeamUsers(new_user), 1)
 
-	t:assert(teams:acceptJoinRequest(ctx.user, team, new_user.id))
+	t:assert(teams:acceptJoinRequest(ctx.user, team.id, new_user.id))
 
 	t:eq(#teams:getUserAcceptedTeamUsers(new_user.id), 1)
 	t:eq(#teams:getUserUnacceptedTeamUsers(new_user), 0)
@@ -175,6 +175,29 @@ function test.join_request(t)
 	t:eq(#teams:getTeamUsers(team.id), 2)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
 	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+end
+
+---@param t testing.T
+function test.join_double_request(t)
+	local ctx = create_test_ctx()
+	local teams = ctx.teams
+
+	local team = Team()
+	team.type = "request"
+	team = teams:update(ctx.user, team)
+	---@cast team -?
+
+	local new_user = User()
+	new_user.id = 2
+	t:assert(teams:join(new_user, team))
+	t:tdeq({teams:join(new_user, team)}, { nil, "already sent join request" })
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:eq(#teams:getUserAcceptedTeamUsers(new_user.id), 0)
+	t:eq(#teams:getUserUnacceptedTeamUsers(new_user), 1)
 end
 
 ---@param t testing.T
@@ -195,8 +218,8 @@ function test.join_request_revoke(t)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
 	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
 
-	t:tdeq({teams:revokeJoinInvite(ctx.user, team, new_user.id)}, {nil, "is not invitation"})
-	t:assert(teams:revokeJoinRequest(new_user, team))
+	t:tdeq({teams:revokeJoinInvite(ctx.user, team.id, new_user.id)}, {nil, "is not invitation"})
+	t:assert(teams:revokeJoinRequest(new_user, team.id, new_user.id))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
@@ -260,12 +283,97 @@ function test.join_invite_revoke(t)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
 	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 1)
 
-	t:tdeq({teams:revokeJoinRequest(new_user, team)}, {nil, "is not request"})
-	t:assert(teams:revokeJoinInvite(ctx.user, team, new_user.id))
+	t:tdeq({teams:revokeJoinRequest(new_user, team.id, new_user.id)}, {nil, "is not request"})
+	t:assert(teams:revokeJoinInvite(ctx.user, team.id, new_user.id))
 
 	t:eq(#teams:getTeamUsers(team.id), 1)
 	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
 	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+end
+
+--------------------------------------------------------------------------------
+--- leaving
+--------------------------------------------------------------------------------
+
+---@param t testing.T
+function test.leave(t)
+	local ctx = create_test_ctx()
+	local teams = ctx.teams
+
+	local team = Team()
+	team.type = "open"
+	team = teams:update(ctx.user, team)
+	---@cast team -?
+
+	local new_user = User()
+	new_user.id = 2
+
+	t:assert(teams:join(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 2)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:assert(teams:leave(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	team.type = "request"
+	team = teams:update(ctx.user, team)
+	---@cast team -?
+
+	t:assert(teams:join(new_user, team))
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	t:tdeq({teams:leave(new_user, team)}, {nil, "team user is not accepted"})
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 1)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+
+	teams:revokeJoinRequest(new_user, team.id, new_user.id)
+
+	t:eq(#teams:getTeamUsers(team.id), 1)
+	t:eq(#teams:getRequestTeamUsers(ctx.user, team), 0)
+	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
+end
+
+---@param t testing.T
+function test.transferOwner(t)
+	local ctx = create_test_ctx()
+	local teams = ctx.teams
+
+	local team = Team()
+	team.type = "open"
+	team = teams:update(ctx.user, team)
+	---@cast team -?
+
+	local new_user = User()
+	new_user.id = 2
+
+	local random_user = User()
+	random_user.id = 3
+
+	t:tdeq({teams:transferOwner(new_user, team.id, new_user.id)}, {nil, "can't transfer to self"})
+	t:tdeq({teams:transferOwner(new_user, team.id, random_user.id)}, {nil, "not allowed"})
+	t:tdeq({teams:transferOwner(ctx.user, team.id, new_user.id)}, {nil, "team user not found"})
+
+	t:assert(teams:join(new_user, team))
+	t:assert(teams:join(random_user, team))
+
+	t:tdeq({teams:transferOwner(new_user, team.id, new_user.id)}, {nil, "can't transfer to self"})
+	t:tdeq({teams:transferOwner(new_user, team.id, random_user.id)}, {nil, "not allowed"})
+
+	team = teams:transferOwner(ctx.user, team.id, new_user.id)
+	---@cast team -?
+	t:eq(team.owner_id, new_user.id)
+
+	t:tdeq({teams:transferOwner(ctx.user, team.id, random_user.id)}, {nil, "not allowed"})
 end
 
 return test

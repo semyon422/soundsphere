@@ -40,6 +40,12 @@ function Users:getUser(id)
 	return user
 end
 
+---@param name string
+---@return sea.User?
+function Users:findUserByName(name)
+	return self.users_repo:findUserByName(name)
+end
+
 ---@param _ sea.User
 ---@param ip string
 ---@param time integer

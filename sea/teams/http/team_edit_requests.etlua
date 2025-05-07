@@ -1,0 +1,31 @@
+<% if not request_users or #request_users == 0 then %>
+	<p>Empty. No one sent a request to join.</p>
+<% else %>
+	<table class="ranking-table">
+		<tbody>
+			<% for _, v in ipairs(request_users) do %>
+				<tr>
+					<td align="left" class="ranking-table__main-cell">
+						<a href="/users/<%= v.user.id %>" class="is-size-4"><%= v.user.name %></a>
+					</td>
+					<td>
+						<button
+							hx-post="/teams/<%= team.id %>/accept_join_request/<%= v.user.id %>"
+							hx-target="body"
+							class="button">
+							Accept
+						</button>
+					</td>
+					<td>
+						<button
+							hx-post="/teams/<%= team.id %>/revoke_join_request/<%= v.user.id %>"
+							hx-target="body"
+							class="button">
+							Decline
+						</button>
+					</td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>

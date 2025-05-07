@@ -34,6 +34,12 @@ end
 
 --------------------------------------------------------------------------------
 
+---@param team_users sea.TeamUser[]
+---@return sea.TeamUser[]
+function ITeamsRepo:preloadUsers(team_users)
+	return team_users
+end
+
 ---@param team_id integer
 ---@return sea.TeamUser[]
 function ITeamsRepo:getTeamUsers(team_id)
