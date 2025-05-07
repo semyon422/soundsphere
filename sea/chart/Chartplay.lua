@@ -62,6 +62,9 @@ end
 ---@return number
 function Chartplay:getExScore()
 	local judges = self.judges
+	if #judges <= 1 then
+		return 0
+	end
 
 	local total = 0
 	for _, c in ipairs(judges) do

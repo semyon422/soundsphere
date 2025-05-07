@@ -109,7 +109,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.ignore_main_container = true
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
-	ctx.scores = page:getScores(ctx.leaderboard)
+	ctx.scores = page:getScores(ctx.leaderboard, user.id)
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end

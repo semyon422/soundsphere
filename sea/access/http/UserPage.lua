@@ -151,19 +151,22 @@ function UserPage:getGeneralStats()
 end
 
 ---@param lb sea.Leaderboard
+---@param user_id integer
 ---@return table
-function UserPage:getScores(lb)
-	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, self.sessionUser.id)
+function UserPage:getScores(lb, user_id)
+	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
 
 	local scores = {}
 
 	for i, cpv in ipairs(chartplayviews) do
+		local chartmeta = cpv.chartmeta
+		local chartdiff = cpv.chartdiff
 		scores[i] = {
-			artist = cpv.chartmeta.artist,
-			title = cpv.chartmeta.title,
-			name = cpv.chartmeta.name,
-			creator = cpv.chartmeta.creator,
-			timeRate = cpv.chartdiff.rate,
+			artist = chartmeta and chartmeta.artist or "?",
+			title = chartmeta and chartmeta.title or "?",
+			name = chartmeta and chartmeta.name or "?",
+			creator = chartmeta and chartmeta.creator or "?",
+			timeRate = chartdiff and chartdiff.rate or "?",
 			mods = ModifierModel:getString(cpv.modifiers),
 			accuracy = cpv.accuracy,
 			norm_accuracy = cpv:getNormAccuracy(),
