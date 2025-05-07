@@ -39,6 +39,9 @@
 			<% if settings_updated then %>
 				<p class="help is-success">Settings updated</p>
 			<% end %>
+			<% if settings_error then %>
+				<p class="help is-danger"><%= settings_error %></p>
+			<% end %>
 		</div>
 	</form>
 </div>

@@ -146,7 +146,7 @@
 
 						<% if can_manage then %>
 							<div class="block">
-								<a href="/teams/<%= team.id %>/update_settings" class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</a>
+								<a href="/teams/<%= team.id %>/edit/settings" class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</a>
 							</div>
 						<% end %>
 					</div>

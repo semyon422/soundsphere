@@ -19,10 +19,10 @@
 					end
 				%>
 				<ul class="menu-list">
-					<li><a href="<%= url %>update_settings" <%- addClass("settings") %>>Settings</a></li>
-					<li><a href="<%= url %>members" <%- addClass("members") %>>Members</a></li>
-					<li><a href="<%= url %>requests" <%- addClass("requests") %>>Incoming join requests</a></li>
-					<li><a href="<%= url %>invite_user" <%- addClass("invites") %>>Outgoing invitations</a></li>
+					<li><a href="<%= url %>edit/settings" <%- addClass("settings") %>>Settings</a></li>
+					<li><a href="<%= url %>edit/members" <%- addClass("members") %>>Members</a></li>
+					<li><a href="<%= url %>edit/requests" <%- addClass("requests") %>>Incoming join requests</a></li>
+					<li><a href="<%= url %>edit/invites" <%- addClass("invites") %>>Outgoing invitations</a></li>
 				</ul>
 			</p>
 		</aside>
