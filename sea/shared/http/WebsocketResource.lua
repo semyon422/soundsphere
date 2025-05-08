@@ -48,6 +48,7 @@ function WebsocketResource:server(req, res, ctx)
 	local peer = WebsocketPeer(ws)
 	local task_handler = TaskHandler(self.remote_handler)
 
+	ws.max_payload_len = 1e7
 	task_handler.timeout = 60
 
 	---@param msg icc.Message
