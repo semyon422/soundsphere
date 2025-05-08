@@ -118,7 +118,7 @@
 							]]):format(team.id)
 						%>
 
-						<% if session_user.id == 0 then %>
+						<% if session_user:isAnon() then %>
 							<% if team.type == "open" then %>
 								<p align="center">Login to join</p>
 							<% elseif team.type == "request" then %>
