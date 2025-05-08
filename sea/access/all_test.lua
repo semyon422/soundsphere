@@ -253,10 +253,10 @@ function test.ban(t)
 	t:assert(user.is_banned)
 
 	local _, err = users:ban(su.user, 0, su.user.id)
-	t:eq(err, "not_allowed")
+	t:eq(err, "not allowed")
 
 	local _, err = users:ban(su.user, 0, 3)
-	t:eq(err, "not_found")
+	t:eq(err, "not found")
 end
 
 return test
