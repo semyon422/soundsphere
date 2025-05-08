@@ -91,10 +91,21 @@ function createPreview() {
 	const hit_position = 690
 	const min_time = 1
 	const max_time = 0
-	var start_draw_index = 0
-	var current_note_index = 0
+	let start_draw_index = 0
+	let current_note_index = 0
+	let should_stop = false
+
+	document.addEventListener("htmx:beforeSwap", (event) => {
+		should_stop = true
+	})
+
+	let prev_time = start_time
 
 	function loop() {
+		if (should_stop) {
+			return
+		}
+
 		ctx.reset()
 
 		const theme = localStorage.getItem("theme")
