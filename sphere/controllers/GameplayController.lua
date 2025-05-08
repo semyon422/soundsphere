@@ -384,7 +384,7 @@ function GameplayController:saveScore()
 	local _chartplay = self.cacheModel.chartsRepo:createChartplay(chartplay)
 	self.computeContext.chartplay = _chartplay
 
-	coroutine.wrap(function()
+	local function submit()
 		if not self.seaClient.connected then
 			return
 		end
@@ -400,6 +400,13 @@ function GameplayController:saveScore()
 		print("got", ok, err)
 		if ok then
 			print(require("stbl").encode(ok))
+		end
+	end
+
+	coroutine.wrap(function()
+		local ok, err = xpcall(submit, debug.traceback)
+		if not ok then
+			print("submit error", err)
 		end
 	end)()
 
