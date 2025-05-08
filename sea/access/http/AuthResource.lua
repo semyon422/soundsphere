@@ -49,6 +49,7 @@ function AuthResource:getLogin(req, res, ctx)
 	ctx.recaptcha_site_key = self.recaptcha.site_key
 	ctx.is_login_captcha_enabled = self.is_login_captcha_enabled
 
+	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/login.etlua", ctx, true)
 end
 
@@ -156,6 +157,7 @@ function AuthResource:getRegister(req, res, ctx)
 	ctx.recaptcha_site_key = self.recaptcha.site_key
 	ctx.is_register_captcha_enabled = self.is_register_captcha_enabled
 
+	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/register.etlua", ctx, true)
 end
 

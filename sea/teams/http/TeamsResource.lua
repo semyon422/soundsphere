@@ -32,6 +32,8 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function TeamsResource:getCreateTeam(req, res, ctx)
+	ctx.can_create = self.teams:canCreate(ctx.session_user)
+	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
 end
 

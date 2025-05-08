@@ -33,12 +33,16 @@
 			<%- view:render("sea/shared/http/header.etlua") %>
 		<% end %>
 
-		<% if ignore_main_container then %>
-			<%- inner %>
-		<% else %>
+		<% if not main_container_type then %>
 			<main class="container">
 				<%- inner %>
 			</main>
+		<% elseif main_container_type == "vertically_centered" then %>
+			<main class="container center-vertically">
+				<%- inner %>
+			</main>
+		<% elseif main_container_type == "none" then %>
+			<%- inner %>
 		<% end %>
 
 		<% if not ignore_footer then %>

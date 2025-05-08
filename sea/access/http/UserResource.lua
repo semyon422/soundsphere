@@ -107,7 +107,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.page = page
 	ctx.user = user
 
-	ctx.ignore_main_container = true
+	ctx.main_container_type = "none"
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
 	ctx.scores = page:getScores(ctx.leaderboard, user.id)

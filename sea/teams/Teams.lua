@@ -427,4 +427,9 @@ function Teams:canUpdate(user, team)
 	return self.teams_access:canUpdate(user, team)
 end
 
+---@param user sea.User
+function Teams:canCreate(user)
+	return self.teams_access:canCreate(user)
+end
+
 return Teams

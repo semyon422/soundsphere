@@ -64,7 +64,7 @@ function TeamResource:getTeamPage(req, res, ctx)
 	ctx.can_update = can_update
 	ctx.edit_description = can_update and query.edit_description == "true"
 
-	ctx.ignore_main_container = true
+	ctx.main_container_type = "none"
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
 end
 
