@@ -62,6 +62,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		chartplay_values.id = nil
 		chartplay_values.user_id = user.id
 		chartplay_values.submitted_at = time
+		chartplay_values.computed_at = time
 		chartplay_values.compute_state = "new"
 
 		chartplay = self.charts_repo:createChartplay(chartplay_values)
@@ -115,6 +116,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 			chartfile_values.hash = chartplay.hash
 			chartfile_values.creator_id = user.id
 			chartfile_values.compute_state = "new"
+			chartfile_values.computed_at = time
 			chartfile_values.submitted_at = time
 			chartfile_values.name = chartfile_name
 			chartfile_values.size = #chartfile_data
@@ -203,18 +205,24 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 
 	local chartdiff = self.charts_repo:getChartdiffByChartkey(computed_chartdiff)
 	if not chartdiff then
+		computed_chartdiff.created_at = time
+		computed_chartdiff.computed_at = time
 		self.charts_repo:createChartdiff(computed_chartdiff)
 	elseif not chartdiff:equalsComputed(computed_chartdiff) then
 		computed_chartdiff.id = chartdiff.id
+		computed_chartdiff.computed_at = time
 		self.charts_repo:updateChartdiff(computed_chartdiff)
 		-- add a note on chartdiff page about this change
 	end
 
 	local chartmeta = self.charts_repo:getChartmetaByHashIndex(computed_chartmeta.hash, computed_chartmeta.index)
 	if not chartmeta then
+		computed_chartmeta.created_at = time
+		computed_chartmeta.computed_at = time
 		self.charts_repo:createChartmeta(computed_chartmeta)
 	elseif not chartmeta:equalsComputed(computed_chartmeta) then
 		computed_chartmeta.id = chartmeta.id
+		computed_chartmeta.computed_at = time
 		self.charts_repo:updateChartmeta(computed_chartmeta)
 		-- add a note on chartmeta page about this change
 	end

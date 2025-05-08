@@ -45,20 +45,20 @@ CREATE TABLE IF NOT EXISTS `user_locations` (
 
 CREATE TABLE IF NOT EXISTS `sessions` (
 	`id` INTEGER PRIMARY KEY,
-	`user_id` INTEGER,
-	`active` INTEGER,
-	`ip` INTEGER,
-	`created_at` INTEGER,
-	`updated_at` INTEGER
+	`user_id` INTEGER NOT NULL,
+	`active` INTEGER NOT NULL,
+	`ip` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
+	`updated_at` INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,
-	`name` TEXT,
-	`size` INTEGER,
+	`name` TEXT NOT NULL,
+	`size` INTEGER NOT NULL,
 	`compute_state` INTEGER NOT NULL,
-	`computed_at` INTEGER,
+	`computed_at` INTEGER NOT NULL,
 	`creator_id` INTEGER NOT NULL,
 	`submitted_at` INTEGER NOT NULL,
 	UNIQUE(`hash`)
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 
 CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`id` INTEGER PRIMARY KEY,
-	`created_at` INTEGER,
-	`computed_at` INTEGER,
+	`created_at` INTEGER NOT NULL,
+	`computed_at` INTEGER NOT NULL,
 	`osu_ranked_status` INTEGER,
 
 	`hash` TEXT NOT NULL,
@@ -105,8 +105,8 @@ CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
 	`custom_user_id` INTEGER,
-	`created_at` INTEGER,
-	`computed_at` INTEGER,
+	`created_at` INTEGER NOT NULL,
+	`computed_at` INTEGER NOT NULL,
 
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
@@ -140,42 +140,42 @@ CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
 
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
-	`user_id` INTEGER,
-	`compute_state` INTEGER,
-	`computed_at` INTEGER,
-	`submitted_at` INTEGER,
+	`user_id` INTEGER NOT NULL,
+	`compute_state` INTEGER NOT NULL,
+	`computed_at` INTEGER NOT NULL,
+	`submitted_at` INTEGER NOT NULL,
 
-	`replay_hash` TEXT,
-	`pause_count` INTEGER,
-	`created_at` INTEGER,
+	`replay_hash` TEXT NOT NULL,
+	`pause_count` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
 
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 
 	`modifiers` TEXT NOT NULL,
 	`rate` INTEGER NOT NULL,
-	`mode` INTEGER,
+	`mode` INTEGER NOT NULL,
 
-	`nearest` INTEGER,
-	`tap_only` INTEGER,
+	`nearest` INTEGER NOT NULL,
+	`tap_only` INTEGER NOT NULL,
 	`timings` INTEGER,
 	`subtimings` INTEGER,
 	`healths` INTEGER,
 	`columns_order` BLOB,
 
-	`custom` INTEGER,
-	`const` INTEGER,
-	`rate_type` INTEGER,
+	`custom` INTEGER NOT NULL,
+	`const` INTEGER NOT NULL,
+	`rate_type` INTEGER NOT NULL,
 
-	`judges` BLOB,
-	`accuracy` REAL,
-	`max_combo` INTEGER,
-	`miss_count` INTEGER,
-	`not_perfect_count` INTEGER,
-	`pass` INTEGER,
-	`rating` REAL,
-	`rating_pp` REAL,
-	`rating_msd` REAL
+	`judges` BLOB NOT NULL,
+	`accuracy` REAL NOT NULL,
+	`max_combo` INTEGER NOT NULL,
+	`miss_count` INTEGER NOT NULL,
+	`not_perfect_count` INTEGER NOT NULL,
+	`pass` INTEGER NOT NULL,
+	`rating` REAL NOT NULL,
+	`rating_pp` REAL NOT NULL,
+	`rating_msd` REAL NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS chartplays_user_id_idx ON chartplays (`user_id`);

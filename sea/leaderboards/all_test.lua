@@ -64,7 +64,23 @@ local function create_chartplay(ctx, values)
 	chartplay.not_perfect_count = values.not_perfect_count or 0
 	chartplay.timings = values.timings or Timings("simple", 0.1)
 	chartplay.subtimings = values.subtimings
-	chartplay.submitted_at = values.submitted_at
+	chartplay.submitted_at = values.submitted_at or 0
+	chartplay.computed_at = values.computed_at or 0
+	chartplay.created_at = values.created_at or 0
+	chartplay.compute_state = "valid"
+	chartplay.replay_hash = "00000000000000000000000000000000"
+	chartplay.pause_count = chartplay.pause_count or 0
+	chartplay.nearest = not not chartplay.nearest
+	chartplay.tap_only = not not chartplay.tap_only
+	chartplay.custom = not not chartplay.custom
+	chartplay.const = not not chartplay.const
+	chartplay.rate_type = "linear"
+	chartplay.judges = {}
+	chartplay.accuracy = chartplay.accuracy or 0
+	chartplay.max_combo = chartplay.max_combo or 0
+	chartplay.miss_count = chartplay.miss_count or 0
+	chartplay.rating_pp = chartplay.rating_pp or 0
+	chartplay.rating_msd = chartplay.rating_msd or 0
 	if values.pass ~= nil then
 		chartplay.pass = values.pass
 	else
@@ -343,6 +359,8 @@ function test.free_timings_filter(t)
 		timings = Timings("simple", 0.1),
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
@@ -373,6 +391,8 @@ function test.free_timings_filter_specific(t)
 		timings = Timings("simple", 0.2),
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
@@ -403,6 +423,8 @@ function test.free_timings_filter_undefined(t)
 	ctx.db.models.chartmetas:create({
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1})
@@ -428,6 +450,8 @@ function test.free_healths_filter(t)
 		healths = Healths("simple", 10),
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, healths = Healths("simple", 10)})
@@ -457,6 +481,8 @@ function test.rate_filter(t)
 	ctx.db.models.chartmetas:create({
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, rate = 1.0})
@@ -496,18 +522,24 @@ function test.chartmeta_inputmode_filter(t)
 		hash = "1",
 		index = 1,
 		inputmode = "4key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartmetas:create({
 		hash = "2",
 		index = 1,
 		inputmode = "7key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartmetas:create({
 		hash = "3",
 		index = 1,
 		inputmode = "10key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, hash = "1"})
@@ -538,6 +570,8 @@ function test.chartdiff_inputmode_filter(t)
 		mode = "mania",
 		modifiers = {},
 		rate = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartdiffs:create({
@@ -547,6 +581,8 @@ function test.chartdiff_inputmode_filter(t)
 		mode = "mania",
 		modifiers = {},
 		rate = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartdiffs:create({
@@ -556,6 +592,8 @@ function test.chartdiff_inputmode_filter(t)
 		mode = "mania",
 		modifiers = {},
 		rate = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, hash = "1"})
