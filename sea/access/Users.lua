@@ -158,17 +158,21 @@ function Users:login(_, ip, time, user_values)
 end
 
 ---@param user sea.User
----@param session_id integer
+---@param session_id integer?
 ---@return true?
 ---@return string?
 function Users:logout(user, session_id)
+	if user:isAnon() or not session_id then
+		return nil, "not allowed"
+	end
+
 	local session = self.users_repo:getSession(session_id)
 	if not session then
-		return nil, "not_found"
+		return nil, "not found"
 	end
 
 	if session.user_id ~= user.id then
-		return nil, "not_allowed"
+		return nil, "not allowed"
 	end
 
 	session.active = false
@@ -181,20 +185,20 @@ end
 ---@param time integer
 ---@param target_user_id integer
 ---@return sea.User?
----@return "not_allowed"|"not_found"?
+---@return string?
 function Users:ban(user, time, target_user_id)
 	if user.id == target_user_id then
-		return nil, "not_allowed"
+		return nil, "not allowed"
 	end
 
 	local target_user = self.users_repo:getUser(target_user_id)
 	if not target_user then
-		return nil, "not_found"
+		return nil, "not found"
 	end
 
 	local can, err = self.users_access:canUpdate(user, target_user, time)
 	if not can then
-		return nil, "not_allowed"
+		return nil, "not allowed"
 	end
 
 	target_user.is_banned = true
