@@ -1,10 +1,11 @@
 local path_util = require("path_util")
-local chartdiffs = require("sphere.persistence.CacheModel.models.chartdiffs")
 local int_rates = require("libchart.int_rates")
 local RateType = require("sea.chart.RateType")
 local ChartFormat = require("sea.chart.ChartFormat")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
+local Gamemode = require("sea.chart.Gamemode")
+local Modifiers = require("sea.storage.server.Modifiers")
 
 local chartviews = {}
 
@@ -13,13 +14,13 @@ chartviews.table_name = "chartviews"
 chartviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
-	modifiers = chartdiffs.types.modifiers,
+	modifiers = Modifiers,
 	rate = int_rates,
 	rate_type = RateType,
 	format = ChartFormat,
 	timings = Timings,
 	healths = Healths,
-	mode = chartdiffs.types.mode,
+	mode = Gamemode,
 }
 
 chartviews.relations = {}

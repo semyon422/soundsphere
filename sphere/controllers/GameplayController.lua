@@ -362,7 +362,8 @@ function GameplayController:saveScore()
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
-	chartdiff.notes_preview = nil  -- fixes erasing
+	chartdiff.created_at = created_at
+	chartdiff.computed_at = created_at
 	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff)
 
 	local chartplay = Chartplay()
@@ -380,6 +381,12 @@ function GameplayController:saveScore()
 	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
+	local chartplay_copy = table_util.deepcopy(chartplay)
+
+	chartplay.user_id = 1
+	chartplay.compute_state = "valid"
+	chartplay.computed_at = created_at
+	chartplay.submitted_at = created_at
 
 	local _chartplay = self.cacheModel.chartsRepo:createChartplay(chartplay)
 	self.computeContext.chartplay = _chartplay
@@ -396,7 +403,7 @@ function GameplayController:saveScore()
 		end
 
 		print("submit")
-		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay, chartdiff_copy)
+		local ok, err = self.seaClient.remote.submission:submitChartplay(chartplay_copy, chartdiff_copy)
 		print("got", ok, err)
 		if ok then
 			print(require("stbl").encode(ok))

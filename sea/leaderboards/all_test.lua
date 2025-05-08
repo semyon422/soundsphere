@@ -89,6 +89,36 @@ local function create_chartplay(ctx, values)
 	return ctx.db.models.chartplays:create(chartplay)
 end
 
+---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
+---@param values {[string]: any}
+local function create_chartdiff(ctx, values)
+	---@type sea.Chartdiff
+	local chartdiff = table_util.copy(values)
+	chartdiff.created_at = chartdiff.created_at or 0
+	chartdiff.computed_at = chartdiff.computed_at or 0
+	chartdiff.hash = chartdiff.hash or "00000000000000000000000000000000"
+	chartdiff.index = chartdiff.index or 1
+	chartdiff.modifiers = chartdiff.modifiers or {}
+	chartdiff.rate = chartdiff.rate or 1
+	chartdiff.mode = chartdiff.mode or "mania"
+	chartdiff.inputmode = chartdiff.inputmode or "4key"
+	chartdiff.duration = chartdiff.duration or 0
+	chartdiff.start_time = chartdiff.start_time or 0
+	chartdiff.notes_count = chartdiff.notes_count or 0
+	chartdiff.judges_count = chartdiff.judges_count or 0
+	chartdiff.note_types_count = chartdiff.note_types_count or {}
+	chartdiff.density_data = chartdiff.density_data or {}
+	chartdiff.sv_data = chartdiff.sv_data or {}
+	chartdiff.enps_diff = chartdiff.enps_diff or 0
+	chartdiff.osu_diff = chartdiff.osu_diff or 0
+	chartdiff.msd_diff = chartdiff.msd_diff or 0
+	chartdiff.msd_diff_data = chartdiff.msd_diff_data or ""
+	chartdiff.user_diff = chartdiff.user_diff or 0
+	chartdiff.user_diff_data = chartdiff.user_diff_data or ""
+	chartdiff.notes_preview = chartdiff.notes_preview or ""
+	return ctx.db.models.chartdiffs:create(chartdiff)
+end
+
 ---@param t testing.T
 function test.best_score_filter(t)
 	local ctx = create_test_ctx()
@@ -356,6 +386,8 @@ function test.free_timings_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		timings = Timings("simple", 0.1),
 		hash = "",
 		index = 1,
@@ -388,6 +420,8 @@ function test.free_timings_filter_specific(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		timings = Timings("simple", 0.2),
 		hash = "",
 		index = 1,
@@ -421,6 +455,8 @@ function test.free_timings_filter_undefined(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "",
 		index = 1,
 		created_at = 0,
@@ -447,6 +483,8 @@ function test.free_healths_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		healths = Healths("simple", 10),
 		hash = "",
 		index = 1,
@@ -479,6 +517,8 @@ function test.rate_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "",
 		index = 1,
 		created_at = 0,
@@ -519,6 +559,8 @@ function test.chartmeta_inputmode_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "1",
 		index = 1,
 		inputmode = "4key",
@@ -527,6 +569,8 @@ function test.chartmeta_inputmode_filter(t)
 	})
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "2",
 		index = 1,
 		inputmode = "7key",
@@ -535,6 +579,8 @@ function test.chartmeta_inputmode_filter(t)
 	})
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "3",
 		index = 1,
 		inputmode = "10key",
@@ -563,37 +609,19 @@ end
 function test.chartdiff_inputmode_filter(t)
 	local ctx = create_test_ctx()
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "1",
-		index = 1,
 		inputmode = "4key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
-		created_at = 0,
-		computed_at = 0,
 	})
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "2",
-		index = 1,
 		inputmode = "7key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
-		created_at = 0,
-		computed_at = 0,
 	})
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "3",
-		index = 1,
 		inputmode = "10key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
-		created_at = 0,
-		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, hash = "1"})

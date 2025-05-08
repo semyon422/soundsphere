@@ -230,24 +230,16 @@ function ChartsRepo:getChartplaysComputedCount(computed_at, state)
 end
 
 ---@param computed_at integer
----@param state sea.ComputeState?
+---@param state sea.ComputeState
 ---@param limit integer?
 ---@return sea.Chartplay[]
 function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
 	return self.models.chartplays:select({
 		computed_at__lte = assert(computed_at),
-		compute_state = state,
-		compute_state__isnull = not state,
+		compute_state = assert(state),
 	}, {
 		order = {"computed_at ASC"},
 		limit = limit or 1,
-	})
-end
-
----@return sea.Chartplay[]
-function ChartsRepo:getChartplaysComputedNull()
-	return self.models.chartplays_computable:select({
-		compute_state__isnull = true,
 	})
 end
 

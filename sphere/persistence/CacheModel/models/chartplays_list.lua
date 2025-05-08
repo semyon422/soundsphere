@@ -4,7 +4,9 @@ local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local RateType = require("sea.chart.RateType")
 local int_rates = require("libchart.int_rates")
-local json = require("web.json")
+local IntegerArray = require("sea.storage.server.IntegerArray")
+local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
+local Modifiers = require("sea.storage.server.Modifiers")
 
 local chartplays_list = {}
 
@@ -15,9 +17,9 @@ chartplays_list.types = {
 	pass = "boolean",
 	mode = chartdiffs.types.mode,
 	custom = "boolean",
-	columns_order = json,
-	modifiers = chartdiffs.types.modifiers,
-	judges = json,
+	columns_order = IntegerArrayOptional,
+	modifiers = Modifiers,
+	judges = IntegerArray,
 	tap_only = "boolean",
 	const = "boolean",
 	rate = int_rates,

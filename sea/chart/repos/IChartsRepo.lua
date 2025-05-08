@@ -172,15 +172,10 @@ function IChartsRepo:getChartplaysComputedCount(computed_at, state)
 end
 
 ---@param computed_at integer
----@param state sea.ComputeState?
----@param limit integer
+---@param state sea.ComputeState
+---@param limit integer?
 ---@return sea.Chartplay[]
 function IChartsRepo:getChartplaysComputed(computed_at, state, limit)
-	return {}
-end
-
----@return sea.Chartplay[]
-function IChartsRepo:getChartplaysComputedNull()
 	return {}
 end
 

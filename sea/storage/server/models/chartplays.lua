@@ -5,7 +5,9 @@ local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 local RateType = require("sea.chart.RateType")
 local int_rates = require("libchart.int_rates")
-local json = require("web.json")
+local IntegerArray = require("sea.storage.server.IntegerArray")
+local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
+local Modifiers = require("sea.storage.server.Modifiers")
 
 ---@type rdb.ModelOptions
 local chartplays = {}
@@ -17,9 +19,9 @@ chartplays.types = {
 	pass = "boolean",
 	mode = Gamemode,
 	custom = "boolean",
-	columns_order = json,
-	modifiers = json,
-	judges = json,
+	columns_order = IntegerArrayOptional,
+	modifiers = Modifiers,
+	judges = IntegerArray,
 	tap_only = "boolean",
 	const = "boolean",
 	rate = int_rates,

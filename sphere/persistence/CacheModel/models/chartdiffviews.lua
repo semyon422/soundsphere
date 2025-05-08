@@ -5,6 +5,7 @@ local RateType = require("sea.chart.RateType")
 local ChartFormat = require("sea.chart.ChartFormat")
 local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
+local Modifiers = require("sea.storage.server.Modifiers")
 
 local chartdiffviews = {}
 
@@ -13,7 +14,7 @@ chartdiffviews.table_name = "chartdiffviews"
 chartdiffviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
-	modifiers = chartdiffs.types.modifiers,
+	modifiers = Modifiers,
 	mode = chartdiffs.types.mode,
 	rate = int_rates,
 	rate_type = RateType,

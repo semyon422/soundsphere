@@ -36,8 +36,12 @@ function ChartmetaGenerator:generate(chartfile, content, not_reuse)
 		return nil, err
 	end
 
+	local created_at = os.time()
 	for _, t in ipairs(chart_chartmetas) do
-		chartsRepo:createUpdateChartmeta(t.chartmeta)
+		local chartmeta = t.chartmeta
+		chartmeta.created_at = created_at
+		chartmeta.computed_at = created_at
+		chartsRepo:createUpdateChartmeta(chartmeta)
 	end
 
 	chartfile.hash = hash

@@ -1,7 +1,8 @@
 local int_rates = require("libchart.int_rates")
-local json = require("web.json")
+local stbl = require("stbl")
 local Gamemode = require("sea.chart.Gamemode")
 local Chartdiff = require("sea.chart.Chartdiff")
+local Modifiers = require("sea.storage.server.Modifiers")
 
 ---@type rdb.ModelOptions
 local chartdiffs = {}
@@ -9,12 +10,12 @@ local chartdiffs = {}
 chartdiffs.metatable = Chartdiff
 
 chartdiffs.types = {
-	modifiers = json,
+	modifiers = Modifiers,
 	rate = int_rates,
 	mode = Gamemode,
-	note_types_count = json,
-	density_data = json,
-	sv_data = json,
+	note_types_count = stbl,
+	density_data = stbl,
+	sv_data = stbl,
 }
 
 return chartdiffs

@@ -59,7 +59,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 
 	local chartplay = self.charts_repo:getChartplayByReplayHash(chartplay_values.replay_hash)
 	if not chartplay then
-		chartplay_values.id = nil
+		assert(not chartplay_values.id)
 		chartplay_values.user_id = user.id
 		chartplay_values.submitted_at = time
 		chartplay_values.computed_at = time

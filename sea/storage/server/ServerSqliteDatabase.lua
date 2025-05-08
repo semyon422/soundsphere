@@ -1,4 +1,5 @@
 local class = require("class")
+local io_util = require("io_util")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
@@ -23,12 +24,9 @@ function ServerSqliteDatabase:remove()
 end
 
 function ServerSqliteDatabase:open()
-	local f = assert(io.open("sea/storage/server/db.sql"))
-	local sql = f:read("*a")
-	f:close()
-
 	self.db:open(self.path)
-	self.db:exec(sql)
+	self.db:exec(io_util.read_file("sea/storage/server/db.sql"))
+	self.db:exec(io_util.read_file("sea/storage/shared/db.sql"))
 	self.db:exec("PRAGMA foreign_keys = ON;")
 end
 

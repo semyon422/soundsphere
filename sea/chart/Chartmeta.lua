@@ -16,54 +16,54 @@ local ChartmetaKey = require("sea.chart.ChartmetaKey")
 ---@field offset number
 --- ChartmetaKey
 --- COMPUTED
+---@field inputmode string
+---@field format sea.ChartFormat
 ---@field timings sea.Timings?
 ---@field healths sea.Healths?
----@field title string
----@field title_unicode string
----@field artist string
----@field artist_unicode string
----@field name string
----@field creator string
----@field level number
----@field inputmode string
----@field source string
----@field tags string
----@field format sea.ChartFormat
----@field audio_path string
----@field audio_offset string
----@field background_path string
----@field preview_time number
----@field osu_beatmap_id integer
----@field osu_beatmapset_id integer
----@field tempo number
----@field tempo_avg number
----@field tempo_max number
----@field tempo_min number
+---@field title string?
+---@field title_unicode string?
+---@field artist string?
+---@field artist_unicode string?
+---@field name string?
+---@field creator string?
+---@field level number?
+---@field source string?
+---@field tags string?
+---@field audio_path string?
+---@field audio_offset string?
+---@field background_path string?
+---@field preview_time number?
+---@field osu_beatmap_id integer?
+---@field osu_beatmapset_id integer?
+---@field tempo number?
+---@field tempo_avg number?
+---@field tempo_max number?
+---@field tempo_min number?
 local Chartmeta = ChartmetaKey + {}
 
 local text = types.description
 
 Chartmeta.struct = {
+	format = types.new_enum(ChartFormat),
+	inputmode = chart_types.inputmode,
 	timings = valid.optional(chart_types.timings),
 	healths = valid.optional(chart_types.healths),
-	title = text,
+	title = valid.optional(text),
 	title_unicode = valid.optional(text),
-	artist = text,
+	artist = valid.optional(text),
 	artist_unicode = valid.optional(text),
 	name = valid.optional(text),
 	creator = valid.optional(text),
 	level = valid.optional(types.number),
-	inputmode = chart_types.inputmode,
 	source = valid.optional(text),
 	tags = valid.optional(text),
-	format = types.new_enum(ChartFormat),
 	audio_path = valid.optional(text),
 	audio_offset = valid.optional(types.number),
 	background_path = valid.optional(text),
 	preview_time = valid.optional(types.number),
 	osu_beatmap_id = valid.optional(types.integer),
 	osu_beatmapset_id = valid.optional(types.integer),
-	tempo = types.number,
+	tempo = valid.optional(types.number),
 	tempo_avg = valid.optional(types.number),
 	tempo_max = valid.optional(types.number),
 	tempo_min = valid.optional(types.number),
