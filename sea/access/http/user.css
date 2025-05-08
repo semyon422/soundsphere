@@ -103,10 +103,6 @@
 	background-color: var(--bulma-border);
 }
 
-.user__score-panel:hover * {
-	background-color: var(--bulma-border);
-}
-
 .user__score-panel:not(:last-child) {
 	margin-bottom: 4px;
 }
@@ -145,60 +141,12 @@
 	padding-right: 20px;
 	font-size: 42px;
 	line-height: 52px;
-	text-shadow: -1px -1px 0 #00000055, 1px -1px 0 #00000055, -1px 1px 0 #00000055, 1px 1px 0 #00000055;
-}
-
-.user__score-grade[data-grade="X"] {
-	color: paleturquoise;
-}
-
-.user__score-grade[data-grade="S"] {
-	color: gold;
-}
-
-.user__score-grade[data-grade="A"] {
-	color: greenyellow;
-}
-
-.user__score-grade[data-grade="B"] {
-	color: cornflowerblue;
-}
-
-.user__score-grade[data-grade="C"] {
-	color: magenta;
-}
-
-.user__score-grade[data-grade="D"] {
-	color: red;
+	text-shadow: -1px -1px 0 #00000022, 1px -1px 0 #00000022, -1px 1px 0 #00000022, 1px 1px 0 #00000022;
 }
 
 .user__score-line {
 	min-width: 8px;
 	border-radius: 8px;
-}
-
-.user__score-line[data-grade="X"] {
-	background-color: paleturquoise;
-}
-
-.user__score-line[data-grade="S"] {
-	background-color: gold;
-}
-
-.user__score-line[data-grade="A"] {
-	background-color: greenyellow;
-}
-
-.user__score-line[data-grade="B"] {
-	background-color: cornflowerblue;
-}
-
-.user__score-line[data-grade="C"] {
-	background-color: magenta;
-}
-
-.user__score-line[data-grade="D"] {
-	background-color: red;
 }
 
 .user__score-rating-box {
@@ -216,6 +164,9 @@
 		5px 80%,
 		5px 20%
 	);
+}
+.user__score-panel:hover .user__score-rating-box {
+	background-color: var(--bulma-border);
 }
 
 .user__score-rating-postfix {
