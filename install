@@ -12,6 +12,7 @@ luarocks install lsqlite3
 luarocks install etlua
 luarocks install luacov
 luarocks install luacov-reporter-lcov
+luarocks install nginx-lua-prometheus
 
 mkdir -p logs
 mkdir -p temp
