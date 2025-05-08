@@ -16,7 +16,6 @@ userdata/hitsounds
 userdata/testcharts
 !userdata/hitsounds/midi
 
-userdata/*.db
 userdata/main.log
 userdata/input.lua
 userdata/modifier.lua
@@ -33,9 +32,6 @@ userdata/filters.lua
 userdata/play.lua
 userdata/avatar.png
 userdata/lasterror.txt
-
-userdata/charts.db-journal
-userdata/scores.db-journal
 
 moddedgame
 
@@ -60,9 +56,11 @@ lcov.info
 luacov.report.out
 userdata/osu_ui.lua
 userdata/result.gif
-server.db
 nginx.conf
 nginx_config.lua
 app_config.lua
 my.cnf
 backups
+
+*.db
+*.scores.db-journal
