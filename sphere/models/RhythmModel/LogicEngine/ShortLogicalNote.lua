@@ -65,7 +65,7 @@ function ShortLogicalNote:switchState(newState)
 	local time = noteTime + lastTime * timeRate
 
 	local currentTime = math.min(eventTime, time)
-	local deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
+	local deltaTime = math.min(self:getDeltaTime() / timeRate, lastTime)
 
 	local scoreEvent = {
 		name = "NoteState",
@@ -105,7 +105,7 @@ end
 
 ---@return string
 function ShortLogicalNote:getTimeState()
-	local deltaTime = (self:getEventTime() - self:getNoteTime()) / self.logicEngine:getTimeRate()
+	local deltaTime = self:getDeltaTime() / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.ShortNote, deltaTime)
 end
 

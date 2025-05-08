@@ -85,9 +85,20 @@ function LogicalNote:getNoteTime(side)
 	return self.startNote:getTime() + offset
 end
 
+---@param side string?
+---@return number
+function LogicalNote:getDeltaTime(side)
+	local offset = 0
+	if self.isPlayable then
+		offset = self.logicEngine:getInputOffset()
+	end
+	local eventTime = self:getEventTime() - offset
+	return eventTime - self.startNote:getTime()
+end
+
 ---@return boolean
 function LogicalNote:isHere()
-	return self:getNoteTime() <= self.logicEngine:getEventTime()
+	return self:getDeltaTime() >= 0
 end
 
 ---@return boolean
