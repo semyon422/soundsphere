@@ -63,4 +63,4 @@ my.cnf
 backups
 
 *.db
-*.scores.db-journal
+*.db-journal
