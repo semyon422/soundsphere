@@ -36,7 +36,6 @@ local function is_alias(v)
 end
 
 local validate_team = valid.struct({
-	id = types.integer,
 	name = types.name,
 	alias = is_alias,
 	description = types.description,

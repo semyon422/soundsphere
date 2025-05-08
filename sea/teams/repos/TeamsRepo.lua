@@ -20,6 +20,18 @@ function TeamsRepo:getTeam(id)
 	return self.models.teams:find({id = assert(id)})
 end
 
+---@param name string
+---@return sea.Team?
+function TeamsRepo:findByName(name)
+	return self.models.teams:find({name = assert(name)})
+end
+
+---@param alias string
+---@return sea.Team?
+function TeamsRepo:findByAlias(alias)
+	return self.models.teams:find({alias = assert(alias)})
+end
+
 ---@param team sea.Team
 ---@return sea.Team
 function TeamsRepo:createTeam(team)

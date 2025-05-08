@@ -15,6 +15,18 @@ function ITeamsRepo:getTeam(id)
 	return {}
 end
 
+---@param name string
+---@return sea.Team?
+function ITeamsRepo:findByName(name)
+	return {}
+end
+
+---@param alias string
+---@return sea.Team?
+function ITeamsRepo:findByAlias(alias)
+	return {}
+end
+
 ---@param team sea.Team
 ---@return sea.Team
 function ITeamsRepo:createTeam(team)

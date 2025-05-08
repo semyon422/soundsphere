@@ -32,7 +32,7 @@ end
 ---@param alias string
 ---@return sea.Team?
 ---@return string?
-function Teams:create(user, name, alias)
+function Teams:create(user, name, alias, type)
 	local can, err = self.teams_access:canCreate(user)
 	if not can then
 		return nil, err
@@ -44,8 +44,22 @@ function Teams:create(user, name, alias)
 	team.description = ""
 	team.users_count = 0
 	team.owner_id = user.id
-	team.type = "invite"
+	team.type = type
 	team.created_at = os.time()
+
+	local ok, err = team:validate()
+	if not ok then
+		---@cast err -?
+		return nil, table.concat(err, ", ")
+	end
+
+	if self.teams_repo:findByName(name) then
+		return nil, "team_name_taken"
+	end
+
+	if self.teams_repo:findByAlias(alias) then
+		return nil, "team_alias_taken"
+	end
 
 	team = self.teams_repo:createTeam(team)
 

@@ -6,7 +6,7 @@
 					<h1 class="title">Create a team</h1>
 					<p class="subtitle">Want to compete with your friends against other teams?</p>
 				</div>
-				<div <%- not can_create and "class='content-disabled'" %>>
+				<form action="/teams/create" method="post" <%- not can_create and "class='content-disabled'" %>>
 					<div class="field">
 						<label class="label">Name</label>
 						<div class="control">
