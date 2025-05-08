@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 	`tags` TEXT,
 	`format` INTEGER,
 	`audio_path` TEXT,
+	`audio_offset` REAL,
 	`background_path` TEXT,
 	`preview_time` REAL,
 	`osu_beatmap_id` INTEGER,
