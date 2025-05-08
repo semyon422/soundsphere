@@ -77,19 +77,19 @@ end
 ---@return string
 function Chartplay:getGrade()
 	local exscore = self:getExScore() * 9
-	if exscore == 9 then
+	if exscore >= 8 then
 		return "X"
-	elseif exscore >= 8 then
-		return "S"
 	elseif exscore >= 7 then
-		return "A"
+		return "S"
 	elseif exscore >= 6 then
-		return "B"
+		return "A"
 	elseif exscore >= 5 then
-		return "C"
+		return "B"
 	elseif exscore >= 4 then
-		return "D"
+		return "C"
 	elseif exscore >= 3 then
+		return "D"
+	elseif exscore >= 2 then
 		return "E"
 	end
 	return "F"
