@@ -1,20 +1,45 @@
+.welcome__main-container {
+	display: flex;
+	flex-direction: column;
+	min-height: calc(100vh - 56px); /* minus header height */
+}
+
+.welcome__main-content {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+
+.welcome__main-columns {
+	width: 100%;
+}
+
 .welcome__hero {
 	display: flex;
 	height: 100%;
 	flex-direction: column;
-	justify-content: center
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 
 .welcome__game-name {
-	font-size: 70px;
+	font-size: max(46px, 5vw);
 	color: var(--bulma-text-strong);
-	text-align: center;
+	margin-bottom: 8px;
 }
 
 .welcome__game-description {
 	font-size: 16px;
 	color: var(--bulma-text-strong);
-	text-align: center;
+	margin-bottom: 26px;
+}
+
+.welcome__buttons-level {
+	 width: 100%;
+	 justify-content: center;
 }
 
 .welcome__canvas-container {
@@ -27,4 +52,43 @@
 .welcome__canvas {
 	height: 60vh;
 	mask-image: linear-gradient(rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 1) 150px);
+	max-width: 100%;
+	width: auto;
+	object-fit: contain;
+}
+
+.welcome__bottom-text {
+	margin-top: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 20px 0;
+	text-align: center;
+	width: 100%;
+}
+
+.welcome__bottom-text i {
+	 margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+	.welcome__main-columns.is-desktop {
+		flex-direction: column;
+	}
+
+	.welcome__left-column,
+	.welcome__right-column {
+		 width: 100%;
+	}
+
+	.welcome__hero,
+	.welcome__canvas-container {
+		 height: auto;
+		 padding: 20px 0;
+	}
+
+	.welcome__canvas {
+		 height: auto;
+		 max-height: 50vh;
+	}
 }
