@@ -48,6 +48,59 @@ body {
 	padding: 0;
 }
 
+.score-grade {
+	text-shadow: -1px -1px 0 #00000022, 1px -1px 0 #00000022, -1px 1px 0 #00000022, 1px 1px 0 #00000022;
+}
+
+.score-grade[data-grade="X"] {
+	color: oklch(0.72 0.1871 231.88);
+}
+
+.score-grade[data-grade="S"] {
+	color: oklch(0.72 0.1871 50.82);
+}
+
+.score-grade[data-grade="A"] {
+	color: oklch(0.72 0.1871 141.54);
+}
+
+.score-grade[data-grade="B"] {
+	color: oklch(0.72 0.1871 308.12);
+}
+
+.score-grade[data-grade="C"] {
+	color: oklch(0.72 0.1871 353.06);
+}
+
+.score-grade[data-grade="D"] {
+	color: oklch(0.72 0.1871 17.63);
+}
+
+.score-background[data-grade="X"] {
+	background-color: oklch(0.72 0.1871 231.88);
+}
+
+.score-background[data-grade="S"] {
+	background-color: oklch(0.72 0.1871 50.82);
+}
+
+.score-background[data-grade="A"] {
+	background-color: oklch(0.72 0.1871 141.54);
+}
+
+.score-background[data-grade="B"] {
+	background-color: oklch(0.72 0.1871 308.12);
+}
+
+.score-background[data-grade="C"] {
+	background-color: oklch(0.72 0.1871 353.06);
+}
+
+.score-background[data-grade="D"] {
+	background-color: oklch(0.72 0.1871 17.63);
+}
+
+
 .saira-regular {
   font-family: "Saira", sans-serif;
   font-optical-sizing: auto;
