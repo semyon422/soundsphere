@@ -1,8 +1,8 @@
-local IDifftablesRepo = require("sea.difftables.repos.IDifftablesRepo")
+local class = require("class")
 
----@class sea.DifftablesRepo: sea.IDifftablesRepo
+---@class sea.DifftablesRepo
 ---@operator call: sea.DifftablesRepo
-local DifftablesRepo = IDifftablesRepo + {}
+local DifftablesRepo = class()
 
 ---@param models rdb.Models
 function DifftablesRepo:new(models)

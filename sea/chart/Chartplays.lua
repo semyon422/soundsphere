@@ -7,8 +7,8 @@ local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
 ---@operator call: sea.Chartplays
 local Chartplays = class()
 
----@param charts_repo sea.IChartsRepo
----@param chartfiles_repo sea.IChartfilesRepo
+---@param charts_repo sea.ChartsRepo
+---@param chartfiles_repo sea.ChartfilesRepo
 ---@param chartplay_computer sea.IChartplayComputer
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param leaderboards sea.Leaderboards

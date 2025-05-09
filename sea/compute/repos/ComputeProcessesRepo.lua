@@ -1,8 +1,8 @@
-local IComputeProcessesRepo = require("sea.compute.repos.IComputeProcessesRepo")
+local class = require("class")
 
----@class sea.ComputeProcessesRepo: sea.IComputeProcessesRepo
+---@class sea.ComputeProcessesRepo
 ---@operator call: sea.ComputeProcessesRepo
-local ComputeProcessesRepo = IComputeProcessesRepo + {}
+local ComputeProcessesRepo = class()
 
 ---@param models rdb.Models
 function ComputeProcessesRepo:new(models)

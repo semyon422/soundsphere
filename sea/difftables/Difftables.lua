@@ -8,7 +8,7 @@ local DifftablesAccess = require("sea.difftables.access.DifftablesAccess")
 ---@field id integer
 local Difftables = class()
 
----@param difftables_repo sea.IDifftablesRepo
+---@param difftables_repo sea.DifftablesRepo
 function Difftables:new(difftables_repo)
 	self.difftables_repo = difftables_repo
 	self.difftables_access = DifftablesAccess()

@@ -1,9 +1,8 @@
-local relations = require("rdb.relations")
-local IUsersRepo = require("sea.access.repos.IUsersRepo")
+local class = require("class")
 
----@class sea.UsersRepo: sea.IUsersRepo
+---@class sea.UsersRepo
 ---@operator call: sea.UsersRepo
-local UsersRepo = IUsersRepo + {}
+local UsersRepo = class()
 
 ---@param models rdb.Models
 function UsersRepo:new(models)

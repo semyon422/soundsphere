@@ -6,7 +6,7 @@ local ComputeProcess = require("sea.compute.ComputeProcess")
 local ComputeProcessor = class()
 
 ---@param charts_computer sea.ChartsComputer
----@param compute_processes_repo sea.IComputeProcessesRepo
+---@param compute_processes_repo sea.ComputeProcessesRepo
 function ComputeProcessor:new(charts_computer, compute_processes_repo)
 	self.charts_computer = charts_computer
 	self.compute_processes_repo = compute_processes_repo

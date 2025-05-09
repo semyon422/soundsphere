@@ -7,7 +7,7 @@ local TeamUser = require("sea.teams.TeamUser")
 ---@operator call: sea.Teams
 local Teams = class()
 
----@param teams_repo sea.ITeamsRepo
+---@param teams_repo sea.TeamsRepo
 function Teams:new(teams_repo)
 	self.teams_repo = teams_repo
 	self.teams_access = TeamsAccess()

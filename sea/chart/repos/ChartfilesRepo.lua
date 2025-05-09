@@ -1,8 +1,8 @@
-local IChartfilesRepo = require("sea.chart.repos.IChartfilesRepo")
+local class = require("class")
 
----@class sea.ChartfilesRepo: sea.IChartfilesRepo
+---@class sea.ChartfilesRepo
 ---@operator call: sea.ChartfilesRepo
-local ChartfilesRepo = IChartfilesRepo + {}
+local ChartfilesRepo = class()
 
 ---@param models rdb.Models
 function ChartfilesRepo:new(models)

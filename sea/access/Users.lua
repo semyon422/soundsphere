@@ -14,7 +14,7 @@ Users.is_login_enabled = true
 Users.is_register_enabled = true
 Users.ip_register_delay = 24 * 60 * 60
 
----@param users_repo sea.IUsersRepo
+---@param users_repo sea.UsersRepo
 ---@param password_hasher sea.IPasswordHasher
 function Users:new(users_repo, password_hasher)
 	self.users_repo = users_repo

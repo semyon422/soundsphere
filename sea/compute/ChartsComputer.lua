@@ -6,7 +6,7 @@ local ChartsComputer = class()
 
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param chartplay_computer sea.IChartplayComputer
----@param charts_repo sea.IChartsRepo
+---@param charts_repo sea.ChartsRepo
 function ChartsComputer:new(compute_data_loader, chartplay_computer, charts_repo)
 	self.compute_data_loader = compute_data_loader
 	self.chartplay_computer = chartplay_computer

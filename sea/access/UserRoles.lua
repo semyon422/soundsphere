@@ -6,7 +6,7 @@ local UsersAccess = require("sea.access.access.UsersAccess")
 ---@operator call: sea.UserRoles
 local UserRoles = class()
 
----@param users_repo sea.IUsersRepo
+---@param users_repo sea.UsersRepo
 function UserRoles:new(users_repo)
 	self.users_repo = users_repo
 	self.users_access = UsersAccess()

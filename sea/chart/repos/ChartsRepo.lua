@@ -1,10 +1,10 @@
-local IChartsRepo = require("sea.chart.repos.IChartsRepo")
+local class = require("class")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
 
----@class sea.ChartsRepo: sea.IChartsRepo
+---@class sea.ChartsRepo
 ---@operator call: sea.ChartsRepo
-local ChartsRepo = IChartsRepo + {}
+local ChartsRepo = class()
 
 ---@param models rdb.Models
 ---@param diffcalc_fields string[]

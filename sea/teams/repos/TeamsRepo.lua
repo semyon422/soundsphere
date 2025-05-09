@@ -1,8 +1,8 @@
-local ITeamsRepo = require("sea.teams.repos.ITeamsRepo")
+local class = require("class")
 
----@class sea.TeamsRepo: sea.ITeamsRepo
+---@class sea.TeamsRepo
 ---@operator call: sea.TeamsRepo
-local TeamsRepo = ITeamsRepo + {}
+local TeamsRepo = class()
 
 ---@param models rdb.Models
 function TeamsRepo:new(models)

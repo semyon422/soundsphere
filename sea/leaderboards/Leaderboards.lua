@@ -10,7 +10,7 @@ local RatingCalc = require("sea.leaderboards.RatingCalc")
 ---@operator call: sea.Leaderboards
 local Leaderboards = class()
 
----@param leaderboards_repo sea.ILeaderboardsRepo
+---@param leaderboards_repo sea.LeaderboardsRepo
 function Leaderboards:new(leaderboards_repo)
 	self.leaderboards_repo = leaderboards_repo
 	self.leaderboards_access = LeaderboardsAccess()

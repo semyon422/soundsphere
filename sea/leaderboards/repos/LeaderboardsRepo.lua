@@ -1,12 +1,12 @@
+local class = require("class")
 local sql_util = require("rdb.sql_util")
 local table_util = require("table_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
-local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 
----@class sea.LeaderboardsRepo: sea.ILeaderboardsRepo
+---@class sea.LeaderboardsRepo
 ---@operator call: sea.LeaderboardsRepo
-local LeaderboardsRepo = ILeaderboardsRepo + {}
+local LeaderboardsRepo = class()
 
 ---@param models rdb.Models
 function LeaderboardsRepo:new(models)

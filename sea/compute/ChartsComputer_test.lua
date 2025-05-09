@@ -8,7 +8,7 @@ local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 local ChartsComputer = require("sea.compute.ChartsComputer")
 local Chartplays = require("sea.chart.Chartplays")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
-local ILeaderboardsRepo = require("sea.leaderboards.repos.ILeaderboardsRepo")
+local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
 
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
@@ -39,7 +39,7 @@ local function create_test_ctx()
 	local charts_computer = ChartsComputer(compute_data_loader, chartplay_computer, charts_repo)
 
 	local chartplayComputer = ChartplayComputer()
-	local leaderboards = Leaderboards(ILeaderboardsRepo())
+	local leaderboards = Leaderboards(LeaderboardsRepo(models))
 
 	local chartplays = Chartplays(
 		charts_repo,
