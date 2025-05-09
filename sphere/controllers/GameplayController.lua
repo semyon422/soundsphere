@@ -362,9 +362,7 @@ function GameplayController:saveScore()
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = table_util.deepcopy(chartdiff)
 
-	chartdiff.created_at = created_at
-	chartdiff.computed_at = created_at
-	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff)
+	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff, created_at)
 
 	local chartplay = Chartplay()
 

@@ -95,14 +95,20 @@ function ChartsRepo:deleteChartdiffsByHashIndex(hash, index)
 end
 
 ---@param chartdiff sea.Chartdiff
+---@param time integer
 ---@return sea.Chartdiff
-function ChartsRepo:createUpdateChartdiff(chartdiff)
+function ChartsRepo:createUpdateChartdiff(chartdiff, time)
 	local _chartdiff = self:getChartdiffByChartkey(chartdiff)
 	if not _chartdiff then
+		chartdiff.created_at = time
+		chartdiff.computed_at = time
 		return self:createChartdiff(chartdiff)
+	elseif not _chartdiff:equalsComputed(chartdiff) then
+		chartdiff.id = _chartdiff.id
+		chartdiff.computed_at = time
+		return self:updateChartdiff(chartdiff)
 	end
-	chartdiff.id = _chartdiff.id
-	return self:updateChartdiff(chartdiff)
+	return _chartdiff
 end
 
 ---@return sea.Chartdiff[]
@@ -178,14 +184,20 @@ function ChartsRepo:getChartmetasMissingChartdiffs()
 end
 
 ---@param chartmeta sea.Chartmeta
+---@param time integer
 ---@return sea.Chartmeta
-function ChartsRepo:createUpdateChartmeta(chartmeta)
+function ChartsRepo:createUpdateChartmeta(chartmeta, time)
 	local _chartmeta = self:getChartmetaByHashIndex(chartmeta.hash, chartmeta.index)
 	if not _chartmeta then
+		chartmeta.created_at = time
+		chartmeta.computed_at = time
 		return self:createChartmeta(chartmeta)
+	elseif not _chartmeta:equalsComputed(chartmeta) then
+		chartmeta.id = _chartmeta.id
+		chartmeta.computed_at = time
+		return self:updateChartmeta(chartmeta)
 	end
-	chartmeta.id = _chartmeta.id
-	return self:updateChartmeta(chartmeta)
+	return _chartmeta
 end
 
 --------------------------------------------------------------------------------

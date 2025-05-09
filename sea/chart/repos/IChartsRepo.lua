@@ -65,8 +65,9 @@ function IChartsRepo:deleteChartdiffsByHashIndex(hash, index)
 end
 
 ---@param chartdiff sea.Chartdiff
+---@param time integer
 ---@return sea.Chartdiff
-function IChartsRepo:createUpdateChartdiff(chartdiff)
+function IChartsRepo:createUpdateChartdiff(chartdiff, time)
 	return {}
 end
 
@@ -128,8 +129,9 @@ function IChartsRepo:getChartmetasMissingChartdiffs()
 end
 
 ---@param chartmeta sea.Chartmeta
+---@param time integer
 ---@return sea.Chartmeta
-function IChartsRepo:createUpdateChartmeta(chartmeta)
+function IChartsRepo:createUpdateChartmeta(chartmeta, time)
 	return {}
 end
 

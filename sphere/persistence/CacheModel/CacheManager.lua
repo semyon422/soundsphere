@@ -252,13 +252,11 @@ function CacheManager:computeChartdiffs()
 
 			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
 			if ok then
-				local created_at = os.time()
+				local time = os.time()
 				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
 				chartdiff.hash = chartmeta.hash
 				chartdiff.index = chartmeta.index
-				chartdiff.created_at = created_at
-				chartdiff.computed_at = created_at
-				chartsRepo:createUpdateChartdiff(chartdiff)
+				chartsRepo:createUpdateChartdiff(chartdiff, time)
 			else
 				print("toAbsolute", err)
 			end
@@ -282,15 +280,13 @@ function CacheManager:computeChartdiffs()
 			if ok then
 				ModifierModel:apply(score.modifiers, chart)
 
-				local created_at = os.time()
+				local time = os.time()
 				local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
 				chartdiff.modifiers = score.modifiers
 				chartdiff.hash = score.hash
 				chartdiff.index = score.index
-				chartdiff.created_at = created_at
-				chartdiff.computed_at = created_at
 
-				chartsRepo:createUpdateChartdiff(chartdiff)
+				chartsRepo:createUpdateChartdiff(chartdiff, time)
 			else
 				print("toAbsolute", err)
 			end

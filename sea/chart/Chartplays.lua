@@ -52,12 +52,15 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function Chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
+	local charts_repo = self.charts_repo
+	local chartfiles_repo = self.chartfiles_repo
+
 	local can, err = self.chartplays_access:canSubmit(user)
 	if not can then
 		return nil, "can submit: " .. err
 	end
 
-	local chartplay = self.charts_repo:getChartplayByReplayHash(chartplay_values.replay_hash)
+	local chartplay = charts_repo:getChartplayByReplayHash(chartplay_values.replay_hash)
 	if not chartplay then
 		assert(not chartplay_values.id)
 		chartplay_values.user_id = user.id
@@ -65,7 +68,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		chartplay_values.computed_at = time
 		chartplay_values.compute_state = "new"
 
-		chartplay = self.charts_repo:createChartplay(chartplay_values)
+		chartplay = charts_repo:createChartplay(chartplay_values)
 	end
 
 	assert(chartplay_values:equalsChartplay(chartplay))
@@ -110,7 +113,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 	local chartfile
 
 	if save_chart then
-		chartfile = self.chartfiles_repo:getChartfileByHash(chartplay.hash)
+		chartfile = chartfiles_repo:getChartfileByHash(chartplay.hash)
 		if not chartfile then
 			local chartfile_values = Chartfile()
 			chartfile_values.hash = chartplay.hash
@@ -120,7 +123,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 			chartfile_values.submitted_at = time
 			chartfile_values.name = chartfile_name
 			chartfile_values.size = #chartfile_data
-			chartfile = self.chartfiles_repo:createChartfile(chartfile_values)
+			chartfile = chartfiles_repo:createChartfile(chartfile_values)
 		end
 
 		local ok, err = self.charts_storage:set(chartplay.hash, chartfile_data)
@@ -136,7 +139,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		end
 	end
 
-	chartfile = assert(self.chartfiles_repo:getChartfileByHash(chartplay.hash))
+	chartfile = assert(chartfiles_repo:getChartfileByHash(chartplay.hash))
 
 	---@type sea.Chartdiff
 	local computed_chartdiff
@@ -151,7 +154,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		if not computed_chartmeta then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
-			self.charts_repo:updateChartplay(chartplay)
+			charts_repo:updateChartplay(chartplay)
 			return nil, "compute chartmeta: " .. err
 		end
 	else
@@ -161,7 +164,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		if not ret then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
-			self.charts_repo:updateChartplay(chartplay)
+			charts_repo:updateChartplay(chartplay)
 			return nil, "compute: " .. err
 		end
 
@@ -172,7 +175,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		if not eq then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
-			self.charts_repo:updateChartplay(chartplay)
+			charts_repo:updateChartplay(chartplay)
 			return nil, "computed chartplay differs: " .. err
 		end
 
@@ -194,38 +197,17 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		if not timing_values then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
-			self.charts_repo:updateChartplay(chartplay)
+			charts_repo:updateChartplay(chartplay)
 			return nil, "timing values differs"
 		end
 	end
 
 	chartplay.compute_state = "valid"
 	chartplay.computed_at = time
-	self.charts_repo:updateChartplay(chartplay)
+	charts_repo:updateChartplay(chartplay)
 
-	local chartdiff = self.charts_repo:getChartdiffByChartkey(computed_chartdiff)
-	if not chartdiff then
-		computed_chartdiff.created_at = time
-		computed_chartdiff.computed_at = time
-		self.charts_repo:createChartdiff(computed_chartdiff)
-	elseif not chartdiff:equalsComputed(computed_chartdiff) then
-		computed_chartdiff.id = chartdiff.id
-		computed_chartdiff.computed_at = time
-		self.charts_repo:updateChartdiff(computed_chartdiff)
-		-- add a note on chartdiff page about this change
-	end
-
-	local chartmeta = self.charts_repo:getChartmetaByHashIndex(computed_chartmeta.hash, computed_chartmeta.index)
-	if not chartmeta then
-		computed_chartmeta.created_at = time
-		computed_chartmeta.computed_at = time
-		self.charts_repo:createChartmeta(computed_chartmeta)
-	elseif not chartmeta:equalsComputed(computed_chartmeta) then
-		computed_chartmeta.id = chartmeta.id
-		computed_chartmeta.computed_at = time
-		self.charts_repo:updateChartmeta(computed_chartmeta)
-		-- add a note on chartmeta page about this change
-	end
+	local chartdiff = charts_repo:createUpdateChartdiff(computed_chartdiff, time)
+	local chartmeta = charts_repo:createUpdateChartmeta(computed_chartmeta, time)
 
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)
