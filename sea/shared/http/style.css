@@ -69,6 +69,16 @@ main.center-vertically > * {
 	padding: 0;
 }
 
+.team-avatar {
+	display: inline-block;
+	width: 100%;
+	aspect-ratio: 2;
+	border-radius: 40px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
 .score-grade {
 	text-shadow: -1px -1px 0 #00000022, 1px -1px 0 #00000022, -1px 1px 0 #00000022, 1px 1px 0 #00000022;
 }

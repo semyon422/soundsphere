@@ -1,8 +1,38 @@
-<a href="/teams/create">Create</a>
+<section class="hero">
+	<div class="hero-body">
+		<h1 class="title">Teams</h1>
+		<h2 class="subtitle">Compete with your friends against other teams!</h2>
+	</div>
+</section>
 
-<h3>teams:</h3>
-<ul>
-<% for _, team in ipairs(teams) do %>
-	<li><a href="/teams/<%= team.id %>"><%= team.name %></a></li>
-<% end %>
-</ul>
+<nav class="level">
+	<div class="level-left">
+	</div>
+
+	<div class="level-right">
+		<p class="level-item"><a href="/teams/create" class="button is-success">Create</a></p>
+	</div>
+</nav>
+
+<table class="ranking-table">
+	<thead>
+		<th></th>
+		<th></th>
+		<th>Members</th>
+		<th>Activity</th>
+	</thead>
+	<tbody>
+		<% for _, team in ipairs(teams) do %>
+			<tr class="has-text">
+				<td class="ranking-table__team-avatar-cell">
+					<div class="team-avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></div>
+				</td>
+				<td align="left" class="ranking-table__main-cell">
+					<a class="has-text-primary-35" href="/teams/<%= team.id %>"><strong><%= team.name %></strong></a>
+				</td>
+				<td class="ranking-table__more-padding"><%= team.users_count %></td>
+				<td class="ranking-table__more-padding">10 hours</td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

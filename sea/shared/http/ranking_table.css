@@ -51,6 +51,16 @@
 	border-radius: 6px;
 }
 
+.ranking-table__team-avatar-cell {
+	vertical-align: middle;
+}
+
+.ranking-table__team-avatar-cell * {
+	display: block !important;
+	width: 48px;
+	height: 24px;
+}
+
 .ranking-table__main-cell {
 	width: 100%;
 }

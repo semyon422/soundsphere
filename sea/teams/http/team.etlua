@@ -8,16 +8,6 @@
 	margin-top: 105px;
 }
 
-.team__avatar {
-	display: inline-block;
-	width: 100%;
-	aspect-ratio: 2;
-	border-radius: 40px;
-	background-position: 50%;
-	background-repeat: no-repeat;
-	background-size: cover;
-}
-
 .team__key-value {
 	display: flex;
 	justify-content: space-between;
@@ -43,7 +33,7 @@
 				<div class="block">
 					<div class="box team__card-spacing">
 						<div class="block">
-							<span class="team__avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></span>
+							<span class="team-avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></span>
 						</div>
 						<div class="block">
 							<h1 class="title is-4 is-spaced" align="center"><%= team.name %></h1>
