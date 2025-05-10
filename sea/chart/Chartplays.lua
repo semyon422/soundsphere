@@ -9,7 +9,7 @@ local Chartplays = class()
 
 ---@param charts_repo sea.ChartsRepo
 ---@param chartfiles_repo sea.ChartfilesRepo
----@param chartplay_computer sea.IChartplayComputer
+---@param chartplay_computer sea.ChartplayComputer
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param leaderboards sea.Leaderboards
 ---@param charts_storage sea.IKeyValueStorage

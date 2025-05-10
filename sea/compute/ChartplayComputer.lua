@@ -1,4 +1,4 @@
-local IChartplayComputer = require("sea.compute.IChartplayComputer")
+local class = require("class")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 local ChartFactory = require("notechart.ChartFactory")
 local ComputeContext = require("sea.compute.ComputeContext")
@@ -6,9 +6,9 @@ local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayModel = require("sphere.models.ReplayModel")
 local RhythmModel = require("sphere.models.RhythmModel")
 
----@class sea.ChartplayComputer: sea.IChartplayComputer
+---@class sea.ChartplayComputer
 ---@operator call: sea.ChartplayComputer
-local ChartplayComputer = IChartplayComputer + {}
+local ChartplayComputer = class()
 
 function ChartplayComputer:new()
 	self.difficultyModel = DifficultyModel()
