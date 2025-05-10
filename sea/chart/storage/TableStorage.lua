@@ -1,6 +1,6 @@
 local IKeyValueStorage = require("sea.chart.storage.IKeyValueStorage")
 
----@class sea.TableStorage
+---@class sea.TableStorage: sea.IKeyValueStorage
 ---@operator call: sea.TableStorage
 local TableStorage = IKeyValueStorage + {}
 

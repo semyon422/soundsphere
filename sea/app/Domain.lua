@@ -5,7 +5,7 @@ local Teams = require("sea.teams.Teams")
 local Difftables = require("sea.difftables.Difftables")
 local Chartplays = require("sea.chart.Chartplays")
 local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
-local TableStorage = require("sea.chart.storage.TableStorage")
+local FolderStorage = require("sea.chart.storage.FolderStorage")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 
@@ -15,8 +15,8 @@ local Domain = class()
 
 ---@param repos sea.Repos
 function Domain:new(repos)
-	self.charts_storage = TableStorage()
-	self.replays_storage = TableStorage()
+	self.charts_storage = FolderStorage("storages/charts")
+	self.replays_storage = FolderStorage("storages/replays")
 	self.compute_data_provider = ComputeDataProvider(repos.chartfiles_repo, self.charts_storage, self.replays_storage)
 	self.compute_data_loader = ComputeDataLoader(self.compute_data_provider)
 
