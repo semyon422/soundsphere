@@ -19,23 +19,38 @@ end
 ---@return string?
 function ChartsComputer:computeChartplay(chartplay)
 	local charts_repo = self.charts_repo
-	local compute_data_loader = self.compute_data_loader
-
 	local time = os.time()
 
-	local chart_file_data, err = compute_data_loader:requireChart(chartplay.hash)
-	if not chart_file_data then
+	local ret, err = self:computeChartplayNoUpdate(chartplay, time)
+	if not ret then
 		chartplay.compute_state = "invalid"
 		chartplay.computed_at = time
 		charts_repo:updateChartplay(chartplay)
+		return nil, err
+	end
+
+	chartplay.compute_state = "valid"
+	chartplay.computed_at = time
+	charts_repo:updateChartplay(chartplay)
+
+	return ret
+end
+
+---@param chartplay sea.Chartplay
+---@param time integer
+---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
+---@return string?
+function ChartsComputer:computeChartplayNoUpdate(chartplay, time)
+	local charts_repo = self.charts_repo
+	local compute_data_loader = self.compute_data_loader
+
+	local chart_file_data, err = compute_data_loader:requireChart(chartplay.hash)
+	if not chart_file_data then
 		return nil, "require chart: " .. err
 	end
 
 	local replay_and_data, err = compute_data_loader:requireReplay(chartplay.replay_hash)
 	if not replay_and_data then
-		chartplay.compute_state = "invalid"
-		chartplay.computed_at = time
-		charts_repo:updateChartplay(chartplay)
 		return nil, "require replay: " .. err
 	end
 
@@ -78,18 +93,11 @@ function ChartsComputer:computeChartplay(chartplay)
 
 	local chartplay_computed, err = ctx:computeReplay(replay)
 	if not chartplay_computed then
-		chartplay.compute_state = "invalid"
-		chartplay.computed_at = time
-		charts_repo:updateChartplay(chartplay)
 		return nil, "compute: " .. err
 	end
 
 	chartplay:importChartplayBase(replay)
 	chartplay:importChartplayComputed(chartplay_computed)
-
-	chartplay.compute_state = "valid"
-	chartplay.computed_at = time
-	charts_repo:updateChartplay(chartplay)
 
 	return {
 		chartplay_computed = chartplay_computed,
