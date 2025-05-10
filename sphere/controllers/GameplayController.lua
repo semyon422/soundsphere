@@ -206,6 +206,10 @@ function GameplayController:actualizeReplayBaseTimings()
 	local timings = chartmeta.timings
 	timings = timings or Timings(unpack(settings.format_timings[chartmeta.format]))
 	self:setReplayBaseTimings(timings)
+
+	if chartmeta.timings then
+		self.replayBase.timings = nil
+	end
 end
 
 function GameplayController:actualizeReplayBase()
@@ -355,8 +359,7 @@ function GameplayController:saveScore()
 		replayBase,
 		chartmeta,
 		created_at,
-		pauseCounter.count,
-		config.replay_base.auto_timings
+		pauseCounter.count
 	)
 
 	local chartdiff = assert(computeContext.chartdiff)

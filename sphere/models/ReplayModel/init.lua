@@ -98,19 +98,14 @@ end
 ---@param chartmetaKey sea.ChartmetaKey
 ---@param created_at integer
 ---@param pause_count integer
----@param auto_timings boolean
 ---@return sea.Replay
 ---@return string
 ---@return string
-function ReplayModel:createReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
+function ReplayModel:createReplay(replayBase, chartmetaKey, created_at, pause_count)
 	local replay = Replay()
 
 	replay:importReplayBase(replayBase)
 	replay:importChartmetaKey(chartmetaKey)
-
-	if auto_timings then
-		replay.timings = nil
-	end
 
 	replay.healths = nil
 
@@ -135,11 +130,10 @@ end
 ---@param chartmetaKey sea.ChartmetaKey
 ---@param created_at integer
 ---@param pause_count integer
----@param auto_timings boolean
 ---@return sea.Replay
 ---@return string
-function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
-	local replay, data, hash = self:createReplay(replayBase, chartmetaKey, created_at, pause_count, auto_timings)
+function ReplayModel:saveReplay(replayBase, chartmetaKey, created_at, pause_count)
+	local replay, data, hash = self:createReplay(replayBase, chartmetaKey, created_at, pause_count)
 	assert(love.filesystem.write(self.path .. "/" .. hash, data))
 	return replay, hash
 end
