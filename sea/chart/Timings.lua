@@ -77,7 +77,7 @@ function Timings.decode(v)
 		return Timings("simple", (v - 1000) / 1000)
 	elseif v >= 2100 and v <= 2200 then
 		return Timings("osuod", (v - 2100) / 10) -- OverallDifficulty
-	elseif v >= 2301 and v <= 2302 then
+	elseif v >= 2301 and v <= 2309 then
 		return Timings("etternaj", v - 2300)
 	elseif v == 2400 then
 		return Timings("quaver")
