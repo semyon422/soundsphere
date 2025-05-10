@@ -1,6 +1,6 @@
 local class = require("class")
 local socket_url = require("socket.url")
-local LsqliteDatabase = require("rdb.db.LsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Resources = require("sea.app.Resources")
 local Repos = require("sea.app.Repos")
@@ -27,7 +27,7 @@ local App = class()
 
 ---@param app_config sea.AppConfig
 function App:new(app_config)
-	self.app_db = ServerSqliteDatabase(LsqliteDatabase())
+	self.app_db = ServerSqliteDatabase(LjsqliteDatabase())
 	self.sessions = Sessions("sea", app_config.sessions_secret)
 	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key)
 

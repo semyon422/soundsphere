@@ -255,6 +255,16 @@ function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
 	})
 end
 
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function ChartsRepo:getChartplaysComputedCount(computed_at, state)
+	return self.models.chartplays:count({
+		computed_at__lte = assert(computed_at),
+		compute_state = assert(state),
+	})
+end
+
 ---@param chartmeta_key sea.ChartmetaKey
 ---@return sea.Chartplay[]
 function ChartsRepo:getChartplaysForChartmeta(chartmeta_key)

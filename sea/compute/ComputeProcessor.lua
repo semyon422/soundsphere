@@ -12,6 +12,17 @@ function ComputeProcessor:new(charts_computer, compute_processes_repo)
 	self.compute_processes_repo = compute_processes_repo
 end
 
+---@return sea.ComputeProcess[]
+function ComputeProcessor:getComputeProcesses()
+	return self.compute_processes_repo:getComputeProcesses()
+end
+
+---@param id integer
+---@return sea.ComputeProcess?
+function ComputeProcessor:getComputeProcess(id)
+	return self.compute_processes_repo:getComputeProcess(id)
+end
+
 ---@param time integer
 ---@param state sea.ComputeState
 ---@param total integer
@@ -59,6 +70,11 @@ function ComputeProcessor:step(compute_process, chartplays)
 		return self:stepChartplays(compute_process, chartplays)
 	end
 	error()
+end
+
+---@return sea.ComputeProcess?
+function ComputeProcessor:deleteProcess(id)
+	return self.compute_processes_repo:deleteComputeProcess(id)
 end
 
 return ComputeProcessor

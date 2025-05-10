@@ -8,6 +8,8 @@ local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
 local FolderStorage = require("sea.chart.storage.FolderStorage")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
+local ComputeProcessor = require("sea.compute.ComputeProcessor")
+local ChartsComputer = require("sea.compute.ChartsComputer")
 
 ---@class sea.Domain
 ---@operator call: sea.Domain
@@ -32,6 +34,9 @@ function Domain:new(repos)
 		self.charts_storage,
 		self.replays_storage
 	)
+
+	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
+	self.compute_processor = ComputeProcessor(self.charts_computer, repos.compute_processes_repo)
 end
 
 return Domain

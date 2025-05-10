@@ -14,6 +14,21 @@ function ChartsComputer:new(compute_data_loader, charts_repo)
 	self.charts_repo = charts_repo
 end
 
+---@param computed_at integer
+---@param state sea.ComputeState
+---@param limit integer?
+---@return sea.Chartplay[]
+function ChartsComputer:getChartplaysComputed(computed_at, state, limit)
+	return self.charts_repo:getChartplaysComputed(computed_at, state, limit)
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function ChartsComputer:getChartplaysComputedCount(computed_at, state)
+	return self.charts_repo:getChartplaysComputedCount(computed_at, state)
+end
+
 ---@param chartplay sea.Chartplay
 ---@return {chartplay_computed: sea.ChartplayComputed, chartdiff: sea.Chartdiff, chartmeta: sea.Chartmeta}?
 ---@return string?

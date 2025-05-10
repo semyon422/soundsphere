@@ -32,4 +32,10 @@ function ComputeProcessesRepo:updateComputeProcess(compute_process)
 	return self.models.compute_processes:update(compute_process, {id = assert(compute_process.id)})[1]
 end
 
+---@param id integer
+---@return sea.ComputeProcess?
+function ComputeProcessesRepo:deleteComputeProcess(id)
+	return self.models.compute_processes:delete({id = assert(id)})[1]
+end
+
 return ComputeProcessesRepo
