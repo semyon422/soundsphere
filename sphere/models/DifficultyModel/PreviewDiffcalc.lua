@@ -38,6 +38,7 @@ function PreviewDiffcalc:compute(ctx)
 	end)
 
 	if not ok then
+		ctx.chartdiff.notes_preview = ""
 		print(err)
 	end
 end
