@@ -11,7 +11,6 @@ local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
 local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
-local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local ChartsComputer = require("sea.compute.ChartsComputer")
 local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
@@ -64,8 +63,7 @@ function CacheManager:new(gdb)
 	)
 	self.computeDataLoader = ComputeDataLoader(self.computeDataProvider)
 
-	self.chartplayComputer = ChartplayComputer()
-	self.chartsComputer = ChartsComputer(self.computeDataLoader, self.chartplayComputer, self.chartsRepo)
+	self.chartsComputer = ChartsComputer(self.computeDataLoader, self.chartsRepo)
 end
 
 function CacheManager:begin()

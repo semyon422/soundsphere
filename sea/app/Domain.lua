@@ -6,7 +6,6 @@ local Difftables = require("sea.difftables.Difftables")
 local Chartplays = require("sea.chart.Chartplays")
 local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
 local TableStorage = require("sea.chart.storage.TableStorage")
-local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 
@@ -20,7 +19,6 @@ function Domain:new(repos)
 	self.replays_storage = TableStorage()
 	self.compute_data_provider = ComputeDataProvider(repos.chartfiles_repo, self.charts_storage, self.replays_storage)
 	self.compute_data_loader = ComputeDataLoader(self.compute_data_provider)
-	self.chartplay_computer = ChartplayComputer(self.charts_storage, self.replays_storage)
 
 	self.users = Users(repos.users_repo, BcryptPasswordHasher())
 	self.leaderboards = Leaderboards(repos.leaderboards_repo)
@@ -29,7 +27,6 @@ function Domain:new(repos)
 	self.chartplays = Chartplays(
 		repos.charts_repo,
 		repos.chartfiles_repo,
-		self.chartplay_computer,
 		self.compute_data_loader,
 		self.leaderboards,
 		self.charts_storage,

@@ -2,6 +2,9 @@ local class = require("class")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local Chartfile = require("sea.chart.Chartfile")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
+local Chartkey = require("sea.chart.Chartkey")
+local ComputeContext = require("sea.compute.ComputeContext")
+local ReplayBase = require("sea.replays.ReplayBase")
 
 ---@class sea.Chartplays
 ---@operator call: sea.Chartplays
@@ -9,7 +12,6 @@ local Chartplays = class()
 
 ---@param charts_repo sea.ChartsRepo
 ---@param chartfiles_repo sea.ChartfilesRepo
----@param chartplay_computer sea.ChartplayComputer
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param leaderboards sea.Leaderboards
 ---@param charts_storage sea.IKeyValueStorage
@@ -17,7 +19,6 @@ local Chartplays = class()
 function Chartplays:new(
 	charts_repo,
 	chartfiles_repo,
-	chartplay_computer,
 	compute_data_loader,
 	leaderboards,
 	charts_storage,
@@ -25,7 +26,6 @@ function Chartplays:new(
 )
 	self.charts_repo = charts_repo
 	self.chartfiles_repo = chartfiles_repo
-	self.chartplay_computer = chartplay_computer
 	self.compute_data_loader = compute_data_loader
 	self.leaderboards = leaderboards
 	self.charts_storage = charts_storage
@@ -141,37 +141,67 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 
 	chartfile = assert(chartfiles_repo:getChartfileByHash(chartplay.hash))
 
+	local ctx = ComputeContext()
+
+	local chart_chartmeta, err = ctx:fromFileData(
+		chart_file_data.name,
+		chart_file_data.data,
+		chartplay.index
+	)
+
+	if not chart_chartmeta then
+		chartplay.compute_state = "invalid"
+		chartplay.computed_at = time
+		charts_repo:updateChartplay(chartplay)
+		return nil, "from file data: " .. err
+	end
+
+	local chartmeta = charts_repo:createUpdateChartmeta(chart_chartmeta.chartmeta, time)
+
+	local timings = chartplay.timings or chartmeta.timings
+	if not timings then
+		chartplay.compute_state = "invalid"
+		chartplay.computed_at = time
+		charts_repo:updateChartplay(chartplay)
+		return nil, "missing timings"
+	end
+
+	if #chartplay.modifiers > 0 or chartplay.rate ~= 1 then
+		-- create default chartdiff
+		local default_chartkey = Chartkey()
+		default_chartkey.hash = chartplay.hash
+		default_chartkey.index = chartplay.index
+		default_chartkey.rate = 1
+		default_chartkey.modifiers = {}
+		default_chartkey.mode = "mania"
+
+		local default_chartdiff = charts_repo:getChartdiffByChartkey(default_chartkey)
+		if not default_chartdiff then
+			local chartdiff = ctx:computeBase(ReplayBase())
+			chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)
+		end
+	end
+
 	---@type sea.Chartdiff
 	local computed_chartdiff
-	---@type sea.Chartmeta
-	local computed_chartmeta
 
 	if chartplay.custom then
 		computed_chartdiff = chartdiff_values
 		computed_chartdiff.custom_user_id = user.id
-
-		computed_chartmeta, err = self.chartplay_computer:computeChartmeta(chartfile.name, chartfile_data, chartplay.index)
-		if not computed_chartmeta then
-			chartplay.compute_state = "invalid"
-			chartplay.computed_at = time
-			charts_repo:updateChartplay(chartplay)
-			return nil, "compute chartmeta: " .. err
-		end
 	else
-		local ret, err = self.chartplay_computer:compute(
-			chartfile.name, chartfile_data, chartplay.index, replay
-		)
-		if not ret then
+		ctx:applyModifierReorder(replay)
+
+		computed_chartdiff = ctx:computeBase(replay)
+
+		local chartplay_computed, err = ctx:computeReplay(replay)
+		if not chartplay_computed then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
 			charts_repo:updateChartplay(chartplay)
 			return nil, "compute: " .. err
 		end
 
-		computed_chartdiff = ret.chartdiff
-		computed_chartmeta = ret.chartmeta
-
-		local eq, err = chartplay:equalsComputed(ret.chartplay_computed)
+		local eq, err = chartplay:equalsComputed(chartplay_computed)
 		if not eq then
 			chartplay.compute_state = "invalid"
 			chartplay.computed_at = time
@@ -181,13 +211,11 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 
 		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff)
 		if not eq then
+			chartplay.compute_state = "invalid"
+			chartplay.computed_at = time
+			charts_repo:updateChartplay(chartplay)
 			return nil, "computed values differs: " .. err
 		end
-	end
-
-	local timings = chartplay.timings or computed_chartmeta.timings
-	if not timings then
-		return nil, "missing timings"
 	end
 
 	local subtimings = chartplay.subtimings
@@ -207,7 +235,6 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 	charts_repo:updateChartplay(chartplay)
 
 	local chartdiff = charts_repo:createUpdateChartdiff(computed_chartdiff, time)
-	local chartmeta = charts_repo:createUpdateChartmeta(computed_chartmeta, time)
 
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)

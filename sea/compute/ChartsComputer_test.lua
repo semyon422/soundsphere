@@ -1,5 +1,4 @@
 local TableStorage = require("sea.chart.storage.TableStorage")
-local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local FakeClient = require("sea.compute.FakeClient")
@@ -35,16 +34,13 @@ local function create_test_ctx()
 
 	local compute_data_provider = ComputeDataProvider(chartfiles_repo, charts_storage, replays_storage)
 	local compute_data_loader = ComputeDataLoader(compute_data_provider)
-	local chartplay_computer = ChartplayComputer()
-	local charts_computer = ChartsComputer(compute_data_loader, chartplay_computer, charts_repo)
+	local charts_computer = ChartsComputer(compute_data_loader, charts_repo)
 
-	local chartplayComputer = ChartplayComputer()
 	local leaderboards = Leaderboards(LeaderboardsRepo(models))
 
 	local chartplays = Chartplays(
 		charts_repo,
 		chartfiles_repo,
-		chartplayComputer,
 		compute_data_loader,
 		leaderboards,
 		charts_storage,

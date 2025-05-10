@@ -4,7 +4,6 @@ local math_util = require("math_util")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartfile = require("sea.chart.Chartfile")
 local ComputeContext = require("sea.compute.ComputeContext")
-local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local TableStorage = require("sea.chart.storage.TableStorage")
@@ -29,7 +28,6 @@ function FakeClient:new(accuracy, miss_ratio)
 	self.computeContext = ComputeContext()
 	self.replayBase = ReplayBase()
 	self.replayModel = ReplayModel()
-	self.chartplayComputer = ChartplayComputer()
 
 	local db = ServerSqliteDatabase(LjsqliteDatabase())
 	db.path = ":memory:"
@@ -83,8 +81,7 @@ end
 ---@param index integer
 ---@param created_at integer
 ---@param pause_count integer
----@param auto_timings boolean
-function FakeClient:play(chartfile_name, chartfile_data, index, created_at, pause_count, auto_timings)
+function FakeClient:play(chartfile_name, chartfile_data, index, created_at, pause_count)
 	local computeContext = self.computeContext
 	local replayBase = self.replayBase
 	local replayModel = self.replayModel
@@ -102,18 +99,16 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 		replayBase,
 		chartmeta,
 		created_at,
-		pause_count,
-		auto_timings
+		pause_count
 	)
 
-	self.chartplayComputer:computeFromContext(computeContext, replay)
-	local ret = assert(self.chartplayComputer:computeFromContext(computeContext, replay))
+	local chartplay_computed = assert(computeContext:computeReplay(replay))
 
 	local chartplay = Chartplay()
 
 	chartplay:importChartmetaKey(chartmeta)
 	chartplay:importChartplayBase(replay)
-	chartplay:importChartplayComputed(ret.chartplay_computed)
+	chartplay:importChartplayComputed(chartplay_computed)
 
 	chartplay.replay_hash = replay_hash
 	chartplay.pause_count = pause_count
@@ -142,8 +137,8 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 
 	return {
 		chartplay = chartplay,
-		chartdiff = ret.chartdiff,
-		chartmeta = ret.chartmeta,
+		chartdiff = computeContext.chartdiff,
+		chartmeta = computeContext.chartmeta,
 		replay = replay,
 		replay_hash = replay_hash,
 		replay_data = replay_data,

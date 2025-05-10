@@ -1,15 +1,16 @@
 local class = require("class")
+local ReplayBase = require("sea.replays.ReplayBase")
+local Chartkey = require("sea.chart.Chartkey")
+local ComputeContext = require("sea.compute.ComputeContext")
 
 ---@class sea.ChartsComputer
 ---@operator call: sea.ChartsComputer
 local ChartsComputer = class()
 
 ---@param compute_data_loader sea.ComputeDataLoader
----@param chartplay_computer sea.ChartplayComputer
 ---@param charts_repo sea.ChartsRepo
-function ChartsComputer:new(compute_data_loader, chartplay_computer, charts_repo)
+function ChartsComputer:new(compute_data_loader, charts_repo)
 	self.compute_data_loader = compute_data_loader
-	self.chartplay_computer = chartplay_computer
 	self.charts_repo = charts_repo
 end
 
@@ -19,7 +20,6 @@ end
 function ChartsComputer:computeChartplay(chartplay)
 	local charts_repo = self.charts_repo
 	local compute_data_loader = self.compute_data_loader
-	local chartplay_computer = self.chartplay_computer
 
 	local time = os.time()
 
@@ -39,24 +39,50 @@ function ChartsComputer:computeChartplay(chartplay)
 		return nil, "require replay: " .. err
 	end
 
-	local replay = replay_and_data.replay
+	local ctx = ComputeContext()
 
-	local ret, err = chartplay_computer:compute(
+	local chart_chartmeta, err = ctx:fromFileData(
 		chart_file_data.name,
 		chart_file_data.data,
-		chartplay.index,
-		replay
+		chartplay.index
 	)
-	if not ret then
+
+	if not chart_chartmeta then
+		return nil, "from file data: " .. err
+	end
+
+	local chartmeta = charts_repo:createUpdateChartmeta(chart_chartmeta.chartmeta, time)
+
+	if #chartplay.modifiers > 0 or chartplay.rate ~= 1 then
+		-- create default chartdiff
+		local default_chartkey = Chartkey()
+		default_chartkey.hash = chartplay.hash
+		default_chartkey.index = chartplay.index
+		default_chartkey.rate = 1
+		default_chartkey.modifiers = {}
+		default_chartkey.mode = "mania"
+
+		local default_chartdiff = charts_repo:getChartdiffByChartkey(default_chartkey)
+		if not default_chartdiff then
+			local chartdiff = ctx:computeBase(ReplayBase())
+			chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)
+		end
+	end
+
+	local replay = replay_and_data.replay
+
+	ctx:applyModifierReorder(replay)
+
+	local chartdiff = ctx:computeBase(replay)
+	chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)
+
+	local chartplay_computed, err = ctx:computeReplay(replay)
+	if not chartplay_computed then
 		chartplay.compute_state = "invalid"
 		chartplay.computed_at = time
 		charts_repo:updateChartplay(chartplay)
 		return nil, "compute: " .. err
 	end
-
-	local computed_chartdiff = ret.chartdiff
-	local computed_chartmeta = ret.chartmeta
-	local chartplay_computed = ret.chartplay_computed
 
 	chartplay:importChartplayBase(replay)
 	chartplay:importChartplayComputed(chartplay_computed)
@@ -65,17 +91,11 @@ function ChartsComputer:computeChartplay(chartplay)
 	chartplay.computed_at = time
 	charts_repo:updateChartplay(chartplay)
 
-	computed_chartdiff.computed_at = time
-	computed_chartmeta.computed_at = time
-
-	local chartdiff = charts_repo:createUpdateChartdiff(computed_chartdiff, time)
-	local chartmeta = charts_repo:createUpdateChartmeta(computed_chartmeta, time)
-
-	if #chartdiff.modifiers > 0 or chartdiff.rate ~= 1 then
-		-- create default chartdiff if missing
-	end
-
-	return ret
+	return {
+		chartplay_computed = chartplay_computed,
+		chartdiff = chartdiff,
+		chartmeta = chartmeta,
+	}
 end
 
 return ChartsComputer

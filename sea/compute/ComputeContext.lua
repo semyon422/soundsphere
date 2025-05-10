@@ -11,6 +11,8 @@ local InputMode = require("ncdk.InputMode")
 local TempoRange = require("notechart.TempoRange")
 local Note = require("ncdk2.notes.Note")
 local Notes = require("ncdk2.notes.Notes")
+local ReplayModel = require("sphere.models.ReplayModel")
+local RhythmModel = require("sphere.models.RhythmModel")
 
 ---@class sea.ComputeContext
 ---@operator call: sea.ComputeContext
@@ -95,7 +97,7 @@ end
 
 ---@param replayBase sea.ReplayBase
 ---@return sea.Chartdiff
----@return table
+---@return sea.ModifiersMetaState
 function ComputeContext:computeBase(replayBase)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
@@ -124,6 +126,29 @@ function ComputeContext:computeBase(replayBase)
 	end
 
 	return chartdiff, state
+end
+
+---@param replay sea.Replay
+---@return sea.ChartplayComputed?
+---@return string?
+function ComputeContext:computeReplay(replay)
+	local chartmeta = assert(self.chartmeta)
+	assert(self.chartdiff)
+
+	local rhythmModel = RhythmModel()
+	local replayModel = ReplayModel(rhythmModel)
+
+	rhythmModel:setReplayBase(replay)
+	replayModel:decodeEvents(replay.events)
+
+	self:computePlay(rhythmModel, replayModel)
+
+	local timings = assert(replay.timings or chartmeta.timings)
+	rhythmModel.scoreEngine:createAndSelectByTimings(timings, replay.subtimings)
+
+	local chartplay_computed = rhythmModel:getChartplayComputed()
+
+	return chartplay_computed
 end
 
 ---@param rhythmModel sphere.RhythmModel

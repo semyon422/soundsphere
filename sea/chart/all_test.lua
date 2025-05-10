@@ -6,7 +6,6 @@ local Chartplays = require("sea.chart.Chartplays")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
-local ChartplayComputer = require("sea.compute.ChartplayComputer")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
@@ -41,7 +40,6 @@ local function create_test_ctx()
 	local charts_repo = ChartsRepo(models)
 	local chartfiles_repo = ChartfilesRepo(models)
 
-	local chartplayComputer = ChartplayComputer()
 	local leaderboards = Leaderboards(LeaderboardsRepo(models))
 
 	local charts_storage = TableStorage()
@@ -53,7 +51,6 @@ local function create_test_ctx()
 	local chartplays = Chartplays(
 		charts_repo,
 		chartfiles_repo,
-		chartplayComputer,
 		compute_data_loader,
 		leaderboards,
 		charts_storage,
