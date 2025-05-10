@@ -22,7 +22,7 @@ local function create_test_ctx()
 	local user = User()
 	user.id = 1
 
-	local team, err = assert(teams:create(user, "Team 1", "T1"))
+	local team, err = assert(teams:create(user, "Team 1", "T1", "open"))
 
 	return {
 		db = db,
@@ -55,7 +55,7 @@ function test.join_open(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -79,7 +79,7 @@ function test.join_open_by_invite_1(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -105,7 +105,7 @@ function test.join_open_by_invite_2(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -131,7 +131,7 @@ function test.join_open_double_invite(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -151,7 +151,7 @@ function test.join_request(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "request"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -182,7 +182,7 @@ function test.join_double_request(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "request"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -205,7 +205,7 @@ function test.join_request_revoke(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "request"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -235,7 +235,7 @@ function test.join_invite(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "invite"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -268,7 +268,7 @@ function test.join_invite_revoke(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "invite"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -300,7 +300,7 @@ function test.leave(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?
@@ -348,7 +348,7 @@ function test.transferOwner(t)
 	local ctx = create_test_ctx()
 	local teams = ctx.teams
 
-	local team = Team()
+	local team = ctx.team
 	team.type = "open"
 	team = teams:update(ctx.user, team)
 	---@cast team -?

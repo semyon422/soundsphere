@@ -30,9 +30,10 @@ end
 ---@param user sea.User
 ---@param name string
 ---@param alias string
+---@param _type sea.TeamType
 ---@return sea.Team?
 ---@return string?
-function Teams:create(user, name, alias, type)
+function Teams:create(user, name, alias, _type)
 	local can, err = self.teams_access:canCreate(user)
 	if not can then
 		return nil, err
@@ -44,7 +45,7 @@ function Teams:create(user, name, alias, type)
 	team.description = ""
 	team.users_count = 0
 	team.owner_id = user.id
-	team.type = type
+	team.type = _type
 	team.created_at = os.time()
 
 	local ok, err = team:validate()
