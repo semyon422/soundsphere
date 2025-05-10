@@ -97,7 +97,7 @@ local _events = {
 
 local _replayfile_data_table = {
 	version = 1,
-	timing_values = TimingValuesFactory:get(Timings("sphere")),
+	timing_values = TimingValuesFactory:get(Timings("osuod", 8)),
 	events = ReplayEvents.encode(_events),
 	created_at = 0,
 	--
