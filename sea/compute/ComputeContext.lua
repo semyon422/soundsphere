@@ -219,6 +219,7 @@ end
 function ComputeContext:applyTempo(tempoFactor, primaryTempo)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
+	local chartdiff = assert(self.chartdiff)
 
 	if tempoFactor == "primary" then
 		applyTempo(chart, primaryTempo)
@@ -230,11 +231,11 @@ function ComputeContext:applyTempo(tempoFactor, primaryTempo)
 		return
 	end
 
-	local minTime = chartmeta.start_time
-	local maxTime = minTime + chartmeta.duration
+	local start_time = chartdiff.start_time
+	local end_time = start_time + chartdiff.duration
 
 	local t = {}
-	t.average, t.minimum, t.maximum = TempoRange:find(chart, minTime, maxTime)
+	t.average, t.minimum, t.maximum = TempoRange:find(chart, start_time, end_time)
 
 	applyTempo(chart, t[tempoFactor])
 end
