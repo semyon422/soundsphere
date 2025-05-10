@@ -56,12 +56,15 @@ function TeamResource:getTeamPage(req, res, ctx)
 	local team_users = self.teams:getTeamUsers(team.id)
 	ctx.team_users = team_users and self.teams:preloadUsers(team_users)
 
+	if not ctx.session_user:isAnon() then
+		ctx.team_user = self.teams:getTeamUser(ctx.session_user, team)
+	end
+
 	ctx.team = team
-	ctx.team_user = self.teams:getTeamUser(ctx.session_user, team)
 	ctx.can_update = can_update
 	ctx.edit_description = can_update and query.edit_description == "true"
 
-	ctx.ignore_main_container = true
+	ctx.main_container_type = "none"
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
 end
 

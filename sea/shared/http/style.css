@@ -5,14 +5,35 @@ body {
 	margin: 0;
 }
 
-.icon-margin-right {
-	margin-right: 5px;
+header {
+	flex-shrink: 0;
 }
 
-.center-form-vertical {
-	display: grid;
-	max-height: 80vh;
-	grid-template-rows: repeat(3, 1fr);
+footer {
+	flex-shrink: 0;
+}
+
+main {
+	flex-grow: 1;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+main.center-vertically {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow-y: auto;
+	padding: 20px;
+}
+
+main.center-vertically > * {
+	width: 100%;
+}
+
+.icon-margin-right {
+	margin-right: 5px;
 }
 
 .border-box {
@@ -46,6 +67,16 @@ body {
 	border-top: 1px solid #ccc;
 	margin: 1em 0;
 	padding: 0;
+}
+
+.team-avatar {
+	display: inline-block;
+	width: 100%;
+	aspect-ratio: 2;
+	border-radius: 40px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 
 .score-grade {
@@ -100,6 +131,34 @@ body {
 	background-color: oklch(0.72 0.1871 17.63);
 }
 
+.form-container {
+	display: flex;
+	justify-content: center;
+	margin: 1em;
+}
+
+.form {
+	position: relative;
+	width: 560px;
+}
+
+.content-disabled {
+	filter: blur(2px) opacity(0.4);
+	pointer-events: none;
+	user-select: none;
+}
+
+.content-disabled-message {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 1em 1em;
+	text-align: center;
+	z-index: 10;
+}
+
 
 .saira-regular {
   font-family: "Saira", sans-serif;
@@ -107,7 +166,7 @@ body {
   font-weight: 300;
   font-style: normal;
   font-variation-settings:
-    "wdth" 95;
+	"wdth" 95;
 }
 
 .saira-medium {

@@ -5,7 +5,12 @@ local class = require("class")
 local TeamAccess = class()
 
 ---@param user sea.User
+---@return boolean
+---@return string? error
 function TeamAccess:canCreate(user)
+	if user:isAnon() then
+		return false, "not allowed"
+	end
 	return true
 end
 
