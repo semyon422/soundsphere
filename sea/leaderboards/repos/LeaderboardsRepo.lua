@@ -189,8 +189,7 @@ end
 ---@return sea.Chartplayview[]
 function LeaderboardsRepo:getBestChartplaysFull(lb, user_id)
 	local chartplayviews = self:getBestChartplays(lb, user_id)
-	self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
-	return chartplayviews
+	return self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
 end
 
 --------------------------------------------------------------------------------
@@ -203,6 +202,21 @@ function LeaderboardsRepo:getLeaderboardUser(leaderboard_id, user_id)
 		leaderboard_id = assert(leaderboard_id),
 		user_id = assert(user_id),
 	})
+end
+
+---@param leaderboard_id integer
+---@return sea.LeaderboardUser[]
+function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id)
+	return self.models.leaderboard_users:select({leaderboard_id = assert(leaderboard_id)})
+end
+
+---@param leaderboard_id integer
+---@return sea.LeaderboardUser[]
+function LeaderboardsRepo:getLeaderboardUsersFull(leaderboard_id)
+	return self.models.leaderboard_users:preload(
+		self:getLeaderboardUsers(leaderboard_id),
+		"user"
+	)
 end
 
 ---@param lb_user sea.LeaderboardUser

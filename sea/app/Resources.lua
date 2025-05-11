@@ -50,7 +50,7 @@ function Resources:new(domain, server_remote, views, sessions)
 	self.users = UsersResource(domain.users, views)
 	self.user = UserResource(domain.users, domain.leaderboards, views)
 
-	self.rankings = RankingsResource(views)
+	self.rankings = RankingsResource(domain.users, domain.leaderboards, views)
 
 	self.leaderboards = LeaderboardsResource(domain.leaderboards, views)
 	self.leaderboard = LeaderboardResource(domain.leaderboards, domain.difftables, views)

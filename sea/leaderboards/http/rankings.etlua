@@ -1,3 +1,5 @@
+<% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
+
 <%
 local function getQuery(field, value)
 	local strs = {}
@@ -34,11 +36,11 @@ end
 
 <div class="tabs is-centered">
 	<ul>
-		<% for _, v in ipairs(ranking_types) do %>
-			<% if v.id == query.ranking_type_id then %>
+		<% for _, v in ipairs(ranking_type_tabs) do %>
+			<% if v.id == ranking_type then %>
 				<li class="is-active"><a><%= v.name %></a></li>
 			<% else %>
-				<li><a href="<%= getQuery('ranking_type_id', v.id)%>"><%= v.name %></a></li>
+				<li><a href="<%= getQuery('ranking_type', v.id)%>"><%= v.name %></a></li>
 			<% end %>
 		<% end %>
 	</ul>
@@ -47,7 +49,9 @@ end
 <div class="columns">
 	<% if display_leaderboards then %>
 		<div class="column is-one-quarter">
-			<div class="block">
+<%
+--[[%>
+				<div class="block">
 				<h1 class="title">Game mode</h1>
 				<aside class="menu">
 					<ul class="menu-list">
@@ -61,23 +65,24 @@ end
 					</ul>
 				</aside>
 			</div>
+<%
+]]%>
 			<div class="block">
 				<h1 class="title">Leaderboard</h1>
 				<aside class="menu">
-					<% for _, category in ipairs(leaderboards) do %>
-						<p class="menu-label"><%= category.name %></p>
-						<ul class="menu-list">
-							<% for _, leaderboard in ipairs(category.items) do %>
-								<% if leaderboard.id == query.leaderboard_id then %>
-									<li><a class="is-active"><%= leaderboard.name %></a></li>
-								<% else %>
-									<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>"><%= leaderboard.name %></a></li>
-								<% end %>
+					<ul class="menu-list">
+						<% for _, leaderboard in ipairs(leaderboards) do %>
+							<% if leaderboard.id == query.leaderboard_id then %>
+								<li><a class="is-active"><%= leaderboard.name %></a></li>
+							<% else %>
+								<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>"><%= leaderboard.name %></a></li>
 							<% end %>
-						</ul>
-					<% end %>
+						<% end %>
+					</ul>
 				</aside>
 			</div>
+<%
+--[[%>
 			<% if display_key_modes then %>
 				<div class="block">
 					<h1 class="title">Key mode</h1>
@@ -97,10 +102,12 @@ end
 					</aside>
 				</div>
 			<% end %>
+<%
+]]%>
 		</div>
 	<% end %>
 	<div class="column">
-		<% if display_leaderboards then %>
+		<% if false and display_leaderboards then %>
 			<div class="block">
 				<div class="card">
 					<div class="card-content">
@@ -150,29 +157,31 @@ end
 			</div>
 		<% end %>
 		<div class="block">
+			<% if ranking_type == "rating" then %>
 			<table class="ranking-table">
 				<thead>
 					<th>Rank</th>
 					<th></th>
 					<th></th>
 					<th></th>
-					<% for _, v in ipairs(table_cell_names) do %>
-						<th><%= v %></th>
-					<% end %>
+					<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
+					<th>Plays</th>
 				</thead>
 				<tbody>
-					<% for _, user in ipairs(users) do %>
+					<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
+						<% local user = leaderboard_user.user %>
+						<% local rankChange = 0 %>
 						<tr class="has-text">
-							<td>#<%= user.rank %></td>
-							<% if user.rankChange > 0 then %>
+							<td>#<%= leaderboard_user.rank %></td>
+							<% if rankChange > 0 then %>
 								<td class="ranking-table__rank-change-cell has-text-success">
 									<i class="fa fa-solid fa-arrow-up"></i>
-									<%= user.rankChange %>
+									<%= rankChange %>
 								</td>
-							<% elseif user.rankChange < 0 then %>
+							<% elseif rankChange < 0 then %>
 								<td class="ranking-table__rank-change-cell has-text-danger">
 									<i class="fa fa-solid fa-arrow-down"></i>
-									<%= math.abs(user.rankChange) %>
+									<%= math.abs(rankChange) %>
 								</td>
 							<% else %>
 								<td></td>
@@ -183,17 +192,52 @@ end
 							<td align="left" class="ranking-table__main-cell">
 								<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
 							</td>
-							<% for _, v in ipairs(user.cellValues) do %>
-								<% if v.dimmed then %>
-									<td class="ranking-table__more-padding has-text-grey"><%= v.label %></td>
-								<% else %>
-									<td class="ranking-table__more-padding has-background"><%= v.label %></td>
-								<% end %>
-							<% end %>
+							<td class="ranking-table__more-padding has-background"><%= ("%0.2f"):format(leaderboard_user.total_rating) %></td>
+							<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
 						</tr>
 					<% end %>
 				</tbody>
 			</table>
+			<% else %>
+			<table class="ranking-table">
+				<thead>
+					<th>Rank</th>
+					<th></th>
+					<th></th>
+					<th>
+						<% if ranking_type == "charts" then %>
+							Charts
+						<% elseif ranking_type == "play_count" then %>
+							Plays
+						<% elseif ranking_type == "play_time" then %>
+							Time
+						<% end %>
+					</th>
+				</thead>
+				<tbody>
+					<% for i, user in ipairs(users) do %>
+						<tr class="has-text">
+							<td>#<%= i %></td>
+							<td class="ranking-table__flag-cell">
+								<div class="fi-<%= user.flag %>"></div>
+							</td>
+							<td align="left" class="ranking-table__main-cell">
+								<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+							</td>
+							<td class="ranking-table__more-padding has-background">
+								<% if ranking_type == "charts" then %>
+									<%= user.chartmetas_count %>
+								<% elseif ranking_type == "play_count" then %>
+									<%= user.chartplays_count %>
+								<% elseif ranking_type == "play_time" then %>
+									<%= user.play_time %>
+								<% end %>
+							</td>
+						</tr>
+					<% end %>
+				</tbody>
+			</table>
+			<% end %>
 		</div>
 		<div class="block">
 			<nav class="pagination is-centered" role="navigation" aria-label="pagination">

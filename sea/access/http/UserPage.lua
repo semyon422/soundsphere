@@ -195,7 +195,7 @@ function UserPage:getScores(lb, user_id)
 			timeSince = time_util.time_ago_in_words(cpv.created_at),
 			grade = cpv:getGrade(),
 			rating = rating,
-			ratingPostfix = postfixes[lb.rating_calc],
+			ratingPostfix = RatingCalc:postfix(lb.rating_calc):upper(),
 		}
 	end
 
