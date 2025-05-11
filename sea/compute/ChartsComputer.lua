@@ -36,7 +36,12 @@ function ChartsComputer:computeChartplay(chartplay)
 	local charts_repo = self.charts_repo
 	local time = os.time()
 
-	local ret, err = self:computeChartplayNoUpdate(chartplay, time)
+	local ok, ret, err = xpcall(self.computeChartplayNoUpdate, debug.traceback, self, chartplay, time)
+	if not ok then
+		ret, err = ok, ret
+		---@cast err string
+	end
+
 	if not ret then
 		chartplay.compute_state = "invalid"
 		chartplay.computed_at = time

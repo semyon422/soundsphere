@@ -48,7 +48,10 @@ function ComputeProcessor:stepChartplays(compute_process, chartplays)
 	local charts_computer = self.charts_computer
 
 	for _, chartplay in ipairs(chartplays) do
-		charts_computer:computeChartplay(chartplay)
+		local ret, err = charts_computer:computeChartplay(chartplay)
+		if not ret then
+			print(err)
+		end
 	end
 
 	compute_process.current = compute_process.current + #chartplays
