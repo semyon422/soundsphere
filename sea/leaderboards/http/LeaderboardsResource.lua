@@ -57,8 +57,6 @@ function LeaderboardsResource:createLeaderboard(req, res, ctx)
 	lb.description = body_params.description
 
 	lb.rating_calc = body_params.rating_calc
-	lb.scores_comb = body_params.scores_comb
-	lb.scores_comb_count = tonumber(body_params.scores_comb_count) or 0
 
 	lb.nearest = body_params.nearest
 	lb.pass = body_params.pass == "on"

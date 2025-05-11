@@ -80,8 +80,6 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 	`description` TEXT,
 	`created_at` INTEGER,
 	`rating_calc` INTEGER,
-	`scores_comb` INTEGER,
-	`scores_comb_count` INTEGER,
 	`nearest` INTEGER,
 	`pass` INTEGER,
 	`judges` INTEGER,

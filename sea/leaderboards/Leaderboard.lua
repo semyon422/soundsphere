@@ -4,7 +4,6 @@ local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
-local ScoreComb = require("sea.leaderboards.ScoreComb")
 local TernaryState = require("sea.chart.TernaryState")
 local JudgesResult = require("sea.chart.JudgesResult")
 local Gamemode = require("sea.chart.Gamemode")
@@ -17,8 +16,6 @@ local Gamemode = require("sea.chart.Gamemode")
 ---@field created_at integer
 ---rating
 ---@field rating_calc sea.RatingCalc
----@field scores_comb sea.ScoreComb
----@field scores_comb_count integer
 ---filters
 ---@field nearest sea.TernaryState
 ---@field pass boolean
@@ -44,8 +41,6 @@ local Leaderboard = class()
 
 function Leaderboard:new()
 	self.rating_calc = "enps"
-	self.scores_comb = "avg"
-	self.scores_comb_count = 20
 
 	self.nearest = "any"
 	self.pass = false
@@ -90,8 +85,6 @@ Leaderboard.struct = {
 	name = types.name,
 	description = types.description,
 	rating_calc = types.new_enum(RatingCalc),
-	scores_comb = types.new_enum(ScoreComb),
-	scores_comb_count = types.count,
 	nearest = types.new_enum(TernaryState),
 	pass = types.boolean,
 	judges = types.new_enum(JudgesResult),

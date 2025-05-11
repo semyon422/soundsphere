@@ -3,6 +3,7 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local TotalRating = require("sea.leaderboards.TotalRating")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
@@ -787,9 +788,7 @@ function test.total_rating(t)
 	local cp1 = create_chartplay(ctx, {rating = 1, hash = "1"})
 	local cp2 = create_chartplay(ctx, {rating = 2, hash = "2"})
 
-	ctx.leaderboard.scores_comb = "avg"
-	ctx.leaderboard.scores_comb_count = 10
-	lb_update_select(ctx)
+	ctx.leaderboards.total_rating.avg_count = 10
 
 	ctx.leaderboards:addChartplay(cp1)
 
@@ -803,9 +802,7 @@ end
 function test.rank(t)
 	local ctx = create_test_ctx()
 
-	ctx.leaderboard.scores_comb = "avg"
-	ctx.leaderboard.scores_comb_count = 1
-	lb_update_select(ctx)
+	ctx.leaderboards.total_rating.avg_count = 1
 
 	local cp1 = create_chartplay(ctx, {rating = 1, user_id = 1})
 	local cp2 = create_chartplay(ctx, {rating = 2, user_id = 2})

@@ -1,6 +1,7 @@
 local class = require("class")
 local time_util = require("time_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
+local TotalRating = require("sea.leaderboards.TotalRating")
 local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sea.UserPage
@@ -163,23 +164,18 @@ local postfixes = {
 ---@param lb sea.Leaderboard
 ---@param user_id integer
 ---@return table
----@return table
+---@return sea.TotalRating
 function UserPage:getScores(lb, user_id)
 	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
 
-	local scores = {}
+	local total_rating = TotalRating()
+	total_rating:calc(chartplayviews)
 
-	local enps = 0
-	local pp = 0
-	local msd = 0
+	local scores = {}
 
 	for i, cpv in ipairs(chartplayviews) do
 		local chartmeta = cpv.chartmeta
 		local chartdiff = cpv.chartdiff
-
-		enps = enps + cpv.rating
-		pp = pp + cpv.rating_pp
-		msd = msd + cpv.rating_msd
 
 		---@type number
 		local rating = cpv[RatingCalc:column(lb.rating_calc)]
@@ -189,8 +185,10 @@ function UserPage:getScores(lb, user_id)
 			title = chartmeta and chartmeta.title or "?",
 			name = chartmeta and chartmeta.name or "?",
 			creator = chartmeta and chartmeta.creator or "?",
-			timeRate = chartdiff and chartdiff.rate or "?",
-			mods = ModifierModel:getString(cpv.modifiers),
+			rate = chartdiff and chartdiff.rate or "?",
+			modifiers = ModifierModel:getString(cpv.modifiers),
+			const = cpv.const,
+			tap_only = cpv.tap_only,
 			accuracy = cpv.accuracy,
 			norm_accuracy = cpv:getNormAccuracy(),
 			exscore = cpv:getExScore(),
@@ -201,13 +199,7 @@ function UserPage:getScores(lb, user_id)
 		}
 	end
 
-	local ratings = {
-		enps = enps,
-		pp = pp,
-		msd = msd,
-	}
-
-	return scores, ratings
+	return scores, total_rating
 end
 
 return UserPage

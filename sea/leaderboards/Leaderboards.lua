@@ -5,6 +5,7 @@ local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardUser = require("sea.leaderboards.LeaderboardUser")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
+local TotalRating = require("sea.leaderboards.TotalRating")
 
 ---@class sea.Leaderboards
 ---@operator call: sea.Leaderboards
@@ -12,6 +13,7 @@ local Leaderboards = class()
 
 ---@param leaderboards_repo sea.LeaderboardsRepo
 function Leaderboards:new(leaderboards_repo)
+	self.total_rating = TotalRating()
 	self.leaderboards_repo = leaderboards_repo
 	self.leaderboards_access = LeaderboardsAccess()
 end
@@ -54,6 +56,7 @@ end
 ---@param user_id integer
 function Leaderboards:updateLeaderboardUser(lb, user_id)
 	local repo = self.leaderboards_repo
+	local total_rating = self.total_rating
 
 	local lb_user = repo:getLeaderboardUser(lb.id, user_id)
 	if not lb_user then
@@ -65,21 +68,9 @@ function Leaderboards:updateLeaderboardUser(lb, user_id)
 
 	local chartplays = repo:getBestChartplays(lb, user_id)
 
-	local total_rating = 0
-	if lb.scores_comb == "avg" then
-		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc)
-		end
-		total_rating = total_rating / lb.scores_comb_count
-	elseif lb.scores_comb == "exp95" then
-		local mul = 1
-		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc) * mul
-			mul = mul * 0.95
-		end
-	end
+	total_rating:calc(chartplays)
 
-	lb_user.total_rating = total_rating
+	lb_user.total_rating = total_rating:get(lb.rating_calc)
 	lb_user.rank = repo:getLeaderboardUserRank(lb_user)
 	lb_user.updated_at = os.time()
 	repo:updateLeaderboardUser(lb_user)

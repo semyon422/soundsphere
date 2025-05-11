@@ -1,5 +1,4 @@
 <% local json = require("web.json") %>
-<% local ScoreComb = require("sea.leaderboards.ScoreComb") %>
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
 <% local TernaryState = require("sea.chart.TernaryState") %>
 <% local JudgesResult = require("sea.chart.JudgesResult") %>
@@ -31,26 +30,6 @@
 				<% end %>
 			</select>
 		</div>
-	</div>
-</div>
-
-<div class="field">
-	<label class="label">Score combiner</label>
-	<div class="control">
-		<div class="select">
-			<select name="scores_comb">
-				<% for _, v in ipairs(ScoreComb:list()) do %>
-					<option <%= leaderboard.scores_comb == v and "selected" or "" %>><%= v %></option>
-				<% end %>
-			</select>
-		</div>
-	</div>
-</div>
-
-<div class="field">
-	<label class="label">Score count (combiner)</label>
-	<div class="control">
-		<input class="input" type="number" name="scores_comb_count" value="<%= leaderboard.scores_comb_count or 1 %>">
 	</div>
 </div>
 

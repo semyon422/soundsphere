@@ -8,14 +8,10 @@
 <table class="table">
 	<tr>
 		<th>Rating calculator</td>
-		<th>Scores combiner</td>
 	</tr>
 	<tr>
 		<td>
 			<%= leaderboard.rating_calc %>
-		</td>
-		<td>
-			<%= leaderboard.scores_comb %> (<%= leaderboard.scores_comb_count %>)
 		</td>
 	</tr>
 </table>

@@ -277,15 +277,15 @@
 							<div class="border-box">
 								<div class="user__key-value">
 									<p>PP:</p>
-									<p><strong><%= math.floor(ratings.pp) %>pp</strong></p>
+									<p><strong><%= math.floor(total_rating.rating_pp) %>pp</strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>MSD:</p>
-									<p><strong><%= ("%0.2f"):format(ratings.msd) %></strong></p>
+									<p><strong><%= ("%0.2f"):format(total_rating.rating_msd) %></strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>ENPS:</p>
-									<p><strong><%= ("%0.2f"):format(ratings.enps) %></strong></p>
+									<p><strong><%= ("%0.2f"):format(total_rating.rating) %></strong></p>
 								</div>
 <%
 --[[%>
@@ -334,7 +334,16 @@
 										<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
 										<div style="display: flex">
 											<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
-											<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods %></p>
+											<% if v.rate ~= 1 then %>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
+											<% end %>
+											<% if v.const then %>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
+											<% end %>
+											<% if v.tap_only then %>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
+											<% end %>
+											<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
 										</div>
 									</div>
 									<div style="display: flex; min-width: fit-content;">

@@ -155,7 +155,7 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	---@type rdb.Options
 	local options = {
 		group = {"hash"},
-		limit = lb.scores_comb_count,
+		limit = 100,
 		order = {rating_column .. " DESC"}, -- TODO: rating_calculator
 		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column)},
 	}

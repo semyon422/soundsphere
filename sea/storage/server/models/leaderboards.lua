@@ -1,5 +1,4 @@
 local Leaderboard = require("sea.leaderboards.Leaderboard")
-local ScoreComb = require("sea.leaderboards.ScoreComb")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local JudgesResult = require("sea.chart.JudgesResult")
 local TernaryState = require("sea.chart.TernaryState")
@@ -14,7 +13,6 @@ local leaderboards = {}
 leaderboards.metatable = Leaderboard
 
 leaderboards.types = {
-	score_comb = ScoreComb,
 	rating_calc = RatingCalc,
 	nearest = TernaryState,
 	pass = "boolean",
