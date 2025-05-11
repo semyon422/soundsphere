@@ -50,7 +50,13 @@ function RankingsResource:getRankings(req, res, ctx)
 		ctx.leaderboard = self.leaderboards:getLeaderboard(leaderboard_id)
 		ctx.leaderboard_users = self.leaderboards:getLeaderboardUsersFull(leaderboard_id)
 	else
-		ctx.users = self.users:getUsers()
+		local order = "chartplays_count"
+		if ranking_type == "charts" then
+			order = "chartmetas_count"
+		elseif ranking_type == "play_time" then
+			order = "play_time"
+		end
+		ctx.users = self.users:getUsers(order)
 	end
 	-- local first = (page - 1) * self.maxUsersPerPage
 	-- local last = math.min(first + self.maxUsersPerPage, #self.testUsers)

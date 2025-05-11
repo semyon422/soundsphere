@@ -230,7 +230,7 @@ end
 								<% elseif ranking_type == "play_count" then %>
 									<%= user.chartplays_count %>
 								<% elseif ranking_type == "play_time" then %>
-									<%= user.play_time %>
+									<%= math.floor(user.play_time / 3600) %>h
 								<% end %>
 							</td>
 						</tr>
