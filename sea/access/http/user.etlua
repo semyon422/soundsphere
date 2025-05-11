@@ -271,22 +271,24 @@
 ]]%>
 				</div>
 				<div class="block border-box">
-					<p class="title is-4">Global Leaderboard 14K2S</p>
+					<p class="title is-4"><%= leaderboard.name %></p>
 					<div class="columns is-desktop">
 						<div class="column is-two-fifths-desktop">
 							<div class="border-box">
 								<div class="user__key-value">
 									<p>PP:</p>
-									<p><strong>8471pp</strong></p>
+									<p><strong><%= math.floor(ratings.pp) %>pp</strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>MSD:</p>
-									<p><strong>29.58</strong></p>
+									<p><strong><%= ("%0.2f"):format(ratings.msd) %></strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>ENPS:</p>
-									<p><strong>30.13</strong></p>
+									<p><strong><%= ("%0.2f"):format(ratings.enps) %></strong></p>
 								</div>
+<%
+--[[%>
 								<div class="user__key-value">
 									<p>Unique scores:</p>
 									<p><strong>871</strong></p>
@@ -295,6 +297,8 @@
 									<p>Play count:</p>
 									<p><strong>983</strong></p>
 								</div>
+<%
+]]%>
 							</div>
 						</div>
 						<div class="column" style="display: flex;align-items:center">

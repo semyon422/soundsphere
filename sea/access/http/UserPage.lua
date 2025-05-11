@@ -1,5 +1,6 @@
 local class = require("class")
 local time_util = require("time_util")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
 local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sea.UserPage
@@ -150,17 +151,39 @@ function UserPage:getGeneralStats()
 	return cells
 end
 
+---@type {[sea.RatingCalc]: string}
+local postfixes = {
+	level = "LVL",
+	difftable = "LVL",
+	enps = "ENPS",
+	pp = "PP",
+	msd = "MSD",
+}
+
 ---@param lb sea.Leaderboard
 ---@param user_id integer
+---@return table
 ---@return table
 function UserPage:getScores(lb, user_id)
 	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
 
 	local scores = {}
 
+	local enps = 0
+	local pp = 0
+	local msd = 0
+
 	for i, cpv in ipairs(chartplayviews) do
 		local chartmeta = cpv.chartmeta
 		local chartdiff = cpv.chartdiff
+
+		enps = enps + cpv.rating
+		pp = pp + cpv.rating_pp
+		msd = msd + cpv.rating_msd
+
+		---@type number
+		local rating = cpv[RatingCalc:column(lb.rating_calc)]
+
 		scores[i] = {
 			artist = chartmeta and chartmeta.artist or "?",
 			title = chartmeta and chartmeta.title or "?",
@@ -173,12 +196,18 @@ function UserPage:getScores(lb, user_id)
 			exscore = cpv:getExScore(),
 			timeSince = time_util.time_ago_in_words(cpv.created_at),
 			grade = cpv:getGrade(),
-			rating = cpv.rating,
-			ratingPostfix = "ENPS",
+			rating = rating,
+			ratingPostfix = postfixes[lb.rating_calc],
 		}
 	end
 
-	return scores
+	local ratings = {
+		enps = enps,
+		pp = pp,
+		msd = msd,
+	}
+
+	return scores, ratings
 end
 
 return UserPage

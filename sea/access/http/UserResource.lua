@@ -100,6 +100,7 @@ function UserResource:getUser(req, res, ctx)
 
 	local leaderboard_id = tonumber(query.lb) or 1
 	ctx.leaderboard = assert(self.leaderboards:getLeaderboard(leaderboard_id))
+	-- ctx.leaderboard_user = assert(self.leaderboards:getLeaderboardUser(leaderboard_id, user.id))
 
 	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards)
 	page:setActivity(self.testActivity)
@@ -110,7 +111,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.main_container_type = "none"
 	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
-	ctx.scores = page:getScores(ctx.leaderboard, user.id)
+	ctx.scores, ctx.ratings = page:getScores(ctx.leaderboard, user.id)
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end

@@ -30,6 +30,13 @@ function Leaderboards:getLeaderboard(id)
 	return self.leaderboards_repo:getLeaderboard(id)
 end
 
+---@param lb_id integer
+---@param user_id integer
+---@return sea.LeaderboardUser?
+function Leaderboards:getLeaderboardUser(lb_id, user_id)
+	return self.leaderboards_repo:getLeaderboardUser(lb_id, user_id)
+end
+
 ---@param lb sea.Leaderboard
 ---@param user_id integer
 ---@return sea.Chartplayview[]
