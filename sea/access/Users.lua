@@ -22,9 +22,10 @@ function Users:new(users_repo, password_hasher)
 	self.users_access = UsersAccess()
 end
 
+---@param order string?
 ---@return sea.User[]
-function Users:getUsers()
-	return self.users_repo:getUsers()
+function Users:getUsers(order)
+	return self.users_repo:getUsers(order)
 end
 
 ---@return integer

@@ -1,4 +1,5 @@
 local class = require("class")
+local sql_util = require("rdb.sql_util")
 
 ---@class sea.UsersRepo
 ---@operator call: sea.UsersRepo
@@ -9,9 +10,15 @@ function UsersRepo:new(models)
 	self.models = models
 end
 
+---@param order string?
 ---@return sea.User[]
-function UsersRepo:getUsers()
-	local users = self.models.users:select()
+function UsersRepo:getUsers(order)
+	---@type rdb.Options
+	local options = {}
+	if order then
+		options.order = {sql_util.escape_identifier(order) .. " DESC"}
+	end
+	local users = self.models.users:select(nil, options)
 	self.models.users:preload(users, "user_roles")
 	return users
 end
