@@ -306,15 +306,19 @@
 								<div class="level-item has-text-centered">
 									<div>
 										<p class="heading">Global rank</p>
-										<p class="title">#12745</p>
+										<p class="title">#<%= leaderboard_user and leaderboard_user.rank or "?" %></p>
 									</div>
 								</div>
+<%
+--[[%>
 								<div class="level-item has-text-centered">
 									<div>
 										<p class="heading">Country rank</p>
 										<p class="title">#531</p>
 									</div>
 								</div>
+<%
+]]%>
 							</nav>
 						</div>
 					</div>
