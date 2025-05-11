@@ -50,6 +50,7 @@ function TotalRating:calc(cpvs)
 end
 
 ---@param rating_calc sea.RatingCalc
+---@return number
 function TotalRating:get(rating_calc)
 	return self[RatingCalc:column(rating_calc)]
 end

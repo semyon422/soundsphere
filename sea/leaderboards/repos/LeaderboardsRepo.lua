@@ -231,13 +231,19 @@ function LeaderboardsRepo:updateLeaderboardUser(lb_user)
 	return self.models.leaderboard_users:update(lb_user, {id = assert(lb_user.id)})[1]
 end
 
----@param lb_user sea.LeaderboardUser
+---@param leaderboard_id integer
+---@param total_rating number
 ---@return integer
-function LeaderboardsRepo:getLeaderboardUserRank(lb_user)
+function LeaderboardsRepo:getLeaderboardUserRank(leaderboard_id, total_rating)
 	return self.models.leaderboard_users:count({
-		leaderboard_id = assert(lb_user.leaderboard_id),
-		total_rating__gte = assert(lb_user.total_rating),
-	})
+		leaderboard_id = assert(leaderboard_id),
+		total_rating__gt = assert(total_rating),
+	}) + 1
+end
+
+---@param lb sea.Leaderboard
+function LeaderboardsRepo:updateLeaderboardUserRanks(lb)
+	
 end
 
 --------------------------------------------------------------------------------

@@ -54,26 +54,42 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
-function Leaderboards:updateLeaderboardUser(lb, user_id)
+---@param no_rank boolean?
+function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 	local repo = self.leaderboards_repo
 	local total_rating = self.total_rating
+	local time = os.time()
+
+	local chartplays = repo:getBestChartplays(lb, user_id)
+	total_rating:calc(chartplays)
+	local rating = total_rating:get(lb.rating_calc)
 
 	local lb_user = repo:getLeaderboardUser(lb.id, user_id)
+	local found = not not lb_user
 	if not lb_user then
 		lb_user = LeaderboardUser()
 		lb_user.leaderboard_id = lb.id
 		lb_user.user_id = user_id
-		lb_user = repo:createLeaderboardUser(lb_user)
+		lb_user.rank = 0
 	end
 
-	local chartplays = repo:getBestChartplays(lb, user_id)
+	if not no_rank then
+		lb_user.rank = repo:getLeaderboardUserRank(lb.id, rating)
+	end
 
-	total_rating:calc(chartplays)
+	lb_user.total_rating = rating
+	lb_user.updated_at = time
 
-	lb_user.total_rating = total_rating:get(lb.rating_calc)
-	lb_user.rank = repo:getLeaderboardUserRank(lb_user)
-	lb_user.updated_at = os.time()
-	repo:updateLeaderboardUser(lb_user)
+	if not found then
+		repo:createLeaderboardUser(lb_user)
+	else
+		repo:updateLeaderboardUser(lb_user)
+	end
+end
+
+---@param lb sea.Leaderboard
+function Leaderboards:updateRanks(lb)
+	self.leaderboards_repo:updateLeaderboardUserRanks(lb)
 end
 
 ---@param chartplay sea.Chartplay
