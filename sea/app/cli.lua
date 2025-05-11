@@ -28,22 +28,26 @@ local app = App(app_config)
 app:load()
 
 local domain = app.domain
-local compute_processor = domain.compute_processor
+local compute_tasks = domain.compute_tasks
 local charts_computer = domain.charts_computer
+local leaderboards = domain.leaderboards
 
-local cmds = {}
-
-function cmds.run(id)
+local function run_chartplays(task)
 	local start_time = socket.gettime()
 	local count = 0
 
-	id = assert(tonumber(id))
-	local task = assert(compute_processor:getComputeTask(id))
-	assert(task.target == "chartplays")
-
 	local chartplays = charts_computer:getChartplaysComputed(task.created_at, task.state, 10)
 	while #chartplays > 0 do
-		task = compute_processor:step(task, chartplays)
+		for _, chartplay in ipairs(chartplays) do
+			local ret, err = charts_computer:computeChartplay(chartplay)
+			if not ret then
+				print(err)
+			end
+		end
+
+		task = compute_tasks:step(task, #chartplays)
+		chartplays = charts_computer:getChartplaysComputed(task.created_at, task.state, 10)
+
 		count = count + #chartplays
 		local dt = socket.gettime() - start_time
 		local speed = count / dt
@@ -55,7 +59,31 @@ function cmds.run(id)
 			task.total,
 			task.current / task.total * 100
 		))
-		chartplays = charts_computer:getChartplaysComputed(task.created_at, task.state, 10)
+	end
+end
+
+local function run_total_rating(task)
+	local lbs = domain.leaderboards:getLeaderboards()
+	local users = domain.users:getUsers()
+
+	for i, user in ipairs(users) do
+		for _, lb in ipairs(lbs) do
+			-- task = compute_tasks:step(task, user, lb)
+			leaderboards:updateLeaderboardUser(lb, user.id, true)
+		end
+		print(i)
+	end
+end
+
+local cmds = {}
+
+function cmds.run(id)
+	id = assert(tonumber(id))
+	local task = assert(compute_tasks:getComputeTask(id))
+	if task.target == "chartplays" then
+		run_chartplays(task)
+	elseif task.target == "total_rating" then
+		run_total_rating(task)
 	end
 
 	print("done")
@@ -64,18 +92,24 @@ end
 function cmds.start_chartplays()
 	local time = os.time()
 	local total = charts_computer:getChartplaysComputedCount(time, "new")
-	local proc = compute_processor:startChartplays(os.time(), "new", total)
+	local task = compute_tasks:Compute(time, "chartplays", "new", total)
+	cmds.list()
+end
+
+function cmds.start_total_rating()
+	local total = domain.users:getUsersCount() * leaderboards:getLeaderboardsCount()
+	local task = compute_tasks:Compute(os.time(), "total_rating", "new", total)
 	cmds.list()
 end
 
 function cmds.delete(id)
 	id = assert(tonumber(id))
-	compute_processor:deleteProcess(id)
+	compute_tasks:deleteProcess(id)
 	cmds.list()
 end
 
 function cmds.list()
-	local cps = compute_processor:getComputeTasks()
+	local cps = compute_tasks:getComputeTasks()
 	print("Compute processes:")
 	for _, cp in ipairs(cps) do
 		print(stbl.encode(cp))

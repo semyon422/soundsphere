@@ -5,8 +5,9 @@ local ComputeTarget = {
 	chartplays = 0,
 	chartdiffs = 1,
 	chartmetas = 2,
-	leaderboard_users = 3,
-	users = 4,
+	users = 3,
+	total_rating = 4,
+	ranks = 5,
 }
 
 return Enum(ComputeTarget)

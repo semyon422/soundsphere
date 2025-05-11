@@ -23,6 +23,11 @@ function Leaderboards:getLeaderboards()
 	return self.leaderboards_repo:getLeaderboards()
 end
 
+---@return integer
+function Leaderboards:getLeaderboardsCount()
+	return self.leaderboards_repo:getLeaderboardsCount()
+end
+
 ---@param id integer?
 ---@return sea.Leaderboard?
 function Leaderboards:getLeaderboard(id)

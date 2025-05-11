@@ -27,6 +27,11 @@ function Users:getUsers()
 	return self.users_repo:getUsers()
 end
 
+---@return integer
+function Users:getUsersCount()
+	return self.users_repo:getUsersCount()
+end
+
 ---@param id integer?
 ---@return sea.User
 function Users:getUser(id)

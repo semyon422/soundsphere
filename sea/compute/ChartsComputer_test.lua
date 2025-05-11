@@ -104,8 +104,6 @@ end
 ---@param t testing.T
 function test.chartdiffs_full(t)
 	local ctx = create_test_ctx()
-
-	-- ctx.compute_processor:start
 end
 
 return test

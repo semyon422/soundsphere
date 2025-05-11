@@ -20,6 +20,11 @@ function LeaderboardsRepo:getLeaderboards()
 	return lbs
 end
 
+---@return integer
+function LeaderboardsRepo:getLeaderboardsCount()
+	return self.models.leaderboards:count()
+end
+
 ---@param id integer
 ---@return sea.Leaderboard?
 function LeaderboardsRepo:getLeaderboard(id)
@@ -207,7 +212,9 @@ end
 ---@param leaderboard_id integer
 ---@return sea.LeaderboardUser[]
 function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id)
-	return self.models.leaderboard_users:select({leaderboard_id = assert(leaderboard_id)})
+	return self.models.leaderboard_users:select({
+		leaderboard_id = assert(leaderboard_id)
+	}, {order = {"total_rating DESC"}})
 end
 
 ---@param leaderboard_id integer

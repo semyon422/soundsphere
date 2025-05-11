@@ -16,6 +16,11 @@ function UsersRepo:getUsers()
 	return users
 end
 
+---@return integer
+function UsersRepo:getUsersCount()
+	return self.models.users:count()
+end
+
 ---@return sea.UserInsecure[]
 function UsersRepo:getUsersInsecure()
 	local users = self.models.users_insecure:select()

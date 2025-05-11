@@ -1,4 +1,4 @@
-local ComputeProcessor = require("sea.compute.ComputeProcessor")
+local ComputeTasks = require("sea.compute.ComputeTasks")
 local ComputeTasksRepo = require("sea.compute.repos.ComputeTasksRepo")
 
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
@@ -17,29 +17,25 @@ local function create_test_ctx()
 
 	local compute_tasks_repo = ComputeTasksRepo(models)
 
-	local charts_computer = {
-		computeChartplay = function() return true end,
-	}
-
-	local compute_processor = ComputeProcessor(charts_computer, compute_tasks_repo)
+	local compute_tasks = ComputeTasks(compute_tasks_repo)
 
 	return {
 		db = db,
 		compute_tasks_repo = compute_tasks_repo,
-		compute_processor = compute_processor,
+		compute_tasks = compute_tasks,
 	}
 end
 
 ---@param t testing.T
-function test.chartplays_full_all_ok(t)
+function test.chartplays_valid(t)
 	local ctx = create_test_ctx()
 
 	local chartplays = {{}, {}}
 
-	local compute_task = ctx.compute_processor:startChartplays(2, "valid", #chartplays)
+	local compute_task = ctx.compute_tasks:createComputeTask(2, "chartplays", "valid", #chartplays)
 
 	while not compute_task.completed_at do
-		compute_task = ctx.compute_processor:step(compute_task, chartplays)
+		compute_task = ctx.compute_tasks:step(compute_task, #chartplays)
 		chartplays = {}
 	end
 
