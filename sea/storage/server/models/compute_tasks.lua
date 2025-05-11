@@ -1,15 +1,15 @@
-local ComputeProcess = require("sea.compute.ComputeProcess")
+local ComputeTask = require("sea.compute.ComputeTask")
 local ComputeState = require("sea.compute.ComputeState")
 local ComputeTarget = require("sea.compute.ComputeTarget")
 
 ---@type rdb.ModelOptions
-local compute_processes = {}
+local compute_tasks = {}
 
-compute_processes.metatable = ComputeProcess
+compute_tasks.metatable = ComputeTask
 
-compute_processes.types = {
+compute_tasks.types = {
 	state = ComputeState,
 	target = ComputeTarget,
 }
 
-return compute_processes
+return compute_tasks

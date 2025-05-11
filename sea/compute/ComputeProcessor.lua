@@ -1,50 +1,50 @@
 local class = require("class")
-local ComputeProcess = require("sea.compute.ComputeProcess")
+local ComputeTask = require("sea.compute.ComputeTask")
 
 ---@class sea.ComputeProcessor
 ---@operator call: sea.ComputeProcessor
 local ComputeProcessor = class()
 
 ---@param charts_computer sea.ChartsComputer
----@param compute_processes_repo sea.ComputeProcessesRepo
-function ComputeProcessor:new(charts_computer, compute_processes_repo)
+---@param compute_tasks_repo sea.ComputeTasksRepo
+function ComputeProcessor:new(charts_computer, compute_tasks_repo)
 	self.charts_computer = charts_computer
-	self.compute_processes_repo = compute_processes_repo
+	self.compute_tasks_repo = compute_tasks_repo
 end
 
----@return sea.ComputeProcess[]
-function ComputeProcessor:getComputeProcesses()
-	return self.compute_processes_repo:getComputeProcesses()
+---@return sea.ComputeTask[]
+function ComputeProcessor:getComputeTasks()
+	return self.compute_tasks_repo:getComputeTasks()
 end
 
 ---@param id integer
----@return sea.ComputeProcess?
-function ComputeProcessor:getComputeProcess(id)
-	return self.compute_processes_repo:getComputeProcess(id)
+---@return sea.ComputeTask?
+function ComputeProcessor:getComputeTask(id)
+	return self.compute_tasks_repo:getComputeTask(id)
 end
 
 ---@param time integer
 ---@param state sea.ComputeState
 ---@param total integer
----@return sea.ComputeProcess
+---@return sea.ComputeTask
 function ComputeProcessor:startChartplays(time, state, total)
-	local compute_process = ComputeProcess()
+	local compute_task = ComputeTask()
 
-	compute_process.created_at = time
-	compute_process.current = 0
-	compute_process.target = "chartplays"
-	compute_process.state = state
-	compute_process.total = total
+	compute_task.created_at = time
+	compute_task.current = 0
+	compute_task.target = "chartplays"
+	compute_task.state = state
+	compute_task.total = total
 
-	compute_process = self.compute_processes_repo:createComputeProcess(compute_process)
+	compute_task = self.compute_tasks_repo:createComputeTask(compute_task)
 
-	return compute_process
+	return compute_task
 end
 
----@param compute_process sea.ComputeProcess
+---@param compute_task sea.ComputeTask
 ---@param chartplays sea.Chartplay[]
----@return sea.ComputeProcess
-function ComputeProcessor:stepChartplays(compute_process, chartplays)
+---@return sea.ComputeTask
+function ComputeProcessor:stepChartplays(compute_task, chartplays)
 	local charts_computer = self.charts_computer
 
 	for _, chartplay in ipairs(chartplays) do
@@ -54,30 +54,30 @@ function ComputeProcessor:stepChartplays(compute_process, chartplays)
 		end
 	end
 
-	compute_process.current = compute_process.current + #chartplays
+	compute_task.current = compute_task.current + #chartplays
 
-	if compute_process.current >= compute_process.total then
-		compute_process.completed_at = os.time()
+	if compute_task.current >= compute_task.total then
+		compute_task.completed_at = os.time()
 	end
 
-	self.compute_processes_repo:updateComputeProcess(compute_process)
+	self.compute_tasks_repo:updateComputeTask(compute_task)
 
-	return compute_process
+	return compute_task
 end
 
----@param compute_process sea.ComputeProcess
+---@param compute_task sea.ComputeTask
 ---@param chartplays sea.Chartplay[]
----@return sea.ComputeProcess
-function ComputeProcessor:step(compute_process, chartplays)
-	if compute_process.target == "chartplays" then
-		return self:stepChartplays(compute_process, chartplays)
+---@return sea.ComputeTask
+function ComputeProcessor:step(compute_task, chartplays)
+	if compute_task.target == "chartplays" then
+		return self:stepChartplays(compute_task, chartplays)
 	end
 	error()
 end
 
----@return sea.ComputeProcess?
+---@return sea.ComputeTask?
 function ComputeProcessor:deleteProcess(id)
-	return self.compute_processes_repo:deleteComputeProcess(id)
+	return self.compute_tasks_repo:deleteComputeTask(id)
 end
 
 return ComputeProcessor

@@ -38,24 +38,24 @@ function cmds.run(id)
 	local count = 0
 
 	id = assert(tonumber(id))
-	local proc = assert(compute_processor:getComputeProcess(id))
-	assert(proc.target == "chartplays")
+	local task = assert(compute_processor:getComputeTask(id))
+	assert(task.target == "chartplays")
 
-	local chartplays = charts_computer:getChartplaysComputed(proc.created_at, proc.state, 10)
+	local chartplays = charts_computer:getChartplaysComputed(task.created_at, task.state, 10)
 	while #chartplays > 0 do
-		proc = compute_processor:step(proc, chartplays)
+		task = compute_processor:step(task, chartplays)
 		count = count + #chartplays
 		local dt = socket.gettime() - start_time
 		local speed = count / dt
 		print(("%s / %s - %0.2f rps - %s / %s - %0.2f%%"):format(
 			time_util.format(dt),
-			time_util.format((proc.total - proc.current) / speed),
+			time_util.format((task.total - task.current) / speed),
 			speed,
-			proc.current,
-			proc.total,
-			proc.current / proc.total * 100
+			task.current,
+			task.total,
+			task.current / task.total * 100
 		))
-		chartplays = charts_computer:getChartplaysComputed(proc.created_at, proc.state, 10)
+		chartplays = charts_computer:getChartplaysComputed(task.created_at, task.state, 10)
 	end
 
 	print("done")
@@ -75,7 +75,7 @@ function cmds.delete(id)
 end
 
 function cmds.list()
-	local cps = compute_processor:getComputeProcesses()
+	local cps = compute_processor:getComputeTasks()
 	print("Compute processes:")
 	for _, cp in ipairs(cps) do
 		print(stbl.encode(cp))

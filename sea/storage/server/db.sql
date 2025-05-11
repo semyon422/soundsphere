@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `chartfiles` (
 	UNIQUE(`hash`)
 );
 
-CREATE TABLE IF NOT EXISTS `compute_processes` (
+CREATE TABLE IF NOT EXISTS `compute_tasks` (
 	`id` INTEGER PRIMARY KEY,
 	`created_at` INTEGER NOT NULL,
 	`completed_at` INTEGER,

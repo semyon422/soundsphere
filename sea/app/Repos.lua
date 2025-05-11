@@ -5,7 +5,7 @@ local TeamsRepo = require("sea.teams.repos.TeamsRepo")
 local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
-local ComputeProcessesRepo = require("sea.compute.repos.ComputeProcessesRepo")
+local ComputeTasksRepo = require("sea.compute.repos.ComputeTasksRepo")
 
 ---@class sea.Repos
 ---@operator call: sea.Repos
@@ -19,7 +19,7 @@ function Repos:new(models)
 	self.difftables_repo = DifftablesRepo(models)
 	self.charts_repo = ChartsRepo(models)
 	self.chartfiles_repo = ChartfilesRepo(models)
-	self.compute_processes_repo = ComputeProcessesRepo(models)
+	self.compute_tasks_repo = ComputeTasksRepo(models)
 end
 
 return Repos

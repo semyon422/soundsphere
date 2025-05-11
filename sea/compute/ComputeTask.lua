@@ -1,7 +1,7 @@
 local class = require("class")
 
----@class sea.ComputeProcess
----@operator call: sea.ComputeProcess
+---@class sea.ComputeTask
+---@operator call: sea.ComputeTask
 ---@field id integer
 ---@field created_at integer
 ---@field completed_at integer?
@@ -9,6 +9,6 @@ local class = require("class")
 ---@field target sea.ComputeTarget
 ---@field current integer
 ---@field total integer
-local ComputeProcess = class()
+local ComputeTask = class()
 
-return ComputeProcess
+return ComputeTask
