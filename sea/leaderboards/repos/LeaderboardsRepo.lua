@@ -157,8 +157,12 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		group = {"hash"},
 		limit = lb.scores_comb_count,
 		order = {rating_column .. " DESC"}, -- TODO: rating_calculator
-		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column), "MAX(difftable_level) AS _difftable_level"}
+		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column)},
 	}
+
+	if difftable_ids[1] then
+		options.columns[3] = "MAX(difftable_level) AS difftable_level"
+	end
 
 	return conds, options
 end
