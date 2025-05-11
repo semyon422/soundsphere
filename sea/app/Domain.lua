@@ -36,7 +36,7 @@ function Domain:new(repos)
 	)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
-	self.compute_tasks = ComputeTasks(self.charts_computer, repos.compute_tasks_repo)
+	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
 end
 
 return Domain
