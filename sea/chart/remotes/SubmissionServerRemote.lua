@@ -1,5 +1,8 @@
 local class = require("class")
 local valid = require("valid")
+local types = require("sea.shared.types")
+local Chartkey = require("sea.chart.Chartkey")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
@@ -38,6 +41,43 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 	end
 
 	return chartplay
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]?
+---@return string?
+function SubmissionServerRemote:getBestChartplaysForChartmeta(chartmeta_key)
+	local ok, err = valid.format(ChartmetaKey.validate(chartmeta_key))
+	if not ok then
+		return nil, "validate chartmeta key: " .. err
+	end
+	setmetatable(chartmeta_key, ChartmetaKey)
+
+	return self.chartplays:getBestChartplaysForChartmeta(chartmeta_key)
+end
+
+---@param chartkey sea.Chartkey
+---@return sea.Chartplay[]?
+---@return string?
+function SubmissionServerRemote:getBestChartplaysForChartdiff(chartkey)
+	local ok, err = valid.format(Chartkey.validate(chartkey))
+	if not ok then
+		return nil, "validate chartkey: " .. err
+	end
+	setmetatable(chartkey, Chartkey)
+
+	return self.chartplays:getBestChartplaysForChartdiff(chartkey)
+end
+
+---@param replay_hash string
+---@return string?
+---@return string?
+function SubmissionServerRemote:getReplayFile(replay_hash)
+	if not types.md5hash(replay_hash) then
+		return nil, "invalid replay hash"
+	end
+
+	return self.chartplays:getReplayFile(replay_hash)
 end
 
 return SubmissionServerRemote

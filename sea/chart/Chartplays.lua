@@ -33,6 +33,13 @@ function Chartplays:new(
 	self.chartplays_access = ChartplaysAccess()
 end
 
+---@param replay_hash string
+---@return string?
+---@return string?
+function Chartplays:getReplayFile(replay_hash)
+	return self.replays_storage:get(replay_hash)
+end
+
 ---@return sea.Chartplay[]
 function Chartplays:getChartplays()
 	return self.charts_repo:getChartplays()
@@ -42,6 +49,34 @@ end
 ---@return sea.Chartplay?
 function Chartplays:getChartplay(id)
 	return self.charts_repo:getChartplay(id)
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]?
+---@return string?
+function Chartplays:getChartplaysForChartmeta(chartmeta_key)
+	return self.charts_repo:getChartplaysForChartmeta(chartmeta_key)
+end
+
+---@param chartkey sea.Chartkey
+---@return sea.Chartplay[]?
+---@return string?
+function Chartplays:getChartplaysForChartdiff(chartkey)
+	return self.charts_repo:getChartplaysForChartdiff(chartkey)
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]?
+---@return string?
+function Chartplays:getBestChartplaysForChartmeta(chartmeta_key)
+	return self.charts_repo:getBestChartplaysForChartmeta(chartmeta_key)
+end
+
+---@param chartkey sea.Chartkey
+---@return sea.Chartplay[]?
+---@return string?
+function Chartplays:getBestChartplaysForChartdiff(chartkey)
+	return self.charts_repo:getBestChartplaysForChartdiff(chartkey)
 end
 
 ---@param user_id integer

@@ -271,13 +271,34 @@ function ChartsRepo:getChartplaysForChartmeta(chartmeta_key)
 	return self.models.chartplays_list:select({
 		hash = assert(chartmeta_key.hash),
 		index = assert(chartmeta_key.index),
-	})
+	}, {order = {"rating DESC"}})
 end
 
 ---@param chartkey sea.Chartkey
 ---@return sea.Chartplay[]
 function ChartsRepo:getChartplaysForChartdiff(chartkey)
 	return self.models.chartplays_list:select({
+		hash = assert(chartkey.hash),
+		index = assert(chartkey.index),
+		modifiers = assert(chartkey.modifiers),
+		rate = assert(chartkey.rate),
+		mode = assert(chartkey.mode),
+	}, {order = {"rating DESC"}})
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]
+function ChartsRepo:getBestChartplaysForChartmeta(chartmeta_key)
+	return self.models.best_chartmeta_chartplays:select({
+		hash = assert(chartmeta_key.hash),
+		index = assert(chartmeta_key.index),
+	})
+end
+
+---@param chartkey sea.Chartkey
+---@return sea.Chartplay[]
+function ChartsRepo:getBestChartplaysForChartdiff(chartkey)
+	return self.models.best_chartdiff_chartplays:select({
 		hash = assert(chartkey.hash),
 		index = assert(chartkey.index),
 		modifiers = assert(chartkey.modifiers),

@@ -57,15 +57,13 @@ local readAsync = thread.async(function(...) return love.filesystem.read(...) en
 ---@param chartplay sea.Chartplay
 ---@return string?
 function ResultController:getReplayDataAsync(chartplay)
-	local replayModel = self.replayModel
-	local webApi = self.onlineModel.webApi
-
 	---@type string?
 	local content
-	if chartplay.file then
-		content = webApi.api.files[chartplay.file.id]:__get({download = true})
+	if chartplay.user_name then
+		local remote = self.onlineModel.authManager.sea_client.remote
+		content = remote.submission:getReplayFile(chartplay.replay_hash)
 	elseif chartplay.replay_hash then
-		content = readAsync(replayModel.path .. "/" .. chartplay.replay_hash)
+		content = readAsync(self.replayModel.path .. "/" .. chartplay.replay_hash)
 	end
 
 	return content

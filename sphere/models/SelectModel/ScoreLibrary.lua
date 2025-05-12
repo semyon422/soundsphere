@@ -1,6 +1,8 @@
 local thread = require("thread")
 local erfunc = require("libchart.erfunc")
 local class = require("class")
+local Chartkey = require("sea.chart.Chartkey")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 
 ---@class sphere.ScoreLibrary
 ---@operator call: sphere.ScoreLibrary
@@ -29,6 +31,11 @@ end
 ---@param scores table
 ---@return table
 function ScoreLibrary:filterScores(scores)
+	for _, score in ipairs(scores) do
+		local s = erfunc.erf(0.032 / (score.accuracy * math.sqrt(2)))
+		score.score = s * 10000
+	end
+
 	local filters = self.configModel.configs.filters.score
 	local select = self.configModel.configs.select
 	local index
@@ -65,7 +72,7 @@ function ScoreLibrary:updateItemsAsync(chartview, exact)
 
 	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then
-		self:updateItemsOnline(chartview)
+		self:updateItemsOnline(chartview, exact)
 	else
 		self:updateItemsLocal(chartview, exact)
 	end
@@ -78,62 +85,40 @@ end
 ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
 
 ---@param chartview table
-function ScoreLibrary:updateItemsOnline(chartview)
-	local api = self.onlineModel.webApi.api
+---@param exact boolean?
+function ScoreLibrary:updateItemsOnline(chartview, exact)
+	local remote = self.onlineModel.authManager.sea_client.remote
 
-	print("GET " .. api.notecharts)
-	local notecharts = api.notecharts:get({
-		hash = chartview.hash,
-		index = chartview.index,
-	})
-	local id = notecharts and notecharts[1] and notecharts[1].id
-
-	if not id then
-		return
+	---@type sea.Chartplay[]?, string?
+	local chartplays, err
+	if exact then
+		local chartkey = Chartkey()
+		chartkey:importChartkey(chartview)
+		chartplays, err = remote.submission:getBestChartplaysForChartdiff(chartkey)
+	else
+		local chartmeta_key = ChartmetaKey()
+		chartmeta_key:importChartmetaKey(chartview)
+		chartplays, err = remote.submission:getBestChartplaysForChartmeta(chartmeta_key)
 	end
-
-	print("GET " .. api.notecharts[id].scores)
-	local scores = api.notecharts[id].scores:get({
-		user = true,
-		file = true,
-		modifierset = true,
-	})
-	self.items = scores or {}
-
-	for i, score in ipairs(self.items) do
-		self.items[i] = self:transformOnlineScore(score, chartview)
+	if not chartplays then
+		print(err)
 	end
-end
+	chartplays = chartplays or {}
 
----@param score table
-function ScoreLibrary:fillScoreRating(score)
-	local window = self.configModel.configs.settings.gameplay.ratingHitTimingWindow
-	local s = erfunc.erf(window / (score.accuracy * math.sqrt(2)))
-	score.rating = (score.difficulty or 0) * s
-	score.score = s * 10000
+	self.items = self:filterScores(chartplays)
 end
 
 ---@param chartview table
 ---@param exact boolean?
 function ScoreLibrary:updateItemsLocal(chartview, exact)
-	local scores
+	---@type sea.Chartplay[]
+	local chartplays
 	if exact then
-		scores = self.cacheModel.chartsRepo:getChartplaysForChartdiff(chartview)
+		chartplays = self.cacheModel.chartsRepo:getChartplaysForChartdiff(chartview)
 	else
-		scores = self.cacheModel.chartsRepo:getChartplaysForChartmeta(chartview)
+		chartplays = self.cacheModel.chartsRepo:getChartplaysForChartmeta(chartview)
 	end
-
-	for i, score in ipairs(scores) do
-		self:fillScoreRating(score)
-	end
-	table.sort(scores, function(a, b)
-		return a.rating > b.rating
-	end)
-	scores = self:filterScores(scores)
-	for i, score in ipairs(scores) do
-		score.rank = i
-	end
-	self.items = scores
+	self.items = self:filterScores(chartplays)
 end
 
 ---@param chartplay_id number
@@ -153,37 +138,6 @@ function ScoreLibrary:getItemIndex(chartplay_id)
 	end
 
 	return 1
-end
-
----@param score table
----@return table
-function ScoreLibrary:transformOnlineScore(score, chartview)
-	local s = {
-		id = score.id,
-		chart_hash = "",
-		chart_index = 1,
-		player_name = score.user.name,
-		time = score.created_at,
-		accuracy = score.accuracy,
-		max_combo = score.max_combo,
-		modifiers = score.modifierset.encoded,
-		rate = score.modifierset.timerate,
-		const = score.modifierset.const,
-		replay_hash = score.file.hash,
-		ratio = score.ratio0,
-		perfect = 0,
-		not_perfect = 0,
-		miss = score.misses_count,
-		mean = 0,
-		earlylate = 0,
-		inputmode = score.inputmode,
-		difficulty = score.difficulty,
-		pauses = 0,
-	}
-	for k, v in pairs(s) do
-		score[k] = v
-	end
-	return score
 end
 
 return ScoreLibrary

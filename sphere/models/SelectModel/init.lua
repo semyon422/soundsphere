@@ -473,7 +473,9 @@ function SelectModel:findScore()
 end
 
 function SelectModel:updateScoresAsync()
-	self.scoreLibrary:updateItemsAsync(self.chartview)
+	local config = self.configModel.configs.settings.select
+	local exact = config.chartviews_table ~= "chartviews"
+	self.scoreLibrary:updateItemsAsync(self.chartview, exact)
 	self:findScore()
 end
 

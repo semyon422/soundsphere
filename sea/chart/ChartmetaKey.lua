@@ -1,4 +1,5 @@
 local class = require("class")
+local valid = require("valid")
 local types = require("sea.shared.types")
 local table_util = require("table_util")
 
@@ -14,6 +15,14 @@ ChartmetaKey.struct = {
 }
 
 assert(#table_util.keys(ChartmetaKey.struct) == 2)
+
+local validate_chartmeta_key = valid.struct(ChartmetaKey.struct)
+
+---@return true?
+---@return string|valid.Errors?
+function ChartmetaKey:validate()
+	return validate_chartmeta_key(self)
+end
 
 ---@param key sea.ChartmetaKey
 ---@return boolean
