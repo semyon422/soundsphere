@@ -1,7 +1,7 @@
 local thread = require("thread")
 local erfunc = require("libchart.erfunc")
 local class = require("class")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 
 ---@class sphere.ScoreLibrary
@@ -92,9 +92,9 @@ function ScoreLibrary:updateItemsOnline(chartview, exact)
 	---@type sea.Chartplay[]?, string?
 	local chartplays, err
 	if exact then
-		local chartkey = Chartkey()
-		chartkey:importChartkey(chartview)
-		chartplays, err = remote.submission:getBestChartplaysForChartdiff(chartkey)
+		local chartdiff_key = ChartdiffKey()
+		chartdiff_key:importChartdiffKey(chartview)
+		chartplays, err = remote.submission:getBestChartplaysForChartdiff(chartdiff_key)
 	else
 		local chartmeta_key = ChartmetaKey()
 		chartmeta_key:importChartmetaKey(chartview)

@@ -1,7 +1,7 @@
 local class = require("class")
 local valid = require("valid")
 local types = require("sea.shared.types")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
@@ -56,17 +56,17 @@ function SubmissionServerRemote:getBestChartplaysForChartmeta(chartmeta_key)
 	return self.chartplays:getBestChartplaysForChartmeta(chartmeta_key)
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]?
 ---@return string?
-function SubmissionServerRemote:getBestChartplaysForChartdiff(chartkey)
-	local ok, err = valid.format(Chartkey.validate(chartkey))
+function SubmissionServerRemote:getBestChartplaysForChartdiff(chartdiff_key)
+	local ok, err = valid.format(ChartdiffKey.validate(chartdiff_key))
 	if not ok then
-		return nil, "validate chartkey: " .. err
+		return nil, "validate chartdiff_key: " .. err
 	end
-	setmetatable(chartkey, Chartkey)
+	setmetatable(chartdiff_key, ChartdiffKey)
 
-	return self.chartplays:getBestChartplaysForChartdiff(chartkey)
+	return self.chartplays:getBestChartplaysForChartdiff(chartdiff_key)
 end
 
 ---@param replay_hash string

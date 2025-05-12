@@ -1,6 +1,6 @@
 local class = require("class")
 local ReplayBase = require("sea.replays.ReplayBase")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ComputeContext = require("sea.compute.ComputeContext")
 
 ---@class sea.ChartsComputer
@@ -90,14 +90,14 @@ function ChartsComputer:computeChartplayNoUpdate(chartplay, time)
 
 	if #chartplay.modifiers > 0 or chartplay.rate ~= 1 then
 		-- create default chartdiff
-		local default_chartkey = Chartkey()
-		default_chartkey.hash = chartplay.hash
-		default_chartkey.index = chartplay.index
-		default_chartkey.rate = 1
-		default_chartkey.modifiers = {}
-		default_chartkey.mode = "mania"
+		local default_chartdiff_key = ChartdiffKey()
+		default_chartdiff_key.hash = chartplay.hash
+		default_chartdiff_key.index = chartplay.index
+		default_chartdiff_key.rate = 1
+		default_chartdiff_key.modifiers = {}
+		default_chartdiff_key.mode = "mania"
 
-		local default_chartdiff = charts_repo:getChartdiffByChartkey(default_chartkey)
+		local default_chartdiff = charts_repo:getChartdiffByChartdiffKey(default_chartdiff_key)
 		if not default_chartdiff then
 			local chartdiff = ctx:computeBase(ReplayBase())
 			chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)

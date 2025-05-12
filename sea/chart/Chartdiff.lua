@@ -1,17 +1,17 @@
 local table_util = require("table_util")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local chart_types = require("sea.chart.types")
 
----@class sea.Chartdiff: sea.Chartkey
+---@class sea.Chartdiff: sea.ChartdiffKey
 ---@operator call: sea.Chartdiff
 --- Server managed keys
 ---@field id integer
 ---@field custom_user_id integer
 ---@field created_at integer
 ---@field computed_at integer
---- Chartkey
+--- ChartdiffKey
 --- COMPUTED
 ---@field inputmode string
 ---@field duration number not affected by rate
@@ -28,7 +28,7 @@ local chart_types = require("sea.chart.types")
 ---@field user_diff number
 ---@field user_diff_data string
 ---@field notes_preview string
-local Chartdiff = Chartkey + {}
+local Chartdiff = ChartdiffKey + {}
 
 function Chartdiff:new()
 	self.modifiers = {}
@@ -64,7 +64,7 @@ function Chartdiff:equalsComputed(values)
 	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
 end
 
-table_util.copy(Chartkey.struct, Chartdiff.struct)
+table_util.copy(ChartdiffKey.struct, Chartdiff.struct)
 
 assert(#table_util.keys(Chartdiff.struct) == 20)
 

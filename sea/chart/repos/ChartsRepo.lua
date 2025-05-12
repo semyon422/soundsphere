@@ -24,15 +24,15 @@ function ChartsRepo:getChartdiff(id)
 	return self.models.chartdiffs:find({id = assert(id)})
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartdiff?
-function ChartsRepo:getChartdiffByChartkey(chartkey)
+function ChartsRepo:getChartdiffByChartdiffKey(chartdiff_key)
 	return self.models.chartdiffs:find({
-		hash = assert(chartkey.hash),
-		index = assert(chartkey.index),
-		modifiers = assert(chartkey.modifiers),
-		rate = assert(chartkey.rate),
-		mode = assert(chartkey.mode),
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
 	})
 end
 
@@ -98,7 +98,7 @@ end
 ---@param time integer
 ---@return sea.Chartdiff
 function ChartsRepo:createUpdateChartdiff(chartdiff, time)
-	local _chartdiff = self:getChartdiffByChartkey(chartdiff)
+	local _chartdiff = self:getChartdiffByChartdiffKey(chartdiff)
 	if not _chartdiff then
 		chartdiff.created_at = time
 		chartdiff.computed_at = time
@@ -274,15 +274,15 @@ function ChartsRepo:getChartplaysForChartmeta(chartmeta_key)
 	}, {order = {"rating DESC"}})
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]
-function ChartsRepo:getChartplaysForChartdiff(chartkey)
+function ChartsRepo:getChartplaysForChartdiff(chartdiff_key)
 	return self.models.chartplays_list:select({
-		hash = assert(chartkey.hash),
-		index = assert(chartkey.index),
-		modifiers = assert(chartkey.modifiers),
-		rate = assert(chartkey.rate),
-		mode = assert(chartkey.mode),
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
 	}, {order = {"rating DESC"}})
 end
 
@@ -295,15 +295,15 @@ function ChartsRepo:getBestChartplaysForChartmeta(chartmeta_key)
 	})
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]
-function ChartsRepo:getBestChartplaysForChartdiff(chartkey)
+function ChartsRepo:getBestChartplaysForChartdiff(chartdiff_key)
 	return self.models.best_chartdiff_chartplays:select({
-		hash = assert(chartkey.hash),
-		index = assert(chartkey.index),
-		modifiers = assert(chartkey.modifiers),
-		rate = assert(chartkey.rate),
-		mode = assert(chartkey.mode),
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
 	})
 end
 

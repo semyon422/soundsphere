@@ -2,7 +2,7 @@ local class = require("class")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local Chartfile = require("sea.chart.Chartfile")
 local ChartplaysAccess = require("sea.chart.access.ChartplaysAccess")
-local Chartkey = require("sea.chart.Chartkey")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
 
@@ -58,11 +58,11 @@ function Chartplays:getChartplaysForChartmeta(chartmeta_key)
 	return self.charts_repo:getChartplaysForChartmeta(chartmeta_key)
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]?
 ---@return string?
-function Chartplays:getChartplaysForChartdiff(chartkey)
-	return self.charts_repo:getChartplaysForChartdiff(chartkey)
+function Chartplays:getChartplaysForChartdiff(chartdiff_key)
+	return self.charts_repo:getChartplaysForChartdiff(chartdiff_key)
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
@@ -72,11 +72,11 @@ function Chartplays:getBestChartplaysForChartmeta(chartmeta_key)
 	return self.charts_repo:getBestChartplaysForChartmeta(chartmeta_key)
 end
 
----@param chartkey sea.Chartkey
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]?
 ---@return string?
-function Chartplays:getBestChartplaysForChartdiff(chartkey)
-	return self.charts_repo:getBestChartplaysForChartdiff(chartkey)
+function Chartplays:getBestChartplaysForChartdiff(chartdiff_key)
+	return self.charts_repo:getBestChartplaysForChartdiff(chartdiff_key)
 end
 
 ---@param user_id integer
@@ -272,14 +272,14 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 
 	if #chartplay.modifiers > 0 or chartplay.rate ~= 1 then
 		-- create default chartdiff
-		local default_chartkey = Chartkey()
-		default_chartkey.hash = chartplay.hash
-		default_chartkey.index = chartplay.index
-		default_chartkey.rate = 1
-		default_chartkey.modifiers = {}
-		default_chartkey.mode = "mania"
+		local default_chartdiff_key = ChartdiffKey()
+		default_chartdiff_key.hash = chartplay.hash
+		default_chartdiff_key.index = chartplay.index
+		default_chartdiff_key.rate = 1
+		default_chartdiff_key.modifiers = {}
+		default_chartdiff_key.mode = "mania"
 
-		local default_chartdiff = charts_repo:getChartdiffByChartkey(default_chartkey)
+		local default_chartdiff = charts_repo:getChartdiffByChartdiffKey(default_chartdiff_key)
 		if not default_chartdiff then
 			local chartdiff = ctx:computeBase(ReplayBase())
 			chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)
