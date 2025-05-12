@@ -46,7 +46,7 @@ function ChartdiffGenerator:create(chart, hash, index)
 	chartdiff.hash = hash
 	chartdiff.index = index
 
-	self.chartsRepo:createChartdiff(chartdiff)
+	self.chartsRepo:createUpdateChartdiff(chartdiff, os.time())
 
 	return chartdiff
 end
