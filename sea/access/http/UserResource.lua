@@ -170,6 +170,14 @@ end
 ---@param ctx sea.RequestContext
 function UserResource:getUserSettings(req, res, ctx)
 	ctx.user = self.users:getUser(tonumber(ctx.path_params.user_id))
+
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
 end
 
