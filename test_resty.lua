@@ -12,6 +12,8 @@ pkg.add("chartbase")
 pkg.add("libchart")
 pkg.add("tree/share/lua/5.1")
 
+pkg.add(os.getenv("OR_ROOT") .. "/lualib")
+
 pkg.export_lua()
 
 -- lua-nginx-module bug fix
