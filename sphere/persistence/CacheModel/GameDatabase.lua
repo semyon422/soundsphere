@@ -37,7 +37,7 @@ function GameDatabase:load()
 	if ver == 0 then
 		db:exec(assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql")))
 		db:exec(assert(love.filesystem.read("sea/storage/shared/db.sql")))
-		orm:user_version(user_version)
+		db:user_version(user_version)
 		ver = user_version
 	elseif ver == user_version - 1 then
 		self:migrate()
