@@ -169,6 +169,7 @@
 					</table>
 				</div>
 				<div class="block">
+					<% local can_update = page:canUpdate() %>
 					<% if user.description ~= "" or can_update then %>
 						<div class="border-box">
 							<% if not edit_description and user.description == "" then %>

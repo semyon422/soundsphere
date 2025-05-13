@@ -1,6 +1,5 @@
 local IResource = require("web.framework.IResource")
 local UserPage = require("sea.access.http.UserPage")
-local User = require("sea.access.User")
 local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
 local json = require("web.json")
@@ -27,8 +26,6 @@ UserResource.routes = {
 		GET = "getUserTeams",
 	}},
 }
-
-UserResource.descriptionLength = 4096
 
 ---@param users sea.Users
 ---@param leaderboards sea.Leaderboards
@@ -143,12 +140,6 @@ function UserResource:updateDescription(req, res, ctx)
 
 	local encoded = json.encode(description)
 
-	if encoded:len() > self.descriptionLength then
-		res.status = 400
-		res:send("description size limit reached")
-		return
-	end
-
 	if not description.ops then
 		encoded = ""
 	end
@@ -157,7 +148,19 @@ function UserResource:updateDescription(req, res, ctx)
 		encoded = ""
 	end
 
-	-- TODO: Replace user description with `encoded`
+	local user_update = UserUpdate()
+	user_update.id = user.id
+	user_update.description = encoded
+
+	local user, err = self.users:updateUser(user, user_update, ctx.time)
+
+	if not user then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
 	res.status = 200
 end
 
