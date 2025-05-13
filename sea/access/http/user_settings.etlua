@@ -62,7 +62,7 @@
 						</div>
 						]]
 
-						local donator =  user:hasRole("donator", time)
+						local donator = user:hasRole("donator", time)
 
 						local color_left_hex = "#cf9ceb"
 						local color_right_hex = "#ee93bd"
@@ -126,7 +126,7 @@
 								<div class="field">
 									<div class="control">
 										<label class="checkbox">
-											<input type="checkbox">
+											<input type="checkbox" name="enable_gradient">
 											Enable gradient
 										</label>
 									</div>
@@ -188,13 +188,14 @@ function updateGradient() {
 	document.documentElement.style.setProperty("--gradient-right", color_right.value)
 }
 
-document.addEventListener("htmx:load", () => {
+function updateGradientInitial() {
 	document.documentElement.style.setProperty("--gradient-left", color_left.defaultValue)
 	document.documentElement.style.setProperty("--gradient-right", color_right.defaultValue)
 	color_left.value = color_left.defaultValue
 	color_right.value = color_right.defaultValue
-})
+}
 
+document.addEventListener("htmx:load", updateGradientInitial)
 color_left.addEventListener("input", updateGradient)
 color_right.addEventListener("input", updateGradient)
 </script>

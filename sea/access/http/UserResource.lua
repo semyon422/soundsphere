@@ -1,5 +1,7 @@
 local IResource = require("web.framework.IResource")
 local UserPage = require("sea.access.http.UserPage")
+local User = require("sea.access.User")
+local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
 local json = require("web.json")
 
@@ -19,6 +21,7 @@ UserResource.routes = {
 	}},
 	{"/users/:user_id/settings", {
 		GET = "getUserSettings",
+		POST = "updateSettings",
 	}},
 	{"/users/:user_id/teams", {
 		GET = "getUserTeams",
@@ -186,6 +189,60 @@ end
 ---@param ctx sea.RequestContext
 function UserResource:getUserTeams(req, res, ctx)
 	self.views:render_send(res, "sea/access/http/user_teams.etlua", ctx, true)
+end
+
+---@param str string?
+---@return integer
+local function hex_to_integer(str)
+	if not str then
+		return 0
+	end
+	return tonumber(str:sub(2, #str), 16) or 0
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updateSettings(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		ctx.user_settings_error = err
+		res.status = 400
+		return
+	end
+
+	---@type sea.UserUpdate
+	local user_values = UserUpdate()
+	user_values.id = user_id
+	user_values.name = body_params.name
+	user_values.discord = body_params.discord
+	--user.avatar_url = body_params.avatar_url
+	--user.banner_url = body_params.banner_url
+	--user.enable_gradient = body_params.enable_gradient
+	user_values.color_left = hex_to_integer(body_params.color_left)
+	user_values.color_right = hex_to_integer(body_params.color_right)
+
+	local user, err = self.users:updateUser(ctx.session_user, user_values, ctx.time)
+
+	if not user then
+		---@cast err -?
+		res.status = 404
+		res:send(err)
+		return
+	end
+
+	ctx.user = user
+	ctx.main_container_type = "vertically_centered"
+	ctx.user_settings_updated = true
+	res.headers:set("HX-Location", ("/users/%i/settings"):format(user.id))
+	res:send(tostring(body_params.color_left))
+	--self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
 end
 
 return UserResource

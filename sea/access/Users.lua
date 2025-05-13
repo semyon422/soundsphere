@@ -188,6 +188,36 @@ function Users:logout(user, session_id)
 end
 
 ---@param user sea.User
+---@param user_update sea.UserUpdate
+---@param time number
+---@return sea.User?
+---@return string?
+function Users:updateUser(user, user_update, time)
+	if not user_update.id then
+		return nil, "not found"
+	end
+
+	local ok, errs = user_update:validate()
+
+	if not ok then
+		---@cast errs -?
+		return nil, table.concat(errs, ", ")
+	end
+
+	local target_user = self.users_repo:getUser(user_update.id)
+
+	if not target_user then
+		return nil, "not found"
+	end
+
+	if not self.users_access:canUpdateSelf(user, target_user, time) then
+		return nil, "not allowed"
+	end
+
+	return self.users_repo:updateUser(user_update)
+end
+
+---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
 ---@return sea.User?

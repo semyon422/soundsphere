@@ -67,7 +67,7 @@ function UsersRepo:createUser(user)
 	return self.models.users:create(user)
 end
 
----@param user sea.User
+---@param user sea.User | sea.UserUpdate
 ---@return sea.User
 function UsersRepo:updateUser(user)
 	return self.models.users:update(user, {id = assert(user.id)})[1]
