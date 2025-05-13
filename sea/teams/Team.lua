@@ -48,11 +48,7 @@ local validate_team = valid.struct({
 ---@return true?
 ---@return string[]?
 function Team:validate()
-	local ok, errs = validate_team(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return valid.flatten(validate_team(self))
 end
 
 return Team

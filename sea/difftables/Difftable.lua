@@ -20,11 +20,7 @@ local validate_difftable = valid.struct({
 ---@return true?
 ---@return string[]?
 function Difftable:validate()
-	local ok, errs = validate_difftable(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return valid.flatten(validate_difftable(self))
 end
 
 return Difftable

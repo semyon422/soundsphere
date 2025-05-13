@@ -112,11 +112,7 @@ local validate_leaderboard = valid.struct(Leaderboard.struct)
 ---@return true?
 ---@return string[]?
 function Leaderboard:validate()
-	local ok, errs = validate_leaderboard(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return valid.flatten(validate_leaderboard(self))
 end
 
 return Leaderboard
