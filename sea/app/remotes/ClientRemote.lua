@@ -9,4 +9,9 @@ function ClientRemote:new(cacheModel)
 	self.compute_data_provider = cacheModel.computeDataProvider
 end
 
+---@param ... any
+function ClientRemote:print(...)
+	print(...)
+end
+
 return ClientRemote
