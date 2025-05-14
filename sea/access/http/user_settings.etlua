@@ -54,7 +54,7 @@
 					<h1 class="title">User Preferences</h1>
 					<p class="subtitle">Change credentials and statistics in your profile</p>
 				</div>
-				<form action="/users/<%= session_user.id %>/settings" method="post">
+				<form action="/users/<%= user.id %>/settings" method="post">
 					<%
 						local save_button = [[
 						<div class="control">
@@ -75,7 +75,7 @@
 					<div class="field">
 						<label class="label">Username</label>
 						<div class="control has-icons-left">
-							<input class="input" type="text" name="name" maxlength="22" value="<%= session_user.name %>" required>
+							<input class="input" type="text" name="name" maxlength="22" value="<%= user.name %>" required>
 							<span class="icon is-small is-left">
 								<i class="fas fa-user"></i>
 							</span>
@@ -84,7 +84,7 @@
 					<div class="field">
 						<label class="label">Discord handle</label>
 						<div class="control has-icons-left">
-							<input class="input" type="text" name="discord" placeholder="@username" value="<%= session_user.discord or "" %>">
+							<input class="input" type="text" name="discord" placeholder="@username" value="<%= user.discord or "" %>">
 							<span class="icon is-small is-left">
 								<i class="fab fa-discord"></i>
 							</span>
@@ -108,7 +108,7 @@
 					<div class="field">
 						<label class="label">Link to banner image</label>
 						<div class="control has-icons-left">
-							<input class="input" type="text" name="banner_url" placeholder="https://####.com/image542.png">
+							<input class="input" type="text" name="banner_url" value="<%= user.banner %>" placeholder="https://####.com/image542.png">
 							<span class="icon is-small is-left">
 								<i class="fas fa-link"></i>
 							</span>
@@ -146,11 +146,11 @@
 							<div>
 								<div class="has-text-grey">Preview on white</div>
 								<div class="username-preview has-background-light">
-									<span class="username-gradient" id="preview-white"><%= session_user.name %></span>
+									<span class="username-gradient" id="preview-white"><%= user.name %></span>
 								</div>
 								<div class="has-text-grey">Preview on dark</div>
 								<div class="username-preview has-background-dark">
-									<span class="username-gradient" id="preview-dark"><%= session_user.name %></span>
+									<span class="username-gradient" id="preview-dark"><%= user.name %></span>
 								</div>
 							</div>
 							<%- save_button %>
@@ -170,8 +170,8 @@
 						<p class="subtitle">Be sure to change your password from time to time.</p>
 					</div>
 					<div class="buttons">
-						<a class="button is-danger is-light" href="/users/<%= session_user.id %>/update_email">Change Email</a>
-						<a class="button is-danger is-light" href="/users/<%= session_user.id %>/update_password">Change Password</a>
+						<a class="button is-danger is-light" href="/users/<%= user.id %>/update_email">Change Email</a>
+						<a class="button is-danger is-light" href="/users/<%= user.id %>/update_password">Change Password</a>
 					</div>
 				</form>
 			</div>

@@ -215,37 +215,36 @@ function UserResource:updateSettings(req, res, ctx)
 
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
-		ctx.user_settings_error = err
+		---@cast err -?
 		res.status = 400
+		res:send(err)
 		return
 	end
 
 	---@type sea.UserUpdate
-	local user_values = UserUpdate()
-	user_values.id = user_id
-	user_values.name = body_params.name
-	user_values.discord = body_params.discord
-	--user.avatar_url = body_params.avatar_url
-	--user.banner_url = body_params.banner_url
-	--user.enable_gradient = body_params.enable_gradient
-	user_values.color_left = hex_to_integer(body_params.color_left)
-	user_values.color_right = hex_to_integer(body_params.color_right)
+	local user_update = UserUpdate()
+	user_update.id = user_id
+	user_update.name = body_params.name
+	user_update.discord = body_params.discord
+	user_update.banner = body_params.banner_url
+	--user_update.avatar_url = body_params.avatar_url
+	--user_update.enable_gradient = body_params.enable_gradient
+	user_update.color_left = hex_to_integer(body_params.color_left)
+	user_update.color_right = hex_to_integer(body_params.color_right)
 
-	local user, err = self.users:updateUser(ctx.session_user, user_values, ctx.time)
+	local user, err = self.users:updateUser(ctx.session_user, user_update, ctx.time)
 
 	if not user then
 		---@cast err -?
-		res.status = 404
+		res.status = 400
 		res:send(err)
 		return
 	end
 
 	ctx.user = user
 	ctx.main_container_type = "vertically_centered"
-	ctx.user_settings_updated = true
-	res.headers:set("HX-Location", ("/users/%i/settings"):format(user.id))
-	res:send(tostring(body_params.color_left))
-	--self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
+	res.headers:set("HX-Location", ("/users/%i/settings"):format(user_id))
+	self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
 end
 
 return UserResource
