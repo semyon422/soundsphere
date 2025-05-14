@@ -99,7 +99,7 @@
 					<div class="field">
 						<label class="label">Link to avatar image</label>
 						<div class="control has-icons-left">
-							<input class="input" type="text" name="avatar_url" placeholder="https://####.com/image541.png">
+							<input class="input" type="text" name="avatar_url" value="<%= user.avatar or "" %>" placeholder="https://####.com/image541.png">
 							<span class="icon is-small is-left">
 								<i class="fas fa-link"></i>
 							</span>
@@ -108,7 +108,7 @@
 					<div class="field">
 						<label class="label">Link to banner image</label>
 						<div class="control has-icons-left">
-							<input class="input" type="text" name="banner_url" value="<%= user.banner %>" placeholder="https://####.com/image542.png">
+							<input class="input" type="text" name="banner_url" value="<%= user.banner or "" %>" placeholder="https://####.com/image542.png">
 							<span class="icon is-small is-left">
 								<i class="fas fa-link"></i>
 							</span>

@@ -17,7 +17,14 @@
 				<div class="block">
 					<div class="box">
 						<div class="block">
-							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= user.name %>&size=300">
+							<%
+								local avatar_url = ([[https://eu.ui-avatars.com/api/?name=%s&size=300]]):format(user.name)
+
+								if user.avatar and user.avatar ~= "" then
+									avatar_url = user.avatar
+								end
+							%>
+							<img class="user__avatar" src="<%= avatar_url %>">
 						</div>
 						<div class="block">
 							<div class="user__username-container">

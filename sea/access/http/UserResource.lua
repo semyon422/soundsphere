@@ -227,8 +227,8 @@ function UserResource:updateSettings(req, res, ctx)
 	user_update.name = body_params.name
 	user_update.discord = body_params.discord
 	user_update.banner = body_params.banner_url
-	--user_update.avatar_url = body_params.avatar_url
-	--user_update.enable_gradient = body_params.enable_gradient
+	user_update.avatar = body_params.avatar_url
+	user_update.enable_gradient = body_params.enable_gradient
 	user_update.color_left = hex_to_integer(body_params.color_left)
 	user_update.color_right = hex_to_integer(body_params.color_right)
 

@@ -15,8 +15,10 @@ local Roles = require("sea.access.Roles")
 ---@field chartfiles_upload_size integer
 ---@field chartplays_upload_size integer
 ---@field play_time integer
+---@field enable_gradient boolean
 ---@field color_left integer
 ---@field color_right integer
+---@field avatar string
 ---@field banner string
 ---@field discord string
 ---@field custom_link string
