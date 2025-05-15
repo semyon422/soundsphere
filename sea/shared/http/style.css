@@ -147,6 +147,7 @@ main.center-vertically > * {
 
 .form {
 	position: relative;
+	flex-grow: 1;
 	max-width: 560px;
 }
 

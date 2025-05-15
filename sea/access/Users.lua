@@ -238,7 +238,7 @@ function Users:updateEmail(user, current_password, new_email, time)
 		return nil, "not allowed"
 	end
 
-	local valid = self.password_hasher:verify(target_user.password, current_password)
+	local valid = self.password_hasher:verify(current_password, target_user.password)
 	if not valid then
 		return nil, "invalid credentials"
 	end
@@ -266,7 +266,7 @@ function Users:updatePassword(user, current_password, new_password, time)
 		return nil, "not allowed"
 	end
 
-	local valid = self.password_hasher:verify(target_user.password, current_password)
+	local valid = self.password_hasher:verify(current_password, target_user.password)
 	if not valid then
 		return nil, "invalid credentials"
 	end

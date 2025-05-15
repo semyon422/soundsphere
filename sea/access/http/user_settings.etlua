@@ -170,8 +170,8 @@
 						<p class="subtitle">Be sure to change your password from time to time.</p>
 					</div>
 					<div class="buttons">
-						<a class="button is-danger is-light" href="/users/<%= user.id %>/update_email">Change Email</a>
-						<a class="button is-danger is-light" href="/users/<%= user.id %>/update_password">Change Password</a>
+						<a class="button is-danger is-light" href="/users/update_email">Change Email</a>
+						<a class="button is-danger is-light" href="/users/update_password">Change Password</a>
 					</div>
 				</form>
 			</div>
