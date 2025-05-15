@@ -218,6 +218,64 @@ function Users:updateUser(user, user_update, time)
 end
 
 ---@param user sea.User
+---@param current_password string
+---@param new_email string
+---@param time number
+---@return sea.User?
+---@return string?
+function Users:updateEmail(user, current_password, new_email, time)
+	if user:isAnon() then
+		return nil, "not allowed"
+	end
+
+	local target_user = self.users_repo:getUserInsecure(user.id)
+	if not target_user then
+		return nil, "not found"
+	end
+
+	local can = self.users_access:canUpdateSelf(user, target_user, time)
+	if not can then
+		return nil, "not allowed"
+	end
+
+	local valid = self.password_hasher:verify(target_user.password, current_password)
+	if not valid then
+		return nil, "invalid credentials"
+	end
+
+	target_user.email = new_email
+	return self.users_repo:updateUser(target_user)
+end
+
+---@param user sea.User
+---@param current_password string
+---@param new_password string
+---@param time number
+function Users:updatePassword(user, current_password, new_password, time)
+	if user:isAnon() then
+		return nil, "not allowed"
+	end
+
+	local target_user = self.users_repo:getUserInsecure(user.id)
+	if not target_user then
+		return nil, "not found"
+	end
+
+	local can = self.users_access:canUpdateSelf(user, target_user, time)
+	if not can then
+		return nil, "not allowed"
+	end
+
+	local valid = self.password_hasher:verify(target_user.password, current_password)
+	if not valid then
+		return nil, "invalid credentials"
+	end
+
+	target_user.password = self.password_hasher:digest(new_password)
+	return self.users_repo:updateUser(target_user)
+end
+
+---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
 ---@return sea.User?

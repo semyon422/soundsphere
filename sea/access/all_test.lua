@@ -328,4 +328,62 @@ function test.update(t)
 	t:eq(err, "not allowed")
 end
 
+---@param t testing.T
+function test.update_email(t)
+	local ctx = create_test_ctx()
+
+	local time = 0
+
+	local users = Users(ctx.users_repo, IPasswordHasher())
+
+	local user, err = users:updateEmail(ctx.anon_user, "aaa", "email@example.com", time)
+	t:eq(err, "not allowed")
+
+	local user_values = UserInsecure()
+	user_values.name = "user"
+	user_values.email = "user@example.com"
+	user_values.password = "password"
+
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
+	---@cast su -?
+	user = users:getUser(su.user.id)
+
+	_, err = users:updateEmail(user, "wrong password", "new_email@example.com", time)
+	t:eq(err, "invalid credentials")
+
+	_, err = users:updateEmail(user, "password", "new_email@example.com", time)
+	user = users.users_repo:getUserInsecure(user.id)
+	---@cast user -?
+	t:eq(user.email, "new_email@example.com")
+end
+
+---@param t testing.T
+function test.update_password(t)
+	local ctx = create_test_ctx()
+
+	local time = 0
+
+	local users = Users(ctx.users_repo, IPasswordHasher())
+
+	local user, err = users:updatePassword(ctx.anon_user, "password", "new_password", time)
+	t:eq(err, "not allowed")
+
+	local user_values = UserInsecure()
+	user_values.name = "user"
+	user_values.email = "user@example.com"
+	user_values.password = "password"
+
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
+	---@cast su -?
+	local player = users:getUser(su.user.id)
+
+	_, err = users:updatePassword(player, "wrong password", "new_password", time)
+	t:eq(err, "invalid credentials")
+
+	_, err = users:updatePassword(player, "password", "new_password", time)
+	player = users.users_repo:getUserInsecure(player.id)
+	---@cast player -?
+	t:eq(player.password, "new_password")
+end
+
 return test
