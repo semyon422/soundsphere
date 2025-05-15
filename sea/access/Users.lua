@@ -188,6 +188,87 @@ function Users:logout(user, session_id)
 end
 
 ---@param user sea.User
+---@param user_update sea.UserUpdate
+---@param time number
+---@return sea.User?
+---@return string?
+function Users:updateUser(user, user_update, time)
+	if not user_update.id then
+		return nil, "not found"
+	end
+
+	local target_user = self.users_repo:getUser(user_update.id)
+
+	if not target_user then
+		return nil, "not found"
+	end
+
+	if not self.users_access:canUpdateSelf(user, target_user, time) then
+		return nil, "not allowed"
+	end
+
+	return self.users_repo:updateUser(user_update)
+end
+
+---@param user sea.User
+---@param current_password string
+---@param new_email string
+---@param time number
+---@return sea.User?
+---@return string?
+function Users:updateEmail(user, current_password, new_email, time)
+	if user:isAnon() then
+		return nil, "not allowed"
+	end
+
+	local target_user = self.users_repo:getUserInsecure(user.id)
+	if not target_user then
+		return nil, "not found"
+	end
+
+	local can = self.users_access:canUpdateSelf(user, target_user, time)
+	if not can then
+		return nil, "not allowed"
+	end
+
+	local valid = self.password_hasher:verify(current_password, target_user.password)
+	if not valid then
+		return nil, "invalid credentials"
+	end
+
+	target_user.email = new_email
+	return self.users_repo:updateUser(target_user)
+end
+
+---@param user sea.User
+---@param current_password string
+---@param new_password string
+---@param time number
+function Users:updatePassword(user, current_password, new_password, time)
+	if user:isAnon() then
+		return nil, "not allowed"
+	end
+
+	local target_user = self.users_repo:getUserInsecure(user.id)
+	if not target_user then
+		return nil, "not found"
+	end
+
+	local can = self.users_access:canUpdateSelf(user, target_user, time)
+	if not can then
+		return nil, "not allowed"
+	end
+
+	local valid = self.password_hasher:verify(current_password, target_user.password)
+	if not valid then
+		return nil, "invalid credentials"
+	end
+
+	target_user.password = self.password_hasher:digest(new_password)
+	return self.users_repo:updateUser(target_user)
+end
+
+---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
 ---@return sea.User?

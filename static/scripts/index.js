@@ -29,8 +29,8 @@ function createPreview() {
 
 	const note_image_transform = [
 		{ x: 0, r: 0, ox: ox, oy: oy },
-		{ x: iw, r: Math.PI / 2, ox: ox, oy: oy },
-		{ x: iw * 2, r: -Math.PI / 2, ox: ox, oy: oy },
+		{ x: iw, r: -Math.PI / 2, ox: ox, oy: oy },
+		{ x: iw * 2, r: Math.PI / 2, ox: ox, oy: oy },
 		{ x: iw * 3, r: Math.PI, ox: ox, oy: oy }
 	]
 
@@ -41,8 +41,8 @@ function createPreview() {
 
 	const key_image_transform = [
 		{ x: 0, r: 0, ox: ox, oy: oy },
-		{ x: iw, r: Math.PI / 2, ox: ox, oy: oy },
-		{ x: iw * 2, r: -Math.PI / 2, ox: ox, oy: oy },
+		{ x: iw, r: -Math.PI / 2, ox: ox, oy: oy },
+		{ x: iw * 2, r: Math.PI / 2, ox: ox, oy: oy },
 		{ x: iw * 3, r: Math.PI, ox: ox, oy: oy }
 	]
 

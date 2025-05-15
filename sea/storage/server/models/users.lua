@@ -7,6 +7,7 @@ users.metatable = User
 
 users.types = {
 	is_banned = "boolean",
+	enable_gradient = "boolean",
 }
 
 users.relations = {

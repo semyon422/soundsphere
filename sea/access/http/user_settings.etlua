@@ -1,1 +1,201 @@
-user settings
+<style>
+:root {
+	--gradient-left: #ff6b6b;
+	--gradient-right: #1e90ff;
+}
+
+.user-settings__row {
+	display: flex;
+	align-items: center;
+}
+
+.user-settings__row * {
+	margin-right: 1em;
+}
+
+.user-settings__row input[type="color"] {
+	width: 3rem;
+	height: 3rem;
+	aspect-ratio: 1;
+	border: none;
+	background: none;
+	cursor: pointer;
+	padding: 0;
+	border-radius: 50%;
+}
+
+.username-preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2rem;
+	font-weight: 700;
+	padding: 0.5rem 1rem;
+	margin-bottom: 1rem;
+	width: 100%;
+	overflow-x: auto;
+	border: 1px solid var(--bulma-border);
+	border-radius: 0.5em;
+}
+
+.username-gradient {
+	background: linear-gradient(90deg, var(--gradient-left), var(--gradient-right));
+	background-clip: text;
+	text-fill-color: transparent;
+	color: transparent;
+}
+</style>
+
+<div class="centered-form">
+	<div class="form-container">
+		<div class="form">
+			<div class="form border-box">
+				<div class="content">
+					<h1 class="title">User Preferences</h1>
+					<p class="subtitle">Change credentials and statistics in your profile</p>
+				</div>
+				<form action="/users/<%= user.id %>/settings" method="post">
+					<%
+						local save_button = [[
+						<div class="control">
+							<button class="button is-link">Save</button>
+						</div>
+						]]
+
+						local donator = user:hasRole("donator", time)
+
+						local color_left_hex = "#cf9ceb"
+						local color_right_hex = "#ee93bd"
+
+						if donator then
+							color_left_hex = ("#%x"):format(user.color_left or 13213679)
+							color_right_hex = ("#%x"):format(user.color_right or 15373511)
+						end
+					%>
+					<div class="field">
+						<label class="label">Username</label>
+						<div class="control has-icons-left">
+							<input class="input" type="text" name="name" maxlength="22" value="<%= user.name %>" required>
+							<span class="icon is-small is-left">
+								<i class="fas fa-user"></i>
+							</span>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Discord handle</label>
+						<div class="control has-icons-left">
+							<input class="input" type="text" name="discord" placeholder="@username" value="<%= user.discord or "" %>">
+							<span class="icon is-small is-left">
+								<i class="fab fa-discord"></i>
+							</span>
+						</div>
+					</div>
+					<%- save_button %>
+					<div class="separator"></div>
+					<div class="content">
+						<p class="title">Profile visuals</p>
+						<p class="subtitle">Enter links to images below</p>
+					</div>
+					<div class="field">
+						<label class="label">Link to avatar image</label>
+						<div class="control has-icons-left">
+							<input class="input" type="text" name="avatar_url" value="<%= user.avatar or "" %>" placeholder="https://####.com/image541.png">
+							<span class="icon is-small is-left">
+								<i class="fas fa-link"></i>
+							</span>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Link to banner image</label>
+						<div class="control has-icons-left">
+							<input class="input" type="text" name="banner_url" value="<%= user.banner or "" %>" placeholder="https://####.com/image542.png">
+							<span class="icon is-small is-left">
+								<i class="fas fa-link"></i>
+							</span>
+						</div>
+					</div>
+					<%- save_button %>
+					<div class="separator"></div>
+					<div class="content">
+						<p class="title">Username gradient</p>
+						<p class="subtitle">Make sure it's visible on light and dark theme</p>
+					</div>
+					<div class="form">
+						<div <%- not donator and "class='content-disabled'" %>>
+							<div class="block">
+								<div class="field">
+									<div class="control">
+										<label class="checkbox">
+											<input type="checkbox" name="enable_gradient">
+											Enable gradient
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="block">
+								<p>Use <a href="https://oklch.com/#0.724,0.1515,152.76,100">OKLCH</a> color picker, it makes choosing beautiful gradients easier!<p>
+							</div>
+							<div class="block">
+								<div class="user-settings__row">
+									<p>Left color</p>
+									<input id="color-left" name="color_left" type="color" value="<%= color_left_hex %>"></input>
+									<p>Right color</p>
+									<input id="color-right" name="color_right" type="color" value="<%= color_right_hex %>"></input>
+								</div>
+							</div>
+							<div>
+								<div class="has-text-grey">Preview on white</div>
+								<div class="username-preview has-background-light">
+									<span class="username-gradient" id="preview-white"><%= user.name %></span>
+								</div>
+								<div class="has-text-grey">Preview on dark</div>
+								<div class="username-preview has-background-dark">
+									<span class="username-gradient" id="preview-dark"><%= user.name %></span>
+								</div>
+							</div>
+							<%- save_button %>
+						</div>
+						<% if not donator then %>
+							<div class="content-disabled-message">
+								<div class="content">
+									<h2>Supporter-only feature</h2>
+									<p>Consider supporting us to access this feature and more.</p>
+								</div>
+							</div>
+						<% end %>
+					</div>
+					<div class="separator"></div>
+					<div class="content">
+						<p class="title">Credentials</p>
+						<p class="subtitle">Be sure to change your password from time to time.</p>
+					</div>
+					<div class="buttons">
+						<a class="button is-danger is-light" href="/users/update_email">Change Email</a>
+						<a class="button is-danger is-light" href="/users/update_password">Change Password</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+var color_left = document.getElementById("color-left")
+var color_right = document.getElementById("color-right")
+
+function updateGradient() {
+	document.documentElement.style.setProperty("--gradient-left", color_left.value)
+	document.documentElement.style.setProperty("--gradient-right", color_right.value)
+}
+
+function updateGradientInitial() {
+	document.documentElement.style.setProperty("--gradient-left", color_left.defaultValue)
+	document.documentElement.style.setProperty("--gradient-right", color_right.defaultValue)
+	color_left.value = color_left.defaultValue
+	color_right.value = color_right.defaultValue
+}
+
+document.addEventListener("htmx:load", updateGradientInitial)
+color_left.addEventListener("input", updateGradient)
+color_right.addEventListener("input", updateGradient)
+</script>

@@ -9,6 +9,7 @@ users_insecure.metatable = UserInsecure
 
 users_insecure.types = {
 	is_banned = "boolean",
+	enable_gradient = "boolean",
 }
 
 users_insecure.relations = {

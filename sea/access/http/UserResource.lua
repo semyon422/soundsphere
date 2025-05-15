@@ -1,5 +1,6 @@
 local IResource = require("web.framework.IResource")
 local UserPage = require("sea.access.http.UserPage")
+local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
 local json = require("web.json")
 
@@ -8,6 +9,14 @@ local json = require("web.json")
 local UserResource = IResource + {}
 
 UserResource.routes = {
+	{"/users/update_email", {
+		GET = "getUpdateEmail",
+		POST = "updateEmail",
+	}},
+	{"/users/update_password", {
+		GET = "getUpdatePassword",
+		POST = "updatePassword",
+	}},
 	{"/users/:user_id", {
 		GET = "getUser",
 	}},
@@ -19,13 +28,12 @@ UserResource.routes = {
 	}},
 	{"/users/:user_id/settings", {
 		GET = "getUserSettings",
+		POST = "updateSettings",
 	}},
 	{"/users/:user_id/teams", {
 		GET = "getUserTeams",
 	}},
 }
-
-UserResource.descriptionLength = 4096
 
 ---@param users sea.Users
 ---@param leaderboards sea.Leaderboards
@@ -140,12 +148,6 @@ function UserResource:updateDescription(req, res, ctx)
 
 	local encoded = json.encode(description)
 
-	if encoded:len() > self.descriptionLength then
-		res.status = 400
-		res:send("description size limit reached")
-		return
-	end
-
 	if not description.ops then
 		encoded = ""
 	end
@@ -154,7 +156,19 @@ function UserResource:updateDescription(req, res, ctx)
 		encoded = ""
 	end
 
-	-- TODO: Replace user description with `encoded`
+	local user_update = UserUpdate()
+	user_update.id = user.id
+	user_update.description = encoded
+
+	local user, err = self.users:updateUser(user, user_update, ctx.time)
+
+	if not user then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
 	res.status = 200
 end
 
@@ -170,7 +184,43 @@ end
 ---@param ctx sea.RequestContext
 function UserResource:getUserSettings(req, res, ctx)
 	ctx.user = self.users:getUser(tonumber(ctx.path_params.user_id))
+
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/user_settings.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUpdateEmail(req, res, ctx)
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.main_container_type = "vertically_centered"
+	self.views:render_send(res, "sea/access/http/user_update_email.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUpdatePassword(req, res, ctx)
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.main_container_type = "vertically_centered"
+	self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
 end
 
 ---@param req web.IRequest
@@ -178,6 +228,152 @@ end
 ---@param ctx sea.RequestContext
 function UserResource:getUserTeams(req, res, ctx)
 	self.views:render_send(res, "sea/access/http/user_teams.etlua", ctx, true)
+end
+
+---@param str string?
+---@return integer
+local function hex_to_integer(str)
+	if not str then
+		return 0
+	end
+	return tonumber(str:sub(2, #str), 16) or 0
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updateSettings(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	---@type sea.UserUpdate
+	local user_update = UserUpdate()
+	user_update.id = user_id
+	user_update.name = body_params.name
+	user_update.discord = body_params.discord
+	user_update.banner = body_params.banner_url
+	user_update.avatar = body_params.avatar_url
+	user_update.enable_gradient = body_params.enable_gradient
+	user_update.color_left = hex_to_integer(body_params.color_left)
+	user_update.color_right = hex_to_integer(body_params.color_right)
+
+	local ok, errs = user_update:validate()
+
+	if not ok then
+		---@cast errs -?
+		res.status = 400
+		res:send(table.concat(errs, ", "))
+		return
+	end
+
+	local user, err = self.users:updateUser(ctx.session_user, user_update, ctx.time)
+
+	if not user then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%i/settings"):format(user_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updateEmail(req, res, ctx)
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	local current_password = body_params.current_password ---@type string?
+	local new_email = body_params.new_email ---@type string?
+
+	if not current_password or not new_email then
+		res.status = 400
+		res:send("invalid body params")
+		return
+	end
+
+	local user, err = self.users:updateEmail(ctx.session_user, current_password, new_email, ctx.time)
+
+	if not user then
+		ctx.main_container_type = "vertically_centered"
+		ctx.update_email_error = err
+		self.views:render_send(res, "sea/access/http/user_update_email.etlua", ctx, true)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%i/settings"):format(ctx.session_user.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updatePassword(req, res, ctx)
+	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	local current_password = body_params.current_password ---@type string?
+	local new_password = body_params.new_password ---@type string?
+	local confirm_new_password = body_params.confirm_new_password ---@type string?
+
+	if not current_password or not new_password or not confirm_new_password then
+		ctx.main_container_type = "vertically_centered"
+		ctx.update_password_error = "invalid body params"
+		self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
+		return
+	end
+
+	if confirm_new_password ~= new_password then
+		ctx.main_container_type = "vertically_centered"
+		ctx.update_password_error = "new passwords don't match"
+		self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
+		return
+	end
+
+	local user, err = self.users:updatePassword(ctx.session_user, current_password, new_password, ctx.time)
+
+	if not user then
+		ctx.main_container_type = "vertically_centered"
+		ctx.update_password_error = err
+		self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%i/settings"):format(ctx.session_user.id))
 end
 
 return UserResource

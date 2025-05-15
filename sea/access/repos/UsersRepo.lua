@@ -43,6 +43,14 @@ function UsersRepo:getUser(id)
 	return user
 end
 
+---@param id integer
+---@return sea.UserInsecure?
+function UsersRepo:getUserInsecure(id)
+	local user = self.models.users_insecure:find({id = assert(id)})
+	self.models.users:preload({user}, "user_roles")
+	return user
+end
+
 ---@param email string
 ---@return sea.User?
 function UsersRepo:findUserByEmail(email)
@@ -67,7 +75,7 @@ function UsersRepo:createUser(user)
 	return self.models.users:create(user)
 end
 
----@param user sea.User
+---@param user sea.User | sea.UserUpdate
 ---@return sea.User
 function UsersRepo:updateUser(user)
 	return self.models.users:update(user, {id = assert(user.id)})[1]

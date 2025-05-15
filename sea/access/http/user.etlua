@@ -1,5 +1,13 @@
 <div class="is-hidden-mobile" style="position:relative;">
-	<div class="page-banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+	<%
+		local banner_url = [[https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D]]
+
+		if user.banner and user.banner ~= "" then
+			banner_url = user.banner
+		end
+	%>
+
+	<div class="page-banner" style="background-image:url('<%= banner_url %>');"></div>
 </div>
 
 <main class="container">
@@ -9,7 +17,14 @@
 				<div class="block">
 					<div class="box">
 						<div class="block">
-							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= user.name %>&size=300">
+							<%
+								local avatar_url = ([[https://eu.ui-avatars.com/api/?name=%s&size=300]]):format(user.name)
+
+								if user.avatar and user.avatar ~= "" then
+									avatar_url = user.avatar
+								end
+							%>
+							<img class="user__avatar" src="<%= avatar_url %>">
 						</div>
 						<div class="block">
 							<div class="user__username-container">
@@ -169,6 +184,7 @@
 					</table>
 				</div>
 				<div class="block">
+					<% local can_update = page:canUpdate() %>
 					<% if user.description ~= "" or can_update then %>
 						<div class="border-box">
 							<% if not edit_description and user.description == "" then %>

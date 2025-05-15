@@ -77,7 +77,14 @@
 						<p>
 							<%= session_user.name %>
 						</p>
-						<img class="header__avatar is-hidden-touch" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=128">
+						<%
+							local avatar_url = ([[https://eu.ui-avatars.com/api/?name=%s&size=128]]):format(session_user.name)
+
+							if session_user.avatar and session_user.avatar ~= "" then
+								avatar_url = session_user.avatar
+							end
+						%>
+						<img class="header__avatar is-hidden-touch" src="<%= avatar_url %>">
 					</a>
 					<div class="navbar-dropdown is-right">
 						<% local user_id = session.user_id %>
