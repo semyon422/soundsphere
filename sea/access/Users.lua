@@ -197,13 +197,6 @@ function Users:updateUser(user, user_update, time)
 		return nil, "not found"
 	end
 
-	local ok, errs = user_update:validate()
-
-	if not ok then
-		---@cast errs -?
-		return nil, table.concat(errs, ", ")
-	end
-
 	local target_user = self.users_repo:getUser(user_update.id)
 
 	if not target_user then

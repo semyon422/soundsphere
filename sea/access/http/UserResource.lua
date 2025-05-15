@@ -268,6 +268,15 @@ function UserResource:updateSettings(req, res, ctx)
 	user_update.color_left = hex_to_integer(body_params.color_left)
 	user_update.color_right = hex_to_integer(body_params.color_right)
 
+	local ok, errs = user_update:validate()
+
+	if not ok then
+		---@cast errs -?
+		res.status = 400
+		res:send(table.concat(errs, ", "))
+		return
+	end
+
 	local user, err = self.users:updateUser(ctx.session_user, user_update, ctx.time)
 
 	if not user then
