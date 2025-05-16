@@ -140,6 +140,7 @@ if arg[2] == "test" then
 		"3rd-deps",
 		"tree",
 		"userdata",
+		"storages",
 	}
 
 	local testing = Testing(tio)
