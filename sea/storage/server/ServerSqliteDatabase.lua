@@ -12,10 +12,10 @@ ServerSqliteDatabase.path = "server.db"
 
 -- TODO: migrations
 
----@param db rdb.IDatabase
+---@param db rdb.SqliteDatabase
 function ServerSqliteDatabase:new(db)
 	self.db = db
-	self.orm = TableOrm(self.db)
+	self.orm = TableOrm(db)
 	self.models = Models(autoload("sea.storage.server.models", true), self.orm)
 end
 

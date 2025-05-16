@@ -56,12 +56,14 @@ end
 
 ---@param self table
 local function ScreenMenu(self)
-	local multiplayerModel = self.game.multiplayerModel
+	---@type sphere.GameController
+	local game = self.game
+	local multiplayerModel = game.multiplayerModel
 
 	local w, h = Layout:move("column3", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	if imgui.TextOnlyButton("Leave", "Leave", 120, h) then
-		multiplayerModel:leaveRoom()
+		multiplayerModel.client:leaveRoom()
 	end
 end
 
@@ -257,14 +259,18 @@ end
 local function RoomSettings(self)
 	local w, h = Layout:move("column3")
 
-	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.room or noRoom
-	local user = multiplayerModel.user or noUser
+	---@type sphere.GameController
+	local game = self.game
+
+	local multiplayerModel = game.multiplayerModel
+	local mp_client = multiplayerModel.client
+	local room = mp_client.room or noRoom
+	local user = mp_client.user or noUser
 
 	love.graphics.translate(0, 36)
 
 	local _h = 55
-	local isHost = multiplayerModel:isHost()
+	local isHost = mp_client:isHost()
 	if isHost then
 		if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
 			multiplayerModel:setFreeNotechart(not room.is_free_notechart)
@@ -292,7 +298,7 @@ local function RoomSettings(self)
 	end
 
 	if imgui.Checkbox("Ready", user.isReady, _h) then
-		multiplayerModel:switchReady()
+		mp_client:switchReady()
 	end
 	just.sameline()
 	imgui.Label("Ready", "Ready", _h)
@@ -315,9 +321,9 @@ local function RoomSettings(self)
 	love.graphics.translate(36, h - 72)
 	if isHost then
 		if not room.isPlaying and imgui.TextOnlyButton("Start match", "Start match", w - 72, 72) then
-			multiplayerModel:startMatch()
+			mp_client:startMatch()
 		elseif room.isPlaying and imgui.TextOnlyButton("Stop match", "Stop match", w - 72, 72) then
-			multiplayerModel:stopMatch()
+			mp_client:stopMatch()
 		end
 	end
 end
@@ -342,8 +348,11 @@ local function ChatWindow(self)
 
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h)
 
-	local multiplayerModel = self.game.multiplayerModel
-	local roomMessages = multiplayerModel.roomMessages
+	---@type sphere.GameController
+	local game = self.game
+
+	local mp_client = game.multiplayerModel.client
+	local messages = mp_client.room_messages
 
 	local scroll = just.wheel_over(chat, just.is_over(w, h))
 
@@ -352,8 +361,8 @@ local function ChatWindow(self)
 
 	local startHeight = just.height
 
-	for i = 1, #roomMessages do
-		local message = roomMessages[i]
+	for i = 1, #messages do
+		local message = messages[i]
 		just.text(message)
 	end
 
@@ -365,9 +374,9 @@ local function ChatWindow(self)
 	if overlap > 0 then
 		if scroll then
 			chat.scroll = math.min(math.max(chat.scroll - scroll * 50, 0), overlap)
-		elseif chat.messageCount ~= #roomMessages then
+		elseif chat.messageCount ~= #messages then
 			chat.scroll = overlap
-			chat.messageCount = #roomMessages
+			chat.messageCount = #messages
 		end
 	end
 
@@ -393,7 +402,7 @@ local function ChatWindow(self)
 		chat.scroll = overlap
 	end
 	if just.keypressed("return") then
-		multiplayerModel:sendMessage(chat.message)
+		mp_client:sendMessage(chat.message)
 		chat.message = ""
 	end
 end

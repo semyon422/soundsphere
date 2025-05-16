@@ -10,6 +10,11 @@ local AppConfig = {
 		site_key = "",
 		secret_key = "",
 	},
+
+	multiplayer = {
+		address = "*",
+		port = 9000,
+	},
 }
 
 return AppConfig

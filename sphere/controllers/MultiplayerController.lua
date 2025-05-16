@@ -23,55 +23,6 @@ end
 
 function MultiplayerController:load()
 	local mpModel = self.multiplayerModel
-	mpModel.handlers = {
-		set = function(peer, key, value)
-			mpModel[key] = value
-			if key == "room" then
-				local room = value
-				if not mpModel:isHost() then
-					self:findNotechart()
-					if not room.is_free_modifiers then
-						self.replayBase.modifiers = room.modifiers
-					end
-					if not room.is_free_const then
-						self.replayBase.const = room.const
-					end
-					if not room.is_free_rate then
-						self.replayBase.rate = room.rate
-					end
-				end
-			end
-		end,
-		startMatch = function(peer)
-			if mpModel.isPlaying or not mpModel.chartview then
-				return
-			end
-			local room = mpModel.room
-			if not mpModel:isHost() then
-				if not room.is_free_notechart then
-					self.selectModel:setConfig(mpModel.chartview)
-				end
-				if not room.is_free_modifiers then
-					self.replayBase.modifiers = room.modifiers
-				end
-				if not room.is_free_const then
-					self.replayBase.const = room.const
-				end
-				if not room.is_free_rate then
-					self.replayBase.rate = room.rate
-				end
-			end
-			mpModel:setIsPlaying(true)
-		end,
-		stopMatch = function(peer)
-			if mpModel.isPlaying then
-				mpModel:setIsPlaying(false)
-			end
-		end,
-		addMessage = function(peer, message)
-			mpModel:addMessage(message)
-		end,
-	}
 	mpModel:load()
 end
 

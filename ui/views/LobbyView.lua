@@ -63,16 +63,23 @@ local modal = ModalImView(function(self, quit)
 	return close
 end)
 
+---@type sea.Room?
+local selectedRoom
+
 function section_draw.rooms(self, inner_w)
-	local multiplayerModel = self.game.multiplayerModel
+	---@type sphere.GameController
+	local game = self.game
+
+	local multiplayerModel = game.multiplayerModel
+	local mp_client = game.multiplayerModel.client
 
 	local close
 	local status = multiplayerModel.status
 	if status ~= "connected" then
 		imgui.text(status)
-	elseif not multiplayerModel.user then
+	elseif not mp_client.user then
 		imgui.text("Not logged in")
-	elseif not multiplayerModel.selectedRoom and not multiplayerModel.room then
+	elseif not selectedRoom and not mp_client.room then
 		imgui.text("Create room")
 
 		name = imgui.input("LobbyView name", name, "Name")
@@ -81,24 +88,24 @@ function section_draw.rooms(self, inner_w)
 		just.sameline()
 		just.offset(inner_w - 144)
 		if imgui.button("Create", "Create") and name ~= "" then
-			multiplayerModel:createRoom(name, password)
+			mp_client:createRoom(name, password)
 		end
 
 		imgui.separator()
 
-		for i = 1, #multiplayerModel.rooms do
-			local room = multiplayerModel.rooms[i]
+		for i = 1, #mp_client.rooms do
+			local room = mp_client.rooms[i]
 			local name = room.name
 			if room.isPlaying then
 				name = name .. " (playing)"
 			end
 			just.row(true)
 			imgui.label(i, name)
-			if not multiplayerModel.room then
+			if not mp_client.room then
 				just.offset(inner_w - 144)
 				if imgui.button(i, "Join") then
-					multiplayerModel.selectedRoom = room
-					multiplayerModel:joinRoom("")
+					selectedRoom = room
+					mp_client:joinRoom(room.id, "")
 					just.focus()
 				end
 			end
@@ -107,17 +114,17 @@ function section_draw.rooms(self, inner_w)
 			love.graphics.line(0, 0, inner_w, 0)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
-	elseif not multiplayerModel.room then
-		imgui.text(multiplayerModel.selectedRoom.name)
+	elseif selectedRoom and not mp_client.room then
+		imgui.text(selectedRoom.name)
 		password = imgui.input("LobbyView password", password, "Password")
 		just.sameline()
 		just.offset(inner_w - 144)
 		if imgui.button("LobbyView join", "Join") then
-			multiplayerModel:joinRoom(password)
+			mp_client:joinRoom(selectedRoom.id, password)
 			just.focus()
 		end
 		if imgui.button("LobbyView back", "Back") then
-			multiplayerModel.selectedRoom = nil
+			selectedRoom = nil
 			just.focus()
 		end
 	else
@@ -128,11 +135,9 @@ function section_draw.rooms(self, inner_w)
 end
 
 function section_draw.players(self, inner_w)
-	local users = self.game.multiplayerModel.users
-	if not users then
-		return
-	end
-	for _, user in ipairs(users) do
+	---@type sphere.GameController
+	local game = self.game
+	for _, user in ipairs(game.multiplayerModel.client.users) do
 		imgui.text(user.name)
 	end
 end
