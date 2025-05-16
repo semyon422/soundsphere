@@ -175,7 +175,7 @@ function GameplayController:load()
 
 	self.windowModel:setVsyncOnSelect(false)
 
-	self.multiplayerModel:setIsPlaying(true)
+	self.multiplayerModel.client:setPlaying(true)
 
 	self.previewModel:stop()
 end
@@ -246,7 +246,7 @@ function GameplayController:unload()
 
 	self.windowModel:setVsyncOnSelect(true)
 
-	self.multiplayerModel:setIsPlaying(false)
+	self.multiplayerModel.client:setPlaying(false)
 end
 
 ---@param dt number
@@ -282,7 +282,7 @@ end
 
 ---@param state string
 function GameplayController:changePlayState(state)
-	if self.multiplayerModel.room then
+	if self.multiplayerModel.client.room then
 		return
 	end
 

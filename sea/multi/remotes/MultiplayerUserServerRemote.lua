@@ -12,7 +12,9 @@ end
 ---@param chartplay_computed sea.ChartplayComputed
 function MultiplayerUserServerRemote:setChartplayComputed(chartplay_computed) end
 
-function MultiplayerUserServerRemote:switchReady() end
+function MultiplayerUserServerRemote:switchReady()
+	self.mp_server:switchReady(self.user)
+end
 
 ---@param found boolean
 function MultiplayerUserServerRemote:setNotechartFound(found) end

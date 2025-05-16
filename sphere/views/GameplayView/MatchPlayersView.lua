@@ -9,7 +9,7 @@ local Format = require("sphere.views.Format")
 local MatchPlayersView = class()
 
 function MatchPlayersView:draw()
-	local room = self.game.multiplayerModel.room
+	local room = self.game.multiplayerModel.client.room
 	local users = room and room.users
 	if not users then
 		return

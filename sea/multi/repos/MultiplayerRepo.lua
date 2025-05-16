@@ -66,14 +66,16 @@ function MultiplayerRepo:getRoomUserByUserId(user_id)
 	})
 end
 
----@param room_id integer
----@param user_id integer
+---@param room_user sea.RoomUser
 ---@return sea.RoomUser
-function MultiplayerRepo:createRoomUser(room_id, user_id)
-	return self.models.room_users:create({
-		room_id = assert(room_id),
-		user_id = assert(user_id),
-	})
+function MultiplayerRepo:createRoomUser(room_user)
+	return self.models.room_users:create(room_user)
+end
+
+---@param room_user sea.RoomUser
+---@return sea.RoomUser
+function MultiplayerRepo:updateRoomUser(room_user)
+	return self.models.room_users:update(room_user, {id = assert(room_user.id)})[1]
 end
 
 ---@param room_id integer

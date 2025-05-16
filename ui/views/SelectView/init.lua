@@ -83,7 +83,7 @@ function SelectView:play()
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
-	if multiplayerModel.room and not multiplayerModel.isPlaying then
+	if multiplayerModel.client.room and not multiplayerModel.client.is_playing then
 		multiplayerModel:pushNotechart()
 		self:changeScreen("multiplayerView")
 		return

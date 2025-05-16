@@ -1,5 +1,4 @@
 local class = require("class")
-local table_util = require("table_util")
 
 ---@class sea.Room
 ---@operator call: sea.Room

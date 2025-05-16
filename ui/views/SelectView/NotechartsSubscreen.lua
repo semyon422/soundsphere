@@ -182,7 +182,7 @@ local function ChartCells(self)
 	TextCellImView(w, h, "right", "format", format)
 	just.row()
 
-	if self.game.multiplayerModel.room then
+	if self.game.multiplayerModel.client.room then
 		return
 	end
 

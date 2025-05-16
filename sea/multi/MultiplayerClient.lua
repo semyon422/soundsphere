@@ -6,8 +6,10 @@ local icc_co = require("icc.co")
 local MultiplayerClient = class()
 
 ---@param server_remote sea.MultiplayerServerRemote
-function MultiplayerClient:new(server_remote)
+---@param replay_base sea.ReplayBase
+function MultiplayerClient:new(server_remote, replay_base)
 	self.server_remote = server_remote
+	self.replay_base = replay_base
 
 	---@type sea.User[]
 	self.users = {}
@@ -50,6 +52,7 @@ end
 
 function MultiplayerClient:refreshAsync()
 	self:pullRoomAsync()
+	self:pullRoomUsersAsync()
 	self:pullUsersAsync()
 	self:pullRoomsAsync()
 end
@@ -63,12 +66,26 @@ function MultiplayerClient:pullRoomAsync()
 	self.room = self.server_remote:getCurrentRoom()
 end
 
+function MultiplayerClient:pullRoomUsersAsync()
+	self.room_users = self.server_remote:getLocalRoomUsers()
+end
+
 function MultiplayerClient:pullUsersAsync()
 	self.users = self.server_remote:getUsers()
 end
 
 function MultiplayerClient:pullRoomsAsync()
 	self.rooms = self.server_remote:getRooms()
+end
+
+---@param user_id integer
+---@return sea.RoomUser?
+function MultiplayerClient:getRoomUser(user_id)
+	for _, room_user in ipairs(self.room_users) do
+		if room_user.user_id == user_id then
+			return room_user
+		end
+	end
 end
 
 ---@return boolean
@@ -81,7 +98,12 @@ function MultiplayerClient:isHost()
 end
 
 function MultiplayerClient:switchReadyAsync()
+	local room_user = self:getRoomUser(self.user.id)
+	if room_user then
+		room_user.is_ready = not room_user.is_ready
+	end
 	self.server_remote.mp_user:switchReady()
+	self:pullRoomUsersAsync()
 end
 
 ---@param is_playing boolean
@@ -99,8 +121,43 @@ function MultiplayerClient:startMatchAsync()
 	self.server_remote.mp_room:startMatch()
 end
 
+function MultiplayerClient:startClientMatch() -- !!!
+	if self.is_playing then
+		-- if self.is_playing or not self.chartview then -- !!!
+		return
+	end
+
+	self:setPlaying(true)
+
+	local room = self.room
+	if not room or not self:isHost() then
+		return
+	end
+
+	local rules = room.rules
+
+	if not rules.chart then
+		-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
+	end
+	if not rules.modifiers then
+		self.replay_base.modifiers = room.replay_base.modifiers
+	end
+	if not rules.const then
+		self.replay_base.const = room.replay_base.const
+	end
+	if not rules.rate then
+		self.replay_base.rate = room.replay_base.rate
+	end
+end
+
 function MultiplayerClient:stopMatchAsync()
 	self.server_remote.mp_room:stopMatch()
+end
+
+function MultiplayerClient:stopClientMatch()
+	if self.is_playing then
+		self:setPlaying(false)
+	end
 end
 
 ---@param user_id integer

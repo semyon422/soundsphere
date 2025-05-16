@@ -9,6 +9,7 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local MultiplayerDatabase = require("sea.storage.server.MultiplayerDatabase")
 local RoomRules = require("sea.multi.RoomRules")
 local Room = require("sea.multi.Room")
+local RoomUser = require("sea.multi.RoomUser")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local ReplayBase = require("sea.replays.ReplayBase")
 
@@ -82,14 +83,16 @@ function test.create_join_leave_room(t)
 		id = 1, host_user_id = 1, name = "Room 1",
 		rules = RoomRules(), chartmeta_key = ChartmetaKey(), replay_base = ReplayBase(),
 	}})
-	t:tdeq(client_1.room_users, {{id = 1, room_id = 1, user_id = 1}})
+
+	local room_user_1 = RoomUser(1, 1)
+	room_user_1.id = 1
+	t:tdeq(client_1.room_users, {room_user_1})
 
 	t:assert(ctx.server:joinRoom(peer_2.user, room.id, "password"))
 
-	t:tdeq(client_1.room_users, {
-		{id = 1, room_id = 1, user_id = 1},
-		{id = 2, room_id = 1, user_id = 2},
-	})
+	local room_user_2 = RoomUser(1, 2)
+	room_user_2.id = 2
+	t:tdeq(client_1.room_users, {room_user_1, room_user_2})
 
 	t:assert(ctx.server:leaveRoom(peer_1.user))
 	t:eq(ctx.server:getRoomId(peer_1.user), nil)
@@ -98,7 +101,7 @@ function test.create_join_leave_room(t)
 		id = 1, host_user_id = 2, name = "Room 1",
 		rules = RoomRules(), chartmeta_key = ChartmetaKey(), replay_base = ReplayBase(),
 	}})
-	t:tdeq(client_1.room_users, {{id = 2, room_id = 1, user_id = 2}})
+	t:tdeq(client_1.room_users, {room_user_2})
 end
 
 ---@param t testing.T

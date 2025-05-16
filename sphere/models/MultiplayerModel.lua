@@ -34,7 +34,7 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 
 	self.status = "disconnected"
 
-	self.client = MultiplayerClient({})
+	self.client = MultiplayerClient({}, replayBase)
 	self.client_remote = MultiplayerClientRemote(self.client)
 
 	local function remote_handler_transform(_, th, peer, obj, ...)
@@ -172,10 +172,9 @@ function MultiplayerModel:peerconnected(peer_id, icc_peer)
 
 	local server_remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerServerRemote]]
 	self.remote = server_remote
+	self.client.server_remote = server_remote
 
 	server_remote:print("hello", peer_id)
-
-	self.client.server_remote = server_remote
 
 	self:loginOfflineAsync()
 	self.client:pullUserAsync()

@@ -2,6 +2,7 @@ local class = require("class")
 local Room = require("sea.multi.Room")
 local MultiplayerAccess = require("sea.multi.access.MultiplayerAccess")
 local RoomRules = require("sea.multi.RoomRules")
+local RoomUser = require("sea.multi.RoomUser")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local ReplayBase = require("sea.replays.ReplayBase")
 
@@ -47,7 +48,7 @@ end
 
 ---@param peer sea.Peer
 function MultiplayerServer:disconnected(peer)
-
+	self:leaveRoom(peer.user)
 end
 
 ---@return sea.User[]
@@ -58,6 +59,37 @@ function MultiplayerServer:getUsers()
 		table.insert(users, p.user)
 	end
 	return users
+end
+
+---@param user_id integer
+---@return sea.Peer?
+function MultiplayerServer:getPeerByUserId(user_id)
+	for _, p in self.peers:iter() do
+		if p.user.id == user_id then
+			return p
+		end
+	end
+end
+
+---@param room_id integer
+function MultiplayerServer:iterRoomPeers(room_id)
+	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
+
+	---@type {[integer]: true}
+	local user_ids = {}
+	for _, room_user in ipairs(room_users) do
+		user_ids[room_user.user_id] = true
+	end
+
+	---@type sea.Peer[]
+	local peers = {}
+	for _, p in self:iterPeers() do
+		if user_ids[p.user.id] then
+			table.insert(peers, p)
+		end
+	end
+
+	return ipairs(peers)
 end
 
 ---@return sea.Room[]
@@ -104,7 +136,9 @@ function MultiplayerServer:createRoom(user, name, password)
 	room.replay_base = ReplayBase()
 
 	room = self.multiplayer_repo:createRoom(room)
-	local room_user = self.multiplayer_repo:createRoomUser(room.id, user.id)
+
+	local room_user = RoomUser(room.id, user.id)
+	room_user = self.multiplayer_repo:createRoomUser(room_user)
 
 	self:pushRooms()
 	self:pushRoomUsers(room.id)
@@ -154,7 +188,8 @@ function MultiplayerServer:joinRoom(user, room_id, password)
 		return nil, "invalid password"
 	end
 
-	room_user = self.multiplayer_repo:createRoomUser(room.id, user.id)
+	room_user = RoomUser(room.id, user.id)
+	room_user = self.multiplayer_repo:createRoomUser(room_user)
 
 	self:pushRoomUsers(room_id)
 
@@ -218,23 +253,22 @@ function MultiplayerServer:leaveRoom(user)
 	return self:kickUser(user, room_id, user.id)
 end
 
+---@return sea.Room?
+function MultiplayerServer:getCurrentRoom(user)
+	local id = self:getRoomId(user)
+	if id then
+		return self:getRoom(id)
+	end
+end
+
 ---@param user sea.User
 ---@param room_id integer
 ---@param msg string
 function MultiplayerServer:sendMessage(user, room_id, msg)
 	msg = ("%s: %s"):format(user.name, msg)
-	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 
-	---@type {[integer]: true}
-	local user_ids = {}
-	for _, room_user in ipairs(room_users) do
-		user_ids[room_user.user_id] = true
-	end
-
-	for _, p in self:iterPeers() do
-		if user_ids[p.user.id] then
-			p.remote:addMessage(msg)
-		end
+	for _, p in self:iterRoomPeers(room_id) do
+		p.remote:addMessage(msg)
 	end
 end
 
@@ -246,6 +280,68 @@ function MultiplayerServer:sendLocalMessage(user, msg)
 		return
 	end
 	self:sendMessage(user, room_id, msg)
+end
+
+---@param user sea.User
+---@return sea.RoomUser[]
+function MultiplayerServer:getLocalRoomUsers(user)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return {}
+	end
+
+	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
+	for _, room_user in ipairs(room_users) do
+		local peer = self:getPeerByUserId(room_user.user_id)
+		if peer then
+			room_user.user = peer.user
+		end
+	end
+
+	return room_users
+end
+
+---@param user sea.User
+---@param rules sea.RoomRules
+function MultiplayerServer:setLocalRules(user, rules)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return
+	end
+
+	local room = Room()
+	room.id = room_id
+	room.rules = rules
+
+	self.multiplayer_repo:updateRoom(room)
+end
+
+---@param user sea.User
+function MultiplayerServer:switchReady(user)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return
+	end
+
+	local room_user = self.multiplayer_repo:getRoomUser(room_id, user.id)
+	if not room_user then
+		return
+	end
+
+	room_user.is_ready = not room_user.is_ready
+	self.multiplayer_repo:updateRoomUser(room_user)
+end
+
+---@param user sea.User
+function MultiplayerServer:startLocalMatch(user)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return
+	end
+
+	for _, p in self:iterRoomPeers(room_id) do
+		p.remote:startMatch()
+	end
 end
 
 return MultiplayerServer

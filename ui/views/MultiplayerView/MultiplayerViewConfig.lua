@@ -151,24 +151,24 @@ local function DownloadButton(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local multiplayerModel = self.game.multiplayerModel
-	if not multiplayerModel.room then
+	if not multiplayerModel.client.room then
 		return
 	end
 
-	local notechart = multiplayerModel.room.notechart
-	if not notechart.osuSetId then
-		return
-	end
-	local beatmap = multiplayerModel.downloadingBeatmap
-	if beatmap then
-		just.indent(w / 2)
-		imgui.Label("beatmap status", beatmap.status, h)
-	else
-		just.indent(w / 2)
-		if imgui.TextOnlyButton("Download", multiplayerModel.chartview and "Redownload" or "Download", 144, h) then
-			multiplayerModel:downloadNoteChart()
-		end
-	end
+	-- local notechart = multiplayerModel.room.notechart
+	-- if not notechart.osuSetId then
+	-- 	return
+	-- end
+	-- local beatmap = multiplayerModel.downloadingBeatmap
+	-- if beatmap then
+	-- 	just.indent(w / 2)
+	-- 	imgui.Label("beatmap status", beatmap.status, h)
+	-- else
+	-- 	just.indent(w / 2)
+	-- 	if imgui.TextOnlyButton("Download", multiplayerModel.chartview and "Redownload" or "Download", 144, h) then
+	-- 		multiplayerModel:downloadNoteChart()
+	-- 	end
+	-- end
 end
 
 ---@param self table
@@ -249,7 +249,7 @@ local function RoomInfo(self)
 	local w, h = Layout:move("column2", "header")
 
 	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.room or noRoom
+	local room = multiplayerModel.client.room or noRoom
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	gfx_util.printFrame(room.name, 22, 0, w, h, "left", "center")
@@ -266,38 +266,47 @@ local function RoomSettings(self)
 	local mp_client = multiplayerModel.client
 	local room = mp_client.room or noRoom
 	local user = mp_client.user or noUser
+	local room_user = mp_client:getRoomUser(user.id)
+	if not room_user then
+		return
+	end
 
 	love.graphics.translate(0, 36)
 
 	local _h = 55
 	local isHost = mp_client:isHost()
 	if isHost then
-		if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
-			multiplayerModel:setFreeNotechart(not room.is_free_notechart)
-		end
-		just.sameline()
-		imgui.Label("Free chart", "Free chart", _h)
+		local rules = room.rules
 
-		if imgui.Checkbox("Free mods", room.is_free_modifiers, _h) then
-			multiplayerModel:setFreeModifiers(not room.is_free_modifiers)
+		-- if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
+		-- 	multiplayerModel:setFreeNotechart(not room.is_free_notechart)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free chart", "Free chart", _h)
+
+		if imgui.Checkbox("Free mods", rules.modifiers, _h) then
+			rules.modifiers = not rules.modifiers
+			mp_client:setRules(rules)
 		end
 		just.sameline()
 		imgui.Label("Free mods", "Free mods", _h)
 
-		if imgui.Checkbox("Free const", room.is_free_const, _h) then
-			multiplayerModel:setFreeConst(not room.is_free_const)
+		if imgui.Checkbox("Free const", rules.const, _h) then
+			rules.const = not rules.const
+			mp_client:setRules(rules)
 		end
 		just.sameline()
 		imgui.Label("Free const", "Free const", _h)
 
-		if imgui.Checkbox("Free rate", room.is_free_rate, _h) then
-			multiplayerModel:setFreeRate(not room.is_free_rate)
+		if imgui.Checkbox("Free rate", rules.rate, _h) then
+			rules.rate = not rules.rate
+			mp_client:setRules(rules)
 		end
 		just.sameline()
 		imgui.Label("Free rate", "Free rate", _h)
 	end
 
-	if imgui.Checkbox("Ready", user.isReady, _h) then
+	if imgui.Checkbox("Ready", room_user.is_ready, _h) then
 		mp_client:switchReady()
 	end
 	just.sameline()

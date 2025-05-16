@@ -76,7 +76,7 @@ end)
 
 function ResultView:quit()
 	self.game.resultController:unload()
-	if self.game.multiplayerModel.room then
+	if self.game.multiplayerModel.client.room then
 		self:changeScreen("multiplayerView")
 		return
 	end
