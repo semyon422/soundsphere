@@ -10,7 +10,9 @@ function MultiplayerUserServerRemote:new(mp_server)
 end
 
 ---@param chartplay_computed sea.ChartplayComputed
-function MultiplayerUserServerRemote:setChartplayComputed(chartplay_computed) end
+function MultiplayerUserServerRemote:setChartplayComputed(chartplay_computed)
+	self.mp_server:setChartplayComputed(self.user, chartplay_computed)
+end
 
 function MultiplayerUserServerRemote:switchReady()
 	self.mp_server:switchReady(self.user)

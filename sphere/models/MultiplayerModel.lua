@@ -95,8 +95,8 @@ function MultiplayerModel:refreshAsync()
 
 	self.client:refreshAsync()
 
-	-- local chartplay_computed = self.rhythmModel:getChartplayComputed()
-	-- remote.user:setChartplayComputed(chartplay_computed)
+	local chartplay_computed = self.rhythmModel:getChartplayComputed()
+	remote.mp_user:setChartplayComputed(chartplay_computed)
 end
 
 local toipAsync = thread.async(function(host)

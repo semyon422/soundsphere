@@ -17,6 +17,18 @@ local types = require("sea.shared.types")
 ---@field rating_msd number
 local ChartplayComputed = class()
 
+function ChartplayComputed:new()
+	self.pass = true
+	self.judges = {}
+	self.accuracy = 0
+	self.max_combo = 0
+	self.miss_count = 0
+	self.not_perfect_count = 0
+	self.rating = 0
+	self.rating_pp = 0
+	self.rating_msd = 0
+end
+
 ChartplayComputed.struct = {
 	judges = valid.array(types.count, 10),
 	accuracy = types.number,

@@ -318,17 +318,24 @@ end
 
 ---@param user sea.User
 function MultiplayerServer:switchReady(user)
-	local room_id = self:getRoomId(user)
-	if not room_id then
-		return
-	end
-
-	local room_user = self.multiplayer_repo:getRoomUser(room_id, user.id)
+	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
 	if not room_user then
 		return
 	end
 
 	room_user.is_ready = not room_user.is_ready
+	self.multiplayer_repo:updateRoomUser(room_user)
+end
+
+---@param user sea.User
+---@param chartplay_computed sea.ChartplayComputed
+function MultiplayerServer:setChartplayComputed(user, chartplay_computed)
+	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
+	if not room_user then
+		return
+	end
+
+	room_user.chartplay_computed = chartplay_computed
 	self.multiplayer_repo:updateRoomUser(room_user)
 end
 

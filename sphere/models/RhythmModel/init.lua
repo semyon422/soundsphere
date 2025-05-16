@@ -119,12 +119,16 @@ function RhythmModel:hasResult()
 end
 
 function RhythmModel:getChartplayComputed()
+	local chartdiff = self.chartdiff
+	if not chartdiff then
+		return ChartplayComputed()
+	end
+
 	local scoreEngine = self.scoreEngine
 	local scores = scoreEngine.scores
 	local judgesSource = assert(scoreEngine.judgesSource)
 
 	local ns_score = scores.normalscore:getScore()
-	local chartdiff = self.chartdiff
 
 	local c = ChartplayComputed()
 	c.pass = not scores.hp:isFailed()
