@@ -17,6 +17,8 @@ main {
 	flex-grow: 1;
 	padding-top: 10px;
 	padding-bottom: 10px;
+	display: flex;
+	flex-direction: column;
 }
 
 main.center-vertically {
@@ -168,6 +170,12 @@ main.center-vertically > * {
 	z-index: 10;
 }
 
+.center-content {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
 .saira-regular {
   font-family: "Saira", sans-serif;

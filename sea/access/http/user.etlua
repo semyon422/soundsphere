@@ -347,37 +347,45 @@
 									<li><a>Recent scores</a></li>
 								</ul>
 							</div>
-							<% for _, v in ipairs(scores) do %>
-								<div class="user__score-panel">
-									<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
-									<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-										<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
-										<div style="display: flex">
-											<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
-											<% if v.rate ~= 1 then %>
-												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
-											<% end %>
-											<% if v.const then %>
-												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
-											<% end %>
-											<% if v.tap_only then %>
-												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
-											<% end %>
-											<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
-										</div>
-									</div>
-									<div style="display: flex; min-width: fit-content;">
-										<div class="user__score-rows" style="text-align: right;">
-											<p style="padding-left: 6px"><strong><%= ("%0.2f"):format(v.norm_accuracy * 100) %>%</strong></p>
-											<p class="has-text-grey"><%= v.timeSince %></p>
-										</div>
-										<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
-										<div class="user__score-rating-box has-background-gray-light">
-											<p class="saira-bold" style="padding-left: 5px"><strong><%= ("%0.2f"):format(v.rating) %></strong></p>
-											<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
-										</div>
-									</div>
+
+							<% if #scores == 0 then %>
+								<div align="center" class="content">
+									<h2>There are no scores</h2>
+									<p>The player hasn't played anything yet</p>
 								</div>
+							<% else %>
+								<% for _, v in ipairs(scores) do %>
+									<div class="user__score-panel">
+										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
+										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
+											<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
+											<div style="display: flex">
+												<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
+												<% if v.rate ~= 1 then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
+												<% end %>
+												<% if v.const then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
+												<% end %>
+												<% if v.tap_only then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
+												<% end %>
+												<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
+											</div>
+										</div>
+										<div style="display: flex; min-width: fit-content;">
+											<div class="user__score-rows" style="text-align: right;">
+												<p style="padding-left: 6px"><strong><%= ("%0.2f"):format(v.norm_accuracy * 100) %>%</strong></p>
+												<p class="has-text-grey"><%= v.timeSince %></p>
+											</div>
+											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
+											<div class="user__score-rating-box has-background-gray-light">
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= ("%0.2f"):format(v.rating) %></strong></p>
+												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
+											</div>
+										</div>
+									</div>
+								<% end %>
 							<% end %>
 						</div>
 						<div class="block">

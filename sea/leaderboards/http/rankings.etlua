@@ -156,112 +156,120 @@ end
 				</div>
 			</div>
 		<% end %>
-		<div class="block">
-			<% if ranking_type == "rating" then %>
-			<table class="ranking-table">
-				<thead>
-					<th>Rank</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
-					<th>Plays</th>
-				</thead>
-				<tbody>
-					<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
-						<% local user = leaderboard_user.user %>
-						<% local rankChange = 0 %>
-						<tr class="has-text">
-							<td>#<%= leaderboard_user.rank %></td>
-							<% if rankChange > 0 then %>
-								<td class="ranking-table__rank-change-cell has-text-success">
-									<i class="fa fa-solid fa-arrow-up"></i>
-									<%= rankChange %>
-								</td>
-							<% elseif rankChange < 0 then %>
-								<td class="ranking-table__rank-change-cell has-text-danger">
-									<i class="fa fa-solid fa-arrow-down"></i>
-									<%= math.abs(rankChange) %>
-								</td>
-							<% else %>
-								<td></td>
+		<% local rows = leaderboard_users and (#leaderboard_users) or (users and (#users) or 0) %>
+		<% if rows == 0 then %>
+			<div align="center" class="content">
+				<h2>There are no players</h2>
+				<p>Be the first one here!</p>
+			</div>
+		<% else %>
+			<div class="block">
+				<% if ranking_type == "rating" then %>
+					<table class="ranking-table">
+						<thead>
+							<th>Rank</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
+							<th>Plays</th>
+						</thead>
+						<tbody>
+							<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
+								<% local user = leaderboard_user.user %>
+								<% local rankChange = 0 %>
+								<tr class="has-text">
+									<td>#<%= leaderboard_user.rank %></td>
+									<% if rankChange > 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-success">
+											<i class="fa fa-solid fa-arrow-up"></i>
+											<%= rankChange %>
+										</td>
+									<% elseif rankChange < 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-danger">
+											<i class="fa fa-solid fa-arrow-down"></i>
+											<%= math.abs(rankChange) %>
+										</td>
+									<% else %>
+										<td></td>
+									<% end %>
+									<td class="ranking-table__flag-cell">
+										<div class="fi-<%= user.flag %>"></div>
+									</td>
+									<td align="left" class="ranking-table__main-cell">
+										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+									</td>
+									<td class="ranking-table__more-padding has-background"><%= ("%0.2f"):format(leaderboard_user.total_rating) %></td>
+									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
+								</tr>
 							<% end %>
-							<td class="ranking-table__flag-cell">
-								<div class="fi-<%= user.flag %>"></div>
-							</td>
-							<td align="left" class="ranking-table__main-cell">
-								<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
-							</td>
-							<td class="ranking-table__more-padding has-background"><%= ("%0.2f"):format(leaderboard_user.total_rating) %></td>
-							<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-			<% else %>
-			<table class="ranking-table">
-				<thead>
-					<th>Rank</th>
-					<th></th>
-					<th></th>
-					<th>
-						<% if ranking_type == "charts" then %>
-							Charts
-						<% elseif ranking_type == "play_count" then %>
-							Plays
-						<% elseif ranking_type == "play_time" then %>
-							Time
-						<% end %>
-					</th>
-				</thead>
-				<tbody>
-					<% for i, user in ipairs(users) do %>
-						<tr class="has-text">
-							<td>#<%= i %></td>
-							<td class="ranking-table__flag-cell">
-								<div class="fi-<%= user.flag %>"></div>
-							</td>
-							<td align="left" class="ranking-table__main-cell">
-								<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
-							</td>
-							<td class="ranking-table__more-padding has-background">
+						</tbody>
+					</table>
+				<% else %>
+					<table class="ranking-table">
+						<thead>
+							<th>Rank</th>
+							<th></th>
+							<th></th>
+							<th>
 								<% if ranking_type == "charts" then %>
-									<%= user.chartmetas_count %>
+									Charts
 								<% elseif ranking_type == "play_count" then %>
-									<%= user.chartplays_count %>
+									Plays
 								<% elseif ranking_type == "play_time" then %>
-									<%= math.floor(user.play_time / 3600) %>h
+									Time
 								<% end %>
-							</td>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-			<% end %>
-		</div>
-		<div class="block">
-			<nav class="pagination is-centered" role="navigation" aria-label="pagination">
-				<ul class="pagination-list">
-					<% local page = query.page %>
-					<% if page ~= 1 then %>
-						<% if page ~= 2 then %>
-							<li><a href="<%= getQuery('page', 1) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
-							<li><span class="pagination-ellipsis">&hellip;</span></li>
+							</th>
+						</thead>
+						<tbody>
+							<% for i, user in ipairs(users) do %>
+								<tr class="has-text">
+									<td>#<%= i %></td>
+									<td class="ranking-table__flag-cell">
+										<div class="fi-<%= user.flag %>"></div>
+									</td>
+									<td align="left" class="ranking-table__main-cell">
+										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+									</td>
+									<td class="ranking-table__more-padding has-background">
+										<% if ranking_type == "charts" then %>
+											<%= user.chartmetas_count %>
+										<% elseif ranking_type == "play_count" then %>
+											<%= user.chartplays_count %>
+										<% elseif ranking_type == "play_time" then %>
+											<%= math.floor(user.play_time / 3600) %>h
+										<% end %>
+									</td>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+				<% end %>
+			</div>
+			<div class="block">
+				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+					<ul class="pagination-list">
+						<% local page = query.page %>
+						<% if page ~= 1 then %>
+							<% if page ~= 2 then %>
+								<li><a href="<%= getQuery('page', 1) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
+								<li><span class="pagination-ellipsis">&hellip;</span></li>
+							<% end %>
+							<li><a href="<%= getQuery('page', page - 1) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
 						<% end %>
-						<li><a href="<%= getQuery('page', page - 1) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
-					<% end %>
-					<li>
-					<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
-					</li>
-					<% if page ~= page_count then %>
-						<li><a href="<%= getQuery('page', page + 1) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
-						<% if page ~= page_count - 1 then %>
-							<li><span class="pagination-ellipsis">&hellip;</span></li>
-							<li><a href="<%= getQuery('page', page_count) %>" class="pagination-link"><%= page_count %></a></li>
+						<li>
+						<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
+						</li>
+						<% if page ~= page_count then %>
+							<li><a href="<%= getQuery('page', page + 1) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
+							<% if page ~= page_count - 1 then %>
+								<li><span class="pagination-ellipsis">&hellip;</span></li>
+								<li><a href="<%= getQuery('page', page_count) %>" class="pagination-link"><%= page_count %></a></li>
+							<% end %>
 						<% end %>
-					<% end %>
-				</ul>
-			</nav>
-		<div>
+					</ul>
+				</nav>
+			<div>
+		<% end %>
 	</div>
 </div>
