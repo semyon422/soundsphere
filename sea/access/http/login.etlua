@@ -13,15 +13,21 @@ function onSubmit(token) {
 					<div class="block">
 						<div class="field">
 							<label class="label">Email</label>
-							<div class="control">
+							<div class="control has-icons-left">
 								<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-at"></i>
+								</span>
 							</div>
 						</div>
 
 						<div class="field">
 							<label class="label">Password</label>
-							<div class="control">
+							<div class="control has-icons-left">
 								<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-key"></i>
+								</span>
 							</div>
 						</div>
 					</div>
