@@ -235,6 +235,9 @@ end
 ---@param user sea.User
 ---@return integer?
 function MultiplayerServer:getRoomId(user)
+	if user:isAnon() then
+		return
+	end
 	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
 	if not room_user then
 		return
@@ -246,10 +249,15 @@ end
 ---@return true?
 ---@return string?
 function MultiplayerServer:leaveRoom(user)
+	if user:isAnon() then
+		return
+	end
+
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return nil, "is not in a room"
 	end
+
 	return self:kickUser(user, room_id, user.id)
 end
 

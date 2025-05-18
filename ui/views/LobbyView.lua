@@ -138,7 +138,7 @@ function section_draw.players(self, inner_w)
 	---@type sphere.GameController
 	local game = self.game
 	for _, user in ipairs(game.multiplayerModel.client.users) do
-		imgui.text(user.name)
+		imgui.text(user.name or "unknown")
 	end
 end
 
