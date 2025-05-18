@@ -34,6 +34,8 @@ function MatchPlayersView:draw()
 
 	for i, room_user in ipairs(sorted_room_users) do
 		local score = room_user.chartplay_computed
+		local user = client:getUser(room_user.user_id)
+		local user_name = user and user.name or "unknown"
 
 		local twidth = 300
 		local theight = font:getHeight() * 2
@@ -44,7 +46,7 @@ function MatchPlayersView:draw()
 		love.graphics.rectangle("line", 0, 0, twidth, theight, theight / 6)
 
 		love.graphics.setColor(1, 1, 1, 1)
-		just.text(("#%d: %s"):format(i, room_user.user.name))
+		just.text(("#%d: %s"):format(i, user_name))
 		just.text(("%5d, %s"):format(score.miss_count, Format.accuracy(score.accuracy)))
 		if score.failed then
 			just.sameline()

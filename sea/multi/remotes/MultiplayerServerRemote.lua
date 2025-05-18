@@ -98,9 +98,4 @@ function MultiplayerServerRemote:getCurrentRoom()
 	return self.mp_server:getCurrentRoom(self.user)
 end
 
----@return sea.RoomUser[]
-function MultiplayerServerRemote:getLocalRoomUsers()
-	return self.mp_server:getLocalRoomUsers(self.user)
-end
-
 return MultiplayerServerRemote

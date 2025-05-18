@@ -1,4 +1,5 @@
 local class = require("class")
+local icc_co = require("icc.co")
 
 local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
@@ -93,13 +94,18 @@ function MultiplayerApp:connected(peer_id, icc_peer)
 
 	self.peers:add(peer_id, peer)
 
-	self.server:connected(peer)
+	icc_co.wrap(function()
+		self.server:connected(peer)
+	end)()
 end
 
 ---@param peer_id string
 function MultiplayerApp:disconnected(peer_id)
 	local peer = self.peers:remove(peer_id)
-	self.server:disconnected(peer)
+
+	icc_co.wrap(function()
+		self.server:disconnected(peer)
+	end)()
 end
 
 return MultiplayerApp

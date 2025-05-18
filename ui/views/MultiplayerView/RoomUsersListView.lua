@@ -27,8 +27,8 @@ function RoomUsersListView:drawItem(i, w, h)
 	local items = self.items
 	local room_user = items[i]
 
-	local mp_client = game.multiplayerModel.client
-	local room = mp_client.room
+	local client = game.multiplayerModel.client
+	local room = client.room
 	if not room then
 		return
 	end
@@ -49,7 +49,9 @@ function RoomUsersListView:drawItem(i, w, h)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local name = room_user.user and room_user.user.name or "unknown"
+	local user = client:getUser(room_user.user_id)
+
+	local name = user and user.name or "unknown"
 	if room_user.is_playing then
 		name = name .. " (playing)"
 	end
@@ -80,7 +82,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	imgui.Label(room_user, description, h)
 	just.row()
 
-	if not mp_client:isHost() or room.host_user_id == room_user.user_id then
+	if not client:isHost() or room.host_user_id == room_user.user_id then
 		return
 	end
 
@@ -93,11 +95,11 @@ function RoomUsersListView:drawItem(i, w, h)
 			just.text(name)
 			love.graphics.line(0, 0, 200, 0)
 			if imgui.TextOnlyButton("Kick", "Kick", width, 55) then
-				mp_client:kickUser(room_user.user_id)
+				client:kickUser(room_user.user_id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Give host", "Give host", width, 55) then
-				mp_client:setHost(room_user.user_id)
+				client:setHost(room_user.user_id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Close", "Close", width, 55) then

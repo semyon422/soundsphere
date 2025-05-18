@@ -14,7 +14,6 @@ local ReplayBase = require("sea.replays.ReplayBase")
 ---@field chartmeta_key sea.ChartmetaKey
 ---@field replay_base sea.ReplayBase
 ---@field chartplay_computed sea.ChartplayComputed
----@field user sea.User?
 local RoomUser = class()
 
 ---@param room_id integer

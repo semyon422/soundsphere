@@ -51,31 +51,22 @@ function MultiplayerClient:pullUserAsync()
 end
 
 function MultiplayerClient:refreshAsync()
-	self:pullRoomAsync()
-	self:pullRoomUsersAsync()
-	self:pullUsersAsync()
-	self:pullRoomsAsync()
+
+end
+
+---@param id integer
+---@return sea.User?
+function MultiplayerClient:getUser(id)
+	for _, user in ipairs(self.users) do
+		if user.id == id then
+			return user
+		end
+	end
 end
 
 ---@param msg string
 function MultiplayerClient:addMessage(msg)
 	table.insert(self.room_messages, msg)
-end
-
-function MultiplayerClient:pullRoomAsync()
-	self.room = self.server_remote:getCurrentRoom()
-end
-
-function MultiplayerClient:pullRoomUsersAsync()
-	self.room_users = self.server_remote:getLocalRoomUsers()
-end
-
-function MultiplayerClient:pullUsersAsync()
-	self.users = self.server_remote:getUsers()
-end
-
-function MultiplayerClient:pullRoomsAsync()
-	self.rooms = self.server_remote:getRooms()
 end
 
 ---@param user_id integer
@@ -103,7 +94,6 @@ function MultiplayerClient:switchReadyAsync()
 		room_user.is_ready = not room_user.is_ready
 	end
 	self.server_remote.mp_user:switchReady()
-	self:pullRoomUsersAsync()
 end
 
 ---@param is_playing boolean
@@ -174,7 +164,6 @@ end
 function MultiplayerClient:setRulesAsync(rules)
 	self.room.rules = rules
 	self.server_remote.mp_room:setRules(rules)
-	self:pullRoomAsync()
 end
 
 ---@param name string
@@ -197,9 +186,7 @@ function MultiplayerClient:joinRoomAsync(id, password)
 	local ok, err = self.server_remote:joinRoom(id, password)
 	if not ok then
 		print(err)
-		return
 	end
-	self:pullRoomAsync()
 end
 
 function MultiplayerClient:leaveRoomAsync()
