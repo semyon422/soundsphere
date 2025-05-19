@@ -24,17 +24,19 @@
 				<a class="navbar-link">Community</a>
 				<div class="navbar-dropdown">
 					<a class="navbar-item" href="/rankings">Rankings</a>
-					<a class="navbar-item" href="/leaderboards">Leaderboards</a>
 					<a class="navbar-item" href="/teams">Teams</a>
 				</div>
 			</div>
-			<div class="navbar-item has-dropdown is-hoverable">
-				<a class="navbar-link">Admin</a>
-				<div class="navbar-dropdown">
-					<a class="navbar-item" href="/difftables">Difftables</a>
-					<a class="navbar-item" href="/charts">Charts</a>
+			<% if not session_user:isAnon() and session_user:hasRole("admin", time) then %>
+				<div class="navbar-item has-dropdown is-hoverable">
+					<a class="navbar-link">Admin</a>
+					<div class="navbar-dropdown">
+						<a class="navbar-item" href="/leaderboards">Leaderboards</a>
+						<a class="navbar-item" href="/difftables">Difftables</a>
+						<a class="navbar-item" href="/charts">Charts</a>
+					</div>
 				</div>
-			</div>
+			<% end %>
 			<a class="navbar-item" href="/wiki">
 				<p>
 					<i class="fas icon-margin-right fa-book"></i>
