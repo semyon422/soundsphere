@@ -89,8 +89,7 @@
 					<div class="navbar-dropdown is-right">
 						<% local user_id = session.user_id %>
 						<a class="navbar-item" href="/users/<%= user_id %>">My profile</a>
-						<a class="navbar-item" href="/users/<%= user_id %>/teams">My teams</a>
-						<a class="navbar-item" href="/users/<%= user_id %>/sessions">Sessions</a>
+						<a class="navbar-item" href="/teams/user_team/<%= user_id %>">My team</a>
 						<a class="navbar-item" href="/users/<%= user_id %>/settings">Settings</a>
 						<a class="navbar-item" hx-post="/logout">Log out</a>
 					</div>

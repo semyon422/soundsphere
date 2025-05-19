@@ -7,6 +7,9 @@ local json = require("web.json")
 local TeamResource = IResource + {}
 
 TeamResource.routes = {
+	{"/teams/user_team/:user_id", {
+		GET = "redirectToUserTeam",
+	}},
 	{"/teams/:team_id", {
 		GET = "getTeamPage",
 	}},
@@ -209,6 +212,28 @@ function TeamResource:updateDescription(req, res, ctx)
 
 	self.teams:update(ctx.session_user, team)
 	res.status = 200
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function TeamResource:redirectToUserTeam(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+
+	if not user_id then
+		res.status = 400
+		return
+	end
+
+	local team_user, err = self.teams:getUserAcceptedTeamUsers(user_id)
+
+	if not team_user then
+		res.status = 400
+		return
+	end
+
+	res.status = 302
+	res.headers:set("HX-Location", ("/teams/%i"):format(team_user[1].team_id))
 end
 
 return TeamResource
