@@ -68,6 +68,7 @@ function AuthResource:login(req, res, ctx)
 	user.password = body_params.password
 
 	ctx.user = user
+	ctx.main_container_type = "vertically_centered"
 
 	local valid, errs = user:validateLogin()
 	if not valid then
@@ -168,6 +169,14 @@ function AuthResource:register(req, res, ctx)
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		res.status = 400
+		return
+	end
+
+	ctx.main_container_type = "vertically_centered"
+
+	if not body_params.agree_to_terms_of_use then
+		ctx.errors = {"you should agree to the terms of use."}
+		self.views:render_send(res, "sea/access/http/register.etlua", ctx, true)
 		return
 	end
 

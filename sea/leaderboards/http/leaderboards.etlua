@@ -1,12 +1,36 @@
-<div class="section">
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Leaderboards</p>
+		<p class="subtitle">Do you want to fragment the community even more?</p>
+	</div>
+</section>
 
-<a href="/leaderboards/create">Create</a>
+<nav class="level">
+	<div class="level-left">
+	</div>
 
-<h3>leaderboards:</h3>
-<ul>
-<% for _, leaderboard in ipairs(leaderboards) do %>
-	<li><a href="/leaderboards/<%= leaderboard.id %>"><%= leaderboard.name %></a></li>
-<% end %>
-</ul>
+	<div class="level-right">
+		<p class="level-item"><a href="/leaderboards/create" class="button is-success">Create</a></p>
+	</div>
+</nav>
 
-</div>
+<table class="table is-fullwidth is-striped">
+	<thead>
+		<th>Name</th>
+		<th>Created at</th>
+		<th>Mode</th>
+		<th>Rating Calc</th>
+		<th>Ends at</th>
+	</thead>
+	<tbody>
+		<% for _, leaderboard in ipairs(leaderboards) do %>
+			<tr>
+				<td><a href="/leaderboards/<%= leaderboard.id %>"><%= leaderboard.name %></a></td>
+				<td><%= os.date("%d.%m.%Y", leaderboard.created_at) %></td>
+				<td><%= leaderboard.mode %></td>
+				<td><%= leaderboard.rating_calc %></td>
+				<td><%= leaderboard.ends_at and os.date("%d.%m.%Y", leaderboard.ends_at) or "Permanent" %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

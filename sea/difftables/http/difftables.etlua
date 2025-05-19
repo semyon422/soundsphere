@@ -1,8 +1,32 @@
-<a href="/difftables/create">Create</a>
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Difficulty tables</p>
+		<p class="subtitle">If creating a difficulty calculator is hard</p>
+	</div>
+</section>
 
-<h3>difftables:</h3>
-<ul>
-<% for _, difftable in ipairs(difftables) do %>
-	<li><a href="/difftables/<%= difftable.id %>"><%= difftable.name %></a></li>
-<% end %>
-</ul>
+<nav class="level">
+	<div class="level-left">
+	</div>
+
+	<div class="level-right">
+		<p class="level-item"><a href="/difftables/create" class="button is-success">Create</a></p>
+	</div>
+</nav>
+
+<table class="table is-fullwidth is-striped">
+	<thead>
+		<th>Name</th>
+		<th>Created at</th>
+		<th>Symbol</th>
+	</thead>
+	<tbody>
+		<% for _, difftable in ipairs(difftables) do %>
+			<tr>
+				<td><a href="/difftables/<%= difftable.id %>"><%= difftable.name %></a></td>
+				<td><%= os.date("%d.%m.%Y", difftable.created_at) %></td>
+				<td><%= difftable.symbol %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

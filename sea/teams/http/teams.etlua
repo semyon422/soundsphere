@@ -14,25 +14,32 @@
 	</div>
 </nav>
 
-<table class="ranking-table">
-	<thead>
-		<th></th>
-		<th></th>
-		<th>Members</th>
-		<th>Activity</th>
-	</thead>
-	<tbody>
-		<% for _, team in ipairs(teams) do %>
-			<tr class="has-text">
-				<td class="ranking-table__team-avatar-cell">
-					<div class="team-avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></div>
-				</td>
-				<td align="left" class="ranking-table__main-cell">
-					<a class="has-text-primary-35" href="/teams/<%= team.id %>"><strong><%= team.name %></strong></a>
-				</td>
-				<td class="ranking-table__more-padding"><%= team.users_count %></td>
-				<td class="ranking-table__more-padding">10 hours</td>
-			</tr>
-		<% end %>
-	</tbody>
-</table>
+<% if #teams == 0 then %>
+	<div align="center" class="content empty-list-message">
+		<h2>There are no teams</h2>
+		<p>Why not create one?</p>
+	</div>
+<% else %>
+	<table class="ranking-table">
+		<thead>
+			<th></th>
+			<th></th>
+			<th>Members</th>
+			<th>Activity</th>
+		</thead>
+		<tbody>
+			<% for _, team in ipairs(teams) do %>
+				<tr class="has-text">
+					<td class="ranking-table__team-avatar-cell">
+						<div class="team-avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></div>
+					</td>
+					<td align="left" class="ranking-table__main-cell">
+						<a class="has-text-primary-35" href="/teams/<%= team.id %>"><strong><%= team.name %></strong></a>
+					</td>
+					<td class="ranking-table__more-padding"><%= team.users_count %></td>
+					<td class="ranking-table__more-padding">10 hours</td>
+				</tr>
+			<% end %>
+		</tbody>
+	</table>
+<% end %>
