@@ -22,14 +22,6 @@ function MultiplayerServer:iterPeers()
 	return self.peers:iter()
 end
 
----@param key any
----@param value any
-function MultiplayerServer:setAll(key, value)
-	for _, p in self.peers:iter() do
-		p.remote:set(key, value)
-	end
-end
-
 ---@param user sea.User
 ---@param user_name string
 function MultiplayerServer:loginOffline(user, user_name)
@@ -60,6 +52,9 @@ function MultiplayerServer:getUsers()
 	for _, p in self.peers:iter() do
 		table.insert(users, p.user)
 	end
+	table.sort(users, function(a, b)
+		return a.id < b.id
+	end)
 	return users
 end
 
@@ -110,18 +105,24 @@ function MultiplayerServer:getRoom(id)
 end
 
 function MultiplayerServer:pushUsers()
-	self:setAll("users", self:getUsers())
+	local users = self:getUsers()
+	for _, p in self.peers:iter() do
+		p.remote:setUsers(users)
+	end
 end
 
 function MultiplayerServer:pushRooms()
-	self:setAll("rooms", self:getRooms())
+	local rooms = self:getRooms()
+	for _, p in self.peers:iter() do
+		p.remote:setRooms(rooms)
+	end
 end
 
 ---@param room_id integer
 function MultiplayerServer:pushRoomUsers(room_id)
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 	for _, p in self:iterRoomPeers(room_id) do
-		p.remote:set("room_users", room_users)
+		p.remote:setRoomUsers(room_users)
 	end
 end
 
@@ -235,6 +236,11 @@ function MultiplayerServer:kickUser(user, room_id, target_user_id)
 		self.multiplayer_repo:deleteRoom(room_id)
 		self:pushRooms()
 		self:pushRoomUsers(room_id)
+	end
+
+	local peer = self:getPeerByUserId(target_user_id)
+	if peer then
+		peer.remote:setRoomUsers({})
 	end
 
 	return true

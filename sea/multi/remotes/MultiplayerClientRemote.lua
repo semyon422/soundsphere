@@ -14,10 +14,19 @@ function MultiplayerClientRemote:print(...)
 	print(...)
 end
 
----@param key any
----@param value any
-function MultiplayerClientRemote:set(key, value)
-	self.client:set(key, value)
+---@param rooms sea.Room[]
+function MultiplayerClientRemote:setRooms(rooms)
+	self.client:setRooms(rooms)
+end
+
+---@param room_users sea.RoomUser[]
+function MultiplayerClientRemote:setRoomUsers(room_users)
+	self.client:setRoomUsers(room_users)
+end
+
+---@param users sea.User[]
+function MultiplayerClientRemote:setUsers(users)
+	self.client:setUsers(users)
 end
 
 function MultiplayerClientRemote:startMatch()

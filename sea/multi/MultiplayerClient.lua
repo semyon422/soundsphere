@@ -22,26 +22,24 @@ function MultiplayerClient:new(server_remote, replay_base)
 	self.room_messages = {}
 end
 
----@param key any
----@param value any
-function MultiplayerClient:set(key, value)
-	self[key] = value ---@diagnostic disable-line
+---@param rooms sea.Room[]
+function MultiplayerClient:setRooms(rooms)
+	self.rooms = rooms
+end
 
-	-- local room = value
-	-- if key ~= "room" or self:isHost() then
-	-- 	return
-	-- end
+---@param room_users sea.RoomUser[]
+function MultiplayerClient:setRoomUsers(room_users)
+	self.room_users = room_users
+end
 
-	-- -- self:findNotechart() -- mp controller
-	-- if not room.is_free_modifiers then
-	-- 	self.replayBase.modifiers = room.modifiers
-	-- end
-	-- if not room.is_free_const then
-	-- 	self.replayBase.const = room.const
-	-- end
-	-- if not room.is_free_rate then
-	-- 	self.replayBase.rate = room.rate
-	-- end
+---@param users sea.User[]
+function MultiplayerClient:setUsers(users)
+	self.users = users
+end
+
+---@param msg string
+function MultiplayerClient:addMessage(msg)
+	table.insert(self.room_messages, msg)
 end
 
 function MultiplayerClient:pullUserAsync()
@@ -62,11 +60,6 @@ function MultiplayerClient:getUser(id)
 			return user
 		end
 	end
-end
-
----@param msg string
-function MultiplayerClient:addMessage(msg)
-	table.insert(self.room_messages, msg)
 end
 
 ---@param user_id integer

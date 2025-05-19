@@ -51,16 +51,16 @@ local function create_peer(ctx, id)
 end
 
 ---@param t testing.T
-function test.setAll(t)
+function test.pushUsers(t)
 	local ctx = create_test_ctx()
 
 	local peer_1, client_1 = create_peer(ctx, 1)
 	local peer_2, client_2 = create_peer(ctx, 2)
 
-	ctx.server:setAll("key", "value")
+	ctx.server:pushUsers()
 
-	t:eq(client_1.key, "value")
-	t:eq(client_2.key, "value")
+	t:tdeq(client_1.users, {peer_1.user, peer_2.user})
+	t:tdeq(client_2.users, {peer_1.user, peer_2.user})
 end
 
 ---@param t testing.T
@@ -87,12 +87,14 @@ function test.create_join_leave_room(t)
 	local room_user_1 = RoomUser(1, 1)
 	room_user_1.id = 1
 	t:tdeq(client_1.room_users, {room_user_1})
+	t:tdeq(client_2.room_users, {})
 
 	t:assert(ctx.server:joinRoom(peer_2.user, room.id, "password"))
 
 	local room_user_2 = RoomUser(1, 2)
 	room_user_2.id = 2
 	t:tdeq(client_1.room_users, {room_user_1, room_user_2})
+	t:tdeq(client_2.room_users, {room_user_1, room_user_2})
 
 	t:assert(ctx.server:leaveRoom(peer_1.user))
 	t:eq(ctx.server:getRoomId(peer_1.user), nil)
@@ -101,7 +103,8 @@ function test.create_join_leave_room(t)
 		id = 1, host_user_id = 2, name = "Room 1",
 		rules = RoomRules(), chartmeta_key = ChartmetaKey(), replay_base = ReplayBase(),
 	}})
-	t:tdeq(client_1.room_users, {room_user_2})
+	t:tdeq(client_1.room_users, {})
+	t:tdeq(client_2.room_users, {room_user_2})
 end
 
 ---@param t testing.T
