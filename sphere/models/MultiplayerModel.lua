@@ -161,7 +161,7 @@ function MultiplayerModel:loginOfflineAsync()
 		name = user.name
 	end
 
-	self.remote:loginOffline(name)
+	self.client:loginOffline(name)
 end
 
 ---@param peer_id string
@@ -177,7 +177,6 @@ function MultiplayerModel:peerconnected(peer_id, icc_peer)
 	server_remote:print("hello", peer_id)
 
 	self:loginOfflineAsync()
-	self.client:pullUserAsync()
 end
 MultiplayerModel.peerconnected = icc_co.callwrap(MultiplayerModel.peerconnected)
 

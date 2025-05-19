@@ -151,7 +151,7 @@ local function DownloadButton(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local multiplayerModel = self.game.multiplayerModel
-	if not multiplayerModel.client.room then
+	if not multiplayerModel.client:isInRoom() then
 		return
 	end
 
@@ -242,14 +242,13 @@ end
 local noRoom = {
 	name = "No room"
 }
-local noUser = {}
 
 ---@param self table
 local function RoomInfo(self)
 	local w, h = Layout:move("column2", "header")
 
 	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.client.room or noRoom
+	local room = multiplayerModel.client:getMyRoom() or noRoom
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	gfx_util.printFrame(room.name, 22, 0, w, h, "left", "center")
@@ -264,9 +263,8 @@ local function RoomSettings(self)
 
 	local multiplayerModel = game.multiplayerModel
 	local mp_client = multiplayerModel.client
-	local room = mp_client.room or noRoom
-	local user = mp_client.user or noUser
-	local room_user = mp_client:getRoomUser(user.id)
+	local room = mp_client:getMyRoom() or noRoom
+	local room_user = mp_client:getMyRoomUser()
 	if not room_user then
 		return
 	end

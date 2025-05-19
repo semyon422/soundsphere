@@ -59,7 +59,7 @@ function GameplayView:draw()
 
 	local state = self.game.pauseModel.state
 	local multiplayerModel = self.game.multiplayerModel
-	local isPlaying = multiplayerModel.client.room and multiplayerModel.client.is_playing
+	local isPlaying = multiplayerModel.client:isInRoom() and multiplayerModel.client.is_playing
 	if
 		not love.window.hasFocus() and
 		state == "play" and
@@ -104,7 +104,7 @@ function GameplayView:update(dt)
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
-	if multiplayerModel.client.room and not multiplayerModel.client.is_playing then
+	if multiplayerModel.client:isInRoom() and not multiplayerModel.client.is_playing then
 		self:quit()
 	end
 
@@ -120,7 +120,7 @@ end
 function GameplayView:quit()
 	if self.game.gameplayController:hasResult() then
 		self:changeScreen("resultView")
-	elseif self.game.multiplayerModel.client.room then
+	elseif self.game.multiplayerModel.client:isInRoom() then
 		self:changeScreen("multiplayerView")
 	else
 		self:changeScreen("selectView")

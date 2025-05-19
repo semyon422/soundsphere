@@ -24,10 +24,12 @@ end
 
 ---@param user sea.User
 ---@param user_name string
+---@return integer
 function MultiplayerServer:loginOffline(user, user_name)
 	user.id = -math.random(1, 1e9)
 	user.name = user_name
 	self:pushUsers()
+	return user.id
 end
 
 function MultiplayerServer:update()
@@ -129,7 +131,7 @@ end
 ---@param user sea.User
 ---@param name string
 ---@param password string
----@return sea.Room?
+---@return integer?
 ---@return string?
 function MultiplayerServer:createRoom(user, name, password)
 	if not self.multiplayer_access:canCreateRoom(user) then
@@ -152,7 +154,7 @@ function MultiplayerServer:createRoom(user, name, password)
 	self:pushRooms()
 	self:pushRoomUsers(room.id)
 
-	return room
+	return room.id
 end
 
 ---@param user sea.User

@@ -77,9 +77,9 @@ function section_draw.rooms(self, inner_w)
 	local status = multiplayerModel.status
 	if status ~= "connected" then
 		imgui.text(status)
-	elseif not mp_client.user then
+	elseif not mp_client:isLoggedIn() then
 		imgui.text("Not logged in")
-	elseif not selectedRoom and not mp_client.room then
+	elseif not selectedRoom and not mp_client:isInRoom() then
 		imgui.text("Create room")
 
 		name = imgui.input("LobbyView name", name, "Name")
@@ -101,20 +101,18 @@ function section_draw.rooms(self, inner_w)
 			end
 			just.row(true)
 			imgui.label(i, name)
-			if not mp_client.room then
-				just.offset(inner_w - 144)
-				if imgui.button(i, "Join") then
-					selectedRoom = room
-					mp_client:joinRoom(room.id, "")
-					just.focus()
-				end
+			just.offset(inner_w - 144)
+			if imgui.button(i, "Join") then
+				selectedRoom = room
+				mp_client:joinRoom(room.id, "")
+				just.focus()
 			end
 			just.row()
 			love.graphics.setColor(1, 1, 1, 0.2)
 			love.graphics.line(0, 0, inner_w, 0)
 			love.graphics.setColor(1, 1, 1, 1)
 		end
-	elseif selectedRoom and not mp_client.room then
+	elseif selectedRoom and not mp_client:isInRoom() then
 		imgui.text(selectedRoom.name)
 		password = imgui.input("LobbyView password", password, "Password")
 		just.sameline()

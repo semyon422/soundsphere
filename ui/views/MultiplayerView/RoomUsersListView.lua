@@ -28,7 +28,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	local room_user = items[i]
 
 	local client = game.multiplayerModel.client
-	local room = client.room
+	local room = client:getMyRoom()
 	if not room then
 		return
 	end

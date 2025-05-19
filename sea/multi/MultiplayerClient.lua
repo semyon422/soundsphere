@@ -20,6 +20,11 @@ function MultiplayerClient:new(server_remote, replay_base)
 
 	---@type string[]
 	self.room_messages = {}
+
+	---@type integer?
+	self.user_id = nil
+	---@type integer?
+	self.room_id = nil
 end
 
 ---@param rooms sea.Room[]
@@ -30,6 +35,11 @@ end
 ---@param room_users sea.RoomUser[]
 function MultiplayerClient:setRoomUsers(room_users)
 	self.room_users = room_users
+	if #room_users == 0 then
+		self.room_id = nil
+		return
+	end
+	self.room_id = room_users[1].room_id
 end
 
 ---@param users sea.User[]
@@ -42,14 +52,41 @@ function MultiplayerClient:addMessage(msg)
 	table.insert(self.room_messages, msg)
 end
 
-function MultiplayerClient:pullUserAsync()
-	print(self.server_remote)
-	self.user = self.server_remote:getUser()
-	print("USER", self.user)
-end
-
 function MultiplayerClient:refreshAsync()
 
+end
+
+---@return boolean
+function MultiplayerClient:isLoggedIn()
+	return not not self.user_id
+end
+
+---@param user_name string
+function MultiplayerClient:loginOffline(user_name)
+	self.user_id = self.server_remote:loginOffline(user_name)
+end
+
+---@param id integer
+---@return sea.Room?
+function MultiplayerClient:getRoom(id)
+	for _, room in ipairs(self.rooms) do
+		if room.id == id then
+			return room
+		end
+	end
+end
+
+---@return sea.Room?
+function MultiplayerClient:getMyRoom()
+	if not self.room_id then
+		return
+	end
+	return self:getRoom(self.room_id)
+end
+
+---@return boolean
+function MultiplayerClient:isInRoom()
+	return not not self.room_id
 end
 
 ---@param id integer
@@ -72,17 +109,25 @@ function MultiplayerClient:getRoomUser(user_id)
 	end
 end
 
+---@return sea.RoomUser?
+function MultiplayerClient:getMyRoomUser()
+	if not self.user_id then
+		return
+	end
+	return self:getRoomUser(self.user_id)
+end
+
 ---@return boolean
 function MultiplayerClient:isHost()
-	local room = self.room
+	local room = self:getMyRoom()
 	if not room then
 		return false
 	end
-	return room.host_user_id == self.user.id
+	return room.host_user_id == self.user_id
 end
 
 function MultiplayerClient:switchReadyAsync()
-	local room_user = self:getRoomUser(self.user.id)
+	local room_user = self:getRoomUser(self.user_id)
 	if room_user then
 		room_user.is_ready = not room_user.is_ready
 	end
@@ -112,7 +157,7 @@ function MultiplayerClient:startClientMatch() -- !!!
 
 	self:setPlaying(true)
 
-	local room = self.room
+	local room = self:getMyRoom()
 	if not room or not self:isHost() then
 		return
 	end
@@ -155,22 +200,20 @@ end
 
 ---@param rules sea.RoomRules
 function MultiplayerClient:setRulesAsync(rules)
-	self.room.rules = rules
+	local room = assert(self:getMyRoom())
+	room.rules = rules
 	self.server_remote.mp_room:setRules(rules)
 end
 
 ---@param name string
 ---@param password string
 function MultiplayerClient:createRoomAsync(name, password)
-	local room, err = self.server_remote:createRoom(name, password)
-	if not room then
+	local room_id, err = self.server_remote:createRoom(name, password)
+	if not room_id then
 		print(err)
 		return
 	end
-	self.room = room
-	-- self.server_remote.mp_room:setChartmetaKey()
-	-- self.server_remote.mp_room:setReplayBase()
-	-- self:pushNotechart()
+	self.room_id = room_id
 end
 
 ---@param id integer
@@ -184,7 +227,7 @@ end
 
 function MultiplayerClient:leaveRoomAsync()
 	self.server_remote:leaveRoom()
-	self.room = nil
+	self.room_id = nil
 	self.room_messages = {}
 end
 

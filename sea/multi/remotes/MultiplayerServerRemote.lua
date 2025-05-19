@@ -55,13 +55,14 @@ function MultiplayerServerRemote:login()
 end
 
 ---@param user_name string
+---@return integer
 function MultiplayerServerRemote:loginOffline(user_name)
-	self.mp_server:loginOffline(self.user, user_name)
+	return self.mp_server:loginOffline(self.user, user_name)
 end
 
 ---@param name string
 ---@param password string
----@return sea.Room?
+---@return integer?
 ---@return string?
 function MultiplayerServerRemote:createRoom(name, password)
 	if type(name) ~= "string" then

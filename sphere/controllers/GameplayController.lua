@@ -282,7 +282,7 @@ end
 
 ---@param state string
 function GameplayController:changePlayState(state)
-	if self.multiplayerModel.client.room then
+	if self.multiplayerModel.client:isInRoom() then
 		return
 	end
 
