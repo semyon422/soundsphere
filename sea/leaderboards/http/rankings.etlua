@@ -75,7 +75,7 @@ end
 							<% if leaderboard.id == query.leaderboard_id then %>
 								<li><a class="is-active"><%= leaderboard.name %></a></li>
 							<% else %>
-								<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>"><%= leaderboard.name %></a></li>
+								<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>" hx-swap="innerHTML show:no-scroll"><%= leaderboard.name %></a></li>
 							<% end %>
 						<% end %>
 					</ul>

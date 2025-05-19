@@ -72,7 +72,7 @@
 						<aside class="menu">
 							<ul class="menu-list">
 								<% for _, lb in ipairs(leaderboards) do %>
-									<li><a href="?lb=<%= lb.id %>"><%= lb.name %></a></li>
+									<li><a href="?lb=<%= lb.id %>" hx-swap="innerHTML show:no-scroll"><%= lb.name %></a></li>
 								<% end %>
 							</ul>
 						</aside>
