@@ -72,7 +72,11 @@
 						<aside class="menu">
 							<ul class="menu-list">
 								<% for _, lb in ipairs(leaderboards) do %>
-									<li><a href="?lb=<%= lb.id %>" hx-swap="innerHTML show:no-scroll"><%= lb.name %></a></li>
+									<% if lb.id == leaderboard.id then %>
+										<li><a class="is-active"><%= lb.name %></a></li>
+									<% else %>
+										<li><a href="?lb=<%= lb.id %>" hx-swap="innerHTML show:no-scroll"><%= lb.name %></a></li>
+									<% end %>
 								<% end %>
 							</ul>
 						</aside>
