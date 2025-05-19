@@ -1,4 +1,5 @@
 local just = require("just")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local ModalImView = require("ui.imviews.ModalImView")
 local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
@@ -72,6 +73,7 @@ function section_draw.rooms(self, inner_w)
 
 	local multiplayerModel = game.multiplayerModel
 	local mp_client = game.multiplayerModel.client
+	local chartview = game.selectModel.chartview
 
 	local close
 	local status = multiplayerModel.status
@@ -88,7 +90,10 @@ function section_draw.rooms(self, inner_w)
 		just.sameline()
 		just.offset(inner_w - 144)
 		if imgui.button("Create", "Create") and name ~= "" then
-			mp_client:createRoom(name, password)
+			local chartmeta_key = ChartmetaKey()
+			chartmeta_key.hash = chartview.hash
+			chartmeta_key.index = chartview.index
+			mp_client:createRoom(name, password, chartmeta_key)
 		end
 
 		imgui.separator()

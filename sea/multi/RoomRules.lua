@@ -1,4 +1,6 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
 
 ---@class sea.RoomRules
 ---@operator call: sea.RoomRules
@@ -21,6 +23,28 @@ function RoomRules:new()
 
 	self.custom = false
 	self.const = false
+end
+
+RoomRules.struct = {
+	chart = types.boolean,
+	modifiers = types.boolean,
+	rate = types.boolean,
+	mode = types.boolean,
+	nearest = types.boolean,
+	tap_only = types.boolean,
+	timings = types.boolean,
+	healths = types.boolean,
+	columns_order = types.boolean,
+	custom = types.boolean,
+	const = types.boolean,
+}
+
+local validate_room_rules = valid.struct(RoomRules.struct)
+
+---@return true?
+---@return string|valid.Errors?
+function RoomRules:validate()
+	return validate_room_rules(self)
 end
 
 return RoomRules

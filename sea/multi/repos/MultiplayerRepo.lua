@@ -26,7 +26,7 @@ function MultiplayerRepo:createRoom(room)
 	return self.models.rooms:create(room)
 end
 
----@param room sea.Room
+---@param room sea.Room|sea.RoomUpdate
 ---@return sea.Room?
 function MultiplayerRepo:updateRoom(room)
 	return self.models.rooms:update(room, {id = assert(room.id)})[1]

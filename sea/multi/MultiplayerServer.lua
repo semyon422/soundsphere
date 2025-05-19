@@ -1,10 +1,8 @@
 local class = require("class")
 local Room = require("sea.multi.Room")
-local MultiplayerAccess = require("sea.multi.access.MultiplayerAccess")
-local RoomRules = require("sea.multi.RoomRules")
+local RoomUpdate = require("sea.multi.RoomUpdate")
 local RoomUser = require("sea.multi.RoomUser")
-local ChartmetaKey = require("sea.chart.ChartmetaKey")
-local ReplayBase = require("sea.replays.ReplayBase")
+local MultiplayerAccess = require("sea.multi.access.MultiplayerAccess")
 
 ---@class sea.MultiplayerServer
 ---@operator call: sea.MultiplayerServer
@@ -128,38 +126,46 @@ function MultiplayerServer:pushRoomUsers(room_id)
 	end
 end
 
+---@param room_id integer
+---@param room sea.Room|sea.RoomUpdate
+function MultiplayerServer:syncRoomParts(room_id, room)
+	for _, p in self:iterRoomPeers(room_id) do
+		if room.rules then
+			p.remote:syncRules()
+		end
+		if room.chartmeta_key then
+			p.remote:syncChart()
+		end
+		if room.replay_base then
+			p.remote:syncReplayBase()
+		end
+	end
+end
+
 ---@param user sea.User
----@param name string
----@param password string
+---@param room_values sea.Room
 ---@return integer?
 ---@return string?
-function MultiplayerServer:createRoom(user, name, password)
+function MultiplayerServer:createRoom(user, room_values)
 	if not self.multiplayer_access:canCreateRoom(user) then
 		return nil, "not allowed"
 	end
 
-	local room = Room()
+	room_values.host_user_id = user.id
 
-	room.name = name
-	room.password = password
-	room.host_user_id = user.id
-	room.rules = RoomRules()
-	room.chartmeta_key = ChartmetaKey()
-	room.replay_base = ReplayBase()
-
-	room = self.multiplayer_repo:createRoom(room)
-
-	self:joinRoom(user, room.id, password)
-
+	local room = self.multiplayer_repo:createRoom(room_values)
 	self:pushRooms()
-	self:pushRoomUsers(room.id)
+
+	self:joinRoom(user, room.id, room.password)
 
 	return room.id
 end
 
 ---@param user sea.User
 ---@param room_id integer
----@param room_values sea.Room
+---@param room_values sea.RoomUpdate
+---@return true?
+---@return string?
 function MultiplayerServer:updateRoom(user, room_id, room_values)
 	local room = self.multiplayer_repo:getRoom(room_id)
 	if not room then
@@ -170,10 +176,14 @@ function MultiplayerServer:updateRoom(user, room_id, room_values)
 		return nil, "not allowed"
 	end
 
-	room_values.id = room.id
+	room_values.id = room_id
 
 	self.multiplayer_repo:updateRoom(room_values)
 	self:pushRooms()
+
+	self:syncRoomParts(room_id, room_values)
+
+	return true
 end
 
 ---@param room_id integer
@@ -203,6 +213,7 @@ function MultiplayerServer:joinRoom(user, room_id, password)
 	room_user = self.multiplayer_repo:createRoomUser(room_user)
 
 	self:pushRoomUsers(room_id)
+	self:syncRoomParts(room_id, room)
 
 	return true
 end
@@ -307,18 +318,15 @@ function MultiplayerServer:sendLocalMessage(user, msg)
 end
 
 ---@param user sea.User
----@param rules sea.RoomRules
-function MultiplayerServer:setLocalRules(user, rules)
+---@param room_values sea.RoomUpdate
+---@return boolean?
+---@return string?
+function MultiplayerServer:updateLocalRoom(user, room_values)
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return
 	end
-
-	local room = Room()
-	room.id = room_id
-	room.rules = rules
-
-	self.multiplayer_repo:updateRoom(room)
+	return self:updateRoom(user, room_id, room_values)
 end
 
 ---@param user sea.User
@@ -344,6 +352,8 @@ function MultiplayerServer:setChartplayComputed(user, chartplay_computed)
 
 	room_user.chartplay_computed = chartplay_computed
 	self.multiplayer_repo:updateRoomUser(room_user)
+
+	self:pushRoomUsers(room_user.room_id)
 end
 
 ---@param user sea.User

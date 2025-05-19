@@ -42,4 +42,16 @@ function MultiplayerClientRemote:addMessage(msg)
 	self.client:addMessage(msg)
 end
 
+function MultiplayerClientRemote:syncRules()
+	self.client:syncRules()
+end
+
+function MultiplayerClientRemote:syncChart()
+	self.client:syncChart()
+end
+
+function MultiplayerClientRemote:syncReplayBase()
+	self.client:syncReplayBase()
+end
+
 return MultiplayerClientRemote

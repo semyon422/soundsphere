@@ -1,5 +1,7 @@
 local class = require("class")
 local icc_co = require("icc.co")
+local Room = require("sea.multi.Room")
+local RoomUpdate = require("sea.multi.RoomUpdate")
 
 ---@class sea.MultiplayerClient
 ---@operator call: sea.MultiplayerClient
@@ -50,6 +52,39 @@ end
 ---@param msg string
 function MultiplayerClient:addMessage(msg)
 	table.insert(self.room_messages, msg)
+end
+
+function MultiplayerClient:syncRules()
+end
+
+function MultiplayerClient:syncChart()
+	local room = self:getMyRoom()
+	if not room then
+		return
+	end
+
+	local rules = room.rules
+	if not rules.chart then
+		-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
+	end
+end
+
+function MultiplayerClient:syncReplayBase()
+	local room = self:getMyRoom()
+	if not room then
+		return
+	end
+
+	local rules = room.rules
+	if not rules.modifiers then
+		self.replay_base.modifiers = room.replay_base.modifiers
+	end
+	if not rules.const then
+		self.replay_base.const = room.replay_base.const
+	end
+	if not rules.rate then
+		self.replay_base.rate = room.replay_base.rate
+	end
 end
 
 function MultiplayerClient:refreshAsync()
@@ -162,20 +197,9 @@ function MultiplayerClient:startClientMatch() -- !!!
 		return
 	end
 
-	local rules = room.rules
-
-	if not rules.chart then
-		-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
-	end
-	if not rules.modifiers then
-		self.replay_base.modifiers = room.replay_base.modifiers
-	end
-	if not rules.const then
-		self.replay_base.const = room.replay_base.const
-	end
-	if not rules.rate then
-		self.replay_base.rate = room.replay_base.rate
-	end
+	self:syncRules()
+	self:syncChart()
+	self:syncReplayBase()
 end
 
 function MultiplayerClient:stopMatchAsync()
@@ -202,13 +226,24 @@ end
 function MultiplayerClient:setRulesAsync(rules)
 	local room = assert(self:getMyRoom())
 	room.rules = rules
-	self.server_remote.mp_room:setRules(rules)
+
+	local room_values = RoomUpdate()
+	room_values.rules = rules
+
+	self.server_remote.mp_room:updateRoom(room_values)
 end
 
 ---@param name string
 ---@param password string
-function MultiplayerClient:createRoomAsync(name, password)
-	local room_id, err = self.server_remote:createRoom(name, password)
+---@param chartmeta_key sea.ChartmetaKey
+function MultiplayerClient:createRoomAsync(name, password, chartmeta_key)
+	local room_values = Room()
+	room_values.name = name
+	room_values.password = password
+	room_values.replay_base = self.replay_base
+	room_values.chartmeta_key = chartmeta_key
+
+	local room_id, err = self.server_remote:createRoom(room_values)
 	if not room_id then
 		print(err)
 		return

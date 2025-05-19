@@ -1,6 +1,9 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
 local MultiplayerUserServerRemote = require("sea.multi.remotes.MultiplayerUserServerRemote")
 local RoomServerRemote = require("sea.multi.remotes.RoomServerRemote")
+local Room = require("sea.multi.Room")
 
 ---@class sea.MultiplayerServerRemote: sea.IMultiplayerServerRemote
 ---@operator call: sea.MultiplayerServerRemote
@@ -60,35 +63,34 @@ function MultiplayerServerRemote:loginOffline(user_name)
 	return self.mp_server:loginOffline(self.user, user_name)
 end
 
----@param name string
----@param password string
+---@param room_values sea.Room
 ---@return integer?
 ---@return string?
-function MultiplayerServerRemote:createRoom(name, password)
-	if type(name) ~= "string" then
-		return nil, "invalid name"
+function MultiplayerServerRemote:createRoom(room_values)
+	local ok, err = valid.format(Room.validate(room_values))
+	if not ok then
+		return nil, "validate room: " .. err
 	end
-	if type(password) ~= "string" then
-		return nil, "invalid password"
-	end
-	return self.mp_server:createRoom(self.user, name, password)
+	setmetatable(room_values, Room)
+
+	return self.mp_server:createRoom(self.user, room_values)
 end
 
 ---@param room_id integer
 ---@param password string
----@return true?
+---@return boolean?
 ---@return string?
 function MultiplayerServerRemote:joinRoom(room_id, password)
-	if type(room_id) ~= "number" or math.floor(room_id) ~= room_id then
+	if not types.integer(room_id) then
 		return nil, "invalid room_id"
 	end
-	if type(password) ~= "string" then
+	if not types.string(password) then
 		return nil, "invalid password"
 	end
 	return self.mp_server:joinRoom(self.user, room_id, password)
 end
 
----@return true?
+---@return boolean?
 ---@return string?
 function MultiplayerServerRemote:leaveRoom()
 	return self.mp_server:leaveRoom(self.user)

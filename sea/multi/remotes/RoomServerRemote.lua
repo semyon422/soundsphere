@@ -1,4 +1,6 @@
 local class = require("class")
+local valid = require("valid")
+local RoomUpdate = require("sea.multi.RoomUpdate")
 
 ---@class sea.RoomServerRemote: sea.IMultiplayerServerRemote
 ---@operator call: sea.RoomServerRemote
@@ -9,16 +11,18 @@ function RoomServerRemote:new(mp_server)
 	self.mp_server = mp_server
 end
 
----@param rules sea.RoomRules
-function RoomServerRemote:setRules(rules)
-	self.mp_server:setLocalRules(self.user, rules)
+---@param room_values sea.RoomUpdate
+---@return boolean?
+---@return string?
+function RoomServerRemote:updateRoom(room_values)
+	local ok, err = valid.format(RoomUpdate.validate(room_values))
+	if not ok then
+		return nil, "validate room update: " .. err
+	end
+	setmetatable(room_values, RoomUpdate)
+
+	self.mp_server:updateLocalRoom(self.user, room_values)
 end
-
----@param chartmeta_key sea.ChartmetaKey
-function RoomServerRemote:setChartmetaKey(chartmeta_key) end
-
----@param replay_base sea.ReplayBase
-function RoomServerRemote:setReplayBase(replay_base) end
 
 ---@param user_id any
 function RoomServerRemote:setHost(user_id) end
