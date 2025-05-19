@@ -177,6 +177,10 @@ main.center-vertically > * {
 	justify-content: center;
 }
 
+.empty-list-message {
+	margin: 1em;
+}
+
 .saira-regular {
   font-family: "Saira", sans-serif;
   font-optical-sizing: auto;

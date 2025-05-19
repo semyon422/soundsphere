@@ -15,7 +15,7 @@
 </nav>
 
 <% if #teams == 0 then %>
-	<div align="center" class="content">
+	<div align="center" class="content empty-list-message">
 		<h2>There are no teams</h2>
 		<p>Why not create one?</p>
 	</div>

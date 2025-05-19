@@ -158,7 +158,7 @@ end
 		<% end %>
 		<% local rows = leaderboard_users and (#leaderboard_users) or (users and (#users) or 0) %>
 		<% if rows == 0 then %>
-			<div align="center" class="content">
+			<div align="center" class="content empty-list-message">
 				<h2>There are no players</h2>
 				<p>Be the first one here!</p>
 			</div>

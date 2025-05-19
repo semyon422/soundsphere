@@ -349,7 +349,7 @@
 							</div>
 
 							<% if #scores == 0 then %>
-								<div align="center" class="content">
+								<div align="center" class="content empty-list-message">
 									<h2>There are no scores</h2>
 									<p>The player hasn't played anything yet</p>
 								</div>
