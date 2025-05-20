@@ -223,11 +223,19 @@ end
 
 ---@param user_id integer
 function MultiplayerClient:kickUserAsync(user_id)
+	if not self:isInRoom() then
+		return
+	end
+
 	self.server_remote.mp_room:kickUser(user_id)
 end
 
 ---@param user_id integer
 function MultiplayerClient:setHostAsync(user_id)
+	if not self:isInRoom() then
+		return
+	end
+
 	local room = assert(self:getMyRoom())
 	room.host_user_id = user_id
 
@@ -242,6 +250,10 @@ end
 
 ---@param rules sea.RoomRules
 function MultiplayerClient:setRulesAsync(rules)
+	if not self:isInRoom() then
+		return
+	end
+
 	local room = assert(self:getMyRoom())
 	room.rules = rules
 
@@ -255,6 +267,10 @@ function MultiplayerClient:setRulesAsync(rules)
 end
 
 function MultiplayerClient:updateReplayBaseAsync()
+	if not self:isInRoom() then
+		return
+	end
+
 	local room_values = RoomUpdate()
 	room_values.replay_base = self.replay_base
 
@@ -266,6 +282,10 @@ end
 
 ---@param chartmeta_key sea.ChartmetaKey
 function MultiplayerClient:updateChartmetaKeyAsync(chartmeta_key)
+	if not self:isInRoom() then
+		return
+	end
+
 	local room_values = RoomUpdate()
 	room_values.chartmeta_key = chartmeta_key
 
