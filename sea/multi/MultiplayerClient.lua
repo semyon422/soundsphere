@@ -180,6 +180,10 @@ end
 
 ---@param is_playing boolean
 function MultiplayerClient:setPlayingAsync(is_playing)
+	if not self:isInRoom() then
+		return
+	end
+
 	self.is_playing = is_playing
 	self.server_remote.mp_user:setPlaying(is_playing)
 end
