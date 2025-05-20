@@ -196,7 +196,9 @@ end
 function Chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
 	local charts_repo = self.charts_repo
 
-	local can, err = self.chartplays_access:canSubmit(user)
+	local last_chartplay = charts_repo:getRecentChartplays(user.id, 1)
+
+	local can, err = self.chartplays_access:canSubmit(user, time, last_chartplay[1])
 	if not can then
 		return nil, "can submit: " .. err
 	end

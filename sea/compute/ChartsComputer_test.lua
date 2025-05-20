@@ -71,14 +71,16 @@ function test.chartplays_full(t)
 
 	local count = 4
 	for i = 1, count do
-		local time = i
-		local play = client:play(sample.name, sample.data, 1, time, 0, false)
+		local time = i * ctx.chartplays.chartplays_access.submit_interval
+		local play = client:play(sample.name, sample.data, 1, time, 0)
 		local chartplay, err = ctx.chartplays:submit(ctx.user, time, client.compute_data_loader, play.chartplay, play.chartdiff)
 		t:assert(chartplay, err)
 	end
 
 	local chartplays = ctx.chartplays:getChartplays()
-	t:eq(#chartplays, count)
+	if not t:eq(#chartplays, count) then
+		return
+	end
 
 	for _, p in ipairs(chartplays) do
 		t:assert(p.rating > 0)

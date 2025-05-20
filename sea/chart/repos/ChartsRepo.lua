@@ -315,4 +315,16 @@ function ChartsRepo:getChartplaysMissingChartdiffs()
 	})
 end
 
+---@param user_id integer
+---@param limit integer
+---@return sea.Chartplay[]
+function ChartsRepo:getRecentChartplays(user_id, limit)
+	return self.models.chartplays:select({
+		user_id = assert(user_id),
+	}, {
+		limit = limit or 1,
+		order = {"submitted_at DESC"},
+	})
+end
+
 return ChartsRepo
