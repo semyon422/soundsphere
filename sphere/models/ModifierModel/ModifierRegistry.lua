@@ -38,9 +38,11 @@ ModifierRegistry.enum = {
 	LessChord = 23,
 	MaxChord = 24,
 	Taiko = 25,
+	Custom = 26,
 }
 
 ModifierRegistry.list = {
+	"Custom",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",

@@ -81,7 +81,8 @@ return ModalImView(function(self, quit)
 	replayBase.nearest = imgui.checkbox("nearest", replayBase.nearest, "nearest")
 	replayBase.tap_only = imgui.checkbox("tap_only", replayBase.tap_only, "tap only")
 	replayBase.const = imgui.checkbox("const", replayBase.const, "const")
-	replayBase.custom = imgui.checkbox("custom", replayBase.custom, "custom")
+	replayBase.custom = state.custom
+	replayBase.custom = imgui.checkbox("custom", replayBase.custom, "custom", true)
 	just.row(false)
 
 	imgui.separator()

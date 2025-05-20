@@ -9,6 +9,7 @@ local ModifiersMetaState = class()
 ---@param inputMode ncdk.InputMode?
 function ModifiersMetaState:new(inputMode)
 	self.inputMode = InputMode(inputMode)
+	self.custom = false
 	self:resetOrder()
 end
 

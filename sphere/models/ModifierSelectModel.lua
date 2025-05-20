@@ -10,6 +10,7 @@ local ModifierSelectModel = class()
 local Modifiers = ModifierRegistry.list
 
 local OneUseModifiers = {
+	"Custom",
 	"WindUp",
 	"NoScratch",
 	"NoLongNote",

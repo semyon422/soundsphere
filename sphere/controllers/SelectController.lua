@@ -73,6 +73,7 @@ end
 
 function SelectController:applyModifierMeta()
 	self.state.inputMode = InputMode()
+	self.state.custom = false
 
 	local replayBase = self.replayBase
 
