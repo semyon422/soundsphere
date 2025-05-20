@@ -53,7 +53,7 @@ function SubmissionServerRemote:getBestChartplaysForChartmeta(chartmeta_key)
 	end
 	setmetatable(chartmeta_key, ChartmetaKey)
 
-	return self.chartplays:getBestChartplaysForChartmeta(chartmeta_key)
+	return self.chartplays:getBestChartplaysForChartmeta(self.user, chartmeta_key)
 end
 
 ---@param chartdiff_key sea.ChartdiffKey
@@ -66,7 +66,7 @@ function SubmissionServerRemote:getBestChartplaysForChartdiff(chartdiff_key)
 	end
 	setmetatable(chartdiff_key, ChartdiffKey)
 
-	return self.chartplays:getBestChartplaysForChartdiff(chartdiff_key)
+	return self.chartplays:getBestChartplaysForChartdiff(self.user, chartdiff_key)
 end
 
 ---@param replay_hash string
@@ -77,7 +77,7 @@ function SubmissionServerRemote:getReplayFile(replay_hash)
 		return nil, "invalid replay hash"
 	end
 
-	return self.chartplays:getReplayFile(replay_hash)
+	return self.chartplays:getReplayFile(self.user, replay_hash)
 end
 
 return SubmissionServerRemote

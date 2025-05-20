@@ -33,10 +33,14 @@ function Chartplays:new(
 	self.chartplays_access = ChartplaysAccess()
 end
 
+---@param user sea.User
 ---@param replay_hash string
 ---@return string?
 ---@return string?
-function Chartplays:getReplayFile(replay_hash)
+function Chartplays:getReplayFile(user, replay_hash)
+	if user:isAnon() then
+		return nil, "anon user"
+	end
 	return self.replays_storage:get(replay_hash)
 end
 
@@ -65,17 +69,25 @@ function Chartplays:getChartplaysForChartdiff(chartdiff_key)
 	return self.charts_repo:getChartplaysForChartdiff(chartdiff_key)
 end
 
+---@param user sea.User
 ---@param chartmeta_key sea.ChartmetaKey
 ---@return sea.Chartplay[]?
 ---@return string?
-function Chartplays:getBestChartplaysForChartmeta(chartmeta_key)
+function Chartplays:getBestChartplaysForChartmeta(user, chartmeta_key)
+	if user:isAnon() then
+		return nil, "anon user"
+	end
 	return self.charts_repo:getBestChartplaysForChartmeta(chartmeta_key)
 end
 
+---@param user sea.User
 ---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]?
 ---@return string?
-function Chartplays:getBestChartplaysForChartdiff(chartdiff_key)
+function Chartplays:getBestChartplaysForChartdiff(user, chartdiff_key)
+	if user:isAnon() then
+		return nil, "anon user"
+	end
 	return self.charts_repo:getBestChartplaysForChartdiff(chartdiff_key)
 end
 
@@ -194,6 +206,10 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function Chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
+	if user:isAnon() then
+		return nil, "anon user"
+	end
+
 	local charts_repo = self.charts_repo
 
 	local last_chartplay = charts_repo:getRecentChartplays(user.id, 1)
