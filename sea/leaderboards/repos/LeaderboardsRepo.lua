@@ -197,6 +197,29 @@ function LeaderboardsRepo:getBestChartplaysFull(lb, user_id)
 	return self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
 end
 
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function LeaderboardsRepo:getFirstPlaceChartplaysFull(lb, user_id)
+	local conds, options = self:getFilterConds(lb, user_id)
+	conds.user_id = nil
+	options.group = {"hash", "`index`"}
+	options.having = {user_id = user_id}
+	local chartplayviews = self.models.chartplayviews:select(conds, options)
+	return self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function LeaderboardsRepo:getRecentChartplaysFull(lb, user_id)
+	local conds, options = self:getFilterConds(lb, user_id)
+	options.order = {"submitted_at DESC"}
+	options.group = {"id"}
+	local chartplayviews = self.models.chartplayviews:select(conds, options)
+	return self.models.chartplayviews:preload(chartplayviews, "chartdiff", "chartmeta")
+end
+
 --------------------------------------------------------------------------------
 
 ---@param leaderboard_id integer

@@ -96,8 +96,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function UserResource:getUser(req, res, ctx)
-	local query = http_util.decode_query_string(ctx.parsed_uri.query)
-
 	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
 
 	if user:isAnon() then
@@ -106,7 +104,7 @@ function UserResource:getUser(req, res, ctx)
 		return
 	end
 
-	local leaderboard_id = tonumber(query.lb) or 1
+	local leaderboard_id = tonumber(ctx.query.lb) or 1
 	ctx.leaderboard = assert(self.leaderboards:getLeaderboard(leaderboard_id))
 	ctx.leaderboard_user = self.leaderboards:getLeaderboardUser(leaderboard_id, user.id)
 
@@ -117,9 +115,9 @@ function UserResource:getUser(req, res, ctx)
 	ctx.user = user
 
 	ctx.main_container_type = "none"
-	ctx.edit_description = page:canUpdate() and query.edit_description == "true"
+	ctx.edit_description = page:canUpdate() and ctx.query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
-	ctx.scores, ctx.total_rating = page:getScores(ctx.leaderboard, user.id)
+	ctx.scores, ctx.total_rating = page:getScores(ctx.leaderboard, user.id, ctx.query.scores)
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end

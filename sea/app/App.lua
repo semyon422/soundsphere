@@ -1,4 +1,5 @@
 local class = require("class")
+local http_util = require("web.http.util")
 local socket_url = require("socket.url")
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -17,6 +18,7 @@ local etlua_util = require("web.framework.page.etlua_util")
 ---@field ip string
 ---@field time integer
 ---@field path_params {[string]: string}
+---@field query {[string]: string}
 ---@field session_user sea.User
 ---@field session sea.Session?
 ---@field version any
@@ -135,6 +137,7 @@ function App:handle(req, res, ip)
 	local ctx = {
 		parsed_uri = parsed_uri,
 		path_params = path_params,
+		query = http_util.decode_query_string(parsed_uri.query),
 		ip = ip,
 		time = os.time(),
 		session = self.domain.users:getSession(),

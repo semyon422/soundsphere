@@ -36,11 +36,14 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function RankingsResource:getRankings(req, res, ctx)
-	local query = http_util.decode_query_string(ctx.parsed_uri.query)
+	local query = ctx.query
 	local page_count = 1
 
 	local page = math.floor(math_util.clamp(tonumber(query.page) or 1, 1, page_count)) or 1
 	local leaderboard_id = tonumber(query.leaderboard_id) or 1
+
+	ctx.page = page
+	ctx.leaderboard_id = leaderboard_id
 
 	---@type sea.RankingType
 	local ranking_type = query.ranking_type or "rating"
@@ -63,11 +66,6 @@ function RankingsResource:getRankings(req, res, ctx)
 
 	ctx.page_count = page_count
 	ctx.ranking_type_tabs = self.ranking_type_tabs
-	ctx.query = {
-		page = page,
-		leaderboard_id = leaderboard_id,
-		ranking_type = ranking_type,
-	}
 
 	ctx.ranking_type = ranking_type
 	ctx.display_leaderboards = ranking_type == "rating"

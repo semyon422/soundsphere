@@ -41,7 +41,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function TeamResource:getTeamPage(req, res, ctx)
-	local query = http_util.decode_query_string(ctx.parsed_uri.query)
 	local team = self.teams:getTeam(tonumber(ctx.path_params.team_id))
 
 	if not team then
@@ -65,7 +64,7 @@ function TeamResource:getTeamPage(req, res, ctx)
 
 	ctx.team = team
 	ctx.can_update = can_update
-	ctx.edit_description = can_update and query.edit_description == "true"
+	ctx.edit_description = can_update and ctx.query.edit_description == "true"
 
 	ctx.main_container_type = "none"
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)

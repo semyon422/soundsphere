@@ -37,8 +37,7 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function PolicyResource:getPage(req, res, ctx)
-	local query = http_util.decode_query_string(ctx.parsed_uri.query)
-	local policy_key = query.policy_key or "terms"
+	local policy_key = ctx.query.policy_key or "terms"
 
 	ctx.policies = self.policies
 	ctx.selected_policy_key = policy_key

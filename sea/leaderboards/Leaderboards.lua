@@ -59,6 +59,20 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
+---@return sea.Chartplayview[]
+function Leaderboards:getFirstPlaceChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getFirstPlaceChartplaysFull(lb, user_id)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function Leaderboards:getRecentChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getRecentChartplaysFull(lb, user_id)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
 ---@param no_rank boolean?
 function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 	local repo = self.leaderboards_repo

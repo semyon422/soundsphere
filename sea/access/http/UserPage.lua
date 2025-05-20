@@ -34,7 +34,7 @@ function UserPage:setActivity(activity)
 	self.currentDateStartTime = os.time({
 		year = self.currentDate.year,
 		month = self.currentDate.month,
-		day = self.currentDate.day
+		day = self.currentDate.day,
 	})
 	self.currentWeekDay = self.currentDate.wday -- Sunday is 1 | Saturday is 7
 	self.maxDays = self.activityWeeks * 7 - (7 - self.currentWeekDay)
@@ -43,6 +43,7 @@ end
 ---@return { name: string, span: number }[]
 function UserPage:getActivityWeekLabels()
 	local t = {}
+	---@type string
 	local current_month_name
 	local span = 0
 
@@ -54,7 +55,7 @@ function UserPage:getActivityWeekLabels()
 			current_month_name = month
 			span = span + 1
 		elseif month ~= current_month_name then
-			table.insert(t, { name = current_month_name, span = span })
+			table.insert(t, {name = current_month_name, span = span})
 			current_month_name = month
 			span = 1
 		else
@@ -62,7 +63,7 @@ function UserPage:getActivityWeekLabels()
 		end
 	end
 
-	table.insert(t, { name = current_month_name, span = span })
+	table.insert(t, {name = current_month_name, span = span})
 	return t
 end
 
@@ -78,7 +79,7 @@ function UserPage:getActivityWeekDayLabel(week_num)
 	end
 end
 
----@return { date: string, activity: integer }[]
+---@return {date: string, activity: integer}[]
 --- Returns a table of rows. Row is a day of the week.
 --- Activity is a number from 0 to 4.
 function UserPage:getActivityRectangles()
@@ -92,11 +93,11 @@ function UserPage:getActivityRectangles()
 			local delta = (((week - 1) * 7) + week_day) - self.maxDays
 			local date = os.date("%d-%m-%Y", self.currentDateStartTime + (delta * 60 * 60 * 24))
 			local activity = math.min(4, math.ceil((self.activity[date] or 0) / 10))
-			table.insert(row, { date = date, activity = activity })
+			table.insert(row, {date = date, activity = activity})
 		end
 
 		table.insert(rows, row)
-	 end
+	end
 
 	return rows
 end
@@ -139,34 +140,35 @@ function UserPage:getGeneralStats()
 	local cells = {}
 	-- TODO: Get these values from the main leaderboard.
 	-- TODO: People have their preferences in rating calculators, let them choose one or two options in the settings. This is a personal option.
-	table.insert(cells, { label = "PP", value = "15028" })
-	table.insert(cells, { label = "MSD", value = "33.42" })
+	table.insert(cells, {label = "PP", value = "15028"})
+	table.insert(cells, {label = "MSD", value = "33.42"})
 
 	-- Accuracy should always be displayed
-	table.insert(cells, { label = "Accuracy", value = "90.81%" })
+	table.insert(cells, {label = "Accuracy", value = "90.81%"})
 
 	-- The owner of the profile decides which dans to display
-	table.insert(cells, { label = "4K Regular dan", value = "Delta" })
-	table.insert(cells, { label = "Satellite", value = "Lv.6" })
+	table.insert(cells, {label = "4K Regular dan", value = "Delta"})
+	table.insert(cells, {label = "Satellite", value = "Lv.6"})
 
 	return cells
 end
 
----@type {[sea.RatingCalc]: string}
-local postfixes = {
-	level = "LVL",
-	difftable = "LVL",
-	enps = "ENPS",
-	pp = "PP",
-	msd = "MSD",
-}
-
 ---@param lb sea.Leaderboard
 ---@param user_id integer
+---@param _type "top"|"first"|"recent"
 ---@return table
 ---@return sea.TotalRating
-function UserPage:getScores(lb, user_id)
-	local chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
+function UserPage:getScores(lb, user_id, _type)
+	---@type sea.Chartplayview[]
+	local chartplayviews = {}
+
+	if _type == "top" then
+		chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
+	elseif _type == "first" then
+		chartplayviews = self.leaderboards:getFirstPlaceChartplaysFull(lb, user_id)
+	elseif _type == "recent" then
+		chartplayviews = self.leaderboards:getRecentChartplaysFull(lb, user_id)
+	end
 
 	local total_rating = TotalRating()
 	total_rating:calc(chartplayviews)

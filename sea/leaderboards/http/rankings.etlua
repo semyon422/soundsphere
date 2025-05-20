@@ -1,32 +1,6 @@
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
+<% local util = require("web.http.util") %>
 
-<%
-local function getQuery(field, value)
-	local strs = {}
-
-	for k, v in pairs(query) do
-		table.insert(strs, ("%s=%s"):format(k, k == field and value or v))
-	end
-
-	return ("rankings?%s"):format(table.concat(strs, "&"))
-end
-
-local function getQueryComplex(params)
-	local strs = {}
-
-	for qk, qv in pairs(query) do
-		local value = qv
-		for pk, pv in pairs(params) do
-			if qk == pk then
-				value = pv
-			end
-		end
-		table.insert(strs, ("%s=%s"):format(qk, value))
-	end
-
-	return ("rankings?%s"):format(table.concat(strs, "&"))
-end
-%>
 <section class="hero">
 	<div class="hero-body">
 		<h1 class="title">Rankings</h1>
@@ -40,7 +14,7 @@ end
 			<% if v.id == ranking_type then %>
 				<li class="is-active"><a><%= v.name %></a></li>
 			<% else %>
-				<li><a href="<%= getQuery('ranking_type', v.id)%>"><%= v.name %></a></li>
+				<li><a href="?ranking_type=<%= v.id %>"><%= v.name %></a></li>
 			<% end %>
 		<% end %>
 	</ul>
@@ -72,10 +46,10 @@ end
 				<aside class="menu">
 					<ul class="menu-list">
 						<% for _, leaderboard in ipairs(leaderboards) do %>
-							<% if leaderboard.id == query.leaderboard_id then %>
+							<% if leaderboard.id == leaderboard_id then %>
 								<li><a class="is-active"><%= leaderboard.name %></a></li>
 							<% else %>
-								<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>" hx-swap="innerHTML show:no-scroll"><%= leaderboard.name %></a></li>
+								<li><a href="?leaderboard_id=<%= leaderboard.id %>" hx-swap="innerHTML show:no-scroll"><%= leaderboard.name %></a></li>
 							<% end %>
 						<% end %>
 					</ul>
@@ -249,22 +223,21 @@ end
 			<div class="block">
 				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
 					<ul class="pagination-list">
-						<% local page = query.page %>
 						<% if page ~= 1 then %>
 							<% if page ~= 2 then %>
-								<li><a href="<%= getQuery('page', 1) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
+								<li><a href="?<%= util.query(query, {page = 1}) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
 								<li><span class="pagination-ellipsis">&hellip;</span></li>
 							<% end %>
-							<li><a href="<%= getQuery('page', page - 1) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
+							<li><a href="?<%= util.query(query, {page = page - 1}) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
 						<% end %>
 						<li>
 						<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
 						</li>
 						<% if page ~= page_count then %>
-							<li><a href="<%= getQuery('page', page + 1) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
+							<li><a href="?<%= util.query(query, {page = page + 1}) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
 							<% if page ~= page_count - 1 then %>
 								<li><span class="pagination-ellipsis">&hellip;</span></li>
-								<li><a href="<%= getQuery('page', page_count) %>" class="pagination-link"><%= page_count %></a></li>
+								<li><a href="?<%= util.query(query, {page = page_count}) %>" class="pagination-link"><%= page_count %></a></li>
 							<% end %>
 						<% end %>
 					</ul>

@@ -1,3 +1,5 @@
+<% local util = require("web.http.util") %>
+
 <div class="is-hidden-mobile" style="position:relative;">
 	<%
 		local banner_url = [[https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D]]
@@ -10,7 +12,7 @@
 	<div class="page-banner" style="background-image:url('<%= banner_url %>');"></div>
 </div>
 
-<main class="container">
+<main class="container" hx-swap="show:no-scroll">
 	<div class="block user__container">
 		<div class="columns">
 			<div class="column">
@@ -75,7 +77,7 @@
 									<% if lb.id == leaderboard.id then %>
 										<li><a class="is-active"><%= lb.name %></a></li>
 									<% else %>
-										<li><a href="?lb=<%= lb.id %>" hx-swap="innerHTML show:no-scroll"><%= lb.name %></a></li>
+										<li><a href="?<%= util.query(query, {lb = lb.id}) %>"><%= lb.name %></a></li>
 									<% end %>
 								<% end %>
 							</ul>
@@ -346,9 +348,15 @@
 						<div class="block">
 							<div class="tabs">
 								<ul>
-									<li class="is-active"><a>Top scores</a></li>
-									<li><a>First places (100)</a></li>
-									<li><a>Recent scores</a></li>
+									<li class="<%= query.scores == "top" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "top"}) %>">Top scores</a>
+									</li>
+									<li class="<%= query.scores == "first" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "first"}) %>">First places (100)</a>
+									</li>
+									<li class="<%= query.scores == "recent" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "recent"}) %>">Recent scores</a>
+									</li>
 								</ul>
 							</div>
 
