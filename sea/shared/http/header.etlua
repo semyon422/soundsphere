@@ -43,7 +43,7 @@
 					Wiki
 				</p>
 			</a>
-			<a class="navbar-item" href="/support">
+			<a class="navbar-item" href="/donate">
 				<p>
 					<i class="fas fa-heart icon-margin-right header__support-icon"></i>
 					Donate
