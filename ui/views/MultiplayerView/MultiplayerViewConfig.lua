@@ -263,45 +263,45 @@ local function RoomSettings(self)
 
 	local multiplayerModel = game.multiplayerModel
 	local mp_client = multiplayerModel.client
-	local room = mp_client:getMyRoom() or noRoom
+	local room = mp_client:getMyRoom()
 	local room_user = mp_client:getMyRoomUser()
-	if not room_user then
+	if not room or not room_user then
 		return
 	end
+
+	local rules = room.rules
 
 	love.graphics.translate(0, 36)
 
 	local _h = 55
 	local isHost = mp_client:isHost()
 	if isHost then
-		local rules = room.rules
-
 		-- if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
 		-- 	multiplayerModel:setFreeNotechart(not room.is_free_notechart)
 		-- end
 		-- just.sameline()
 		-- imgui.Label("Free chart", "Free chart", _h)
 
-		if imgui.Checkbox("Free mods", rules.modifiers, _h) then
-			rules.modifiers = not rules.modifiers
-			mp_client:setRules(rules)
-		end
-		just.sameline()
-		imgui.Label("Free mods", "Free mods", _h)
+		-- if imgui.Checkbox("Free mods", rules.modifiers, _h) then
+		-- 	rules.modifiers = not rules.modifiers
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free mods", "Free mods", _h)
 
-		if imgui.Checkbox("Free const", rules.const, _h) then
-			rules.const = not rules.const
-			mp_client:setRules(rules)
-		end
-		just.sameline()
-		imgui.Label("Free const", "Free const", _h)
+		-- if imgui.Checkbox("Free const", rules.const, _h) then
+		-- 	rules.const = not rules.const
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free const", "Free const", _h)
 
-		if imgui.Checkbox("Free rate", rules.rate, _h) then
-			rules.rate = not rules.rate
-			mp_client:setRules(rules)
-		end
-		just.sameline()
-		imgui.Label("Free rate", "Free rate", _h)
+		-- if imgui.Checkbox("Free rate", rules.rate, _h) then
+		-- 	rules.rate = not rules.rate
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free rate", "Free rate", _h)
 	end
 
 	if imgui.Checkbox("Ready", room_user.is_ready, _h) then
@@ -311,16 +311,21 @@ local function RoomSettings(self)
 	imgui.Label("Ready", "Ready", _h)
 
 	w, h = Layout:move("column3")
-	love.graphics.translate(36, h - 72 * 3)
+	love.graphics.translate(36, h - 72 * 4)
 
-	if isHost or room.is_free_notechart then
+	if isHost or rules.chart then
 		if imgui.TextOnlyButton("Select chart", "Select", w - 72, 72) then
 			self:changeScreen("selectView")
 		end
 	end
-	if isHost or room.is_free_modifiers then
+	if isHost or rules.modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
 			self.gameView:setModal(require("ui.views.ModifierView"))
+		end
+	end
+	if isHost then
+		if imgui.TextOnlyButton("Settings", "Settings", w - 72, 72) then
+			self.gameView:setModal(require("ui.views.SelectView.PlayConfigView"))
 		end
 	end
 

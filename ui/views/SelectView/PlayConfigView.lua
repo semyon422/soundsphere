@@ -22,12 +22,15 @@ local window_id = "PlayConfigView"
 local swapping_column
 
 return ModalImView(function(self, quit)
-	if quit then
-		return true
-	end
-
 	---@type sphere.GameController
 	local game = self.game
+
+	local replay_base = game.configModel.configs.settings.replay_base
+
+	if quit then
+		game.multiplayerModel.client:updateReplayBase()
+		return true
+	end
 
 	local state = game.selectController.state
 
@@ -45,8 +48,6 @@ return ModalImView(function(self, quit)
 	just.push()
 
 	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
-
-	local replay_base = game.configModel.configs.settings.replay_base
 
 	imgui.text("Auto:")
 	just.row(true)

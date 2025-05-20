@@ -26,20 +26,6 @@ function MultiplayerController:load()
 	mpModel:load()
 end
 
-MultiplayerController.findNotechart = remote.wrap(function(self)
-	local mpModel = self.multiplayerModel
-
-	local hash = mpModel.room.notechart.hash or ""
-	local index = mpModel.room.notechart.index or 0
-	if self.hash == hash and self.index == index then
-		return
-	end
-	self.hash = hash
-	self.index = index
-
-	self.multiplayerModel:findNotechartAsync()
-end)
-
 function MultiplayerController:beginUnload()
 	self.selectModel:setLock(true)
 end

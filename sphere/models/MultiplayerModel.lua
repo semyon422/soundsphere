@@ -34,7 +34,7 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 
 	self.status = "disconnected"
 
-	self.client = MultiplayerClient({}, replayBase)
+	self.client = MultiplayerClient({}, replayBase, self)
 	self.client_remote = MultiplayerClientRemote(self.client)
 
 	local function remote_handler_transform(_, th, peer, obj, ...)
@@ -131,28 +131,6 @@ function MultiplayerModel:disconnect()
 	end
 end
 
-MultiplayerModel.pushPlayContext = icc_co.callwrap(function(self)
-	if not self.peer then return end
-	self.peer._setModifiers(self.replayBase.modifiers)
-	self.peer._setRate(self.replayBase.rate)
-	self.peer._setConst(self.replayBase.const)
-end)
-
-MultiplayerModel.pushNotechart = icc_co.callwrap(function(self)
-	if not self.peer then
-		return
-	end
-
-	local chartview = self.selectModel.chartview
-	if not chartview then
-		return
-	end
-
-	self.chartview = chartview
-	self.peer._setNotechart(chartview)
-	self.peer._setNotechartFound(true)
-end)
-
 function MultiplayerModel:loginOfflineAsync()
 	local user = self.configModel.configs.online.user
 
@@ -212,11 +190,16 @@ function MultiplayerModel:update()
 	self.task_handler:update()
 end
 
-function MultiplayerModel:findNotechartAsync()
+function MultiplayerModel:selectChart()
 	local selectModel = self.selectModel
 
-	local hash = self.room.notechart.hash or ""
-	local index = self.room.notechart.index or 0
+	local room = self.client:getMyRoom()
+	if not room then
+		return
+	end
+
+	local hash = room.chartmeta_key.hash
+	local index = room.chartmeta_key.index
 
 	print("find", hash, index)
 	selectModel:findNotechart(hash, index)
@@ -230,7 +213,7 @@ function MultiplayerModel:findNotechartAsync()
 		self.chartview = chartview
 		selectModel:setConfig(chartview)
 		selectModel:pullNoteChartSet(true)
-		self.peer.setNotechartFound(true)
+		self.remote.mp_user:setChartFound(true)
 		return
 	end
 	selectModel:setConfig({
@@ -240,7 +223,7 @@ function MultiplayerModel:findNotechartAsync()
 	})
 	self.chartview = nil
 	selectModel:pullNoteChartSet(true)
-	self.peer.setNotechartFound(false)
+	self.remote.mp_user:setChartFound(false)
 end
 
 MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
@@ -255,10 +238,10 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 	}
 	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
 	self.downloadingBeatmap.status = "done"
-	self.peer.setNotechartFound(false)
+	self.remote.mp_user:setChartFound(false)
 
 	self.cacheModel:startUpdateAsync("downloads", 1)
-	self:findNotechartAsync()
+	self:selectChart()
 end)
 
 return MultiplayerModel

@@ -126,7 +126,7 @@ function SelectController:update()
 	end
 
 	if self.modifierSelectModel:isChanged() then
-		self.multiplayerModel:pushPlayContext()
+		self.multiplayerModel.client:updateReplayBase()
 		self:applyModifierMeta()
 	end
 

@@ -12,6 +12,7 @@ local RoomRules = require("sea.multi.RoomRules")
 local Room = require("sea.multi.Room")
 local RoomUpdate = require("sea.multi.RoomUpdate")
 local RoomUser = require("sea.multi.RoomUser")
+local IChartSelector = require("sea.multi.IChartSelector")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local ReplayBase = require("sea.replays.ReplayBase")
 
@@ -42,7 +43,7 @@ local function create_test_ctx()
 end
 
 local function create_peer(ctx, id)
-	local client = MultiplayerClient(ctx.server_remote, ReplayBase())
+	local client = MultiplayerClient(ctx.server_remote, ReplayBase(), IChartSelector())
 
 	local peer = Peer()
 	peer.user = User()
@@ -138,9 +139,14 @@ function test.update_room(t)
 		rules = RoomRules(), chartmeta_key = ChartmetaKey(), replay_base = ReplayBase(),
 	}})
 
+	local chartmeta_key = ChartmetaKey()
+	chartmeta_key.hash = "00000000000000000000000000000000"
+	chartmeta_key.index = 1
+
 	local room_values = RoomUpdate()
 	room_values.name = "Room 2"
 	room_values.password = "password 2"
+	room_values.chartmeta_key = chartmeta_key
 
 	local ok, err = ctx.server:updateRoom(peer_1.user, room_id, room_values)
 	if not t:assert(ok, err) then
@@ -149,7 +155,7 @@ function test.update_room(t)
 
 	t:tdeq(client_1.rooms, {{
 		id = 1, host_user_id = 1, name = "Room 2",
-		rules = RoomRules(), chartmeta_key = ChartmetaKey(), replay_base = ReplayBase(),
+		rules = RoomRules(), chartmeta_key = chartmeta_key, replay_base = ReplayBase(),
 	}})
 end
 

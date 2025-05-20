@@ -1,4 +1,5 @@
 local class = require("class")
+local types = require("sea.shared.types")
 
 ---@class sea.MultiplayerUserServerRemote: sea.IMultiplayerServerRemote
 ---@operator call: sea.MultiplayerUserServerRemote
@@ -19,7 +20,13 @@ function MultiplayerUserServerRemote:switchReady()
 end
 
 ---@param found boolean
-function MultiplayerUserServerRemote:setNotechartFound(found) end
+function MultiplayerUserServerRemote:setChartFound(found)
+	if not types.boolean(found) then
+		return nil, "invalid found"
+	end
+	self.mp_server:setChartFound(self.user, found)
+	return true
+end
 
 ---@param is_playing boolean
 function MultiplayerUserServerRemote:setPlaying(is_playing) end

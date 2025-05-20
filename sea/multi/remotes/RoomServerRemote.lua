@@ -21,7 +21,7 @@ function RoomServerRemote:updateRoom(room_values)
 	end
 	setmetatable(room_values, RoomUpdate)
 
-	self.mp_server:updateLocalRoom(self.user, room_values)
+	return self.mp_server:updateLocalRoom(self.user, room_values)
 end
 
 ---@param user_id any

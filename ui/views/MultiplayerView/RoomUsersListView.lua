@@ -33,6 +33,8 @@ function RoomUsersListView:drawItem(i, w, h)
 		return
 	end
 
+	local rules = room.rules
+
 	love.graphics.setColor(0.8, 0.8, 0.8, 1)
 	if room_user.is_ready then
 		love.graphics.setColor(0.3, 1, 0.3, 1)
@@ -69,7 +71,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	-- 		description = description .. "\n"
 	-- 	end
 	-- end
-	if room.is_free_modifiers then
+	if rules.modifiers then
 		description = description .. modifiers_string
 	end
 

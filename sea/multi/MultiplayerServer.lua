@@ -37,6 +37,7 @@ end
 ---@param peer sea.Peer
 function MultiplayerServer:connected(peer)
 	self:pushUsers()
+	peer.remote:setRooms(self:getRooms())
 end
 
 ---@param peer sea.Peer
@@ -50,7 +51,9 @@ function MultiplayerServer:getUsers()
 	---@type sea.User[]
 	local users = {}
 	for _, p in self.peers:iter() do
-		table.insert(users, p.user)
+		if not p.user:isAnon() then
+			table.insert(users, p.user)
+		end
 	end
 	table.sort(users, function(a, b)
 		return a.id < b.id
@@ -337,6 +340,20 @@ function MultiplayerServer:switchReady(user)
 	end
 
 	room_user.is_ready = not room_user.is_ready
+	self.multiplayer_repo:updateRoomUser(room_user)
+
+	self:pushRoomUsers(room_user.room_id)
+end
+
+---@param user sea.User
+---@param found boolean
+function MultiplayerServer:setChartFound(user, found)
+	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
+	if not room_user then
+		return
+	end
+
+	room_user.chart_found = found
 	self.multiplayer_repo:updateRoomUser(room_user)
 
 	self:pushRoomUsers(room_user.room_id)
