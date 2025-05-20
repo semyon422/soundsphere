@@ -1,0 +1,52 @@
+<style>
+.donate__service-container {
+	display: flex;
+	border-radius: 1em;
+	background-color: white;
+	width: 20em;
+	height: 8em;
+	margin: 2em;
+	transition: all cubic-bezier(0.33, 1, 0.68, 1) 0.2s;
+}
+
+.donate__service-container:hover {
+	transform: translateY(-10px);
+}
+
+.donate__container {
+	margin: auto;
+	padding: 1em;
+}
+
+</style>
+
+<div class="donate__container">
+	<div class="content">
+		<h1>Support the game and us!</h1>
+		<p>Do you not want the game to suddenly shut its doors? You can help us spread the game on social media and in chat rooms. Join our Discord server, thank the developers by adding a star to the soundsphere GitHub repository, and play our game!</p>
+		<h2>Helping monetarily</h2>
+		<p>The entire project is and always will be free. However, keeping the server open costs us a lot of money. We also need to eat, so donating money would greatly benefit the project.</p>
+		<p>Below are the services you can use to donate money. Currently, we don't have a way to automatically add the Donator role to your profile, so after using one of the services, you should contact Semyon and share the link to your profile. We give <strong>one month</strong> of the Donator role <strong>for each dollar</strong> donated.</p>
+	</div>
+
+	<div class="is-flex is-justify-content-space-evenly is-flex-wrap-wrap">
+		<a target="_blank" href="https://boosty.to/semyon422" class="donate__service-container card">
+			<img src="static/images/donate/boosty.svg">
+		</a>
+
+		<a target="_blank" href="https://bscscan.com/address/0xC9Ad4f1843100a6E4DA38C8f4DA2aee84a8875eC" class="donate__service-container card">
+			<img style="padding: 28px;" src="static/images/donate/bscscan.svg">
+		</a>
+	</div>
+
+	<div class="content">
+		<h2>Donator perks</h2>
+		<p>Here is the list of perks we give to donators:</p>
+		<ul>
+			<li>You will be able to change a description of your profile</li>
+			<li>You can add a gradient to your username</li>
+			<li>You will be able to create a team if you have enough playtime to create one</li>
+			<li>You will get a Donator role in our Discord server</li>
+		</ul>
+	</div>
+</div>
