@@ -23,8 +23,10 @@ end
 function MultiplayerView:update(dt)
 	self.game.selectController:update()
 
-	local mp_client = self.game.multiplayerModel.client
-	if not mp_client:isInRoom() then
+	local mp_model = self.game.multiplayerModel
+	local mp_client = mp_model.client
+
+	if not mp_client:isInRoom() or mp_model.status == "disconnected" then
 		self:changeScreen("selectView")
 	elseif mp_client.is_playing then
 		self:changeScreen("gameplayView")

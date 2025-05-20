@@ -71,14 +71,6 @@ function MultiplayerClient:syncChart()
 	-- 	-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
 	-- end
 
-	local hash = room.chartmeta_key.hash
-	local index = room.chartmeta_key.index
-	if self.hash == hash and self.index == index then
-		return
-	end
-	self.hash = hash
-	self.index = index
-
 	self.chart_selector:selectChart(hash, index)
 end
 
@@ -230,13 +222,22 @@ function MultiplayerClient:stopClientMatch()
 end
 
 ---@param user_id integer
-function MultiplayerClient:setHostAsync(user_id)
-	self.server_remote.mp_room:setHost(user_id)
+function MultiplayerClient:kickUserAsync(user_id)
+	self.server_remote.mp_room:kickUser(user_id)
 end
 
 ---@param user_id integer
-function MultiplayerClient:kickUserAsync(user_id)
-	self.server_remote.mp_room:kickUser(user_id)
+function MultiplayerClient:setHostAsync(user_id)
+	local room = assert(self:getMyRoom())
+	room.host_user_id = user_id
+
+	local room_values = RoomUpdate()
+	room_values.host_user_id = user_id
+
+	local ok, err = self.server_remote.mp_room:updateRoom(room_values)
+	if not ok then
+		print("setHostAsync", err)
+	end
 end
 
 ---@param rules sea.RoomRules
@@ -249,7 +250,7 @@ function MultiplayerClient:setRulesAsync(rules)
 
 	local ok, err = self.server_remote.mp_room:updateRoom(room_values)
 	if not ok then
-		print(err)
+		print("setRulesAsync", err)
 	end
 end
 
@@ -259,7 +260,7 @@ function MultiplayerClient:updateReplayBaseAsync()
 
 	local ok, err = self.server_remote.mp_room:updateRoom(room_values)
 	if not ok then
-		print(err)
+		print("updateReplayBaseAsync", err)
 	end
 end
 
@@ -270,7 +271,7 @@ function MultiplayerClient:updateChartmetaKeyAsync(chartmeta_key)
 
 	local ok, err = self.server_remote.mp_room:updateRoom(room_values)
 	if not ok then
-		print(err)
+		print("updateChartmetaKeyAsync", err)
 	end
 end
 
@@ -286,7 +287,7 @@ function MultiplayerClient:createRoomAsync(name, password, chartmeta_key)
 
 	local room_id, err = self.server_remote:createRoom(room_values)
 	if not room_id then
-		print(err)
+		print("createRoomAsync", err)
 		return
 	end
 	self.room_id = room_id
@@ -297,7 +298,7 @@ end
 function MultiplayerClient:joinRoomAsync(id, password)
 	local ok, err = self.server_remote:joinRoom(id, password)
 	if not ok then
-		print(err)
+		print("joinRoomAsync", err)
 	end
 end
 

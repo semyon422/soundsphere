@@ -152,8 +152,6 @@ function MultiplayerModel:peerconnected(peer_id, icc_peer)
 	self.remote = server_remote
 	self.client.server_remote = server_remote
 
-	server_remote:print("hello", peer_id)
-
 	self:loginOfflineAsync()
 end
 MultiplayerModel.peerconnected = icc_co.callwrap(MultiplayerModel.peerconnected)

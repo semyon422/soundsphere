@@ -81,7 +81,10 @@ function MultiplayerApp:handle_peer(peer_id, icc_peer, msg)
 end
 
 function MultiplayerApp:update()
-	self.task_handler:update()
+	local ok, err = pcall(self.task_handler.update, self.task_handler)
+	if not ok then
+		print(err)
+	end
 end
 
 ---@param peer_id string

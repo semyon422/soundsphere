@@ -24,11 +24,10 @@ function RoomServerRemote:updateRoom(room_values)
 	return self.mp_server:updateLocalRoom(self.user, room_values)
 end
 
----@param user_id any
-function RoomServerRemote:setHost(user_id) end
-
----@param user_id any
-function RoomServerRemote:kickUser(user_id) end
+---@param user_id integer
+function RoomServerRemote:kickUser(user_id)
+	self.mp_server:kickLocalUser(self.user, user_id)
+end
 
 function RoomServerRemote:startMatch()
 	self.mp_server:startLocalMatch(self.user)

@@ -25,7 +25,7 @@ end
 ---@return integer
 function MultiplayerServer:loginOffline(user, user_name)
 	user.id = -math.random(1, 1e9)
-	user.name = user_name
+	user.name = ("%s (%s)"):format(user_name, -user.id)
 	self:pushUsers()
 	return user.id
 end
@@ -330,6 +330,16 @@ function MultiplayerServer:updateLocalRoom(user, room_values)
 		return
 	end
 	return self:updateRoom(user, room_id, room_values)
+end
+
+---@param user sea.User
+---@param target_user_id integer
+function MultiplayerServer:kickLocalUser(user, target_user_id)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return
+	end
+	self:kickUser(user, room_id, target_user_id)
 end
 
 ---@param user sea.User
