@@ -5,6 +5,8 @@ local Remote = require("icc.Remote")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
 
+local whitelist = require("sea.app.remotes.whitelist")
+
 ---@class sea.WebsocketResource: web.IResource
 ---@operator call: sea.WebsocketResource
 local WebsocketResource = IResource + {}
@@ -35,7 +37,7 @@ end
 ---@param server_handler sea.ServerRemote
 ---@param views web.Views
 function WebsocketResource:new(server_handler, views)
-	self.remote_handler = RemoteHandler(server_handler)
+	self.remote_handler = RemoteHandler(server_handler, whitelist)
 	self.remote_handler.transform = remote_handler_transform
 	self.views = views
 end

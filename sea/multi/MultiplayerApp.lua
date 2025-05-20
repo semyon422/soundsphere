@@ -18,6 +18,8 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local MultiplayerDatabase = require("sea.storage.server.MultiplayerDatabase")
 local MultiplayerRepo = require("sea.multi.repos.MultiplayerRepo")
 
+local whitelist = require("sea.multi.remotes.whitelist")
+
 ---@class sea.MultiplayerApp
 ---@operator call: sea.MultiplayerApp
 local MultiplayerApp = class()
@@ -44,7 +46,7 @@ function MultiplayerApp:new()
 		return _obj, select(2, ...)
 	end
 
-	self.remote_handler = RemoteHandler(MultiplayerServerRemote(self.server))
+	self.remote_handler = RemoteHandler(MultiplayerServerRemote(self.server), whitelist)
 	self.remote_handler.transform = remote_handler_transform
 
 	self.task_handler = TaskHandler(self.remote_handler)
