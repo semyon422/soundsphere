@@ -3,6 +3,7 @@ local RatingCalc = require("sea.leaderboards.RatingCalc")
 
 ---@class sea.TotalRating
 ---@operator call: sea.TotalRating
+---@field accuracy number
 ---@field rating number
 ---@field rating_msd number
 ---@field rating_pp number
@@ -13,6 +14,7 @@ local TotalRating = class()
 TotalRating.avg_count = 20
 
 function TotalRating:new()
+	self.accuracy = 0
 	self.rating = 0
 	self.rating_msd = 0
 	self.rating_pp = 0
@@ -24,6 +26,7 @@ end
 function TotalRating:calc(cpvs)
 	self:new()
 
+	local accuracy = self.accuracy
 	local rating = self.rating
 	local rating_msd = self.rating_msd
 	local rating_pp = self.rating_pp
@@ -34,6 +37,7 @@ function TotalRating:calc(cpvs)
 
 	for i, cp in ipairs(cpvs) do
 		if i <= avg_count then
+			accuracy = accuracy + cp.accuracy
 			rating = rating + cp.rating
 			rating_msd = rating_msd + cp.rating_msd
 			chartmeta_level = rating_msd + (cp.chartmeta_level or 0)
@@ -42,6 +46,7 @@ function TotalRating:calc(cpvs)
 		rating_pp = rating_pp + cp.rating_pp * 0.95 ^ (i - 1)
 	end
 
+	self.accuracy = accuracy / avg_count
 	self.rating = rating / avg_count
 	self.rating_msd = rating_msd / avg_count
 	self.rating_pp = rating_pp

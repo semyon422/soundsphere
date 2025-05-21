@@ -92,13 +92,13 @@ end
 function cmds.start_chartplays()
 	local time = os.time()
 	local total = charts_computer:getChartplaysComputedCount(time, "new")
-	local task = compute_tasks:Compute(time, "chartplays", "new", total)
+	local task = compute_tasks:createComputeTask(time, "chartplays", "new", total)
 	cmds.list()
 end
 
 function cmds.start_total_rating()
 	local total = domain.users:getUsersCount() * leaderboards:getLeaderboardsCount()
-	local task = compute_tasks:Compute(os.time(), "total_rating", "new", total)
+	local task = compute_tasks:createComputeTask(os.time(), "total_rating", "new", total)
 	cmds.list()
 end
 

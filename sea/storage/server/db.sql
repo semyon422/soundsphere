@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS `leaderboard_users` (
 	`leaderboard_id` INTEGER NOT NULL,
 	`user_id` INTEGER NOT NULL,
 	`total_rating` REAL NOT NULL,
+	`total_accuracy` REAL NOT NULL,
 	`rank` INTEGER NOT NULL,
 	`updated_at` INTEGER NOT NULL,
 	UNIQUE(`leaderboard_id`, `user_id`)

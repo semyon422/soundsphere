@@ -1,4 +1,5 @@
 local class = require("class")
+local format = require("sea.shared.format")
 local time_util = require("time_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = require("sea.leaderboards.TotalRating")
@@ -150,7 +151,12 @@ function UserPage:getGeneralStats(user_id)
 
 	table.insert(cells, {
 		label = RatingCalc:postfix(lb.rating_calc):upper(),
-		value = lb_user.total_rating,
+		value = format.float4(lb_user.total_rating),
+	})
+
+	table.insert(cells, {
+		label = "Accuracy",
+		value = ("%0.2f%%"):format(lb_user:getNormAccuracy() * 100),
 	})
 
 	-- TODO: Get these values from the main leaderboard.

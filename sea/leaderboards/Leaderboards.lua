@@ -105,6 +105,7 @@ function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 	end
 
 	lb_user.total_rating = rating
+	lb_user.total_accuracy = total_rating.accuracy
 	lb_user.updated_at = time
 
 	if not found then
