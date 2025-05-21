@@ -23,13 +23,13 @@ end
 function ChartResource:getPage(req, res, ctx)
 	local chartmeta = {
 		artist = "Artist",
-		artist_unicode = "Artist",
+		artist_unicode = "Jack Black",
 		title = "Title",
-		title_unicode = "Title",
+		title_unicode = "Steve's Lava Chicken",
 		tags = "tag1 tag2 tag3",
 		creator = "Creator",
 		name = "Insane",
-		source = "Source",
+		source = "Movie about the cubes and stuff",
 		inputmode = "4key",
 		tempo = 120,
 		tempo_avg = 120,
@@ -44,8 +44,8 @@ function ChartResource:getPage(req, res, ctx)
 		enps_diff = 20,
 		osu_diff = 7,
 		msd_diff = 35,
-		judges_count = 90,
-		notes_count = 50
+		judges_count = 461,
+		notes_count = 417
 	}
 
 	local cpv = Chartplay()
