@@ -68,8 +68,8 @@
 						local color_right_hex = "#ee93bd"
 
 						if donator then
-							color_left_hex = ("#%x"):format(user.color_left or 13213679)
-							color_right_hex = ("#%x"):format(user.color_right or 15373511)
+							color_left_hex = ("#%06x"):format(user.color_left or 13213679)
+							color_right_hex = ("#%06x"):format(user.color_right or 15373511)
 						end
 					%>
 					<div class="field">
@@ -126,7 +126,7 @@
 								<div class="field">
 									<div class="control">
 										<label class="checkbox">
-											<input type="checkbox" name="enable_gradient">
+											<input type="checkbox" name="enable_gradient" <%= user.enable_gradient and "checked" or "" %>>
 											Enable gradient
 										</label>
 									</div>
