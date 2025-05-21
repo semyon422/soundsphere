@@ -1,0 +1,54 @@
+<style>
+.chart-scores__grade {
+	font-size: 25px;
+	text-shadow: none;
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+}
+
+.chart-scores__flag-padding {
+	padding-left: 20px !important;
+}
+</style>
+
+<table class="ranking-table">
+	<thead>
+		<th></th>
+		<th></th>
+		<th>Accuracy</th>
+		<th>MAX</th>
+		<th>BAD</th>
+		<th>X</th>
+		<th></th>
+		<th></th>
+		<th>Modifiers</th>
+		<th>Rate</th>
+		<th><%= chart_page:getPreferredRatingCalc():upper() %></th>
+		<th>Date</th>
+	</thead>
+	<tbody>
+		<% local scores = chart_page:getScores() %>
+		<% for i, v in ipairs(scores) do %>
+			<tr class="has-text">
+				<%
+				%>
+				<td class="ranking-table__more-padding"><strong>#<%= v.rank %></strong></td>
+				<td class="score-grade saira-bold chart-scores__grade" data-grade="<%= v.grade %>"><%= v.grade %></td>
+				<td class="ranking-table__more-padding">
+					<%= ("%0.02f%%"):format(v.accuracy * 100) %>
+				</td>
+				<td><%= v.perfect_count %></td>
+				<td><%= v.not_perfect_count %></td>
+				<td><%= v.miss_count %></td>
+				<td class="ranking-table__flag-cell chart-scores__flag-padding">
+					<div class="fi-<%= v.flag %>"></div>
+				</td>
+				<td align="left" class="ranking-table__main-cell"><%= v.username %></td>
+				<td class="ranking-table__more-padding"><%= v.modifiers %></td>
+				<td class="ranking-table__more-padding"><%= ("%gx"):format(v.rate) %></td>
+				<td class="ranking-table__more-padding"><%= ("%0.02f"):format(v.rating) %></td>
+				<td class="ranking-table__more-padding"><%= v.time_ago %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

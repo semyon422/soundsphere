@@ -24,6 +24,7 @@ local TeamEditResource = require("sea.teams.http.TeamEditResource")
 local DifftablesResource = require("sea.difftables.http.DifftablesResource")
 local DifftableResource = require("sea.difftables.http.DifftableResource")
 
+local ChartResource = require("sea.chart.http.ChartResource")
 local ChartsResource = require("sea.chart.http.ChartsResource")
 local ChartmetaResource = require("sea.chart.http.ChartmetaResource")
 local ChartdiffResource = require("sea.chart.http.ChartdiffResource")
@@ -64,6 +65,7 @@ function Resources:new(domain, server_remote, views, sessions)
 	self.difftables = DifftablesResource(domain.difftables, views)
 	self.difftable = DifftableResource(domain.difftables, views)
 
+	self.chart = ChartResource(views)
 	self.charts = ChartsResource(nil, views)
 	self.chartmeta = ChartmetaResource(nil, views)
 	self.chartdiff = ChartdiffResource(nil, views)
@@ -98,6 +100,7 @@ function Resources:getList()
 		self.difftables,
 		self.difftable,
 
+		self.chart,
 		self.charts,
 		self.chartmeta,
 		self.chartdiff,
