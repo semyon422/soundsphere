@@ -23,9 +23,11 @@ function Users:new(users_repo, password_hasher)
 end
 
 ---@param order string?
+---@param limit integer?
+---@param offset integer?
 ---@return sea.User[]
-function Users:getUsers(order)
-	return self.users_repo:getUsers(order)
+function Users:getUsers(order, limit, offset)
+	return self.users_repo:getUsers(order, limit, offset)
 end
 
 ---@return integer

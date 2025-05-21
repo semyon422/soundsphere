@@ -198,7 +198,7 @@
 						<tbody>
 							<% for i, user in ipairs(users) do %>
 								<tr class="has-text">
-									<td>#<%= i %></td>
+									<td>#<%= i + (page - 1) * users_per_page %></td>
 									<td class="ranking-table__flag-cell">
 										<div class="fi-<%= user.flag %>"></div>
 									</td>

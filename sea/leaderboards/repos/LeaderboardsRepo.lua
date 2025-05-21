@@ -233,18 +233,34 @@ function LeaderboardsRepo:getLeaderboardUser(leaderboard_id, user_id)
 end
 
 ---@param leaderboard_id integer
+---@param limit integer?
+---@param offset integer?
 ---@return sea.LeaderboardUser[]
-function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id)
+function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id, limit, offset)
 	return self.models.leaderboard_users:select({
 		leaderboard_id = assert(leaderboard_id)
-	}, {order = {"total_rating DESC"}})
+	}, {
+		order = {"total_rating DESC"},
+		limit = limit,
+		offset = offset,
+	})
 end
 
 ---@param leaderboard_id integer
+---@return integer
+function LeaderboardsRepo:getLeaderboardUsersCount(leaderboard_id)
+	return self.models.leaderboard_users:count({
+		leaderboard_id = assert(leaderboard_id)
+	})
+end
+
+---@param leaderboard_id integer
+---@param limit integer?
+---@param offset integer?
 ---@return sea.LeaderboardUser[]
-function LeaderboardsRepo:getLeaderboardUsersFull(leaderboard_id)
+function LeaderboardsRepo:getLeaderboardUsersFull(leaderboard_id, limit, offset)
 	return self.models.leaderboard_users:preload(
-		self:getLeaderboardUsers(leaderboard_id),
+		self:getLeaderboardUsers(leaderboard_id, limit, offset),
 		"user"
 	)
 end

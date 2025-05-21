@@ -45,9 +45,17 @@ function Leaderboards:getLeaderboardUser(lb_id, user_id)
 end
 
 ---@param lb_id integer
+---@return integer
+function Leaderboards:getLeaderboardUsersCount(lb_id)
+	return self.leaderboards_repo:getLeaderboardUsersCount(lb_id)
+end
+
+---@param lb_id integer
+---@param limit integer?
+---@param offset integer?
 ---@return sea.LeaderboardUser[]
-function Leaderboards:getLeaderboardUsersFull(lb_id)
-	return self.leaderboards_repo:getLeaderboardUsersFull(lb_id)
+function Leaderboards:getLeaderboardUsersFull(lb_id, limit, offset)
+	return self.leaderboards_repo:getLeaderboardUsersFull(lb_id, limit, offset)
 end
 
 ---@param lb sea.Leaderboard

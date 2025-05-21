@@ -11,10 +11,15 @@ function UsersRepo:new(models)
 end
 
 ---@param order string?
+---@param limit integer?
+---@param offset integer?
 ---@return sea.User[]
-function UsersRepo:getUsers(order)
+function UsersRepo:getUsers(order, limit, offset)
 	---@type rdb.Options
-	local options = {}
+	local options = {
+		limit = limit,
+		offset = offset,
+	}
 	if order then
 		options.order = {sql_util.escape_identifier(order) .. " DESC"}
 	end

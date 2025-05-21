@@ -12,7 +12,7 @@ RankingsResource.routes = {
 	}},
 }
 
-RankingsResource.maxUsersPerPage = 50
+RankingsResource.users_per_page = 50
 
 RankingsResource.ranking_type_tabs = {
 	{name = "Rating", id = "rating"},
@@ -37,21 +37,24 @@ end
 ---@param ctx sea.RequestContext
 function RankingsResource:getRankings(req, res, ctx)
 	local query = ctx.query
-	local page_count = 1
 
-	local page = math.floor(math_util.clamp(tonumber(query.page) or 1, 1, page_count)) or 1
-	local leaderboard_id = tonumber(query.leaderboard_id) or 1
+	local page = math.floor(tonumber(query.page) or 1)
+	local leaderboard_id = math.max(tonumber(query.leaderboard_id) or 1)
 
-	ctx.page = page
 	ctx.leaderboard_id = leaderboard_id
 
 	---@type sea.RankingType
 	local ranking_type = query.ranking_type or "rating"
 
+	local per_page = self.users_per_page
+	ctx.users_per_page = per_page
 	if ranking_type == "rating" then
-		ctx.leaderboards = self.leaderboards:getLeaderboards()
-		ctx.leaderboard = self.leaderboards:getLeaderboard(leaderboard_id)
-		ctx.leaderboard_users = self.leaderboards:getLeaderboardUsersFull(leaderboard_id)
+		local lbs = self.leaderboards
+		ctx.leaderboards = lbs:getLeaderboards()
+		ctx.leaderboard = lbs:getLeaderboard(leaderboard_id)
+		ctx.page_count = math.ceil(lbs:getLeaderboardUsersCount(leaderboard_id) / per_page)
+		page = math.min(page, ctx.page_count)
+		ctx.leaderboard_users = lbs:getLeaderboardUsersFull(leaderboard_id, per_page, (page - 1) * per_page)
 	else
 		local order = "chartplays_count"
 		if ranking_type == "charts" then
@@ -59,12 +62,16 @@ function RankingsResource:getRankings(req, res, ctx)
 		elseif ranking_type == "play_time" then
 			order = "play_time"
 		end
-		ctx.users = self.users:getUsers(order)
+		ctx.page_count = math.ceil(self.users:getUsersCount() / per_page)
+		page = math.min(page, ctx.page_count)
+		ctx.users = self.users:getUsers(order, per_page, (page - 1) * per_page)
 	end
-	-- local first = (page - 1) * self.maxUsersPerPage
-	-- local last = math.min(first + self.maxUsersPerPage, #self.testUsers)
 
-	ctx.page_count = page_count
+	ctx.page = page
+
+	-- local first = (page - 1) * self.users_per_page
+	-- local last = math.min(first + self.users_per_page, #self.testUsers)
+
 	ctx.ranking_type_tabs = self.ranking_type_tabs
 
 	ctx.ranking_type = ranking_type
