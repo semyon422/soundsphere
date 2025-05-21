@@ -125,12 +125,16 @@ end
 
 ---@return string
 function UserPage:formatRole()
-	if self.targetUser:hasRole("owner", os.time(), true) then
+	local time = os.time()
+
+	if self.targetUser:hasRole("owner", time, true) then
 		return "Project leader"
-	elseif self.targetUser:hasRole("admin", os.time(), true) then
+	elseif self.targetUser:hasRole("admin", time, true) then
 		return "Admin"
-	elseif self.targetUser:hasRole("moderator", os.time(), true) then
+	elseif self.targetUser:hasRole("moderator", time, true) then
 		return "Moderator"
+	elseif self.targetUser:hasRole("donator", time, true) then
+		return "Donator"
 	end
 
 	return ""
