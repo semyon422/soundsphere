@@ -1,5 +1,6 @@
 local IResource = require("web.framework.IResource")
 local UserPage = require("sea.access.http.UserPage")
+local UserSettingsPage = require("sea.access.http.UserSettingsPage")
 local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
 local json = require("web.json")
@@ -47,48 +48,6 @@ function UserResource:new(users, leaderboards, views)
 		["21-03-2025"] = 30,
 		["24-03-2025"] = 40,
 		["25-03-2025"] = 10,
-	}
-
-	self.testScores = {
-		{
-			artist = "Artist",
-			title = "Not very long title but still it's long",
-			name = "Easy",
-			creator = "Someone",
-			timeRate = 1.05,
-			mods = "P2 AltK RD AM7 CH5 BS",
-			accuracy = 0.9013,
-			timeSince = "10 days ago",
-			grade = "S",
-			rating = "30.10",
-			ratingPostfix = "ENPS"
-		},
-		{
-			artist = "A",
-			title = "Short title!",
-			name = "Insane",
-			creator = "( ͡° ͜ʖ ͡°)",
-			timeRate = 1,
-			mods = "",
-			accuracy = 0.9459,
-			timeSince = "1 year ago",
-			grade = "A",
-			rating = "517",
-			ratingPostfix = "PP"
-		},
-		{
-			artist = "I hate short titles",
-			title = "This text means nothing this text means nothing this text means nothing this text means nothing this text means nothing",
-			name = "123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123 123",
-			creator = "( ͡° ͜ʖ ͡°)",
-			timeRate = 1,
-			mods = "P2 AltK RD AM7 CH5 BS",
-			accuracy = 0.9459,
-			timeSince = "1 year ago",
-			grade = "X",
-			rating = "34.34",
-			ratingPostfix = "MSD"
-		}
 	}
 end
 
@@ -187,7 +146,10 @@ end
 function UserResource:getUserSettings(req, res, ctx)
 	ctx.user = self.users:getUser(tonumber(ctx.path_params.user_id))
 
-	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.user, ctx.time) then
+	local page = UserSettingsPage(ctx.session_user, ctx.user)
+	ctx.page = page
+
+	if not page:canUpdate() then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return

@@ -209,6 +209,12 @@ function Users:updateUser(user, user_update, time)
 		return nil, "not allowed"
 	end
 
+	if not self.users_access:canUpdateNameGradient(user, target_user, time) then
+		user_update.color_left = 0
+		user_update.color_right = 0
+		user_update.enable_gradient = false
+	end
+
 	return self.users_repo:updateUser(user_update)
 end
 

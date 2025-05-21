@@ -62,12 +62,12 @@
 						</div>
 						]]
 
-						local donator = user:hasRole("donator", time)
+						local can_update_gradient = page:canUpdateNameGradient()
 
 						local color_left_hex = "#cf9ceb"
 						local color_right_hex = "#ee93bd"
 
-						if donator then
+						if can_update_gradient then
 							color_left_hex = ("#%06x"):format(user.color_left or 13213679)
 							color_right_hex = ("#%06x"):format(user.color_right or 15373511)
 						end
@@ -121,7 +121,7 @@
 						<p class="subtitle">Make sure it's visible on light and dark theme</p>
 					</div>
 					<div class="form">
-						<div <%- not donator and "class='content-disabled'" %>>
+						<div <%- not can_update_gradient and "class='content-disabled'" %>>
 							<div class="block">
 								<div class="field">
 									<div class="control">
@@ -155,7 +155,7 @@
 							</div>
 							<%- save_button %>
 						</div>
-						<% if not donator then %>
+						<% if not can_update_gradient then %>
 							<div class="content-disabled-message">
 								<div class="content">
 									<h2>Supporter-only feature</h2>
