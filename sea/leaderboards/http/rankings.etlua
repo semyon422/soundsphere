@@ -1,5 +1,6 @@
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
 <% local util = require("web.http.util") %>
+<% local format = require("sea.shared.format") %>
 
 <section class="hero">
 	<div class="hero-body">
@@ -146,6 +147,7 @@
 							<th></th>
 							<th></th>
 							<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
+							<th>Accuracy</th>
 							<th>Plays</th>
 						</thead>
 						<tbody>
@@ -173,7 +175,8 @@
 									<td align="left" class="ranking-table__main-cell">
 										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
 									</td>
-									<td class="ranking-table__more-padding has-background"><%= ("%0.2f"):format(leaderboard_user.total_rating) %></td>
+									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
+									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
 								</tr>
 							<% end %>
