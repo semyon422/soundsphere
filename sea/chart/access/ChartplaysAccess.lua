@@ -12,6 +12,9 @@ ChartplaysAccess.submit_interval = 30
 ---@return boolean?
 ---@return string?
 function ChartplaysAccess:canSubmit(user, time, last_chartplay)
+	if user.is_banned then
+		return false
+	end
 	if not last_chartplay then
 		return true
 	end
