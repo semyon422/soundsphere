@@ -116,6 +116,8 @@ function UserResource:getUser(req, res, ctx)
 
 	ctx.query.scores = ctx.query.scores or "top"
 
+	ctx.general_stats = page:getGeneralStats(user.id)
+
 	ctx.main_container_type = "none"
 	ctx.edit_description = page:canUpdate() and ctx.query.edit_description == "true"
 	ctx.leaderboards = self.leaderboards:getLeaderboards()

@@ -135,20 +135,35 @@ function UserPage:formatRole()
 	return ""
 end
 
+---@param user_id integer
 ---@return {label: string, value: string}[]
-function UserPage:getGeneralStats()
+function UserPage:getGeneralStats(user_id)
+	local lb_id = 1
+	local lb = self.leaderboards:getLeaderboard(lb_id)
+	local lb_user = self.leaderboards:getLeaderboardUser(lb_id, user_id)
+
+	if not lb_user or not lb then
+		return {}
+	end
+
 	local cells = {}
+
+	table.insert(cells, {
+		label = RatingCalc:postfix(lb.rating_calc):upper(),
+		value = lb_user.total_rating,
+	})
+
 	-- TODO: Get these values from the main leaderboard.
 	-- TODO: People have their preferences in rating calculators, let them choose one or two options in the settings. This is a personal option.
-	table.insert(cells, {label = "PP", value = "15028"})
-	table.insert(cells, {label = "MSD", value = "33.42"})
+	-- table.insert(cells, {label = "PP", value = "15028"})
+	-- table.insert(cells, {label = "MSD", value = "33.42"})
 
 	-- Accuracy should always be displayed
-	table.insert(cells, {label = "Accuracy", value = "90.81%"})
+	-- table.insert(cells, {label = "Accuracy", value = "90.81%"})
 
 	-- The owner of the profile decides which dans to display
-	table.insert(cells, {label = "4K Regular dan", value = "Delta"})
-	table.insert(cells, {label = "Satellite", value = "Lv.6"})
+	-- table.insert(cells, {label = "4K Regular dan", value = "Delta"})
+	-- table.insert(cells, {label = "Satellite", value = "Lv.6"})
 
 	return cells
 end

@@ -1,4 +1,5 @@
 <% local util = require("web.http.util") %>
+<% local format = require("sea.shared.format") %>
 
 <div class="is-hidden-mobile" style="position:relative;">
 	<%
@@ -143,13 +144,12 @@
 				<div class="block">
 					<nav class="level">
 						<%
-							local stats_cells = page:getGeneralStats()
-							for _, cell in ipairs(stats_cells) do
+							for _, cell in ipairs(general_stats) do
 						%>
 							<div class="level-item has-text-centered">
 								<div>
 									<p class="heading"><%= cell.label %></p>
-									<p class="title"><%= cell.value %></p>
+									<p class="title"><%= format.float4(cell.value) %></p>
 								</div>
 							</div>
 						<% end %>
