@@ -52,8 +52,8 @@ function RankingsResource:getRankings(req, res, ctx)
 		local lbs = self.leaderboards
 		ctx.leaderboards = lbs:getLeaderboards()
 		ctx.leaderboard = lbs:getLeaderboard(leaderboard_id)
-		ctx.page_count = math.ceil(lbs:getLeaderboardUsersCount(leaderboard_id) / per_page)
-		page = math.min(page, ctx.page_count)
+		ctx.pages_count = math.ceil(lbs:getLeaderboardUsersCount(leaderboard_id) / per_page)
+		page = math.min(page, ctx.pages_count)
 		ctx.leaderboard_users = lbs:getLeaderboardUsersFull(leaderboard_id, per_page, (page - 1) * per_page)
 	else
 		local order = "chartplays_count"
@@ -62,12 +62,12 @@ function RankingsResource:getRankings(req, res, ctx)
 		elseif ranking_type == "play_time" then
 			order = "play_time"
 		end
-		ctx.page_count = math.ceil(self.users:getUsersCount() / per_page)
-		page = math.min(page, ctx.page_count)
+		ctx.pages_count = math.ceil(self.users:getUsersCount() / per_page)
+		page = math.min(page, ctx.pages_count)
 		ctx.users = self.users:getUsers(order, per_page, (page - 1) * per_page)
 	end
 
-	ctx.page = page
+	ctx.page_num = page
 
 	-- local first = (page - 1) * self.users_per_page
 	-- local last = math.min(first + self.users_per_page, #self.testUsers)

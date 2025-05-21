@@ -198,7 +198,7 @@
 						<tbody>
 							<% for i, user in ipairs(users) do %>
 								<tr class="has-text">
-									<td>#<%= i + (page - 1) * users_per_page %></td>
+									<td>#<%= i + (page_num - 1) * users_per_page %></td>
 									<td class="ranking-table__flag-cell">
 										<div class="fi-<%= user.flag %>"></div>
 									</td>
@@ -223,21 +223,21 @@
 			<div class="block">
 				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
 					<ul class="pagination-list">
-						<% if page ~= 1 then %>
-							<% if page ~= 2 then %>
+						<% if page_num ~= 1 then %>
+							<% if page_num ~= 2 then %>
 								<li><a href="?<%= util.query(query, {page = 1}) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
 								<li><span class="pagination-ellipsis">&hellip;</span></li>
 							<% end %>
-							<li><a href="?<%= util.query(query, {page = page - 1}) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
+							<li><a href="?<%= util.query(query, {page = page_num - 1}) %>" class="pagination-link" aria-label="Goto page <%= page_num - 1 %>"><%= page_num - 1 %></a></li>
 						<% end %>
 						<li>
-						<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
+						<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page_num %></a>
 						</li>
-						<% if page ~= page_count then %>
-							<li><a href="?<%= util.query(query, {page = page + 1}) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
-							<% if page ~= page_count - 1 then %>
+						<% if page_num ~= pages_count then %>
+							<li><a href="?<%= util.query(query, {page = page_num + 1}) %>" class="pagination-link" aria-label="Goto page <%= page_num + 1 %>"><%= page_num + 1 %></a></li>
+							<% if page_num ~= pages_count - 1 then %>
 								<li><span class="pagination-ellipsis">&hellip;</span></li>
-								<li><a href="?<%= util.query(query, {page = page_count}) %>" class="pagination-link"><%= page_count %></a></li>
+								<li><a href="?<%= util.query(query, {page = pages_count}) %>" class="pagination-link"><%= pages_count %></a></li>
 							<% end %>
 						<% end %>
 					</ul>
