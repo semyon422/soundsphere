@@ -22,18 +22,30 @@ end
 ---@param ctx sea.RequestContext
 function ChartResource:getPage(req, res, ctx)
 	local chartmeta = {
-		artist = "Artist not unicode",
-		artist_unicode = "Artist unicode",
-		title = "Title not unicode",
-		title_unicode = "Title unicode",
+		artist = "Artist",
+		artist_unicode = "Artist",
+		title = "Title",
+		title_unicode = "Title",
+		tags = "tag1 tag2 tag3",
 		creator = "Creator",
-		name = "Diff",
+		name = "Insane",
 		source = "Source",
 		inputmode = "4key",
 		tempo = 120,
 		tempo_avg = 120,
 		tempo_min = 60,
-		tempo_max = 240
+		tempo_max = 240,
+		osu_beatmapset_id = 2352142,
+		format = "osu",
+	}
+
+	local chartdiff = {
+		duration = 140,
+		enps_diff = 20,
+		osu_diff = 7,
+		msd_diff = 35,
+		judges_count = 90,
+		notes_count = 50
 	}
 
 	local cpv = Chartplay()
@@ -52,7 +64,7 @@ function ChartResource:getPage(req, res, ctx)
 
 	local chartplays = {cpv}
 
-	ctx.chart_page = ChartPage(ctx.session_user, chartmeta, chartplays)
+	ctx.chart_page = ChartPage(ctx.session_user, chartmeta, chartdiff, chartplays)
 
 	self.views:render_send(res, "sea/chart/http/chart.etlua", ctx, true)
 end
