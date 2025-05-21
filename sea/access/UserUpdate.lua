@@ -33,11 +33,7 @@ local validate_user_update = valid.struct({
 ---@return true?
 ---@return string[]?
 function UserUpdate:validate()
-	local ok, errs = validate_user_update(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return valid.flatten(validate_user_update(self))
 end
 
 return UserUpdate
