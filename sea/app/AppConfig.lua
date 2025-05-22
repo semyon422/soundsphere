@@ -9,6 +9,7 @@ local AppConfig = {
 	recaptcha = {
 		site_key = "",
 		secret_key = "",
+		required_score = 0.5,
 	},
 
 	multiplayer = {

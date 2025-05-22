@@ -31,7 +31,7 @@ local App = class()
 function App:new(app_config)
 	self.app_db = ServerSqliteDatabase(LjsqliteDatabase())
 	self.sessions = Sessions("sea", app_config.sessions_secret)
-	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key)
+	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key, app_config.recaptcha.required_score)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
