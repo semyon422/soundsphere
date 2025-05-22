@@ -302,6 +302,7 @@ end
 
 function GameplayController:retry()
 	local rhythmModel = self.rhythmModel
+	local replayBase = self.replayBase
 
 	rhythmModel.inputManager:setMode("external")
 	self.replayModel:setMode("record")
@@ -312,6 +313,10 @@ function GameplayController:retry()
 	self.pauseModel:load()
 	self.replayModel:load()
 	self.resourceModel:rewind()
+
+	local timings = assert(replayBase.timings or self.computeContext.chartmeta.timings)
+	self.rhythmModel.scoreEngine:createAndSelectByTimings(timings, replayBase.subtimings)
+
 	self:play()
 end
 
