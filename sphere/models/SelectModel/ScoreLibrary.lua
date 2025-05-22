@@ -87,7 +87,12 @@ ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
 ---@param chartview table
 ---@param exact boolean?
 function ScoreLibrary:updateItemsOnline(chartview, exact)
-	local remote = self.onlineModel.authManager.sea_client.remote
+	local sea_client = self.onlineModel.authManager.sea_client
+	if not sea_client.connected then
+		return
+	end
+
+	local remote = sea_client.remote
 
 	---@type sea.Chartplay[]?, string?
 	local chartplays, err

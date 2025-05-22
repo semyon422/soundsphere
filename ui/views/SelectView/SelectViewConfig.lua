@@ -35,10 +35,14 @@ end
 local function Header(self)
 	local w, h = Layout:move("column1", "header")
 
-	local username = self.game.configModel.configs.online.user.name or "Not logged in"
-	local session = self.game.configModel.configs.online.session
+	---@type sphere.GameController
+	local game = self.game
+
+	local sea_client = game.seaClient
+	local username = sea_client.user and sea_client.user.name or "Not logged in"
+
 	just.row(true)
-	if UserInfoView:draw(w, h, username, not not (session and next(session))) then
+	if UserInfoView:draw(w, h, username, sea_client.connected) then
 		self.gameView:setModal(require("ui.views.OnlineView"))
 	end
 	just.offset(0)

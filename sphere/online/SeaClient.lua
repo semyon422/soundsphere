@@ -90,6 +90,7 @@ function SeaClient:load(url, on_connect)
 		while true do
 			local state = self.sphws_ret:getState()
 			if state ~= "open" then
+				self.user = nil
 				print("connecting to websocket")
 				local ok, err = self.sphws_ret:connect(url)
 				if not ok then
@@ -101,6 +102,7 @@ function SeaClient:load(url, on_connect)
 					self.server_peer.ws = self.sphws_ret.ws
 					print("connected")
 					on_connect()
+					self.user = self.remote:getUser()
 				end
 			end
 			delay.sleep(1)
