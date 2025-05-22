@@ -47,7 +47,7 @@ end
 ---@param ctx sea.RequestContext
 function AuthResource:getLogin(req, res, ctx)
 	ctx.recaptcha_site_key = self.recaptcha.site_key
-	ctx.is_login_captcha_enabled = self.is_login_captcha_enabled
+	ctx.is_captcha_enabled = self.is_login_captcha_enabled
 
 	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/login.etlua", ctx, true)
@@ -78,7 +78,7 @@ function AuthResource:login(req, res, ctx)
 	end
 
 	ctx.recaptcha_site_key = self.recaptcha.site_key
-	ctx.is_login_captcha_enabled = self.is_login_captcha_enabled
+	ctx.is_captcha_enabled = self.is_login_captcha_enabled
 
 	if self.is_login_captcha_enabled then
 		local ok, err = self.recaptcha:verify(ctx.ip, body_params, "login")
@@ -156,7 +156,7 @@ end
 ---@param ctx sea.RequestContext
 function AuthResource:getRegister(req, res, ctx)
 	ctx.recaptcha_site_key = self.recaptcha.site_key
-	ctx.is_register_captcha_enabled = self.is_register_captcha_enabled
+	ctx.is_captcha_enabled = self.is_register_captcha_enabled
 
 	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/access/http/register.etlua", ctx, true)
@@ -201,7 +201,7 @@ function AuthResource:register(req, res, ctx)
 	end
 
 	ctx.recaptcha_site_key = self.recaptcha.site_key
-	ctx.is_register_captcha_enabled = self.is_register_captcha_enabled
+	ctx.is_captcha_enabled = self.is_register_captcha_enabled
 
 	if self.is_register_captcha_enabled then
 		local ok, err = self.recaptcha:verify(ctx.ip, body_params, "register")
