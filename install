@@ -4,7 +4,6 @@ source ./aqua/env/openresty_setenv
 luarocks install luasocket
 luarocks install luaossl
 luarocks install luasec
-luarocks install luautf8
 luarocks install bcrypt
 luarocks install md5
 luarocks install utf8
