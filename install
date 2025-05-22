@@ -16,3 +16,5 @@ luarocks install enet
 
 mkdir -p logs
 mkdir -p temp
+mkdir -p storages/charts
+mkdir -p storages/replays
