@@ -4,7 +4,7 @@ local class = require("class")
 ---@operator call: sphere.IAccuracySource
 local IAccuracySource = class()
 
-IAccuracySource.accuracyMultiplier = 1
+IAccuracySource.accuracy_multiplier = 1
 
 ---@return number
 function IAccuracySource:getAccuracy()

@@ -12,6 +12,7 @@ local Timings = require("sea.chart.Timings")
 ---@operator call: sphere.LunaticRaveScore
 local LunaticRaveScore = ScoreSystem + SimpleJudgesSource + IAccuracySource
 
+LunaticRaveScore.accuracy_multiplier = 100
 LunaticRaveScore.judge_names = {"pgreat", "great", "good", "bad", "miss"}
 
 local windows = {
@@ -26,7 +27,6 @@ local weights = {2, 1, 0, 0}
 ---@param rank integer
 function LunaticRaveScore:new(rank)
 	self.timings = Timings("bmsrank", rank)
-	self.accuracyMultiplier = 100
 
 	self.rank = rank
 
@@ -49,7 +49,7 @@ function LunaticRaveScore:getAccuracy()
 end
 
 function LunaticRaveScore:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracyMultiplier)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 ---@param event table

@@ -11,12 +11,13 @@ local Timings = require("sea.chart.Timings")
 ---@operator call: sphere.EtternaAccuracy
 local EtternaAccuracy = ScoreSystem + IAccuracySource
 
+EtternaAccuracy.accuracy_multiplier = 100
+
 local judgeDifficulty = {0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20}
 
 ---@param j integer
 function EtternaAccuracy:new(j)
 	self.timings = Timings("etternaj", j)
-	self.accuracyMultiplier = 100
 
 	self.judge = j
 
@@ -81,7 +82,7 @@ function EtternaAccuracy:getAccuracy()
 end
 
 function EtternaAccuracy:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracyMultiplier)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 function EtternaAccuracy:getSlice()
