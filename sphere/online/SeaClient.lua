@@ -95,7 +95,7 @@ function SeaClient:load(url, on_connect)
 				local ok, err = self.sphws_ret:connect(url)
 				if not ok then
 					self.connected = false
-					print("connection failed")
+					print("connection failed", err)
 					delay.sleep(self.reconnect_interval)
 				else
 					self.connected = true
