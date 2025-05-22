@@ -23,4 +23,9 @@ function UserSettingsPage:canUpdateNameGradient()
 	return self.users_access:canUpdateNameGradient(self.session_user, self.target_user, os.time())
 end
 
+---@return boolean
+function UserSettingsPage:canBan()
+	return self.users_access:canUpdate(self.session_user, self.target_user, os.time())
+end
+
 return UserSettingsPage

@@ -46,6 +46,10 @@ UserResource.routes = {
 		POST = "createUserRole",
 		PATCH = "updateUserRole",
 	}},
+	{"/users/:user_id/ban", {
+		POST = "banUser",
+		DELETE = "unbanUser",
+	}},
 }
 
 ---@param users sea.Users
@@ -496,6 +500,50 @@ function UserResource:updateUserRole(req, res, ctx)
 	end
 
 	res.headers:set("HX-Location", ("/users/%s/roles/%s"):format(user_id, role))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:banUser(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user, err = self.users:updateBanned(ctx.session_user, os.time(), user_id, true)
+	if not user then
+		---@cast err -?
+		res.status = 403
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%s/settings"):format(user_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:unbanUser(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user, err = self.users:updateBanned(ctx.session_user, os.time(), user_id, false)
+	if not user then
+		---@cast err -?
+		res.status = 403
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%s/settings"):format(user_id))
 end
 
 return UserResource

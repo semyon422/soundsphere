@@ -279,9 +279,10 @@ end
 ---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
+---@param is_banned boolean
 ---@return sea.User?
 ---@return string?
-function Users:ban(user, time, target_user_id)
+function Users:updateBanned(user, time, target_user_id, is_banned)
 	if user.id == target_user_id then
 		return nil, "not allowed"
 	end
@@ -296,7 +297,7 @@ function Users:ban(user, time, target_user_id)
 		return nil, "not allowed"
 	end
 
-	target_user.is_banned = true
+	target_user.is_banned = is_banned
 	target_user = self.users_repo:updateUser(target_user)
 
 	return target_user

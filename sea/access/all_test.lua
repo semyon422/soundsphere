@@ -243,7 +243,7 @@ function test.ban(t)
 	local su2, err = users:register(ctx.anon_user, "127.0.0.2", time, user_values)
 	---@cast su2 -?
 
-	local user, err = users:ban(su.user, time, su2.user.id)
+	local user, err = users:updateBanned(su.user, time, su2.user.id, true)
 
 	if not t:assert(user, err) then
 		return
@@ -253,10 +253,10 @@ function test.ban(t)
 	t:eq(user.id, su2.user.id)
 	t:assert(user.is_banned)
 
-	local _, err = users:ban(su.user, 0, su.user.id)
+	local _, err = users:updateBanned(su.user, 0, su.user.id, true)
 	t:eq(err, "not allowed")
 
-	local _, err = users:ban(su.user, 0, 3)
+	local _, err = users:updateBanned(su.user, 0, 3, true)
 	t:eq(err, "not found")
 end
 

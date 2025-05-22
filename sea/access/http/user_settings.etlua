@@ -177,6 +177,23 @@
 			</div>
 		</div>
 	</div>
+	<div class="form-container">
+		<div class="form">
+			<div class="form border-box">
+				<div class="content">
+					<h1 class="title">Admin tools</h1>
+				</div>
+				<% if page:canBan() then %>
+					<% if user.is_banned then %>
+						<a hx-delete="/users/<%= user.id%>/ban" class="button is-link">Unban</a>
+					<% else %>
+						<a hx-post="/users/<%= user.id%>/ban" class="button is-link">Ban</a>
+					<% end %>
+				<% end %>
+				<a href="/users/<%= user.id%>/roles" class="button is-link">Roles</a>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script>
