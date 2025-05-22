@@ -61,7 +61,7 @@ function onSubmit(token) {
 					</div>
 
 					<div class="block">
-						<p>Already registered? <a href="/login">Log in</a></p>
+						<p>Already registered? <a hx-boost="false" href="/login">Log in</a></p>
 					</div>
 
 					<div class="field">

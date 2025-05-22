@@ -33,7 +33,7 @@ function onSubmit(token) {
 					</div>
 
 					<div class="block">
-						<p>Not registered? <a href="/register">Sign up</a></p>
+						<p>Not registered? <a hx-boost="false" href="/register">Sign up</a></p>
 					</div>
 
 					<div class="block">
