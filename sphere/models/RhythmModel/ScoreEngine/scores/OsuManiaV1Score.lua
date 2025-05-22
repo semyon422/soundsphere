@@ -16,6 +16,7 @@ local Subtimings = require("sea.chart.Subtimings")
 ---@operator call: sphere.OsuManiaV1Score
 local OsuManiaV1Score = ScoreSystem + IAccuracySource + IScoreSource + SimpleJudgesSource
 
+OsuManiaV1Score.accuracy_multiplier = 100
 OsuManiaV1Score.judge_names = {"perfect", "great", "good", "ok", "meh", "miss"}
 
 local hitBonus = {2, 1, -8, -24, -44, -100}
@@ -183,7 +184,7 @@ function OsuManiaV1Score:getAccuracy()
 end
 
 function OsuManiaV1Score:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * 100)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 function OsuManiaV1Score:getSlice()

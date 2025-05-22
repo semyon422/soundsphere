@@ -12,6 +12,7 @@ local Timings = require("sea.chart.Timings")
 ---@operator call: sphere.QuaverScore
 local QuaverScore = ScoreSystem + IAccuracySource + SimpleJudgesSource
 
+QuaverScore.accuracy_multiplier = 100
 QuaverScore.judge_names = {"marvelous", "perfect", "great", "good", "okay", "miss"}
 
 local stdWindows = {0.018, 0.043, 0.076, 0.106, 0.127, 0.164}
@@ -56,7 +57,7 @@ function QuaverScore:getAccuracy()
 end
 
 function QuaverScore:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * 100)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 function QuaverScore:getSlice()

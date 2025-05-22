@@ -4,6 +4,8 @@ local class = require("class")
 ---@operator call: sphere.IScoreSource
 local IScoreSource = class()
 
+IScoreSource.score_multiplier = 1
+
 ---@return number
 function IScoreSource:getScore()
 	error("not implemented")
