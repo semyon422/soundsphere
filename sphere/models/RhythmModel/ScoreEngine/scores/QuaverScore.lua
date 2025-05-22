@@ -19,6 +19,7 @@ local weights = {100, 98.25, 65, 25, -100, -50}
 
 function QuaverScore:new()
 	self.timings = Timings("quaver")
+	self.accuracyMultiplier = 100
 	self.judge_counter = JudgeCounter(6)
 	self.judge_windows = JudgeWindows(stdWindows)
 	self.judge_accuracy = JudgeAccuracy(weights)
@@ -56,7 +57,7 @@ function QuaverScore:getAccuracy()
 end
 
 function QuaverScore:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * 100)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracyMultiplier)
 end
 
 function QuaverScore:getSlice()

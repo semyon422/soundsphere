@@ -26,6 +26,7 @@ local weights = {2, 1, 0, 0}
 ---@param rank integer
 function LunaticRaveScore:new(rank)
 	self.timings = Timings("bmsrank", rank)
+	self.accuracyMultiplier = 100
 
 	self.rank = rank
 
@@ -48,7 +49,7 @@ function LunaticRaveScore:getAccuracy()
 end
 
 function LunaticRaveScore:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * 100)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracyMultiplier)
 end
 
 ---@param event table

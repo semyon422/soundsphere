@@ -16,6 +16,7 @@ local judgeDifficulty = {0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20}
 ---@param j integer
 function EtternaAccuracy:new(j)
 	self.timings = Timings("etternaj", j)
+	self.accuracyMultiplier = 100
 
 	self.judge = j
 
@@ -80,7 +81,7 @@ function EtternaAccuracy:getAccuracy()
 end
 
 function EtternaAccuracy:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * 100)
+	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracyMultiplier)
 end
 
 function EtternaAccuracy:getSlice()

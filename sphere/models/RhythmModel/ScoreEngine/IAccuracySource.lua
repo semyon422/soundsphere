@@ -4,6 +4,8 @@ local class = require("class")
 ---@operator call: sphere.IAccuracySource
 local IAccuracySource = class()
 
+IAccuracySource.accuracyMultiplier = 1
+
 ---@return number
 function IAccuracySource:getAccuracy()
 	error("not implemented")
