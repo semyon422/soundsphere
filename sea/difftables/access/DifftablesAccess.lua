@@ -5,9 +5,10 @@ local class = require("class")
 local DifftablesAccess = class()
 
 ---@param user sea.User
+---@param time integer
 ---@return boolean
-function DifftablesAccess:canManage(user)
-	return true
+function DifftablesAccess:canManage(user, time)
+	return user:hasRole("admin", time)
 end
 
 return DifftablesAccess

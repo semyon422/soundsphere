@@ -4,6 +4,7 @@ local TeamsRepo = require("sea.teams.repos.TeamsRepo")
 local Teams = require("sea.teams.Teams")
 local Team = require("sea.teams.Team")
 local User = require("sea.access.User")
+local UserRole = require("sea.access.UserRole")
 
 local function create_test_ctx()
 	local db = ServerSqliteDatabase(LjsqliteDatabase())
@@ -21,8 +22,16 @@ local function create_test_ctx()
 	local teams = Teams(teams_repo)
 	local user = User()
 	user.id = 1
+	user.user_roles = {UserRole("admin", 0)}
+	user.play_time = 1e6
 
-	local team, err = assert(teams:create(user, "Team 1", "T1", "open"))
+	local team_values = Team()
+	team_values.name = "Team 1"
+	team_values.alias = "T1"
+	team_values.description = ""
+	team_values.type = "open"
+
+	local team, err = assert(teams:create(user, team_values))
 
 	return {
 		db = db,
@@ -57,7 +66,7 @@ function test.join_open(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -81,7 +90,7 @@ function test.join_open_by_invite_1(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -107,7 +116,7 @@ function test.join_open_by_invite_2(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -133,7 +142,7 @@ function test.join_open_double_invite(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -153,7 +162,7 @@ function test.join_request(t)
 
 	local team = ctx.team
 	team.type = "request"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -184,7 +193,7 @@ function test.join_double_request(t)
 
 	local team = ctx.team
 	team.type = "request"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -207,7 +216,7 @@ function test.join_request_revoke(t)
 
 	local team = ctx.team
 	team.type = "request"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -237,7 +246,7 @@ function test.join_invite(t)
 
 	local team = ctx.team
 	team.type = "invite"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -270,7 +279,7 @@ function test.join_invite_revoke(t)
 
 	local team = ctx.team
 	team.type = "invite"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -302,7 +311,7 @@ function test.leave(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()
@@ -321,7 +330,7 @@ function test.leave(t)
 	t:eq(#teams:getInviteTeamUsers(ctx.user, team), 0)
 
 	team.type = "request"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	t:assert(teams:join(new_user, team))
@@ -350,7 +359,7 @@ function test.transferOwner(t)
 
 	local team = ctx.team
 	team.type = "open"
-	team = teams:update(ctx.user, team)
+	team = teams:update(ctx.user, team.id, team)
 	---@cast team -?
 
 	local new_user = User()

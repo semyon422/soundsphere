@@ -40,4 +40,11 @@ function UsersAccess:canChangeRole(user, time, role)
 	return Roles:compare(roles, {role})
 end
 
+---@param user sea.User
+---@param time integer
+---@return boolean
+function UsersAccess:isStaff(user, time)
+	return user:hasRole("moderator", time)
+end
+
 return UsersAccess

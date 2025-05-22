@@ -13,13 +13,13 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`chartfiles_upload_size` INTEGER NOT NULL,
 	`chartplays_upload_size` INTEGER NOT NULL,
 	`play_time` INTEGER NOT NULL,
-	`enable_gradient` INTEGER,
-	`color_left` INTEGER,
-	`color_right` INTEGER,
-	`avatar` TEXT,
-	`banner` TEXT,
-	`discord` TEXT,
-	`custom_link` TEXT,
+	`enable_gradient` INTEGER NOT NULL,
+	`color_left` INTEGER NOT NULL,
+	`color_right` INTEGER NOT NULL,
+	`avatar` TEXT NOT NULL,
+	`banner` TEXT NOT NULL,
+	`discord` TEXT NOT NULL,
+	`custom_link` TEXT NOT NULL,
 	UNIQUE(`name`),
 	UNIQUE(`email`)
 );
@@ -118,40 +118,40 @@ CREATE TABLE IF NOT EXISTS `leaderboard_users` (
 
 CREATE TABLE IF NOT EXISTS `leaderboard_difftables` (
 	`id` INTEGER PRIMARY KEY,
-	`leaderboard_id` INTEGER,
-	`difftable_id` INTEGER,
+	`leaderboard_id` INTEGER NOT NULL,
+	`difftable_id` INTEGER NOT NULL,
 	UNIQUE(`leaderboard_id`, `difftable_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `difftables` (
 	`id` INTEGER PRIMARY KEY,
-	`name` TEXT,
-	`description` TEXT,
-	`symbol` TEXT,
-	`created_at` INTEGER,
+	`name` TEXT NOT NULL,
+	`description` TEXT NOT NULL,
+	`symbol` TEXT NOT NULL,
+	`created_at` INTEGER NOT NULL,
 	UNIQUE(`name`)
 );
 
 CREATE TABLE IF NOT EXISTS `difftable_chartmetas` (
 	`id` INTEGER PRIMARY KEY,
-	`user_id` INTEGER,
+	`user_id` INTEGER NOT NULL,
 	`difftable_id` INTEGER NOT NULL,
 	`hash` TEXT NOT NULL,
 	`index` INTEGER NOT NULL,
 	`level` REAL NOT NULL,
-	`created_at` INTEGER,
+	`created_at` INTEGER NOT NULL,
 	UNIQUE(`hash`, `index`, `difftable_id`)
 );
 
 CREATE TABLE IF NOT EXISTS `teams` (
 	`id` INTEGER PRIMARY KEY,
-	`name` TEXT,
-	`alias` TEXT,
-	`description` TEXT,
-	`owner_id` INTEGER,
-	`type` INTEGER,
-	`users_count` INTEGER,
-	`created_at` INTEGER,
+	`name` TEXT NOT NULL,
+	`alias` TEXT NOT NULL,
+	`description` TEXT NOT NULL,
+	`owner_id` INTEGER NOT NULL,
+	`type` INTEGER NOT NULL,
+	`users_count` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
 	UNIQUE(`name`),
 	UNIQUE(`alias`)
 );
@@ -160,8 +160,8 @@ CREATE TABLE IF NOT EXISTS `team_users` (
 	`id` INTEGER PRIMARY KEY,
 	`team_id` INTEGER NOT NULL,
 	`user_id` INTEGER NOT NULL,
-	`is_accepted` INTEGER,
-	`is_invitation` INTEGER,
-	`created_at` INTEGER,
+	`is_accepted` INTEGER NOT NULL,
+	`is_invitation` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
 	UNIQUE(`team_id`, `user_id`)
 );

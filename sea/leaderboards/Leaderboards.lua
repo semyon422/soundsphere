@@ -137,7 +137,7 @@ end
 ---@return sea.Leaderboard?
 ---@return string?
 function Leaderboards:create(user, lb_values)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -161,7 +161,7 @@ end
 ---@return sea.Leaderboard?
 ---@return string?
 function Leaderboards:update(user, id, lb_values)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -190,7 +190,7 @@ end
 ---@return true?
 ---@return string?
 function Leaderboards:delete(user, id)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end

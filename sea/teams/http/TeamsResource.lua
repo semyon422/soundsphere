@@ -1,5 +1,6 @@
 local IResource = require("web.framework.IResource")
 local http_util = require("web.http.util")
+local Team = require("sea.teams.Team")
 
 ---@class sea.TeamsResource: web.IResource
 ---@operator call: sea.TeamsResource
@@ -34,7 +35,7 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function TeamsResource:getCreateTeam(req, res, ctx)
-	ctx.can_create = self.teams:canCreate(ctx.session_user)
+	ctx.can_create = self.teams.teams_access:canCreate(ctx.session_user, os.time())
 	ctx.main_container_type = "vertically_centered"
 	self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
 end
@@ -43,7 +44,7 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function TeamsResource:createTeam(req, res, ctx)
-	ctx.can_create = self.teams:canCreate(ctx.session_user)
+	ctx.can_create = self.teams.teams_access:canCreate(ctx.session_user, os.time())
 	ctx.main_container_type = "vertically_centered"
 
 	local body_params, err = http_util.get_form(req)
@@ -54,12 +55,20 @@ function TeamsResource:createTeam(req, res, ctx)
 		return
 	end
 
-	---@cast body_params {[string]: string}
-	local name = body_params.name
-	local alias = body_params.alias
-	local type = body_params.type
+	local team_values = Team()
+	team_values.name = body_params.name
+	team_values.alias = body_params.alias
+	team_values.type = body_params.type
+	team_values.description = ""
 
-	local team, err = self.teams:create(ctx.session_user, name, alias, type)
+	local ok, err = team_values:validate()
+	if not ok then
+		---@cast err -?
+		ctx.creation_error = table.concat(err, ", ")
+		self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
+	end
+
+	local team, err = self.teams:create(ctx.session_user, team_values)
 
 	if not team then
 		ctx.creation_error = err

@@ -116,6 +116,15 @@ function TeamsRepo:getTeamUser(team_id, user_id)
 	})
 end
 
+---@param user_id integer
+---@return sea.TeamUser[]
+function TeamsRepo:getTeamUsersByUserId(user_id)
+	return self.models.team_users:select({
+		user_id = assert(user_id),
+		is_accepted = true,
+	})
+end
+
 ---@param team_user sea.TeamUser
 ---@return sea.TeamUser
 function TeamsRepo:createTeamUser(team_user)

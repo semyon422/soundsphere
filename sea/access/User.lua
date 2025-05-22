@@ -35,6 +35,13 @@ function User:new()
 	self.chartfiles_upload_size = 0
 	self.chartplays_upload_size = 0
 	self.play_time = 0
+	self.enable_gradient = false
+	self.color_left = 0
+	self.color_right = 0
+	self.avatar = ""
+	self.banner = ""
+	self.discord = ""
+	self.custom_link = ""
 
 	self.user_roles = {}
 end

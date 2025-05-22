@@ -5,6 +5,7 @@ local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local User = require("sea.access.User")
+local UserRole = require("sea.access.UserRole")
 
 local test = {}
 
@@ -25,6 +26,7 @@ local function create_test_ctx()
 
 	local user = User()
 	user.id = 1
+	user.user_roles = {UserRole("admin", 0)}
 
 	return {
 		db = db,

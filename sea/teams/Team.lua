@@ -17,12 +17,15 @@ local types = require("sea.shared.types")
 ---@field created_at integer
 local Team = class()
 
+---@param v any
+---@return boolean?
+---@return string?
 local function is_alias(v)
-	local success, err = types.name(v)
-
-	if not success then
+	local ok, err = types.name(v)
+	if not ok then
 		return nil, err
 	end
+	---@cast v string
 
 	local len = v:len()
 
@@ -39,10 +42,7 @@ local validate_team = valid.struct({
 	name = types.name,
 	alias = is_alias,
 	description = types.description,
-	owner_id = types.integer,
 	type = types.new_enum(TeamType),
-	users_count = types.integer,
-	created_at = types.time,
 })
 
 ---@return true?

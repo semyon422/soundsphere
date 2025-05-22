@@ -107,12 +107,10 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function UserResource:updateDescription(req, res, ctx)
-	local user = self.users:getUser(tonumber(ctx.path_params.user_id))
-	local page = UserPage(self.users.users_access, ctx.session_user, user)
-
-	if not page:canUpdate() then
-		res.status = 403
-		res:send("forbidden")
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
 
@@ -136,10 +134,10 @@ function UserResource:updateDescription(req, res, ctx)
 	end
 
 	local user_update = UserUpdate()
-	user_update.id = user.id
+	user_update.id = user_id
 	user_update.description = encoded
 
-	local user, err = self.users:updateUser(user, user_update, ctx.time)
+	local user, err = self.users:updateUser(ctx.session_user, user_update, ctx.time)
 
 	if not user then
 		---@cast err -?
@@ -275,12 +273,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function UserResource:updateEmail(req, res, ctx)
-	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
-		res.status = 404
-		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
-		return
-	end
-
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		---@cast err -?
@@ -289,14 +281,20 @@ function UserResource:updateEmail(req, res, ctx)
 		return
 	end
 
-	local current_password = body_params.current_password ---@type string?
-	local new_email = body_params.new_email ---@type string?
+	local ok, err = valid.format(valid.struct({
+		current_password = types.password,
+		new_email = types.email,
+	})(body_params))
 
-	if not current_password or not new_email then
-		res.status = 400
-		res:send("invalid body params")
+	if not ok then
+		ctx.main_container_type = "vertically_centered"
+		ctx.update_email_error = err
+		self.views:render_send(res, "sea/access/http/user_update_email.etlua", ctx, true)
 		return
 	end
+
+	local current_password = body_params.current_password ---@type string
+	local new_email = body_params.new_email ---@type string
 
 	local user, err = self.users:updateEmail(ctx.session_user, current_password, new_email, ctx.time)
 
@@ -314,12 +312,6 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function UserResource:updatePassword(req, res, ctx)
-	if not self.users.users_access:canUpdateSelf(ctx.session_user, ctx.session_user, ctx.time) then
-		res.status = 404
-		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
-		return
-	end
-
 	local body_params, err = http_util.get_form(req)
 	if not body_params then
 		---@cast err -?
@@ -328,23 +320,25 @@ function UserResource:updatePassword(req, res, ctx)
 		return
 	end
 
-	local current_password = body_params.current_password ---@type string?
-	local new_password = body_params.new_password ---@type string?
-	local confirm_new_password = body_params.confirm_new_password ---@type string?
+	local validate_update_password = valid.wrap_format(valid.struct({
+		current_password = types.password,
+		new_password = types.password,
+		confirm_new_password = function(v)
+			return v == body_params.new_password, "not matching new_password"
+		end,
+	}))
 
-	if not current_password or not new_password or not confirm_new_password then
+	local ok, err = validate_update_password(body_params)
+
+	if not ok then
 		ctx.main_container_type = "vertically_centered"
-		ctx.update_password_error = "invalid body params"
+		ctx.update_password_error = err
 		self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
 		return
 	end
 
-	if confirm_new_password ~= new_password then
-		ctx.main_container_type = "vertically_centered"
-		ctx.update_password_error = "new passwords don't match"
-		self.views:render_send(res, "sea/access/http/user_update_password.etlua", ctx, true)
-		return
-	end
+	local current_password = body_params.current_password ---@type string
+	local new_password = body_params.new_password ---@type string
 
 	local user, err = self.users:updatePassword(ctx.session_user, current_password, new_password, ctx.time)
 

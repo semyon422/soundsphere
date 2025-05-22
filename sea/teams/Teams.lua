@@ -28,41 +28,33 @@ function Teams:getTeam(id)
 end
 
 ---@param user sea.User
----@param name string
----@param alias string
----@param _type sea.TeamType
+---@param team_values sea.Team
 ---@return sea.Team?
 ---@return string?
-function Teams:create(user, name, alias, _type)
-	local can, err = self.teams_access:canCreate(user)
+function Teams:create(user, team_values)
+	local can, err = self.teams_access:canCreate(user, os.time())
 	if not can then
 		return nil, err
 	end
 
-	local team = Team()
-	team.name = name
-	team.alias = alias
-	team.description = ""
-	team.users_count = 0
-	team.owner_id = user.id
-	team.type = _type
-	team.created_at = os.time()
-
-	local ok, err = team:validate()
-	if not ok then
-		---@cast err -?
-		return nil, table.concat(err, ", ")
+	local team_users = self.teams_repo:getTeamUsersByUserId(user.id)
+	if #team_users > 0 then
+		return nil, "user in a team"
 	end
 
-	if self.teams_repo:findByName(name) then
+	if self.teams_repo:findByName(team_values.name) then
 		return nil, "team_name_taken"
 	end
 
-	if self.teams_repo:findByAlias(alias) then
+	if self.teams_repo:findByAlias(team_values.alias) then
 		return nil, "team_alias_taken"
 	end
 
-	team = self.teams_repo:createTeam(team)
+	team_values.users_count = 0
+	team_values.owner_id = user.id
+	team_values.created_at = os.time()
+
+	local team = self.teams_repo:createTeam(team_values)
 
 	local team_user = TeamUser()
 	team_user.is_accepted = true
@@ -77,11 +69,12 @@ function Teams:create(user, name, alias, _type)
 end
 
 ---@param user sea.User
+---@param team_id integer
 ---@param team_values sea.Team
 ---@return sea.Team?
 ---@return string?
-function Teams:update(user, team_values)
-	local team = self.teams_repo:getTeam(team_values.id)
+function Teams:update(user, team_id, team_values)
+	local team = self.teams_repo:getTeam(team_id)
 	if not team then
 		return nil, "not found"
 	end
@@ -433,18 +426,6 @@ end
 ---@return string?
 function Teams:getUserUnacceptedTeamUsers(user)
 	return self.teams_repo:getUserUnacceptedTeamUsers(user.id)
-end
-
----@param user sea.User
----@param team sea.Team
----@return boolean
-function Teams:canUpdate(user, team)
-	return self.teams_access:canUpdate(user, team)
-end
-
----@param user sea.User
-function Teams:canCreate(user)
-	return self.teams_access:canCreate(user)
 end
 
 return Teams

@@ -33,7 +33,7 @@ end
 ---@return sea.Difftable?
 ---@return string?
 function Difftables:create(user, dt_values)
-	local can, err = self.difftables_access:canManage(user)
+	local can, err = self.difftables_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -53,7 +53,7 @@ end
 ---@return sea.Difftable?
 ---@return string?
 function Difftables:update(user, id, dt_values)
-	local can, err = self.difftables_access:canManage(user)
+	local can, err = self.difftables_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -83,7 +83,7 @@ end
 ---@return true?
 ---@return string?
 function Difftables:delete(user, id)
-	local can, err = self.difftables_access:canManage(user)
+	local can, err = self.difftables_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -101,7 +101,9 @@ end
 ---@return sea.DifftableChartmeta?
 ---@return string?
 function Difftables:setDifftableChartmeta(user, difftable_id, hash, index, level)
-	local can, err = self.difftables_access:canManage(user)
+	local time = os.time()
+
+	local can, err = self.difftables_access:canManage(user, time)
 	if not can then
 		return nil, err
 	end
@@ -118,10 +120,12 @@ function Difftables:setDifftableChartmeta(user, difftable_id, hash, index, level
 	end
 
 	dt_cm = DifftableChartmeta()
+	dt_cm.user_id = user.id
 	dt_cm.difftable_id = difftable_id
 	dt_cm.hash = hash
 	dt_cm.index = index
 	dt_cm.level = level
+	dt_cm.created_at = time
 
 	return self.difftables_repo:createDifftableChartmeta(dt_cm)
 end

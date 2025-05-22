@@ -28,4 +28,9 @@ function UserSettingsPage:canBan()
 	return self.users_access:canUpdate(self.session_user, self.target_user, os.time())
 end
 
+---@return boolean
+function UserSettingsPage:canSeeAdminTools()
+	return self.users_access:isStaff(self.session_user, os.time())
+end
+
 return UserSettingsPage

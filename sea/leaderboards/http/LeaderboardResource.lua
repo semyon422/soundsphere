@@ -49,9 +49,18 @@ end
 ---@param ctx sea.RequestContext
 function LeaderboardResource:deleteLeaderboard(req, res, ctx)
 	local leaderboard_id = tonumber(ctx.path_params.leaderboard_id)
+	if not leaderboard_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
 
-	if leaderboard_id then
-		self.leaderboards:delete(ctx.session_user, leaderboard_id)
+	local ok, err = self.leaderboards:delete(ctx.session_user, leaderboard_id)
+	if not ok then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
 	end
 
 	res.status = 302

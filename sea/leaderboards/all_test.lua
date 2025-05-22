@@ -7,6 +7,7 @@ local TotalRating = require("sea.leaderboards.TotalRating")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
+local UserRole = require("sea.access.UserRole")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
@@ -26,6 +27,7 @@ local function create_test_ctx()
 
 	local user = User()
 	user.id = 1
+	user.user_roles = {UserRole("admin", 0)}
 
 	local leaderboard = Leaderboard()
 	leaderboard.name = "Leaderboard 1"
@@ -652,14 +654,19 @@ function test.difftable_filter_single(t)
 	create_chartplay(ctx, {rating = 2, hash = "2"})
 
 	local difftable = models.difftables:create({
-		name = "Ranked list 1"
+		name = "Ranked list 1",
+		description = "",
+		symbol = "x",
+		created_at = 0,
 	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable.id,
+		user_id = 1,
 		hash = "2",
 		index = 1,
 		level = 0,
+		created_at = 0,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable.id}}
@@ -679,21 +686,35 @@ function test.difftable_filter_multiple(t)
 
 	create_chartplay(ctx, {rating = 1})
 
-	local difftable_1 = models.difftables:create({name = "Ranked list 1"})
-	local difftable_2 = models.difftables:create({name = "Ranked list 2"})
+	local difftable_1 = models.difftables:create({
+		name = "Ranked list 1",
+		description = "",
+		symbol = "x",
+		created_at = 0,
+	})
+	local difftable_2 = models.difftables:create({
+		name = "Ranked list 2",
+		description = "",
+		symbol = "y",
+		created_at = 0,
+	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable_1.id,
+		user_id = 1,
 		hash = "",
 		index = 1,
 		level = 1,
+		created_at = 0,
 	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable_2.id,
+		user_id = 1,
 		hash = "",
 		index = 1,
 		level = 2,
+		created_at = 0,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable_1.id}}

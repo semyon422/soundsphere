@@ -1,6 +1,8 @@
 local IResource = require("web.framework.IResource")
 local http_util = require("web.http.util")
 local json = require("web.json")
+local types = require("sea.shared.types")
+local Team = require("sea.teams.Team")
 
 ---@class sea.TeamResource: web.IResource
 ---@operator call: sea.TeamResource
@@ -53,7 +55,7 @@ function TeamResource:getTeamPage(req, res, ctx)
 		ctx.can_manage = true
 	end
 
-	local can_update = self.teams:canUpdate(ctx.session_user, team)
+	local can_update = self.teams.teams_access:canUpdate(ctx.session_user, team)
 
 	local team_users = self.teams:getTeamUsers(team.id)
 	ctx.team_users = team_users and self.teams:preloadUsers(team_users)
@@ -176,7 +178,7 @@ function TeamResource:updateDescription(req, res, ctx)
 		return
 	end
 
-	if not self.teams:canUpdate(ctx.session_user, team) then
+	if not self.teams.teams_access:canUpdate(ctx.session_user, team) then
 		res.status = 403
 		return
 	end
@@ -199,17 +201,18 @@ function TeamResource:updateDescription(req, res, ctx)
 		encoded = ""
 	end
 
-	team.description = encoded
-	local success, err = team:validate()
-
-	if not success then
-		---@cast err string[]
+	local ok, err = types.description(encoded)
+	if not ok then
+		---@cast err -?
 		res.status = 400
-		res:send(table.concat(err, ", "))
+		res:send(err)
 		return
 	end
 
-	self.teams:update(ctx.session_user, team)
+	local team_values = Team()
+	team_values.description = encoded
+
+	self.teams:update(ctx.session_user, team.id, team_values)
 	res.status = 200
 end
 

@@ -1,5 +1,6 @@
 local IResource = require("web.framework.IResource")
 local http_util = require("web.http.util")
+local Team = require("sea.teams.Team")
 
 ---@class sea.TeamEditResource: web.IResource
 ---@operator call: sea.TeamEditResource
@@ -59,7 +60,7 @@ function TeamEditResource:getEditPage(req, res, ctx)
 		return
 	end
 
-	if not self.teams:canUpdate(ctx.session_user, team) then
+	if not self.teams.teams_access:canUpdate(ctx.session_user, team) then
 		res.status = 302
 		res.headers:set("Location", ("/teams/%i"):format(team.id))
 		return
@@ -104,14 +105,16 @@ function TeamEditResource:updateSettings(req, res, ctx)
 		return
 	end
 
-	team.name = body_params.name
-	team.alias = body_params.alias
-	team.type = body_params.type
+	local team_values = Team()
+	team_values.name = body_params.name
+	team_values.alias = body_params.alias
+	team_values.type = body_params.type
+	team_values.description = team.description
 
-	local success, err = team:validate()
+	local ok, err = team_values:validate()
 
-	if success then
-		self.teams:update(ctx.session_user, team)
+	if ok then
+		self.teams:update(ctx.session_user, team.id, team_values)
 		ctx.settings_updated = true
 	else
 		---@cast err string[]
@@ -159,7 +162,7 @@ function TeamEditResource:inviteUser(req, res, ctx)
 	else
 		local invite_users = self.teams:getInviteTeamUsers(ctx.session_user, team)
 		ctx.invite_users = invite_users and self.teams:preloadUsers(invite_users)
-		ctx.invitation_success  = ("Successfully sent an invitation to '%s'"):format(username)
+		ctx.invitation_success = ("Successfully sent an invitation to '%s'"):format(username)
 	end
 
 	self:getEditPage(req, res, ctx)

@@ -5,10 +5,11 @@ local class = require("class")
 local TeamAccess = class()
 
 ---@param user sea.User
+---@param time integer
 ---@return boolean
 ---@return string? error
-function TeamAccess:canCreate(user)
-	if user:isAnon() then
+function TeamAccess:canCreate(user, time)
+	if user:isAnon() or not user:hasRole("donator", time) or user.play_time < 60 * 60 * 48 then
 		return false, "not allowed"
 	end
 	return true

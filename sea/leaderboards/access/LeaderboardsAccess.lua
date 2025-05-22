@@ -5,8 +5,13 @@ local class = require("class")
 local LeaderboardsAccess = class()
 
 ---@param user sea.User
----@return boolean
-function LeaderboardsAccess:canManage(user)
+---@param time integer
+---@return boolean?
+---@return string?
+function LeaderboardsAccess:canManage(user, time)
+	if not user:hasRole("admin", time) then
+		return nil, "not allowed"
+	end
 	return true
 end
 
