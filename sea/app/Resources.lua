@@ -51,7 +51,7 @@ function Resources:new(domain, server_remote, views, sessions)
 	self.auth = AuthResource(sessions, domain.users, views)
 
 	self.users = UsersResource(domain.users, views)
-	self.user = UserResource(domain.users, domain.leaderboards, views)
+	self.user = UserResource(domain.users, domain.user_roles, domain.leaderboards, views)
 
 	self.rankings = RankingsResource(domain.users, domain.leaderboards, views)
 

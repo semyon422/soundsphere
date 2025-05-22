@@ -1,5 +1,7 @@
 local class = require("class")
+local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
+local UserRole = require("sea.access.UserRole")
 
 ---@class sea.UsersRepo
 ---@operator call: sea.UsersRepo
@@ -122,6 +124,14 @@ end
 ---@return sea.UserRole
 function UsersRepo:updateUserRole(user_role)
 	return self.models.user_roles:update(user_role, {id = assert(user_role.id)})[1]
+end
+
+---@param user_role sea.UserRole
+---@return sea.UserRole
+function UsersRepo:updateUserRoleFull(user_role)
+	local values = sql_util.null_keys(UserRole.struct)
+	table_util.copy(user_role, values)
+	return self.models.user_roles:update(values, {id = assert(user_role.id)})[1]
 end
 
 ---@param user_role sea.UserRole

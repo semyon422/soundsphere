@@ -4,6 +4,9 @@ local UserSettingsPage = require("sea.access.http.UserSettingsPage")
 local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
 local json = require("web.json")
+local valid = require("valid")
+local types = require("sea.shared.types")
+local Roles = require("sea.access.Roles")
 
 ---@class sea.UserResource: web.IResource
 ---@operator call: sea.UserResource
@@ -34,13 +37,24 @@ UserResource.routes = {
 	{"/users/:user_id/teams", {
 		GET = "getUserTeams",
 	}},
+	{"/users/:user_id/roles", {
+		GET = "getUserRoles",
+	}},
+	{"/users/:user_id/roles/:role", {
+		GET = "getUserRole",
+		DELETE = "deleteUserRole",
+		POST = "createUserRole",
+		PATCH = "updateUserRole",
+	}},
 }
 
 ---@param users sea.Users
+---@param user_roles sea.UserRoles
 ---@param leaderboards sea.Leaderboards
 ---@param views web.Views
-function UserResource:new(users, leaderboards, views)
+function UserResource:new(users, user_roles, leaderboards, views)
 	self.users = users
+	self.user_roles = user_roles
 	self.leaderboards = leaderboards
 	self.views = views
 
@@ -338,6 +352,150 @@ function UserResource:updatePassword(req, res, ctx)
 	end
 
 	res.headers:set("HX-Location", ("/users/%i/settings"):format(ctx.session_user.id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserRoles(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user = self.users:getUser(user_id)
+	if user:isAnon() then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.user = user
+
+	self.views:render_send(res, "sea/access/http/user_roles.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:createUserRole(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	local role = ctx.path_params.role
+	if not user_id or not types.new_enum(Roles.enum)(role) then
+		res.status = 404
+		res:send("not found")
+		return
+	end
+
+	local user = self.users:getUser(user_id)
+	if user:isAnon() then
+		res.status = 404
+		res:send("not found")
+		return
+	end
+
+	local user_role, err = self.user_roles:createRole(ctx.session_user, os.time(), user_id, role)
+	if not user_role then
+		---@cast err -?
+		res.status = 403
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%s/roles"):format(user_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserRole(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	local role = ctx.path_params.role
+	if not user_id or not types.new_enum(Roles.enum)(role) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user_role = self.user_roles:getRole(user_id, role)
+	local user = self.users:getUser(user_id)
+
+	if user:isAnon() or not user_role then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.user = user
+	ctx.user_role = user_role
+
+	self.views:render_send(res, "sea/access/http/user_role.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:deleteUserRole(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	local role = ctx.path_params.role
+	if not user_id or not types.new_enum(Roles.enum)(role) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user_role, err = self.user_roles:deleteRole(ctx.session_user, os.time(), user_id, role)
+	if not user_role then
+		---@cast err -?
+		res.status = 403
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%s/roles"):format(user_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:updateUserRole(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	local role = ctx.path_params.role
+	if not user_id or not types.new_enum(Roles.enum)(role) then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	---@type sea.UserRole?, string?
+	local user_role, err
+
+	local duration = tonumber(body_params.duration)
+	local unexpire = body_params.unexpire == "true"
+	if duration then
+		user_role, err = self.user_roles:addTimeRole(ctx.session_user, os.time(), user_id, role, duration)
+	elseif unexpire then
+		user_role, err = self.user_roles:makeUnexpirableRole(ctx.session_user, os.time(), user_id, role)
+	end
+
+	if not user_role then
+		---@cast err -?
+		res.status = 403
+		res:send(err)
+		return
+	end
+
+	res.headers:set("HX-Location", ("/users/%s/roles/%s"):format(user_id, role))
 end
 
 return UserResource

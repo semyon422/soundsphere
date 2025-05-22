@@ -1,4 +1,7 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
+local Roles = require("sea.access.Roles")
 
 ---@class sea.UserRole
 ---@operator call: sea.UserRole
@@ -9,6 +12,22 @@ local class = require("class")
 ---@field expires_at integer?
 ---@field total_time integer private
 local UserRole = class()
+
+UserRole.struct = {
+	user_id = types.integer,
+	role = types.new_enum(Roles.enum),
+	started_at = types.integer,
+	expires_at = valid.optional(types.integer),
+	total_time = types.integer,
+}
+
+local validate_user_role = valid.struct(UserRole.struct)
+
+---@return true?
+---@return string?
+function UserRole:validate()
+	return valid.format(validate_user_role(self))
+end
 
 ---@param role sea.Role
 ---@param time integer

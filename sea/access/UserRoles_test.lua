@@ -101,7 +101,10 @@ function test.all(t)
 	--
 
 	user_role, err = user_roles:makeUnexpirableRole(su.user, 0, su.user.id, "moderator")
-	t:assert(user_role, err)
+	if t:assert(user_role, err) then
+		---@cast user_role -?
+		t:eq(user_role.expires_at, nil)
+	end
 
 	_, err = user_roles:makeUnexpirableRole(su.user, 0, su.user.id, "owner")
 	t:eq(err, "not_allowed")
@@ -112,5 +115,7 @@ function test.all(t)
 	_, err = user_roles:makeUnexpirableRole(su.user, 0, 2, "user")
 	t:eq(err, "not_found")
 end
+
+-- TODO: tests with multiple users
 
 return test
