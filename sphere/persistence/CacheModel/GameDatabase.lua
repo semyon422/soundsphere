@@ -27,10 +27,10 @@ end
 
 function GameDatabase:load()
 	local db = self.db
-	local orm = self.orm
 
 	db:open("userdata/data.db")
-	db:exec("PRAGMA foreign_keys = ON;")
+	db:exec("PRAGMA foreign_keys = ON")
+	db:exec("PRAGMA busy_timeout = 10000")
 
 	local ver = db:user_version()
 

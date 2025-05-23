@@ -24,10 +24,12 @@ function ServerSqliteDatabase:remove()
 end
 
 function ServerSqliteDatabase:open()
-	self.db:open(self.path)
-	self.db:exec(io_util.read_file("sea/storage/server/db.sql"))
-	self.db:exec(io_util.read_file("sea/storage/shared/db.sql"))
-	self.db:exec("PRAGMA foreign_keys = ON;")
+	local db = self.db
+	db:open(self.path)
+	db:exec(io_util.read_file("sea/storage/server/db.sql"))
+	db:exec(io_util.read_file("sea/storage/shared/db.sql"))
+	db:exec("PRAGMA foreign_keys = ON")
+	db:exec("PRAGMA busy_timeout = 10000")
 end
 
 function ServerSqliteDatabase:close()
