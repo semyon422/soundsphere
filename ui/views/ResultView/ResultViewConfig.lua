@@ -98,7 +98,7 @@ local function ScoreSources(self)
 	end
 
 	local timings, subtimings = replayModel.replay.timings, replayModel.replay.subtimings
-	if not show then
+	if not show and scoreItem then
 		timings, subtimings = scoreItem.timings, scoreItem.subtimings
 	end
 
