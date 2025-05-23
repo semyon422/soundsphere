@@ -3,8 +3,6 @@ local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 local Chartplays = require("sea.chart.Chartplays")
-local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
-local Leaderboards = require("sea.leaderboards.Leaderboards")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
@@ -40,8 +38,6 @@ local function create_test_ctx()
 	local charts_repo = ChartsRepo(models)
 	local chartfiles_repo = ChartfilesRepo(models)
 
-	local leaderboards = Leaderboards(LeaderboardsRepo(models))
-
 	local charts_storage = TableStorage()
 	local replays_storage = TableStorage()
 
@@ -52,7 +48,6 @@ local function create_test_ctx()
 		charts_repo,
 		chartfiles_repo,
 		compute_data_loader,
-		leaderboards,
 		charts_storage,
 		replays_storage
 	)
@@ -64,7 +59,6 @@ local function create_test_ctx()
 		db = db,
 		charts_repo = charts_repo,
 		chartfiles_repo = chartfiles_repo,
-		leaderboards = leaderboards,
 		chartplays = chartplays,
 		user = user,
 	}

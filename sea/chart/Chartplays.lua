@@ -13,21 +13,18 @@ local Chartplays = class()
 ---@param charts_repo sea.ChartsRepo
 ---@param chartfiles_repo sea.ChartfilesRepo
 ---@param compute_data_loader sea.ComputeDataLoader
----@param leaderboards sea.Leaderboards
 ---@param charts_storage sea.IKeyValueStorage
 ---@param replays_storage sea.IKeyValueStorage
 function Chartplays:new(
 	charts_repo,
 	chartfiles_repo,
 	compute_data_loader,
-	leaderboards,
 	charts_storage,
 	replays_storage
 )
 	self.charts_repo = charts_repo
 	self.chartfiles_repo = chartfiles_repo
 	self.compute_data_loader = compute_data_loader
-	self.leaderboards = leaderboards
 	self.charts_storage = charts_storage
 	self.replays_storage = replays_storage
 	self.chartplays_access = ChartplaysAccess()
@@ -232,10 +229,6 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 	chartplay.compute_state = "valid"
 	chartplay.computed_at = time
 	charts_repo:updateChartplay(chartplay)
-
-	if not chartplay.custom then
-		self.leaderboards:addChartplay(chartplay)
-	end
 
 	return chartplay
 end

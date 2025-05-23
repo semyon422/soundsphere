@@ -191,7 +191,7 @@ end
 
 ---@param user sea.User
 ---@param user_update sea.UserUpdate
----@param time number
+---@param time integer
 ---@return sea.User?
 ---@return string?
 function Users:updateUser(user, user_update, time)
@@ -221,7 +221,7 @@ end
 ---@param user sea.User
 ---@param current_password string
 ---@param new_email string
----@param time number
+---@param time integer
 ---@return sea.User?
 ---@return string?
 function Users:updateEmail(user, current_password, new_email, time)
@@ -251,7 +251,7 @@ end
 ---@param user sea.User
 ---@param current_password string
 ---@param new_password string
----@param time number
+---@param time integer
 function Users:updatePassword(user, current_password, new_password, time)
 	if user:isAnon() then
 		return nil, "not allowed"
@@ -349,6 +349,19 @@ function Users:updateSession(user, session)
 	session = self.users_repo:updateSession(session)
 
 	return session
+end
+
+---@param user sea.User
+---@param time integer
+---@param chartplay sea.Chartplay
+---@param chartdiff sea.Chartdiff
+---@return sea.User?
+---@return string?
+function Users:updateSubmit(user, time, chartplay, chartdiff)
+	user.play_time = user.play_time + chartdiff.duration
+	user.chartplays_count = user.chartplays_count + 1
+	user.latest_activity = time
+	return self.users_repo:updateUser(user)
 end
 
 return Users

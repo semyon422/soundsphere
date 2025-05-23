@@ -11,9 +11,10 @@ local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 ---@operator call: sea.SubmissionServerRemote
 local SubmissionServerRemote = class()
 
----@param chartplays sea.Chartplays
-function SubmissionServerRemote:new(chartplays)
-	self.chartplays = chartplays
+---@param domain sea.Domain
+function SubmissionServerRemote:new(domain)
+	self.domain = domain
+	self.chartplays = domain.chartplays
 end
 
 ---@param chartplay_values sea.Chartplay
@@ -35,7 +36,7 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 
 	local compute_data_loader = ComputeDataLoader(self.remote.compute_data_provider)
 
-	local chartplay, err = self.chartplays:submit(self.user, os.time(), compute_data_loader, chartplay_values, chartdiff_values)
+	local chartplay, err = self.domain:submitChartplay(self.user, os.time(), compute_data_loader, chartplay_values, chartdiff_values)
 	if not chartplay then
 		return nil, "submit: " .. err
 	end

@@ -10,7 +10,7 @@ local ServerRemote = class()
 ---@param sessions web.Sessions
 function ServerRemote:new(domain, sessions)
 	self.auth = AuthServerRemote(domain.users, sessions)
-	self.submission = SubmissionServerRemote(domain.chartplays)
+	self.submission = SubmissionServerRemote(domain)
 end
 
 ---@return sea.User

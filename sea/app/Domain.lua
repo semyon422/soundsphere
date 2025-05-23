@@ -32,13 +32,34 @@ function Domain:new(repos)
 		repos.charts_repo,
 		repos.chartfiles_repo,
 		self.compute_data_loader,
-		self.leaderboards,
 		self.charts_storage,
 		self.replays_storage
 	)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
+end
+
+---@param user sea.User
+---@param time integer
+---@param compute_data_loader sea.ComputeDataLoader
+---@param chartplay_values sea.Chartplay
+---@param chartdiff_values sea.Chartdiff
+---@return sea.Chartplay?
+---@return string?
+function Domain:submitChartplay(user, time, compute_data_loader, chartplay_values, chartdiff_values)
+	local chartplay, err = self.chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
+	if not chartplay then
+		return nil, err
+	end
+
+	if not chartplay.custom then
+		self.leaderboards:addChartplay(chartplay)
+	end
+
+	self.users:updateSubmit(user, time, chartplay_values, chartdiff_values)
+
+	return chartplay
 end
 
 return Domain
