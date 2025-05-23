@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`chartdiffs_count` INTEGER NOT NULL,
 	`chartfiles_upload_size` INTEGER NOT NULL,
 	`chartplays_upload_size` INTEGER NOT NULL,
-	`play_time` INTEGER NOT NULL,
+	`play_time` REAL NOT NULL,
 	`enable_gradient` INTEGER NOT NULL,
 	`color_left` INTEGER NOT NULL,
 	`color_right` INTEGER NOT NULL,
