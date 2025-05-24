@@ -21,6 +21,7 @@ local Roles = require("sea.access.Roles")
 ---@field avatar string
 ---@field banner string
 ---@field discord string
+---@field country_code string
 ---@field custom_link string
 ---relations
 ---@field user_roles sea.UserRole[]
@@ -41,6 +42,7 @@ function User:new()
 	self.avatar = ""
 	self.banner = ""
 	self.discord = ""
+	self.country_code = "kp"
 	self.custom_link = ""
 
 	self.user_roles = {}

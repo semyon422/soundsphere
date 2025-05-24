@@ -1,4 +1,5 @@
 local utf8 = require("utf8")
+local country_codes = require("sea.shared.country_codes")
 
 local types = {}
 
@@ -181,6 +182,29 @@ function types.md5hash(v)
 	end
 
 	return true
+end
+
+function types.country_code(v)
+	if type(v) ~= "string" then
+		return nil, "not a string"
+	end
+
+	---@type integer?
+	local len = utf8.len(v)
+	if not len then
+		return nil, "not a valid UTF-8 string"
+	end
+	if len ~= 2 then
+		return nil, "invalid code length"
+	end
+
+	for _, t in ipairs(country_codes) do
+		if t.code == v then
+			return true
+		end
+	end
+
+	return nil, "country code does not exist"
 end
 
 --------------------------------------------------------------------------------

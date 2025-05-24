@@ -1,3 +1,5 @@
+<% local country_codes = require("sea.shared.country_codes") %>
+
 <style>
 :root {
 	--gradient-left: #ff6b6b;
@@ -90,6 +92,22 @@
 							</span>
 						</div>
 					</div>
+					<div class="field">
+						<label class="label">Country</label>
+						<div class="control">
+							<div class="select">
+								<select name="country_code">
+									<% for _, v in ipairs(country_codes) do %>
+										<% if v.code == user.country_code then %>
+											<option selected value="<%= v.code %>"><%= v.name %></option>
+										<% else %>
+											<option value="<%= v.code %>"><%= v.name %></option>
+										<% end %>
+									<% end %>
+								</select>
+							</div>
+						</div>
+					</div>
 					<%- save_button %>
 					<div class="separator"></div>
 					<div class="content">
@@ -177,25 +195,25 @@
 			</div>
 		</div>
 	</div>
+	<% if page:canSeeAdminTools() then %>
 	<div class="form-container">
 		<div class="form">
 			<div class="form border-box">
-				<% if page:canSeeAdminTools() then %>
-					<div class="content">
-						<h1 class="title">Admin tools</h1>
-					</div>
-					<% if page:canBan() then %>
-						<% if user.is_banned then %>
-							<a hx-delete="/users/<%= user.id%>/ban" class="button is-link">Unban</a>
-						<% else %>
-							<a hx-post="/users/<%= user.id%>/ban" class="button is-link">Ban</a>
-						<% end %>
+				<div class="content">
+					<h1 class="title">Admin tools</h1>
+				</div>
+				<% if page:canBan() then %>
+					<% if user.is_banned then %>
+						<a hx-delete="/users/<%= user.id%>/ban" class="button is-link">Unban</a>
+					<% else %>
+						<a hx-post="/users/<%= user.id%>/ban" class="button is-link">Ban</a>
 					<% end %>
-					<a href="/users/<%= user.id%>/roles" class="button is-link">Roles</a>
 				<% end %>
+				<a href="/users/<%= user.id%>/roles" class="button is-link">Roles</a>
 			</div>
 		</div>
 	</div>
+	<% end %>
 </div>
 
 <script>

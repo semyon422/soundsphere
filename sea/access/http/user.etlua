@@ -30,7 +30,7 @@
 						</div>
 						<div class="block">
 							<div class="user__username-container">
-								<div class="user__table-flag fi-gb user__username-cell"></div>
+								<div class="user__table-flag fi-<%= user.country_code %> user__username-cell"></div>
 								<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
 							</div>
 							<h3 class="is-5" align="center"><%= page:formatRole() %></h3>
