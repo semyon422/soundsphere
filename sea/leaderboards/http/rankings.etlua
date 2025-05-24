@@ -170,7 +170,7 @@
 										<td></td>
 									<% end %>
 									<td class="ranking-table__flag-cell">
-										<div class="fi-<%= user.flag %>"></div>
+										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
 										<a class="has-text-primary-35" href="/users/<%= user.id %>?lb=<%= leaderboard.id %>"><strong><%= user.name %></strong></a>
@@ -203,7 +203,7 @@
 								<tr class="has-text">
 									<td>#<%= i + (page_num - 1) * users_per_page %></td>
 									<td class="ranking-table__flag-cell">
-										<div class="fi-<%= user.flag %>"></div>
+										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
 										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>

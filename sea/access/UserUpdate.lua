@@ -14,6 +14,7 @@ local types = require("sea.shared.types")
 ---@field avatar string
 ---@field banner string
 ---@field discord string
+---@field country_code string
 ---@field custom_link string
 local UserUpdate = class()
 
@@ -27,6 +28,7 @@ local validate_user_update = valid.struct({
 	avatar = valid.optional(types.string),
 	banner = valid.optional(types.string),
 	discord = valid.optional(types.string),
+	country_code = valid.optional(types.country_code),
 	custom_link = valid.optional(types.string),
 })
 

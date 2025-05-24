@@ -173,7 +173,7 @@ function ChartPage:getScores()
 		table.insert(scores, {
 			rank = rank,
 			username = "Username",
-			flag = "gb",
+			country_code = "gb",
 			grade = cpv:getGrade(),
 			accuracy = cpv.accuracy,
 			norm_accuracy = cpv:getNormAccuracy(),

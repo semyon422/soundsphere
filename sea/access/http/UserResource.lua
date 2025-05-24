@@ -247,6 +247,7 @@ function UserResource:updateSettings(req, res, ctx)
 	user_update.enable_gradient = body_params.enable_gradient == "on"
 	user_update.color_left = hex_to_integer(body_params.color_left)
 	user_update.color_right = hex_to_integer(body_params.color_right)
+	user_update.country_code = body_params.country_code
 
 	local ok, errs = user_update:validate()
 

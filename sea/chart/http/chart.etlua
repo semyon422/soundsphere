@@ -141,13 +141,13 @@
 				<td class="ranking-table__more-padding"><strong>#<%= v.rank %></strong></td>
 				<td class="score-grade saira-bold chart-scores__grade" data-grade="<%= v.grade %>"><%= v.grade %></td>
 				<td class="ranking-table__more-padding">
-					<%= ("%0.02f%%"):format(v.accuracy * 100) %>
+					<strong><%= ("%0.02f%%"):format(v.accuracy * 100) %></strong>
 				</td>
 				<td><%= v.perfect_count %></td>
 				<td><%= v.not_perfect_count %></td>
 				<td><%= v.miss_count %></td>
 				<td class="ranking-table__flag-cell chart-scores__flag-padding">
-					<div class="fi-<%= v.flag %>"></div>
+					<div class="fi-<%= v.country_code %>"></div>
 				</td>
 				<td align="left" class="ranking-table__main-cell"><%= v.username %></td>
 				<td class="ranking-table__more-padding"><%= v.modifiers %></td>

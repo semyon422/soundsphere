@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`avatar` TEXT NOT NULL,
 	`banner` TEXT NOT NULL,
 	`discord` TEXT NOT NULL,
+	`country_code` TEXT NOT NULL,
 	`custom_link` TEXT NOT NULL,
 	UNIQUE(`name`),
 	UNIQUE(`email`)
