@@ -294,8 +294,8 @@ function UserResource:updateEmail(req, res, ctx)
 		return
 	end
 
-	local current_password = body_params.current_password ---@type string
-	local new_email = body_params.new_email ---@type string
+	local current_password = body_params.current_password
+	local new_email = body_params.new_email
 
 	local user, err = self.users:updateEmail(ctx.session_user, current_password, new_email, ctx.time)
 
@@ -338,8 +338,8 @@ function UserResource:updatePassword(req, res, ctx)
 		return
 	end
 
-	local current_password = body_params.current_password ---@type string
-	local new_password = body_params.new_password ---@type string
+	local current_password = body_params.current_password
+	local new_password = body_params.new_password
 
 	local user, err = self.users:updatePassword(ctx.session_user, current_password, new_password, ctx.time)
 
