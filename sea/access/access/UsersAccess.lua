@@ -47,4 +47,11 @@ function UsersAccess:isStaff(user, time)
 	return user:hasRole("moderator", time)
 end
 
+---@param user sea.User
+---@param time integer
+---@return boolean
+function UsersAccess:canCreateAuthCode(user, time)
+	return user:hasRole("owner", time)
+end
+
 return UsersAccess

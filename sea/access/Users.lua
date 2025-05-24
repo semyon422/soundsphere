@@ -5,6 +5,7 @@ local UserInsecure = require("sea.access.UserInsecure")
 local UserLocation = require("sea.access.UserLocation")
 local Session = require("sea.access.Session")
 local SessionInsecure = require("sea.access.SessionInsecure")
+local AuthCode = require("sea.access.AuthCode")
 
 ---@class sea.Users
 ---@operator call: sea.Users
@@ -16,9 +17,11 @@ Users.ip_register_delay = 24 * 60 * 60
 
 ---@param users_repo sea.UsersRepo
 ---@param password_hasher sea.IPasswordHasher
-function Users:new(users_repo, password_hasher)
+---@param email_sender sea.IEmailSender
+function Users:new(users_repo, password_hasher, email_sender)
 	self.users_repo = users_repo
 	self.password_hasher = password_hasher
+	self.email_sender = email_sender
 	self.users_access = UsersAccess()
 end
 
@@ -276,6 +279,35 @@ function Users:updatePassword(user, current_password, new_password, time)
 	return self.users_repo:updateUser(target_user)
 end
 
+---@param time integer
+---@param code string
+---@param new_password string
+function Users:updatePasswordUsingCode(time, code, new_password)
+	local auth_code = self.users_repo:getAuthCode(code)
+	if not auth_code then
+		return nil, "code not found"
+	elseif auth_code.used then
+		return nil, "code used"
+	elseif auth_code.expires_at < time then
+		return nil, "code expired"
+	end
+
+	local user = self.users_repo:getUser(auth_code.user_id)
+	if not user then
+		return nil, "invalid user"
+	end
+
+	auth_code.used = true
+
+	self.users_repo:updateAuthCode(auth_code)
+
+	local user_insecure = UserInsecure()
+	user_insecure.id = user.id
+	user_insecure.password = self.password_hasher:digest(new_password)
+
+	return self.users_repo:updateUser(user_insecure)
+end
+
 ---@param user sea.User
 ---@param time integer
 ---@param target_user_id integer
@@ -362,6 +394,65 @@ function Users:updateSubmit(user, time, chartplay, chartdiff)
 	user.chartplays_count = user.chartplays_count + 1
 	user.latest_activity = time
 	return self.users_repo:updateUser(user)
+end
+
+---@param user sea.User
+---@param ip string
+---@param time integer
+---@param target_user_id integer?
+---@param _type sea.AuthCodeType
+---@param duration integer
+---@return sea.AuthCode?
+---@return string?
+function Users:createAuthCode(user, ip, time, target_user_id, _type, duration)
+	local can = self.users_access:canCreateAuthCode(user, time)
+	if not can then
+		return nil, "not allowed"
+	end
+
+	local auth_code = AuthCode()
+	auth_code.user_id = target_user_id
+	auth_code.type = _type
+	auth_code.created_at = time
+	auth_code.expires_at = time + duration
+	auth_code.ip = ip
+
+	auth_code = self.users_repo:createAuthCode(auth_code)
+
+	return auth_code
+end
+
+---@param ip string
+---@param email string
+---@param time integer
+---@param duration integer
+---@param rate_limit integer
+---@return string?
+---@return string?
+function Users:createAndSendPasswordResetAuthCode(ip, email, time, duration, rate_limit)
+	local auth_code = self.users_repo:getRecentAuthCodeByIp(ip)
+	if auth_code and auth_code.created_at + rate_limit > time then
+		return nil, "rate limit"
+	end
+
+	local user = self.users_repo:findUserByEmail(email)
+	if not user then
+		-- TODO: log email
+		return nil, "user not found"
+	end
+
+	local auth_code = AuthCode()
+	auth_code.user_id = user.id
+	auth_code.type = "password_reset"
+	auth_code.created_at = time
+	auth_code.expires_at = time + duration
+	auth_code.ip = ip
+
+	auth_code = self.users_repo:createAuthCode(auth_code)
+
+	self.email_sender:send(email, ("password reset code: %s"):format(auth_code.code))
+
+	return auth_code.code
 end
 
 return Users

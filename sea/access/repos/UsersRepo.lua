@@ -219,4 +219,36 @@ function UsersRepo:updateSession(session)
 	return self.models.sessions:update(session, {id = assert(session.id)})[1]
 end
 
+--------------------------------------------------------------------------------
+
+---@param code string
+---@return sea.AuthCode?
+function UsersRepo:getAuthCode(code)
+	return self.models.auth_codes:find({code = assert(code)})
+end
+
+---@param ip string
+---@return sea.AuthCode?
+function UsersRepo:getRecentAuthCodeByIp(ip)
+	return self.models.auth_codes:find({ip = assert(ip)}, {order = {"created_at DESC"}})
+end
+
+---@param auth_code sea.AuthCode
+---@return sea.AuthCode
+function UsersRepo:createAuthCode(auth_code)
+	return self.models.auth_codes:create(auth_code)
+end
+
+---@param auth_code sea.AuthCode
+---@return sea.AuthCode
+function UsersRepo:updateAuthCode(auth_code)
+	return self.models.auth_codes:update(auth_code, {id = assert(auth_code.id)})[1]
+end
+
+---@param id integer
+---@return sea.AuthCode?
+function UsersRepo:deleteAuthCode(id)
+	return self.models.auth_codes:delete({id = assert(id)})[1]
+end
+
 return UsersRepo

@@ -54,6 +54,18 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 	`updated_at` INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS `auth_codes` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER,
+	`type` INTEGER NOT NULL,
+	`created_at` INTEGER NOT NULL,
+	`expires_at` INTEGER NOT NULL,
+	`used` INTEGER NOT NULL,
+	`ip` TEXT NOT NULL,
+	`code` TEXT NOT NULL,
+	UNIQUE(`code`)
+);
+
 CREATE TABLE IF NOT EXISTS `chartfiles` (
 	`id` INTEGER PRIMARY KEY,
 	`hash` TEXT NOT NULL,

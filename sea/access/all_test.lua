@@ -6,6 +6,7 @@ local User = require("sea.access.User")
 local UserInsecure = require("sea.access.UserInsecure")
 local UserUpdate = require("sea.access.UserUpdate")
 local UserRole = require("sea.access.UserRole")
+local FakeEmailSender = require("sea.access.FakeEmailSender")
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
@@ -384,6 +385,69 @@ function test.update_password(t)
 	player = users.users_repo:getUserInsecure(player.id)
 	---@cast player -?
 	t:eq(player.password, "new_password")
+end
+
+---@param t testing.T
+function test.reset_password(t)
+	local ctx = create_test_ctx()
+
+	local email_sender = FakeEmailSender()
+	local users = Users(ctx.users_repo, IPasswordHasher(), email_sender)
+
+	local email = "user@example.com"
+	local email_2 = "user2@example.com"
+
+	local user_values = UserInsecure()
+	user_values.name = "user"
+	user_values.email = email
+	user_values.password = "password"
+
+	local su, err = users:register(ctx.anon_user, "127.0.0.1", 0, user_values)
+	---@cast su -?
+
+	local user = su.user
+
+	local code, err = users:createAndSendPasswordResetAuthCode("127.0.0.1", email_2, 0, 10, 2)
+	t:eq(err, "user not found")
+
+	code, err = users:createAndSendPasswordResetAuthCode("127.0.0.1", email_2, 0, 10, 2)
+	t:eq(err, "user not found")
+
+	t:tdeq(email_sender.emails, {})
+
+	code, err = users:createAndSendPasswordResetAuthCode("127.0.0.1", email, 0, 10, 2)
+	if not t:assert(code, err) then
+		return
+	end
+	---@cast code -?
+
+	t:tdeq(email_sender.emails, {"user@example.com: password reset code: " .. code})
+
+	local _, err = users:updatePasswordUsingCode(0, "qwe", "new_password")
+	t:eq(err, "code not found")
+
+	local _, err = users:updatePasswordUsingCode(20, code, "new_password")
+	t:eq(err, "code expired")
+
+	local ok, err = users:updatePasswordUsingCode(0, code, "new_password")
+	if not t:assert(ok, err) then
+		return
+	end
+
+	user = assert(ctx.users_repo:getUserInsecure(1))
+	t:eq(user.password, "new_password")
+
+	local _, err = users:updatePasswordUsingCode(0, code, "new_password")
+	t:eq(err, "code used")
+
+	local _, err = users:updatePasswordUsingCode(20, code, "new_password")
+	t:eq(err, "code used")
+
+	_, err = users:createAndSendPasswordResetAuthCode("127.0.0.1", email, 0, 10, 2)
+	t:eq(err, "rate limit")
+
+	code, err = users:createAndSendPasswordResetAuthCode("127.0.0.1", email, 2, 10, 2)
+	t:assert(code, err)
 end
 
 return test
