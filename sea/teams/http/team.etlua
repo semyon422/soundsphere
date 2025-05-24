@@ -230,7 +230,7 @@
 									<% local user = team_user.user %>
 									<tr class="has-text">
 										<td class="ranking-table__flag-cell">
-											<div class="fi-gb"></div>
+											<div class="fi-<%= user.country_code %>"></div>
 										</td>
 										<td align="left" class="ranking-table__main-cell">
 											<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>

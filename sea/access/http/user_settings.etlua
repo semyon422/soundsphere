@@ -94,7 +94,7 @@
 					</div>
 					<div class="field">
 						<label class="label">Country</label>
-						<div class="control">
+						<div class="control has-icons-left">
 							<div class="select">
 								<select name="country_code">
 									<% for _, v in ipairs(country_codes) do %>
@@ -105,6 +105,9 @@
 										<% end %>
 									<% end %>
 								</select>
+							</div>
+							<div class="icon is-small is-left">
+								<i class="fas fa-globe"></i>
 							</div>
 						</div>
 					</div>
