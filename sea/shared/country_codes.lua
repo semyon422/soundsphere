@@ -1,4 +1,8 @@
----@class sea.CountryCodes
+---@class sea.CountryCode
+---@field code string
+---@field name string
+
+---@type sea.CountryCode[]
 --- ISO 3166-1 alpha-2
 local t = {
 	{code = "af", name = "Afghanistan"},
