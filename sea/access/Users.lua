@@ -390,9 +390,12 @@ end
 ---@return sea.User?
 ---@return string?
 function Users:updateSubmit(user, time, chartplay, chartdiff)
+	user = assert(self.users_repo:getUser(user.id))
+
 	user.play_time = user.play_time + chartdiff.duration
 	user.chartplays_count = user.chartplays_count + 1
 	user.latest_activity = time
+
 	return self.users_repo:updateUser(user)
 end
 
