@@ -109,6 +109,10 @@ function ComputeContext:computeBase(replayBase)
 
 	assert(state.reorders == 0, "ending reorder modifiers")
 
+	if replayBase.tap_only then
+		self:applyTapOnly()
+	end
+
 	local chartdiff = self:computeChartdiff(chart, replayBase.rate)
 
 	chartdiff.modifiers = replayBase.modifiers
@@ -121,9 +125,6 @@ function ComputeContext:computeBase(replayBase)
 	self.state = state
 
 	self:applyColumnOrder(replayBase.columns_order)
-	if replayBase.tap_only then
-		self:applyTapOnly()
-	end
 
 	return chartdiff, state
 end
