@@ -37,8 +37,8 @@ function User:new()
 	self.chartplays_upload_size = 0
 	self.play_time = 0
 	self.enable_gradient = false
-	self.color_left = 0
-	self.color_right = 0
+	self.color_left = 7128983
+	self.color_right = 4376023
 	self.avatar = ""
 	self.banner = ""
 	self.discord = ""

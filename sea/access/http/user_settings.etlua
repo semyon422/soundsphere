@@ -59,14 +59,8 @@
 						]]
 
 						local can_update_gradient = page:canUpdateNameGradient()
-
-						local color_left_hex = "#cf9ceb"
-						local color_right_hex = "#ee93bd"
-
-						if can_update_gradient then
-							color_left_hex = ("#%06x"):format(user.color_left or 13213679)
-							color_right_hex = ("#%06x"):format(user.color_right or 15373511)
-						end
+						local color_left_hex = ("#%06x"):format(user.color_left)
+						local color_right_hex = ("#%06x"):format(user.color_right)
 					%>
 					<div class="field">
 						<label class="label">Username</label>
