@@ -176,7 +176,7 @@
 										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
-										<%- Username(leaderboard_user, ("/users/%i?lb=%i"):format(user.id, leaderboard.id)) %>
+										<%- Username(leaderboard_user.user, ("/users/%i?lb=%i"):format(user.id, leaderboard.id)) %>
 									</td>
 									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
