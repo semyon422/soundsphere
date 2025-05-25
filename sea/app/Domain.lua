@@ -19,6 +19,9 @@ local Domain = class()
 
 ---@param repos sea.Repos
 function Domain:new(repos)
+	self.users_repo = repos.users_repo
+	self.charts_repo = repos.charts_repo
+
 	self.charts_storage = FolderStorage("storages/charts")
 	self.replays_storage = FolderStorage("storages/replays")
 	self.compute_data_provider = ComputeDataProvider(repos.chartfiles_repo, self.charts_storage, self.replays_storage)
@@ -58,7 +61,15 @@ function Domain:submitChartplay(user, time, compute_data_loader, chartplay_value
 		self.leaderboards:addChartplay(chartplay)
 	end
 
-	self.users:updateSubmit(user, time, chartplay_values, chartdiff_values)
+	user = assert(self.users_repo:getUser(user.id))
+
+	user.latest_activity = time
+	user.play_time = user.play_time + chartdiff_values.duration
+	user.chartplays_count = self.charts_repo:getUserChartplaysCount(user.id)
+	user.chartmetas_count = self.charts_repo:getUserChartmetasCount(user.id)
+	user.chartdiffs_count = self.charts_repo:getUserChartdiffsCount(user.id)
+
+	self.users_repo:updateUser(user)
 
 	return chartplay
 end

@@ -327,4 +327,32 @@ function ChartsRepo:getRecentChartplays(user_id, limit)
 	})
 end
 
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartplaysCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	})
+end
+
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartmetasCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	}, {
+		group = {"hash", "`index`"},
+	})
+end
+
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartdiffsCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	}, {
+		group = {"hash", "`index`", "modifiers", "rate", "mode"},
+	})
+end
+
 return ChartsRepo

@@ -382,22 +382,6 @@ function Users:updateSession(user, session)
 end
 
 ---@param user sea.User
----@param time integer
----@param chartplay sea.Chartplay
----@param chartdiff sea.Chartdiff
----@return sea.User?
----@return string?
-function Users:updateSubmit(user, time, chartplay, chartdiff)
-	user = assert(self.users_repo:getUser(user.id))
-
-	user.play_time = user.play_time + chartdiff.duration
-	user.chartplays_count = user.chartplays_count + 1
-	user.latest_activity = time
-
-	return self.users_repo:updateUser(user)
-end
-
----@param user sea.User
 ---@param ip string
 ---@param time integer
 ---@param target_user_id integer?
