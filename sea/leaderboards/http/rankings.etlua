@@ -159,12 +159,12 @@
 								%>
 								<tr class="has-text">
 									<td>#<%= leaderboard_user.rank %></td>
-									<% if rankChange > 0 then %>
+									<% if rank_change > 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-success">
 											<i class="fa fa-solid fa-arrow-up"></i>
 											<%= rank_change %>
 										</td>
-									<% elseif rankChange < 0 then %>
+									<% elseif rank_change < 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-danger">
 											<i class="fa fa-solid fa-arrow-down"></i>
 											<%= math.abs(rank_change) %>
