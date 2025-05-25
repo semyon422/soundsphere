@@ -40,12 +40,6 @@
 	border-radius: 0.5em;
 }
 
-.username-gradient {
-	background: linear-gradient(90deg, var(--gradient-left), var(--gradient-right));
-	background-clip: text;
-	text-fill-color: transparent;
-	color: transparent;
-}
 </style>
 
 <div class="centered-form">
@@ -167,11 +161,21 @@
 							<div>
 								<div class="has-text-grey">Preview on white</div>
 								<div class="username-preview has-background-light">
-									<span class="username-gradient" id="preview-white"><%= user.name %></span>
+									<span
+										class="text-clip"
+										style="background: linear-gradient(90deg, var(--gradient-left), var(--gradient-right));"
+										id="preview-white">
+										<%= user.name %>
+									</span>
 								</div>
 								<div class="has-text-grey">Preview on dark</div>
 								<div class="username-preview has-background-dark">
-									<span class="username-gradient" id="preview-dark"><%= user.name %></span>
+									<span
+										class="text-clip"
+										style="background: linear-gradient(90deg, var(--gradient-left), var(--gradient-right));"
+										id="preview-white">
+										<%= user.name %>
+									</span>
 								</div>
 							</div>
 							<%- save_button %>

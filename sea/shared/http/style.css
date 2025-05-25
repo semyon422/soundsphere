@@ -181,6 +181,11 @@ main.center-vertically > * {
 	margin: 1em;
 }
 
+.text-clip {
+	background-clip: text !important;
+	color: transparent !important;
+}
+
 .saira-regular {
   font-family: "Saira", sans-serif;
   font-optical-sizing: auto;

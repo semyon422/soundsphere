@@ -1,6 +1,7 @@
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
 <% local util = require("web.http.util") %>
 <% local format = require("sea.shared.format") %>
+<% local Username = require("sea.shared.http.components.Username") %>
 
 <section class="hero">
 	<div class="hero-body">
@@ -152,19 +153,21 @@
 						</thead>
 						<tbody>
 							<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
-								<% local user = leaderboard_user.user %>
-								<% local rankChange = 0 %>
+								<%
+									local user = leaderboard_user.user
+								 	local rank_change = 0
+								%>
 								<tr class="has-text">
 									<td>#<%= leaderboard_user.rank %></td>
 									<% if rankChange > 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-success">
 											<i class="fa fa-solid fa-arrow-up"></i>
-											<%= rankChange %>
+											<%= rank_change %>
 										</td>
 									<% elseif rankChange < 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-danger">
 											<i class="fa fa-solid fa-arrow-down"></i>
-											<%= math.abs(rankChange) %>
+											<%= math.abs(rank_change) %>
 										</td>
 									<% else %>
 										<td></td>
@@ -173,7 +176,7 @@
 										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
-										<a class="has-text-primary-35" href="/users/<%= user.id %>?lb=<%= leaderboard.id %>"><strong><%= user.name %></strong></a>
+										<%- Username(leaderboard_user, ("/users/%i?lb=%i"):format(user.id, leaderboard.id)) %>
 									</td>
 									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
@@ -200,13 +203,17 @@
 						</thead>
 						<tbody>
 							<% for i, user in ipairs(users) do %>
+								<%
+									local color_left = ("#%06x"):format(user.color_left)
+									local color_right = ("#%06x"):format(user.color_right)
+								%>
 								<tr class="has-text">
 									<td>#<%= i + (page_num - 1) * users_per_page %></td>
 									<td class="ranking-table__flag-cell">
 										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
-										<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+										<%- Username(user, ("/users/%i"):format(user.id)) %>
 									</td>
 									<td class="ranking-table__more-padding has-background">
 										<% if ranking_type == "charts" then %>
