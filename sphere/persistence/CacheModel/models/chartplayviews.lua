@@ -6,6 +6,9 @@ local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 local Gamemode = require("sea.chart.Gamemode")
 local Modifiers = require("sea.storage.server.Modifiers")
+local Subtimings = require("sea.chart.Subtimings")
+local IntegerArray = require("sea.storage.server.IntegerArray")
+local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
 
 local chartplayviews = {}
 
@@ -14,13 +17,22 @@ chartplayviews.table_name = "chartplayviews"
 chartplayviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
-	modifiers = Modifiers,
-	rate = int_rates,
-	rate_type = RateType,
 	format = ChartFormat,
-	timings = Timings,
-	healths = Healths,
+
+	nearest = "boolean",
+	pass = "boolean",
 	mode = Gamemode,
+	custom = "boolean",
+	columns_order = IntegerArrayOptional,
+	modifiers = Modifiers,
+	judges = IntegerArray,
+	tap_only = "boolean",
+	const = "boolean",
+	rate = int_rates,
+	timings = Timings,
+	subtimings = Subtimings,
+	healths = Healths,
+	rate_type = RateType,
 }
 
 chartplayviews.relations = {}

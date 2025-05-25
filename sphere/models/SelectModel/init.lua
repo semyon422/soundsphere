@@ -293,13 +293,29 @@ function SelectModel:setConfig(chartview)
 	self.config.select_chartplay_id = chartview.chartplay_id
 
 	local config = self.configModel.configs.settings.select
-	if config.chartviews_table == "chartviews" then
+
+	local views = config.chartviews_table
+	if views == "chartviews" then
 		return
 	end
 
 	local replayBase = self.replayBase
+
 	replayBase.modifiers = chartview.modifiers or {}
 	replayBase.rate = chartview.rate or 1
+	replayBase.mode = chartview.mode or "mania"
+
+	if views == "chartdiffviews" then
+		return
+	end
+
+	replayBase.nearest = chartview.nearest or false
+	replayBase.tap_only = chartview.tap_only or false
+	replayBase.timings = chartview.timings
+	replayBase.subtimings = chartview.subtimings
+	replayBase.columns_order = chartview.columns_order
+	replayBase.custom = chartview.custom or false
+	replayBase.const = chartview.const or false
 	replayBase.rate_type = chartview.rate_type or "linear"
 end
 

@@ -10,6 +10,14 @@ local function TimingsSelectorView(game)
 	local timings_config = game.configModel.configs.settings.timings
 	local subtimings_config = game.configModel.configs.settings.subtimings
 
+	if not replayBase.timings then
+		imgui.text("Missing timings")
+		if imgui.button("select default timings", "select") then
+			replayBase.timings = Timings("sphere")
+		end
+		return
+	end
+
 	local timings_name = replayBase.timings.name
 	local timings_data = replayBase.timings.data
 
