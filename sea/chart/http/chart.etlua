@@ -1,3 +1,5 @@
+<% local Username = require("sea.shared.http.components.Username") %>
+
 <style>
 .chart__background {
 	width: 100%;
@@ -149,7 +151,9 @@
 				<td class="ranking-table__flag-cell chart-scores__flag-padding">
 					<div class="fi-<%= v.country_code %>"></div>
 				</td>
-				<td align="left" class="ranking-table__main-cell"><%= v.username %></td>
+				<td align="left" class="ranking-table__main-cell">
+					<%- Username(session_user, ("/users/%i"):format(session_user.id)) %>
+				</td>
 				<td class="ranking-table__more-padding"><%= v.modifiers %></td>
 				<td class="ranking-table__more-padding"><%= ("%gx"):format(v.rate) %></td>
 				<td class="ranking-table__more-padding"><%= ("%0.02f"):format(v.rating) %></td>

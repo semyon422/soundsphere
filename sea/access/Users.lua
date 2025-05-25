@@ -213,8 +213,6 @@ function Users:updateUser(user, user_update, time)
 	end
 
 	if not self.users_access:canUpdateNameGradient(user, target_user, time) then
-		user_update.color_left = 0
-		user_update.color_right = 0
 		user_update.enable_gradient = false
 	end
 

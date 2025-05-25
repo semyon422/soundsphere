@@ -1,3 +1,5 @@
+<% local Username = require("sea.shared.http.components.Username") %>
+
 <style>
 .team__container {
 	margin-top: 20px;
@@ -233,7 +235,7 @@
 											<div class="fi-<%= user.country_code %>"></div>
 										</td>
 										<td align="left" class="ranking-table__main-cell">
-											<a class="has-text-primary-35" href="/users/<%= user.id %>"><strong><%= user.name %></strong></a>
+											<%- Username(user, ("/users/%i"):format(user.id)) %>
 											<% if user.id == team.owner_id then %>
 												<span class="team__role">
 													<i class="fas fa-fist-raised"></i>
