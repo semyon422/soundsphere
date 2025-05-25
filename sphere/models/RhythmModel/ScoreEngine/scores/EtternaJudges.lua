@@ -59,6 +59,12 @@ function EtternaJudges:miss()
 	self.judge_counter:add(-1)
 end
 
+function EtternaJudges:getSlice()
+	return {
+		last_judge = self:getLastJudge(),
+	}
+end
+
 EtternaJudges.events = {
 	ShortNote = {
 		clear = {
