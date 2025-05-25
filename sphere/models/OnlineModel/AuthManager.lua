@@ -14,8 +14,10 @@ end
 
 function AuthManager:checkUserAsync()
 	print("check user")
-	local server_remote = self.sea_client.remote
+	local sea_client = self.sea_client
+	local server_remote = sea_client.remote
 	self.config.user = server_remote:getUser()
+	sea_client.user = self.config.user
 	print("user", inspect(self.config.user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
@@ -89,15 +91,15 @@ end
 AuthManager.quickGetToken = thread.coro(AuthManager.quickGetTokenAsync)
 
 function AuthManager:quickLogin()
-	print("quick login")
-	local config = self.config
-	local key = config.quick_login_key
+	-- print("quick login")
+	-- local config = self.config
+	-- local key = config.quick_login_key
 
-	if key and #key ~= 0 then
-		self:quickGetToken()
-	else
-		self:quickGetKey()
-	end
+	-- if key and #key ~= 0 then
+	-- 	self:quickGetToken()
+	-- else
+	-- 	self:quickGetKey()
+	-- end
 end
 
 ---@param email string
@@ -105,7 +107,8 @@ end
 function AuthManager:loginAsync(email, password)
 	print("login")
 
-	local server_remote = self.sea_client.remote
+	local sea_client = self.sea_client
+	local server_remote = sea_client.remote
 	local config = self.config
 
 	local ret, err = server_remote.auth:login(email, password)
@@ -117,13 +120,16 @@ function AuthManager:loginAsync(email, password)
 	config.session = ret.session
 	config.user = ret.user
 	config.token = ret.token
+
+	self:checkSessionAsync()
 end
 AuthManager.login = thread.coro(AuthManager.loginAsync)
 
 function AuthManager:logoutAsync()
 	print("logout")
 
-	local server_remote = self.sea_client.remote
+	local sea_client = self.sea_client
+	local server_remote = sea_client.remote
 	local config = self.config
 
 	server_remote.auth:logout()
@@ -131,6 +137,8 @@ function AuthManager:logoutAsync()
 	config.session = {}
 	config.user = {}
 	config.token = ""
+
+	sea_client.user = {}
 end
 AuthManager.logout = thread.coro(AuthManager.logoutAsync)
 
