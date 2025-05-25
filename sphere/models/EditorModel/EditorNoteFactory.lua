@@ -7,7 +7,7 @@ local LongEditorNote = require("sphere.models.EditorModel.LongEditorNote")
 local EditorNoteFactory = class()
 
 local notes = {
-	note = {ShortEditorNote, "ShortNote"},
+	tap = {ShortEditorNote, "ShortNote"},
 	hold = {LongEditorNote, "LongNote"},
 	laser = {LongEditorNote, "LongNote"},
 	drumroll = {LongEditorNote, "LongNote"},
