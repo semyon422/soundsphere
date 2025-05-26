@@ -549,7 +549,7 @@ function OsuNoteSkin:addJudgements()  -- TriggerScoreIncrease
 	local mania = self.mania
 
 	local rate = 20
-	local duration = 0.22
+	local duration = 0.44
 
 	local judgements = {}
 	for i, jd in ipairs(defaultJudgements) do

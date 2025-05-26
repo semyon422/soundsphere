@@ -9,6 +9,7 @@ local IScoreSource = require("sphere.models.RhythmModel.ScoreEngine.IScoreSource
 local NormalscoreScore = ScoreSystem + IAccuracySource + IScoreSource
 
 NormalscoreScore.accuracy_multiplier = 1000
+NormalscoreScore.accuracy_format = "%0.02fms"
 NormalscoreScore.score_multiplier = 10000
 
 function NormalscoreScore:new()
@@ -37,10 +38,6 @@ end
 
 function NormalscoreScore:getAccuracy()
 	return self.accuracyAdjusted
-end
-
-function NormalscoreScore:getAccuracyString()
-	return ("%0.2fms"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 function NormalscoreScore:getScore()

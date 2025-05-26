@@ -13,6 +13,7 @@ local Timings = require("sea.chart.Timings")
 local LunaticRaveScore = ScoreSystem + SimpleJudgesSource + IAccuracySource
 
 LunaticRaveScore.accuracy_multiplier = 100
+LunaticRaveScore.accuracy_format = "%0.02f%%"
 LunaticRaveScore.judge_names = {"pgreat", "great", "good", "bad", "miss"}
 
 local windows = {
@@ -46,10 +47,6 @@ end
 
 function LunaticRaveScore:getAccuracy()
 	return self.judge_accuracy:get(self.judge_counter.judges)
-end
-
-function LunaticRaveScore:getAccuracyString()
-	return ("%0.02f%%"):format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 ---@param event table

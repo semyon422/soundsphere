@@ -12,6 +12,7 @@ local Timings = require("sea.chart.Timings")
 local EtternaAccuracy = ScoreSystem + IAccuracySource
 
 EtternaAccuracy.accuracy_multiplier = 100
+EtternaAccuracy.accuracy_format = "%0.02f%%"
 
 local judgeDifficulty = {0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20}
 
@@ -26,8 +27,8 @@ function EtternaAccuracy:new(j)
 	self.maxPoints = 2
 	self.missWeight = -5.5
 	self.jPow = 0.75
-	self.maxBooWeight = 180.0 * self.difficulty
-	self.ridic = 5 * self.difficulty
+	self.maxBooWeight = 0.180 * self.difficulty
+	self.ridic = 0.005 * self.difficulty
 
 	self.points = 0
 	self.miss_count = 0
@@ -45,22 +46,22 @@ local function pointsMultiplier(x)
 	return math_util.sign(x) * erfunc.erf(math.abs(x))
 end
 
----@param deltaTimeMs number
+---@param deltaTime number
 ---@return number
-function EtternaAccuracy:getPoints(deltaTimeMs)
-	if deltaTimeMs <= self.ridic then
+function EtternaAccuracy:getPoints(deltaTime)
+	if deltaTime<= self.ridic then
 		return self.maxPoints
 	end
 
-	local zero = 65.0 * math.pow(self.difficulty, self.jPow)
-	local dev = 22.7 * math.pow(self.difficulty, self.jPow)
+	local zero = 0.065 * math.pow(self.difficulty, self.jPow)
+	local dev = 0.0227 * math.pow(self.difficulty, self.jPow)
 
-	if deltaTimeMs <= zero then
-		return self.maxPoints * pointsMultiplier((zero - deltaTimeMs) / dev)
+	if deltaTime <= zero then
+		return self.maxPoints * pointsMultiplier((zero - deltaTime) / dev)
 	end
 
-	if deltaTimeMs <= self.maxBooWeight then
-		return (deltaTimeMs - zero) * self.missWeight / (self.maxBooWeight - zero)
+	if deltaTime <= self.maxBooWeight then
+		return (deltaTime - zero) * self.missWeight / (self.maxBooWeight - zero)
 	end
 
 	return self.missWeight
@@ -68,7 +69,7 @@ end
 
 ---@param event table
 function EtternaAccuracy:hit(event)
-	self.points = self.points + self:getPoints(math.abs(event.deltaTime) * 1000)
+	self.points = self.points + self:getPoints(math.abs(event.deltaTime))
 	self.notes = self.notes + 1
 end
 

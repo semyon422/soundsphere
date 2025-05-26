@@ -4,6 +4,8 @@ local Animation = require("Animation")
 
 ---@class sphere.ImageAnimationView
 ---@operator call: sphere.ImageAnimationView
+---@field sx number?
+---@field sy number?
 local ImageAnimationView = class()
 
 function ImageAnimationView:load()

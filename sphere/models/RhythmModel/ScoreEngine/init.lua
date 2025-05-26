@@ -28,6 +28,7 @@ local ScoreEngineFactory = require("sphere.models.RhythmModel.ScoreEngine.ScoreE
 ---@field healthsSource sphere.IHealthsSource
 ---@field judgesSource sphere.IJudgesSource
 ---@field scoreSource sphere.IScoreSource
+---@field sequence {[string]: table}[]
 local ScoreEngine = class()
 
 function ScoreEngine:new()
