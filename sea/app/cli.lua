@@ -108,15 +108,18 @@ function cmds.compute_chartplay(id)
 	id = assert(tonumber(id))
 
 	local _chartplay = assert(chartplays:getChartplay(id))
-	local _chartdiff = assert(chartplays.charts_repo:getChartdiffByChartdiffKey(_chartplay))
-
-	_chartdiff.notes_preview = "hidden"
+	local _chartdiff = chartplays.charts_repo:getChartdiffByChartdiffKey(_chartplay)
 
 	print("-- Saved chartplay")
 	print(stbl.encode(_chartplay))
 
 	print("-- Saved chartdiff")
-	print(stbl.encode(_chartdiff))
+	if _chartdiff then
+		_chartdiff.notes_preview = "hidden"
+		print(stbl.encode(_chartdiff))
+	else
+		print("missing")
+	end
 
 	local compute_data_loader = domain.compute_data_loader
 
