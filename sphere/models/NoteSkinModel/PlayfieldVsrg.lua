@@ -221,7 +221,9 @@ function PlayfieldVsrg:addScore(object)
 		object = ValueView(object)
 	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine.scoreSource:getScoreString()
+		---@type sphere.IScoreSource
+		local score_source = self.game.rhythmModel.scoreEngine.scoreSource
+		return score_source:getScore() * score_source.score_multiplier
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
@@ -236,7 +238,9 @@ function PlayfieldVsrg:addAccuracy(object)
 		object = ValueView(object)
 	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine.accuracySource:getAccuracyString()
+		---@type sphere.IAccuracySource
+		local accuracy_source = self.game.rhythmModel.scoreEngine.scoreSource
+		return accuracy_source:getAccuracy() * accuracy_source.accuracy_multiplier
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
