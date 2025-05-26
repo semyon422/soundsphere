@@ -127,9 +127,9 @@ CREATE TABLE IF NOT EXISTS `chartdiffs_new` (
 	`enps_diff` REAL,
 	`osu_diff` REAL,
 	`msd_diff` REAL,
-	`msd_diff_data` TEXT,
+	`msd_diff_data` BLOB,
 	`user_diff` REAL,
-	`user_diff_data` TEXT,
+	`user_diff_data` BLOB,
 	`notes_preview` BLOB
 );
 

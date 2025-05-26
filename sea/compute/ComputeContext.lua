@@ -82,6 +82,7 @@ end
 ---@param chart ncdk2.Chart
 ---@param rate number
 ---@return sea.Chartdiff
+---@return sphere.DiffcalcContext
 function ComputeContext:computeChartdiff(chart, rate)
 	local chartdiff = {
 		mode = "mania",
@@ -90,14 +91,15 @@ function ComputeContext:computeChartdiff(chart, rate)
 	}
 	setmetatable(chartdiff, Chartdiff)
 	---@cast chartdiff sea.Chartdiff
-	self.difficultyModel:compute(chartdiff, chart, rate)
+	local diffcalc_context = self.difficultyModel:compute(chartdiff, chart, rate)
 
-	return chartdiff
+	return chartdiff, diffcalc_context
 end
 
 ---@param replayBase sea.ReplayBase
 ---@return sea.Chartdiff
 ---@return sea.ModifiersMetaState
+---@return sphere.DiffcalcContext
 function ComputeContext:computeBase(replayBase)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
@@ -113,7 +115,7 @@ function ComputeContext:computeBase(replayBase)
 		self:applyTapOnly()
 	end
 
-	local chartdiff = self:computeChartdiff(chart, replayBase.rate)
+	local chartdiff, diffcalc_context = self:computeChartdiff(chart, replayBase.rate)
 
 	chartdiff.modifiers = replayBase.modifiers
 	chartdiff.hash = chartmeta.hash
@@ -123,10 +125,11 @@ function ComputeContext:computeBase(replayBase)
 
 	self.chartdiff = chartdiff
 	self.state = state
+	self.diffcalc_context = diffcalc_context
 
 	self:applyColumnOrder(replayBase.columns_order)
 
-	return chartdiff, state
+	return chartdiff, state, diffcalc_context
 end
 
 ---@param replay sea.Replay
@@ -145,7 +148,7 @@ function ComputeContext:computeReplay(replay)
 	self:computePlay(rhythmModel, replayModel)
 
 	local timings = assert(replay.timings or chartmeta.timings)
-	rhythmModel.scoreEngine:createAndSelectByTimings(timings, replay.subtimings)
+	rhythmModel.scoreEngine:createByTimings(timings, replay.subtimings, true)
 
 	local chartplay_computed = rhythmModel:getChartplayComputed()
 
@@ -159,9 +162,10 @@ function ComputeContext:computePlay(rhythmModel, replayModel)
 	local chartmeta = assert(self.chartmeta)
 	local chartdiff = assert(self.chartdiff)
 	local state = assert(self.state)
+	local diffcalc_context = assert(self.diffcalc_context)
 
 	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 
 	replayModel:setMode("replay")

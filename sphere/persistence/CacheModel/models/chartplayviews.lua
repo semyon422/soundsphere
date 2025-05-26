@@ -9,6 +9,7 @@ local Modifiers = require("sea.storage.server.Modifiers")
 local Subtimings = require("sea.chart.Subtimings")
 local IntegerArray = require("sea.storage.server.IntegerArray")
 local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
+local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
 
 local chartplayviews = {}
 
@@ -33,6 +34,8 @@ chartplayviews.types = {
 	subtimings = Subtimings,
 	healths = Healths,
 	rate_type = RateType,
+
+	msd_diff_data = MsdDiffData,
 }
 
 chartplayviews.relations = {}

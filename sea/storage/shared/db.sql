@@ -60,9 +60,9 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`enps_diff` REAL NOT NULL,
 	`osu_diff` REAL NOT NULL,
 	`msd_diff` REAL NOT NULL,
-	`msd_diff_data` TEXT NOT NULL,
+	`msd_diff_data` BLOB NOT NULL,
 	`user_diff` REAL NOT NULL,
-	`user_diff_data` TEXT NOT NULL,
+	`user_diff_data` BLOB NOT NULL,
 	`notes_preview` BLOB NOT NULL
 );
 

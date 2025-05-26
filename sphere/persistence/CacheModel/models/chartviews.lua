@@ -6,6 +6,7 @@ local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 local Gamemode = require("sea.chart.Gamemode")
 local Modifiers = require("sea.storage.server.Modifiers")
+local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
 
 local chartviews = {}
 
@@ -21,6 +22,7 @@ chartviews.types = {
 	timings = Timings,
 	healths = Healths,
 	mode = Gamemode,
+	msd_diff_data = MsdDiffData,
 }
 
 chartviews.relations = {}

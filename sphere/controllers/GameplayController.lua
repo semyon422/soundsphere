@@ -106,7 +106,7 @@ function GameplayController:load()
 	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 	computeContext:applyModifierReorder(replayBase)
-	local chartdiff, state = computeContext:computeBase(replayBase)
+	local chartdiff, state, diffcalc_context = computeContext:computeBase(replayBase)
 
 	computeContext:applyTempo(config.gameplay.tempoFactor, config.gameplay.primaryTempo)
 	if config.gameplay.autoKeySound then
@@ -130,7 +130,7 @@ function GameplayController:load()
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
-	rhythmModel:setNoteChart(chart, chartmeta, chartdiff)
+	rhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
 	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
 	rhythmModel:setDrawRange(noteSkin.range)
 	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
@@ -148,7 +148,7 @@ function GameplayController:load()
 	pauseModel:load()
 
 	local timings = assert(replayBase.timings or chartmeta.timings)
-	self.rhythmModel.scoreEngine:createAndSelectByTimings(timings, replayBase.subtimings)
+	self.rhythmModel.scoreEngine:createByTimings(timings, replayBase.subtimings, true)
 
 	self:updateOffsets()
 
@@ -315,7 +315,7 @@ function GameplayController:retry()
 	self.resourceModel:rewind()
 
 	local timings = assert(replayBase.timings or self.computeContext.chartmeta.timings)
-	self.rhythmModel.scoreEngine:createAndSelectByTimings(timings, replayBase.subtimings)
+	self.rhythmModel.scoreEngine:createByTimings(timings, replayBase.subtimings, true)
 
 	self:play()
 end

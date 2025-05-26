@@ -41,7 +41,13 @@ function NormalscoreScore:getAccuracy()
 end
 
 function NormalscoreScore:getScore()
-	return erfunc.erf(0.032 / ((self.accuracyAdjusted or math.huge) * math.sqrt(2)))
+	return self:getScoreForWindow(0.032)
+end
+
+---@param w number
+---@return number
+function NormalscoreScore:getScoreForWindow(w)
+	return erfunc.erf(w / ((self.accuracyAdjusted or math.huge) * math.sqrt(2)))
 end
 
 function NormalscoreScore:getScoreString()

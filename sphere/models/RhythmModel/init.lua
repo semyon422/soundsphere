@@ -8,7 +8,9 @@ local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
 local PauseCounter = require("sphere.models.RhythmModel.PauseCounter")
 local ChartplayComputed = require("sea.chart.ChartplayComputed")
+local Timings = require("sea.chart.Timings")
 local osu_pp = require("libchart.osu_pp")
+local minacalc = require("libchart.minacalc")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -128,7 +130,16 @@ function RhythmModel:getChartplayComputed()
 	local scores = scoreEngine.scores
 	local judgesSource = assert(scoreEngine.judgesSource)
 
+	scoreEngine:createByTimings(Timings("etternaj", 4))
+
+	-- local j4 = scoreEngine:getScoreSystem("etterna_accuracy_j4")
+	-- ---@cast j4 sphere.EtternaAccuracy
+
 	local ns_score = scores.normalscore:getScore()
+	-- print(ns_score, scores.normalscore:getScoreForWindow(0.040), j4:getAccuracyString())
+
+	local ctx = self.diffcalc_context
+	local ssr = minacalc.calc(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
 
 	local c = ChartplayComputed()
 	c.pass = not scores.hp:isFailed()
@@ -139,7 +150,7 @@ function RhythmModel:getChartplayComputed()
 	c.not_perfect_count = judgesSource:getNotPerfect()
 	c.rating = ns_score * chartdiff.enps_diff
 	c.rating_pp = osu_pp.calc(ns_score, chartdiff.osu_diff, chartdiff.notes_count, 0)
-	c.rating_msd = 0
+	c.rating_msd = ssr.overall
 
 	return c
 end
@@ -177,11 +188,13 @@ end
 ---@param chart ncdk2.Chart
 ---@param chartmeta sea.Chartmeta
 ---@param chartdiff sea.Chartdiff
-function RhythmModel:setNoteChart(chart, chartmeta, chartdiff)
+---@param diffcalc_context sphere.DiffcalcContext
+function RhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
 	assert(chart)
 	self.chart = chart
 	self.chartmeta = chartmeta
 	self.chartdiff = chartdiff
+	self.diffcalc_context = diffcalc_context
 	self.timeEngine.noteChart = chart
 	self.scoreEngine.noteChart = chart
 	self.scoreEngine.chartdiff = chartdiff

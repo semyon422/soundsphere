@@ -22,7 +22,7 @@ return ModalImView(function(self, quit)
 	local replayBase = game.replayBase
 
 	if quit then
-		game.rhythmModel.scoreEngine:createAndSelectByTimings(replayBase.timings, replayBase.subtimings)
+		game.rhythmModel.scoreEngine:createByTimings(replayBase.timings, replayBase.subtimings, true)
 		return true
 	end
 

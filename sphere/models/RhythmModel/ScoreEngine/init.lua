@@ -76,18 +76,26 @@ end
 
 ---@param t sea.Timings
 ---@param st sea.Subtimings
----@return sphere.ScoreSystem?
-function ScoreEngine:createAndSelectByTimings(t, st)
+---@param _select boolean?
+---@return boolean?
+---@return string?
+function ScoreEngine:createByTimings(t, st, _select)
 	local systems, err = ScoreEngineFactory:get(t, st)
 	if not systems then
-		self:selectDefault()
-		return
+		if _select then
+			self:selectDefault()
+		end
+		return nil, err
 	end
 
 	for _, sys in ipairs(systems) do
 		self:addScoreSystem(sys)
-		self:select(sys:getKey())
+		if _select then
+			self:select(sys:getKey())
+		end
 	end
+
+	return true
 end
 
 ---@param key string

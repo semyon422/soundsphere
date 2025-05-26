@@ -24,7 +24,7 @@ local chart_types = require("sea.chart.types")
 ---@field enps_diff number
 ---@field osu_diff number
 ---@field msd_diff number
----@field msd_diff_data string
+---@field msd_diff_data minacalc.Ssr
 ---@field user_diff number
 ---@field user_diff_data string
 ---@field notes_preview string
@@ -48,7 +48,7 @@ Chartdiff.struct = {
 	enps_diff = types.number,
 	osu_diff = types.number,
 	msd_diff = types.number,
-	msd_diff_data = types.binary,
+	msd_diff_data = chart_types.msd_diff_data,
 	user_diff = types.number,
 	user_diff_data = types.binary,
 	notes_preview = types.binary,

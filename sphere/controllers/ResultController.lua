@@ -121,7 +121,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	computeContext:computePlay(rhythmModel, replayModel)
 
 	self:actualizeReplayBase()
-	self.rhythmModel.scoreEngine:createAndSelectByTimings(self.replayBase.timings, self.replayBase.subtimings)
+	self.rhythmModel.scoreEngine:createByTimings(self.replayBase.timings, self.replayBase.subtimings, true)
 
 	if self.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")
