@@ -5,6 +5,7 @@ local class = require("class")
 local IAccuracySource = class()
 
 IAccuracySource.accuracy_multiplier = 1
+IAccuracySource.accuracy_format = "%0.02f"
 
 ---@return number
 function IAccuracySource:getAccuracy()
@@ -13,7 +14,7 @@ end
 
 ---@return string
 function IAccuracySource:getAccuracyString()
-	return tostring(self:getAccuracy())
+	return self.accuracy_format:format(self:getAccuracy() * self.accuracy_multiplier)
 end
 
 return IAccuracySource

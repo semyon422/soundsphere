@@ -12,6 +12,7 @@ local Timings = require("sea.chart.Timings")
 local EtternaAccuracy = ScoreSystem + IAccuracySource
 
 EtternaAccuracy.accuracy_multiplier = 100
+EtternaAccuracy.accuracy_format = "%0.02f%%"
 
 local judgeDifficulty = {0, 0, 0, 1.00, 0.84, 0.66, 0.50, 0.33, 0.20}
 
