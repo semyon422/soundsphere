@@ -18,6 +18,7 @@ require("preload")
 local stbl = require("stbl")
 local socket = require("socket")
 local time_util = require("time_util")
+local ComputeContext = require("sea.compute.ComputeContext")
 
 -- lua-nginx-module bug fix
 coroutine.wrap = require("icc.co").wrap
@@ -28,6 +29,7 @@ local app = App(app_config)
 app:load()
 
 local domain = app.domain
+local chartplays = domain.chartplays
 local compute_tasks = domain.compute_tasks
 local charts_computer = domain.charts_computer
 local leaderboards = domain.leaderboards
@@ -100,6 +102,52 @@ function cmds.start_total_rating()
 	local total = domain.users:getUsersCount() * leaderboards:getLeaderboardsCount()
 	local task = compute_tasks:createComputeTask(os.time(), "total_rating", "new", total)
 	cmds.list()
+end
+
+function cmds.compute_chartplay(id)
+	id = assert(tonumber(id))
+
+	local _chartplay = assert(chartplays:getChartplay(id))
+	local _chartdiff = assert(chartplays.charts_repo:getChartdiffByChartdiffKey(_chartplay))
+
+	_chartdiff.notes_preview = "hidden"
+
+	print("-- Saved chartplay")
+	print(stbl.encode(_chartplay))
+
+	print("-- Saved chartdiff")
+	print(stbl.encode(_chartdiff))
+
+	local compute_data_loader = domain.compute_data_loader
+
+	local chart_file_data = assert(compute_data_loader:requireChart(_chartplay.hash))
+	local replay_and_data = assert(compute_data_loader:requireReplay(_chartplay.replay_hash))
+
+	local ctx = ComputeContext()
+
+	assert(ctx:fromFileData(
+		chart_file_data.name,
+		chart_file_data.data,
+		_chartplay.index
+	))
+
+	local replay = replay_and_data.replay
+
+	ctx:applyModifierReorder(replay)
+
+	local chartdiff = ctx:computeBase(replay)
+	chartdiff.notes_preview = "hidden"
+
+	local chartplay_computed = assert(ctx:computeReplay(replay))
+
+	-- chartplay:importChartplayBase(replay)
+	-- chartplay:importChartplayComputed(chartplay_computed)
+
+	print("-- Computed chartplay")
+	print(stbl.encode(chartplay_computed))
+
+	print("-- Computed chartdiff")
+	print(stbl.encode(chartdiff))
 end
 
 function cmds.ranks()
