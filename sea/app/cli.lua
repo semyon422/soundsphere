@@ -91,10 +91,11 @@ function cmds.run(id)
 	print("done")
 end
 
-function cmds.start_chartplays()
+function cmds.start_chartplays(state)
+	assert(state)
 	local time = os.time()
-	local total = charts_computer:getChartplaysComputedCount(time, "new")
-	local task = compute_tasks:createComputeTask(time, "chartplays", "new", total)
+	local total = charts_computer:getChartplaysComputedCount(time, state)
+	local task = compute_tasks:createComputeTask(time, "chartplays", state, total)
 	cmds.list()
 end
 
