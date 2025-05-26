@@ -54,7 +54,7 @@ ModifierRegistry.list = {
 	"Alternate2",
 	"Shift",
 	"Mirror",
-	"Random",
+	-- "Random",
 	"BracketSwap",
 	"MaxChord",
 	"LessChord",
