@@ -200,6 +200,18 @@ function ChartsRepo:createUpdateChartmeta(chartmeta, time)
 	return _chartmeta
 end
 
+---@param computed_at integer
+---@param limit integer?
+---@return sea.Chartmeta[]
+function ChartsRepo:getChartmetasComputed(computed_at, limit)
+	return self.models.chartmetas:select({
+		computed_at__lt = assert(computed_at),
+	}, {
+		order = {"computed_at ASC"},
+		limit = limit or 1,
+	})
+end
+
 --------------------------------------------------------------------------------
 
 ---@param id integer

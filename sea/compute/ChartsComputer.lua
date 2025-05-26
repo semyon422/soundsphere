@@ -126,4 +126,41 @@ function ChartsComputer:computeChartplayNoUpdate(chartplay, time)
 	}
 end
 
+---@param name string
+---@param data string
+---@param time integer
+---@return boolean?
+---@return string?
+function ChartsComputer:computeChartfile(name, data, time)
+	local charts_repo = self.charts_repo
+
+	local ctx = ComputeContext()
+
+	local ok, err = ctx:fromFileData(name, data, 1)
+	if not ok then
+		return nil, "from file data: " .. err
+	end
+
+	local chart_chartmetas = assert(ctx.chart_chartmetas)
+
+	for _, chart_chartmeta in ipairs(chart_chartmetas) do
+		local chartmeta = charts_repo:createUpdateChartmeta(chart_chartmeta.chartmeta, time)
+
+		local default_chartdiff_key = ChartdiffKey()
+		default_chartdiff_key.hash = chartmeta.hash
+		default_chartdiff_key.index = chartmeta.index
+		default_chartdiff_key.rate = 1
+		default_chartdiff_key.modifiers = {}
+		default_chartdiff_key.mode = "mania"
+
+		local default_chartdiff = charts_repo:getChartdiffByChartdiffKey(default_chartdiff_key)
+		if not default_chartdiff then
+			local chartdiff = ctx:computeBase(ReplayBase())
+			chartdiff = charts_repo:createUpdateChartdiff(chartdiff, time)
+		end
+	end
+
+	return true
+end
+
 return ChartsComputer
