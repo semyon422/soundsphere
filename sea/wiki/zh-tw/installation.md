@@ -10,7 +10,8 @@
 只需運行 `game-win64.bat`。
 
 ## 在 Mac OS 上運行
-只需運行 `game-macos`。
+解壓縮檔案後，開啟終端機並執行指令： `xattr -cr soundsphere.app`。
+然後執行 `game-macos`。
 
 ## 在 Linux 上運行
 有兩種腳本可以運行遊戲：`game-appimage` 和 `game-linux`。我們推薦使用 **appimage** 版本。
