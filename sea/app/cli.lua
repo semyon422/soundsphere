@@ -234,6 +234,27 @@ function cmds.chartmetas_count()
 	]])
 end
 
+function cmds.auth_codes()
+	local codes = app.app_db.db:query([[
+		SELECT
+			auth_codes.code,
+			auth_codes.type,
+			users.id,
+			users.name,
+			users.email
+		FROM auth_codes
+		INNER JOIN users ON
+			users.id = auth_codes.user_id
+		WHERE
+			auth_codes.used = 0
+		;
+	]])
+
+	for _, c in ipairs(codes) do
+		print(c.code, tonumber(c.id), c.name, c.email)
+	end
+end
+
 function cmds.delete(id)
 	id = assert(tonumber(id))
 	compute_tasks:deleteProcess(id)
