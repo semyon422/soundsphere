@@ -120,7 +120,8 @@ function RhythmModel:hasResult()
 		accuracy < math.huge
 end
 
-function RhythmModel:getChartplayComputed()
+---@param fast boolean?
+function RhythmModel:getChartplayComputed(fast)
 	local chartdiff = self.chartdiff
 	if not chartdiff then
 		return ChartplayComputed()
@@ -130,7 +131,7 @@ function RhythmModel:getChartplayComputed()
 	local scores = scoreEngine.scores
 	local judgesSource = assert(scoreEngine.judgesSource)
 
-	scoreEngine:createByTimings(Timings("etternaj", 4))
+	-- scoreEngine:createByTimings(Timings("etternaj", 4))
 
 	-- local j4 = scoreEngine:getScoreSystem("etterna_accuracy_j4")
 	-- ---@cast j4 sphere.EtternaAccuracy
@@ -138,8 +139,12 @@ function RhythmModel:getChartplayComputed()
 	local ns_score = scores.normalscore:getScore()
 	-- print(ns_score, scores.normalscore:getScoreForWindow(0.040), j4:getAccuracyString())
 
-	local ctx = self.diffcalc_context
-	local ssr = minacalc.calc(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
+	local rating_msd = 0
+	if not fast then
+		local ctx = self.diffcalc_context
+		local ssr = minacalc.calc(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
+		rating_msd = ssr.overall
+	end
 
 	local c = ChartplayComputed()
 	c.pass = not scores.hp:isFailed()
@@ -149,8 +154,8 @@ function RhythmModel:getChartplayComputed()
 	c.miss_count = scores.base.missCount
 	c.not_perfect_count = judgesSource:getNotPerfect()
 	c.rating = ns_score * chartdiff.enps_diff
-	c.rating_pp = osu_pp.calc(ns_score, chartdiff.osu_diff, chartdiff.notes_count, 0)
-	c.rating_msd = ssr.overall
+	c.rating_pp = osu_pp.calc_no_acc(ns_score, chartdiff.osu_diff, chartdiff.notes_count)
+	c.rating_msd = rating_msd
 
 	return c
 end
