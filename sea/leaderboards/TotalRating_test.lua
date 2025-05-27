@@ -1,4 +1,5 @@
 local TotalRating = require("sea.leaderboards.TotalRating")
+local erfunc = require("libchart.erfunc")
 
 local test = {}
 
@@ -8,7 +9,9 @@ function test.accuracy(t)
 
 	tr:calc({})
 
-	t:eq(tr.accuracy, 0.032)
+	local accuracy = erfunc.erf(0.032 / (tr.accuracy * math.sqrt(2)))
+
+	t:eq(accuracy, 0.5)
 end
 
 return test

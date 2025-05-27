@@ -1,4 +1,5 @@
 local class = require("class")
+local erfunc = require("libchart.erfunc")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 
 ---@class sea.TotalRating
@@ -12,6 +13,9 @@ local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = class()
 
 TotalRating.avg_count = 20
+
+-- 50% = 0.047
+TotalRating.start_accuracy = 0.032 / (erfunc.erfinv(0.5) * math.sqrt(2))
 
 function TotalRating:new()
 	self.accuracy = 0
@@ -50,7 +54,7 @@ function TotalRating:calc(cpvs)
 
 	local missing = avg_count - _avg_count
 	if missing > 0 then
-		accuracy = accuracy + missing * 0.032
+		accuracy = accuracy + missing * self.start_accuracy
 	end
 
 	self.accuracy = accuracy / avg_count
