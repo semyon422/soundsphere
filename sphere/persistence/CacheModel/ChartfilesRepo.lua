@@ -47,10 +47,19 @@ function ChartfilesRepo:selectChartfileSetById(id)
 	return self.models.chartfile_sets:find({id = assert(id)})
 end
 
----@param location_id integer?
 ---@return sea.ClientChartfileSet[]
-function ChartfilesRepo:selectChartfileSetsAtLocation(location_id)
-	return self.models.chartfile_sets:select({location_id = location_id})
+function ChartfilesRepo:selectChartfileSets()
+	return self.models.chartfile_sets:select()
+end
+
+---@param location_id integer
+---@param dir integer?
+---@return sea.ClientChartfileSet[]
+function ChartfilesRepo:selectChartfileSetsAtLocation(location_id, dir)
+	return self.models.chartfile_sets:select({
+		location_id = assert(location_id),
+		dir = dir,
+	})
 end
 
 ---@return integer

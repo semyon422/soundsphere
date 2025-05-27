@@ -13,6 +13,19 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 		table.insert(actions, {"ss", dir, name})
 		return chartfile_sets[path_util.join(dir, name)]
 	end
+	function chartRepo:selectChartfileSetsAtLocation(location_id, dir)
+		table.insert(actions, {"ssatl", location_id, dir})
+		local sets = {}
+		for _, v in pairs(chartfile_sets) do
+			if v.dir == dir then
+				table.insert(sets, v)
+			end
+		end
+		table.sort(sets, function(a, b)
+			return a.name < b.name
+		end)
+		return sets
+	end
 	function chartRepo:insertChartfileSet(chartfile_set)
 		table.insert(actions, {"is", chartfile_set})
 		chartfile_sets[path_util.join(chartfile_set.dir, chartfile_set.name)] = chartfile_set
@@ -219,11 +232,7 @@ function test.root_packs(t)
 	t:tdeq(actions, {
 		{"ss", nil, "osucharts"},
 		{"ss", nil, "jamcharts"},
-		{"ds", {
-			dir__isnull = true,
-			location_id = 1,
-			name__notin = {"osucharts", "jamcharts"},
-		}}
+		{"ssatl", 1},
 	})
 end
 
@@ -267,20 +276,10 @@ function test.complex(t)
 	t:tdeq(actions, {
 		{"ss", "root", "osucharts"},
 		{"ss", "root", "jamcharts"},
-		{"ds", {
-			dir = "root",
-			dir__isnull = false,
-			name__notin = {"osucharts", "jamcharts"},
-			location_id = 1,
-		}},
+		{"ssatl", 1, "root"},
 		{"ss", "root/osucharts", "chartset1"},
 		{"ss", "root/osucharts", "chartset2"},
-		{"ds", {
-			dir = "root/osucharts",
-			dir__isnull = false,
-			name__notin = {"chartset1", "chartset2"},
-			location_id = 1,
-		}},
+		{"ssatl", 1, "root/osucharts"},
 		{"ss", "root/osucharts", "chartset1"},
 		{"is", {
 			id = 1,
@@ -421,18 +420,8 @@ function test.complex(t)
 	t:tdeq(actions, {
 		{"ss", "root", "osucharts"},
 		{"ss", "root", "jamcharts"},
-		{"ds", {
-			dir = "root",
-			dir__isnull = false,
-			name__notin = {"osucharts", "jamcharts"},
-			location_id = 1,
-		}},
-		{"ds", {
-			dir = "root/osucharts",
-			dir__isnull = false,
-			name__notin = {"chartset1", "chartset2"},
-			location_id = 1,
-		}},
+		{"ssatl", 1, "root"},
+		{"ssatl", 1, "root/osucharts"},
 
 		{"ss", "root/osucharts", "chartset1"},
 		{"ss", "root/osucharts", "chartset1"},
