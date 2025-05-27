@@ -10,8 +10,8 @@
 `game-win64.bat` を実行するだけです。
 
 ## Mac OS で実行
-アーカイブを解凍したら、ターミナルを開いてコマンドを実行する： `xattr -cr soundsphere.app`.
-次に `game-macos` を実行する。
+アーカイブを解凍したら、ターミナルを開いてコマンドを実行する： `xattr -cr soundsphere.app`.  
+次に `soundsphere.app` を実行する。
 
 ## Linux で実行
 ゲームを実行するための2つのスクリプトがあります：`game-appimage` と `game-linux`。**appimage** バージョンの使用を推奨します。
