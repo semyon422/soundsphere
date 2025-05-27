@@ -48,16 +48,17 @@ function TotalRating:calc(cpvs)
 		rating_pp = rating_pp + cp.rating_pp * 0.95 ^ (i - 1)
 	end
 
-	if _avg_count == 0 then
-		_avg_count = 1
+	local missing = avg_count - _avg_count
+	if missing > 0 then
+		accuracy = avg_count + missing * 0.032
 	end
 
-	self.accuracy = accuracy / _avg_count
-	self.rating = rating / _avg_count
-	self.rating_msd = rating_msd / _avg_count
+	self.accuracy = accuracy / avg_count
+	self.rating = rating / avg_count
+	self.rating_msd = rating_msd / avg_count
 	self.rating_pp = rating_pp
-	self.chartmeta_level = chartmeta_level / _avg_count
-	self.difftable_level = difftable_level / _avg_count
+	self.chartmeta_level = chartmeta_level / avg_count
+	self.difftable_level = difftable_level / avg_count
 end
 
 ---@param rating_calc sea.RatingCalc
