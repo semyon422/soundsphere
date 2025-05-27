@@ -200,6 +200,11 @@ function LongLogicalNote:switchState(newState, reachableNote)
 	scoreEvent.noteIndex = self.index
 	scoreEvent.noteIndexType = self.index .. self.column -- required for osu!legacy LN's to track their state
 	scoreEvent.currentTime = currentTime
+	scoreEvent.noteStartTime = self.startNote:getTime()
+	scoreEvent.noteColumn = self.startNote.column
+	scoreEvent.inputOffset = self.logicEngine.inputOffset
+	scoreEvent.selfEventTime = self.eventTime
+	scoreEvent.engineEventTime = self.logicEngine:getEventTime()
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.timeRate = timeRate
 	scoreEvent.notesCount = self.logicEngine.notesCount

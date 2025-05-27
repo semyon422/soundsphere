@@ -413,6 +413,10 @@ function GameplayController:saveScore()
 		print("got", ok, err)
 		if ok then
 			print(require("stbl").encode(ok))
+		else
+			print("dumping events")
+			local data = require("string.buffer").encode(self.rhythmModel.scoreEngine.events)
+			love.filesystem.write("events.bin", data)
 		end
 	end
 

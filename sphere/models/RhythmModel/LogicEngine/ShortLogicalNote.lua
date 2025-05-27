@@ -74,6 +74,11 @@ function ShortLogicalNote:switchState(newState)
 
 	scoreEvent.noteIndex = self.index  -- required for tests
 	scoreEvent.currentTime = currentTime
+	scoreEvent.noteStartTime = self.startNote:getTime()
+	scoreEvent.noteColumn = self.startNote.column
+	scoreEvent.inputOffset = self.logicEngine.inputOffset
+	scoreEvent.selfEventTime = self.eventTime
+	scoreEvent.engineEventTime = self.logicEngine:getEventTime()
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.timeRate = timeRate
 	scoreEvent.notesCount = self.logicEngine.notesCount
