@@ -120,12 +120,19 @@ local transforms = {
 			return i < 3 and i % 2 + 1 or i > 3 and (i - 3) % 2 + 4 or i
 		end
 
-		local half = math.floor(c / 2)
-		if i <= half then
-			return (2 * (i - 1)) % half + 1
-		elseif i > c - half then
-			return c - (2 * (c - i)) % half
+		local h = math.floor(c / 2)
+		local q = math.ceil(h / 2)
+
+		local function f(j)
+			return (2 * (j % q)) % h + math.floor(j / q)
 		end
+
+		if i <= h then
+			return f(i - 1) + 1
+		elseif i > c - h then
+			return c - f(c - i)
+		end
+
 		return i
 	end,
 	random = function(c, i, t)

@@ -57,7 +57,11 @@ function test.bracketswap(t)
 	t:tdeq(ColumnsOrder("4key"):bracketswap():export(), {1, 3, 2, 4})
 	t:tdeq(ColumnsOrder("5key"):bracketswap():export(), {2, 1, 3, 5, 4})
 	t:tdeq(ColumnsOrder("7key"):bracketswap():export(), {1, 3, 2, 4, 6, 5, 7})
+	t:tdeq(ColumnsOrder("8key"):bracketswap():export(), {1, 3, 2, 4, 5, 7, 6, 8})
+	t:tdeq(ColumnsOrder("9key"):bracketswap():export(), {1, 3, 2, 4, 5, 6, 8, 7, 9})
 	t:tdeq(ColumnsOrder("10key"):bracketswap():export(), {1, 4, 2, 5, 3, 8, 6, 9, 7, 10})
+	t:tdeq(ColumnsOrder("11key"):bracketswap():export(), {1, 4, 2, 5, 3, 6, 9, 7, 10, 8, 11})
+	t:tdeq(ColumnsOrder("12key"):bracketswap():export(), {1, 4, 2, 5, 3, 6, 7, 10, 8, 11, 9, 12})
 end
 
 ---@param t testing.T

@@ -1,4 +1,5 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
+local ColumnsOrder = require("sea.chart.ColumnsOrder")
 
 ---@class sphere.BracketSwap: sphere.SwapModifier
 ---@operator call: sphere.BracketSwap
@@ -31,15 +32,10 @@ function BracketSwap:getMap(config, inputMode)
 		return hardcodedMaps[keyCount] or {}
 	end
 
-	local map = {}
+	local co = ColumnsOrder(inputMode)
+	co:bracketswap()
 
-	local half = math.floor(keyCount / 2)
-	for i = 1, half do
-		map["key" .. i] = "key" .. ((2 * (i - 1)) % half + 1)
-		map["key" .. (keyCount - i + 1)] = "key" .. (keyCount - (2 * (i - 1)) % half)
-	end
-
-	return map
+	return co.map
 end
 
 return BracketSwap
