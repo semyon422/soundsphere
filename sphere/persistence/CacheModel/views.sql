@@ -23,7 +23,7 @@ FROM chartmetas
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index` AND
-chartdiffs.modifiers = "" AND
+chartdiffs.modifiers = '' AND
 chartdiffs.rate = 1000
 WHERE
 chartdiffs.id IS NULL
@@ -101,7 +101,7 @@ chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index` AND
-chartdiffs.modifiers = "" AND
+chartdiffs.modifiers = '' AND
 chartdiffs.rate = 1000
 LEFT JOIN chartplays ON
 chartmetas.hash = chartplays.hash AND
@@ -184,7 +184,7 @@ chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index` AND
-chartdiffs.modifiers = "" AND
+chartdiffs.modifiers = '' AND
 chartdiffs.rate = 1000
 LEFT JOIN chartplays ON
 chartmetas.hash = chartplays.hash AND
