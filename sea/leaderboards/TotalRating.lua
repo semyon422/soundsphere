@@ -50,7 +50,7 @@ function TotalRating:calc(cpvs)
 
 	local missing = avg_count - _avg_count
 	if missing > 0 then
-		accuracy = avg_count + missing * 0.032
+		accuracy = accuracy + missing * 0.032
 	end
 
 	self.accuracy = accuracy / avg_count

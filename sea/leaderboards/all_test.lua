@@ -816,7 +816,7 @@ function test.total_rating(t)
 	local lb_user = ctx.db.models.leaderboard_users:find({})
 	---@cast lb_user sea.LeaderboardUser
 
-	t:eq(lb_user.total_rating, 1.5)
+	t:eq(lb_user.total_rating, 0.3)
 end
 
 ---@param t testing.T
