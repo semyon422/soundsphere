@@ -57,11 +57,20 @@ Chartdiff.struct = {
 local computed_keys = table_util.keys(Chartdiff.struct)
 assert(#table_util.keys(Chartdiff.struct) == 15)
 
+local computed_keys_no_msd = table_util.copy(computed_keys)
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff"))
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff_data"))
+
 ---@param values sea.Chartdiff
+---@param no_msd boolean?
 ---@return boolean?
 ---@return string?
-function Chartdiff:equalsComputed(values)
-	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
+function Chartdiff:equalsComputed(values, no_msd)
+	local keys = computed_keys
+	if no_msd then
+		keys = computed_keys_no_msd
+	end
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
 end
 
 table_util.copy(ChartdiffKey.struct, Chartdiff.struct)

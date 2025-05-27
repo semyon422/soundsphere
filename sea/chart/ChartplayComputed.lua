@@ -43,11 +43,19 @@ ChartplayComputed.struct = {
 
 local computed_keys = table_util.keys(ChartplayComputed.struct)
 
+local computed_keys_no_msd = table_util.copy(computed_keys)
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "rating_msd"))
+
 ---@param values sea.ChartplayComputed
+---@param no_msd boolean?
 ---@return boolean?
 ---@return string?
-function ChartplayComputed:equalsComputed(values)
-	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
+function ChartplayComputed:equalsComputed(values, no_msd)
+	local keys = computed_keys
+	if no_msd then
+		keys = computed_keys_no_msd
+	end
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
 end
 
 ---@param base sea.ChartplayComputed

@@ -308,7 +308,10 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 
 		computed_chartdiff = ctx:computeBase(replay)
 
-		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff)
+		-- MSD is inconsistent for some reason
+		-- Remove it from compare keys
+
+		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff, true)
 		if not eq then
 			return nil, "computed chartdiff differs: " .. err
 		end
@@ -318,10 +321,13 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 			return nil, "compute: " .. err
 		end
 
-		local eq, err = chartplay:equalsComputed(chartplay_computed)
+		local eq, err = chartplay:equalsComputed(chartplay_computed, true)
 		if not eq then
 			return nil, "computed chartplay differs: " .. err
 		end
+
+		-- Use computed MSD
+		chartplay:importChartplayComputed(chartplay_computed)
 	end
 
 	charts_repo:createUpdateChartdiff(computed_chartdiff, time)
