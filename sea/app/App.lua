@@ -38,7 +38,7 @@ function App:new(app_config)
 	self.server_remote = ServerRemote(self.domain, self.sessions)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
-	self.resources = Resources(self.domain, self.server_remote, views, self.sessions)
+	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)
 
 	local router = Router()
 	self.router = router

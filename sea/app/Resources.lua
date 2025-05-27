@@ -40,11 +40,12 @@ local Resources = class()
 ---@param server_remote sea.ServerRemote
 ---@param views web.Views
 ---@param sessions web.Sessions
-function Resources:new(domain, server_remote, views, sessions)
+---@param app_config sea.AppConfig
+function Resources:new(domain, server_remote, views, sessions, app_config)
 	self.index = IndexResource(views)
 	self.style = StyleResource()
 	self.download = DownloadResource(views)
-	self.policy = PolicyResource(views)
+	self.policy = PolicyResource(views, app_config.responsible_person)
 	self.wiki = WikiResource(views)
 	self.donate = DonateResource(views)
 

@@ -58,7 +58,7 @@ Our services are not intended for children under the age of 13. If you are under
 
 ### Account Deletion
 
-If you wish to delete your account, please contact us at <%= responsible_person_email %>. This process may take several days to complete.
+If you wish to delete your account, please contact us at <%= responsible_person.email %>. This process may take several days to complete.
 
 ### Changes to this Policy
 
@@ -70,5 +70,5 @@ By using our services, you acknowledge that you have read, understood, and agree
 
 If you have any questions or concerns about our Privacy Policy, please contact us at:
 
-<%= responsible_person_name %>  
-<%= responsible_person_email %>
+<%= responsible_person.name %>  
+<%= responsible_person.email %>

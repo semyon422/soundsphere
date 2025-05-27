@@ -12,8 +12,10 @@ PolicyResource.routes = {
 }
 
 ---@param views web.Views
-function PolicyResource:new(views)
+---@param responsible_person {name: string, email: string}
+function PolicyResource:new(views, responsible_person)
 	self.views = views
+	self.responsible_person = responsible_person
 	self.policies = {
 		{
 			key = "terms",
@@ -48,8 +50,7 @@ function PolicyResource:getPage(req, res, ctx)
 		end
 	end
 
-	ctx.responsible_person_name = "Semyon"
-	ctx.responsible_person_email = "semyon@email.com"
+	ctx.responsible_person = self.responsible_person
 
 	if not ctx.policy_filename then
 		ctx.policy_filename = self.policies[1].filename

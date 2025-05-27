@@ -16,6 +16,11 @@ local AppConfig = {
 		address = "*",
 		port = 9000,
 	},
+
+	responsible_person = {
+		name = "Name",
+		email = "email@example.com",
+	},
 }
 
 return AppConfig

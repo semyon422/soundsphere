@@ -15,5 +15,5 @@ The soundsphere project may request additional information before removing any a
 
 Pursuant to 17 U.S.C. 512(c), the designated Copyright Agent for the soundsphere project is:
 
-<%= responsible_person_name %>  
-<%= responsible_person_email %>
+<%= responsible_person.name %>  
+<%= responsible_person.email %>
