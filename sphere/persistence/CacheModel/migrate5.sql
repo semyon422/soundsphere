@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs_new` (
 	`osu_diff` REAL,
 	`msd_diff` REAL,
 	`msd_diff_data` BLOB,
+	`msd_diff_rates` BLOB,
 	`user_diff` REAL,
 	`user_diff_data` BLOB,
 	`notes_preview` BLOB
@@ -154,6 +155,7 @@ INSERT INTO chartdiffs_new (
 `osu_diff`,
 `msd_diff`,
 `msd_diff_data`,
+`msd_diff_rates`,
 `user_diff`,
 `user_diff_data`,
 `notes_preview`
@@ -179,6 +181,7 @@ NULL,
 `osu_diff`,
 `msd_diff`,
 `msd_diff_data`,
+'',
 `user_diff`,
 `user_diff_data`,
 `notes_preview`
