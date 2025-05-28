@@ -31,6 +31,15 @@ function NoteChartListView:draw(...)
 	end
 end
 
+local pattern_short_name = {
+	stream = "ST",
+	jumpstream = "JS",
+	handstream = "HS",
+	jackspeed = "JK",
+	chordjack = "CJ",
+	technical = "TH"
+}
+
 ---@param i number
 ---@param w number
 ---@param h number
@@ -41,11 +50,29 @@ function NoteChartListView:drawItem(i, w, h)
 	just.indent(18)
 
 	local baseTimeRate = self.game.replayBase.rate
-	if self.game.configModel.configs.settings.select.chartviews_table ~= "chartviews" then
+
+	local select = self.game.configModel.configs.settings.select
+
+	if select.chartviews_table ~= "chartviews" then
 		baseTimeRate = 1
 	end
 
 	local difficulty = item.difficulty and Format.difficulty(item.difficulty * baseTimeRate) or ""
+	local left_cell_width = 72
+
+	if select.diff_column == "msd_diff" and item.msd_diff_data then
+		local pattern = ""
+		left_cell_width = 110
+		local max_diff = -math.huge
+		for p, diff in pairs(item.msd_diff_data) do
+			if diff > max_diff and p ~= "stamina" and p ~= "overall" then
+				pattern = p
+				max_diff = diff
+			end
+		end
+		difficulty = ("%s %s"):format(difficulty, pattern_short_name[pattern] or pattern)
+	end
+
 
 	local inputmode = item.chartdiff_inputmode and Format.inputMode(item.chartdiff_inputmode) or ""
 	local creator = item.creator or ""
@@ -60,7 +87,7 @@ function NoteChartListView:drawItem(i, w, h)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	TextCellImView(72, h, "right", inputmode, difficulty, true)
+	TextCellImView(left_cell_width, h, "right", inputmode, difficulty, true)
 	just.sameline()
 
 	if item.lamp then
