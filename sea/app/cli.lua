@@ -13,6 +13,7 @@ pkg.add("libchart")
 pkg.add("tree/share/lua/5.1")
 
 pkg.export_lua()
+pcall(pkg.export_love)
 
 require("preload")
 local stbl = require("stbl")
@@ -26,7 +27,6 @@ coroutine.wrap = require("icc.co").wrap
 local App = require("sea.app.App")
 local app_config = require("app_config")
 local app = App(app_config)
-app:load()
 
 local domain = app.domain
 local chartplays = domain.chartplays
@@ -291,6 +291,7 @@ end
 local command = arg[1]
 local f = cmds[command]
 if f then
+	app:load()
 	f(unpack(arg, 2))
 else
 	print("unknown command")
