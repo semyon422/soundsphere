@@ -113,6 +113,8 @@ soundsphere имеет свою папку с картами в которую �
 [Mumeisen11 (1.3GB)](https://drive.usercontent.google.com/download?id=0BxcEoygd7bh-Y3FpaVdmdGhCQmM&export=download&authuser=0) Google Drive  
 [Mumeisen15 (3.5GB)](https://drive.google.com/file/d/1p8_4UpilwmoresANu747w07M48X2rTUY/view) Google Drive  
 
+### [The Big Sister BMS Project](https://bms.wrigglebug.xyz/)
+
 ### [bms.kyouko.moe](https://bms.kyouko.moe/)
 Это огромная коллекция паков, есть возможность загрузить отдельные карты и возможность загрузить целые паки.  
 Первым делом рекомендую ознакомится с [презентацией](https://docs.google.com/presentation/d/1j5Xwon8NR6rTvmYCvvnbhFyeP5SAL6NYHtlHhln8nSM/edit?slide=id.p#slide=id.p) где подробно описан лучший способ загрузки.  
