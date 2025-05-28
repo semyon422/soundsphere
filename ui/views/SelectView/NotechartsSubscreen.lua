@@ -153,11 +153,12 @@ local function ChartCells(self)
 	local localOffset = ""
 	local format = ""
 	if chartview then
+		notes_count = chartview.notes_count or 0
 		bpm = (chartview.tempo or 0) * baseTimeRate
 		length = (chartview.duration or 0) / baseTimeRate
-		notes_count = chartview.notes_count or 0
 		level = chartview.level or 0
-		longNoteRatio = (chartview.long_notes_count or 0) / (chartview.notes_count or 0)
+		local long_notes_count = (chartview.judges_count or 0) - notes_count
+		longNoteRatio = long_notes_count / notes_count
 		localOffset = chartview.offset or ""
 		format = chartview.format or ""
 	end

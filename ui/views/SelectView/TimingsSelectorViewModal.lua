@@ -43,6 +43,10 @@ return ModalImView(function(self, quit)
 
 	TimingsSelectorView(game)
 
+	if imgui.button("applyTimings", "apply") then
+		game.rhythmModel.scoreEngine:createByTimings(replayBase.timings, replayBase.subtimings, true)
+	end
+
 	scrollY = imgui.Container()
 	just.pop()
 

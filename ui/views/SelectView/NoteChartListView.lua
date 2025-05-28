@@ -2,6 +2,7 @@ local ListView = require("sphere.views.ListView")
 local just = require("just")
 local TextCellImView = require("ui.imviews.TextCellImView")
 local Format = require("sphere.views.Format")
+local math_util = require("math_util")
 
 local NoteChartListView = ListView()
 
@@ -31,6 +32,67 @@ function NoteChartListView:draw(...)
 	end
 end
 
+local pattern_short_name = {
+	stream = "ST",
+	jumpstream = "JS",
+	handstream = "HS",
+	jackspeed = "JK",
+	chordjack = "CJ",
+	technical = "TH"
+}
+
+local msd_min_rate = 7
+local msd_max_rate = 20
+
+---@param rate_multipliers number[]
+---@param time_rate number
+---@return number
+local function approximateRateMultiplier(rate_multipliers, time_rate)
+	local floor = math_util.clamp(math.floor(time_rate * 10), msd_min_rate, msd_max_rate) - msd_min_rate + 1
+	local ceil = math_util.clamp(math.ceil(time_rate * 10), msd_min_rate, msd_max_rate) - msd_min_rate + 1
+
+	if floor == ceil then
+		return rate_multipliers[floor]
+	end
+
+	local lower = rate_multipliers[floor]
+	local upper = rate_multipliers[ceil]
+
+	return (lower + upper) / 2
+end
+
+---@param item table
+---@param diff_column string
+---@param time_rate number
+---@return string
+local function formatDifficulty(item, diff_column, time_rate)
+	if not item.difficulty then
+		return ""
+	end
+
+	if diff_column ~= "msd_diff" then
+		return Format.difficulty(item.difficulty * time_rate) or ""
+	end
+
+	if not item.msd_diff_data or not item.msd_diff_rates then
+		return ""
+	end
+
+	local max_diff = -math.huge
+	local pattern = ""
+
+	for p, diff in pairs(item.msd_diff_data) do
+		if diff > max_diff and p ~= "stamina" and p ~= "overall" then
+			pattern = p
+			max_diff = diff
+		end
+	end
+
+	local rate_multiplier = approximateRateMultiplier(item.msd_diff_rates, time_rate)
+	local f = Format.difficulty(item.difficulty * rate_multiplier) or ""
+	return ("%s %s"):format(f, pattern_short_name[pattern])
+end
+
 ---@param i number
 ---@param w number
 ---@param h number
@@ -41,11 +103,15 @@ function NoteChartListView:drawItem(i, w, h)
 	just.indent(18)
 
 	local baseTimeRate = self.game.replayBase.rate
-	if self.game.configModel.configs.settings.select.chartviews_table ~= "chartviews" then
+
+	local select = self.game.configModel.configs.settings.select
+
+	if select.chartviews_table ~= "chartviews" then
 		baseTimeRate = 1
 	end
 
-	local difficulty = item.difficulty and Format.difficulty(item.difficulty * baseTimeRate) or ""
+	local difficulty = formatDifficulty(item, select.diff_column, baseTimeRate)
+	local left_cell_width = select.diff_column == "msd_diff" and 110 or 72
 
 	local inputmode = item.chartdiff_inputmode and Format.inputMode(item.chartdiff_inputmode) or ""
 	local creator = item.creator or ""
@@ -60,7 +126,7 @@ function NoteChartListView:drawItem(i, w, h)
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	TextCellImView(72, h, "right", inputmode, difficulty, true)
+	TextCellImView(left_cell_width, h, "right", inputmode, difficulty, true)
 	just.sameline()
 
 	if item.lamp then

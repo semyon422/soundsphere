@@ -142,7 +142,7 @@ function RhythmModel:getChartplayComputed(fast)
 	local rating_msd = 0
 	if not fast then
 		local ctx = self.diffcalc_context
-		local ssr = minacalc.calc(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
+		local ssr = minacalc.calc_ssr(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
 		rating_msd = ssr.overall
 	end
 

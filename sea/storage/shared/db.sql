@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`osu_diff` REAL NOT NULL,
 	`msd_diff` REAL NOT NULL,
 	`msd_diff_data` BLOB NOT NULL,
+	`msd_diff_rates` BLOB NOT NULL,
 	`user_diff` REAL NOT NULL,
 	`user_diff_data` BLOB NOT NULL,
 	`notes_preview` BLOB NOT NULL
