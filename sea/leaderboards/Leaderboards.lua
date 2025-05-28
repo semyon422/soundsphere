@@ -100,10 +100,6 @@ function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 		lb_user.rank = 0
 	end
 
-	if not no_rank then
-		lb_user.rank = repo:getLeaderboardUserRank(lb.id, rating)
-	end
-
 	lb_user.total_rating = rating
 	lb_user.total_accuracy = total_rating.accuracy
 	lb_user.updated_at = time
@@ -112,6 +108,11 @@ function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 		repo:createLeaderboardUser(lb_user)
 	else
 		repo:updateLeaderboardUser(lb_user)
+	end
+
+	if not no_rank then
+		-- lb_user.rank = repo:getLeaderboardUserRank(lb.id, rating)
+		repo:updateLeaderboardUserRanks()
 	end
 end
 

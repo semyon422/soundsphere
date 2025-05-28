@@ -287,9 +287,20 @@ function LeaderboardsRepo:getLeaderboardUserRank(leaderboard_id, total_rating)
 	}) + 1
 end
 
----@param lb sea.Leaderboard
-function LeaderboardsRepo:updateLeaderboardUserRanks(lb)
-	
+function LeaderboardsRepo:updateLeaderboardUserRanks()
+	self.models._orm.db:query([[
+		UPDATE leaderboard_users
+		SET rank = lb_users.rank
+		FROM (
+			SELECT
+				ROW_NUMBER() OVER (PARTITION BY leaderboard_id ORDER BY total_rating DESC) AS rank,
+				id
+			FROM leaderboard_users
+		) AS lb_users
+		WHERE
+			leaderboard_users.id = lb_users.id AND
+			leaderboard_users.rank != lb_users.rank
+	]])
 end
 
 --------------------------------------------------------------------------------
