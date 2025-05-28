@@ -25,6 +25,7 @@ local chart_types = require("sea.chart.types")
 ---@field osu_diff number
 ---@field msd_diff number
 ---@field msd_diff_data minacalc.Ssr
+---@field msd_diff_rates number[]
 ---@field user_diff number
 ---@field user_diff_data string
 ---@field notes_preview string
@@ -49,13 +50,14 @@ Chartdiff.struct = {
 	osu_diff = types.number,
 	msd_diff = types.number,
 	msd_diff_data = chart_types.msd_diff_data,
+	msd_diff_rates = chart_types.msd_diff_rates,
 	user_diff = types.number,
 	user_diff_data = types.binary,
 	notes_preview = types.binary,
 }
 
 local computed_keys = table_util.keys(Chartdiff.struct)
-assert(#table_util.keys(Chartdiff.struct) == 15)
+assert(#table_util.keys(Chartdiff.struct) == 16)
 
 local computed_keys_no_msd = table_util.copy(computed_keys)
 table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff"))
@@ -75,7 +77,7 @@ end
 
 table_util.copy(ChartdiffKey.struct, Chartdiff.struct)
 
-assert(#table_util.keys(Chartdiff.struct) == 20)
+assert(#table_util.keys(Chartdiff.struct) == 21)
 
 local validate_chartdiff = valid.struct(Chartdiff.struct)
 

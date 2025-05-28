@@ -109,4 +109,6 @@ chart_types.msd_diff_data = valid.struct({
 	technical = types.number,
 })
 
+chart_types.msd_diff_rates = valid.array(types.number, 14)
+
 return chart_types

@@ -116,6 +116,7 @@ local function create_chartdiff(ctx, values)
 	chartdiff.osu_diff = chartdiff.osu_diff or 0
 	chartdiff.msd_diff = chartdiff.msd_diff or 0
 	chartdiff.msd_diff_data = chartdiff.msd_diff_data or {}
+	chartdiff.msd_diff_rates = chartdiff.msd_diff_rates or {}
 	chartdiff.user_diff = chartdiff.user_diff or 0
 	chartdiff.user_diff_data = chartdiff.user_diff_data or ""
 	chartdiff.notes_preview = chartdiff.notes_preview or ""

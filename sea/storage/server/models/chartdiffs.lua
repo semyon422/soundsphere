@@ -4,6 +4,7 @@ local Gamemode = require("sea.chart.Gamemode")
 local Chartdiff = require("sea.chart.Chartdiff")
 local Modifiers = require("sea.storage.server.Modifiers")
 local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
+local MsdDiffRates = require("sphere.models.DifficultyModel.MsdDiffRates")
 
 ---@type rdb.ModelOptions
 local chartdiffs = {}
@@ -18,6 +19,7 @@ chartdiffs.types = {
 	density_data = stbl,
 	sv_data = stbl,
 	msd_diff_data = MsdDiffData,
+	msd_diff_rates = MsdDiffRates,
 }
 
 return chartdiffs

@@ -10,6 +10,7 @@ local Subtimings = require("sea.chart.Subtimings")
 local IntegerArray = require("sea.storage.server.IntegerArray")
 local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
 local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
+local MsdDiffRates = require("sphere.models.DifficultyModel.MsdDiffRates")
 
 local chartdiffviews = {}
 
@@ -36,6 +37,7 @@ chartdiffviews.types = {
 	rate_type = RateType,
 
 	msd_diff_data = MsdDiffData,
+	msd_diff_rates = MsdDiffRates,
 }
 
 chartdiffviews.relations = {}
