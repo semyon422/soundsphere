@@ -184,7 +184,7 @@
 							<% if edit_description then %>
 								<div class="columns">
 									<div class="column">
-										<a class="button"" id="saveButton">Save</a>
+										<a class="button" id="saveButton">Save</a>
 									</div>
 									<div class="column is-full" style="align-content: center">
 										<p class="has-text-danger" id="descriptionStatus"></p>
