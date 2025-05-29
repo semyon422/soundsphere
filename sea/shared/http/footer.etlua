@@ -17,5 +17,7 @@
 		<a href="/policies?policy_key=privacy" class="footer__link">Privacy</a>
 		<p>•</p>
 		<a href="/policies?policy_key=dmca" class="footer__link">Copyright (DMCA)</a>
+		<p>•</p>
+		<a href="https://github.com/semyon422/soundsphere" class="footer__link">Source code</a>
 	</div>
 </footer>
