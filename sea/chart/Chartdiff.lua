@@ -62,6 +62,7 @@ assert(#table_util.keys(Chartdiff.struct) == 16)
 local computed_keys_no_msd = table_util.copy(computed_keys)
 table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff"))
 table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff_data"))
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff_rates"))
 
 ---@param values sea.Chartdiff
 ---@param no_msd boolean?
