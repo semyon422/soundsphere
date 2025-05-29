@@ -271,3 +271,11 @@ main.center-vertically > * {
 	border: none !important;
 }
 
+/* No flag */
+.fi-xd {
+	background: linear-gradient(135deg,
+		#6ba4da 0%,
+		#a292d7 100%
+	);
+}
+
