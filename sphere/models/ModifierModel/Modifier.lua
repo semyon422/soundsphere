@@ -43,7 +43,7 @@ function Modifier:getCount()
 end
 
 ---@param modifierConfig table
----@param state table
+---@param state sea.ModifiersMetaState
 function Modifier:applyMeta(modifierConfig, state) end
 
 ---@param modifierConfig table

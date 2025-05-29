@@ -1,137 +1,98 @@
 local valid = require("valid")
+local table_util = require("table_util")
+local erfunc = require("libchart.erfunc")
 local types = require("sea.shared.types")
-local Chartkey = require("sea.chart.Chartkey")
-local RateType = require("sea.chart.RateType")
-local Gamemode = require("sea.chart.Gamemode")
-local ComputeState = require("sea.chart.ComputeState")
-local Result = require("sea.chart.Result")
+local chart_types = require("sea.chart.types")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
+local ChartplayBase = require("sea.chart.ChartplayBase")
+local ChartplayComputed = require("sea.chart.ChartplayComputed")
 
----@class sea.Chartplay: sea.Chartkey
+---@class sea.Chartplay: sea.ChartmetaKey, sea.ChartplayBase, sea.ChartplayComputed
 ---@operator call: sea.Chartplay
+--- SERVER defined fields
 ---@field id integer
----@field online_id integer client-only
 ---@field user_id integer
----@field events_hash string
----@field notes_hash string
----@field hash string
----@field index integer
----@field modifiers sea.Modifier[]
----@field custom boolean
----@field rate number
----@field rate_type sea.RateType
----@field mode sea.Gamemode
----@field const boolean
----@field nearest boolean
----@field tap_only boolean - like NoLongNote
----@field timings sea.Timings
----@field healths sea.Healths
----@field columns_order integer[]? nil - unchanged
----@field created_at integer
----@field submitted_at integer
----@field computed_at integer
 ---@field compute_state sea.ComputeState
+---@field computed_at integer
+---@field submitted_at integer
+--- CLEINT defined fields
+---@field online_id integer
+--- METADATA
+---@field replay_hash string
 ---@field pause_count integer
----@field result sea.Result
----@field judges integer[] computed always using chart's timings/judges
----@field accuracy number normalscore
----@field max_combo integer strictly timing-based
----@field perfect_count integer - [-0.016, 0.016] window hits
----@field miss_count integer strictly timing-based
----@field rating number enps normalscore 32
----@field accuracy_osu number
----@field accuracy_etterna number
----@field rating_pp number
----@field rating_msd number
-local Chartplay = Chartkey + {}
+---@field created_at integer client-defined value
+--- REQUIRED for computation: sea.ChartplayBase
+--- METADATA not for computation: sea.ChartplayBase
+--- COMPUTED: sea.ChartplayComputed
+local Chartplay = ChartmetaKey + ChartplayBase + ChartplayComputed
 
-local computed_keys = {
-	"notes_hash",
-	"accuracy",
-	"max_combo",
-	"perfect_count",
-	"not_perfect_count",
-	"miss_count",
-	"rating",
-}
-
----@param values sea.Chartplay
----@return boolean
-function Chartplay:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		if self[key] ~= values[key] then
-			return false
-		end
-	end
-	return true
-end
-
-local is_timings_or_healths = valid.struct({
-	name = types.name,
-	data = valid.optional(types.count),
-})
-
-local is_modifier = valid.struct({})
-
----@param v integer[]
-local function is_columns_order(v)
-	local t = table.move(v, 1, #v, 1)
-	table.sort(t)
-	for i = 1, #v do
-		if i ~= v[i] then
-			return
-		end
-	end
-	return true
-end
-is_columns_order = valid.optional(valid.compose(valid.array(types.index, 100), is_columns_order))
-
-assert(is_columns_order())
-assert(is_columns_order({1, 3, 2}))
-assert(not is_columns_order({1, 3}))
-
-local validate_chartplay = valid.struct({
-	-- user_id = types.index,
-	events_hash = types.md5hash,
-	-- notes_hash = types.md5hash,
-	hash = types.md5hash,
-	index = types.index,
-	modifiers = valid.array(is_modifier, 10),
-	custom = types.boolean,
-	rate = types.number,
-	rate_type = types.new_enum(RateType),
-	mode = types.new_enum(Gamemode),
-	const = types.boolean,
-	nearest = types.boolean,
-	tap_only = types.boolean,
-	timings = is_timings_or_healths,
-	healths = is_timings_or_healths,
-	columns_order = is_columns_order,
-	created_at = types.time,
-	-- submitted_at = types.time,
-	-- computed_at = types.time,
-	-- compute_state = types.new_enum(ComputeState),
+Chartplay.struct = {
+	replay_hash = types.md5hash,
 	pause_count = types.count,
-	result = types.new_enum(Result),
-	judges = valid.array(types.count, 10),
-	accuracy = types.number,
-	max_combo = types.count,
-	perfect_count = types.count,
-	miss_count = types.count,
-	rating = types.number,
-	accuracy_osu = types.number,
-	accuracy_etterna = types.number,
-	rating_pp = types.number,
-	rating_msd = types.number,
-})
+	created_at = types.time,
+}
+table_util.copy(ChartmetaKey.struct, Chartplay.struct)
+table_util.copy(ChartplayBase.struct, Chartplay.struct)
+table_util.copy(ChartplayComputed.struct, Chartplay.struct)
+
+assert(#table_util.keys(Chartplay.struct) == 26)
+
+local validate_chartplay = valid.compose(valid.struct(Chartplay.struct), chart_types.subtimings_pair)
 
 ---@return true?
----@return string[]?
+---@return string|valid.Errors?
 function Chartplay:validate()
-	local ok, errs = validate_chartplay(self)
-	if not ok then
-		return nil, valid.flatten(errs)
+	return validate_chartplay(self)
+end
+
+local keys = table_util.keys(Chartplay.struct)
+
+---@param values sea.Chartplay
+---@return boolean?
+---@return string?
+function Chartplay:equalsChartplay(values)
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
+end
+
+---@return number
+function Chartplay:getNormAccuracy()
+	return erfunc.erf(0.032 / (self.accuracy * math.sqrt(2)))
+end
+
+---@return number
+function Chartplay:getExScore()
+	local judges = self.judges
+	if #judges <= 1 then
+		return 0
 	end
-	return true
+
+	local total = 0
+	for _, c in ipairs(judges) do
+		total = total + c
+	end
+
+	return (2 * judges[1] + judges[2]) / (2 * total)
+end
+
+---@return string
+function Chartplay:getGrade()
+	local exscore = self:getExScore() * 9
+	if exscore >= 8 then
+		return "X"
+	elseif exscore >= 7 then
+		return "S"
+	elseif exscore >= 6 then
+		return "A"
+	elseif exscore >= 5 then
+		return "B"
+	elseif exscore >= 4 then
+		return "C"
+	elseif exscore >= 3 then
+		return "D"
+	elseif exscore >= 2 then
+		return "E"
+	end
+	return "F"
 end
 
 return Chartplay

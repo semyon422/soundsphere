@@ -20,12 +20,12 @@ local Layout = require("ui.views.ResultView.Layout")
 ---@param self table
 ---@return boolean
 local function showLoadedScore(self)
-	local scoreEntry = self.game.playContext.scoreEntry
+	local chartplay = self.game.computeContext.chartplay
 	local scoreItem = self.game.selectModel.scoreItem
-	if not scoreEntry or not scoreItem then
+	if not chartplay or not scoreItem then
 		return false
 	end
-	return scoreItem.id == scoreEntry.id
+	return scoreItem.id == chartplay.id
 end
 
 
@@ -77,6 +77,50 @@ local function Background(self)
 	local dim = self.game.configModel.configs.settings.graphics.dim.result
 	BackgroundView.game = self.game
 	BackgroundView:draw(w, h, dim, 0.01)
+end
+
+---@param self table
+local function ScoreSources(self)
+	local w, h = Layout:move("graphs")
+	local padding = 18 * math.sqrt(2)
+	love.graphics.translate(padding, h)
+
+	---@type sphere.GameController
+	local game = self.game
+	local scoreEngine = game.rhythmModel.scoreEngine
+	local replayModel = game.replayModel
+
+	local show = showLoadedScore(self)
+	local scoreItem = game.selectModel.scoreItem
+
+	if not scoreEngine.accuracySource then
+		return
+	end
+
+	local timings, subtimings = replayModel.replay.timings, replayModel.replay.subtimings
+	if not show and scoreItem then
+		timings, subtimings = scoreItem.timings, scoreItem.subtimings
+	end
+
+	love.graphics.setColor(0, 0, 0, 0.2)
+	love.graphics.rectangle("fill", 0, 0, w, 55)
+
+	love.graphics.setColor(1, 1, 1, 1)
+	love.graphics.setFont(spherefonts.get("Noto Sans", 16))
+
+	imgui.text(("timings: %s, subtimings: %s"):format(timings, subtimings))
+
+	if not show then
+		return
+	end
+
+	imgui.text(("acc: %s, judges: %s, score: %s, combo: %s, healths: %s"):format(
+		scoreEngine.accuracySource:getKey(),
+		scoreEngine.judgesSource:getKey(),
+		scoreEngine.scoreSource:getKey(),
+		scoreEngine.comboSource:getKey(),
+		scoreEngine.healthsSource:getKey()
+	))
 end
 
 ---@param self table
@@ -184,14 +228,17 @@ local _HpGraph = PointGraphView({
 	backgroundRadius = 4,
 	point = function(self, point)
 		local value = 0
-		local _hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
-		local hp = point.hp
-		for _, h in ipairs(hp) do
-			if h.value > 0 then
-				value = h.value / _hp.max
-				break
-			end
-		end
+		local healthsSource = self.game.rhythmModel.scoreEngine.healthsSource
+		local slice = point[healthsSource:getKey()]
+		value = slice.healths / slice.max_healths
+
+		-- local hp = point.hp
+		-- for _, h in ipairs(hp) do
+		-- 	if h.value > 0 then
+		-- 		value = h.value / _hp.max
+		-- 		break
+		-- 	end
+		-- end
 
 		return 1 - value, 0.25, 1, 0.5, 1
 	end,
@@ -212,6 +259,11 @@ local function ScoreList(self)
 	w, h = Layout:move("column3row1")
 	drawFrameRect2(w, h)
 	love.graphics.setColor(1, 1, 1, 1)
+
+	love.graphics.translate(w - h, 0)
+	if imgui.TextButton("replay info", "i", h, h) then
+		self.game.ui.gameView:setModal(require("ui.views.ResultView.ReplayInfoModal"))
+	end
 
 	w, h = Layout:move("column3row2")
 
@@ -261,13 +313,14 @@ local function Title(self)
 	just.text(creator_name)
 end
 
----@param self table
+---@param self {game: sphere.GameController}
 local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythmModel.scoreEngine
 	local scoreItem = self.game.selectModel.scoreItem
+	local judgesSource = scoreEngine.judgesSource
 
-	if not self.judgements or not scoreItem then
+	if not judgesSource or not scoreItem then
 		return
 	end
 
@@ -285,23 +338,20 @@ local function Judgements(self)
 
 	w = w - padding * 2
 
-	local judgeName = self.game.configModel.configs.select.judgements
-	local judge = self.judgements[judgeName]
+	local judgementLists = judgesSource:getJudgeNames()
+	local counters = judgesSource:getJudges()
 
-	local judgementLists = judge.orderedCounters
-	local counters = judge.counters
+	if not show then
+		counters = scoreItem.judges
+	end
 
-	local perfect = show and counters.perfect or scoreItem.perfect or 0
-	local notPerfect = show and counters["not perfect"] or scoreItem.not_perfect or 0
-	local miss = show and judge.counters.miss or scoreItem.miss or 0
+	counters = counters or {}
 
-	local notes = perfect + notPerfect + miss
+	local miss = show and scoreEngine.scores.base.missCount or scoreItem.miss_count or 0
 
-	if show then -- LR2 mash can be higher than total count of notes
-		notes = 0
-		for _, counter in pairs(judge.counters) do
-			notes = notes + counter
-		end
+	local notes = 0
+	for _, n in ipairs(counters) do
+		notes = notes + n
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
@@ -311,14 +361,15 @@ local function Judgements(self)
 	local lineHeight = 40
 
 	if show then
-		for _, name in ipairs(judgementLists) do
-			imgui.ValueBar(w, lineHeight, counters[name] / notes, name, counters[name])
+		for i, name in ipairs(judgementLists) do
+			imgui.ValueBar(w, lineHeight, counters[i] / notes, name, counters[i])
 			just.emptyline(interval)
 		end
 	else
-		imgui.ValueBar(w, lineHeight, perfect / notes, "perfect", perfect)
-		just.emptyline(interval)
-		imgui.ValueBar(w, lineHeight, notPerfect / notes, "not perfect", notPerfect)
+		for i, v in ipairs(counters) do
+			imgui.ValueBar(w, lineHeight, v / notes, "", v)
+			just.emptyline(interval)
+		end
 	end
 
 	Layout:move("column1row2")
@@ -327,77 +378,49 @@ local function Judgements(self)
 	imgui.ValueBar(w, lineHeight, miss / notes, "miss", miss)
 end
 
-local selectorState = {}
-
----@param item table
----@param w number
----@param h number
----@return string?
-local function JudgementSelector(item, w, h)
-	local name = item.name
-	if not item.range then
-		return imgui.TextOnlyButton(name .. "judgement", name, w, h, "center") and name
-	end
-
-	selectorState[name] = selectorState[name] or item.range[1]
-	local v = selectorState[name]
-
-	local text = name:format(selectorState[name])
-
-	if item.rangeValueAlias then
-		text = name:format(item.rangeValueAlias[v])
-	end
-
-	local ret
-	just.row(true)
-	if imgui.TextOnlyButton(name .. "judgement", text, w - h * 2, h, "center") then
-		ret = text
-		if item.rangeValueAlias then
-			ret = name:format(item.rangeValueAlias[v])
-		end
-	end
-	if imgui.TextOnlyButton(name .. "judgement<", "<", h, h, "center") and v > item.range[1] then
-		selectorState[name] = v - 1
-	end
-	if imgui.TextOnlyButton(name .. "judgement>", ">", h, h, "center") and v < item.range[2] then
-		selectorState[name] = v + 1
-	end
-	just.row()
-
-	return ret
-end
-
----@param self table
+---@param self {game: sphere.GameController}
 local function JudgementsDropdown(self)
+	local show = showLoadedScore(self)
+	local scoreItem = self.game.selectModel.scoreItem
+	local chartview = self.game.selectModel.chartview
+
 	local w, h = Layout:move("column1row1")
 	h = 60
 
 	local size = 1 / 2
 	love.graphics.translate(w * (1 - size) - 26, (72 - h) / 2)
 
-	local items = self.selectors
-
-	local config = self.game.configModel.configs.select
-	local preview = config.judgements
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
-	local s = 0.75
-	if imgui.Spoiler("JudgementsDropdown", w * size, h, preview) then
-		love.graphics.setColor(0, 0, 0, 1)
-		love.graphics.rectangle("fill", 0, 0, w, h * s * #items)
-		love.graphics.setColor(1, 1, 1, 1)
-		for i, item in ipairs(items) do
-			local v = JudgementSelector(item, w * size - h * (1 - s), h * s)
-			if v then
-				config.judgements = v
-				just.focus()
-			end
+	imgui.setSize(w, h, w / 2, h / 2)
+
+	---@type sea.ReplayBase
+	local replayBase = self.game.replayBase
+
+	if not show then
+		if not scoreItem then
+			return
 		end
-		imgui.Spoiler()
+		replayBase = scoreItem
+	end
+
+	local timings = replayBase.timings or chartview.timings
+	local subtimings = replayBase.subtimings
+
+	local text = ""
+	if timings then
+		text = timings.name .. " " .. timings.data
+	end
+	if subtimings then
+		text = text .. " " .. subtimings.name .. " " .. subtimings.data
+	end
+
+	if imgui.TextButton("timings modal", text, w * size, h) then
+		self.game.ui.gameView:setModal(require("ui.views.SelectView.TimingsSelectorViewModal"))
 	end
 end
 
----@param self table
+---@param self {game: sphere.GameController}
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
 	local scoreItem = self.game.selectModel.scoreItem
@@ -406,19 +429,14 @@ local function JudgementsAccuracy(self)
 		return
 	end
 
-	local counterName = self.game.configModel.configs.select.judgements
-	local judge = self.judgements[counterName]
-
-	if not judge.accuracy then
-		return
-	end
+	local scoreEngine = self.game.rhythmModel.scoreEngine
 
 	local w, h = Layout:move("column1row1")
 	love.graphics.translate(36, 0)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 32))
-	imgui.Label("j.acc", ("%3.2f%%"):format(judge.accuracy * 100), h)
+	imgui.Label("j.acc", scoreEngine.accuracySource:getAccuracyString(), h)
 end
 
 ---@param self table
@@ -427,12 +445,12 @@ local function NotechartInfo(self)
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
 	local rhythmModel = self.game.rhythmModel
-	local normalscore = rhythmModel.scoreEngine.scoreSystem.normalscore
+	local normalscore = rhythmModel.scoreEngine.scores.normalscore
 
 	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
 	local scoreEngine = rhythmModel.scoreEngine
-	local playContext = self.game.playContext
+	local replay = self.game.replayModel.replay
 
 	if not scoreItem then
 		return
@@ -446,24 +464,24 @@ local function NotechartInfo(self)
 		topScoreItem = scoreItem
 	end
 
-	local scoreEntry = playContext.scoreEntry
-	if not scoreEntry then
+	local chartplay = self.game.computeContext.chartplay
+	if not chartplay then
 		return
 	end
 
 	local show = showLoadedScore(self)
 
-	local baseTimeRate = show and playContext.rate or scoreItem.rate
-	local const = show and playContext.const or scoreItem.const
+	local baseTimeRate = show and replay.rate or scoreItem.rate
+	local const = show and replay.const or scoreItem.const
 
 	local baseBpm = chartview.tempo
-	local baseLength = chartview.duration
+	local baseLength = chartview.duration or 0
 	local baseDifficulty = chartview.difficulty
 	local baseInputMode = chartview.inputmode
 
-	local bpm = scoreItem.tempo
-	local length = scoreItem.duration
-	local difficulty = show and playContext.chartdiff.enps_diff or scoreItem.difficulty
+	local bpm = baseBpm * scoreItem.rate
+	local length = baseLength / scoreItem.rate
+	local difficulty = show and rhythmModel.chartdiff.enps_diff or scoreItem.difficulty
 	local inputMode = show and tostring(rhythmModel.chart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
@@ -508,7 +526,7 @@ local function NotechartInfo(self)
 		just.text("c")
 	end
 
-	local hp = scoreEngine.scoreSystem.hp
+	local hp = scoreEngine.scores.hp
 	if show and hp then
 		just.sameline()
 		just.offset(0)
@@ -548,9 +566,9 @@ local function NotechartInfo(self)
 
 	local rating = scoreItem.rating
 
-	if scoreEntry.id == scoreItem.id then
+	if chartplay.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.chartdiff.enps_diff
+		rating = s * rhythmModel.chartdiff.enps_diff
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)
@@ -684,10 +702,10 @@ local function NotechartInfo(self)
 
 	just.row(true)
 
-	local mean = show and normalscore.normalscore.mean or scoreItem.mean
+	local mean = show and normalscore.normalscore.mean or scoreItem.mean or 0
 	TextCellImView(w, 55, "right", "mean", ("%0.1f"):format(mean * 1000))
 
-	-- local earlylate = show and scoreEngine.scoreSystem.misc.earlylate or scoreItem.earlylate
+	-- local earlylate = show and scoreEngine.scores.misc.earlylate or scoreItem.earlylate
 	-- if earlylate == 0 or earlylate ~= earlylate then
 	-- 	earlylate = "undef"
 	-- elseif earlylate > 1 then
@@ -697,15 +715,15 @@ local function NotechartInfo(self)
 	-- end
 	-- TextCellImView(w, 55, "right", "early/late", earlylate)
 
-	TextCellImView(w, 55, "right", "pauses", scoreItem.pauses)
+	TextCellImView(w, 55, "right", "pauses", scoreItem.pause_count)
 
 	if show then
 		local adjustRatio = normalscore.adjustRatio
 		adjustRatio = adjustRatio ~= adjustRatio and "nan" or ("%d%%"):format((1 - adjustRatio) * 100)
 		TextCellImView(w, 55, "right", "adjust", adjustRatio)
 
-		TextCellImView(w, 55, "right", "spam", scoreEngine.scoreSystem.base.earlyHitCount)
-		TextCellImView(w, 55, "right", "max error", ("%d"):format(scoreEngine.scoreSystem.misc.maxDeltaTime * 1000))
+		TextCellImView(w, 55, "right", "spam", scoreEngine.scores.base.earlyHitCount)
+		TextCellImView(w, 55, "right", "max error", ("%d"):format(scoreEngine.scores.misc.maxDeltaTime * 1000))
 	end
 
 	just.row()
@@ -718,9 +736,16 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(36, 0)
 
 	local selectModel = self.game.selectModel
-	local modifiers = self.game.playContext.modifiers
+	local replay = self.game.replayModel.replay
+
+	local modifiers = replay and replay.modifiers
+
 	if not showLoadedScore(self) and selectModel.scoreItem then
 		modifiers = selectModel.scoreItem.modifiers
+	end
+
+	if not modifiers then
+		return
 	end
 
 	ModifierIconGridView.game = self.game
@@ -739,7 +764,7 @@ local function BottomScreenMenu(self)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEntry = self.game.playContext.scoreEntry
+	local chartplay = self.game.computeContext.chartplay
 
 	w, h = Layout:move("graphs_sup_right")
 	love.graphics.setColor(0, 0, 0, 0.8)
@@ -754,7 +779,7 @@ local function BottomScreenMenu(self)
 	if imgui.TextOnlyButton("replay", "watch", 72 * 1.5, h) then
 		self:play("replay")
 	end
-	if scoreItem and scoreEntry and scoreItem.id == scoreEntry.id and not scoreItem.file then
+	if scoreItem and chartplay and scoreItem.id == chartplay.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
 			self.game.onlineModel.onlineScoreManager:submit(self.game.selectModel.chartview, scoreItem.replay_hash)
 		end
@@ -787,6 +812,7 @@ return function(self)
 	HpGraph(self)
 	MissGraph(self)
 	EarlyHitGraph(self)
+	ScoreSources(self)
 	BottomScreenMenu(self)
 	Judgements(self)
 	JudgementsDropdown(self)

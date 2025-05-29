@@ -21,22 +21,21 @@ Shift.description = "Shift the note chart"
 ---@return string?
 ---@return string?
 function Shift:getString(config)
-    if config.value > 0 then
-        return "S+", math.abs(config.value)
-    elseif config.value < 0 then
-        return "S-", math.abs(config.value)
-    end
+	if config.value > 0 then
+		return "S+", math.abs(config.value)
+	elseif config.value < 0 then
+		return "S-", math.abs(config.value)
+	end
 end
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return table
-function Shift:getMap(config)
-	local chart = self.chart
-
+function Shift:getMap(config, inputMode)
 	local map = {}
 
 	local value = config.value
-	for inputType, inputCount in pairs(chart.inputMode) do
+	for inputType, inputCount in pairs(inputMode) do
 		for i = 1, inputCount do
 			map[inputType .. i] = inputType .. ((i + value - 1) % inputCount + 1)
 		end

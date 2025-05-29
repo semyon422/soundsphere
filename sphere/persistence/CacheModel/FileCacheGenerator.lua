@@ -63,12 +63,22 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 		elseif typ == "directory" then
 			res = self:shouldScan(dir, name, modtime, location_id)
 		elseif typ == "directory_all" then
-			self.chartfilesRepo:deleteChartfileSets({
-				dir = dir,
-				dir__isnull = not dir,
-				name__notin = name,
-				location_id = location_id,
-			})
+			local names_current = table_util.invert(name)
+			local chartfile_sets = self.chartfilesRepo:selectChartfileSetsAtLocation(location_id, dir)
+			local names_to_delete = {}
+			for _, set in ipairs(chartfile_sets) do
+				if not names_current[set.name] then
+					table.insert(names_to_delete, set.name)
+				end
+			end
+			for _, slice in ipairs(table_util.slices(names_to_delete, 1024)) do
+				self.chartfilesRepo:deleteChartfileSets({
+					dir = dir,
+					dir__isnull = not dir,
+					name__in = slice,
+					location_id = location_id,
+				})
+			end
 		elseif typ == "not_found" then
 			self.chartfilesRepo:deleteChartfileSets({
 				dir = dir,

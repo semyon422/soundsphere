@@ -29,7 +29,7 @@ end
 ---@return boolean
 local function checkNote(note)
 	local t = note:getType()
-	return t == "note" or t == "hold"
+	return t == "tap" or t == "hold"
 end
 
 ---@param notes ncdk2.LinkedNote[]

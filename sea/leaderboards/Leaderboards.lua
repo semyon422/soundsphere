@@ -5,13 +5,15 @@ local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardUser = require("sea.leaderboards.LeaderboardUser")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
+local TotalRating = require("sea.leaderboards.TotalRating")
 
 ---@class sea.Leaderboards
 ---@operator call: sea.Leaderboards
 local Leaderboards = class()
 
----@param leaderboards_repo sea.ILeaderboardsRepo
+---@param leaderboards_repo sea.LeaderboardsRepo
 function Leaderboards:new(leaderboards_repo)
+	self.total_rating = TotalRating()
 	self.leaderboards_repo = leaderboards_repo
 	self.leaderboards_access = LeaderboardsAccess()
 end
@@ -19,6 +21,11 @@ end
 ---@return sea.Leaderboard[]
 function Leaderboards:getLeaderboards()
 	return self.leaderboards_repo:getLeaderboards()
+end
+
+---@return integer
+function Leaderboards:getLeaderboardsCount()
+	return self.leaderboards_repo:getLeaderboardsCount()
 end
 
 ---@param id integer?
@@ -30,45 +37,88 @@ function Leaderboards:getLeaderboard(id)
 	return self.leaderboards_repo:getLeaderboard(id)
 end
 
----@param chartplay sea.Chartplayview
----@param rating_calc sea.RatingCalc
-local function get_rating(chartplay, rating_calc)
-	return chartplay[RatingCalc:column(rating_calc)]
+---@param lb_id integer
+---@param user_id integer
+---@return sea.LeaderboardUser?
+function Leaderboards:getLeaderboardUser(lb_id, user_id)
+	return self.leaderboards_repo:getLeaderboardUser(lb_id, user_id)
+end
+
+---@param lb_id integer
+---@return integer
+function Leaderboards:getLeaderboardUsersCount(lb_id)
+	return self.leaderboards_repo:getLeaderboardUsersCount(lb_id)
+end
+
+---@param lb_id integer
+---@param limit integer?
+---@param offset integer?
+---@return sea.LeaderboardUser[]
+function Leaderboards:getLeaderboardUsersFull(lb_id, limit, offset)
+	return self.leaderboards_repo:getLeaderboardUsersFull(lb_id, limit, offset)
 end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
-function Leaderboards:updateLeaderboardUser(lb, user_id)
+---@return sea.Chartplayview[]
+function Leaderboards:getBestChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getBestChartplaysFull(lb, user_id)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function Leaderboards:getFirstPlaceChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getFirstPlaceChartplaysFull(lb, user_id)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@return sea.Chartplayview[]
+function Leaderboards:getRecentChartplaysFull(lb, user_id)
+	return self.leaderboards_repo:getRecentChartplaysFull(lb, user_id)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@param no_rank boolean?
+function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
 	local repo = self.leaderboards_repo
+	local total_rating = self.total_rating
+	local time = os.time()
+
+	local chartplays = repo:getBestChartplays(lb, user_id)
+	total_rating:calc(chartplays)
+	local rating = total_rating:get(lb.rating_calc)
 
 	local lb_user = repo:getLeaderboardUser(lb.id, user_id)
+	local found = not not lb_user
 	if not lb_user then
 		lb_user = LeaderboardUser()
 		lb_user.leaderboard_id = lb.id
 		lb_user.user_id = user_id
-		lb_user = repo:createLeaderboardUser(lb_user)
+		lb_user.rank = 0
 	end
 
-	local chartplays = repo:getBestChartplays(lb, user_id)
+	lb_user.total_rating = rating
+	lb_user.total_accuracy = total_rating.accuracy
+	lb_user.updated_at = time
 
-	local total_rating = 0
-	if lb.scores_comb == "avg" then
-		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc)
-		end
-		total_rating = total_rating / lb.scores_comb_count
-	elseif lb.scores_comb == "exp95" then
-		local mul = 1
-		for i = 1, math.min(lb.scores_comb_count, #chartplays) do
-			total_rating = total_rating + get_rating(chartplays[i], lb.rating_calc) * mul
-			mul = mul * 0.95
-		end
+	if not found then
+		repo:createLeaderboardUser(lb_user)
+	else
+		repo:updateLeaderboardUser(lb_user)
 	end
 
-	lb_user.total_rating = total_rating
-	lb_user.rank = repo:getLeaderboardUserRank(lb_user)
-	lb_user.updated_at = os.time()
-	repo:updateLeaderboardUser(lb_user)
+	if not no_rank then
+		-- lb_user.rank = repo:getLeaderboardUserRank(lb.id, rating)
+		repo:updateLeaderboardUserRanks()
+	end
+end
+
+---@param lb sea.Leaderboard
+function Leaderboards:updateRanks(lb)
+	self.leaderboards_repo:updateLeaderboardUserRanks(lb)
 end
 
 ---@param chartplay sea.Chartplay
@@ -83,36 +133,12 @@ function Leaderboards:addChartplay(chartplay)
 	end
 end
 
----@param src sea.Leaderboard
----@param dst sea.Leaderboard
-local function safe_copy_lb(src, dst)
-	dst.name = src.name
-	dst.description = src.description
-	dst.rating_calc = src.rating_calc
-	dst.scores_comb = src.scores_comb
-	dst.scores_comb_count = src.scores_comb_count
-	dst.nearest = src.nearest
-	dst.result = src.result
-	dst.allow_custom = not not src.allow_custom
-	dst.allow_const = not not src.allow_const
-	dst.allow_pause = not not src.allow_pause
-	dst.allow_reorder = not not src.allow_reorder
-	dst.allow_modifiers = not not src.allow_modifiers
-	dst.allow_tap_only = not not src.allow_tap_only
-	dst.allow_free_timings = not not src.allow_free_timings
-	dst.allow_free_healths = not not src.allow_free_healths
-	dst.mode = src.mode
-	dst.rate = src.rate
-	dst.chartmeta_inputmode = src.chartmeta_inputmode
-	dst.chartdiff_inputmode = src.chartdiff_inputmode
-end
-
 ---@param user sea.User
 ---@param lb_values sea.Leaderboard
 ---@return sea.Leaderboard?
 ---@return string?
 function Leaderboards:create(user, lb_values)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -122,12 +148,9 @@ function Leaderboards:create(user, lb_values)
 		return nil, "name_taken"
 	end
 
-	lb = Leaderboard()
+	lb_values.created_at = os.time()
 
-	safe_copy_lb(lb_values, lb)
-	lb.created_at = os.time()
-
-	lb = self.leaderboards_repo:createLeaderboard(lb)
+	lb = self.leaderboards_repo:createLeaderboard(lb_values)
 	self:updateLeaderboardDifftables(lb.id, lb_values.leaderboard_difftables)
 
 	return lb
@@ -139,7 +162,7 @@ end
 ---@return sea.Leaderboard?
 ---@return string?
 function Leaderboards:update(user, id, lb_values)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end
@@ -155,9 +178,9 @@ function Leaderboards:update(user, id, lb_values)
 		return nil, "not_found"
 	end
 
-	safe_copy_lb(lb_values, lb)
+	lb_values.id = lb.id
 
-	self.leaderboards_repo:updateLeaderboard(lb)
+	lb = self.leaderboards_repo:updateLeaderboardFull(lb_values)
 	self:updateLeaderboardDifftables(id, lb_values.leaderboard_difftables)
 
 	return lb
@@ -168,7 +191,7 @@ end
 ---@return true?
 ---@return string?
 function Leaderboards:delete(user, id)
-	local can, err = self.leaderboards_access:canManage(user)
+	local can, err = self.leaderboards_access:canManage(user, os.time())
 	if not can then
 		return nil, err
 	end

@@ -5,7 +5,7 @@ local ChartfilesAccess = require("sea.chart.access.ChartfilesAccess")
 ---@operator call: sea.Chartfiles
 local Chartfiles = class()
 
----@param charts_repo sea.IChartsRepo
+---@param charts_repo sea.ChartsRepo
 function Chartfiles:new(charts_repo)
 	self.charts_repo = charts_repo
 	self.chartfilesAccess = ChartfilesAccess()

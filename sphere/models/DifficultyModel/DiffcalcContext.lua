@@ -6,7 +6,7 @@ local simplify_notechart = require("libchart.simplify_notechart")
 ---@operator call: sphere.DiffcalcContext
 local DiffcalcContext = class()
 
----@param chartdiff table
+---@param chartdiff sea.Chartdiff
 ---@param chart ncdk2.Chart
 ---@param rate number
 function DiffcalcContext:new(chartdiff, chart, rate)
@@ -15,7 +15,7 @@ function DiffcalcContext:new(chartdiff, chart, rate)
 	self.rate = rate
 end
 
-local note_types = {"note", "hold", "laser"}
+local note_types = {"tap", "hold", "laser"}
 
 ---@return table
 function DiffcalcContext:getSimplifiedNotes()

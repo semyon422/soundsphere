@@ -1,5 +1,6 @@
 local class = require("class")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
+local SqliteMigrator = require("rdb.db.SqliteMigrator")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
@@ -8,7 +9,7 @@ local autoload = require("autoload")
 ---@operator call: sphere.GameDatabase
 local GameDatabase = class()
 
-local user_version = 4
+local user_version = 5
 
 ---@param migrations table?
 function GameDatabase:new(migrations)
@@ -20,14 +21,32 @@ function GameDatabase:new(migrations)
 	local _models = autoload("sphere.persistence.CacheModel.models")
 	self.orm = TableOrm(db)
 	self.models = Models(_models, self.orm)
+
+	self.migrator = SqliteMigrator(db)
 end
 
 function GameDatabase:load()
-	self.db:open("userdata/data.db")
-	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql"))
-	self.db:exec(sql)
-	self.db:exec("PRAGMA foreign_keys = ON;")
-	self:migrate()
+	local db = self.db
+
+	db:open("userdata/data.db")
+	db:exec("PRAGMA foreign_keys = ON")
+	db:exec("PRAGMA busy_timeout = 10000")
+
+	local ver = db:user_version()
+
+	if ver == 0 then
+		db:exec(assert(love.filesystem.read("sphere/persistence/CacheModel/database.sql")))
+		db:exec(assert(love.filesystem.read("sea/storage/shared/db.sql")))
+		db:user_version(user_version)
+		ver = user_version
+	elseif ver == user_version - 1 then
+		self:migrate()
+	elseif ver ~= user_version then
+		error("outdated database")
+	end
+
+	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
+	db:exec(sql)
 end
 
 function GameDatabase:unload()
@@ -35,7 +54,7 @@ function GameDatabase:unload()
 end
 
 function GameDatabase:migrate()
-	local count = self.orm:migrate(user_version, self.migrations)
+	local count = self.migrator:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
 	end

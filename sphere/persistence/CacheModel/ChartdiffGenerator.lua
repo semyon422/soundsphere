@@ -4,10 +4,10 @@ local class = require("class")
 ---@operator call: sphere.ChartdiffGenerator
 local ChartdiffGenerator = class()
 
----@param chartdiffsRepo sphere.ChartdiffsRepo
+---@param chartsRepo sea.ChartsRepo
 ---@param difficultyModel sphere.DifficultyModel
-function ChartdiffGenerator:new(chartdiffsRepo, difficultyModel)
-	self.chartdiffsRepo = chartdiffsRepo
+function ChartdiffGenerator:new(chartsRepo, difficultyModel)
+	self.chartsRepo = chartsRepo
 	self.difficultyModel = difficultyModel
 end
 
@@ -17,6 +17,8 @@ function ChartdiffGenerator:compute(chart, rate)
 	local chartdiff = {
 		rate = rate,
 		inputmode = tostring(chart.inputMode),
+		modifiers = {},
+		mode = "mania",
 	}
 
 	self.difficultyModel:compute(chartdiff, chart, rate)
@@ -24,35 +26,27 @@ function ChartdiffGenerator:compute(chart, rate)
 	return chartdiff
 end
 
----@param chartdiff table
----@param chartmeta table
-function ChartdiffGenerator:fillMeta(chartdiff, chartmeta)
-	local rate = chartdiff.rate
-
-	chartdiff.tempo = (chartmeta.tempo or 0) * rate
-	chartdiff.duration = (chartmeta.duration or 0) / rate
-end
-
 ---@param chart ncdk2.Chart
 ---@param hash string
 ---@param index number
----@return table?
+---@return sea.Chartdiff?
 ---@return string?
 function ChartdiffGenerator:create(chart, hash, index)
-	local chartdiff = self.chartdiffsRepo:selectDefaultChartdiff(hash, index)
+	local chartdiff = self.chartsRepo:selectDefaultChartdiff(hash, index)
 	if chartdiff then
 		return chartdiff
 	end
 
 	local ok, chartdiff = xpcall(self.compute, debug.traceback, self, chart, 1)
 	if not ok then
+		---@cast chartdiff +string, -table
 		return nil, chartdiff
 	end
 
 	chartdiff.hash = hash
 	chartdiff.index = index
 
-	self.chartdiffsRepo:insertChartdiff(chartdiff)
+	self.chartsRepo:createUpdateChartdiff(chartdiff, os.time())
 
 	return chartdiff
 end

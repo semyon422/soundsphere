@@ -1,111 +1,92 @@
-local class = require("class")
+local table_util = require("table_util")
 local valid = require("valid")
 local types = require("sea.shared.types")
-local BeatmapStatus = require("sea.osu.BeatmapStatus")
+local chart_types = require("sea.chart.types")
+local ChartFormat = require("sea.chart.ChartFormat")
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
 
----@class sea.Chartmeta
+---@class sea.Chartmeta: sea.ChartmetaKey
 ---@operator call: sea.Chartmeta
+--- EXTERNAL
 ---@field id integer
----@field hash string
----@field index integer
----@field timings sea.Timings
----@field healths sea.Healths
----@field title string
----@field title_unicode string
----@field artist string
----@field artist_unicode string
----@field name string
----@field creator string
----@field level number
----@field inputmode string
----@field source string
----@field tags string
----@field format string
----@field audio_path string
----@field background_path string
----@field preview_time number
----@field osu_beatmap_id integer
----@field osu_beatmapset_id integer
----@field osu_od number
----@field osu_hp number
----@field osu_ranked_status integer
----@field tempo number
----@field duration number
----@field has_video boolean
----@field has_storyboard boolean
----@field has_subtitles boolean
----@field has_negative_speed boolean
----@field has_stacked_notes boolean
----@field breaks_count integer
----@field played_at integer
----@field added_at integer
 ---@field created_at integer
----@field plays_count integer
----@field pitch number
----@field audio_channels integer
----@field used_columns integer
----@field comment string
----@field chart_preview string
-local Chartmeta = class()
-
-local is_timings_or_healths = valid.struct({
-	name = types.name,
-	data = valid.optional(types.count),
-})
+---@field computed_at integer
+---@field osu_ranked_status integer
+--- CLIENT-ONLY
+---@field offset number
+--- ChartmetaKey
+--- COMPUTED
+---@field inputmode string
+---@field format sea.ChartFormat
+---@field timings sea.Timings?
+---@field healths sea.Healths?
+---@field title string?
+---@field title_unicode string?
+---@field artist string?
+---@field artist_unicode string?
+---@field name string?
+---@field creator string?
+---@field level number?
+---@field source string?
+---@field tags string?
+---@field audio_path string?
+---@field audio_offset string?
+---@field background_path string?
+---@field preview_time number?
+---@field osu_beatmap_id integer?
+---@field osu_beatmapset_id integer?
+---@field tempo number?
+---@field tempo_avg number?
+---@field tempo_max number?
+---@field tempo_min number?
+local Chartmeta = ChartmetaKey + {}
 
 local text = types.description
 
-local validate_chartmeta = valid.struct({
-	hash = types.md5hash,
-	index = types.index,
-	timings = is_timings_or_healths,
-	healths = is_timings_or_healths,
-	title = text,
-	title_unicode = text,
-	artist = text,
-	artist_unicode = text,
-	name = text,
-	creator = text,
-	level = types.number,
-	inputmode = types.name,
-	source = text,
-	tags = text,
-	format = types.name,
-	audio_path = text,
-	background_path = text,
-	preview_time = types.number,
-	-- osu_beatmap_id = types.integer,
-	-- osu_beatmapset_id = types.integer,
-	-- osu_od = types.number,
-	-- osu_hp = types.number,
-	-- osu_ranked_status = types.new_enum(BeatmapStatus),
-	tempo = types.number,
-	duration = types.number,
-	-- has_video = types.boolean,
-	-- has_storyboard = types.boolean,
-	-- has_subtitles = types.boolean,
-	-- has_negative_speed = types.boolean,
-	-- has_stacked_notes = types.boolean,
-	-- breaks_count = types.count,
-	-- played_at = types.time,
-	-- added_at = types.time,
-	-- created_at = types.time,
-	-- plays_count = types.count,
-	-- pitch = types.number,
-	-- audio_channels = types.count,
-	-- used_columns = types.count,
-	-- comment = text,
-	-- chart_preview = types.binary,
-})
+Chartmeta.struct = {
+	format = types.new_enum(ChartFormat),
+	inputmode = chart_types.inputmode,
+	timings = valid.optional(chart_types.timings),
+	healths = valid.optional(chart_types.healths),
+	title = valid.optional(text),
+	title_unicode = valid.optional(text),
+	artist = valid.optional(text),
+	artist_unicode = valid.optional(text),
+	name = valid.optional(text),
+	creator = valid.optional(text),
+	level = valid.optional(types.number),
+	source = valid.optional(text),
+	tags = valid.optional(text),
+	audio_path = valid.optional(text),
+	audio_offset = valid.optional(types.number),
+	background_path = valid.optional(text),
+	preview_time = valid.optional(types.number),
+	osu_beatmap_id = valid.optional(types.integer),
+	osu_beatmapset_id = valid.optional(types.integer),
+	tempo = valid.optional(types.number),
+	tempo_avg = valid.optional(types.number),
+	tempo_max = valid.optional(types.number),
+	tempo_min = valid.optional(types.number),
+}
+table_util.copy(ChartmetaKey.struct, Chartmeta.struct)
+
+assert(#table_util.keys(Chartmeta.struct) == 25)
+
+local validate_chartmeta = valid.struct(Chartmeta.struct)
+
+local computed_keys = table_util.keys(Chartmeta.struct)
+
+---@param values sea.Chartmeta
+---@return boolean?
+---@return string?
+function Chartmeta:equalsComputed(values)
+	return valid.equals(table_util.sub(self, computed_keys), table_util.sub(values, computed_keys))
+end
 
 ---@return true?
----@return string[]?
+---@return string|valid.Errors?
 function Chartmeta:validate()
-	local ok, errs = validate_chartmeta(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return validate_chartmeta(self)
 end
 
 return Chartmeta

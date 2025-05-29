@@ -1,4 +1,5 @@
 local SwapModifier = require("sphere.models.ModifierModel.SwapModifier")
+local ColumnsOrder = require("sea.chart.ColumnsOrder")
 
 ---@class sphere.BracketSwap: sphere.SwapModifier
 ---@operator call: sphere.BracketSwap
@@ -22,23 +23,19 @@ for _, t in pairs(hardcodedMaps) do
 end
 
 ---@param config table
+---@param inputMode ncdk.InputMode
 ---@return table
-function BracketSwap:getMap(config)
-	local keyCount = self.chart.inputMode.key
+function BracketSwap:getMap(config, inputMode)
+	local keyCount = inputMode.key
 
 	if keyCount <= 5 then
 		return hardcodedMaps[keyCount] or {}
 	end
 
-	local map = {}
+	local co = ColumnsOrder(inputMode)
+	co:bracketswap()
 
-	local half = math.floor(keyCount / 2)
-	for i = 1, half do
-		map["key" .. i] = "key" .. ((2 * (i - 1)) % half + 1)
-		map["key" .. (keyCount - i + 1)] = "key" .. (keyCount - (2 * (i - 1)) % half)
-	end
-
-	return map
+	return co.map
 end
 
 return BracketSwap

@@ -1,0 +1,46 @@
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">User role</p>
+		<p class="subtitle"><%= user_role.role %></p>
+	</div>
+</section>
+
+<nav class="level">
+	<div class="level-left">
+		<p class="level-item">
+			<a hx-patch hx-vals='{"duration": 2592000}' href="/users/<%= user.id %>/roles/<%= user_role.role %>" class="button is-success">Add 1 month</a>
+		</p>
+		<p class="level-item">
+			<a hx-patch hx-vals='{"duration": -2592000}' href="/users/<%= user.id %>/roles/<%= user_role.role %>" class="button is-success">Sub 1 month</a>
+		</p>
+		<% if user_role:isExpirable() then %>
+			<p class="level-item">
+				<a hx-patch hx-vals='{"unexpire": true}' hx-confirm="Make unexpirable?" href="/users/<%= user.id %>/roles/<%= user_role.role %>" class="button is-success">Unexpire</a>
+			</p>
+		<% end %>
+	</div>
+
+	<div class="level-right">
+		<p class="level-item">
+			<a hx-delete hx-confirm="Delete role?" href="/users/<%= user.id %>/roles/<%= user_role.role %>" class="button is-success">Delete</a>
+		</p>
+	</div>
+</nav>
+
+<table class="table is-fullwidth is-striped">
+	<thead>
+		<th>Started at</th>
+		<th>Expires at</th>
+		<th>Expired</th>
+		<th>Total time</th>
+	</thead>
+	<tbody>
+		<tr>
+			<td><%= os.date("%d.%m.%Y", user_role.started_at) %></td>
+			<td><%= user_role.expires_at and os.date("%d.%m.%Y", user_role.expires_at) or "-" %></td>
+			<td><%= user_role:isExpired(os.time()) %></td>
+			<td><%= user_role:getTotalTime(os.time()) %></td>
+		</tr>
+	</tbody>
+</table>
+

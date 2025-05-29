@@ -1,7 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
 local Enum = require("rdb.Enum")
-local UserRole = require("sea.access.UserRole")
 
 ---@class sea.Roles
 ---@operator call: sea.Roles

@@ -3,51 +3,55 @@ function onSubmit(token) {
 	document.getElementById("login-form").submit();
 }
 </script>
-<div class="center-form-vertical">
-	<div></div>
-	<div class="columns is-centered">
-		<div class="column is-one-third">
-			<div class="card">
-				<div class="card-content">
-					<form id="login-form" action="/login" method="post">
-						<h1 class="title is-3" align="center">Log in</h1>
+<div class="columns is-centered">
+	<div class="column is-one-third">
+		<div class="card">
+			<div class="card-content">
+				<form id="login-form" action="/login" method="post">
+					<h1 class="title is-3" align="center">Log in</h1>
 
-						<div class="block">
-							<div class="field">
-								<label class="label">Email</label>
-								<div class="control">
-									<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
-								</div>
-							</div>
-
-							<div class="field">
-								<label class="label">Password</label>
-								<div class="control">
-									<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
-								</div>
+					<div class="block">
+						<div class="field">
+							<label class="label">Email</label>
+							<div class="control has-icons-left">
+								<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-at"></i>
+								</span>
 							</div>
 						</div>
 
-						<div class="block">
-							<p>Not registered? <a href="/register">Sign up</a></p>
-						</div>
-
-						<div class="block">
-							<div class="field">
-								<div class="control">
-									<button class="button is-link is-fullwidth g-recaptcha"
-										data-sitekey="<%= recaptcha_site_key %>"
-										data-callback="onSubmit"
-										data-action="login"
-									>Log in</button>
-								</div>
+						<div class="field">
+							<label class="label">Password</label>
+							<div class="control has-icons-left">
+								<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-key"></i>
+								</span>
 							</div>
 						</div>
-						<div class="block">
-							<%- view:render("sea/shared/http/field_errors.etlua") %>
+					</div>
+
+					<div class="block">
+						<p>Not registered? <a hx-boost="false" href="/register">Sign up</a></p>
+						<p><a hx-boost="false" href="/reset_password/send_code">Reset password</a></p>
+					</div>
+
+					<div class="block">
+						<div class="field">
+							<div class="control">
+								<button class="button is-link is-fullwidth g-recaptcha"
+									data-sitekey="<%= recaptcha_site_key %>"
+									data-callback="onSubmit"
+									data-action="login"
+								>Log in</button>
+							</div>
 						</div>
-					</form>
-				</div>
+					</div>
+					<div class="block">
+						<%- view:render("sea/shared/http/field_errors.etlua") %>
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>

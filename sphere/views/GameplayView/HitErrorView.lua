@@ -8,60 +8,57 @@ local inside = require("table_util").inside
 local HitErrorView = class()
 
 HitErrorView.colors = {
-	soundsphere = {
-		perfect = { 1, 1, 1, 1 },
-		["not perfect"] = { 1, 0.6, 0.4, 1 },
+	sphere = {
+		{1, 1, 1, 1},
+		{1, 0.6, 0.4, 1},
 	},
-	osuMania = {
-		perfect = { 0.6, 0.8, 1, 1 },
-		great = { 0.95, 0.796, 0.188, 1 },
-		good = { 0.07, 0.8, 0.56, 1 },
-		ok = { 0.1, 0.39, 1, 1 },
-		meh = { 0.42, 0.48, 0.51, 1 },
+	osuod = {
+		{0.6, 0.8, 1, 1},
+		{0.95, 0.796, 0.188, 1},
+		{0.07, 0.8, 0.56, 1},
+		{0.1, 0.39, 1, 1},
+		{0.42, 0.48, 0.51, 1},
 	},
-	osuLegacy = {
-		perfect = { 0.6, 0.8, 1, 1 },
-		great = { 0.95, 0.796, 0.188, 1 },
-		good = { 0.07, 0.8, 0.56, 1 },
-		ok = { 0.1, 0.39, 1, 1 },
-		meh = { 0.42, 0.48, 0.51, 1 },
-	},
-	etterna = {
-		marvelous = { 0.6, 0.8, 1, 1 },
-		perfect = { 0.95, 0.796, 0.188, 1 },
-		great = { 0.07, 0.8, 0.56, 1 },
-		bad = { 0.1, 0.7, 1, 1 },
-		boo = { 1, 0.1, 0.7, 1 },
+	etternaj = {
+		{0.6, 0.8, 1, 1},
+		{0.95, 0.796, 0.188, 1},
+		{0.07, 0.8, 0.56, 1},
+		{0.1, 0.7, 1, 1},
+		{1, 0.1, 0.7, 1},
 	},
 	quaver = {
-		marvelous = { 1, 1, 0.71, 1 },
-		perfect = { 1, 0.91, 0.44, 1 },
-		great = { 0.38, 0.96, 0.47, 1 },
-		good = { 0.25, 0.7, 0.75, 1 },
-		okay = { 0.72, 0.46, 0.65, 1 },
+		{1, 1, 0.71, 1},
+		{1, 0.91, 0.44, 1},
+		{0.38, 0.96, 0.47, 1},
+		{0.25, 0.7, 0.75, 1},
+		{0.72, 0.46, 0.65, 1},
 	},
-	lr2 = {
-		pgreat = { 0.6, 0.8, 1, 1 },
-		great = { 0.95, 0.796, 0.188, 1 },
-		good = { 1, 0.69, 0.24, 1 },
-		bad = { 1, 0.5, 0.24, 1 },
+	bmsrank = {
+		{0.6, 0.8, 1, 1},
+		{0.95, 0.796, 0.188, 1},
+		{1, 0.69, 0.24, 1},
+		{1, 0.5, 0.24, 1},
 	},
 }
 
 function HitErrorView:load()
+	---@type sphere.ScoreEngine
 	local score_engine = self.game.rhythmModel.scoreEngine
-	if not score_engine.loaded then
-		return
-	end
 
-	self.judge = score_engine:getJudge()
-	self.sequence = score_engine.scoreSystem.sequence
+	self.judgesSource = score_engine.judgesSource
+	self.sequence = score_engine.sequence
 end
 
 local miss = { 1, 0, 0, 1 }
-function HitErrorView.color(value, unit, judge)
-	local counter = judge:getCounter(value, judge.windows)
-	return HitErrorView.colors[judge.scoreSystemName][counter] or miss
+
+---@param value any
+---@param unit any
+---@param judgesSource sphere.IJudgesSource
+---@param slice table
+---@return table
+function HitErrorView.color(value, unit, judgesSource, slice)
+	local index = slice.last_judge
+	return HitErrorView.colors[judgesSource.timings.name][index] or miss
 end
 
 function HitErrorView:draw()
@@ -131,7 +128,11 @@ function HitErrorView:drawPoint(point, fade)
 	end
 
 	if type(color) == "function" then
-		color = color(value, unit, self.judge)
+		local scoreSystem = self.judgesSource
+		---@cast scoreSystem +sphere.ScoreSystem, -sphere.IJudgesSource
+		local slice = point[scoreSystem:getKey()]
+
+		color = color(value, unit, self.judgesSource, slice)
 	end
 	local alpha = color[4]
 	color[4] = color[4] * map(fade, 0, self.count, 1, 0)

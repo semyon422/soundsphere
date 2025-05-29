@@ -82,6 +82,7 @@ function LogicEngine:receive(event)
 	end
 
 	self.eventTime = event.time
+	self:update()
 	noteHandler:setKeyState(event.name == "keypressed", input)
 	self.eventTime = nil
 end
@@ -94,7 +95,7 @@ end
 
 ---@param event table
 function LogicEngine:sendScore(event)
-	self.scoreEngine.scoreSystem:receive(event)
+	self.scoreEngine:receive(event)
 end
 
 ---@param note ncdk2.Note

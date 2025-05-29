@@ -1,6 +1,6 @@
 local IKeyValueStorage = require("sea.chart.storage.IKeyValueStorage")
 
----@class sea.TableStorage
+---@class sea.TableStorage: sea.IKeyValueStorage
 ---@operator call: sea.TableStorage
 local TableStorage = IKeyValueStorage + {}
 
@@ -10,7 +10,7 @@ local TableStorage = IKeyValueStorage + {}
 function TableStorage:get(key)
 	local value = rawget(self, key)
 	if not value then
-		return nil, "not found"
+		return nil, "value not found"
 	end
 	return value
 end

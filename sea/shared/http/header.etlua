@@ -16,7 +16,7 @@
 					-135 250 -272 271 l-43 6 0 -109z"/>
 					</g>
 				</svg>
-				<strong class="navbar-item">soundsphere</strong>
+				<strong class="navbar-item">SOUNDSPHERE</strong>
 			</a>
 		</div>
 		<div class="navbar-start">
@@ -24,18 +24,26 @@
 				<a class="navbar-link">Community</a>
 				<div class="navbar-dropdown">
 					<a class="navbar-item" href="/rankings">Rankings</a>
-					<a class="navbar-item" href="/leaderboards">Leaderboards</a>
 					<a class="navbar-item" href="/teams">Teams</a>
 				</div>
 			</div>
-			<div class="navbar-item has-dropdown is-hoverable">
-				<a class="navbar-link">Admin</a>
-				<div class="navbar-dropdown">
-					<a class="navbar-item" href="/difftables">Difftables</a>
-					<a class="navbar-item" href="/charts">Charts</a>
+			<% if not session_user:isAnon() and session_user:hasRole("admin", time) then %>
+				<div class="navbar-item has-dropdown is-hoverable">
+					<a class="navbar-link">Admin</a>
+					<div class="navbar-dropdown">
+						<a class="navbar-item" href="/leaderboards">Leaderboards</a>
+						<a class="navbar-item" href="/difftables">Difftables</a>
+						<a class="navbar-item" href="/charts">Charts</a>
+					</div>
 				</div>
-			</div>
-			<a class="navbar-item" href="/support">
+			<% end %>
+			<a class="navbar-item" href="/wiki">
+				<p>
+					<i class="fas icon-margin-right fa-book"></i>
+					Wiki
+				</p>
+			</a>
+			<a class="navbar-item" href="/donate">
 				<p>
 					<i class="fas fa-heart icon-margin-right header__support-icon"></i>
 					Donate
@@ -71,13 +79,19 @@
 						<p>
 							<%= session_user.name %>
 						</p>
-						<img class="header__avatar is-hidden-touch" src="https://eu.ui-avatars.com/api/?name=<%= session_user.name %>&size=128">
+						<%
+							local avatar_url = ([[https://eu.ui-avatars.com/api/?name=%s&size=128]]):format(session_user.name)
+
+							if session_user.avatar and session_user.avatar ~= "" then
+								avatar_url = session_user.avatar
+							end
+						%>
+						<img class="header__avatar is-hidden-touch" src="<%= avatar_url %>">
 					</a>
 					<div class="navbar-dropdown is-right">
 						<% local user_id = session.user_id %>
 						<a class="navbar-item" href="/users/<%= user_id %>">My profile</a>
-						<a class="navbar-item" href="/users/<%= user_id %>/teams">My teams</a>
-						<a class="navbar-item" href="/users/<%= user_id %>/sessions">Sessions</a>
+						<a class="navbar-item" href="/teams/user_team/<%= user_id %>">My team</a>
 						<a class="navbar-item" href="/users/<%= user_id %>/settings">Settings</a>
 						<a class="navbar-item" hx-post="/logout">Log out</a>
 					</div>
@@ -85,7 +99,7 @@
 			<% else %>
 				<div class="navbar-item">
 					<div class="buttons">
-						<a class="button is-primary" href="/login">
+						<a hx-boost="false" class="button is-primary" href="/login">
 							<strong>Log in</strong>
 						</a>
 					</div>

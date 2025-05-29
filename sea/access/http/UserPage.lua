@@ -1,5 +1,9 @@
 local class = require("class")
+local format = require("sea.shared.format")
 local time_util = require("time_util")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
+local TotalRating = require("sea.leaderboards.TotalRating")
+local ModifierModel = require("sphere.models.ModifierModel")
 
 ---@class sea.UserPage
 ---@operator call: sea.UserPage
@@ -10,10 +14,12 @@ UserPage.activityWeeks = 53
 ---@param users_access sea.UsersAccess
 ---@param session_user sea.User
 ---@param target_user sea.User
-function UserPage:new(users_access, session_user, target_user)
+---@param leaderboards sea.Leaderboards
+function UserPage:new(users_access, session_user, target_user, leaderboards)
 	self.usersAccess = users_access
 	self.sessionUser = session_user
 	self.targetUser = target_user
+	self.leaderboards = leaderboards
 end
 
 ---@return boolean
@@ -29,7 +35,7 @@ function UserPage:setActivity(activity)
 	self.currentDateStartTime = os.time({
 		year = self.currentDate.year,
 		month = self.currentDate.month,
-		day = self.currentDate.day
+		day = self.currentDate.day,
 	})
 	self.currentWeekDay = self.currentDate.wday -- Sunday is 1 | Saturday is 7
 	self.maxDays = self.activityWeeks * 7 - (7 - self.currentWeekDay)
@@ -38,6 +44,7 @@ end
 ---@return { name: string, span: number }[]
 function UserPage:getActivityWeekLabels()
 	local t = {}
+	---@type string
 	local current_month_name
 	local span = 0
 
@@ -49,7 +56,7 @@ function UserPage:getActivityWeekLabels()
 			current_month_name = month
 			span = span + 1
 		elseif month ~= current_month_name then
-			table.insert(t, { name = current_month_name, span = span })
+			table.insert(t, {name = current_month_name, span = span})
 			current_month_name = month
 			span = 1
 		else
@@ -57,7 +64,7 @@ function UserPage:getActivityWeekLabels()
 		end
 	end
 
-	table.insert(t, { name = current_month_name, span = span })
+	table.insert(t, {name = current_month_name, span = span})
 	return t
 end
 
@@ -73,7 +80,7 @@ function UserPage:getActivityWeekDayLabel(week_num)
 	end
 end
 
----@return { date: string, activity: integer }[]
+---@return {date: string, activity: integer}[]
 --- Returns a table of rows. Row is a day of the week.
 --- Activity is a number from 0 to 4.
 function UserPage:getActivityRectangles()
@@ -87,11 +94,11 @@ function UserPage:getActivityRectangles()
 			local delta = (((week - 1) * 7) + week_day) - self.maxDays
 			local date = os.date("%d-%m-%Y", self.currentDateStartTime + (delta * 60 * 60 * 24))
 			local activity = math.min(4, math.ceil((self.activity[date] or 0) / 10))
-			table.insert(row, { date = date, activity = activity })
+			table.insert(row, {date = date, activity = activity})
 		end
 
 		table.insert(rows, row)
-	 end
+	end
 
 	return rows
 end
@@ -118,33 +125,108 @@ end
 
 ---@return string
 function UserPage:formatRole()
-	if self.targetUser:hasRole("owner", os.time(), true) then
+	local time = os.time()
+
+	if self.targetUser:hasRole("owner", time, true) then
 		return "Project leader"
-	elseif self.targetUser:hasRole("admin", os.time(), true) then
+	elseif self.targetUser:hasRole("admin", time, true) then
 		return "Admin"
-	elseif self.targetUser:hasRole("moderator", os.time(), true) then
+	elseif self.targetUser:hasRole("moderator", time, true) then
 		return "Moderator"
+	elseif self.targetUser:hasRole("donator", time, true) then
+		return "Donator"
 	end
 
 	return ""
 end
 
+---@param user_id integer
 ---@return {label: string, value: string}[]
-function UserPage:getGeneralStats()
+function UserPage:getGeneralStats(user_id)
+	local lb_id = 1
+	local lb = self.leaderboards:getLeaderboard(lb_id)
+	local lb_user = self.leaderboards:getLeaderboardUser(lb_id, user_id)
+
+	if not lb_user or not lb then
+		return {}
+	end
+
 	local cells = {}
+
+	table.insert(cells, {
+		label = RatingCalc:postfix(lb.rating_calc):upper(),
+		value = format.float4(lb_user.total_rating),
+	})
+
+	table.insert(cells, {
+		label = "Accuracy",
+		value = ("%0.2f%%"):format(lb_user:getNormAccuracy() * 100),
+	})
+
 	-- TODO: Get these values from the main leaderboard.
 	-- TODO: People have their preferences in rating calculators, let them choose one or two options in the settings. This is a personal option.
-	table.insert(cells, { label = "PP", value = "15028" })
-	table.insert(cells, { label = "MSD", value = "33.42" })
+	-- table.insert(cells, {label = "PP", value = "15028"})
+	-- table.insert(cells, {label = "MSD", value = "33.42"})
 
 	-- Accuracy should always be displayed
-	table.insert(cells, { label = "Accuracy", value = "90.81%" })
+	-- table.insert(cells, {label = "Accuracy", value = "90.81%"})
 
 	-- The owner of the profile decides which dans to display
-	table.insert(cells, { label = "4K Regular dan", value = "Delta" })
-	table.insert(cells, { label = "Satellite", value = "Lv.6" })
+	-- table.insert(cells, {label = "4K Regular dan", value = "Delta"})
+	-- table.insert(cells, {label = "Satellite", value = "Lv.6"})
 
 	return cells
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
+---@param _type "top"|"first"|"recent"
+---@return table
+---@return sea.TotalRating
+function UserPage:getScores(lb, user_id, _type)
+	---@type sea.Chartplayview[]
+	local chartplayviews = {}
+
+	if _type == "top" then
+		chartplayviews = self.leaderboards:getBestChartplaysFull(lb, user_id)
+	elseif _type == "first" then
+		chartplayviews = self.leaderboards:getFirstPlaceChartplaysFull(lb, user_id)
+	elseif _type == "recent" then
+		chartplayviews = self.leaderboards:getRecentChartplaysFull(lb, user_id)
+	end
+
+	local total_rating = TotalRating()
+	total_rating:calc(chartplayviews)
+
+	local scores = {}
+
+	for i, cpv in ipairs(chartplayviews) do
+		local chartmeta = cpv.chartmeta
+		local chartdiff = cpv.chartdiff
+
+		---@type number
+		local rating = cpv[RatingCalc:column(lb.rating_calc)]
+
+		scores[i] = {
+			artist = chartmeta and chartmeta.artist or "?",
+			title = chartmeta and chartmeta.title or "?",
+			name = chartmeta and chartmeta.name or "?",
+			creator = chartmeta and chartmeta.creator or "?",
+			rate = chartdiff and chartdiff.rate or "?",
+			modifiers = ModifierModel:getString(cpv.modifiers),
+			const = cpv.const,
+			tap_only = cpv.tap_only,
+			accuracy = cpv.accuracy,
+			norm_accuracy = cpv:getNormAccuracy(),
+			exscore = cpv:getExScore(),
+			timeSince = time_util.time_ago_in_words(cpv.created_at),
+			grade = cpv:getGrade(),
+			rating = rating,
+			ratingPostfix = RatingCalc:postfix(lb.rating_calc):upper(),
+		}
+	end
+
+	return scores, total_rating
 end
 
 return UserPage

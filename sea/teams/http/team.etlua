@@ -1,3 +1,257 @@
-Team: <%= team.name %>
-<br>
-<a href="/teams/<%= team.id %>/edit">Edit</a>
+<% local Username = require("sea.shared.http.components.Username") %>
+
+<style>
+.team__container {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.team__card-spacing {
+	margin-top: 105px;
+}
+
+.team__key-value {
+	display: flex;
+	justify-content: space-between;
+}
+
+.team__button {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.team__role {
+	padding-left: 5px;
+}
+</style>
+
+<div class="is-hidden-mobile" style="position:relative;">
+	<div class="page-banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+</div>
+<main class="container">
+	<div class="team__container">
+		<div class="columns is-flex-direction-row-reverse">
+			<div class="column">
+				<div class="block">
+					<div class="box team__card-spacing">
+						<div class="block">
+							<span class="team-avatar" style="background-image: url('https://eu.ui-avatars.com/api/?name=<%= team.name %>&size=300');"></span>
+						</div>
+						<div class="block">
+							<h1 class="title is-4 is-spaced" align="center"><%= team.name %></h1>
+							<h2 class="subtitle is-6" align="center">[<%= team.alias %>]</h2>
+							<div class="separator"></div>
+						</div>
+						<div class="block">
+							<%
+								local together_since = os.date("%d.%m.%Y", team.created_at)
+								local together_since_html = os.date("%Y-%m-%d", team.created_at)
+							%>
+							<div class="team__key-value">
+								<p>Together since:</p>
+								<time datetime="<%= together_since_html %>"><strong><%= together_since %></strong></time>
+							</div>
+							<div class="team__key-value">
+								<p>Members:</p>
+								<p><strong><%= team.users_count %>/1024</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>Accuracy:</p>
+								<p><strong>84.69%</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>ENPS:</p>
+								<p><strong>28.18</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>MSD:</p>
+								<p><strong>32.93</strong></p>
+							</div>
+							<div class="team__key-value">
+								<p>PP:</p>
+								<p><strong>13817</strong></p>
+							</div>
+						</div>
+						<%
+							local join_button = ([[
+								<button
+									class="team__button button is-info is-fullwidth"
+									hx-post="/teams/%i/join"
+									hx-target="body">
+									<i class="fas fa-user-plus icon-margin-right"></i>Join
+								</button>
+							]]):format(team.id)
+
+							local accept_invite_button = ([[
+								<button
+									class="team__button button is-info is-fullwidth"
+									hx-post="/teams/%i/accept_join_invite"
+									hx-target="body">
+									<i class="fas fa-user-plus icon-margin-right"></i>Accept invitation
+								</button>
+							]]):format(team.id)
+
+							local cancel_join_button = ([[
+								<button
+									class="team__button button is-info is-light is-fullwidth"
+									hx-post="/teams/%i/cancel_join_request"
+									hx-target="body">
+									<i class="fas fa-user-slash icon-margin-right"></i>Cancel join request
+								</button>
+							]]):format(team.id)
+
+							local leave_button = ([[
+								<button
+									class="team__button button is-info is-light is-fullwidth"
+									hx-post="/teams/%i/leave"
+									hx-target="body">
+									<i class="fas fa-user-slash icon-margin-right"></i>Leave
+								</button>
+							]]):format(team.id)
+						%>
+
+						<% if session_user:isAnon() then %>
+							<% if team.type == "open" then %>
+								<p align="center">Login to join</p>
+							<% elseif team.type == "request" then %>
+								<p align="center">Login to send a join request</p>
+							<% else %>
+								<p align="center">Join requests are disabled</p>
+							<% end %>
+						<% elseif team_user and not can_manage then %>
+							<% if team_user.is_accepted then %>
+								<%- leave_button %>
+							<% elseif team_user.is_invitation then %>
+								<%- accept_invite_button %>
+							<% else %>
+								<%- cancel_join_button %>
+							<% end %>
+						<% elseif not team_user then %>
+							<% if team.type == "open" then %>
+								<%- join_button %>
+							<% elseif team.type == "request" then %>
+								<%- join_button %>
+							<% elseif team.type == "invite" then %>
+								<p align="center">Join requests are disabled</p>
+							<% end %>
+						<% end %>
+
+						<% if can_manage then %>
+							<div class="block">
+								<a href="/teams/<%= team.id %>/edit/settings" class="team__button button is-primary is-fullwidth"><i class="fas fa-wrench icon-margin-right"></i>Manage</a>
+							</div>
+						<% end %>
+					</div>
+				</div>
+			</div>
+			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
+				<div class="page-banner-box is-hidden-mobile"></div>
+				<div class="block">
+					<nav class="level">
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Monthly activity</p>
+								<p class="title">200 hours</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Rank</p>
+								<p class="title">#1</p>
+							</div>
+						</div>
+						<div class="level-item has-text-centered">
+							<div>
+								<p class="heading">Scores this month</p>
+								<p class="title">1041</p>
+							</div>
+						</div>
+					</nav>
+				</div>
+				<div class="block">
+					<% if team.description ~= "" or can_update then %>
+						<div class="border-box">
+							<% if not edit_description and team.description == "" then %>
+								<p align="center">Click edit to change team description!<p>
+							<% end %>
+
+							<% if team.description ~= "" or edit_description then %>
+								<div class="block">
+									<div class="description-container" id="editorContainer"></div>
+								</div>
+							<% end %>
+
+							<% if edit_description then %>
+								<div class="columns">
+									<div class="column">
+										<a class="button"" id="saveButton">Save</a>
+									</div>
+									<div class="column is-full" style="align-content: center">
+										<p class="has-text-danger" id="descriptionStatus"></p>
+									</div>
+								</div>
+							<% end %>
+
+							<% if can_update and not edit_description then %>
+								<a class="button" href="<%= ("/teams/%i?edit_description=true"):format(team.id) %>"><i class="fas fa-edit"></i></a>
+							<% end %>
+						</div>
+						<script>
+							var quill = addQuillToElement(
+								document.getElementById("editorContainer"),
+								document.getElementById("saveButton"),
+								document.getElementById("descriptionStatus"),
+								"/teams/<%= team.id %>",
+								"/teams/<%= team.id %>/update_description",
+								String.raw`<%- team.description %>`,
+								<%= edit_description %>
+							)
+						</script>
+					<% end %>
+				</div>
+				<div class="block">
+					<div class="tabs is-centered">
+						<ul>
+							<li class="is-active"><a>Members</a></li>
+							<li><a>Performance</a></li>
+							<li><a>Accuracy</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="block">
+					<table class="ranking-table">
+						<thead>
+							<th></th>
+							<th></th>
+							<th>Join date</th>
+							<th>Scores</th>
+						</thead>
+						<tbody>
+							<% for i, team_user in ipairs(team_users) do %>
+								<% if team_user.is_accepted then %>
+									<% local user = team_user.user %>
+									<tr class="has-text">
+										<td class="ranking-table__flag-cell">
+											<div class="fi-<%= user.country_code %>"></div>
+										</td>
+										<td align="left" class="ranking-table__main-cell">
+											<%- Username(user, ("/users/%i"):format(user.id)) %>
+											<% if user.id == team.owner_id then %>
+												<span class="team__role">
+													<i class="fas fa-fist-raised"></i>
+													Leader
+												</span>
+											<% end %>
+										</td>
+										<td class="ranking-table__more-padding"><%= os.date("%d.%m.%Y", user.created_at) %></td>
+										<td class="ranking-table__more-padding"><%= user.chartplays_count %></td>
+									</tr>
+								<% end %>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>

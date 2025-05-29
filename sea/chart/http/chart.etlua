@@ -1,0 +1,164 @@
+<% local Username = require("sea.shared.http.components.Username") %>
+
+<style>
+.chart__background {
+	width: 100%;
+	height: 200px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	border: 1px solid var(--bulma-border);
+	border-radius: 0.5em;
+}
+
+.chart__details {
+	width: 100%;
+	height: 200px;
+	display: flex;
+	flex-direction: column;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.chart__details-key-values td:last-child {
+	padding-left: 1em;
+}
+
+.chart__format {
+	pointer-events: none;
+}
+
+.chart__large-detail {
+	border-radius: 9999px;
+	border: 5px solid var(--bulma-border);
+	text-align: center;
+	padding-left: 24px;
+	padding-right: 24px;
+	font-size: 24px;
+	font-weight: 500;
+	box-shadow: var(--bulma-shadow);
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.chart-scores__grade {
+	font-size: 25px;
+	text-shadow: none;
+	padding-top: 0px !important;
+	padding-bottom: 0px !important;
+}
+
+.chart-scores__flag-padding {
+	padding-left: 20px !important;
+}
+</style>
+
+<% local chartmeta = chart_page.chartmeta %>
+<% local chartdiff = chart_page.chartdiff %>
+
+<div style="height: 24px;"></div>
+
+<div class="block">
+	<div class="columns">
+		<div class="column">
+			<div class="block is-flex">
+				<div class="chart__details">
+					<div class="is-flex-grow-2">
+						<p class="title is-3"><%= chartmeta.title_unicode or chartmeta.title %></p>
+						<p class="subtitle is-5"><%= chartmeta.artist_unicode or chartmeta.artist %></p>
+					</div>
+					<div class="columns">
+						<div class="column">
+							<table class="chart__details-key-values">
+								<tbody>
+									<tr><td><strong>BPM:</strong></td><td><%= chartmeta.tempo %></td></tr>
+									<tr><td><strong>Notes:</strong></td><td><%= chartdiff.notes_count %></td></tr>
+									<tr><td><strong>Game Mode:</strong></td><td><%= chartmeta.inputmode %></td></tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="column">
+							<table class="chart__details-key-values">
+								<tbody>
+									<tr><td><strong>Creator:</strong></td><td><%= chartmeta.creator %></td></tr>
+									<tr><td><strong>Source:</strong></td><td><%= chartmeta.source %></td></tr>
+									<tr><td><strong>Tags:</strong></td><td><%= chartmeta.tags %></td></tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="block">
+				<div class="buttons">
+					<button class="button has-text-current is-rounded chart__format"><%= chart_page:getGameName() %> format</button>
+					<% local download_url = chart_page:getDownloadUrl() %>
+					<% if download_url then %>
+						<a target="_blank" href="<%= download_url %>"class="button is-link is-rounded">Download page</a>
+					<% end %>
+				</div>
+			</div>
+		</div>
+		<div class="column is-narrow">
+			<div class="block">
+				<div class="chart__background" style="background-image: url('<%= chart_page:getBackgroundUrl() or "" %>')"></div>
+			</div>
+
+			<div class="is-flex">
+				<div class="cell chart__large-detail" style="border-color: oklch(0.7418 0.1708 <%= chart_page:getDifficultyHue() %>);">
+					<p><%= ("%0.02f %s"):format(chart_page:getDifficulty(), chart_page:getDifficultyPostfix()) %></p>
+				</div>
+				<div class="cell chart__large-detail" style="border-color: hsl(<%= chart_page:getDurationHue() %>, 80%, 50%);">
+					<p><%= chart_page:getDuration() %></p>
+				</div>
+				<div class="cell chart__large-detail">
+					<p><%= ("%i"):format(chart_page:getLnPercent() * 100) %>% LN</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<table class="ranking-table">
+	<thead>
+		<th></th>
+		<th></th>
+		<th>Accuracy</th>
+		<th>MAX</th>
+		<th>BAD</th>
+		<th>X</th>
+		<th></th>
+		<th></th>
+		<th>Modifiers</th>
+		<th>Rate</th>
+		<th><%= chart_page:getPreferredRatingCalc():upper() %></th>
+		<th>Date</th>
+	</thead>
+	<tbody>
+		<% local scores = chart_page:getScores() %>
+		<% for i, v in ipairs(scores) do %>
+			<tr class="has-text">
+				<%
+				%>
+				<td class="ranking-table__more-padding"><strong>#<%= v.rank %></strong></td>
+				<td class="score-grade saira-bold chart-scores__grade" data-grade="<%= v.grade %>"><%= v.grade %></td>
+				<td class="ranking-table__more-padding">
+					<strong><%= ("%0.02f%%"):format(v.accuracy * 100) %></strong>
+				</td>
+				<td><%= v.perfect_count %></td>
+				<td><%= v.not_perfect_count %></td>
+				<td><%= v.miss_count %></td>
+				<td class="ranking-table__flag-cell chart-scores__flag-padding">
+					<div class="fi-<%= v.country_code %>"></div>
+				</td>
+				<td align="left" class="ranking-table__main-cell">
+					<%- Username(session_user, ("/users/%i"):format(session_user.id)) %>
+				</td>
+				<td class="ranking-table__more-padding"><%= v.modifiers %></td>
+				<td class="ranking-table__more-padding"><%= ("%gx"):format(v.rate) %></td>
+				<td class="ranking-table__more-padding"><%= ("%0.02f"):format(v.rating) %></td>
+				<td class="ranking-table__more-padding"><%= v.time_ago %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

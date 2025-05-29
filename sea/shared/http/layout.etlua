@@ -10,10 +10,16 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@95,100..900&display=swap" rel="stylesheet">
+		<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 		<script src="https://unpkg.com/htmx.org@2.0.0"></script>
 		<script src="https://unpkg.com/hyperscript.org@0.9.8"></script>
 		<script src="https://kit.fontawesome.com/dbaf22a3a8.js?v=1.0"></script>
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+		<script src="/static/scripts/main.js?v=<%= version %>"></script>
+		<script src="/static/scripts/description_editor.js?v=<%= version %>"></script>
 		<% if is_captcha_enabled then %>
 			<script src="https://www.google.com/recaptcha/api.js"></script>
 		<% end %>
@@ -27,27 +33,20 @@
 			<%- view:render("sea/shared/http/header.etlua") %>
 		<% end %>
 
-		<% if ignore_main_container then %>
-			<%- inner %>
-		<% else %>
+		<% if not main_container_type then %>
 			<main class="container">
 				<%- inner %>
 			</main>
+		<% elseif main_container_type == "vertically_centered" then %>
+			<main class="container center-vertically">
+				<%- inner %>
+			</main>
+		<% elseif main_container_type == "none" then %>
+			<%- inner %>
 		<% end %>
 
 		<% if not ignore_footer then %>
-			<footer class="footer">
-				<div class="content"></div>
-			</footer>
+			<%- view:render("sea/shared/http/footer.etlua") %>
 		<% end %>
-
-		<script>
-			function setTheme() {
-				const theme = localStorage.getItem("theme");
-				const html = document.querySelector("html");
-				html.setAttribute("data-theme", theme);
-			}
-			setTheme()
-		</script>
 	</body>
 </html>

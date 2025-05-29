@@ -108,7 +108,7 @@ function NoteManager:changeType()
 			setmetatable(note, LongEditorNote)
 		else
 			local startNote = note.startNote
-			startNote.type = "note"
+			startNote.type = "tap"
 			startNote.weight = 0
 			startNote.endNote = nil
 			note.endNote.type = "ignore"
@@ -239,7 +239,7 @@ function NoteManager:addNote(absoluteTime, column)
 
 	local note
 	if editor.tool == "ShortNote" then
-		note = self:newNote("note", absoluteTime, column)
+		note = self:newNote("tap", absoluteTime, column)
 	elseif editor.tool == "LongNote" then
 		note = self:newNote("hold", absoluteTime, column)
 	end

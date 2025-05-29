@@ -1,0 +1,37 @@
+<div class="centered-form">
+	<div class="form-container">
+		<div class="form">
+			<div class="form border-box">
+				<div class="content">
+					<h1 class="title">Change Email</h1>
+				</div>
+				<form action="/users/update_email" method="post">
+					<div class="field">
+						<label class="label">Current Password</label>
+						<div class="control has-icons-left">
+							<input class="input" type="password" name="current_password" required>
+							<span class="icon is-small is-left">
+								<i class="fas fa-key"></i>
+							</span>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">New Email</label>
+						<div class="control has-icons-left">
+							<input class="input" type="email" name="new_email" required>
+							<span class="icon is-small is-left">
+								<i class="fas fa-at"></i>
+							</span>
+						</div>
+					</div>
+					<div class="control">
+						<button class="button is-link">Change</button>
+					</div>
+					<% if update_email_error then %>
+						<p class="help is-danger"><%= update_email_error %></p>
+					<% end %>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

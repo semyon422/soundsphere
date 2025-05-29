@@ -5,14 +5,38 @@ body {
 	margin: 0;
 }
 
-.icon-margin-right {
-	margin-right: 5px;
+header {
+	flex-shrink: 0;
 }
 
-.center-form-vertical {
-	display: grid;
-	max-height: 80vh;
-	grid-template-rows: repeat(3, 1fr);
+footer {
+	flex-shrink: 0;
+}
+
+main {
+	flex-grow: 1;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+main.center-vertically {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow-y: auto;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+main.center-vertically > * {
+	width: 100%;
+}
+
+.icon-margin-right {
+	margin-right: 5px;
 }
 
 .border-box {
@@ -21,13 +45,154 @@ body {
 	padding: 1.25rem;
 }
 
+@media only screen and (max-width: 600px) {
+	.form-container {
+		margin: 0px !important;
+	}
+}
+
+.page-banner {
+	box-sizing: unset;
+	background-size: cover;
+	background-position: center;
+	width: 100%;
+	height: 400px;
+	min-height: 400px;
+	box-shadow: 0px 10px 0px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1);
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -1;
+}
+
+.page-banner-box {
+	height: 410px;
+}
+
+.separator {
+	display: block;
+	height: 1px;
+	border: 0;
+	border-top: 1px solid #ccc;
+	border: 1px solid var(--bulma-border);
+	margin: 1em 0;
+	padding: 0;
+}
+
+.team-avatar {
+	display: inline-block;
+	width: 100%;
+	aspect-ratio: 2;
+	border-radius: 40px;
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.score-grade {
+	text-shadow: -1px -1px 0 #00000022, 1px -1px 0 #00000022, -1px 1px 0 #00000022, 1px 1px 0 #00000022;
+}
+
+.score-grade[data-grade="X"] {
+	color: oklch(0.72 0.1871 231.88);
+}
+
+.score-grade[data-grade="S"] {
+	color: oklch(0.72 0.1871 50.82);
+}
+
+.score-grade[data-grade="A"] {
+	color: oklch(0.72 0.1871 141.54);
+}
+
+.score-grade[data-grade="B"] {
+	color: oklch(0.72 0.1871 308.12);
+}
+
+.score-grade[data-grade="C"] {
+	color: oklch(0.72 0.1871 353.06);
+}
+
+.score-grade[data-grade="D"] {
+	color: oklch(0.72 0.1871 17.63);
+}
+
+.score-background[data-grade="X"] {
+	background-color: oklch(0.72 0.1871 231.88);
+}
+
+.score-background[data-grade="S"] {
+	background-color: oklch(0.72 0.1871 50.82);
+}
+
+.score-background[data-grade="A"] {
+	background-color: oklch(0.72 0.1871 141.54);
+}
+
+.score-background[data-grade="B"] {
+	background-color: oklch(0.72 0.1871 308.12);
+}
+
+.score-background[data-grade="C"] {
+	background-color: oklch(0.72 0.1871 353.06);
+}
+
+.score-background[data-grade="D"] {
+	background-color: oklch(0.72 0.1871 17.63);
+}
+
+.form-container {
+	display: flex;
+	justify-content: center;
+	margin: 1em;
+}
+
+.form {
+	position: relative;
+	flex-grow: 1;
+	max-width: 560px;
+}
+
+.content-disabled {
+	filter: blur(2px) opacity(0.4);
+	pointer-events: none;
+	user-select: none;
+}
+
+.content-disabled-message {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 1em 1em;
+	text-align: center;
+	z-index: 10;
+}
+
+.center-content {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.empty-list-message {
+	margin: 1em;
+}
+
+.text-clip {
+	background-clip: text !important;
+	color: transparent !important;
+}
+
 .saira-regular {
   font-family: "Saira", sans-serif;
   font-optical-sizing: auto;
   font-weight: 300;
   font-style: normal;
   font-variation-settings:
-    "wdth" 95;
+	"wdth" 95;
 }
 
 .saira-medium {
@@ -61,3 +226,48 @@ body {
   font-weight: 650;
   font-style: normal;
 }
+
+.description-container {
+	width: 100%;
+	max-width: 100%;
+	max-height: 380px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	word-break: break-all;
+	word-wrap: break-word;
+}
+
+.ql-toolbar.ql-snow {
+	border: none !important;
+}
+
+.ql-picker {
+	color: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-stroke {
+	stroke: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill {
+	stroke: var(--bulma-text) !important;
+}
+
+.ql-snow .ql-fill {
+	stroke: var(--bulma-border-light) !important;
+}
+
+.ql-editor.ql-blank::before {
+	color: var(--bulma-text) !important;
+	content: attr(data-placeholder);
+	font-style: italic;
+	left: 15px;
+	pointer-events: none;
+	position: absolute;
+	right: 15px;
+}
+
+.ql-container.ql-snow {
+	border: none !important;
+}
+

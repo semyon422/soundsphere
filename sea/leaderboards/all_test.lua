@@ -1,22 +1,22 @@
 local table_util = require("table_util")
-local LjsqliteDatabase = require("rdb.LjsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local TotalRating = require("sea.leaderboards.TotalRating")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
 local User = require("sea.access.User")
+local UserRole = require("sea.access.UserRole")
 local Timings = require("sea.chart.Timings")
+local Subtimings = require("sea.chart.Subtimings")
 local Healths = require("sea.chart.Healths")
 
 local test = {}
 
 local function create_test_ctx()
 	local db = ServerSqliteDatabase(LjsqliteDatabase())
-
 	db.path = ":memory:"
-
-	db:remove()
 	db:open()
 
 	-- db.orm:debug(true)
@@ -27,6 +27,7 @@ local function create_test_ctx()
 
 	local user = User()
 	user.id = 1
+	user.user_roles = {UserRole("admin", 0)}
 
 	local leaderboard = Leaderboard()
 	leaderboard.name = "Leaderboard 1"
@@ -54,6 +55,7 @@ end
 ---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
 ---@param values {[string]: any}
 local function create_chartplay(ctx, values)
+	---@type sea.Chartplay
 	local chartplay = table_util.copy(values)
 	chartplay.user_id = values.user_id or ctx.user.id
 	chartplay.hash = values.hash or ""
@@ -62,8 +64,63 @@ local function create_chartplay(ctx, values)
 	chartplay.rate = values.rate or 1
 	chartplay.mode = values.mode or "mania"
 	chartplay.rating = values.rating or 0
-	chartplay.result = values.result or "fail"
+	chartplay.not_perfect_count = values.not_perfect_count or 0
+	chartplay.timings = values.timings or Timings("simple", 0.1)
+	chartplay.subtimings = values.subtimings
+	chartplay.submitted_at = values.submitted_at or 0
+	chartplay.computed_at = values.computed_at or 0
+	chartplay.created_at = values.created_at or 0
+	chartplay.compute_state = "valid"
+	chartplay.replay_hash = "00000000000000000000000000000000"
+	chartplay.pause_count = chartplay.pause_count or 0
+	chartplay.nearest = not not chartplay.nearest
+	chartplay.tap_only = not not chartplay.tap_only
+	chartplay.custom = not not chartplay.custom
+	chartplay.const = not not chartplay.const
+	chartplay.rate_type = "linear"
+	chartplay.judges = {}
+	chartplay.accuracy = chartplay.accuracy or 0
+	chartplay.max_combo = chartplay.max_combo or 0
+	chartplay.miss_count = chartplay.miss_count or 0
+	chartplay.rating_pp = chartplay.rating_pp or 0
+	chartplay.rating_msd = chartplay.rating_msd or 0
+	if values.pass ~= nil then
+		chartplay.pass = values.pass
+	else
+		chartplay.pass = false
+	end
 	return ctx.db.models.chartplays:create(chartplay)
+end
+
+---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
+---@param values {[string]: any}
+local function create_chartdiff(ctx, values)
+	---@type sea.Chartdiff
+	local chartdiff = table_util.copy(values)
+	chartdiff.created_at = chartdiff.created_at or 0
+	chartdiff.computed_at = chartdiff.computed_at or 0
+	chartdiff.hash = chartdiff.hash or "00000000000000000000000000000000"
+	chartdiff.index = chartdiff.index or 1
+	chartdiff.modifiers = chartdiff.modifiers or {}
+	chartdiff.rate = chartdiff.rate or 1
+	chartdiff.mode = chartdiff.mode or "mania"
+	chartdiff.inputmode = chartdiff.inputmode or "4key"
+	chartdiff.duration = chartdiff.duration or 0
+	chartdiff.start_time = chartdiff.start_time or 0
+	chartdiff.notes_count = chartdiff.notes_count or 0
+	chartdiff.judges_count = chartdiff.judges_count or 0
+	chartdiff.note_types_count = chartdiff.note_types_count or {}
+	chartdiff.density_data = chartdiff.density_data or {}
+	chartdiff.sv_data = chartdiff.sv_data or {}
+	chartdiff.enps_diff = chartdiff.enps_diff or 0
+	chartdiff.osu_diff = chartdiff.osu_diff or 0
+	chartdiff.msd_diff = chartdiff.msd_diff or 0
+	chartdiff.msd_diff_data = chartdiff.msd_diff_data or {}
+	chartdiff.msd_diff_rates = chartdiff.msd_diff_rates or {}
+	chartdiff.user_diff = chartdiff.user_diff or 0
+	chartdiff.user_diff_data = chartdiff.user_diff_data or ""
+	chartdiff.notes_preview = chartdiff.notes_preview or ""
+	return ctx.db.models.chartdiffs:create(chartdiff)
 end
 
 ---@param t testing.T
@@ -162,26 +219,59 @@ function test.nearest_filter_multiple(t)
 end
 
 ---@param t testing.T
-function test.result_filter(t)
+function test.pass_filter(t)
 	local ctx = create_test_ctx()
 
 	local _chartplays = {
-		create_chartplay(ctx, {rating = 1, result = "pfc"}),
-		create_chartplay(ctx, {rating = 2, result = "fc"}),
-		create_chartplay(ctx, {rating = 3, result = "pass"}),
-		create_chartplay(ctx, {rating = 4, result = "fail"}),
+		create_chartplay(ctx, {rating = 1, pass = true}),
+		create_chartplay(ctx, {rating = 2, pass = false}),
 	}
 
-	t:eq(#_chartplays, 4)
+	t:eq(#_chartplays, 2)
 
 	for _, c in ipairs(_chartplays) do
-		ctx.leaderboard.result = c.result
+		ctx.leaderboard.pass = c.pass
 		lb_update_select(ctx)
 
 		local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
 		if t:eq(#chartplays, 1) then
 			t:eq(chartplays[1].rating, c.rating)
 		end
+	end
+end
+
+---@param t testing.T
+function test.judges_result_filter(t)
+	local ctx = create_test_ctx()
+
+	local _chartplays = {
+		create_chartplay(ctx, {rating = 1, miss_count = 0, not_perfect_count = 0}),
+		create_chartplay(ctx, {rating = 2, miss_count = 0, not_perfect_count = 1}),
+		create_chartplay(ctx, {rating = 3, miss_count = 1, not_perfect_count = 1}),
+	}
+
+	ctx.leaderboard.judges = "pfc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+
+	ctx.leaderboard.judges = "fc"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.judges = "any"
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 3)
 	end
 end
 
@@ -300,13 +390,17 @@ function test.free_timings_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
-		timings = Timings("simple", 100),
+		format = "osu",
+		inputmode = "4key",
+		timings = Timings("simple", 0.1),
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
-	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 100)})
-	create_chartplay(ctx, {rating = 2, timings = Timings("simple", 200)})
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)
@@ -326,13 +420,80 @@ function test.free_timings_filter(t)
 end
 
 ---@param t testing.T
+function test.free_timings_filter_specific(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
+		timings = Timings("simple", 0.2),
+		hash = "",
+		index = 1,
+		created_at = 0,
+		computed_at = 0,
+	})
+
+	create_chartplay(ctx, {rating = 1, timings = Timings("simple", 0.1)})
+	create_chartplay(ctx, {rating = 2, timings = Timings("osuod", 8), subtimings = Subtimings("scorev", 1)})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 2)
+	end
+
+	ctx.leaderboard.allow_free_timings = false
+	ctx.leaderboard.timings = Timings("simple", 0.1)
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	if t:eq(#chartplays, 1) then
+		t:eq(chartplays[1].rating, 1)
+	end
+end
+
+---@param t testing.T
+function test.free_timings_filter_undefined(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
+		hash = "",
+		index = 1,
+		created_at = 0,
+		computed_at = 0,
+	})
+
+	create_chartplay(ctx, {rating = 1})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+
+	ctx.leaderboard.allow_free_timings = false
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 0)
+end
+
+---@param t testing.T
 function test.free_healths_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		healths = Healths("simple", 10),
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, healths = Healths("simple", 10)})
@@ -360,8 +521,12 @@ function test.rate_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "",
 		index = 1,
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, rate = 1.0})
@@ -398,21 +563,33 @@ function test.chartmeta_inputmode_filter(t)
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "1",
 		index = 1,
 		inputmode = "4key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "2",
 		index = 1,
 		inputmode = "7key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
 		hash = "3",
 		index = 1,
 		inputmode = "10key",
+		created_at = 0,
+		computed_at = 0,
 	})
 
 	create_chartplay(ctx, {rating = 1, hash = "1"})
@@ -436,31 +613,19 @@ end
 function test.chartdiff_inputmode_filter(t)
 	local ctx = create_test_ctx()
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "1",
-		index = 1,
 		inputmode = "4key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
 	})
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "2",
-		index = 1,
 		inputmode = "7key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
 	})
 
-	ctx.db.models.chartdiffs:create({
+	create_chartdiff(ctx, {
 		hash = "3",
-		index = 1,
 		inputmode = "10key",
-		mode = "mania",
-		modifiers = {},
-		rate = 1,
 	})
 
 	create_chartplay(ctx, {rating = 1, hash = "1"})
@@ -490,14 +655,19 @@ function test.difftable_filter_single(t)
 	create_chartplay(ctx, {rating = 2, hash = "2"})
 
 	local difftable = models.difftables:create({
-		name = "Ranked list 1"
+		name = "Ranked list 1",
+		description = "",
+		symbol = "x",
+		created_at = 0,
 	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable.id,
+		user_id = 1,
 		hash = "2",
 		index = 1,
 		level = 0,
+		created_at = 0,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable.id}}
@@ -517,21 +687,35 @@ function test.difftable_filter_multiple(t)
 
 	create_chartplay(ctx, {rating = 1})
 
-	local difftable_1 = models.difftables:create({name = "Ranked list 1"})
-	local difftable_2 = models.difftables:create({name = "Ranked list 2"})
+	local difftable_1 = models.difftables:create({
+		name = "Ranked list 1",
+		description = "",
+		symbol = "x",
+		created_at = 0,
+	})
+	local difftable_2 = models.difftables:create({
+		name = "Ranked list 2",
+		description = "",
+		symbol = "y",
+		created_at = 0,
+	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable_1.id,
+		user_id = 1,
 		hash = "",
 		index = 1,
 		level = 1,
+		created_at = 0,
 	})
 
 	models.difftable_chartmetas:create({
 		difftable_id = difftable_2.id,
+		user_id = 1,
 		hash = "",
 		index = 1,
 		level = 2,
+		created_at = 0,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable_1.id}}
@@ -626,9 +810,7 @@ function test.total_rating(t)
 	local cp1 = create_chartplay(ctx, {rating = 1, hash = "1"})
 	local cp2 = create_chartplay(ctx, {rating = 2, hash = "2"})
 
-	ctx.leaderboard.scores_comb = "avg"
-	ctx.leaderboard.scores_comb_count = 10
-	lb_update_select(ctx)
+	ctx.leaderboards.total_rating.avg_count = 10
 
 	ctx.leaderboards:addChartplay(cp1)
 
@@ -642,9 +824,7 @@ end
 function test.rank(t)
 	local ctx = create_test_ctx()
 
-	ctx.leaderboard.scores_comb = "avg"
-	ctx.leaderboard.scores_comb_count = 1
-	lb_update_select(ctx)
+	ctx.leaderboards.total_rating.avg_count = 1
 
 	local cp1 = create_chartplay(ctx, {rating = 1, user_id = 1})
 	local cp2 = create_chartplay(ctx, {rating = 2, user_id = 2})
@@ -698,6 +878,27 @@ function test.difftables_create(t)
 	t:eq(#ctx.leaderboard.leaderboard_difftables, 2)
 	t:eq(ctx.leaderboard.leaderboard_difftables[1].difftable_id, 2)
 	t:eq(ctx.leaderboard.leaderboard_difftables[2].difftable_id, 3)
+end
+
+---@param t testing.T
+function test.submit_time(t)
+	local ctx = create_test_ctx()
+
+	ctx.leaderboard.starts_at = 5
+	ctx.leaderboard.ends_at = 25
+	lb_update_select(ctx)
+
+	assert(ctx.leaderboard.starts_at)
+
+	create_chartplay(ctx, {rating = 1, submitted_at = 0})
+	create_chartplay(ctx, {rating = 2, submitted_at = 10})
+	create_chartplay(ctx, {rating = 3, submitted_at = 20})
+	create_chartplay(ctx, {rating = 4, submitted_at = 30})
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, 1)
+	t:eq(#chartplays, 1)
+
+	t:eq(chartplays[1].rating, 3)
 end
 
 return test

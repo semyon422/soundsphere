@@ -9,6 +9,17 @@ local AppConfig = {
 	recaptcha = {
 		site_key = "",
 		secret_key = "",
+		required_score = 0.5,
+	},
+
+	multiplayer = {
+		address = "*",
+		port = 9000,
+	},
+
+	responsible_person = {
+		name = "Name",
+		email = "email@example.com",
 	},
 }
 

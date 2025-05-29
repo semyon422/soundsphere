@@ -1,21 +1,21 @@
-local Chartkey = require("sea.chart.Chartkey")
-local RateType = require("sea.chart.RateType")
-local Gamemode = require("sea.chart.Gamemode")
+local table_util = require("table_util")
+local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local valid = require("valid")
 local types = require("sea.shared.types")
+local chart_types = require("sea.chart.types")
 
----@class sea.Chartdiff: sea.Chartkey
+---@class sea.Chartdiff: sea.ChartdiffKey
 ---@operator call: sea.Chartdiff
+--- Server managed keys
 ---@field id integer
----@field hash string
----@field index integer
----@field modifiers sea.Modifier[]
----@field rate number
----@field rate_type sea.RateType
----@field mode sea.Gamemode
 ---@field custom_user_id integer
----@field notes_hash string
+---@field created_at integer
+---@field computed_at integer
+--- ChartdiffKey
+--- COMPUTED
 ---@field inputmode string
+---@field duration number not affected by rate
+---@field start_time number not affected by rate
 ---@field notes_count integer total object count
 ---@field judges_count integer total number of judgeable QTEs (long note = 2 qte)
 ---@field note_types_count {[notechart.NoteType]: integer} by type, sum = notes_count
@@ -24,54 +24,23 @@ local types = require("sea.shared.types")
 ---@field enps_diff number
 ---@field osu_diff number
 ---@field msd_diff number
----@field msd_diff_data string
+---@field msd_diff_data minacalc.Ssr
+---@field msd_diff_rates number[]
 ---@field user_diff number
 ---@field user_diff_data string
-local Chartdiff = Chartkey + {}
+---@field notes_preview string
+local Chartdiff = ChartdiffKey + {}
 
 function Chartdiff:new()
 	self.modifiers = {}
 end
 
-local computed_keys = {
-	"notes_hash",
-	"inputmode",
-	"notes_count",
-	"long_notes_count",
-	"density_data",
-	"sv_data",
-	"enps_diff",
-	"osu_diff",
-	"msd_diff",
-	"msd_diff_data",
-	"user_diff",
-	"user_diff_data",
-}
+local note_types_count = valid.map(types.name, types.count, 10)
 
----@param values sea.Chartdiff
----@return boolean
-function Chartdiff:equalsComputed(values)
-	for _, key in ipairs(computed_keys) do
-		if self[key] ~= values[key] then
-			return false
-		end
-	end
-	return true
-end
-
-local is_modifier = valid.struct({})
-
-local note_types_count = valid.struct({})
-
-local validate_chartdiff = valid.struct({
-	hash = types.md5hash,
-	index = types.index,
-	modifiers = valid.array(is_modifier, 10),
-	rate = types.number,
-	rate_type = types.new_enum(RateType),
-	mode = types.new_enum(Gamemode),
-	-- notes_hash = types.md5hash,
-	inputmode = types.name,
+Chartdiff.struct = {
+	inputmode = chart_types.inputmode,
+	duration = types.number,
+	start_time = types.number,
 	notes_count = types.count,
 	judges_count = types.count,
 	note_types_count = note_types_count,
@@ -80,19 +49,42 @@ local validate_chartdiff = valid.struct({
 	enps_diff = types.number,
 	osu_diff = types.number,
 	msd_diff = types.number,
-	msd_diff_data = types.binary,
+	msd_diff_data = chart_types.msd_diff_data,
+	msd_diff_rates = chart_types.msd_diff_rates,
 	user_diff = types.number,
 	user_diff_data = types.binary,
-})
+	notes_preview = types.binary,
+}
+
+local computed_keys = table_util.keys(Chartdiff.struct)
+assert(#table_util.keys(Chartdiff.struct) == 16)
+
+local computed_keys_no_msd = table_util.copy(computed_keys)
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff"))
+table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "msd_diff_data"))
+
+---@param values sea.Chartdiff
+---@param no_msd boolean?
+---@return boolean?
+---@return string?
+function Chartdiff:equalsComputed(values, no_msd)
+	local keys = computed_keys
+	if no_msd then
+		keys = computed_keys_no_msd
+	end
+	return valid.equals(table_util.sub(self, keys), table_util.sub(values, keys))
+end
+
+table_util.copy(ChartdiffKey.struct, Chartdiff.struct)
+
+assert(#table_util.keys(Chartdiff.struct) == 21)
+
+local validate_chartdiff = valid.struct(Chartdiff.struct)
 
 ---@return true?
----@return string[]?
+---@return string|valid.Errors?
 function Chartdiff:validate()
-	local ok, errs = validate_chartdiff(self)
-	if not ok then
-		return nil, valid.flatten(errs)
-	end
-	return true
+	return validate_chartdiff(self)
 end
 
 return Chartdiff

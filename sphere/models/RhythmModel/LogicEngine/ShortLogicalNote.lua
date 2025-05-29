@@ -47,11 +47,6 @@ function ShortLogicalNote:processTimeState(timeState)
 	end
 end
 
-local scoreEvent = {
-	name = "NoteState",
-	noteType = "ShortNote",
-}
-
 ---@param newState string
 function ShortLogicalNote:switchState(newState)
 	local oldState = self.state
@@ -70,10 +65,20 @@ function ShortLogicalNote:switchState(newState)
 	local time = noteTime + lastTime * timeRate
 
 	local currentTime = math.min(eventTime, time)
-	local deltaTime = currentTime == time and lastTime or (currentTime - noteTime) / timeRate
+	local deltaTime = math.min(self:getDeltaTime() / timeRate, lastTime)
+
+	local scoreEvent = {
+		name = "NoteState",
+		noteType = "ShortNote",
+	}
 
 	scoreEvent.noteIndex = self.index  -- required for tests
 	scoreEvent.currentTime = currentTime
+	scoreEvent.noteStartTime = self.startNote:getTime()
+	scoreEvent.noteColumn = self.startNote.column
+	scoreEvent.inputOffset = self.logicEngine.inputOffset
+	scoreEvent.selfEventTime = self.eventTime
+	scoreEvent.engineEventTime = self.logicEngine:getEventTime()
 	scoreEvent.deltaTime = deltaTime
 	scoreEvent.timeRate = timeRate
 	scoreEvent.notesCount = self.logicEngine.notesCount
@@ -105,7 +110,7 @@ end
 
 ---@return string
 function ShortLogicalNote:getTimeState()
-	local deltaTime = (self:getEventTime() - self:getNoteTime()) / self.logicEngine:getTimeRate()
+	local deltaTime = self:getDeltaTime() / self.logicEngine:getTimeRate()
 	return self:getTimeStateFromConfig(self.logicEngine.timings.ShortNote, deltaTime)
 end
 

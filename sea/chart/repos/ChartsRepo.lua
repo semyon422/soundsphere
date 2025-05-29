@@ -1,53 +1,38 @@
-local IChartsRepo = require("sea.chart.repos.IChartsRepo")
+local class = require("class")
+local table_util = require("table_util")
+local sql_util = require("rdb.sql_util")
 
----@class sea.ChartsRepo: sea.IChartsRepo
+---@class sea.ChartsRepo
 ---@operator call: sea.ChartsRepo
-local ChartsRepo = IChartsRepo + {}
+local ChartsRepo = class()
 
 ---@param models rdb.Models
-function ChartsRepo:new(models)
+---@param diffcalc_fields string[]
+function ChartsRepo:new(models, diffcalc_fields)
 	self.models = models
+	self.diffcalc_fields = diffcalc_fields
 end
-
----@return sea.Chartfile[]
-function ChartsRepo:getChartfiles()
-	return self.models.chartfiles:select()
-end
-
----@param hash string
----@return sea.Chartfile?
-function ChartsRepo:getChartfileByHash(hash)
-	return self.models.chartfiles:find({hash = assert(hash)})
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function ChartsRepo:createChartfile(chartfile)
-	return self.models.chartfiles:create(chartfile)
-end
-
----@param chartfile sea.Chartfile
----@return sea.Chartfile
-function ChartsRepo:updateChartfile(chartfile)
-	return self.models.chartfiles:update(chartfile, {id = assert(chartfile.id)})[1]
-end
-
---------------------------------------------------------------------------------
 
 ---@return sea.Chartdiff[]
 function ChartsRepo:getChartdiffs()
 	return self.models.chartdiffs:select()
 end
 
----@param chartkey sea.Chartkey
+---@param id number
 ---@return sea.Chartdiff?
-function ChartsRepo:getChartdiffByChartkey(chartkey)
+function ChartsRepo:getChartdiff(id)
+	return self.models.chartdiffs:find({id = assert(id)})
+end
+
+---@param chartdiff_key sea.ChartdiffKey
+---@return sea.Chartdiff?
+function ChartsRepo:getChartdiffByChartdiffKey(chartdiff_key)
 	return self.models.chartdiffs:find({
-		hash = assert(chartkey.hash),
-		index = assert(chartkey.index),
-		modifiers = assert(chartkey.modifiers),
-		rate = assert(chartkey.rate),
-		mode = assert(chartkey.mode),
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
 	})
 end
 
@@ -63,11 +48,96 @@ function ChartsRepo:updateChartdiff(chartdiff)
 	return self.models.chartdiffs:update(chartdiff, {id = assert(chartdiff.id)})[1]
 end
 
+---@param hash string
+---@param index number
+---@return sea.Chartdiff?
+function ChartsRepo:selectDefaultChartdiff(hash, index)
+	return self.models.chartdiffs:find({
+		hash = assert(hash),
+		index = assert(index),
+		modifiers = {},
+		rate = 1,
+		mode = "mania",
+	})
+end
+
+---@return integer
+function ChartsRepo:countChartdiffs()
+	return self.models.chartdiffs:count()
+end
+
+function ChartsRepo:deleteChartdiffs()
+	self.models.chartdiffs:delete()
+end
+
+function ChartsRepo:deleteModifiedChartdiffs()
+	self.models.chartdiffs:delete({
+		"or",
+		modifiers__ne = {},
+		rate__ne = 1,
+	})
+end
+
+---@param id integer
+---@return sea.Chartdiff?
+function ChartsRepo:deleteChartdiff(id)
+	return self.models.chartdiffs:delete({id = assert(id)})[1]
+end
+
+---@param hash string
+---@param index integer
+---@return sea.Chartdiff[]
+function ChartsRepo:deleteChartdiffsByHashIndex(hash, index)
+	return self.models.chartdiffs:delete({
+		hash = assert(hash),
+		index = assert(index),
+	})
+end
+
+---@param chartdiff sea.Chartdiff
+---@param time integer
+---@return sea.Chartdiff
+function ChartsRepo:createUpdateChartdiff(chartdiff, time)
+	local _chartdiff = self:getChartdiffByChartdiffKey(chartdiff)
+	if not _chartdiff then
+		chartdiff.created_at = time
+		chartdiff.computed_at = time
+		return self:createChartdiff(chartdiff)
+	elseif not _chartdiff:equalsComputed(chartdiff) then
+		chartdiff.id = _chartdiff.id
+		chartdiff.computed_at = time
+		return self:updateChartdiff(chartdiff)
+	end
+	return _chartdiff
+end
+
+---@return sea.Chartdiff[]
+function ChartsRepo:getIncompleteChartdiffs()
+	---@type rdb.Conditions
+	local conds = {"or"}
+	for _, field in ipairs(self.diffcalc_fields) do
+		conds[field .. "__isnull"] = true
+	end
+	assert(next(conds))
+	return self.models.chartdiffs:select(conds)
+end
+
+---@param field string
+function ChartsRepo:resetDiffcalcField(field)
+	assert(table_util.indexof(self.diffcalc_fields, field))
+	self.models.chartdiffs:update({[field] = sql_util.NULL})
+end
+
 --------------------------------------------------------------------------------
 
 ---@return sea.Chartmeta[]
 function ChartsRepo:getChartmetas()
 	return self.models.chartmetas:select()
+end
+
+---@return sea.Chartmeta?
+function ChartsRepo:getChartmeta(id)
+	return self.models.chartmetas:find({id = assert(id)})
 end
 
 ---@param hash string
@@ -92,6 +162,56 @@ function ChartsRepo:updateChartmeta(chartmeta)
 	return self.models.chartmetas:update(chartmeta, {id = assert(chartmeta.id)})[1]
 end
 
+---@return integer
+function ChartsRepo:countChartmetas()
+	return self.models.chartmetas:count()
+end
+
+function ChartsRepo:deleteChartmetas()
+	self.models.chartmetas:delete()
+end
+
+---@param format sea.ChartFormat
+function ChartsRepo:deleteChartmetasByFormat(format)
+	self.models.chartmetas:delete({
+		format = assert(format),
+	})
+end
+
+---@return sea.Chartmeta[]
+function ChartsRepo:getChartmetasMissingChartdiffs()
+	return self.models.chartmetas_diffs_missing:select()
+end
+
+---@param chartmeta sea.Chartmeta
+---@param time integer
+---@return sea.Chartmeta
+function ChartsRepo:createUpdateChartmeta(chartmeta, time)
+	local _chartmeta = self:getChartmetaByHashIndex(chartmeta.hash, chartmeta.index)
+	if not _chartmeta then
+		chartmeta.created_at = time
+		chartmeta.computed_at = time
+		return self:createChartmeta(chartmeta)
+	elseif not _chartmeta:equalsComputed(chartmeta) then
+		chartmeta.id = _chartmeta.id
+		chartmeta.computed_at = time
+		return self:updateChartmeta(chartmeta)
+	end
+	return _chartmeta
+end
+
+---@param computed_at integer
+---@param limit integer?
+---@return sea.Chartmeta[]
+function ChartsRepo:getChartmetasComputed(computed_at, limit)
+	return self.models.chartmetas:select({
+		computed_at__lt = assert(computed_at),
+	}, {
+		order = {"computed_at ASC"},
+		limit = limit or 1,
+	})
+end
+
 --------------------------------------------------------------------------------
 
 ---@param id integer
@@ -105,10 +225,10 @@ function ChartsRepo:getChartplays()
 	return self.models.chartplays:select()
 end
 
----@param events_hash string
+---@param replay_hash string
 ---@return sea.Chartplay?
-function ChartsRepo:getChartplayByEventsHash(events_hash)
-	return self.models.chartplays:find({events_hash = assert(events_hash)})
+function ChartsRepo:getChartplayByReplayHash(replay_hash)
+	return self.models.chartplays:find({replay_hash = assert(replay_hash)})
 end
 
 ---@param chartplay sea.Chartplay
@@ -121,6 +241,130 @@ end
 ---@return sea.Chartplay
 function ChartsRepo:updateChartplay(chartplay)
 	return self.models.chartplays:update(chartplay, {id = assert(chartplay.id)})[1]
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function ChartsRepo:getChartplaysComputedCount(computed_at, state)
+	return self.models.chartplays:count({
+		computed_at__lte = assert(computed_at),
+		compute_state = assert(state),
+	})
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@param limit integer?
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysComputed(computed_at, state, limit)
+	return self.models.chartplays:select({
+		computed_at__lte = assert(computed_at),
+		compute_state = assert(state),
+	}, {
+		order = {"computed_at ASC"},
+		limit = limit or 1,
+	})
+end
+
+---@param computed_at integer
+---@param state sea.ComputeState
+---@return integer
+function ChartsRepo:getChartplaysComputedCount(computed_at, state)
+	return self.models.chartplays:count({
+		computed_at__lte = assert(computed_at),
+		compute_state = assert(state),
+	})
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysForChartmeta(chartmeta_key)
+	return self.models.chartplays_list:select({
+		hash = assert(chartmeta_key.hash),
+		index = assert(chartmeta_key.index),
+	}, {order = {"rating DESC"}})
+end
+
+---@param chartdiff_key sea.ChartdiffKey
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysForChartdiff(chartdiff_key)
+	return self.models.chartplays_list:select({
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
+	}, {order = {"rating DESC"}})
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]
+function ChartsRepo:getBestChartplaysForChartmeta(chartmeta_key)
+	return self.models.best_chartmeta_chartplays:select({
+		hash = assert(chartmeta_key.hash),
+		index = assert(chartmeta_key.index),
+	})
+end
+
+---@param chartdiff_key sea.ChartdiffKey
+---@return sea.Chartplay[]
+function ChartsRepo:getBestChartplaysForChartdiff(chartdiff_key)
+	return self.models.best_chartdiff_chartplays:select({
+		hash = assert(chartdiff_key.hash),
+		index = assert(chartdiff_key.index),
+		modifiers = assert(chartdiff_key.modifiers),
+		rate = assert(chartdiff_key.rate),
+		mode = assert(chartdiff_key.mode),
+	})
+end
+
+---@return sea.Chartplay[]
+function ChartsRepo:getChartplaysMissingChartdiffs()
+	return self.models.chartplays_list:select({
+		chartdiff_id__isnull = true,
+		chartmeta_id__isnotnull = true,
+	})
+end
+
+---@param user_id integer
+---@param limit integer
+---@return sea.Chartplay[]
+function ChartsRepo:getRecentChartplays(user_id, limit)
+	return self.models.chartplays:select({
+		user_id = assert(user_id),
+	}, {
+		limit = limit or 1,
+		order = {"submitted_at DESC"},
+	})
+end
+
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartplaysCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	})
+end
+
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartmetasCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	}, {
+		group = {"hash", "`index`"},
+	})
+end
+
+---@param user_id integer
+---@return integer
+function ChartsRepo:getUserChartdiffsCount(user_id)
+	return self.models.chartplays:count({
+		user_id = assert(user_id),
+	}, {
+		group = {"hash", "`index`", "modifiers", "rate", "mode"},
+	})
 end
 
 return ChartsRepo

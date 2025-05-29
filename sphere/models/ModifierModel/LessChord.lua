@@ -53,7 +53,7 @@ function LessChord:apply(config, chart)
 	local notes = {}
 	for _, note in ipairs(chart.notes:getLinkedNotes()) do
 		local inputType, inputIndex = InputMode:splitInput(note:getColumn())
-		if inputType == "key" and note:getType() == "note" then
+		if inputType == "key" and note:getType() == "tap" then
 			table.insert(notes, {
 				noteData = note,
 				inputIndex = inputIndex,

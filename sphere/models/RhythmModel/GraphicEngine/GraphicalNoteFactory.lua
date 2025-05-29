@@ -18,7 +18,7 @@ local GraphicalNoteFactory = class()
 ---@param note ncdk2.LinkedNote
 ---@return sphere.GraphicalNoteType
 local function getImageNoteType(note)
-	local image = note.startNote.images[1]
+	local image = note.startNote.data.images[1]
 	if image and FileFinder:getType(image[1]) == "video" then
 		return "VideoNote"
 	end
@@ -30,7 +30,7 @@ end
 
 ---@type {[notechart.NoteType]: {[1]: table, [2]: sphere.GraphicalNoteType}}
 local notes = {
-	note = {ShortGraphicalNote, "ShortNote"},
+	tap = {ShortGraphicalNote, "ShortNote"},
 	hold = {LongGraphicalNote, "LongNote"},
 	laser = {LongGraphicalNote, "LongNote"},
 	drumroll = {LongGraphicalNote, "LongNote"},

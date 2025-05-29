@@ -1,0 +1,109 @@
+<style>
+.download__image {
+	border-radius: 12px;
+}
+
+.download__gallery {
+	padding: 1em;
+}
+
+.download__download-wrapper {
+	width: 250px;
+}
+
+.download__os-compatibility {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-top: 1em;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.download__os-icon {
+	padding-left: 4px;
+	padding-right: 4px;
+	font-size: 24px;
+}
+
+.download__inner-container {
+	margin: 1em;
+}
+
+.download__instructions-container {
+	padding: 1em;
+}
+
+</style>
+
+<div class="download__gallery fixed-grid has-3-cols">
+	<div class="grid">
+		<img class="cell image is-16by9 download__image" src="static/images/download/song-select.webp">
+		<img class="cell image is-16by9 download__image" src="static/images/download/gameplay.webp">
+		<img class="cell image is-16by9 download__image" src="static/images/download/gameplay2.webp">
+	</div>
+</div>
+
+<div class="columns is-vcentered" style="padding-bottom: 1em;">
+	<div class="column is-two-fifths">
+		<div class="download__inner-container">
+			<h1 class="title">Download soundsphere</h1>
+			<h2 class="subtitle">Follow the steps on this page to install the game.</h2>
+
+			<div class="download__download-wrapper">
+				<a href="/soundsphere.zip" id="download-button" class="button is-link is-medium is-fullwidth">Download for Windows</a>
+				<div class="download__os-compatibility">
+					<p style="flex-grow: 1">Available for:</p>
+					<a onclick="setDownloadButton('windows');" class="fab fa-windows download__os-icon"></a>
+					<a onclick="setDownloadButton('linux');" class="fab fa-linux download__os-icon"></a>
+					<a onclick="setDownloadButton('macos');" class="fab fa-apple download__os-icon"></a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="column">
+		<div class="content border-box download__instructions-container">
+			<h2>Step 1</h2>
+			<p>Download the zip archive containing the game from this page.</p>
+			<h2>Step 2</h2>
+			<p>This archive contains game files, so there is no installation process. Unzip the files to a location where you have plenty of space.</p>
+			<h2>Step 3</h2>
+			<p>Use the executable for your OS to run the game:</p>
+			<ul>
+				<li><strong>game-win64</strong> - For Windows</li>
+				<li><strong>game-appimage</strong> or <strong>game-linux</strong> - For Linux</li>
+				<li><strong>xattr -cr soundsphere.app</strong>, then <strong>soundsphere.app</strong> - For macOS</li>
+			</ul>
+			<p>You can find a variety of methods for adding songs and skins in our <a href="wiki">Wiki</a>.</p>
+		</div>
+	</div>
+</div>
+
+<script>
+function setDownloadButton(os) {
+	const button = document.getElementById("download-button")
+	if (os == "windows") {
+		button.innerText = "Download for Windows"
+		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere.zip");
+	}
+	else if (os == "linux") {
+		button.innerText = "Download for Linux"
+		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere.zip");
+	}
+	else if (os == "macos") {
+		button.innerText = "Download for macOS"
+		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere_macos.zip");
+	}
+}
+
+function downloadPage() {
+	const ua = window.navigator.userAgent.toLowerCase()
+	const windows = ua.includes("windows") || ua.includes("win64")
+	const linux = ua.includes("linux") || ua.includes("x11")
+	const mac = ua.includes("mac os") || ua.includes("macos")
+
+	const os = windows ? "windows" : linux ? "linux" : mac ? "macos" : "windows"
+	setDownloadButton(os)
+}
+downloadPage()
+</script>

@@ -9,77 +9,82 @@ local RoomUsersListView = ListView()
 
 RoomUsersListView.rows = 9
 
-local empty = {}
 function RoomUsersListView:reloadItems()
-	local room = self.game.multiplayerModel.room
-	self.items = room and room.users or empty
+	---@type sphere.GameController
+	local game = self.game
+	local room_users = game.multiplayerModel.client.room_users
+	self.items = room_users
 end
 
 ---@param i number
 ---@param w number
 ---@param h number
 function RoomUsersListView:drawItem(i, w, h)
-	local items = self.items
-	local user = items[i]
+	---@type sphere.GameController
+	local game = self.game
 
-	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.room
+	---@type sea.RoomUser[]
+	local items = self.items
+	local room_user = items[i]
+
+	local client = game.multiplayerModel.client
+	local room = client:getMyRoom()
 	if not room then
 		return
 	end
 
+	local rules = room.rules
+
 	love.graphics.setColor(0.8, 0.8, 0.8, 1)
-	if user.isReady then
+	if room_user.is_ready then
 		love.graphics.setColor(0.3, 1, 0.3, 1)
 	end
-	if not user.isNotechartFound then
+	if not room_user.chart_found then
 		love.graphics.setColor(1, 0.3, 0.1, 1)
 	end
 	love.graphics.rectangle("fill", 0, 0, 12, h)
 
-	if room.host_user_id == user.id then
+	if room.host_user_id == room_user.user_id then
 		love.graphics.setColor(1, 0.7, 0.1, 1)
 		love.graphics.rectangle("fill", 12, 0, 12, h)
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local name = user.name
-	if user.isPlaying then
+	local user = client:getUser(room_user.user_id)
+
+	local name = user and user.name or "unknown"
+	if room_user.is_playing then
 		name = name .. " (playing)"
 	end
 
-	local configModifier = user.modifiers
-	if type(configModifier) == "string" then
-		configModifier = ModifierEncoder:decode(configModifier)
-	end
-	configModifier = configModifier or {}
-	local modifiers = ModifierModel:getString(configModifier)
+	local modifiers = room_user.replay_base.modifiers
+	local modifiers_string = ModifierModel:getString(modifiers)
 
-	local title = user.notechart.title or ""
-	local diffname = user.notechart.name or ""
+	-- local title = user.notechart.title or ""
+	-- local diffname = user.notechart.name or ""
 
 	local description = ""
-	if room.is_free_notechart then
-		description = ("%s - %s"):format(title, diffname)
-		if room.is_free_modifiers then
-			description = description .. "\n"
-		end
-	end
-	if room.is_free_modifiers then
-		description = description .. modifiers
+	-- if room.is_free_notechart then
+	-- 	description = ("%s - %s"):format(title, diffname)
+	-- 	if room.is_free_modifiers then
+	-- 		description = description .. "\n"
+	-- 	end
+	-- end
+	if rules.modifiers then
+		description = description .. modifiers_string
 	end
 
 	just.row(true)
 	just.indent(30)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	imgui.Label(user, name, h)
+	imgui.Label(room_user, name, h)
 	just.offset(w / 2)
 	love.graphics.setFont(spherefonts.get("Noto Sans", 18))
-	imgui.Label(user, description, h)
+	imgui.Label(room_user, description, h)
 	just.row()
 
-	if not multiplayerModel:isHost() or room.host_user_id == user.id then
+	if not client:isHost() or room.host_user_id == room_user.user_id then
 		return
 	end
 
@@ -89,14 +94,14 @@ function RoomUsersListView:drawItem(i, w, h)
 		self.gameView:setContextMenu(function()
 			local close = false
 			just.indent(10)
-			just.text(user.name)
+			just.text(name)
 			love.graphics.line(0, 0, 200, 0)
 			if imgui.TextOnlyButton("Kick", "Kick", width, 55) then
-				multiplayerModel:kickUser(user.id)
+				client:kickUser(room_user.user_id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Give host", "Give host", width, 55) then
-				multiplayerModel:setHost(user.id)
+				client:setHost(room_user.user_id)
 				close = true
 			end
 			if imgui.TextOnlyButton("Close", "Close", width, 55) then

@@ -1,13 +1,26 @@
 local class = require("class")
 local SubmissionServerRemote = require("sea.chart.remotes.SubmissionServerRemote")
+local AuthServerRemote = require("sea.access.remotes.AuthServerRemote")
 
 ---@class sea.ServerRemote: sea.IServerRemote
 ---@operator call: sea.ServerRemote
 local ServerRemote = class()
 
 ---@param domain sea.Domain
-function ServerRemote:new(domain)
-	self.submission = SubmissionServerRemote(domain.chartplays)
+---@param sessions web.Sessions
+function ServerRemote:new(domain, sessions)
+	self.auth = AuthServerRemote(domain.users, sessions)
+	self.submission = SubmissionServerRemote(domain)
+end
+
+---@return sea.User
+function ServerRemote:getUser()
+	return self.user
+end
+
+---@return sea.Session
+function ServerRemote:getSession()
+	return self.session
 end
 
 ---@param msg string

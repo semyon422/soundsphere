@@ -6,6 +6,11 @@ local GraphicEngine = require("sphere.models.RhythmModel.GraphicEngine")
 local AudioEngine = require("sphere.models.RhythmModel.AudioEngine")
 local TimeEngine = require("sphere.models.RhythmModel.TimeEngine")
 local InputManager = require("sphere.models.RhythmModel.InputManager")
+local PauseCounter = require("sphere.models.RhythmModel.PauseCounter")
+local ChartplayComputed = require("sea.chart.ChartplayComputed")
+local Timings = require("sea.chart.Timings")
+local osu_pp = require("libchart.osu_pp")
+local minacalc = require("libchart.minacalc")
 -- require("sphere.models.RhythmModel.LogicEngine.Test")
 
 ---@class sphere.RhythmModel
@@ -20,10 +25,11 @@ function RhythmModel:new(inputModel, resourceModel)
 
 	self.timeEngine = TimeEngine()
 	self.inputManager = InputManager(self.timeEngine, inputModel)
-	self.scoreEngine = ScoreEngine(self.timeEngine)
+	self.scoreEngine = ScoreEngine()
 	self.audioEngine = AudioEngine(self.timeEngine, resourceModel)
 	self.logicEngine = LogicEngine(self.timeEngine, self.scoreEngine)
 	self.graphicEngine = GraphicEngine(self.timeEngine.visualTimeInfo, self.logicEngine)
+	self.pauseCounter = PauseCounter(self.timeEngine)
 	self.observable = Observable()
 
 	self.timeEngine.audioEngine = self.audioEngine
@@ -35,14 +41,6 @@ function RhythmModel:new(inputModel, resourceModel)
 	self.logicEngine.observable:add(self.audioEngine)
 end
 
-function RhythmModel:load()
-	local scoreEngine = self.scoreEngine
-
-	scoreEngine.judgements = self.judgements
-	scoreEngine.hp = self.hp
-	scoreEngine.settings = self.settings
-end
-
 function RhythmModel:loadAllEngines()
 	self:loadLogicEngines()
 	self.audioEngine:load()
@@ -52,6 +50,7 @@ end
 function RhythmModel:loadLogicEngines()
 	self.timeEngine:load()
 	self.scoreEngine:load()
+	self.pauseCounter:load()
 	self.logicEngine:load()
 end
 
@@ -101,15 +100,15 @@ function RhythmModel:update()
 		self.logicEngine:update()
 	end
 	self.audioEngine:update()
-	self.scoreEngine:update()
+	self.pauseCounter:update()
 	self.graphicEngine:update()
 end
 
 ---@return boolean
 function RhythmModel:hasResult()
 	local timeEngine = self.timeEngine
-	local base = self.scoreEngine.scoreSystem.base
-	local accuracy = self.scoreEngine.scoreSystem.normalscore.accuracyAdjusted
+	local base = self.scoreEngine.scores.base
+	local accuracy = self.scoreEngine.scores.normalscore.accuracyAdjusted
 
 	return
 		not self.logicEngine.autoplay and
@@ -121,19 +120,59 @@ function RhythmModel:hasResult()
 		accuracy < math.huge
 end
 
----@param timings table?
-function RhythmModel:setTimings(timings)
-	self.logicEngine.timings = timings
+---@param fast boolean?
+function RhythmModel:getChartplayComputed(fast)
+	local chartdiff = self.chartdiff
+	if not chartdiff then
+		return ChartplayComputed()
+	end
+
+	local scoreEngine = self.scoreEngine
+	local scores = scoreEngine.scores
+	local judgesSource = assert(scoreEngine.judgesSource)
+
+	-- scoreEngine:createByTimings(Timings("etternaj", 4))
+
+	-- local j4 = scoreEngine:getScoreSystem("etterna_accuracy_j4")
+	-- ---@cast j4 sphere.EtternaAccuracy
+
+	local ns_score = scores.normalscore:getScore()
+	-- print(ns_score, scores.normalscore:getScoreForWindow(0.040), j4:getAccuracyString())
+
+	local rating_msd = 0
+	if not fast then
+		local ctx = self.diffcalc_context
+		local ssr = minacalc.calc_ssr(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
+		rating_msd = ssr.overall
+	end
+
+	local c = ChartplayComputed()
+	c.pass = not scores.hp:isFailed()
+	c.judges = judgesSource:getJudges()
+	c.accuracy = scores.normalscore.accuracyAdjusted
+	c.max_combo = scores.base.maxCombo
+	c.miss_count = scores.base.missCount
+	c.not_perfect_count = judgesSource:getNotPerfect()
+	c.rating = ns_score * chartdiff.enps_diff
+	c.rating_pp = osu_pp.calc_no_acc(ns_score, chartdiff.osu_diff, chartdiff.notes_count)
+	c.rating_msd = rating_msd
+
+	return c
+end
+
+---@param replayBase sea.ReplayBase
+function RhythmModel:setReplayBase(replayBase)
+	self.replayBase = replayBase
+	self.logicEngine.timings = replayBase.timing_values
+	self.timeEngine:setBaseTimeRate(replayBase.rate)
+	self.graphicEngine.constant = replayBase.const
+	self.timeEngine.constant = replayBase.const
+	self.logicEngine.singleHandler = replayBase.mode == "taiko"
 end
 
 ---@param windUp table?
 function RhythmModel:setWindUp(windUp)
 	self.timeEngine.windUp = windUp
-end
-
----@param timeRate number
-function RhythmModel:setTimeRate(timeRate)
-	self.timeEngine:setBaseTimeRate(timeRate)
 end
 
 ---@param autoplay boolean
@@ -146,30 +185,33 @@ function RhythmModel:setPromode(promode)
 	self.logicEngine.promode = promode
 end
 
----@param singleHandler boolean
-function RhythmModel:setSingleHandler(singleHandler)
-	self.logicEngine.singleHandler = singleHandler
-end
-
----@param constant boolean
-function RhythmModel:setConstantSpeed(constant)
-	self.graphicEngine.constant = constant
-	self.timeEngine.constant = constant
-end
-
 ---@param adjustRate number
 function RhythmModel:setAdjustRate(adjustRate)
 	self.timeEngine.adjustRate = adjustRate
 end
 
 ---@param chart ncdk2.Chart
-function RhythmModel:setNoteChart(chart)
+---@param chartmeta sea.Chartmeta
+---@param chartdiff sea.Chartdiff
+---@param diffcalc_context sphere.DiffcalcContext
+function RhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
 	assert(chart)
 	self.chart = chart
+	self.chartmeta = chartmeta
+	self.chartdiff = chartdiff
+	self.diffcalc_context = diffcalc_context
 	self.timeEngine.noteChart = chart
 	self.scoreEngine.noteChart = chart
+	self.scoreEngine.chartdiff = chartdiff
 	self.logicEngine:setChart(chart)
 	self.graphicEngine:setChart(chart)
+end
+
+---@param start_time number
+---@param duration number
+function RhythmModel:setPlayTime(start_time, duration)
+	self.timeEngine:setPlayTime(start_time, duration)
+	self.pauseCounter:setPlayTime(start_time, duration)
 end
 
 ---@param range table

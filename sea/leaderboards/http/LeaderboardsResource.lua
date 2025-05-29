@@ -57,11 +57,10 @@ function LeaderboardsResource:createLeaderboard(req, res, ctx)
 	lb.description = body_params.description
 
 	lb.rating_calc = body_params.rating_calc
-	lb.scores_comb = body_params.scores_comb
-	lb.scores_comb_count = tonumber(body_params.scores_comb_count) or 0
 
 	lb.nearest = body_params.nearest
-	lb.result = body_params.result
+	lb.pass = body_params.pass == "on"
+	lb.judges = body_params.judges
 	lb.allow_custom = body_params.allow_custom == "on"
 	lb.allow_const = body_params.allow_const == "on"
 	lb.allow_pause = body_params.allow_pause == "on"
@@ -71,9 +70,13 @@ function LeaderboardsResource:createLeaderboard(req, res, ctx)
 	lb.allow_free_timings = body_params.allow_free_timings == "on"
 	lb.allow_free_healths = body_params.allow_free_healths == "on"
 	lb.mode = body_params.mode
-	lb.rate = json.decode_safe(body_params.rate)
+	lb.rate = json.decode_safe(body_params.rate) or "any"
 	lb.chartmeta_inputmode = json.decode_safe(body_params.chartmeta_inputmode)
 	lb.chartdiff_inputmode = json.decode_safe(body_params.chartdiff_inputmode)
+	lb.timings = json.decode_safe(body_params.timings)
+	lb.healths = json.decode_safe(body_params.healths)
+	lb.starts_at = tonumber(body_params.starts_at)
+	lb.ends_at = tonumber(body_params.ends_at)
 
 	local difftable_ids = json.decode_safe(body_params.difftable_ids)
 	if type(difftable_ids) ~= "table" then

@@ -1,6 +1,16 @@
 local path_util = require("path_util")
-local chartdiffs = require("sphere.persistence.CacheModel.models.chartdiffs")
 local int_rates = require("libchart.int_rates")
+local RateType = require("sea.chart.RateType")
+local ChartFormat = require("sea.chart.ChartFormat")
+local Timings = require("sea.chart.Timings")
+local Healths = require("sea.chart.Healths")
+local Gamemode = require("sea.chart.Gamemode")
+local Modifiers = require("sea.storage.server.Modifiers")
+local Subtimings = require("sea.chart.Subtimings")
+local IntegerArray = require("sea.storage.server.IntegerArray")
+local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
+local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
+local MsdDiffRates = require("sphere.models.DifficultyModel.MsdDiffRates")
 
 local chartplayviews = {}
 
@@ -9,9 +19,25 @@ chartplayviews.table_name = "chartplayviews"
 chartplayviews.types = {
 	lamp = "boolean",
 	set_is_file = "boolean",
-	modifiers = chartdiffs.types.modifiers,
+	format = ChartFormat,
+
+	nearest = "boolean",
+	pass = "boolean",
+	mode = Gamemode,
+	custom = "boolean",
+	columns_order = IntegerArrayOptional,
+	modifiers = Modifiers,
+	judges = IntegerArray,
+	tap_only = "boolean",
+	const = "boolean",
 	rate = int_rates,
-	rate_type = chartdiffs.types.rate_type,
+	timings = Timings,
+	subtimings = Subtimings,
+	healths = Healths,
+	rate_type = RateType,
+
+	msd_diff_data = MsdDiffData,
+	msd_diff_rates = MsdDiffRates,
 }
 
 chartplayviews.relations = {}

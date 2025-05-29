@@ -8,6 +8,7 @@ local class = require("class")
 ---@field is_accepted boolean
 ---@field is_invitation boolean
 ---@field created_at integer
+---@field user sea.User?
 local TeamUser = class()
 
 return TeamUser

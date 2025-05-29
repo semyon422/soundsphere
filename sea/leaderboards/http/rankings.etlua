@@ -1,30 +1,8 @@
-<%
-local function getQuery(field, value)
-	local strs = {}
+<% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
+<% local util = require("web.http.util") %>
+<% local format = require("sea.shared.format") %>
+<% local Username = require("sea.shared.http.components.Username") %>
 
-	for k, v in pairs(query) do
-		table.insert(strs, ("%s=%s"):format(k, k == field and value or v))
-	end
-
-	return ("rankings?%s"):format(table.concat(strs, "&"))
-end
-
-local function getQueryComplex(params)
-	local strs = {}
-
-	for qk, qv in pairs(query) do
-		local value = qv
-		for pk, pv in pairs(params) do
-			if qk == pk then
-				value = pv
-			end
-		end
-		table.insert(strs, ("%s=%s"):format(qk, value))
-	end
-
-	return ("rankings?%s"):format(table.concat(strs, "&"))
-end
-%>
 <section class="hero">
 	<div class="hero-body">
 		<h1 class="title">Rankings</h1>
@@ -34,11 +12,11 @@ end
 
 <div class="tabs is-centered">
 	<ul>
-		<% for _, v in ipairs(ranking_types) do %>
-			<% if v.id == query.ranking_type_id then %>
+		<% for _, v in ipairs(ranking_type_tabs) do %>
+			<% if v.id == ranking_type then %>
 				<li class="is-active"><a><%= v.name %></a></li>
 			<% else %>
-				<li><a href="<%= getQuery('ranking_type_id', v.id)%>"><%= v.name %></a></li>
+				<li><a href="?ranking_type=<%= v.id %>"><%= v.name %></a></li>
 			<% end %>
 		<% end %>
 	</ul>
@@ -47,7 +25,9 @@ end
 <div class="columns">
 	<% if display_leaderboards then %>
 		<div class="column is-one-quarter">
-			<div class="block">
+<%
+--[[%>
+				<div class="block">
 				<h1 class="title">Game mode</h1>
 				<aside class="menu">
 					<ul class="menu-list">
@@ -61,23 +41,24 @@ end
 					</ul>
 				</aside>
 			</div>
+<%
+]]%>
 			<div class="block">
 				<h1 class="title">Leaderboard</h1>
 				<aside class="menu">
-					<% for _, category in ipairs(leaderboards) do %>
-						<p class="menu-label"><%= category.name %></p>
-						<ul class="menu-list">
-							<% for _, leaderboard in ipairs(category.items) do %>
-								<% if leaderboard.id == query.leaderboard_id then %>
-									<li><a class="is-active"><%= leaderboard.name %></a></li>
-								<% else %>
-									<li><a href="<%= getQuery('leaderboard_id', leaderboard.id)%>"><%= leaderboard.name %></a></li>
-								<% end %>
+					<ul class="menu-list">
+						<% for _, leaderboard in ipairs(leaderboards) do %>
+							<% if leaderboard.id == leaderboard_id then %>
+								<li><a class="is-active"><%= leaderboard.name %></a></li>
+							<% else %>
+								<li><a href="?leaderboard_id=<%= leaderboard.id %>" hx-swap="innerHTML show:no-scroll"><%= leaderboard.name %></a></li>
 							<% end %>
-						</ul>
-					<% end %>
+						<% end %>
+					</ul>
 				</aside>
 			</div>
+<%
+--[[%>
 			<% if display_key_modes then %>
 				<div class="block">
 					<h1 class="title">Key mode</h1>
@@ -97,10 +78,12 @@ end
 					</aside>
 				</div>
 			<% end %>
+<%
+]]%>
 		</div>
 	<% end %>
 	<div class="column">
-		<% if display_leaderboards then %>
+		<% if false and display_leaderboards then %>
 			<div class="block">
 				<div class="card">
 					<div class="card-content">
@@ -149,71 +132,127 @@ end
 				</div>
 			</div>
 		<% end %>
-		<div class="block">
-			<table class="rankings__table">
-				<thead>
-					<th>Rank</th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<th></th>
-					<% for _, v in ipairs(table_cell_names) do %>
-						<th><%= v %></th>
-					<% end %>
-				</thead>
-				<tbody>
-					<% for _, user in ipairs(users) do %>
-						<tr class="has-text">
-							<td class="rankings__table-left-cell has-background">#<%= user.rank %></td>
-							<% if user.rankChange > 0 then %>
-								<td class="rankings__table-left-cell fa fa-solid fa-arrow-up has-text-success has-background"></td>
-								<td class="rankings__table-left-cell has-text-success has-background"><%= user.rankChange %></td>
-							<% elseif user.rankChange < 0 then %>
-								<td class="rankings__table-left-cell fa fa-solid fa-arrow-down has-text-danger has-background "></td>
-								<td class="rankings__table-left-cell has-text-danger has-background"><%= math.abs(user.rankChange) %></td>
-							<% else %>
-								<td class="rankings__table-left-cell has-background"></td>
-								<td class="rankings__table-left-cell has-background"></td>
+		<% local rows = leaderboard_users and (#leaderboard_users) or (users and (#users) or 0) %>
+		<% if rows == 0 then %>
+			<div align="center" class="content empty-list-message">
+				<h2>There are no players</h2>
+				<p>Be the first one here!</p>
+			</div>
+		<% else %>
+			<div class="block">
+				<% if ranking_type == "rating" then %>
+					<table class="ranking-table">
+						<thead>
+							<th>Rank</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
+							<th>Accuracy</th>
+							<th>Plays</th>
+						</thead>
+						<tbody>
+							<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
+								<%
+									local user = leaderboard_user.user
+								 	local rank_change = 0
+								%>
+								<tr class="has-text">
+									<td>#<%= leaderboard_user.rank %></td>
+									<% if rank_change > 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-success">
+											<i class="fa fa-solid fa-arrow-up"></i>
+											<%= rank_change %>
+										</td>
+									<% elseif rank_change < 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-danger">
+											<i class="fa fa-solid fa-arrow-down"></i>
+											<%= math.abs(rank_change) %>
+										</td>
+									<% else %>
+										<td></td>
+									<% end %>
+									<td class="ranking-table__flag-cell">
+										<div class="fi-<%= user.country_code %>"></div>
+									</td>
+									<td align="left" class="ranking-table__main-cell">
+										<%- Username(leaderboard_user.user, ("/users/%i?lb=%i"):format(user.id, leaderboard.id)) %>
+									</td>
+									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
+									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
+									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
+								</tr>
 							<% end %>
-							<td class="rankings__table-left-cell rankings__table-flag-cell has-background">
-								<div class="rankings__table-flag fi-<%= user.flag %>"></div>
-							</td>
-							<td align="left" class="has-background"><%= user.username %></td>
-							<% for _, v in ipairs(user.cellValues) do %>
-								<% if v.dimmed then %>
-									<td class="rankings__table-right-cell has-background has-text-grey"><%= v.label %></td>
-								<% else %>
-									<td class="rankings__table-right-cell has-background"><%= v.label %></td>
+						</tbody>
+					</table>
+				<% else %>
+					<table class="ranking-table">
+						<thead>
+							<th>Rank</th>
+							<th></th>
+							<th></th>
+							<th>
+								<% if ranking_type == "charts" then %>
+									Charts
+								<% elseif ranking_type == "play_count" then %>
+									Plays
+								<% elseif ranking_type == "play_time" then %>
+									Time
 								<% end %>
+							</th>
+						</thead>
+						<tbody>
+							<% for i, user in ipairs(users) do %>
+								<%
+									local color_left = ("#%06x"):format(user.color_left)
+									local color_right = ("#%06x"):format(user.color_right)
+								%>
+								<tr class="has-text">
+									<td>#<%= i + (page_num - 1) * users_per_page %></td>
+									<td class="ranking-table__flag-cell">
+										<div class="fi-<%= user.country_code %>"></div>
+									</td>
+									<td align="left" class="ranking-table__main-cell">
+										<%- Username(user, ("/users/%i"):format(user.id)) %>
+									</td>
+									<td class="ranking-table__more-padding has-background">
+										<% if ranking_type == "charts" then %>
+											<%= user.chartmetas_count %>
+										<% elseif ranking_type == "play_count" then %>
+											<%= user.chartplays_count %>
+										<% elseif ranking_type == "play_time" then %>
+											<%= math.floor(user.play_time / 3600) %>h
+										<% end %>
+									</td>
+								</tr>
 							<% end %>
-						</tr>
-					<% end %>
-				</tbody>
-			</table>
-		</div>
-		<div class="block">
-			<nav class="pagination is-centered" role="navigation" aria-label="pagination">
-				<ul class="pagination-list">
-					<% local page = query.page %>
-					<% if page ~= 1 then %>
-						<% if page ~= 2 then %>
-							<li><a href="<%= getQuery('page', 1) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
-							<li><span class="pagination-ellipsis">&hellip;</span></li>
+						</tbody>
+					</table>
+				<% end %>
+			</div>
+			<div class="block">
+				<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+					<ul class="pagination-list">
+						<% if page_num ~= 1 then %>
+							<% if page_num ~= 2 then %>
+								<li><a href="?<%= util.query(query, {page = 1}) %>" class="pagination-link" aria-label="Goto page 1">1</a></li>
+								<li><span class="pagination-ellipsis">&hellip;</span></li>
+							<% end %>
+							<li><a href="?<%= util.query(query, {page = page_num - 1}) %>" class="pagination-link" aria-label="Goto page <%= page_num - 1 %>"><%= page_num - 1 %></a></li>
 						<% end %>
-						<li><a href="<%= getQuery('page', page - 1) %>" class="pagination-link" aria-label="Goto page <%= page - 1 %>"><%= page - 1 %></a></li>
-					<% end %>
-					<li>
-					<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page %></a>
-					</li>
-					<% if page ~= page_count then %>
-						<li><a href="<%= getQuery('page', page + 1) %>" class="pagination-link" aria-label="Goto page <%= page + 1 %>"><%= page + 1 %></a></li>
-						<% if page ~= page_count - 1 then %>
-							<li><span class="pagination-ellipsis">&hellip;</span></li>
-							<li><a href="<%= getQuery('page', page_count) %>" class="pagination-link"><%= page_count %></a></li>
+						<li>
+						<a class="pagination-link is-current" aria-label="Page <%= cur_page %>" aria-current="page"><%= page_num %></a>
+						</li>
+						<% if page_num ~= pages_count then %>
+							<li><a href="?<%= util.query(query, {page = page_num + 1}) %>" class="pagination-link" aria-label="Goto page <%= page_num + 1 %>"><%= page_num + 1 %></a></li>
+							<% if page_num ~= pages_count - 1 then %>
+								<li><span class="pagination-ellipsis">&hellip;</span></li>
+								<li><a href="?<%= util.query(query, {page = pages_count}) %>" class="pagination-link"><%= pages_count %></a></li>
+							<% end %>
 						<% end %>
-					<% end %>
-				</ul>
-			</nav>
-		<div>
+					</ul>
+				</nav>
+			<div>
+		<% end %>
 	</div>
 </div>

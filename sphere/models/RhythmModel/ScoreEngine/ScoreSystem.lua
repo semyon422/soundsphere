@@ -2,10 +2,24 @@ local class = require("class")
 
 ---@class sphere.ScoreSystem
 ---@operator call: sphere.ScoreSystem
+---@field judge_accuracy sphere.JudgeAccuracy?
+---@field judge_windows sphere.JudgeWindows?
+---@field judge_counter sphere.JudgeCounter?
+---@field judge_names string[]?
+---@field timings sea.Timings?
+---@field subtimings sea.Subtimings?
 local ScoreSystem = class()
 
-ScoreSystem.notes = {}
-function ScoreSystem:load() end
+ScoreSystem.events = {}
+
+ScoreSystem.hasAccuracy = false
+ScoreSystem.hasScore = false
+ScoreSystem.hasJudges = false
+
+---@return string
+function ScoreSystem:getKey()
+	error("not implemented")
+end
 
 ---@param event table
 function ScoreSystem:before(event) end
@@ -38,33 +52,18 @@ function ScoreSystem:receive(event)
 
 	local oldState, newState = event.oldState, event.newState
 	local handler =
-		self.notes[event.noteType] and
-		self.notes[event.noteType][oldState] and
-		self.notes[event.noteType][oldState][newState]
+		self.events[event.noteType] and
+		self.events[event.noteType][oldState] and
+		self.events[event.noteType][oldState][newState]
 
 	handle(self, handler, event)
 
 	self:after(event)
 end
 
----@return number
-function ScoreSystem:getAccuracy(...) return -999 end
----@return number
-function ScoreSystem:getScore(...) return -999 end
-
 ---@return table
 function ScoreSystem:getSlice()
-	local slice = {}
-	for k, v in pairs(self) do
-		local t = type(v)
-		if t == "number" or t == "string" or t == "boolean" then
-			if v == math.huge then
-				v = "inf"
-			end
-			slice[k] = v
-		end
-	end
-	return slice
+	return {}
 end
 
 return ScoreSystem

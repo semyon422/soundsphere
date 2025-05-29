@@ -3,65 +3,78 @@ function onSubmit(token) {
 	document.getElementById("register-form").submit();
 }
 </script>
-<div class="center-form-vertical">
-	<div></div>
-	<div class="columns is-centered">
-		<div class="column is-one-third-desktop">
-			<div class="card">
-				<div class="card-content">
-					<form id="register-form" action="/register" method="post">
-						<h1 class="title is-3" align="center">Sign up</h1>
+<div class="columns is-centered">
+	<div class="column is-one-third-desktop">
+		<div class="card">
+			<div class="card-content">
+				<form id="register-form" action="/register" method="post">
+					<h1 class="title is-3" align="center">Sign up</h1>
 
-						<div class="block">
-							<div class="field">
-								<label class="label">E-mail</label>
-								<div class="control">
-									<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
-								</div>
-							</div>
-
-							<div class="field">
-								<label class="label">Your nickname</label>
-								<div class="control">
-									<input class="input" type="text" name="name" required value="<%= user and user.name or "" %>">
-								</div>
-							</div>
-
-							<div class="field">
-								<label class="label">Password</label>
-								<div class="control">
-									<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
-								</div>
-							</div>
-
-							<div class="field">
-								<label class="label">Confirm password</label>
-								<div class="control">
-									<input class="input" type="password" name="confirm_password" required value="">
-								</div>
+					<div class="block">
+						<div class="field">
+							<label class="label">E-mail</label>
+							<div class="control has-icons-left">
+								<input class="input" type="text" name="email" required value="<%= user and user.email or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-at"></i>
+								</span>
 							</div>
 						</div>
 
-						<div class="block">
-							<p>Already registered? <a href="/login">Log in</a></p>
-						</div>
-
-						<div class="block">
-							<div class="field">
-								<div class="control">
-									<button class="button is-link g-recaptcha is-fullwidth"
-										data-sitekey="<%= recaptcha_site_key %>"
-										data-callback="onSubmit"
-										data-action="register"
-									>Sign up</button>
-								</div>
+						<div class="field">
+							<label class="label">Your nickname</label>
+							<div class="control has-icons-left">
+								<input class="input" type="text" name="name" required value="<%= user and user.name or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-user"></i>
+								</span>
 							</div>
 						</div>
-						<div class="block">
-							<%- view:render("sea/shared/http/field_errors.etlua") %>
+
+						<div class="field">
+							<label class="label">Password</label>
+							<div class="control has-icons-left">
+								<input class="input" type="password" name="password" required value="<%= user and user.password or "" %>">
+								<span class="icon is-small is-left">
+									<i class="fas fa-key"></i>
+								</span>
+							</div>
 						</div>
-					</form>
-				</div>
+
+						<div class="field">
+							<label class="label">Confirm password</label>
+							<div class="control has-icons-left">
+								<input class="input" type="password" name="confirm_password" required value="">
+								<span class="icon is-small is-left">
+									<i class="fas fa-key"></i>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<div class="control">
+							<label class="checkbox">
+								<input type="checkbox" name="agree_to_terms_of_use">
+								I agree to the <a href="/policies?policy_key=terms">terms of use</a>
+							</label>
+						</div>
+					</div>
+
+					<div class="block">
+						<p>Already registered? <a hx-boost="false" href="/login">Log in</a></p>
+					</div>
+
+					<div class="field">
+						<div class="control">
+							<button class="button is-link g-recaptcha is-fullwidth"
+								data-sitekey="<%= recaptcha_site_key %>"
+								data-callback="onSubmit"
+								data-action="register"
+							>Sign up</button>
+						</div>
+					</div>
+					<%- view:render("sea/shared/http/field_errors.etlua") %>
+				</form>
 			</div>
 		</div>
 	</div>

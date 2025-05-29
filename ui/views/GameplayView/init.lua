@@ -59,7 +59,7 @@ function GameplayView:draw()
 
 	local state = self.game.pauseModel.state
 	local multiplayerModel = self.game.multiplayerModel
-	local isPlaying = multiplayerModel.room and multiplayerModel.isPlaying
+	local isPlaying = multiplayerModel.client:isInRoom() and multiplayerModel.client.is_playing
 	if
 		not love.window.hasFocus() and
 		state == "play" and
@@ -93,7 +93,7 @@ function GameplayView:update(dt)
 	end
 
 	local actionOnFail = self.game.configModel.configs.settings.gameplay.actionOnFail
-	local failed = self.game.rhythmModel.scoreEngine.scoreSystem.hp:isFailed()
+	local failed = self.game.rhythmModel.scoreEngine.healthsSource:isFailed()
 	if failed and not self.failed then
 		if actionOnFail == "pause" then
 			self.game.gameplayController:changePlayState("pause")
@@ -104,7 +104,7 @@ function GameplayView:update(dt)
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
-	if multiplayerModel.room and not multiplayerModel.isPlaying then
+	if multiplayerModel.client:isInRoom() and not multiplayerModel.client.is_playing then
 		self:quit()
 	end
 
@@ -120,7 +120,7 @@ end
 function GameplayView:quit()
 	if self.game.gameplayController:hasResult() then
 		self:changeScreen("resultView")
-	elseif self.game.multiplayerModel.room then
+	elseif self.game.multiplayerModel.client:isInRoom() then
 		self:changeScreen("multiplayerView")
 	else
 		self:changeScreen("selectView")

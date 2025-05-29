@@ -25,11 +25,11 @@ SelectModel.debounceTime = 0.5
 ---@param configModel sphere.ConfigModel
 ---@param cacheModel sphere.CacheModel
 ---@param onlineModel sphere.OnlineModel
----@param playContext sphere.PlayContext
-function SelectModel:new(configModel, cacheModel, onlineModel, playContext)
+---@param replayBase sea.ReplayBase
+function SelectModel:new(configModel, cacheModel, onlineModel, replayBase)
 	self.configModel = configModel
 	self.cacheModel = cacheModel
-	self.playContext = playContext
+	self.replayBase = replayBase
 
 	self.noteChartLibrary = NoteChartLibrary(cacheModel)
 	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
@@ -168,6 +168,7 @@ end
 
 ---@param settings table?
 ---@return ncdk2.Chart?
+---@return sea.Chartmeta?
 function SelectModel:loadChart(settings)
 	local chartview = self.chartview
 
@@ -176,22 +177,25 @@ function SelectModel:loadChart(settings)
 		return
 	end
 
-	local charts = assert(ChartFactory:getCharts(
+	local chart_chartmetas = assert(ChartFactory:getCharts(
 		chartview.chartfile_name,
 		content
 	))
-	return charts[chartview.index]
+	local t = chart_chartmetas[chartview.index]
+
+	return t.chart, t.chartmeta
 end
 
 ---@param settings table?
 ---@return ncdk2.Chart?
+---@return sea.Chartmeta?
 function SelectModel:loadChartAbsolute(settings)
-	local chart = self:loadChart(settings)
+	local chart, chartmeta = self:loadChart(settings)
 	if not chart then
 		return
 	end
 	chart.layers.main:toAbsolute()
-	return chart
+	return chart, chartmeta
 end
 
 ---@return boolean
@@ -285,20 +289,34 @@ function SelectModel:setConfig(chartview)
 	self.config.chartfile_id = chartview.chartfile_id
 	self.config.chartmeta_id = chartview.chartmeta_id
 	self.config.chartdiff_id = chartview.chartdiff_id
-	self.config.score_id = chartview.score_id
-	self.config.select_score_id = chartview.score_id
+	self.config.chartplay_id = chartview.chartplay_id
+	self.config.select_chartplay_id = chartview.chartplay_id
 
 	local config = self.configModel.configs.settings.select
-	if config.chartviews_table == "chartviews" then
+
+	local views = config.chartviews_table
+	if views == "chartviews" then
 		return
 	end
 
-	local playContext = self.playContext
-	playContext.modifiers = chartview.modifiers or {}
-	playContext.rate = chartview.rate or 1
+	local replayBase = self.replayBase
 
-	local gameplay = self.configModel.configs.settings.gameplay
-	gameplay.rate_type = chartview.rate_type or gameplay.rate_type  -- no nil
+	replayBase.modifiers = chartview.modifiers or {}
+	replayBase.rate = chartview.rate or 1
+	replayBase.mode = chartview.mode or "mania"
+
+	if views == "chartdiffviews" then
+		return
+	end
+
+	replayBase.nearest = chartview.nearest or false
+	replayBase.tap_only = chartview.tap_only or false
+	replayBase.timings = chartview.timings
+	replayBase.subtimings = chartview.subtimings
+	replayBase.columns_order = chartview.columns_order
+	replayBase.custom = chartview.custom or false
+	replayBase.const = chartview.const or false
+	replayBase.rate_type = chartview.rate_type or "linear"
 end
 
 ---@param direction number?
@@ -369,7 +387,7 @@ function SelectModel:scrollScore(direction, destination)
 	local scoreItem = items[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 
-	self.config.score_id = scoreItem.id
+	self.config.chartplay_id = scoreItem.id
 end
 
 ---@param noUpdate boolean?
@@ -407,7 +425,7 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 	self.config.chartfile_id = nil
 	self.config.chartmeta_id = nil
 	self.config.chartdiff_id = nil
-	self.config.score_id = nil
+	self.config.chartplay_id = nil
 
 	self.chartview = nil
 	self.scoreItem = nil
@@ -442,7 +460,7 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 		self.config.chartfile_id = chartview.chartfile_id
 		self.config.chartmeta_id = chartview.chartmeta_id
 		self.config.chartdiff_id = chartview.chartdiff_id
-		self.config.score_id = chartview.score_id
+		self.config.chartplay_id = chartview.chartplay_id
 		if not noPullNext and old_chartview then
 			self:pullScore()
 		end
@@ -452,7 +470,7 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 	self.config.chartfile_id = nil
 	self.config.chartmeta_id = nil
 	self.config.chartdiff_id = nil
-	self.config.score_id = nil
+	self.config.chartplay_id = nil
 
 	self.scoreItem = nil
 
@@ -461,17 +479,19 @@ end
 
 function SelectModel:findScore()
 	local scoreItems = self.scoreLibrary.items
-	self.scoreItemIndex = self.scoreLibrary:getItemIndex(self.config.score_id) or 1
+	self.scoreItemIndex = self.scoreLibrary:getItemIndex(self.config.chartplay_id) or 1
 
 	local scoreItem = scoreItems[self.scoreItemIndex]
 	self.scoreItem = scoreItem
 	if scoreItem then
-		self.config.score_id = scoreItem.id
+		self.config.chartplay_id = scoreItem.id
 	end
 end
 
 function SelectModel:updateScoresAsync()
-	self.scoreLibrary:updateItemsAsync(self.chartview)
+	local config = self.configModel.configs.settings.select
+	local exact = config.chartviews_table ~= "chartviews"
+	self.scoreLibrary:updateItemsAsync(self.chartview, exact)
 	self:findScore()
 end
 

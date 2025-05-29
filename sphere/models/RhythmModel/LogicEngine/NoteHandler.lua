@@ -102,14 +102,11 @@ function NoteHandler:getCurrentNote()
 		end
 	end
 
-	local eventTime = self.logicEngine:getEventTime()
-
 	local nearestIndex
 	local nearestTime = math.huge
 	for i = self.startNoteIndex, self.endNoteIndex do
 		local note = notes[i]
-		local noteTime = note:getNoteTime()
-		local time = math.abs(noteTime - eventTime)
+		local time = math.abs(note:getDeltaTime())
 		if not note.ended and note.isPlayable and time < nearestTime then
 			nearestTime = time
 			nearestIndex = i

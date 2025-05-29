@@ -9,6 +9,8 @@ local OsudirectSubscreen = require("ui.views.SelectView.OsudirectSubscreen")
 local Background = require("ui.views.SelectView.Background")
 local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
+local ChartmetaKey = require("sea.chart.ChartmetaKey")
+
 ---@class ui.SelectView: ui.ScreenView
 ---@operator call: ui.SelectView
 local SelectView = ScreenView + {}
@@ -78,13 +80,18 @@ function SelectView:draw()
 end
 
 function SelectView:play()
-	if not self.game.selectModel:notechartExists() then
+	local selectModel = self.game.selectModel
+	if not selectModel:notechartExists() then
 		return
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
-	if multiplayerModel.room and not multiplayerModel.isPlaying then
-		multiplayerModel:pushNotechart()
+	if multiplayerModel.client:isInRoom() and not multiplayerModel.client.is_playing then
+		local chartmeta_key = ChartmetaKey()
+		chartmeta_key.hash = selectModel.chartview.hash
+		chartmeta_key.index = selectModel.chartview.index
+
+		multiplayerModel.client:updateChartmetaKey(chartmeta_key)
 		self:changeScreen("multiplayerView")
 		return
 	end

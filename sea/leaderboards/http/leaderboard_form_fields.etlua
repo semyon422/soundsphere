@@ -1,8 +1,7 @@
 <% local json = require("web.json") %>
-<% local ScoreComb = require("sea.leaderboards.ScoreComb") %>
 <% local RatingCalc = require("sea.leaderboards.RatingCalc") %>
 <% local TernaryState = require("sea.chart.TernaryState") %>
-<% local Result = require("sea.chart.Result") %>
+<% local JudgesResult = require("sea.chart.JudgesResult") %>
 <% local Gamemode = require("sea.chart.Gamemode") %>
 
 <div class="field">
@@ -34,26 +33,6 @@
 	</div>
 </div>
 
-<div class="field">
-	<label class="label">Score combiner</label>
-	<div class="control">
-		<div class="select">
-			<select name="scores_comb">
-				<% for _, v in ipairs(ScoreComb:list()) do %>
-					<option <%= leaderboard.scores_comb == v and "selected" or "" %>><%= v %></option>
-				<% end %>
-			</select>
-		</div>
-	</div>
-</div>
-
-<div class="field">
-	<label class="label">Score count (combiner)</label>
-	<div class="control">
-		<input class="input" type="number" name="scores_comb_count" value="<%= leaderboard.scores_comb_count or 1 %>">
-	</div>
-</div>
-
 <hr>
 
 <div class="field">
@@ -70,12 +49,21 @@
 </div>
 
 <div class="field">
-	<label class="label">Result</label>
+	<div class="control">
+		<label class="checkbox">
+			<input type="checkbox" name="pass" <%= leaderboard.pass and "checked" or "" %>>
+			Pass required
+		</label>
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Judges result</label>
 	<div class="control">
 		<div class="select">
-			<select name="result">
-				<% for _, v in ipairs(Result:list()) do %>
-					<option <%= leaderboard.result == v and "selected" or "" %>><%= v %></option>
+			<select name="judges">
+				<% for _, v in ipairs(JudgesResult:list()) do %>
+					<option <%= leaderboard.judges == v and "selected" or "" %>><%= v %></option>
 				<% end %>
 			</select>
 		</div>
@@ -155,15 +143,6 @@
 </div>
 
 <div class="field">
-	<div class="control">
-		<label class="checkbox">
-			<input type="checkbox" name="allow_free_healths" <%= leaderboard.allow_free_healths and "checked" or "" %>>
-			Allow free healths
-		</label>
-	</div>
-</div>
-
-<div class="field">
 	<label class="label">Gamemode</label>
 	<div class="control">
 		<div class="select">
@@ -173,6 +152,34 @@
 				<% end %>
 			</select>
 		</div>
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Timings {name: string, data: number}?</label>
+	<div class="control">
+		<input class="input" type="text" name="timings" value="<%= leaderboard.timings and json.encode(leaderboard.timings) or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Healths {name: string, data: number}?</label>
+	<div class="control">
+		<input class="input" type="text" name="healths" value="<%= leaderboard.healths and json.encode(leaderboard.healths) or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Starts at integer?</label>
+	<div class="control">
+		<input class="input" type="number" name="starts_at" value="<%= leaderboard.starts_at and leaderboard.starts_at or "" %>">
+	</div>
+</div>
+
+<div class="field">
+	<label class="label">Ends at integer?</label>
+	<div class="control">
+		<input class="input" type="number" name="ends_at" value="<%= leaderboard.ends_at and leaderboard.ends_at or "" %>">
 	</div>
 </div>
 

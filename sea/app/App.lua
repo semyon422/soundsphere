@@ -1,10 +1,12 @@
 local class = require("class")
+local http_util = require("web.http.util")
 local socket_url = require("socket.url")
-local LsqliteDatabase = require("rdb.LsqliteDatabase")
+local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local Resources = require("sea.app.Resources")
 local Repos = require("sea.app.Repos")
 local Domain = require("sea.app.Domain")
+local ServerRemote = require("sea.app.remotes.ServerRemote")
 local Views = require("web.framework.page.Views")
 local Router = require("web.framework.router.Router")
 local Sessions = require("web.framework.Sessions")
@@ -16,6 +18,7 @@ local etlua_util = require("web.framework.page.etlua_util")
 ---@field ip string
 ---@field time integer
 ---@field path_params {[string]: string}
+---@field query {[string]: string}
 ---@field session_user sea.User
 ---@field session sea.Session?
 ---@field version any
@@ -26,15 +29,16 @@ local App = class()
 
 ---@param app_config sea.AppConfig
 function App:new(app_config)
-	self.app_db = ServerSqliteDatabase(LsqliteDatabase())
+	self.app_db = ServerSqliteDatabase(LjsqliteDatabase())
 	self.sessions = Sessions("sea", app_config.sessions_secret)
-	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key)
+	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key, app_config.recaptcha.required_score)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos)
+	self.server_remote = ServerRemote(self.domain, self.sessions)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
-	self.resources = Resources(self.domain, views, self.sessions)
+	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)
 
 	local router = Router()
 	self.router = router
@@ -87,14 +91,14 @@ end
 ---@param req web.IRequest
 ---@param ctx sea.RequestContext
 function App:handleSession(req, ctx)
-	---@type {id: integer}?
-	local t = self.sessions:get(req.headers)
-	if not t or not t.id then
+	---@type sea.Session?
+	local req_session = self.sessions:get(req.headers)
+	if not req_session or not req_session.id then
 		return
 	end
 
-	local session = self.domain.users:getSession(t.id)
-	if not session or not session.active then
+	local session = self.domain.users:checkSession(req_session)
+	if not session then
 		return
 	end
 
@@ -133,9 +137,11 @@ function App:handle(req, res, ip)
 	local ctx = {
 		parsed_uri = parsed_uri,
 		path_params = path_params,
+		query = http_util.decode_query_string(parsed_uri.query),
 		ip = ip,
 		time = os.time(),
-		session_user = self.domain.users.anon_user,
+		session = self.domain.users:getSession(),
+		session_user = self.domain.users:getUser(),
 		version = self:getVersion(),
 	}
 

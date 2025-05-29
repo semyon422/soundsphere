@@ -1,23 +1,47 @@
+<% local util = require("web.http.util") %>
+<% local Username = require("sea.shared.http.components.Username") %>
+
 <div class="is-hidden-mobile" style="position:relative;">
-	<div class="user__banner" style="background-image:url('https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');"></div>
+	<%
+		local banner_url = [[https://images.unsplash.com/photo-1637825891035-1930cbd564dd?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D]]
+
+		if user.banner and user.banner ~= "" then
+			banner_url = user.banner
+		end
+	%>
+
+	<div class="page-banner" style="background-image:url('<%= banner_url %>');"></div>
 </div>
 
-<main class="container">
+<main class="container" hx-swap="show:no-scroll">
 	<div class="block user__container">
 		<div class="columns">
 			<div class="column">
 				<div class="block">
 					<div class="box">
 						<div class="block">
-							<img class="user__avatar" src="https://eu.ui-avatars.com/api/?name=<%= user.name %>&size=300">
+							<%
+								local avatar_url = ([[https://eu.ui-avatars.com/api/?name=%s&size=300]]):format(user.name)
+
+								if user.avatar and user.avatar ~= "" then
+									avatar_url = user.avatar
+								end
+							%>
+							<img class="user__avatar" src="<%= avatar_url %>">
 						</div>
 						<div class="block">
 							<div class="user__username-container">
-								<div class="user__table-flag fi-gb user__username-cell"></div>
-								<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
+								<div class="user__table-flag fi-<%= user.country_code %> user__username-cell"></div>
+								<% if user.enable_gradient then %>
+									<h1 class="title is-4 user__username-cell">
+										<%- Username(user) %>
+									</h1>
+								<% else %>
+									<h1 class="title is-4 user__username-cell"><%= user.name %></h1>
+								<% end %>
 							</div>
 							<h3 class="is-5" align="center"><%= page:formatRole() %></h3>
-							<div class="user__separator"></div>
+							<div class="separator"></div>
 						</div>
 						<div class="block" x-data="{ discord: '<%= user.discord %>' }">
 							<%
@@ -52,6 +76,22 @@
 					</div>
 				</div>
 				<div class="block is-hidden-mobile">
+					<div class="block">
+						<h1 class="title">Leaderboard</h1>
+						<aside class="menu">
+							<ul class="menu-list">
+								<% for _, lb in ipairs(leaderboards) do %>
+									<% if lb.id == leaderboard.id then %>
+										<li><a class="is-active"><%= lb.name %></a></li>
+									<% else %>
+										<li><a href="?<%= util.query(query, {lb = lb.id}) %>"><%= lb.name %></a></li>
+									<% end %>
+								<% end %>
+							</ul>
+						</aside>
+					</div>
+<%
+--[[%>
 					<div class="block">
 						<h1 class="title">Game mode</h1>
 						<aside class="menu">
@@ -101,15 +141,16 @@
 							</ul>
 						</aside>
 					</div>
+<%
+]]%>
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
-				<div class="user__banner-box is-hidden-mobile"></div>
+				<div class="page-banner-box is-hidden-mobile"></div>
 				<div class="block">
 					<nav class="level">
 						<%
-							local stats_cells = page:getGeneralStats()
-							for _, cell in ipairs(stats_cells) do
+							for _, cell in ipairs(general_stats) do
 						%>
 							<div class="level-item has-text-centered">
 								<div>
@@ -157,16 +198,18 @@
 				<div class="block">
 					<% local can_update = page:canUpdate() %>
 					<% if user.description ~= "" or can_update then %>
-						<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-						<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 						<div class="border-box">
-							<% if can_update and (user.description == "" and not edit_description) then %>
-								<p align="center">Click edit to change your profile description!<p>
-								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
-							<% elseif can_update and edit_description then %>
+							<% if not edit_description and user.description == "" then %>
+								<p align="center">Click edit to change profile description!<p>
+							<% end %>
+
+							<% if user.description ~= "" or edit_description then %>
 								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
+									<div class="description-container" id="editorContainer"></div>
 								</div>
+							<% end %>
+
+							<% if edit_description then %>
 								<div class="columns">
 									<div class="column">
 										<a class="button"" id="saveButton">Save</a>
@@ -175,54 +218,42 @@
 										<p class="has-text-danger" id="descriptionStatus"></p>
 									</div>
 								</div>
-							<% else %>
-								<div class="block">
-									<div class="user__description-container" id="editorContainer"></div>
-								</div>
+							<% end %>
+
+							<% if can_update and not edit_description then %>
+								<a class="button" href="<%= ("/users/%i?edit_description=true"):format(user.id) %>"><i class="fas fa-edit"></i></a>
 							<% end %>
 						</div>
-						<script src="/static/scripts/user_resource.js?v=<%= version %>"></script>
 						<script>
 							var quill = addQuillToElement(
 								document.getElementById("editorContainer"),
-								"<%- user.description %>",
+								document.getElementById("saveButton"),
+								document.getElementById("descriptionStatus"),
+								"/users/<%= user.id %>",
+								"/users/<%= user.id %>/update_description",
+								String.raw`<%- user.description %>`,
 								<%= edit_description %>
 							)
-
-							var can_upload = true
-
-							if (<%= edit_description %>) {
-								const save_button = document.getElementById("saveButton")
-								const status_text = document.getElementById("descriptionStatus")
-								const user_id = <%= user.id %>
-								const on_click = function() {
-									can_upload = false
-									status_text.innerText = "Saving..."
-
-									sendDescriptionToServer(quill, user_id).then(function([success, err]) {
-										status_text.innerText = err
-										can_upload = true
-
-										setTimeout(function() {
-											status_text.innerText = ""
-										}, "3000")
-
-										if (success) {
-											// Opening the link in the same tab
-											can_upload = false
-											window.open(`/users/${user_id}`, "_self")
-										}
-									})
-								}
-
-								save_button.addEventListener("click", on_click)
-							}
 						</script>
 					<% end %>
 				</div>
 				<div class="block is-hidden-tablet user__options-menu-touch">
 					<p class="title">Stats Filter</p>
 					<p class="subtitle">Select game mode, leaderboard and other options to filter specific statistics.</p>
+					<div class="field">
+						<label class="label">Leaderboard</label>
+						<div class="control">
+							<div class="select is-fullwidth">
+								<select>
+									<% for _, lb in ipairs(leaderboards) do %>
+										<option><%= lb.name %></option>
+									<% end %>
+								</select>
+							</div>
+						</div>
+					</div>
+<%
+--[[%>
 					<div class="field">
 						<label class="label">Gamemode</label>
 						<div class="control">
@@ -264,24 +295,28 @@
 							</div>
 						</div>
 					</div>
+<%
+]]%>
 				</div>
 				<div class="block border-box">
-					<p class="title is-4">Global Leaderboard 14K2S</p>
+					<p class="title is-4"><%= leaderboard.name %></p>
 					<div class="columns is-desktop">
 						<div class="column is-two-fifths-desktop">
 							<div class="border-box">
 								<div class="user__key-value">
 									<p>PP:</p>
-									<p><strong>8471pp</strong></p>
+									<p><strong><%= math.floor(total_rating.rating_pp) %>pp</strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>MSD:</p>
-									<p><strong>29.58</strong></p>
+									<p><strong><%= ("%0.2f"):format(total_rating.rating_msd) %></strong></p>
 								</div>
 								<div class="user__key-value">
 									<p>ENPS:</p>
-									<p><strong>30.13</strong></p>
+									<p><strong><%= ("%0.2f"):format(total_rating.rating) %></strong></p>
 								</div>
+<%
+--[[%>
 								<div class="user__key-value">
 									<p>Unique scores:</p>
 									<p><strong>871</strong></p>
@@ -290,6 +325,8 @@
 									<p>Play count:</p>
 									<p><strong>983</strong></p>
 								</div>
+<%
+]]%>
 							</div>
 						</div>
 						<div class="column" style="display: flex;align-items:center">
@@ -297,56 +334,96 @@
 								<div class="level-item has-text-centered">
 									<div>
 										<p class="heading">Global rank</p>
-										<p class="title">#12745</p>
+										<p class="title">#<%= leaderboard_user and leaderboard_user.rank or "?" %></p>
 									</div>
 								</div>
+<%
+--[[%>
 								<div class="level-item has-text-centered">
 									<div>
 										<p class="heading">Country rank</p>
 										<p class="title">#531</p>
 									</div>
 								</div>
+<%
+]]%>
 							</nav>
 						</div>
 					</div>
-					<div class="user__score-container">
+					<div class="user__score-container" x-data="{limit: 5}">
 						<div class="block">
 							<div class="tabs">
 								<ul>
-									<li class="is-active"><a>Top scores</a></li>
-									<li><a>First places (100)</a></li>
-									<li><a>Recent scores</a></li>
+									<li class="<%= query.scores == "top" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "top"}) %>">Best rating</a>
+									</li>
+									<li class="<%= query.scores == "first" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "first"}) %>">First places</a>
+									</li>
+									<li class="<%= query.scores == "recent" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "recent"}) %>">Recent</a>
+									</li>
 								</ul>
 							</div>
-							<% for _, v in ipairs(scores) do %>
-								<div class="user__score-panel">
-									<div class="user__score-line" data-grade="<%= v.grade %>"></div>
-									<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-										<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
-										<div style="display: flex">
-											<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
-											<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods %></p>
-										</div>
-									</div>
-									<div style="display: flex; min-width: fit-content;">
-										<div class="user__score-rows" style="text-align: right;">
-											<p style="padding-left: 6px"><strong><%= v.accuracy * 100 %>%</strong></p>
-											<p class="has-text-grey"><%= v.timeSince %></p>
-										</div>
-										<p class="user__score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
-										<div class="user__score-rating-box has-background-gray-light">
-											<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
-											<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
-										</div>
-									</div>
+
+							<% if #scores == 0 then %>
+								<div align="center" class="content empty-list-message">
+									<h2>There are no scores</h2>
+									<p>The player hasn't played anything yet</p>
 								</div>
+							<% else %>
+								<% for i, v in ipairs(scores) do %>
+									<div class="user__score-panel" x-show="<%= i %> <= limit" <%= i > 5 and "x-cloak" or "" %>>
+										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
+										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
+											<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
+											<div style="display: flex">
+												<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
+												<% if v.rate ~= 1 then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
+												<% end %>
+												<% if v.const then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
+												<% end %>
+												<% if v.tap_only then %>
+													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
+												<% end %>
+												<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
+											</div>
+										</div>
+										<div style="display: flex; min-width: fit-content;">
+											<div class="user__score-rows" style="text-align: right;">
+												<p style="padding-left: 6px"><strong><%= ("%0.2f"):format(v.norm_accuracy * 100) %>%</strong></p>
+												<p class="has-text-grey"><%= v.timeSince %></p>
+											</div>
+											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
+											<div class="user__score-rating-box has-background-gray-light">
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= ("%0.2f"):format(v.rating) %></strong></p>
+												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
+											</div>
+										</div>
+									</div>
+								<% end %>
 							<% end %>
 						</div>
-						<div class="block">
-							<a class="button">Show 50 scores</a>
+						<div class="block" x-show="limit == 5">
+							<a class="button" @click="limit = 20">Show 20 scores</a>
+						</div>
+						<div class="block" x-show="limit == 20">
+							<a class="button" @click="limit = 50">Show 50 scores</a>
+							<a class="button" @click="limit = 5">Hide</a>
+						</div>
+						<div class="block" x-show="limit == 50">
+							<a class="button" @click="limit = 100">Show 100 scores</a>
+							<a class="button" @click="limit = 5">Hide</a>
+						</div>
+						<div class="block" x-show="limit == 100">
+							<a class="button" @click="limit = 5">Hide</a>
 						</div>
 					</div>
 				</div>
+<%
+--[[%>
 				<div class="block border-box">
 					<p class="title is-4">Dan course clears</p>
 					<table class="table is-fullwidth is-striped">
@@ -414,6 +491,8 @@
 						</tbody>
 					</table>
 				</div>
+<%
+]]%>
 			</div>
 		</div>
 	</div>

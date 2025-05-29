@@ -30,8 +30,8 @@ function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
 	local scoreEngine = self.game.rhythmModel.scoreEngine
-	local scoreEntry = self.game.playContext.scoreEntry
-	local loaded = scoreEntry and scoreEntry.replay_hash == item.replay_hash
+	local chartplay = self.game.computeContext.chartplay
+	local loaded = chartplay and chartplay.replay_hash == item.replay_hash
 
 	if just.button(item, just.is_over(w, h)) then
 		self.screenView:loadScore(i)
@@ -45,14 +45,14 @@ function ScoreListView:drawItem(i, w, h)
 	local rating = item.rating
 	local timeRate = item.rate
 	local inputMode = item.inputmode
-	local playContext = self.game.playContext
+	local rhythmModel = self.game.rhythmModel
 
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
-		local normalscore = scoreEngine.scoreSystem.normalscore
+		local normalscore = scoreEngine.scores.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * playContext.chartdiff.enps_diff
+		rating = s * rhythmModel.chartdiff.enps_diff
 
 		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
 		inputMode = tostring(self.game.rhythmModel.chart.inputMode) or inputMode
@@ -64,33 +64,24 @@ function ScoreListView:drawItem(i, w, h)
 
 	local cw = (w - 44) / 5
 
-	local scoreSourceName = self.game.selectModel.scoreLibrary.scoreSourceName
-	if scoreSourceName == "online" then
-		self:drawItemOnline(i, w, h)
-		return
-	end
+	local time = item.created_at or 0
 
 	just.row(true)
 	just.indent(22)
-	TextCellImView(cw, h, "right", i == 1 and "rank" or "", item.rank, true)
-	TextCellImView(cw, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
-	TextCellImView(cw, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
-	TextCellImView(cw * 2, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.time) or "never", Format.inputMode(inputMode))
+	-- TextCellImView(cw, h, "right", i == 1 and "rank" or "", i, true)
+	-- TextCellImView(cw, h, "right", i == 1 and "rating" or "", Format.difficulty(rating), true)
+	-- TextCellImView(cw, h, "right", i == 1 and "time rate" or "", Format.timeRate(timeRate), true)
+	-- TextCellImView(cw * 2, h, "right", time ~= 0 and time_util.time_ago_in_words(time) or "never", Format.inputMode(inputMode))
+	-- TextCellImView(w * 3, h, "right", time ~= 0 and time_util.time_ago_in_words(time) or "never", item.user_name or "username")
+
+	TextCellImView(cw * 2.25, h, "right", time ~= 0 and time_util.time_ago_in_words(time) or "never", item.user_name or "username")
+	TextCellImView(cw / 2, h, "right", i == 1 and "rank" or "", i)
+	TextCellImView(cw * 0.75, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
+	TextCellImView(cw * 0.75, h, "right", i == 1 and "rate" or "", Format.timeRate(item.rate))
+	TextCellImView(cw * 0.75, h, "right", i == 1 and "keys" or "", Format.inputMode(item.inputmode))
+
 	just.row()
 end
 
-function ScoreListView:drawItemOnline(i, w, h)
-	local item = self.items[i]
-	w = (w - 44) / 7
-
-	just.row(true)
-	just.indent(22)
-	TextCellImView(w, h, "right", i == 1 and "rank" or "", item.rank)
-	TextCellImView(w, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
-	TextCellImView(w, h, "right", i == 1 and "rate" or "", Format.timeRate(item.modifierset.timerate))
-	TextCellImView(w, h, "right", i == 1 and "mode" or "", Format.inputMode(item.inputmode))
-	TextCellImView(w * 3, h, "right", item.time ~= 0 and time_util.time_ago_in_words(item.created_at) or "never", item.user.name)
-	just.row()
-end
 
 return ScoreListView

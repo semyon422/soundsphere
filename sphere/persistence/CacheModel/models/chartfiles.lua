@@ -1,9 +1,7 @@
+local ClientChartfile = require("sea.chart.ClientChartfile")
+
 local chartfiles = {}
 
-chartfiles.table_name = "chartfiles"
-
-chartfiles.types = {}
-
-chartfiles.relations = {}
+chartfiles.metatable = ClientChartfile
 
 return chartfiles

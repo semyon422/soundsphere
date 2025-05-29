@@ -5,56 +5,46 @@ local md5 = require("md5")
 ---@operator call: sphere.ChartmetaGenerator
 local ChartmetaGenerator = class()
 
----@param chartmetasRepo sphere.ChartmetasRepo
+---@param chartsRepo sea.ChartsRepo
 ---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param chartFactory notechart.ChartFactory
-function ChartmetaGenerator:new(chartmetasRepo, chartfilesRepo, chartFactory)
-	self.chartmetasRepo = chartmetasRepo
+function ChartmetaGenerator:new(chartsRepo, chartfilesRepo, chartFactory)
+	self.chartsRepo = chartsRepo
 	self.chartfilesRepo = chartfilesRepo
 	self.chartFactory = chartFactory
 end
 
----@param chartfile table
+---@param chartfile sea.ClientChartfile
 ---@param content string
 ---@param not_reuse boolean?
 ---@return string?
----@return table|string?
+---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}[]|string?
 function ChartmetaGenerator:generate(chartfile, content, not_reuse)
+	local chartfilesRepo = self.chartfilesRepo
+	local chartsRepo = self.chartsRepo
+
 	local hash = md5.sumhexa(content)
 
-	if not not_reuse and self.chartmetasRepo:selectChartmeta(hash, 1) then
+	if not not_reuse and chartsRepo:getChartmetaByHashIndex(hash, 1) then
 		chartfile.hash = hash
-		self.chartfilesRepo:updateChartfile(chartfile)
+		chartfilesRepo:updateChartfile(chartfile)
 		return "reused"
 	end
 
-	local charts, err = self.chartFactory:getCharts(chartfile.name, content)
-	if not charts then
+	local chart_chartmetas, err = self.chartFactory:getCharts(chartfile.name, content, hash)
+	if not chart_chartmetas then
 		return nil, err
 	end
 
-	for index, chart in ipairs(charts) do
-		local chartmeta = chart.chartmeta
-		chartmeta.hash = hash
-		chartmeta.index = index
-		self:setChartmeta(chartmeta)
+	local time = os.time()
+	for _, t in ipairs(chart_chartmetas) do
+		chartsRepo:createUpdateChartmeta(t.chartmeta, time)
 	end
 
 	chartfile.hash = hash
-	self.chartfilesRepo:updateChartfile(chartfile)
+	chartfilesRepo:updateChartfile(chartfile)
 
-	return "cached", charts
-end
-
----@param chartmeta table
-function ChartmetaGenerator:setChartmeta(chartmeta)
-	local old = self.chartmetasRepo:selectChartmeta(chartmeta.hash, chartmeta.index)
-	if not old then
-		self.chartmetasRepo:insertChartmeta(chartmeta)
-		return
-	end
-	chartmeta.id = old.id
-	self.chartmetasRepo:updateChartmeta(chartmeta)
+	return "cached", chart_chartmetas
 end
 
 return ChartmetaGenerator

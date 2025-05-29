@@ -21,42 +21,8 @@ ResultView.load = thread.coro(function(self)
 		self.game.resultController:replayNoteChartAsync("result", self.game.selectModel.scoreItem)
 	end
 
-	self:updateJudgements()
-
-	local config = self.game.configModel.configs.select
-	local selectedJudgement = config.judgements
-
-	if not self.judgements[selectedJudgement] then
-		local k, _ = next(self.judgements)
-		config.judgements = k
-	end
-
 	loading = false
 end)
-
-function ResultView:updateJudgements()
-	local scoreSystems = self.game.rhythmModel.scoreEngine.scoreSystem
-	self.selectors = {
-		scoreSystems["soundsphere"].metadata,
-		scoreSystems["quaver"].metadata,
-		scoreSystems["osuMania"].metadata,
-		scoreSystems["osuLegacy"].metadata,
-		scoreSystems["etterna"].metadata,
-		scoreSystems["lr2"].metadata,
-	}
-
-	self.judgements = {}
-
-	for _, scoreSystem in pairs(scoreSystems) do
-		table_util.copy(scoreSystem.judges, self.judgements)
-	end
-
-	local judgementScoreSystem = scoreSystems["judgement"]
-	for _, judge in ipairs(judgementScoreSystem.judgementList) do
-		table.insert(self.selectors, judge)
-		table_util.copy(judgementScoreSystem.judges[judge.name], self.judgements)
-	end
-end
 
 function ResultView:draw()
 	just.container("screen container", true)
@@ -89,7 +55,6 @@ ResultView.loadScore = thread.coro(function(self, itemIndex)
 	self.game.resultController:replayNoteChartAsync("result", scoreEntry)
 	if itemIndex then
 		self.game.selectModel:scrollScore(nil, itemIndex)
-		self:updateJudgements()
 	end
 	loading = false
 end)
@@ -111,7 +76,7 @@ end)
 
 function ResultView:quit()
 	self.game.resultController:unload()
-	if self.game.multiplayerModel.room then
+	if self.game.multiplayerModel.client:isInRoom() then
 		self:changeScreen("multiplayerView")
 		return
 	end

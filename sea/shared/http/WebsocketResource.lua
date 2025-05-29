@@ -5,6 +5,8 @@ local Remote = require("icc.Remote")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
 
+local whitelist = require("sea.app.remotes.whitelist")
+
 ---@class sea.WebsocketResource: web.IResource
 ---@operator call: sea.WebsocketResource
 local WebsocketResource = IResource + {}
@@ -19,17 +21,23 @@ WebsocketResource.routes = {
 }
 
 local function remote_handler_transform(_, th, peer, obj, ...)
+	---@type sea.IServerRemote
 	local _obj = setmetatable({}, {__index = obj})
 	_obj.remote = Remote(th, peer) --[[@as sea.ClientRemote]]
-	_obj.user = (...) --[[@as sea.User]]
-	---@cast _obj +sea.IServerRemote
+
+	---@type sea.RequestContext
+	local ctx = ...
+	_obj.user = ctx.session_user
+	_obj.session = ctx.session
+	_obj.ip = ctx.ip
+
 	return _obj, select(2, ...)
 end
 
 ---@param server_handler sea.ServerRemote
 ---@param views web.Views
 function WebsocketResource:new(server_handler, views)
-	self.remote_handler = RemoteHandler(server_handler)
+	self.remote_handler = RemoteHandler(server_handler, whitelist)
 	self.remote_handler.transform = remote_handler_transform
 	self.views = views
 end
@@ -42,14 +50,18 @@ function WebsocketResource:server(req, res, ctx)
 	local peer = WebsocketPeer(ws)
 	local task_handler = TaskHandler(self.remote_handler)
 
+	ws.max_payload_len = 1e7
+	task_handler.timeout = 60
+
 	---@param msg icc.Message
 	local function handle_msg(msg)
 		if msg.ret then
 			task_handler:handleReturn(msg)
 		else
-			msg:insert(ctx.session_user, 3)
+			msg:insert(ctx, 3)
 			task_handler:handleCall(peer, msg)
 		end
+		task_handler:update()
 	end
 
 	function ws.protocol:text(payload, fin)

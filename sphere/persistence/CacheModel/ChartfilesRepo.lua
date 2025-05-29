@@ -14,8 +14,8 @@ end
 
 ---@param dir string?
 ---@param name string
----@param location_id number
----@return table?
+---@param location_id integer
+---@return sea.ClientChartfileSet?
 function ChartfilesRepo:selectChartfileSet(dir, name, location_id)
 	return self.models.chartfile_sets:find({
 		dir = dir,
@@ -26,7 +26,7 @@ function ChartfilesRepo:selectChartfileSet(dir, name, location_id)
 end
 
 ---@param chartfile_set table
----@return table
+---@return sea.ClientChartfileSet
 function ChartfilesRepo:insertChartfileSet(chartfile_set)
 	return self.models.chartfile_sets:create(chartfile_set)
 end
@@ -41,34 +41,43 @@ function ChartfilesRepo:deleteChartfileSets(conds)
 	self.models.chartfile_sets:delete(conds)
 end
 
----@param id number
----@return table?
+---@param id integer
+---@return sea.ClientChartfileSet?
 function ChartfilesRepo:selectChartfileSetById(id)
 	return self.models.chartfile_sets:find({id = assert(id)})
 end
 
----@param location_id number?
----@return table
-function ChartfilesRepo:selectChartfileSetsAtLocation(location_id)
-	return self.models.chartfile_sets:select({location_id = location_id})
+---@return sea.ClientChartfileSet[]
+function ChartfilesRepo:selectChartfileSets()
+	return self.models.chartfile_sets:select()
 end
 
----@return number
+---@param location_id integer
+---@param dir integer?
+---@return sea.ClientChartfileSet[]
+function ChartfilesRepo:selectChartfileSetsAtLocation(location_id, dir)
+	return self.models.chartfile_sets:select({
+		location_id = assert(location_id),
+		dir = dir,
+	})
+end
+
+---@return integer
 function ChartfilesRepo:countChartfileSets(conds)
 	return self.models.chartfile_sets:count(conds)
 end
 
 --------------------------------------------------------------------------------
 
----@param set_id number
+---@param set_id integer
 ---@param name string
----@return table?
+---@return sea.ClientChartfile?
 function ChartfilesRepo:selectChartfile(set_id, name)
 	return self.models.chartfiles:find({set_id = assert(set_id), name = assert(name)})
 end
 
 ---@param chartfile table
----@return table
+---@return sea.ClientChartfile
 function ChartfilesRepo:insertChartfile(chartfile)
 	return self.models.chartfiles:create(chartfile)
 end
@@ -89,8 +98,8 @@ function ChartfilesRepo:deleteChartfiles(conds)
 end
 
 ---@param path string?
----@param location_id number
----@param set_id number?
+---@param location_id integer
+---@param set_id integer?
 ---@return table
 function ChartfilesRepo:selectUnhashedChartfiles(path, location_id, set_id)
 	assert(not (path and set_id))
@@ -102,25 +111,31 @@ function ChartfilesRepo:selectUnhashedChartfiles(path, location_id, set_id)
 	})
 end
 
----@param id number
----@return table?
+---@param location_id integer
+---@return {dir: string}[]
+function ChartfilesRepo:selectChartfileSetsDirs(location_id)
+	return self.models.chartfile_set_dirs:select({location_id = assert(location_id)})
+end
+
+---@param id integer
+---@return sea.ClientChartfile?
 function ChartfilesRepo:selectChartfileById(id)
 	return self.models.chartfiles:find({id = assert(id)})
 end
 
 ---@param hash string
----@return table?
+---@return sea.ClientChartfile?
 function ChartfilesRepo:selectChartfileByHash(hash)
 	return self.models.located_chartfiles:find({hash = assert(hash)})
 end
 
----@return number
+---@return integer
 function ChartfilesRepo:countChartfiles(conds)
 	return self.models.located_chartfiles:count(conds)
 end
 
----@param hashes table
----@return rdb.Row[]
+---@param hashes string[]
+---@return sea.ClientChartfile[]
 function ChartfilesRepo:getChartfilesByHashes(hashes)
 	return self.models.chartfiles:select({hash__in = hashes})
 end

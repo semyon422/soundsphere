@@ -1,28 +1,29 @@
-<div style="height: 100vh">
-	<div class="columns" style="height: 88vh">
-		<div class="column">
-			<div class="welcome__hero">
-				<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
-				<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
-
-				<div class="level" style="margin-top:26px">
-					<div class="level-item buttons are-medium">
-						<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
-						<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+<div class="welcome__main-container">
+	<div class="welcome__main-content">
+		<div class="columns is-desktop welcome__main-columns">
+			<div class="column welcome__left-column">
+				<div class="welcome__hero">
+					<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
+					<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
+					<div class="level welcome__buttons-level">
+						<div class="level-item buttons are-medium">
+							<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+							<a href="/osu"><button class="button is-rounded">Connect from osu!</button></a>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="column">
-			<div class="welcome__canvas-container">
-				<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
+			<div class="column welcome__right-column">
+				<div class="welcome__canvas-container">
+					<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
+				</div>
+				<script src="static/scripts/index.js"></script>
 			</div>
-			<script src="static/scripts/index.js"></script>
 		</div>
 	</div>
-	<div style="display: flex; flex-direction: column; align-items:center" class="has-text-grey">
+	<div class="welcome__bottom-text has-text-grey">
 		<p>See why soundsphere is a better choice</p>
-		<i style="margin-top: 8px" class="fas fa-chevron-down"></i>
+		<i class="fas fa-chevron-down"></i>
 	</div>
 </div>
 
@@ -60,10 +61,9 @@
 		})
 	}
 
-	window.onload = function() {
+	document.addEventListener("htmx:load", function() {
 		loadImages()
-	}
-
+	})
 	document.addEventListener("themeChanged", (event) => {
 		loadImages()
 	})
@@ -79,7 +79,7 @@
 
 		<% Feature(
 			"Advanced gameplay modifiers",
-			"Convert songs from anyK to anyK, add more density, apply full long note mode. There are an infinite number of modifier combinations.",
+			"Convert songs from anyK to anyK, add more density, apply full long note modifier. There are an infinite number of modifier combinations.",
 			"mods.svg",
 			"mods-dark.svg")
 		%>
@@ -156,7 +156,7 @@
 		<section class="section">
 			<div class="content is-medium">
 				<h2>The easiest way to play BMS</h2>
-				<p>nstall the game, add your favorite BMS songs, choose a skin, and get ready to play! And the best part? You don't need to learn to configure old games in a language you don't know.</p>
+				<p>Install the game, add your favorite BMS songs, choose a skin, and get ready to play! And the best part? You don't need to learn to configure old games in a language you don't know.</p>
 			</div>
 		</section>
 		<section class="section">

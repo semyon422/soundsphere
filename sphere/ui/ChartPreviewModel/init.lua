@@ -66,7 +66,9 @@ function ChartPreviewModel:setChartview(chartview)
 	end
 
 	local sph = Sph()
-	sph.metadata.input = assert(chartview.chartdiff_inputmode)
+	sph.metadata:set("title", "")
+	sph.metadata:set("artist", "")
+	sph.metadata:set("input", assert(chartview.chartdiff_inputmode))
 	sph.sphLines:decode(lines)
 
 	local decoder = ChartDecoder()

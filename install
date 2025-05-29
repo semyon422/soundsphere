@@ -4,7 +4,6 @@ source ./aqua/env/openresty_setenv
 luarocks install luasocket
 luarocks install luaossl
 luarocks install luasec
-luarocks install luautf8
 luarocks install bcrypt
 luarocks install md5
 luarocks install utf8
@@ -12,6 +11,10 @@ luarocks install lsqlite3
 luarocks install etlua
 luarocks install luacov
 luarocks install luacov-reporter-lcov
+luarocks install nginx-lua-prometheus
+luarocks install enet
 
 mkdir -p logs
 mkdir -p temp
+mkdir -p storages/charts
+mkdir -p storages/replays

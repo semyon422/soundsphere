@@ -12,14 +12,12 @@ local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
 local TimeRateModel = require("sphere.models.TimeRateModel")
 local ResourceModel = require("sphere.models.ResourceModel")
-local PlayContext = require("sphere.models.PlayContext")
 local PauseModel = require("sphere.models.PauseModel")
 local JoystickModel = require("sphere.models.JoystickModel")
 local OffsetModel = require("sphere.models.OffsetModel")
 
 local SelectController = require("sphere.controllers.SelectController")
 local GameplayController = require("sphere.controllers.GameplayController")
-local FastplayController = require("sphere.controllers.FastplayController")
 local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
@@ -35,6 +33,10 @@ local UserInterfaceModel = require("sphere.models.UserInterfaceModel")
 
 local PackageManager = require("sphere.pkg.PackageManager")
 local SeaClient = require("sphere.online.SeaClient")
+local ClientRemote = require("sea.app.remotes.ClientRemote")
+
+local ComputeContext = require("sea.compute.ComputeContext")
+local ReplayBase = require("sea.replays.ReplayBase")
 
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
@@ -47,7 +49,10 @@ function GameController:new()
 	self.app = App(self.persistence)
 	self.uiModel = UserInterfaceModel(self)
 
-	self.onlineModel = OnlineModel(self.persistence.configModel)
+	self.client_remote = ClientRemote(self.persistence.cacheModel)
+	self.seaClient = SeaClient(self.client_remote)
+
+	self.onlineModel = OnlineModel(self.persistence.configModel, self.seaClient)
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel, self.packageManager)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.resourceModel = ResourceModel(
@@ -65,14 +70,15 @@ function GameController:new()
 		self.resourceModel
 	)
 	self.speedModel = SpeedModel(self.persistence.configModel)
-	self.playContext = PlayContext()
-	self.timeRateModel = TimeRateModel(self.persistence.configModel, self.playContext)
-	self.modifierSelectModel = ModifierSelectModel(self.playContext)
+	self.computeContext = ComputeContext()
+	self.replayBase = ReplayBase()
+	self.timeRateModel = TimeRateModel(self.replayBase)
+	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
 		self.persistence.cacheModel,
 		self.onlineModel,
-		self.playContext
+		self.replayBase
 	)
 	self.multiplayerModel = MultiplayerModel(
 		self.persistence.cacheModel,
@@ -81,7 +87,7 @@ function GameController:new()
 		self.selectModel,
 		self.onlineModel,
 		self.persistence.osudirectModel,
-		self.playContext
+		self.replayBase
 	)
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
@@ -104,8 +110,6 @@ function GameController:new()
 	self.previewModel = PreviewModel(self.persistence.configModel)
 	self.chartPreviewModel = ChartPreviewModel(self.persistence.configModel, self.previewModel, self)
 
-	self.seaClient = SeaClient(self)
-
 	self.selectController = SelectController(
 		self.selectModel,
 		self.modifierSelectModel,
@@ -116,7 +120,7 @@ function GameController:new()
 		self.cacheModel,
 		self.osudirectModel,
 		self.windowModel,
-		self.playContext,
+		self.replayBase,
 		self.backgroundModel,
 		self.previewModel,
 		self.chartPreviewModel
@@ -136,18 +140,13 @@ function GameController:new()
 		self.speedModel,
 		self.cacheModel,
 		self.fileFinder,
-		self.playContext,
+		self.replayBase,
+		self.computeContext,
 		self.pauseModel,
 		self.offsetModel,
 		self.previewModel,
 		self.notificationModel,
 		self.seaClient
-	)
-	self.fastplayController = FastplayController(
-		self.rhythmModel,
-		self.replayModel,
-		self.cacheModel,
-		self.playContext
 	)
 	self.resultController = ResultController(
 		self.selectModel,
@@ -155,14 +154,14 @@ function GameController:new()
 		self.rhythmModel,
 		self.onlineModel,
 		self.configModel,
-		self.fastplayController,
-		self.playContext
+		self.computeContext,
+		self.replayBase
 	)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
 		self.configModel,
 		self.selectModel,
-		self.playContext
+		self.replayBase
 	)
 	self.editorController = EditorController(
 		self.selectModel,
@@ -173,8 +172,7 @@ function GameController:new()
 		self.windowModel,
 		self.cacheModel,
 		self.fileFinder,
-		self.previewModel,
-		self.playContext
+		self.previewModel
 	)
 end
 
@@ -194,23 +192,24 @@ function GameController:load()
 	rhythmModel.hp = configModel.configs.settings.gameplay.hp
 	rhythmModel.settings = configModel.configs.settings
 
-	self.playContext:load(configModel.configs.play)
+	self.replayBase:importReplayBase(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
-	self.onlineModel:load()
+	self.seaClient:load(self.persistence.configModel.configs.urls.websocket, function()
+		self.onlineModel:load()
+		self.onlineModel.authManager:checkSession()
+	end)
+
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
 	self.selectModel:load()
 
 	self.multiplayerController:load()
 
-	self.onlineModel.authManager:checkSession()
 	self.multiplayerModel:connect()
 
 	self.backgroundModel:load()
 	self.previewModel:load()
-
-	self.seaClient:load(self.persistence.configModel.configs.urls.websocket)
 end
 
 function GameController:unload()

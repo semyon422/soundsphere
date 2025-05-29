@@ -56,12 +56,14 @@ end
 
 ---@param self table
 local function ScreenMenu(self)
-	local multiplayerModel = self.game.multiplayerModel
+	---@type sphere.GameController
+	local game = self.game
+	local multiplayerModel = game.multiplayerModel
 
 	local w, h = Layout:move("column3", "header")
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	if imgui.TextOnlyButton("Leave", "Leave", 120, h) then
-		multiplayerModel:leaveRoom()
+		multiplayerModel.client:leaveRoom()
 	end
 end
 
@@ -71,7 +73,7 @@ local function Cells(self)
 
 	local multiplayerModel = self.game.multiplayerModel
 
-	local baseTimeRate = self.game.playContext.rate
+	local baseTimeRate = self.game.replayBase.rate
 	local chartview = self.game.selectModel.chartview or multiplayerModel.notechart
 
 	local bpm = 0
@@ -149,24 +151,24 @@ local function DownloadButton(self)
 	love.graphics.setColor(1, 1, 1, 1)
 
 	local multiplayerModel = self.game.multiplayerModel
-	if not multiplayerModel.room then
+	if not multiplayerModel.client:isInRoom() then
 		return
 	end
 
-	local notechart = multiplayerModel.room.notechart
-	if not notechart.osuSetId then
-		return
-	end
-	local beatmap = multiplayerModel.downloadingBeatmap
-	if beatmap then
-		just.indent(w / 2)
-		imgui.Label("beatmap status", beatmap.status, h)
-	else
-		just.indent(w / 2)
-		if imgui.TextOnlyButton("Download", multiplayerModel.chartview and "Redownload" or "Download", 144, h) then
-			multiplayerModel:downloadNoteChart()
-		end
-	end
+	-- local notechart = multiplayerModel.room.notechart
+	-- if not notechart.osuSetId then
+	-- 	return
+	-- end
+	-- local beatmap = multiplayerModel.downloadingBeatmap
+	-- if beatmap then
+	-- 	just.indent(w / 2)
+	-- 	imgui.Label("beatmap status", beatmap.status, h)
+	-- else
+	-- 	just.indent(w / 2)
+	-- 	if imgui.TextOnlyButton("Download", multiplayerModel.chartview and "Redownload" or "Download", 144, h) then
+	-- 		multiplayerModel:downloadNoteChart()
+	-- 	end
+	-- end
 end
 
 ---@param self table
@@ -179,7 +181,7 @@ local function Title(self)
 	end
 	TextCellImView(w, 52, "left", chartview.artist, chartview.title)
 
-	local baseTimeRate = self.game.playContext.rate
+	local baseTimeRate = self.game.replayBase.rate
 	local difficulty = Format.difficulty((chartview.difficulty or 0) * baseTimeRate)
 
 	TextCellImView(72, h, "right", Format.inputMode(chartview.inputmode), difficulty, true)
@@ -195,17 +197,21 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(21, 4)
 
 	ModifierIconGridView.game = self.game
-	ModifierIconGridView:draw(self.game.playContext.modifiers, w - 42, h, h - 8)
+	ModifierIconGridView:draw(self.game.replayBase.modifiers, w - 42, h, h - 8)
 end
 
 ---@param self table
 local function Header(self)
 	local w, h = Layout:move("column1", "header")
 
-	local username = self.game.configModel.configs.online.user.name
-	local session = self.game.configModel.configs.online.session
+	---@type sphere.GameController
+	local game = self.game
+
+	local sea_client = game.seaClient
+	local username = sea_client.user and sea_client.user.name or "Not logged in"
+
 	just.row(true)
-	if UserInfoView:draw(w, h, username, not not (session and next(session))) then
+	if UserInfoView:draw(w, h, username, sea_client.connected) then
 		self.gameView:setModal(require("ui.views.OnlineView"))
 	end
 	just.offset(0)
@@ -240,14 +246,13 @@ end
 local noRoom = {
 	name = "No room"
 }
-local noUser = {}
 
 ---@param self table
 local function RoomInfo(self)
 	local w, h = Layout:move("column2", "header")
 
 	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.room or noRoom
+	local room = multiplayerModel.client:getMyRoom() or noRoom
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	gfx_util.printFrame(room.name, 22, 0, w, h, "left", "center")
@@ -257,57 +262,74 @@ end
 local function RoomSettings(self)
 	local w, h = Layout:move("column3")
 
-	local multiplayerModel = self.game.multiplayerModel
-	local room = multiplayerModel.room or noRoom
-	local user = multiplayerModel.user or noUser
+	---@type sphere.GameController
+	local game = self.game
+
+	local multiplayerModel = game.multiplayerModel
+	local mp_client = multiplayerModel.client
+	local room = mp_client:getMyRoom()
+	local room_user = mp_client:getMyRoomUser()
+	if not room or not room_user then
+		return
+	end
+
+	local rules = room.rules
 
 	love.graphics.translate(0, 36)
 
 	local _h = 55
-	local isHost = multiplayerModel:isHost()
+	local isHost = mp_client:isHost()
 	if isHost then
-		if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
-			multiplayerModel:setFreeNotechart(not room.is_free_notechart)
-		end
-		just.sameline()
-		imgui.Label("Free chart", "Free chart", _h)
+		-- if imgui.Checkbox("Free chart", room.is_free_notechart, _h) then
+		-- 	multiplayerModel:setFreeNotechart(not room.is_free_notechart)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free chart", "Free chart", _h)
 
-		if imgui.Checkbox("Free mods", room.is_free_modifiers, _h) then
-			multiplayerModel:setFreeModifiers(not room.is_free_modifiers)
-		end
-		just.sameline()
-		imgui.Label("Free mods", "Free mods", _h)
+		-- if imgui.Checkbox("Free mods", rules.modifiers, _h) then
+		-- 	rules.modifiers = not rules.modifiers
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free mods", "Free mods", _h)
 
-		if imgui.Checkbox("Free const", room.is_free_const, _h) then
-			multiplayerModel:setFreeConst(not room.is_free_const)
-		end
-		just.sameline()
-		imgui.Label("Free const", "Free const", _h)
+		-- if imgui.Checkbox("Free const", rules.const, _h) then
+		-- 	rules.const = not rules.const
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free const", "Free const", _h)
 
-		if imgui.Checkbox("Free rate", room.is_free_rate, _h) then
-			multiplayerModel:setFreeRate(not room.is_free_rate)
-		end
-		just.sameline()
-		imgui.Label("Free rate", "Free rate", _h)
+		-- if imgui.Checkbox("Free rate", rules.rate, _h) then
+		-- 	rules.rate = not rules.rate
+		-- 	mp_client:setRules(rules)
+		-- end
+		-- just.sameline()
+		-- imgui.Label("Free rate", "Free rate", _h)
 	end
 
-	if imgui.Checkbox("Ready", user.isReady, _h) then
-		multiplayerModel:switchReady()
+	if imgui.Checkbox("Ready", room_user.is_ready, _h) then
+		mp_client:switchReady()
 	end
 	just.sameline()
 	imgui.Label("Ready", "Ready", _h)
 
 	w, h = Layout:move("column3")
-	love.graphics.translate(36, h - 72 * 3)
+	love.graphics.translate(36, h - 72 * 4)
 
-	if isHost or room.is_free_notechart then
+	if isHost or rules.chart then
 		if imgui.TextOnlyButton("Select chart", "Select", w - 72, 72) then
 			self:changeScreen("selectView")
 		end
 	end
-	if isHost or room.is_free_modifiers then
+	if isHost or rules.modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
 			self.gameView:setModal(require("ui.views.ModifierView"))
+		end
+	end
+	if isHost then
+		if imgui.TextOnlyButton("Settings", "Settings", w - 72, 72) then
+			self.gameView:setModal(require("ui.views.SelectView.PlayConfigView"))
 		end
 	end
 
@@ -315,9 +337,9 @@ local function RoomSettings(self)
 	love.graphics.translate(36, h - 72)
 	if isHost then
 		if not room.isPlaying and imgui.TextOnlyButton("Start match", "Start match", w - 72, 72) then
-			multiplayerModel:startMatch()
+			mp_client:startMatch()
 		elseif room.isPlaying and imgui.TextOnlyButton("Stop match", "Stop match", w - 72, 72) then
-			multiplayerModel:stopMatch()
+			mp_client:stopMatch()
 		end
 	end
 end
@@ -342,8 +364,11 @@ local function ChatWindow(self)
 
 	just.clip(love.graphics.rectangle, "fill", 0, 0, w, h)
 
-	local multiplayerModel = self.game.multiplayerModel
-	local roomMessages = multiplayerModel.roomMessages
+	---@type sphere.GameController
+	local game = self.game
+
+	local mp_client = game.multiplayerModel.client
+	local messages = mp_client.room_messages
 
 	local scroll = just.wheel_over(chat, just.is_over(w, h))
 
@@ -352,8 +377,8 @@ local function ChatWindow(self)
 
 	local startHeight = just.height
 
-	for i = 1, #roomMessages do
-		local message = roomMessages[i]
+	for i = 1, #messages do
+		local message = messages[i]
 		just.text(message)
 	end
 
@@ -365,9 +390,9 @@ local function ChatWindow(self)
 	if overlap > 0 then
 		if scroll then
 			chat.scroll = math.min(math.max(chat.scroll - scroll * 50, 0), overlap)
-		elseif chat.messageCount ~= #roomMessages then
+		elseif chat.messageCount ~= #messages then
 			chat.scroll = overlap
-			chat.messageCount = #roomMessages
+			chat.messageCount = #messages
 		end
 	end
 
@@ -393,7 +418,7 @@ local function ChatWindow(self)
 		chat.scroll = overlap
 	end
 	if just.keypressed("return") then
-		multiplayerModel:sendMessage(chat.message)
+		mp_client:sendMessage(chat.message)
 		chat.message = ""
 	end
 end

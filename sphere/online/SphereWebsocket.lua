@@ -24,9 +24,12 @@ function SphereWebsocket:connect(url)
 		return nil, err
 	end
 
-	self.ws = Websocket(self.soc, re.req, re.res, "client")
-	self.ws.protocol = self.protocol
-	return self.ws:handshake()
+	local ws = Websocket(self.soc, re.req, re.res, "client")
+	self.ws = ws
+	ws.protocol = self.protocol
+	ws.max_payload_len = 1e7
+
+	return ws:handshake()
 end
 
 ---@return web.WebsocketState
@@ -36,11 +39,18 @@ function SphereWebsocket:getState()
 end
 
 function SphereWebsocket:update()
-	if not self.soc or not self.ws then
+	local soc = self.soc
+	local ws = self.ws
+	if not soc or not ws then
 		return
 	end
-	while self.soc:selectreceive(0) do
-		if not self.ws:step() then
+	while soc:selectreceive(0) do
+		local state = ws:getState()
+		local ok, err = ws:step()
+		if not ok then
+			if state ~= "closed" then
+				print(("websocket error: %s"):format(err))
+			end
 			break
 		end
 	end

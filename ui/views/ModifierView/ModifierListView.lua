@@ -11,7 +11,7 @@ local ModifierListView = ListView()
 ModifierListView.rows = 11
 
 function ModifierListView:reloadItems()
-	self.items = self.game.playContext.modifiers
+	self.items = self.game.replayBase.modifiers
 end
 
 ---@return number

@@ -1,1 +1,47 @@
-Edit team
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">Team management</p>
+		<p class="subtitle">Manage your team</p>
+	</div>
+</section>
+
+<div class="columns">
+	<div class="column">
+		<div class="block">
+			<a class="button is-fullwidth" href="/teams/<%= team.id %>">Return to team page</a>
+		</div>
+		<aside class="menu">
+			<p class="menu-label">Administration</p>
+				<%
+					local url = ("/teams/%i/"):format(team.id)
+					local function addClass(button)
+						return tab == button and "class=is-active" or ""
+					end
+				%>
+				<ul class="menu-list">
+					<li><a href="<%= url %>edit/settings" <%- addClass("settings") %>>Settings</a></li>
+					<li><a href="<%= url %>edit/members" <%- addClass("members") %>>Members</a></li>
+					<li><a href="<%= url %>edit/requests" <%- addClass("requests") %>>Incoming join requests</a></li>
+					<li><a href="<%= url %>edit/invites" <%- addClass("invites") %>>Outgoing invitations</a></li>
+				</ul>
+			</p>
+		</aside>
+	</div>
+	<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
+		<%
+			local html
+
+			if tab == "settings" then
+				html = view:render("sea/teams/http/team_edit_settings.etlua")
+			elseif tab == "members" then
+				html = view:render("sea/teams/http/team_edit_members.etlua")
+			elseif tab == "requests" then
+				html = view:render("sea/teams/http/team_edit_requests.etlua")
+			elseif tab == "invites" then
+				html = view:render("sea/teams/http/team_edit_invites.etlua")
+			end
+		%>
+		<%- html %>
+	</div>
+</div>
+

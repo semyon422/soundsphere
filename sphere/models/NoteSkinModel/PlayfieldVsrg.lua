@@ -197,10 +197,9 @@ function PlayfieldVsrg:addHpBar(object)
 	if not getmetatable(object) then
 		object = RectangleProgressView(object)
 	end
-	function object:getMax() return self.game.rhythmModel.scoreEngine.scoreSystem.hp.max end
+	function object:getMax() return self.game.rhythmModel.scoreEngine.healthsSource:getMaxHealths() end
 	function object:getCurrent()
-		local hp = self.game.rhythmModel.scoreEngine.scoreSystem.hp
-		return hp:getCurrent()
+		return self.game.rhythmModel.scoreEngine.healthsSource:getHealths()
 	end
 	return self:add(object)
 end
@@ -221,19 +220,12 @@ function PlayfieldVsrg:addScore(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	local base_load = object.load
-	function object:load()
-		base_load(self)
-		local score_engine = self.game.rhythmModel.scoreEngine
-		if not score_engine.loaded then
-			return
-		end
-		local scoring_metadata = score_engine.scoreSource.metadata
-		object.format = scoring_metadata.scoreFormat
-		object.multiplier = scoring_metadata.scoreMultiplier
-	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine:getScore()
+		---@type sphere.IScoreSource
+		local score_source = self.game.rhythmModel.scoreEngine.scoreSource
+		self.format = score_source.score_format
+		self.multiplier = score_source.score_multiplier
+		return score_source:getScore()
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
@@ -247,22 +239,13 @@ function PlayfieldVsrg:addAccuracy(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-
-	local base_load = object.load
-	function object:load()
-		base_load(self)
-		local score_engine = self.game.rhythmModel.scoreEngine
-		if not score_engine.loaded then
-			return
-		end
-		local scoring_metadata = self.game.rhythmModel.scoreEngine.accuracySource.metadata
-		object.format = scoring_metadata.accuracyFormat
-		object.multiplier = scoring_metadata.accuracyMultiplier
-	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine:getAccuracy()
+		---@type sphere.IAccuracySource
+		local accuracy_source = self.game.rhythmModel.scoreEngine.accuracySource
+		self.format = accuracy_source.accuracy_format
+		self.multiplier = accuracy_source.accuracy_multiplier
+		return accuracy_source:getAccuracy()
 	end
-
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
 end
@@ -275,8 +258,9 @@ function PlayfieldVsrg:addCombo(object)
 	if not getmetatable(object) then
 		object = ValueView(object)
 	end
-	object.key = "game.rhythmModel.scoreEngine.scoreSystem.base.combo"
-	object.format = object.format or "%d"
+	function object:value()
+		return self.game.rhythmModel.scoreEngine.comboSource:getCombo()
+	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)
 end

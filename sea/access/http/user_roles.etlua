@@ -1,0 +1,42 @@
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">User roles</p>
+		<p class="subtitle"><%= user.name %></p>
+	</div>
+</section>
+
+<nav class="level">
+	<div class="level-left">
+		<p class="level-item"><a hx-post="/users/<%= user.id %>/roles/donator" class="button is-success">Donator</a></p>
+		<p class="level-item"><a hx-post="/users/<%= user.id %>/roles/moderator" class="button is-success">Moderator</a></p>
+		<p class="level-item"><a hx-post="/users/<%= user.id %>/roles/admin" class="button is-success">Admin</a></p>
+	</div>
+
+	<div class="level-right">
+	</div>
+</nav>
+
+<table class="table is-fullwidth is-striped">
+	<thead>
+		<th>Id</th>
+		<th>Role</th>
+		<th>Started at</th>
+		<th>Expires at</th>
+		<th>Expired</th>
+		<th>Total time</th>
+		<th></th>
+	</thead>
+	<tbody>
+		<% for _, user_role in ipairs(user.user_roles) do %>
+			<tr>
+				<td><%= user_role.id %></td>
+				<td><%= user_role.role %></td>
+				<td><%= os.date("%d.%m.%Y", user_role.started_at) %></td>
+				<td><%= user_role.expires_at and os.date("%d.%m.%Y", user_role.expires_at) or "-" %></td>
+				<td><%= user_role:isExpired(os.time()) %></td>
+				<td><%= user_role:getTotalTime(os.time()) %></td>
+				<td><a href="/users/<%= user.id %>/roles/<%= user_role.role %>">Edit</a></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

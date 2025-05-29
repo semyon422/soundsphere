@@ -6,10 +6,17 @@ local UsersAccess = require("sea.access.access.UsersAccess")
 ---@operator call: sea.UserRoles
 local UserRoles = class()
 
----@param users_repo sea.IUsersRepo
+---@param users_repo sea.UsersRepo
 function UserRoles:new(users_repo)
 	self.users_repo = users_repo
 	self.users_access = UsersAccess()
+end
+
+---@param user_id integer
+---@param role sea.Role
+---@return sea.UserRole?
+function UserRoles:getRole(user_id, role)
+	return self.users_repo:getUserRole(user_id, role)
 end
 
 ---@param user sea.User
@@ -35,7 +42,7 @@ function UserRoles:createRole(user, time, target_user_id, role)
 	end
 
 	user_role = UserRole(role, time)
-	user_role.user_id = user.id
+	user_role.user_id = target_user_id
 	user_role = self.users_repo:createUserRole(user_role)
 
 	return user_role
@@ -120,7 +127,7 @@ function UserRoles:makeUnexpirableRole(user, time, target_user_id, role)
 	end
 
 	user_role:makeUnexpirable(time)
-	user_role = self.users_repo:updateUserRole(user_role)
+	user_role = self.users_repo:updateUserRoleFull(user_role)
 
 	return user_role
 end

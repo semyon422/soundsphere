@@ -24,7 +24,7 @@ SortModel.orders = {
 	tempo = {{"tempo"}, false},
 	modtime = {{"modified_at"}, false},
 	["set modtime"] = {{"set_modified_at"}, true},
-	["last played"] = {{"score_time"}, false},
+	["last played"] = {{"chartplay_created_at"}, false},
 }
 
 SortModel.name = "title"

@@ -62,7 +62,7 @@ function CollectionLibrary:getTree(locations_in_collections)
 	local chartfilesRepo = self.cacheModel.chartfilesRepo
 	local locationsRepo = self.cacheModel.locationsRepo
 	if not locations_in_collections then
-		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation()) do
+		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSets()) do
 			process_chartfile_set(chartfile_set.dir, tree)
 		end
 	else

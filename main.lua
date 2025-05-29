@@ -1,3 +1,10 @@
+if arg[2] == "cli" then
+	table.remove(arg, 1)
+	table.remove(arg, 1)
+	dofile("sea/app/cli.lua")
+	return
+end
+
 require("hooks")
 
 require("mime")
@@ -140,6 +147,7 @@ if arg[2] == "test" then
 		"3rd-deps",
 		"tree",
 		"userdata",
+		"storages",
 	}
 
 	local testing = Testing(tio)
