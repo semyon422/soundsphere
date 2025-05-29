@@ -250,6 +250,7 @@ local t = {
 	{code = "ye", name = "Yemen"},
 	{code = "zm", name = "Zambia"},
 	{code = "zw", name = "Zimbabwe"},
+	{code = "xd", name = "No flag"}
 }
 
 return t
