@@ -1,5 +1,7 @@
 local pkg = require("aqua.pkg")
 
+pkg.import_lua()
+
 pkg.addc()
 pkg.addc("3rd-deps/lib")
 pkg.addc("bin/lib")
