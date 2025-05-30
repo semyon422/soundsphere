@@ -61,6 +61,10 @@ function Domain:submitChartplay(user, time, compute_data_loader, chartplay_value
 
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)
+
+		if self.dans:isDan(chartdiff_values) then
+			local dan_clear, err = self.dans:submit(user, chartplay, chartdiff_values, time)
+		end
 	end
 
 	user = assert(self.users_repo:getUser(user.id))

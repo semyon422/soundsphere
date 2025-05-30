@@ -131,8 +131,8 @@ function Dans:submit(user, chartplay, chartmeta_key, time)
 			return nil, err
 		end
 
-		accuracy = 0
-		miss_count = 0
+		accuracy = 0 ---@type number
+		miss_count = 0 ---@type number
 
 		for _, cp in ipairs(cps) do
 			accuracy = accuracy + cp.accuracy * (1 / #cps)
