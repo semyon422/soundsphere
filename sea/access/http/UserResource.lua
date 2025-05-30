@@ -55,11 +55,13 @@ UserResource.routes = {
 ---@param users sea.Users
 ---@param user_roles sea.UserRoles
 ---@param leaderboards sea.Leaderboards
+---@param dans sea.Dans
 ---@param views web.Views
-function UserResource:new(users, user_roles, leaderboards, views)
+function UserResource:new(users, user_roles, leaderboards, dans, views)
 	self.users = users
 	self.user_roles = user_roles
 	self.leaderboards = leaderboards
+	self.dans = dans
 	self.views = views
 
 	self.testActivity = {
@@ -85,7 +87,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.leaderboard = assert(self.leaderboards:getLeaderboard(leaderboard_id))
 	ctx.leaderboard_user = self.leaderboards:getLeaderboardUser(leaderboard_id, user.id)
 
-	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards)
+	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards, self.dans)
 	page:setActivity(self.testActivity)
 
 	ctx.page = page
@@ -94,6 +96,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.query.scores = ctx.query.scores or "top"
 
 	ctx.general_stats = page:getGeneralStats(user.id)
+	ctx.dan_clears = page:getDanClears()
 
 	ctx.main_container_type = "none"
 	ctx.edit_description = page:canUpdate() and ctx.query.edit_description == "true"

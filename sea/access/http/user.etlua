@@ -422,77 +422,27 @@
 						</div>
 					</div>
 				</div>
-<%
---[[%>
 				<div class="block border-box">
 					<p class="title is-4">Dan course clears</p>
 					<table class="table is-fullwidth is-striped">
 						<thead>
-							<th>Key mode</th>
-							<th>Type</th>
 							<th>Dan</th>
+							<th>Level</th>
+							<th>Rate</th>
 							<th>Date</th>
 						</thead>
 						<tbody>
-							<tr>
-								<td>4K</td>
-								<td>Regular</td>
-								<td>Delta</td>
-								<td>13.06.2024</td>
-							</tr>
-							<tr>
-								<td>4K</td>
-								<td>LN</td>
-								<td>12th</td>
-								<td>20.07.2024</td>
-							</tr>
-							<tr>
-								<td>7K</td>
-								<td>Regular</td>
-								<td>6th</td>
-								<td>30.03.2025</td>
-							</tr>
-							<tr>
-								<td>7K</td>
-								<td>LN</td>
-								<td>1st</td>
-								<td>01.06.2022</td>
-							</tr>
-							<tr>
-								<td>10K</td>
-								<td>Regular</td>
-								<td>1st</td>
-								<td>01.06.2022</td>
-							</tr>
-							<tr>
-								<td>7K1S</td>
-								<td>Satellite</td>
-								<td>Lv.4</td>
-								<td>01.06.2022</td>
-							</tr>
-							<tr>
-								<td>7K1S</td>
-								<td>Satellite</td>
-								<td>Lv.4</td>
-								<td>01.06.2022</td>
-							</tr>
-							<tr>
-								<td>14K</td>
-								<td>DP Satellite</td>
-								<td>Lv.2 No Scratch</td>
-								<td>01.06.2022</td>
-							</tr>
-							<tr>
-								<td>14K2S</td>
-								<td>DP Satellite HARD</td>
-								<td>Lv.1</td>
-								<td>01.06.2022</td>
-							</tr>
+							<% for _, v in ipairs(dan_clears) do %>
+								<tr>
+									<td><%= v.category %></td>
+									<td><%= v.name %></td>
+									<td><%= ("%0.02fx"):format(v.rate) %></td>
+									<td><%= os.date("%d.%m.%Y", v.time) %></td>
+								</tr>
+							<% end %>
 						</tbody>
 					</table>
 				</div>
-<%
-]]%>
 			</div>
 		</div>
 	</div>

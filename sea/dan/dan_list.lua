@@ -148,7 +148,7 @@ local t = {
 	[72] = osuv1("ad25c18e6e4a0f92805c3e9c7399f1ad", 11, "10K REGULAR", "V", 7.5),
 	[73] = osuv1("24369e1034d8614323ecbafa7672ffe6", 12, "10K REGULAR", "XI", 7.5),
 	-- BMS
-	[99999] = bms_dan({"test1", "test2", "test3", "test4"}, 1, "Test", "Lv.1")
+	[99999] = bms_dan({"test1", "test2", "test3", "test4"}, 1, "Test", "Lv.1"),
 }
 
 for id, dan in pairs(t) do

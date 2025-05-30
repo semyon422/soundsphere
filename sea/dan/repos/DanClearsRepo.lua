@@ -10,10 +10,16 @@ function DanClearsRepo:new(models)
 end
 
 ---@param user_id number
+---@return sea.DanClear[]
+function DanClearsRepo:getUserDanClears(user_id)
+	return self.models.dan_clears:select({user_id = assert(user_id)})
+end
+
+---@param user_id number
 ---@param dan_id number
 ---@return sea.DanClear?
 function DanClearsRepo:getUserDanClear(user_id, dan_id)
-	return self.models.dan_clears:find({ user_id = assert(user_id), dan_id = assert(dan_id)})
+	return self.models.dan_clears:find({user_id = assert(user_id), dan_id = assert(dan_id)})
 end
 
 ---@param dan_clear sea.DanClear

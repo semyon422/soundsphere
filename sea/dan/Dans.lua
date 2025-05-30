@@ -164,4 +164,10 @@ function Dans:submit(user, chartplay, chartmeta_key, time)
 	return dan_clear
 end
 
+---@param user sea.User
+---@return sea.DanClear[]
+function Dans:getUserDanClears(user)
+	return self.dan_clears_repo:getUserDanClears(user.id)
+end
+
 return Dans

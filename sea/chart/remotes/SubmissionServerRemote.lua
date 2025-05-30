@@ -19,7 +19,7 @@ end
 
 ---@param chartplay_values sea.Chartplay
 ---@param chartdiff_values sea.Chartdiff
----@return sea.Chartplay?
+---@return { chartplay: sea.Chartplay, dan_clear_result: string? }?
 ---@return string?
 function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_values)
 	local ok, err = valid.format(Chartplay.validate(chartplay_values))
@@ -36,12 +36,18 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 
 	local compute_data_loader = ComputeDataLoader(self.remote.compute_data_provider)
 
-	local chartplay, err = self.domain:submitChartplay(self.user, os.time(), compute_data_loader, chartplay_values, chartdiff_values)
+	local time = os.time()
+	local chartplay, err = self.domain:submitChartplay(self.user, time, compute_data_loader, chartplay_values, chartdiff_values)
 	if not chartplay then
 		return nil, "submit: " .. err
 	end
 
-	return chartplay
+	if self.domain.dans:isDan(chartdiff_values) then
+		local dan_clear, err = self.domain.dans:submit(self.user, chartplay, chartdiff_values, time)
+		return { chartplay = chartplay, dan_clear_result = dan_clear and "cleared" or err }
+	end
+
+	return { chartplay = chartplay }
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
