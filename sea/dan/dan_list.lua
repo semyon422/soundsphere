@@ -1,5 +1,5 @@
 local Dan = require("sea.dan.Dan")
-local Chartdiff = require("sea.chart.Chartdiff")
+local Chartmeta = require("sea.chart.Chartmeta")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
 
@@ -12,9 +12,9 @@ local Subtimings = require("sea.chart.Subtimings")
 ---@return sea.Dan
 local function osuv1(hash, level, category, name, od, accuracy)
 	local d = Dan()
-	local cd = Chartdiff()
-	cd.hash = hash
-	d.chartdiffs = {cd}
+	local cm = Chartmeta()
+	cm.hash = hash
+	d.chartmetas = {cm}
 	d.level = level
 	d.category = category
 	d.name = name
@@ -33,9 +33,9 @@ end
 ---@return sea.Dan
 local function osuv2(hash, level, category, name, od, accuracy)
 	local d = Dan()
-	local cd = Chartdiff()
-	cd.hash = hash
-	d.chartdiffs = {cd}
+	local cm = Chartmeta()
+	cm.hash = hash
+	d.chartmetas = {cm}
 	d.level = level
 	d.category = category
 	d.name = name
@@ -49,20 +49,21 @@ end
 ---@param level number
 ---@param category string
 ---@param name string
+---@param max_misses number?
 ---@return sea.Dan
 local function bms_dan(hashes, level, category, name, max_misses)
 	local d = Dan()
-	d.chartdiffs = {}
+	d.chartmetas = {}
 	for _, hash in ipairs(hashes) do
-		local cd = Chartdiff()
-		cd.hash = hash
-		table.insert(d.chartdiffs, cd)
+		local cm = Chartmeta()
+		cm.hash = hash
+		table.insert(d.chartmetas, cm)
 	end
 	d.level = level
 	d.category = category
 	d.name = name
 	d.timings = Timings("bmsrank", 1)
-	d.max_misses = max_misses
+	d.max_misses = max_misses or 200
 	return d
 end
 
@@ -147,7 +148,7 @@ local t = {
 	[72] = osuv1("ad25c18e6e4a0f92805c3e9c7399f1ad", 11, "10K REGULAR", "V", 7.5),
 	[73] = osuv1("24369e1034d8614323ecbafa7672ffe6", 12, "10K REGULAR", "XI", 7.5),
 	-- BMS
-	[10000] = bms_dan({"aaaaa", "bbbbb", "ccccc", "ddddd"}, 1, "Example", "Lv.1")
+	[99999] = bms_dan({"test1", "test2", "test3", "test4"}, 1, "Test", "Lv.1")
 }
 
 for id, dan in pairs(t) do
@@ -155,4 +156,3 @@ for id, dan in pairs(t) do
 end
 
 return t
-
