@@ -1,11 +1,12 @@
 local class = require("class")
 local dan_list = require("sea.dan.dan_list")
 
+local ColumnOrder = require("sea.chart.ColumnsOrder")
 local DanClear = require("sea.dan.DanClear")
 
 ---@class sea.Dans
 ---@operator call: sea.Dans
----@field hashes {[string]: sea.Dan} The last chartmta hash is used as a key. We need the last chartmta for dans, where the charts are played separately.
+---@field hashes {[string]: {[integer]: sea.Dan}} The last chartmta hash is used as a key. We need the last chartmta for dans, where the charts are played separately.
 local Dans = class()
 
 ---@param charts_repo sea.ChartsRepo
@@ -16,15 +17,17 @@ function Dans:new(charts_repo, dan_clears_repo)
 	self.hashes = {}
 
 	for _, dan in pairs(dan_list) do
-		local last_chartmeta = dan.chartmetas[#dan.chartmetas]
-		self.hashes[last_chartmeta.hash] = dan
+		local last_chartmeta = dan.chartmeta_keys[#dan.chartmeta_keys]
+		self.hashes[last_chartmeta.hash] = self.hashes[last_chartmeta.hash] or {}
+		self.hashes[last_chartmeta.hash][last_chartmeta.index] = dan
 	end
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
 ---@return sea.Dan?
 function Dans:findDan(chartmeta_key)
-	return self.hashes[chartmeta_key.hash]
+	local hash = self.hashes[chartmeta_key.hash]
+	return hash and hash[chartmeta_key.index]
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
@@ -33,21 +36,17 @@ function Dans:isDan(chartmeta_key)
 	return self:findDan(chartmeta_key) ~= nil
 end
 
----@param dan sea.Dan
 ---@param chartplay sea.Chartplay
+---@param chartmeta sea.Chartmeta
 ---@return boolean ok
 ---@return string? err
-local function isChartplayValid(dan, chartplay)
+local function isChartplayValid(chartplay, chartmeta)
 	if chartplay.pause_count ~= 0 then
 		return false, "pauses are not allowed"
 	end
 
-	if chartplay.timings ~= dan.timings then
+	if chartplay.timings and chartplay.timings ~= chartmeta.timings then
 		return false, "unsuitable timings"
-	end
-
-	if chartplay.subtimings ~= dan.subtimings then
-		return false, "unsuitable subtimings"
 	end
 
 	if chartplay.rate < 1 then
@@ -58,16 +57,10 @@ local function isChartplayValid(dan, chartplay)
 		return false, "modifiers are not allowed"
 	end
 
-	local co = chartplay.columns_order
-	if co then
-		local prev_column = co[1]
-
-		for _, column in ipairs(co) do
-			if math.abs(column - prev_column) > 1 then
-				return false, "invalid column order"
-			end
-			prev_column = column
-		end
+	local column_order = ColumnOrder(chartmeta.inputmode, chartplay.columns_order)
+	local order_name = column_order:getName()
+	if order_name and order_name ~= "mirror" then
+		return false, "invalid column order"
 	end
 
 	return true
@@ -75,26 +68,29 @@ end
 
 ---@param dan sea.Dan
 ---@param chartplays sea.Chartplay[]
+---@param chartmetas sea.Chartmeta[]
 ---@return boolean ok
 ---@return string? err
-local function validateChartplays(dan, chartplays)
-	if #chartplays ~= #dan.chartmetas then
+local function validateChartplays(dan, chartplays, chartmetas)
+	if #chartplays ~= #dan.chartmeta_keys then
 		return false, "invalid chartplay order"
 	end
 
-	for i, chartmeta in ipairs(dan.chartmetas) do
-		if chartplays[#chartplays - (i - 1)].hash ~= chartmeta.hash then
+	for i, dan_cmk in ipairs(dan.chartmeta_keys) do
+		if chartplays[i].hash ~= dan_cmk.hash then
 			return false, "invalid chartplay order"
 		end
 	end
 
-	for _, cp in ipairs(chartplays) do
-		local ok, err = isChartplayValid(dan, cp)
+	for i, chartplay in ipairs(chartplays) do
+		local chartmeta = chartmetas[i]
+		assert(chartmeta, #chartmetas)
+		local ok, err = isChartplayValid(chartplay, chartmeta)
 		if not ok then
 			return false, err
 		end
 
-		if cp.rate ~= chartplays[1].rate then
+		if chartplay.rate ~= chartplays[1].rate then
 			return false, "different rates in chartplays"
 		end
 	end
@@ -114,29 +110,53 @@ function Dans:submit(user, chartplay, chartmeta_key, time)
 		return nil, "not a dan"
 	end
 
-	local ok, err = isChartplayValid(dan, chartplay)
+	local accuracy = 0
+	local miss_count = 0
+	local chartplay_ids = {}
 
-	if not ok then
-		return nil, err
-	end
+	if #dan.chartmeta_keys == 1 then
+		local chartmeta = self.charts_repo:getChartmetaByHashIndex(chartmeta_key.hash, chartmeta_key.index)
+		if not chartmeta then
+			return nil, "no chartmeta"
+		end
 
-	local accuracy = chartplay:getNormAccuracy()
-	local miss_count = chartplay.miss_count
-
-	if #dan.chartmetas ~= 1 then
-		local cps = self.charts_repo:getRecentChartplays(user.id, #dan.chartmetas)
-		ok, err = validateChartplays(dan, cps)
-
+		local ok, err = isChartplayValid(chartplay, chartmeta)
 		if not ok then
 			return nil, err
 		end
 
-		accuracy = 0 ---@type number
-		miss_count = 0 ---@type number
+		accuracy = chartplay:getNormAccuracy()
+		miss_count = chartplay.miss_count
+		table.insert(chartplay_ids, chartplay.id)
+	else
+		local chartplays = self.charts_repo:getRecentChartplays(user.id, #dan.chartmeta_keys)
 
-		for _, cp in ipairs(cps) do
-			accuracy = accuracy + cp.accuracy * (1 / #cps)
+		-- chartplays are in descening order, reversing the order to match chartmetas from a dan
+		---@type sea.Chartplay[]
+		local t = {}
+		for i = #chartplays, 1, -1 do
+			table.insert(t, chartplays[i])
+		end
+		chartplays = t
+
+		local chartmetas = {}
+		for _, cp in ipairs(chartplays) do
+			local chartmeta = self.charts_repo:getChartmetaByHashIndex(cp.hash, cp.index)
+			if not chartmeta then
+				return nil, "no chartmeta"
+			end
+			table.insert(chartmetas, chartmeta)
+		end
+
+		local ok, err = validateChartplays(dan, chartplays, chartmetas)
+		if not ok then
+			return nil, err
+		end
+
+		for _, cp in ipairs(chartplays) do
+			accuracy = accuracy + cp.accuracy * (1 / #chartplays)
 			miss_count = miss_count + cp.miss_count
+			table.insert(chartplay_ids, cp.id)
 		end
 	end
 
@@ -159,7 +179,7 @@ function Dans:submit(user, chartplay, chartmeta_key, time)
 	dan_clear.user_id = user.id
 	dan_clear.time = time
 	dan_clear.rate = chartplay.rate
-	dan_clear.chartplay_ids = {chartplay.id}
+	dan_clear.chartplay_ids = chartplay_ids
 	dan_clear = self.dan_clears_repo:createDanClear(dan_clear)
 	return dan_clear
 end
