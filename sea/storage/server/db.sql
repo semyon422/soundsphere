@@ -178,3 +178,12 @@ CREATE TABLE IF NOT EXISTS `team_users` (
 	`created_at` INTEGER NOT NULL,
 	UNIQUE(`team_id`, `user_id`)
 );
+
+CREATE TABLE IF NOT EXISTS `dan_clears` (
+	`id` INTEGER PRIMARY KEY,
+	`dan_id` INTEGER NOT NULL,
+	`user_id` INTEGER NOT NULL,
+	`time` INTEGER NOT NULL,
+	`rate` INTEGER NOT NULL,
+	`chartplay_ids` TEXT NOT NULL
+);

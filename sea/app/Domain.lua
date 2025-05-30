@@ -6,6 +6,7 @@ local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Teams = require("sea.teams.Teams")
 local Difftables = require("sea.difftables.Difftables")
 local Chartplays = require("sea.chart.Chartplays")
+local Dans = require("sea.dan.Dans")
 local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
 local FolderStorage = require("sea.chart.storage.FolderStorage")
 local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
@@ -39,6 +40,7 @@ function Domain:new(repos)
 		self.charts_storage,
 		self.replays_storage
 	)
+	self.dans = Dans(repos.dan_clears_repo)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
