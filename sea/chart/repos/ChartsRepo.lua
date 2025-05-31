@@ -1,6 +1,7 @@
 local class = require("class")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
+local ChartmetaUserData = require("sea.chart.ChartmetaUserData")
 
 ---@class sea.ChartsRepo
 ---@operator call: sea.ChartsRepo
@@ -365,6 +366,39 @@ function ChartsRepo:getUserChartdiffsCount(user_id)
 	}, {
 		group = {"hash", "`index`", "modifiers", "rate", "mode"},
 	})
+end
+
+--------------------------------------------------------------------------------
+
+---@param chartmeta_user_data sea.ChartmetaUserData
+function ChartsRepo:createChartmetaUserData(chartmeta_user_data)
+	return self.models.chartmeta_user_datas:create(chartmeta_user_data)
+end
+
+---@param hash string
+---@param index integer
+---@param user_id integer
+---@return sea.ChartmetaUserData?
+function ChartsRepo:getUserChartmetaUserData(hash, index, user_id)
+	return self.models.chartmeta_user_datas:find({
+		hash = assert(hash),
+		index = assert(index),
+		user_id = assert(user_id),
+	})
+end
+
+---@param chartmeta_user_data sea.ChartmetaUserData
+---@return sea.ChartmetaUserData?
+function ChartsRepo:updateChartmetaUserData(chartmeta_user_data)
+	return self.models.chartmeta_user_datas:update(chartmeta_user_data, {id = assert(chartmeta_user_data.id)})
+end
+
+---@param chartmeta_user_data sea.ChartmetaUserData
+---@return sea.ChartmetaUserData?
+function ChartsRepo:updateChartmetaUserDataFull(chartmeta_user_data)
+	local values = sql_util.null_keys(ChartmetaUserData.struct)
+	table_util.copy(chartmeta_user_data, values)
+	return self.models.chartmeta_user_datas:update(values, {id = assert(chartmeta_user_data.id)})[1]
 end
 
 return ChartsRepo

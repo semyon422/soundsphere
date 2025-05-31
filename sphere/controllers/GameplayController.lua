@@ -8,6 +8,7 @@ local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 local Subtimings = require("sea.chart.Subtimings")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local ChartmetaUserData = require("sea.chart.ChartmetaUserData")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -450,7 +451,8 @@ function GameplayController:skipIntro()
 end
 
 function GameplayController:updateOffsets()
-	local input_offset, visual_offset = self.offsetModel:getInputVisual()
+	local chartmeta = assert(self.computeContext.chartmeta)
+	local input_offset, visual_offset = self.offsetModel:getInputVisual(chartmeta.hash, chartmeta.index)
 
 	self.rhythmModel:setInputOffset(input_offset)
 	self.rhythmModel:setVisualOffset(visual_offset)
@@ -468,30 +470,38 @@ end
 
 ---@param delta number
 function GameplayController:increaseLocalOffset(delta)
+	local chartsRepo = self.cacheModel.chartsRepo
 	local chartmeta = assert(self.computeContext.chartmeta)
 
-	chartmeta.offset = chartmeta.offset or self.offsetModel:getDefaultLocal()
-	chartmeta.offset = math_util.round(chartmeta.offset + delta, delta)
+	local chartmeta_user_data = chartsRepo:getUserChartmetaUserData(chartmeta.hash, chartmeta.index, 1)
+	if not chartmeta_user_data then
+		chartmeta_user_data = ChartmetaUserData()
+		chartmeta_user_data.user_id = 1
+		chartmeta_user_data.hash = chartmeta.hash
+		chartmeta_user_data.index = chartmeta.index
+		chartmeta_user_data = chartsRepo:createChartmetaUserData(chartmeta_user_data)
+	end
 
-	self.cacheModel.chartsRepo:updateChartmeta({
-		id = chartmeta.id,
-		offset = chartmeta.offset,
-	} --[[@as table]])
+	chartmeta_user_data.local_offset = math_util.round((chartmeta_user_data.local_offset or 0) + delta, delta)
+	chartsRepo:updateChartmetaUserData(chartmeta_user_data)
 
-	self.notificationModel:notify("local offset: " .. chartmeta.offset * 1000 .. "ms")
+	self.notificationModel:notify("local offset: " .. chartmeta_user_data.local_offset * 1000 .. "ms")
 	self:updateOffsets()
 end
 
 function GameplayController:resetLocalOffset()
+	local chartsRepo = self.cacheModel.chartsRepo
 	local chartmeta = assert(self.computeContext.chartmeta)
 
-	chartmeta.offset = nil
-	self.cacheModel.chartsRepo:updateChartmeta({
-		id = chartmeta.id,
-		offset = sql_util.NULL,
-	} --[[@as table]])
+	local chartmeta_user_data = chartsRepo:getUserChartmetaUserData(chartmeta.hash, chartmeta.index, 1)
+	if not chartmeta_user_data then
+		return
+	end
 
-	self.notificationModel:notify("local offset reseted: " .. self.offsetModel:getDefaultLocal() * 1000 .. "ms")
+	chartmeta_user_data.local_offset = nil
+	chartsRepo:updateChartmetaUserDataFull(chartmeta_user_data)
+
+	self.notificationModel:notify("local offset reseted")
 
 	self:updateOffsets()
 end

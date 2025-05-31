@@ -159,7 +159,7 @@ local function ChartCells(self)
 		level = chartview.level or 0
 		local long_notes_count = (chartview.judges_count or 0) - notes_count
 		longNoteRatio = long_notes_count / notes_count
-		localOffset = chartview.offset or ""
+		localOffset = chartview.chartmeta_local_offset or ""
 		format = chartview.format or ""
 	end
 

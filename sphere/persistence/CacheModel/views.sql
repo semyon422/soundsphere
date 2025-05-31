@@ -74,6 +74,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -97,6 +101,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
@@ -158,6 +165,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -181,6 +192,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
@@ -242,6 +256,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -265,6 +283,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
@@ -328,6 +349,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -351,6 +376,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
@@ -427,6 +455,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -450,6 +482,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON
@@ -524,6 +559,10 @@ chartmetas.tempo_avg,
 chartmetas.tempo_max,
 chartmetas.tempo_min,
 
+chartmeta_user_datas.local_offset as chartmeta_local_offset,
+chartmeta_user_datas.rating as chartmeta_rating,
+chartmeta_user_datas.comment as chartmeta_comment,
+
 chartdiffs.modifiers,
 chartdiffs.rate,
 chartdiffs.mode,
@@ -547,6 +586,9 @@ chartdiffs.notes_preview
 FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
+LEFT JOIN chartmeta_user_datas ON
+chartmetas.hash = chartmeta_user_datas.hash AND
+chartmetas.`index` = chartmeta_user_datas.`index`
 INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 LEFT JOIN chartdiffs ON

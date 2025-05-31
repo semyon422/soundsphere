@@ -91,7 +91,7 @@ function GameController:new()
 	)
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
-		self.selectModel
+		self.persistence.cacheModel.chartsRepo
 	)
 
 	self.joystickModel = JoystickModel(self.persistence.configModel)

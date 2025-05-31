@@ -9,7 +9,7 @@ local autoload = require("autoload")
 ---@operator call: sphere.GameDatabase
 local GameDatabase = class()
 
-local user_version = 5
+local user_version = 6
 
 ---@param migrations table?
 function GameDatabase:new(migrations)
@@ -39,9 +39,9 @@ function GameDatabase:load()
 		db:exec(assert(love.filesystem.read("sea/storage/shared/db.sql")))
 		db:user_version(user_version)
 		ver = user_version
-	elseif ver == user_version - 1 then
+	elseif ver >= 4 then
 		self:migrate()
-	elseif ver ~= user_version then
+	else
 		error("outdated database")
 	end
 
