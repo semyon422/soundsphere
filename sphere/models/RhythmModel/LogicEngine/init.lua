@@ -8,6 +8,7 @@ local LogicEngine = class()
 
 LogicEngine.inputOffset = 0
 LogicEngine.singleHandler = false
+LogicEngine.check1024 = true
 
 ---@param timeEngine sphere.TimeEngine
 ---@param scoreEngine sphere.ScoreEngine
@@ -23,6 +24,8 @@ function LogicEngine:setChart(chart)
 end
 
 function LogicEngine:load()
+	self.monotonicEventTime = -math.huge
+
 	---@type {[ncdk2.Note]: sphere.LogicalNote}
 	self.sharedLogicalNotes = {}
 
@@ -82,8 +85,13 @@ function LogicEngine:receive(event)
 	end
 
 	self.eventTime = event.time
+
+	if self.check1024 then
+		assert((self:getEventTime() * 1024) % 1 == 0)
+	end
 	self:update()
 	noteHandler:setKeyState(event.name == "keypressed", input)
+
 	self.eventTime = nil
 end
 
@@ -109,7 +117,9 @@ end
 
 ---@return number
 function LogicEngine:getEventTime()
-	return self.eventTime or self.timeEngine.currentTime
+	local eventTime = self.eventTime or self.timeEngine.currentTime
+	self.monotonicEventTime = math.max(self.monotonicEventTime or eventTime, eventTime)
+	return self.monotonicEventTime
 end
 
 ---@return number

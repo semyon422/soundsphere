@@ -37,6 +37,8 @@ logicEngine.timings = {
 	}
 }
 
+logicEngine.check1024 = false
+
 local auto_mt = {}
 
 ---@param n number
