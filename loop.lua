@@ -79,6 +79,7 @@ function Loop:run()
 	love.timer.step()
 
 	local fpsLimitTime = love.timer.getTime()
+	Loop.prevTime = fpsLimitTime
 	Loop.time = fpsLimitTime
 	Loop.startTime = fpsLimitTime
 	Loop.dt = 0
@@ -104,8 +105,11 @@ function Loop:run()
 			asynckey.start()
 		end
 
-		Loop.dt = love.timer.step()
-		Loop.time = love.timer.getTime()
+		love.timer.step()
+		local time = love.timer.getTime()
+
+		Loop.dt = time - Loop.time
+		Loop.prevTime, Loop.time = Loop.time, time
 
 		local timingsEvent = Loop.time
 
@@ -219,7 +223,7 @@ Loop.callbacks = {
 ---@param time number
 ---@return number
 local function clampEventTime(time)
-	return math.min(math.max(time, Loop.time - Loop.dt), Loop.time)
+	return math.min(math.max(time, Loop.prevTime), Loop.time)
 end
 
 local function transformInputEvent(name, ...)

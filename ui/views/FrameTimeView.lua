@@ -86,7 +86,7 @@ function FrameTimeView:draw()
 
 	local y = self.height - 0.5
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.line(0.5, y, 0.5, y - love.timer.getDelta() * 1000 * self.scale)
+	love.graphics.line(0.5, y, 0.5, y - loop.dt * 1000 * self.scale)
 
 	love.graphics.setColor(colors.blue)
 	love.graphics.line(0.5, y, 0.5, y - loop.timings.event * 1000 * self.scale)
@@ -158,7 +158,7 @@ local colorText = {
 }
 
 function FrameTimeView:drawFPS()
-	local frameTime = love.timer.getDelta()
+	local frameTime = loop.dt
 
 	love.graphics.setColor(0, 0, 0, 0.75)
 	love.graphics.rectangle("fill", 0, 0, self.width, 60)
