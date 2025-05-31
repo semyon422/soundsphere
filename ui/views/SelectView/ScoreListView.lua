@@ -32,9 +32,12 @@ function ScoreListView:drawItem(i, w, h)
 
 	local time = item.created_at or 0
 
+	local sea_client = self.game.seaClient
+	local username = sea_client.user and sea_client.user.name or "username"
+
 	just.row(true)
 	just.indent(22)
-	TextCellImView(w * 2.25, h, "right", time ~= 0 and time_util.time_ago_in_words(time) or "never", item.user_name or "username")
+	TextCellImView(w * 2.25, h, "right", time ~= 0 and time_util.time_ago_in_words(time) or "never", item.user_name or username)
 	TextCellImView(w / 2, h, "right", i == 1 and "rank" or "", i)
 	TextCellImView(w * 0.75, h, "right", i == 1 and "rating" or "", Format.difficulty(item.rating))
 	if just.mouse_over(i .. "pr", just.is_over(-w * 0.75, h), "mouse") then
