@@ -1,6 +1,7 @@
 local class = require("class")
 local format = require("sea.shared.format")
 local time_util = require("time_util")
+local dan_list = require("sea.dan.dan_list")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = require("sea.leaderboards.TotalRating")
 local ModifierModel = require("sphere.models.ModifierModel")
@@ -15,11 +16,13 @@ UserPage.activityWeeks = 53
 ---@param session_user sea.User
 ---@param target_user sea.User
 ---@param leaderboards sea.Leaderboards
-function UserPage:new(users_access, session_user, target_user, leaderboards)
+---@param dans sea.Dans
+function UserPage:new(users_access, session_user, target_user, leaderboards, dans)
 	self.usersAccess = users_access
 	self.sessionUser = session_user
 	self.targetUser = target_user
 	self.leaderboards = leaderboards
+	self.dans = dans
 end
 
 ---@return boolean
@@ -227,6 +230,45 @@ function UserPage:getScores(lb, user_id, _type)
 	end
 
 	return scores, total_rating
+end
+
+---@alias sea.UserPage.DanRow { category: string, name: string, rate: number, level: number, time: number }}
+
+function UserPage:getDanClears()
+	local clears = self.dans:getUserDanClears(self.targetUser)
+
+	---@type {[string]: sea.UserPage.DanRow }
+	local peaks = {}
+
+	for _, clear in ipairs(clears) do
+		local dan = dan_list[clear.dan_id]
+		local peak = peaks[dan.category]
+
+		if (peak and dan.level > peak.level) or not peak then
+			peak = {
+				category = dan.category,
+				name = dan.name,
+				rate = clear.rate,
+				time = clear.time,
+				level = dan.level
+			}
+		end
+
+		peaks[dan.category] = peak
+	end
+
+	---@type sea.UserPage.DanRow[]
+	local t = {}
+
+	for _, v in pairs(peaks) do
+		table.insert(t, v)
+	end
+
+	table.sort(t, function (a, b)
+		return a.level > b.level
+	end)
+
+	return t
 end
 
 return UserPage
