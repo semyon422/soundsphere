@@ -11,6 +11,8 @@ local ComputeDataLoader = class()
 ---@param compute_data_provider sea.IComputeDataProvider
 function ComputeDataLoader:new(compute_data_provider)
 	self.compute_data_provider = compute_data_provider
+	self.charts_size = 0
+	self.replays_size = 0
 end
 
 ---@param hash string
@@ -25,6 +27,8 @@ function ComputeDataLoader:requireChart(hash)
 	if md5.sumhexa(file.data) ~= hash then
 		return nil, "invalid hash"
 	end
+
+	self.charts_size = self.charts_size + #file.data
 
 	return {
 		name = file.name,
@@ -56,6 +60,8 @@ function ComputeDataLoader:requireReplay(hash)
 	if not ok then
 		return nil, "invalid replay: " .. err
 	end
+
+	self.replays_size = self.replays_size + #replay_data
 
 	return {
 		replay = replay,

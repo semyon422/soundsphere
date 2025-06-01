@@ -39,6 +39,8 @@ function ChartplaySubmission:submitChartplay(user, time, remote, chartplay_value
 
 	user.latest_activity = time
 	user.play_time = user.play_time + chartdiff_values.duration
+	user.chartplays_upload_size = user.chartplays_upload_size + compute_data_loader.replays_size
+	user.chartfiles_upload_size = user.chartfiles_upload_size + compute_data_loader.charts_size
 	user.chartplays_count = self.chartplays.charts_repo:getUserChartplaysCount(user.id)
 	user.chartmetas_count = self.chartplays.charts_repo:getUserChartmetasCount(user.id)
 	user.chartdiffs_count = self.chartplays.charts_repo:getUserChartdiffsCount(user.id)
