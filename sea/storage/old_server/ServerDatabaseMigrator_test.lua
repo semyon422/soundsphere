@@ -231,7 +231,7 @@ function test.users(t)
 		avatar = "",
 		banner = "qwerty",
 		discord = "discord",
-		country_code = "kp",
+		country_code = "xd",
 		custom_link = "link",
 		user_roles = {},
 	})

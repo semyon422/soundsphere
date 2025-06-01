@@ -42,7 +42,7 @@ function User:new()
 	self.avatar = ""
 	self.banner = ""
 	self.discord = ""
-	self.country_code = "kp"
+	self.country_code = "xd"
 	self.custom_link = ""
 
 	self.user_roles = {}
