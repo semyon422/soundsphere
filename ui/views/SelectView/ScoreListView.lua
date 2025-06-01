@@ -33,7 +33,8 @@ function ScoreListView:drawItem(i, w, h)
 	local time = item.created_at or 0
 
 	local sea_client = self.game.seaClient
-	local username = sea_client.user and sea_client.user.name or "username"
+	local user = sea_client.client:getUser()
+	local username = user and user.name or "username"
 
 	just.row(true)
 	just.indent(22)

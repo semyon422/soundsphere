@@ -19,7 +19,7 @@ end
 
 ---@param chartplay_values sea.Chartplay
 ---@param chartdiff_values sea.Chartdiff
----@return sea.Chartplay
+---@return sea.Chartplay?
 ---@return string?
 function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_values)
 	local ok, err = valid.format(Chartplay.validate(chartplay_values))
@@ -45,6 +45,11 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 	if self.domain.dans:isDan(chartdiff_values) then
 		local dan_clear, err = self.domain.dans:submit(self.user, chartplay, chartdiff_values, time)
 		self.remote:print(dan_clear and "dan cleared" or err)
+	end
+
+	local leaderboard_users = self.domain.leaderboards:getUserLeaderboardUsers(self.user)
+	if leaderboard_users then
+		self.remote.client:setLeaderboardUsers(leaderboard_users)
 	end
 
 	return chartplay

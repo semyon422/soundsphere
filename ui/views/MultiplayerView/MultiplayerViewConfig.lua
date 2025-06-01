@@ -208,7 +208,8 @@ local function Header(self)
 	local game = self.game
 
 	local sea_client = game.seaClient
-	local username = sea_client.user and sea_client.user.name or "Not logged in"
+	local user = sea_client.client:getUser()
+	local username = user and user.name or "Not logged in"
 
 	just.row(true)
 	if UserInfoView:draw(w, h, username, sea_client.connected) then

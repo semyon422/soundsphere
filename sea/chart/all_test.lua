@@ -178,6 +178,7 @@ local _chartdiff_values = {
 		chordjack = 1.1722098588943481445,
 		technical = 1.357906341552734375,
 	},
+	msd_diff_rates = {},
 	user_diff = 0,
 	user_diff_data = "",
 	notes_preview = string.char(1, 0, 0, 64, 0, 193, 64, 194, 64, 196, 64, 200, 64, 4, 193),

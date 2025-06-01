@@ -14,6 +14,10 @@ local whitelist = {
 		getBestChartplaysForChartdiff = true,
 		getReplayFile = true,
 	},
+	leaderboards = {
+		getLeaderboards = true,
+		getUserLeaderboardUsers = true,
+	},
 	getUser = true,
 	getSession = true,
 }

@@ -246,6 +246,12 @@ function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id, limit, offset)
 	})
 end
 
+---@param user_id integer
+---@return sea.LeaderboardUser[]
+function LeaderboardsRepo:getUserLeaderboardUsers(user_id)
+	return self.models.leaderboard_users:select({user_id = assert(user_id)})
+end
+
 ---@param leaderboard_id integer
 ---@return integer
 function LeaderboardsRepo:getLeaderboardUsersCount(leaderboard_id)

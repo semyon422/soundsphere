@@ -18,8 +18,11 @@ local SeaClient = class()
 SeaClient.threaded = true
 SeaClient.reconnect_interval = 30
 
+---@param client sphere.OnlineClient
 ---@param client_remote sea.ClientRemote
-function SeaClient:new(client_remote)
+function SeaClient:new(client, client_remote)
+	self.client = client
+
 	self.protocol = Subprotocol()
 	self.remote_handler = RemoteHandler(client_remote)
 
@@ -90,7 +93,7 @@ function SeaClient:load(url, on_connect)
 		while true do
 			local state = self.sphws_ret:getState()
 			if state ~= "open" then
-				self.user = nil
+				self.client:setUser()
 				print("connecting to websocket")
 				local ok, err = self.sphws_ret:connect(url)
 				if not ok then
@@ -102,7 +105,7 @@ function SeaClient:load(url, on_connect)
 					self.server_peer.ws = self.sphws_ret.ws
 					print("connected")
 					on_connect()
-					self.user = self.remote:getUser()
+					self.client:setUser(self.remote:getUser())
 				end
 			end
 			delay.sleep(1)

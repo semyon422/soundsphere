@@ -4,6 +4,8 @@ local icons = require("sphere.assets.icons")
 local gfx_util = require("gfx_util")
 local time_util = require("time_util")
 local imgui = require("imgui")
+local format = require("sea.shared.format")
+local RatingCalc = require("sea.leaderboards.RatingCalc")
 
 local BackgroundView = require("sphere.views.BackgroundView")
 local ScoreListView = require("ui.views.SelectView.ScoreListView")
@@ -446,12 +448,15 @@ end
 
 ---@param self table
 local function NotechartsSubscreen(self)
+	---@type sphere.GameController
+	local game = self.game
+
 	local _, h = Layout:move("column1", "footer")
 	local w = h * 1.5
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local gameView = self.game.ui.gameView
+	local gameView = game.ui.gameView
 	just.row(true)
 	if imgui.IconOnlyButton("settings", icons("settings"), h, 0.5) then
 		gameView:setModal(require("ui.views.SettingsView"))
@@ -484,7 +489,7 @@ local function NotechartsSubscreen(self)
 	just.row(true)
 	just.indent(-h)
 	if imgui.TextOnlyButton("pause music", "pause", h, h) then
-		self.game.previewModel:stop()
+		game.previewModel:stop()
 	end
 	if imgui.TextOnlyButton("collections", "collections", w / 2, h) then
 		self:switchToCollections()
@@ -509,10 +514,10 @@ local function NotechartsSubscreen(self)
 	just.row(true)
 	just.indent(36)
 	if imgui.IconOnlyButton("open directory", icons("folder_open"), h, 0.5) then
-		self.game.selectController:openDirectory()
+		game.selectController:openDirectory()
 	end
 	if imgui.IconOnlyButton("update cache", icons("refresh"), h, 0.5) then
-		self.game.selectController:updateCache(true)
+		game.selectController:updateCache(true)
 	end
 	just.offset(w - h * 3 - 36)
 	if imgui.IconOnlyButton("editor button", icons("create"), h, 0.5) then
@@ -529,8 +534,21 @@ local function NotechartsSubscreen(self)
 	w, h = Layout:move("column1row1row1")
 
 	just.indent(36)
-	if imgui.IconOnlyButton("open notechart page", icons("info_outline"), h, 0.5) then
-		self.game.selectController:openWebNotechart()
+	-- if imgui.IconOnlyButton("open notechart page", icons("info_outline"), h, 0.5) then
+	-- 	self.game.selectController:openWebNotechart()
+	-- end
+
+	local online_client = game.online_client
+	local lb_user = online_client:getLeaderboardUser(1)
+	local lb = online_client:getLeaderboard(1)
+
+	if lb_user and lb then
+		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 26))
+
+		local label = RatingCalc:postfix(lb.rating_calc)
+		local value = format.float4(lb_user.total_rating)
+
+		imgui.Label("rating label", ("#%s %s %s"):format(lb_user.rank, value, label), h)
 	end
 end
 

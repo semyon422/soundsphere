@@ -50,6 +50,16 @@ function Leaderboards:getLeaderboardUsersCount(lb_id)
 	return self.leaderboards_repo:getLeaderboardUsersCount(lb_id)
 end
 
+---@param user sea.User
+---@return sea.LeaderboardUser[]?
+---@return string?
+function Leaderboards:getUserLeaderboardUsers(user)
+	if user:isAnon() then
+		return nil, "not allowed"
+	end
+	return self.leaderboards_repo:getUserLeaderboardUsers(user.id)
+end
+
 ---@param lb_id integer
 ---@param limit integer?
 ---@param offset integer?

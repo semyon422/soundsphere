@@ -15,10 +15,10 @@ end
 function AuthManager:checkUserAsync()
 	print("check user")
 	local sea_client = self.sea_client
-	local server_remote = sea_client.remote
-	self.config.user = server_remote:getUser()
-	sea_client.user = self.config.user
-	print("user", inspect(self.config.user))
+	local user = sea_client.remote:getUser()
+	sea_client.client:setUser(user)
+	self.config.user = user
+	print("user", inspect(user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 
@@ -138,7 +138,7 @@ function AuthManager:logoutAsync()
 	config.user = {}
 	config.token = ""
 
-	sea_client.user = {}
+	sea_client.client:setUser()
 end
 AuthManager.logout = thread.coro(AuthManager.logoutAsync)
 
