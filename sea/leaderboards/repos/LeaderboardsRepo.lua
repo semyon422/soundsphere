@@ -238,7 +238,8 @@ end
 ---@return sea.LeaderboardUser[]
 function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id, limit, offset)
 	return self.models.leaderboard_users:select({
-		leaderboard_id = assert(leaderboard_id)
+		leaderboard_id = assert(leaderboard_id),
+		total_rating__gt = 0,
 	}, {
 		order = {"total_rating DESC"},
 		limit = limit,
@@ -256,7 +257,8 @@ end
 ---@return integer
 function LeaderboardsRepo:getLeaderboardUsersCount(leaderboard_id)
 	return self.models.leaderboard_users:count({
-		leaderboard_id = assert(leaderboard_id)
+		leaderboard_id = assert(leaderboard_id),
+		total_rating__gt = 0,
 	})
 end
 
