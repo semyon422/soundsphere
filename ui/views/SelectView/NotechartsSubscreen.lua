@@ -533,7 +533,6 @@ local function NotechartsSubscreen(self)
 
 	w, h = Layout:move("column1row1row1")
 
-	just.indent(36)
 	-- if imgui.IconOnlyButton("open notechart page", icons("info_outline"), h, 0.5) then
 	-- 	self.game.selectController:openWebNotechart()
 	-- end
@@ -543,6 +542,7 @@ local function NotechartsSubscreen(self)
 	local lb = online_client:getLeaderboard(1)
 
 	if lb_user and lb then
+		just.indent(36)
 		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 26))
 
 		local label = RatingCalc:postfix(lb.rating_calc)
