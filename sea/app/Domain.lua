@@ -6,6 +6,7 @@ local Leaderboards = require("sea.leaderboards.Leaderboards")
 local Teams = require("sea.teams.Teams")
 local Difftables = require("sea.difftables.Difftables")
 local Chartplays = require("sea.chart.Chartplays")
+local ChartplaySubmission = require("sea.chart.ChartplaySubmission")
 local Dans = require("sea.dan.Dans")
 local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
 local FolderStorage = require("sea.chart.storage.FolderStorage")
@@ -41,39 +42,10 @@ function Domain:new(repos)
 		self.replays_storage
 	)
 	self.dans = Dans(repos.charts_repo, repos.dan_clears_repo)
+	self.chartplay_submission = ChartplaySubmission(self.chartplays, self.leaderboards, self.users, self.dans)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
-end
-
----@param user sea.User
----@param time integer
----@param compute_data_loader sea.ComputeDataLoader
----@param chartplay_values sea.Chartplay
----@param chartdiff_values sea.Chartdiff
----@return sea.Chartplay?
----@return string?
-function Domain:submitChartplay(user, time, compute_data_loader, chartplay_values, chartdiff_values)
-	local chartplay, err = self.chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
-	if not chartplay then
-		return nil, err
-	end
-
-	if not chartplay.custom then
-		self.leaderboards:addChartplay(chartplay)
-	end
-
-	user = assert(self.users_repo:getUser(user.id))
-
-	user.latest_activity = time
-	user.play_time = user.play_time + chartdiff_values.duration
-	user.chartplays_count = self.charts_repo:getUserChartplaysCount(user.id)
-	user.chartmetas_count = self.charts_repo:getUserChartmetasCount(user.id)
-	user.chartdiffs_count = self.charts_repo:getUserChartdiffsCount(user.id)
-
-	self.users_repo:updateUser(user)
-
-	return chartplay
 end
 
 return Domain

@@ -5,16 +5,16 @@ local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
-local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 
 ---@class sea.SubmissionServerRemote: sea.IServerRemote
 ---@operator call: sea.SubmissionServerRemote
 local SubmissionServerRemote = class()
 
----@param domain sea.Domain
-function SubmissionServerRemote:new(domain)
-	self.domain = domain
-	self.chartplays = domain.chartplays
+---@param chartplay_submission sea.ChartplaySubmission
+---@param chartplays sea.Chartplays
+function SubmissionServerRemote:new(chartplay_submission, chartplays)
+	self.chartplay_submission = chartplay_submission
+	self.chartplays = chartplays
 end
 
 ---@param chartplay_values sea.Chartplay
@@ -34,25 +34,7 @@ function SubmissionServerRemote:submitChartplay(chartplay_values, chartdiff_valu
 	end
 	setmetatable(chartdiff_values, Chartdiff)
 
-	local compute_data_loader = ComputeDataLoader(self.remote.compute_data_provider)
-
-	local time = os.time()
-	local chartplay, err = self.domain:submitChartplay(self.user, time, compute_data_loader, chartplay_values, chartdiff_values)
-	if not chartplay then
-		return nil, "submit: " .. err
-	end
-
-	if self.domain.dans:isDan(chartdiff_values) then
-		local dan_clear, err = self.domain.dans:submit(self.user, chartplay, chartdiff_values, time)
-		self.remote:print(dan_clear and "dan cleared" or err)
-	end
-
-	local leaderboard_users = self.domain.leaderboards:getUserLeaderboardUsers(self.user)
-	if leaderboard_users then
-		self.remote.client:setLeaderboardUsers(leaderboard_users)
-	end
-
-	return chartplay
+	return self.chartplay_submission:submitChartplay(self.user, os.time(), self.remote, chartplay_values, chartdiff_values)
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
