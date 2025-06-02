@@ -1,4 +1,0 @@
-#!/bin/bash
-. ./setenv
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/bin/linux64
-screen -dmS soundsphere-compute luajit compute_app.lua
