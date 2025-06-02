@@ -65,7 +65,7 @@ local function create_chartplay(ctx, values)
 	chartplay.mode = values.mode or "mania"
 	chartplay.rating = values.rating or 0
 	chartplay.not_perfect_count = values.not_perfect_count or 0
-	chartplay.timings = values.timings or Timings("simple", 0.1)
+	chartplay.timings = values.timings
 	chartplay.subtimings = values.subtimings
 	chartplay.submitted_at = values.submitted_at or 0
 	chartplay.computed_at = values.computed_at or 0
@@ -455,7 +455,10 @@ function test.free_timings_filter_specific(t)
 end
 
 ---@param t testing.T
-function test.free_timings_filter_undefined(t)
+function test.free_timings_filter_undefined_both(t)
+	-- impossible case because timings should be set
+	-- there is no default timings for timings-less formats
+
 	local ctx = create_test_ctx()
 
 	ctx.db.models.chartmetas:create({
@@ -468,6 +471,37 @@ function test.free_timings_filter_undefined(t)
 	})
 
 	create_chartplay(ctx, {rating = 1})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+
+	ctx.leaderboard.allow_free_timings = false
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+end
+
+---@param t testing.T
+function test.free_timings_filter_undefined_chart(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
+		hash = "",
+		index = 1,
+		created_at = 0,
+		computed_at = 0,
+	})
+
+	create_chartplay(ctx, {
+		rating = 1,
+		timings = Timings("osuod", 10),
+	})
 
 	ctx.leaderboard.allow_free_timings = true
 	lb_update_select(ctx)

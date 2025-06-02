@@ -99,16 +99,44 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	end
 	if not lb.allow_free_timings then
 		if lb.timings then
-			conds.timings = lb.timings
+			table.insert(conds, {
+				"or",
+				timings = lb.timings,
+				{
+					timings__isnull = true,
+					chartmeta_timings = lb.timings,
+				},
+			})
 		else
-			conds.timings_ = "chartmeta_timings"
+			table.insert(conds, {
+				"or",
+				timings_ = "chartmeta_timings",
+				{
+					timings__isnull = true,
+					chartmeta_timings__isnull = true,
+				},
+			})
 		end
 	end
 	if not lb.allow_free_healths then
 		if lb.healths then
-			conds.healths = lb.healths
+			table.insert(conds, {
+				"or",
+				healths = lb.healths,
+				{
+					healths__isnull = true,
+					chartmeta_healths = lb.healths,
+				},
+			})
 		else
-			conds.healths_ = "chartmeta_healths"
+			table.insert(conds, {
+				"or",
+				healths_ = "chartmeta_healths",
+				{
+					healths__isnull = true,
+					chartmeta_healths__isnull = true,
+				},
+			})
 		end
 	end
 	if lb.pass then
