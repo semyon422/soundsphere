@@ -1,4 +1,5 @@
 <% local util = require("web.http.util") %>
+<% local format = require("sea.shared.format") %>
 <% local Username = require("sea.shared.http.components.Username") %>
 
 <div class="is-hidden-mobile" style="position:relative;">
@@ -398,7 +399,7 @@
 											</div>
 											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
 											<div class="user__score-rating-box has-background-gray-light">
-												<p class="saira-bold" style="padding-left: 5px"><strong><%= ("%0.2f"):format(v.rating) %></strong></p>
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= format.float4(v.rating) %></strong></p>
 												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
 											</div>
 										</div>
