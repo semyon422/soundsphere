@@ -1,4 +1,5 @@
 local just = require("just")
+local int_rates = require("libchart.int_rates")
 local imgui = require("imgui")
 local ModalImView = require("ui.imviews.ModalImView")
 local _transform = require("gfx_util").transform
@@ -68,7 +69,8 @@ return ModalImView(function(self, quit)
 	local timeRateModel = game.timeRateModel
 	local range = timeRateModel.range[replayBase.rate_type]
 	local format = timeRateModel.format[replayBase.rate_type]
-	local newRate = imgui.slider1("rate", timeRateModel:get(), format, range[1], range[2], range[3], "play rate")
+
+	local newRate = int_rates.round(imgui.slider1("rate", timeRateModel:get(), format, range[1], range[2], range[3], "play rate"))
 
 	if newRate ~= timeRateModel:get() then
 		game.modifierSelectModel:change()

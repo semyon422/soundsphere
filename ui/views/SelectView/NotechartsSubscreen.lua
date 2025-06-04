@@ -1,4 +1,5 @@
 local just = require("just")
+local int_rates = require("libchart.int_rates")
 local spherefonts = require("sphere.assets.fonts")
 local icons = require("sphere.assets.icons")
 local gfx_util = require("gfx_util")
@@ -408,12 +409,12 @@ local function ModifierIconGrid(self)
 	local timeRateModel = self.game.timeRateModel
 	local range = timeRateModel.range[replayBase.rate_type]
 	local format = timeRateModel.format[replayBase.rate_type]
-	local newRate = imgui.knob(
+	local newRate = int_rates.round(imgui.knob(
 		"rate knob",
 		timeRateModel:get(),
 		range[1], range[2], range[3], 1000,
 		format:format(timeRateModel:get())
-	)
+	))
 
 	if newRate ~= timeRateModel:get() then
 		self.game.modifierSelectModel:change()
