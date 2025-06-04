@@ -280,10 +280,13 @@ function SelectController:exportToOsu()
 
 	local encoder = ChartEncoder()
 
-	local chart = selectModel:loadChartAbsolute()
+	local chart, chartmeta = selectModel:loadChartAbsolute()
 	ModifierModel:apply(self.replayBase.modifiers, chart)
 
-	local data = encoder:encode({chart})
+	local data = encoder:encode({{
+		chart = chart,
+		chartmeta = chartmeta,
+	}})
 
 	local path = chartview.path
 	path = path:find("^.+/.$") and path:match("^(.+)/.$") or path
