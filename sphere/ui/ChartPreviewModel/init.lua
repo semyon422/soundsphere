@@ -4,6 +4,7 @@ local ChartDecoder = require("sph.ChartDecoder")
 local SphPreview = require("sph.SphPreview")
 local Sph = require("sph.Sph")
 local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
+local ComputeContext = require("sea.compute.ComputeContext")
 
 ---@class sphere.ChartPreviewModel
 ---@operator call: sphere.ChartPreviewModel
@@ -11,10 +12,12 @@ local ChartPreviewModel = class()
 
 ---@param configModel sphere.ConfigModel
 ---@param previewModel sphere.PreviewModel
+---@param replayBase sea.ReplayBase
 ---@param game table
-function ChartPreviewModel:new(configModel, previewModel, game)
+function ChartPreviewModel:new(configModel, previewModel, replayBase, game)
 	self.configModel = configModel
 	self.previewModel = previewModel
+	self.replayBase = replayBase
 	self.game = game
 	self.notes = {}
 	self.visualTimeInfo = {
@@ -78,6 +81,10 @@ function ChartPreviewModel:setChartview(chartview)
 		self.graphicEngine:unload()
 		return
 	end
+
+	local ctx = ComputeContext()
+	ctx.chart = chart
+	ctx:applyColumnOrder(self.replayBase.columns_order)
 
 	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
 	self.playField = noteSkin.playField

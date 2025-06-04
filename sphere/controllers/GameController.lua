@@ -112,7 +112,12 @@ function GameController:new()
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
 	self.previewModel = PreviewModel(self.persistence.configModel)
-	self.chartPreviewModel = ChartPreviewModel(self.persistence.configModel, self.previewModel, self)
+	self.chartPreviewModel = ChartPreviewModel(
+		self.persistence.configModel,
+		self.previewModel,
+		self.replayBase,
+		self
+	)
 
 	self.selectController = SelectController(
 		self.selectModel,
