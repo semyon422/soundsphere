@@ -110,14 +110,14 @@ end
 function MultiplayerServer:pushUsers()
 	local users = self:getUsers()
 	for _, p in self.peers:iter() do
-		p.remote:setUsers(users)
+		p.remote_no_return:setUsers(users)
 	end
 end
 
 function MultiplayerServer:pushRooms()
 	local rooms = self:getRooms()
 	for _, p in self.peers:iter() do
-		p.remote:setRooms(rooms)
+		p.remote_no_return:setRooms(rooms)
 	end
 end
 
@@ -125,7 +125,7 @@ end
 function MultiplayerServer:pushRoomUsers(room_id)
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 	for _, p in self:iterRoomPeers(room_id) do
-		p.remote:setRoomUsers(room_users)
+		p.remote_no_return:setRoomUsers(room_users)
 	end
 end
 
@@ -134,13 +134,13 @@ end
 function MultiplayerServer:syncRoomParts(room_id, room)
 	for _, p in self:iterRoomPeers(room_id) do
 		if room.rules then
-			p.remote:syncRules()
+			p.remote_no_return:syncRules()
 		end
 		if room.chartmeta_key then
-			p.remote:syncChart()
+			p.remote_no_return:syncChart()
 		end
 		if room.replay_base then
-			p.remote:syncReplayBase()
+			p.remote_no_return:syncReplayBase()
 		end
 	end
 end
@@ -256,7 +256,7 @@ function MultiplayerServer:kickUser(user, room_id, target_user_id)
 
 	local peer = self:getPeerByUserId(target_user_id)
 	if peer then
-		peer.remote:setRoomUsers({})
+		peer.remote_no_return:setRoomUsers({})
 	end
 
 	return true
@@ -306,7 +306,7 @@ function MultiplayerServer:sendMessage(user, room_id, msg)
 	msg = ("%s: %s"):format(user.name, msg)
 
 	for _, p in self:iterRoomPeers(room_id) do
-		p.remote:addMessage(msg)
+		p.remote_no_return:addMessage(msg)
 	end
 end
 
@@ -391,7 +391,7 @@ function MultiplayerServer:startLocalMatch(user)
 	end
 
 	for _, p in self:iterRoomPeers(room_id) do
-		p.remote:startMatch()
+		p.remote_no_return:startMatch()
 	end
 end
 

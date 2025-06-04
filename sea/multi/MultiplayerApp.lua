@@ -38,10 +38,11 @@ function MultiplayerApp:new()
 		local _obj = setmetatable({}, {__index = obj})
 
 		---@type sea.Peer
-		local ctx = ...
-		_obj.user = ctx.user
-		_obj.session = ctx.session
-		_obj.remote = ctx.remote
+		local p = ...
+		_obj.user = p.user
+		_obj.session = p.session
+		_obj.remote = p.remote
+		_obj.remote_no_return = p.remote_no_return
 
 		return _obj, select(2, ...)
 	end
@@ -94,6 +95,7 @@ end
 function MultiplayerApp:connected(peer_id, icc_peer)
 	local peer = Peer()
 	peer.remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerClientRemote]]
+	peer.remote_no_return = -peer.remote --[[@as sea.MultiplayerClientRemote]]
 	peer.user = User()
 	peer.session = Session()
 

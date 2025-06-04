@@ -6,6 +6,7 @@ local class = require("class")
 ---@field session sea.Session
 ---@field ip string
 ---@field remote sea.MultiplayerClientRemote
+---@field remote_no_return sea.MultiplayerClientRemote
 local Peer = class()
 
 return Peer
