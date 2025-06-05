@@ -49,6 +49,7 @@ local function create_peer(ctx, id)
 	peer.user = User()
 	peer.user.id = id
 	peer.remote = MultiplayerClientRemote(client)
+	peer.remote_no_return = peer.remote
 
 	ctx.peers:add("peer_" .. id, peer)
 
