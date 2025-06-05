@@ -78,7 +78,7 @@ local t = {
 	[12] = osuv1("e3a43a14d982dadfd2b015b0ac641921", 12, "4K REFORM", "Beta"),
 	[13] = osuv1("e0bbf500b763e48ddc5a6f3fafacf58e", 13, "4K REFORM", "Gamma"),
 	[14] = osuv1("6432f864b074264c230604cfe142edb0", 14, "4K REFORM", "Delta"),
-	[15] = osuv1("c290f7c54064a7ff3e15bc64ddfc8692", 15, "4K REFORM", "Epsilin"),
+	[15] = osuv1("c290f7c54064a7ff3e15bc64ddfc8692", 15, "4K REFORM", "Epsilon"),
 	[16] = osuv1("7fab4c2623aac25d74f9300bfc4394c1", 16, "4K REFORM", "Zeta"),
 	[17] = osuv1("8f175c7b6f529a877871eb2044ce516b", 17, "4K REFORM", "Eta"),
 	-- 4K LN
