@@ -15,7 +15,14 @@ local t = {
 			pages = {
 				{ name = "Adding songs/charts", filename = "adding_charts" },
 				{ name = "Adding skins", filename = "adding_skins" },
-				{ name = "Adding plugins", filename = "adding_plugins" }
+				{ name = "Adding plugins", filename = "adding_plugins" },
+				{ name = "Chart filters", filename = "chart_filters" }
+			}
+		},
+		{
+			name = "Community",
+			pages = {
+				{ name = "The Snicker Boost Method", filename = "community_snicker_boost" }
 			}
 		}
 	}
