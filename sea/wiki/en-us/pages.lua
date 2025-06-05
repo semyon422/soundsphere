@@ -19,6 +19,12 @@ local t = {
 				{ name = "Chart filters", filename = "chart_filters" }
 			}
 		},
+		{
+			name = "Community",
+			pages = {
+				{ name = "The Snicker Boost Method", filename = "community_snicker_boost" }
+			}
+		}
 	}
 }
 
