@@ -5,6 +5,7 @@ local dan_list = require("sea.dan.dan_list")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = require("sea.leaderboards.TotalRating")
 local ModifierModel = require("sphere.models.ModifierModel")
+local Format = require("sphere.views.Format")
 
 ---@class sea.UserPage
 ---@operator call: sea.UserPage
@@ -214,8 +215,9 @@ function UserPage:getScores(lb, user_id, _type)
 			artist = chartmeta and chartmeta.artist or "?",
 			title = chartmeta and chartmeta.title or "?",
 			name = chartmeta and chartmeta.name or "?",
-			creator = chartmeta and chartmeta.creator or "?",
+			creator = chartmeta and chartmeta.creator,
 			rate = chartdiff and chartdiff.rate or "?",
+			inputmode = chartdiff and Format.inputMode(chartdiff.inputmode) or "?",
 			modifiers = ModifierModel:getString(cpv.modifiers),
 			const = cpv.const,
 			tap_only = cpv.tap_only,
