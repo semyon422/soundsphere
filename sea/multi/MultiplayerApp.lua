@@ -18,6 +18,8 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local MultiplayerDatabase = require("sea.storage.server.MultiplayerDatabase")
 local MultiplayerRepo = require("sea.multi.repos.MultiplayerRepo")
 
+local MultiplayerClientRemoteValidation = require("sea.multi.remotes.MultiplayerClientRemoteValidation")
+
 local whitelist = require("sea.multi.remotes.whitelist")
 
 ---@class sea.MultiplayerApp
@@ -93,9 +95,11 @@ end
 ---@param peer_id string
 ---@param icc_peer icc.IPeer
 function MultiplayerApp:connected(peer_id, icc_peer)
+	local remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerClientRemote]]
+
 	local peer = Peer()
-	peer.remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerClientRemote]]
-	peer.remote_no_return = -peer.remote --[[@as sea.MultiplayerClientRemote]]
+	peer.remote = MultiplayerClientRemoteValidation(remote)
+	peer.remote_no_return = MultiplayerClientRemoteValidation(-remote)
 	peer.user = User()
 	peer.session = Session()
 
