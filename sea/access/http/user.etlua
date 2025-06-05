@@ -379,7 +379,11 @@
 										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
 											<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
 											<div style="display: flex">
-												<p class="user__score-text"><%= v.name %> by <%= v.creator %></p>
+												<% if v.creator and v.creator ~= "" then %>
+													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %> by <%= v.creator %></p>
+												<% else %>
+													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %></p>
+												<% end %>
 												<% if v.rate ~= 1 then %>
 													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
 												<% end %>
@@ -394,7 +398,7 @@
 										</div>
 										<div style="display: flex; min-width: fit-content;">
 											<div class="user__score-rows" style="text-align: right;">
-												<p style="padding-left: 6px"><strong><%= ("%0.2f"):format(v.norm_accuracy * 100) %>%</strong></p>
+												<p style="padding-left: 6px"><strong><%= ("%0.2f%%"):format(v.norm_accuracy * 100) %></strong></p>
 												<p class="has-text-grey"><%= v.timeSince %></p>
 											</div>
 											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
@@ -423,27 +427,29 @@
 						</div>
 					</div>
 				</div>
-				<div class="block border-box">
-					<p class="title is-4">Dan course clears</p>
-					<table class="table is-fullwidth is-striped">
-						<thead>
-							<th>Dan</th>
-							<th>Level</th>
-							<th>Rate</th>
-							<th>Date</th>
-						</thead>
-						<tbody>
-							<% for _, v in ipairs(dan_clears) do %>
-								<tr>
-									<td><%= v.category %></td>
-									<td><%= v.name %></td>
-									<td><%= ("%0.02fx"):format(v.rate) %></td>
-									<td><%= os.date("%d.%m.%Y", v.time) %></td>
-								</tr>
-							<% end %>
-						</tbody>
-					</table>
-				</div>
+				<% if #dan_clears ~= 0 then %>
+					<div class="block border-box">
+						<p class="title is-4">Dan course clears</p>
+						<table class="table is-fullwidth is-striped">
+							<thead>
+								<th>Dan</th>
+								<th>Level</th>
+								<th>Rate</th>
+								<th>Date</th>
+							</thead>
+							<tbody>
+								<% for _, v in ipairs(dan_clears) do %>
+									<tr>
+										<td><%= v.category %></td>
+										<td><%= v.name %></td>
+										<td><%= ("%0.02fx"):format(v.rate) %></td>
+										<td><%= os.date("%d.%m.%Y", v.time) %></td>
+									</tr>
+								<% end %>
+							</tbody>
+						</table>
+					</div>
+				<% end %>
 			</div>
 		</div>
 	</div>
