@@ -1,5 +1,4 @@
 local class = require("class")
-local 
 
 ---@class sea.UserActivityGraph
 ---@operator call: sea.UserActivityGraph

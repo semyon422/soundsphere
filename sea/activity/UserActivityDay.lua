@@ -1,14 +1,11 @@
-local class = require("class")
+local ActivityDate = require("sea.activity.ActivityDate")
 
----@class sea.UserActivityDay
+---@class sea.UserActivityDay: sea.ActivityDate
 ---@operator call: sea.UserActivityDay
 ---@field user_id integer
 ---@field timezone integer
----@field year integer
----@field month integer
----@field day integer
 ---@field count integer
-local UserActivityDay = class()
+local UserActivityDay = ActivityDate + {}
 
 function UserActivityDay:new()
 	

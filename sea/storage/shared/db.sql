@@ -119,3 +119,15 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 CREATE INDEX IF NOT EXISTS chartplays_user_id_idx ON chartplays (`user_id`);
 CREATE INDEX IF NOT EXISTS chartplays_himr_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`);
 CREATE INDEX IF NOT EXISTS chartplays_himrm_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`, `mode`);
+
+CREATE TABLE IF NOT EXISTS `user_activity_days` (
+	`id` INTEGER PRIMARY KEY,
+	`user_id` INTEGER NOT NULL,
+	`timezone` INTEGER NOT NULL,
+	`year` INTEGER NOT NULL,
+	`month` INTEGER NOT NULL,
+	`day` INTEGER NOT NULL,
+	`count` INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS user_activity_days_full_idx ON user_activity_days (`user_id`, `timezone`, `year`, `month`, `day`, `count`);
