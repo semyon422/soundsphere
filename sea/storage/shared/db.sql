@@ -130,4 +130,4 @@ CREATE TABLE IF NOT EXISTS `user_activity_days` (
 	`count` INTEGER NOT NULL
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS user_activity_days_full_idx ON user_activity_days (`user_id`, `timezone`, `year`, `month`, `day`, `count`);
+CREATE UNIQUE INDEX IF NOT EXISTS user_activity_days_full_idx ON user_activity_days (`user_id`, `timezone`, `year`, `month`, `day`);
