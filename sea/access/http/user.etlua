@@ -188,7 +188,7 @@
 										<td
 											class="user__activity-rect user__activity-color"
 											data-activity="<%= rect.activity %>"
-											title="<%= rect.date %>">
+											title="<%= rect.date %> - <%= rect.count %> plays">
 										</td>
 									<% end %>
 								</tr>

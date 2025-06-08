@@ -104,8 +104,9 @@ function UserPage:getActivityRectangles()
 		for week = 1, rectangles do
 			local delta = (((week - 1) * 7) + week_day) - self.maxDays
 			local date = os.date("%d-%m-%Y", self.currentDateStartTime + (delta * 60 * 60 * 24))
-			local activity = math.min(4, math.ceil((self.activity[date] or 0) / 10))
-			table.insert(row, {date = date, activity = activity})
+			local count = self.activity[date] or 0
+			local activity = math.min(4, math.ceil(count / 10))
+			table.insert(row, {date = date, activity = activity, count = count})
 		end
 
 		table.insert(rows, row)
