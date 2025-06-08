@@ -22,6 +22,7 @@ local stbl = require("stbl")
 local socket = require("socket")
 local time_util = require("time_util")
 local ComputeContext = require("sea.compute.ComputeContext")
+local ActivityTimezones = require("sea.activity.ActivityTimezones")
 
 -- lua-nginx-module bug fix
 coroutine.wrap = require("icc.co").wrap
@@ -154,6 +155,48 @@ function cmds.compute_chartplay(id)
 
 	print("-- Computed chartdiff")
 	print(stbl.encode(chartdiff))
+end
+
+function cmds.activity_graph()
+	local users = app.domain.users:getUsers()
+
+	for _, user in ipairs(users) do
+		app.app_db.db:query("BEGIN")
+		app.app_db.db:query("DELETE FROM user_activity_days WHERE user_id = ?", {user.id})
+
+		---@type {submitted_at: integer}[]
+		local plays = app.app_db.db:query("SELECT submitted_at FROM chartplays WHERE submitted_at > 0 AND user_id = ?", {user.id})
+
+		---@type {[integer]: {[string]: integer}}
+		local activity = {}
+
+		for _, p in ipairs(plays) do
+			local submitted_at = tonumber(p.submitted_at)
+			for _, tz in ipairs(ActivityTimezones) do
+				local tz_key = tz:encode()
+
+				local adjusted_time = submitted_at + tz:seconds()
+				local ymd = os.date("%Y-%m-%d", adjusted_time)
+
+				activity[tz_key] = activity[tz_key] or {}
+				activity[tz_key][ymd] = (activity[tz_key][ymd] or 0) + 1
+			end
+		end
+
+		for tz_key, t in pairs(activity) do
+			for ymd, count in pairs(t) do
+				local y, m, d = ymd:match("(%d+)-(%d+)-(%d+)")
+				app.app_db.db:query([[
+					INSERT INTO user_activity_days (user_id, timezone, year, month, day, count)
+					VALUES (?, ?, ?, ?, ?, ?)
+				]], {user.id, tz_key, tostring(y), tostring(m), tostring(d), count})
+			end
+		end
+
+		app.app_db.db:query("COMMIT")
+
+		print(user.id, #plays)
+	end
 end
 
 function cmds.ranks()
