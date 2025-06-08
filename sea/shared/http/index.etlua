@@ -13,11 +13,11 @@
 					</div>
 				</div>
 			</div>
-			<div class="column welcome__right-column">
+			<div class="column welcome__right-column is-hidden-mobile">
 				<div class="welcome__canvas-container">
 					<canvas id="vsrg-preview" class="welcome__canvas" width="512" height="820"></canvas>
 				</div>
-				<script src="static/scripts/index.js"></script>
+				<script src="static/scripts/index.js?v=1"></script>
 			</div>
 		</div>
 	</div>

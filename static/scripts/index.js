@@ -102,7 +102,7 @@ function createPreview() {
 	let prev_time = start_time
 
 	function loop() {
-		if (should_stop) {
+		if (should_stop || !canvas.checkVisibility()) {
 			return
 		}
 
