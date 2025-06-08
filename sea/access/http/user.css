@@ -59,24 +59,38 @@
 	border-radius: 2px;
 }
 
+html[data-theme=light] {
+	--user-activity-1: #4ac26b;
+	--user-activity-2: #4ac26b;
+	--user-activity-3: #2da44e;
+	--user-activity-4: #116329;
+}
+
+html[data-theme=dark] {
+	--user-activity-1: #116329;
+	--user-activity-2: #116329;
+	--user-activity-3: #2da44e;
+	--user-activity-4: #4ac26b;
+}
+
 .user__activity-color[data-activity = "0"] {
 	background-color: var(--bulma-background);
 }
 
 .user__activity-color[data-activity = "1"] {
-	background-color: #4ac26b;
+	background-color: var(--user-activity-1);
 }
 
 .user__activity-color[data-activity = "2"] {
-	background-color: #4ac26b;
+	background-color: var(--user-activity-2);
 }
 
 .user__activity-color[data-activity = "3"] {
-	background-color: #2da44e;
+	background-color: var(--user-activity-3);
 }
 
 .user__activity-color[data-activity = "4"] {
-	background-color: #116329;
+	background-color: var(--user-activity-4);
 }
 
 .user__activity-week-day {
