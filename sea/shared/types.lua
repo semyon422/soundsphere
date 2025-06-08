@@ -1,3 +1,4 @@
+local valid = require("valid")
 local utf8 = require("utf8")
 local country_codes = require("sea.shared.country_codes")
 
@@ -206,6 +207,12 @@ function types.country_code(v)
 
 	return nil, "country code does not exist"
 end
+
+types.timezone = valid.struct({
+	h = types.integer,
+	m = types.integer,
+	negative = types.boolean,
+})
 
 --------------------------------------------------------------------------------
 

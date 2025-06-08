@@ -1,11 +1,13 @@
 local class = require("class")
 local Roles = require("sea.access.Roles")
+local Timezone = require("sea.activity.Timezone")
 
 ---@class sea.User
 ---@operator call: sea.User
 ---@field id integer
 ---@field name string
 ---@field latest_activity integer
+---@field activity_timezone sea.Timezone
 ---@field created_at integer
 ---@field is_banned boolean
 ---@field description string
@@ -28,6 +30,7 @@ local Roles = require("sea.access.Roles")
 local User = class()
 
 function User:new()
+	self.activity_timezone = Timezone()
 	self.description = ""
 	self.is_banned = false
 	self.chartplays_count = 0

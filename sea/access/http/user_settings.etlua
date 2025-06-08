@@ -1,4 +1,5 @@
 <% local country_codes = require("sea.shared.country_codes") %>
+<% local ActivityTimezones = require("sea.activity.ActivityTimezones") %>
 
 <style>
 :root {
@@ -96,6 +97,25 @@
 							</div>
 							<div class="icon is-small is-left">
 								<i class="fas fa-globe"></i>
+							</div>
+						</div>
+					</div>
+					<div class="field">
+						<label class="label">Activity timezone</label>
+						<div class="control has-icons-left">
+							<div class="select">
+								<select name="activity_timezone">
+									<% for _, tz in ipairs(ActivityTimezones) do %>
+										<% if tz == user.activity_timezone then %>
+											<option selected value="<%= tz:encode() %>">UTC<%= tz %></option>
+										<% else %>
+											<option value="<%= tz:encode() %>">UTC<%= tz %></option>
+										<% end %>
+									<% end %>
+								</select>
+							</div>
+							<div class="icon is-small is-left">
+								<i class="fas fa-clock"></i>
 							</div>
 						</div>
 					</div>

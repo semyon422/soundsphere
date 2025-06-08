@@ -1,4 +1,5 @@
 local User = require("sea.access.User")
+local Timezone = require("sea.activity.Timezone")
 
 ---@type rdb.ModelOptions
 local users = {}
@@ -6,6 +7,7 @@ local users = {}
 users.metatable = User
 
 users.types = {
+	activity_timezone = Timezone,
 	is_banned = "boolean",
 	enable_gradient = "boolean",
 }

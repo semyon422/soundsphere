@@ -7,6 +7,8 @@ local json = require("web.json")
 local valid = require("valid")
 local types = require("sea.shared.types")
 local Roles = require("sea.access.Roles")
+local Timezone = require("sea.activity.Timezone")
+local ActivityDate = require("sea.activity.ActivityDate")
 
 ---@class sea.UserResource: web.IResource
 ---@operator call: sea.UserResource
@@ -56,12 +58,14 @@ UserResource.routes = {
 ---@param user_roles sea.UserRoles
 ---@param leaderboards sea.Leaderboards
 ---@param dans sea.Dans
+---@param user_activity_graph sea.UserActivityGraph
 ---@param views web.Views
-function UserResource:new(users, user_roles, leaderboards, dans, views)
+function UserResource:new(users, user_roles, leaderboards, dans, user_activity_graph, views)
 	self.users = users
 	self.user_roles = user_roles
 	self.leaderboards = leaderboards
 	self.dans = dans
+	self.user_activity_graph = user_activity_graph
 	self.views = views
 
 	self.testActivity = {
@@ -88,7 +92,17 @@ function UserResource:getUser(req, res, ctx)
 	ctx.leaderboard_user = self.leaderboards:getLeaderboardUser(leaderboard_id, user.id)
 
 	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards, self.dans)
-	page:setActivity(self.testActivity)
+
+	local date_t = os.date("*t", os.time() + 3600 * 24)
+	---@cast date_t -string
+
+	local user_activity_days = self.user_activity_graph:getUserActivityDays(
+		user.id,
+		user.activity_timezone,
+		ActivityDate(date_t.year - 1, date_t.month, date_t.day),
+		ActivityDate(date_t.year, date_t.month, date_t.day)
+	)
+	page:setActivity(user_activity_days)
 
 	ctx.page = page
 	ctx.user = user
@@ -245,6 +259,7 @@ function UserResource:updateSettings(req, res, ctx)
 	user_update.id = user_id
 	user_update.name = body_params.name
 	user_update.discord = body_params.discord
+	user_update.activity_timezone = Timezone.decode(tonumber(body_params.activity_timezone) or 0)
 	user_update.banner = body_params.banner_url
 	user_update.avatar = body_params.avatar_url
 	user_update.enable_gradient = body_params.enable_gradient == "on"

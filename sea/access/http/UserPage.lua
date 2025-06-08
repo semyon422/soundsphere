@@ -31,8 +31,15 @@ function UserPage:canUpdate()
 	return self.usersAccess:canUpdateSelf(self.sessionUser, self.targetUser, os.time())
 end
 
----@param activity {[string]: number} activity key should have %d-%m-%Y format
-function UserPage:setActivity(activity)
+---@param user_activity_days sea.UserActivityDay[]
+function UserPage:setActivity(user_activity_days)
+	---@type {[string]: number} activity key should have %d-%m-%Y format
+	local activity = {}
+
+	for _, uad in ipairs(user_activity_days) do
+		activity[("%02d-%02d-%04d"):format(uad.day, uad.month, uad.year)] = uad.count
+	end
+
 	self.activity = activity
 
 	self.currentDate = os.date("*t", os.time())

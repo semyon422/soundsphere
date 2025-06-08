@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`password` TEXT NOT NULL,
 	`description` TEXT NOT NULL,
 	`latest_activity` INTEGER NOT NULL,
+	`activity_timezone` INTEGER NOT NULL,
 	`created_at` INTEGER NOT NULL,
 	`is_banned` INTEGER NOT NULL,
 	`chartplays_count` INTEGER NOT NULL,

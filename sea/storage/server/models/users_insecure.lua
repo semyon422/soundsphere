@@ -1,4 +1,5 @@
 local UserInsecure = require("sea.access.UserInsecure")
+local Timezone = require("sea.activity.Timezone")
 
 ---@type rdb.ModelOptions
 local users_insecure = {}
@@ -8,6 +9,7 @@ users_insecure.table_name = "users"
 users_insecure.metatable = UserInsecure
 
 users_insecure.types = {
+	activity_timezone = Timezone,
 	is_banned = "boolean",
 	enable_gradient = "boolean",
 }

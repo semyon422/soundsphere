@@ -9,11 +9,13 @@ local ChartplaySubmission = class()
 ---@param leaderboards sea.Leaderboards
 ---@param users sea.Users
 ---@param dans sea.Dans
-function ChartplaySubmission:new(chartplays, leaderboards, users, dans)
+---@param user_activity_graph sea.UserActivityGraph
+function ChartplaySubmission:new(chartplays, leaderboards, users, dans, user_activity_graph)
 	self.chartplays = chartplays
 	self.leaderboards = leaderboards
 	self.users = users
 	self.dans = dans
+	self.user_activity_graph = user_activity_graph
 end
 
 ---@param user sea.User
@@ -34,6 +36,8 @@ function ChartplaySubmission:submitChartplay(user, time, remote, chartplay_value
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)
 	end
+
+	self.user_activity_graph:increaseUserActivity(user.id, time)
 
 	user = self.users:getUser(user.id)
 

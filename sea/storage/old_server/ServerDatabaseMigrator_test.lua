@@ -3,6 +3,7 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local ServerRepo = require("sea.storage.old_server.ServerRepo")
 local Repos = require("sea.app.Repos")
+local Timezone = require("sea.activity.Timezone")
 
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
@@ -216,6 +217,7 @@ function test.users(t)
 		email = "user@user.com",
 		password = "password",
 		latest_activity = 10,
+		activity_timezone = Timezone(),
 		created_at = 30,
 		is_banned = false,
 		description = "desc",
