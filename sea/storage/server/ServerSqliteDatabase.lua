@@ -26,10 +26,10 @@ end
 function ServerSqliteDatabase:open()
 	local db = self.db
 	db:open(self.path)
+	db:exec("PRAGMA busy_timeout = 10000")
+	db:exec("PRAGMA foreign_keys = ON")
 	db:exec(io_util.read_file("sea/storage/server/db.sql"))
 	db:exec(io_util.read_file("sea/storage/shared/db.sql"))
-	db:exec("PRAGMA foreign_keys = ON")
-	db:exec("PRAGMA busy_timeout = 10000")
 end
 
 function ServerSqliteDatabase:close()

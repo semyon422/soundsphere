@@ -29,8 +29,8 @@ function GameDatabase:load()
 	local db = self.db
 
 	db:open("userdata/data.db")
-	db:exec("PRAGMA foreign_keys = ON")
 	db:exec("PRAGMA busy_timeout = 10000")
+	db:exec("PRAGMA foreign_keys = ON")
 
 	local ver = db:user_version()
 
