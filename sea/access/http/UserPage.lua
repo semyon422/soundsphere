@@ -32,7 +32,8 @@ function UserPage:canUpdate()
 end
 
 ---@param user_activity_days sea.UserActivityDay[]
-function UserPage:setActivity(user_activity_days)
+---@param timezone sea.Timezone
+function UserPage:setActivity(user_activity_days, timezone)
 	---@type {[string]: number} activity key should have %d-%m-%Y format
 	local activity = {}
 
@@ -42,7 +43,7 @@ function UserPage:setActivity(user_activity_days)
 
 	self.activity = activity
 
-	self.currentDate = os.date("*t", os.time())
+	self.currentDate = os.date("!*t", os.time() + timezone:seconds())
 	self.currentDateStartTime = os.time({
 		year = self.currentDate.year,
 		month = self.currentDate.month,

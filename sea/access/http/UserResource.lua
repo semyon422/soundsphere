@@ -102,7 +102,7 @@ function UserResource:getUser(req, res, ctx)
 		ActivityDate(date_t.year - 1, date_t.month, date_t.day),
 		ActivityDate(date_t.year, date_t.month, date_t.day)
 	)
-	page:setActivity(user_activity_days)
+	page:setActivity(user_activity_days, user.activity_timezone)
 
 	ctx.page = page
 	ctx.user = user
