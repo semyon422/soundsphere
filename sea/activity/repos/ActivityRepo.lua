@@ -37,9 +37,9 @@ function ActivityRepo:increaseUserActivity(user_id, time)
 
 	for _, tz in ipairs(ActivityTimezones) do
 		local adjusted_time = time + tz:seconds()
-		local year = os.date("%Y", adjusted_time)
-		local month = os.date("%m", adjusted_time)
-		local day = os.date("%d", adjusted_time)
+		local year = os.date("!%Y", adjusted_time)
+		local month = os.date("!%m", adjusted_time)
+		local day = os.date("!%d", adjusted_time)
 
 		self.models._orm.db:query([[
 			INSERT OR REPLACE INTO user_activity_days 

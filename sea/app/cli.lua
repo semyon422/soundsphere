@@ -176,7 +176,7 @@ function cmds.activity_graph()
 				local tz_key = tz:encode()
 
 				local adjusted_time = submitted_at + tz:seconds()
-				local ymd = os.date("%Y-%m-%d", adjusted_time)
+				local ymd = os.date("!%Y-%m-%d", adjusted_time)
 
 				activity[tz_key] = activity[tz_key] or {}
 				activity[tz_key][ymd] = (activity[tz_key][ymd] or 0) + 1
