@@ -115,10 +115,6 @@ function Loop:run()
 
 		love.event.pump()
 
-		framestarted.time = Loop.time
-		framestarted.dt = Loop.dt
-		Loop:send(framestarted)
-
 		local asynckeyWorking = Loop.asynckey and asynckey.events
 		if asynckeyWorking then
 			if love.window.hasFocus() then
@@ -135,7 +131,7 @@ function Loop:run()
 			end
 		end
 
-		Loop.eventTime = Loop.time - Loop.dt / 2
+		Loop.eventTime = (Loop.prevTime + Loop.time) / 2
 		for name, a, b, c, d, e, f in love.event.poll() do
 			if name == "quit" then
 				if not love.quit or not love.quit() then
@@ -155,6 +151,10 @@ function Loop:run()
 				love.midireleased(note)
 			end
 		end
+
+		framestarted.time = Loop.time
+		framestarted.dt = Loop.dt
+		Loop:send(framestarted)
 
 		local timingsUpdate = love.timer.getTime()
 		Loop.timings.event = timingsUpdate - timingsEvent

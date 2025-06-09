@@ -27,11 +27,4 @@ function TimeManager:getAudioOffsync()
 	end
 end
 
----@param eventTime number
----@return number
-function TimeManager:transform(eventTime)
-	assert(eventTime - self.eventTime <= 0)
-	return Timer.transform(self, eventTime)
-end
-
 return TimeManager
