@@ -30,6 +30,7 @@ function ServerSqliteDatabase:open()
 	db:exec("PRAGMA foreign_keys = ON")
 	db:exec(io_util.read_file("sea/storage/server/db.sql"))
 	db:exec(io_util.read_file("sea/storage/shared/db.sql"))
+	db:exec(dofile("sea/storage/server/db.lua"))
 end
 
 function ServerSqliteDatabase:close()

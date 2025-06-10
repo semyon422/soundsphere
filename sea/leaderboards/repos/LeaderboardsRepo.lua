@@ -3,6 +3,7 @@ local sql_util = require("rdb.sql_util")
 local table_util = require("table_util")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
+local LeaderboardUserHistory = require("sea.leaderboards.LeaderboardUserHistory")
 
 ---@class sea.LeaderboardsRepo
 ---@operator call: sea.LeaderboardsRepo
@@ -337,6 +338,56 @@ function LeaderboardsRepo:updateLeaderboardUserRanks()
 			leaderboard_users.id = lb_users.id AND
 			leaderboard_users.rank != lb_users.rank
 	]])
+end
+--------------------------------------------------------------------------------
+
+---@param leaderboard_id integer
+---@param user_id integer
+---@return sea.LeaderboardUserHistory?
+function LeaderboardsRepo:getLeaderboardUserHistory(leaderboard_id, user_id)
+	return self.models.leaderboard_user_histories:find({
+		leaderboard_id = assert(leaderboard_id),
+		user_id = assert(user_id),
+	})
+end
+
+---@param lb_user sea.LeaderboardUser
+---@return sea.LeaderboardUserHistory
+function LeaderboardsRepo:createLeaderboardUserHistory(lb_user)
+	local obj = LeaderboardUserHistory()
+	obj.leaderboard_id = lb_user.leaderboard_id
+	obj.user_id = lb_user.user_id
+	obj.updated_at = lb_user.updated_at
+
+	---@type rdb.Row
+	local row = obj
+
+	for i = 1, LeaderboardUserHistory.size do
+		row["total_rating_" .. i] = lb_user.total_rating
+		row["total_accuracy_" .. i] = lb_user.total_accuracy
+		row["rank_" .. i] = lb_user.rank
+	end
+
+	return self.models.leaderboard_user_histories:create(obj)
+end
+
+---@param lb_user sea.LeaderboardUser
+---@param indexes integer[]
+---@return sea.LeaderboardUser
+function LeaderboardsRepo:updateLeaderboardUserHistory(lb_user, indexes)
+	local conds = {
+		leaderboard_id = lb_user.leaderboard_id,
+		user_id = lb_user.user_id,
+	}
+	---@type rdb.Row
+	local values = {}
+	values.updated_at = lb_user.updated_at
+	for _, i in ipairs(indexes) do
+		values["total_rating_" .. i] = lb_user.total_rating
+		values["total_accuracy_" .. i] = lb_user.total_accuracy
+		values["rank_" .. i] = lb_user.rank
+	end
+	return self.models.leaderboard_user_histories:update(values, conds)[1]
 end
 
 --------------------------------------------------------------------------------

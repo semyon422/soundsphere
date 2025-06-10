@@ -131,6 +131,35 @@ function Leaderboards:updateRanks(lb)
 	self.leaderboards_repo:updateLeaderboardUserRanks(lb)
 end
 
+---@param time integer
+function Leaderboards:updateHistories(time)
+	local repo = self.leaderboards_repo
+
+	local lbs = repo:getLeaderboards()
+	for _, lb in ipairs(lbs) do
+		local lb_users = repo:getLeaderboardUsers(lb.id)
+		for _, lb_user in ipairs(lb_users) do
+			lb_user.updated_at = time
+			local lb_user_his = repo:getLeaderboardUserHistory(lb.id, lb_user.user_id)
+			if not lb_user_his then
+				repo:createLeaderboardUserHistory(lb_user)
+			else
+				---@type integer[]
+				local indexes = {}
+				local i = lb_user_his:getIndex(0)
+				local j = lb_user_his:getIndex(1, time)
+				if i - 1 > j then
+					j = j + lb_user_his.size
+				end
+				for k = i, j do
+					table.insert(indexes, (k - 1) % lb_user_his.size + 1)
+				end
+				repo:updateLeaderboardUserHistory(lb_user, indexes)
+			end
+		end
+	end
+end
+
 ---@param chartplay sea.Chartplay
 function Leaderboards:addChartplay(chartplay)
 	local repo = self.leaderboards_repo

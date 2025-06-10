@@ -47,9 +47,10 @@ local function create_test_ctx()
 	}
 end
 
+---@param ctx {leaderboards: sea.Leaderboards, leaderboard: sea.Leaderboard}
 local function lb_update_select(ctx)
 	ctx.leaderboards:update(ctx.user, ctx.leaderboard.id, ctx.leaderboard)
-	ctx.leaderboard = ctx.leaderboards:getLeaderboard(ctx.leaderboard.id)
+	ctx.leaderboard = assert(ctx.leaderboards:getLeaderboard(ctx.leaderboard.id))
 end
 
 ---@param ctx {db: sea.ServerSqliteDatabase, user: sea.User}
@@ -598,7 +599,6 @@ function test.chartmeta_inputmode_filter(t)
 
 	ctx.db.models.chartmetas:create({
 		format = "osu",
-		inputmode = "4key",
 		hash = "1",
 		index = 1,
 		inputmode = "4key",
@@ -608,7 +608,6 @@ function test.chartmeta_inputmode_filter(t)
 
 	ctx.db.models.chartmetas:create({
 		format = "osu",
-		inputmode = "4key",
 		hash = "2",
 		index = 1,
 		inputmode = "7key",
@@ -618,7 +617,6 @@ function test.chartmeta_inputmode_filter(t)
 
 	ctx.db.models.chartmetas:create({
 		format = "osu",
-		inputmode = "4key",
 		hash = "3",
 		index = 1,
 		inputmode = "10key",
@@ -866,10 +864,6 @@ function test.rank(t)
 	ctx.leaderboards:addChartplay(cp1)
 	ctx.leaderboards:addChartplay(cp2)
 
-	-- recalc all ranks
-	ctx.leaderboards:updateLeaderboardUser(ctx.leaderboard, 1)
-	ctx.leaderboards:updateLeaderboardUser(ctx.leaderboard, 2)
-
 	local lb_user_1 = ctx.db.models.leaderboard_users:find({user_id = 1})
 	---@cast lb_user_1 sea.LeaderboardUser
 
@@ -933,6 +927,79 @@ function test.submit_time(t)
 	t:eq(#chartplays, 1)
 
 	t:eq(chartplays[1].rating, 3)
+end
+
+---@param t testing.T
+function test.update_histories(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.leaderboard_users:create({
+		leaderboard_id = 1,
+		user_id = 1,
+		total_rating = 1,
+		total_accuracy = 1,
+		rank = 1,
+		updated_at = 1,
+	})
+
+	ctx.leaderboards:updateHistories(0)
+
+	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
+	---@cast lb_user_his sea.LeaderboardUserHistory
+
+	t:eq(#lb_user_his.rank, 90)
+	t:eq(lb_user_his:getRank(1), 1)
+	t:eq(lb_user_his:getRank(2), 1)
+	t:eq(lb_user_his:getRank(3), 1)
+
+	ctx.db.models.leaderboard_users:update({rank = 2})
+
+	ctx.leaderboards:updateHistories(3600 * 24)
+
+	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
+	---@cast lb_user_his sea.LeaderboardUserHistory
+
+	t:eq(lb_user_his:getRank(1), 2)
+	t:eq(lb_user_his:getRank(2), 1)
+	t:eq(lb_user_his:getRank(3), 1)
+
+	ctx.db.models.leaderboard_users:update({rank = 3})
+
+	ctx.leaderboards:updateHistories(2 * 3600 * 24)
+	ctx.leaderboards:updateHistories(2 * 3600 * 24)
+	ctx.leaderboards:updateHistories(2 * 3600 * 24)
+
+	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
+	---@cast lb_user_his sea.LeaderboardUserHistory
+
+	t:eq(lb_user_his:getRank(1), 3)
+	t:eq(lb_user_his:getRank(2), 2)
+	t:eq(lb_user_his:getRank(3), 1)
+	t:eq(lb_user_his:getRank(4), 1)
+
+	ctx.db.models.leaderboard_users:update({rank = 4})
+
+	ctx.leaderboards:updateHistories(10 * 3600 * 24)
+
+	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
+	---@cast lb_user_his sea.LeaderboardUserHistory
+
+	t:eq(lb_user_his:getRank(1), 4)
+	t:eq(lb_user_his:getRank(8), 4)
+	t:eq(lb_user_his:getRank(9), 3)
+	t:eq(lb_user_his:getRank(10), 2)
+
+	ctx.db.models.leaderboard_users:update({rank = 5})
+
+	ctx.leaderboards:updateHistories(95 * 3600 * 24)
+
+	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
+	---@cast lb_user_his sea.LeaderboardUserHistory
+
+	t:eq(lb_user_his:getRank(1), 5)
+	t:eq(lb_user_his:getRank(85), 5)
+	t:eq(lb_user_his:getRank(86), 4)
+	t:eq(lb_user_his:getRank(87), 4)
 end
 
 return test
