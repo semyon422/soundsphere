@@ -156,13 +156,8 @@
 							<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
 								<%
 									local user = leaderboard_user.user
-									local history = leaderboard_user.history
-								 	local rank_change = 0
-								 	local rating_change = 0
-									if history then
-										rank_change = -history:getRankChange()
-										rating_change = history:getRatingChange()
-									end
+								 	local rank_change = -leaderboard_user:getRankChange()
+								 	local rating_change = leaderboard_user:getRatingChange()
 								%>
 								<tr class="has-text">
 									<td>#<%= leaderboard_user.rank %></td>

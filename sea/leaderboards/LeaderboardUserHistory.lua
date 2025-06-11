@@ -36,19 +36,4 @@ function LeaderboardUserHistory:getAccuracy(index)
 	return self.total_accuracy[self:getIndex(index)]
 end
 
----@return integer
-function LeaderboardUserHistory:getRankChange()
-	return self:getRank(1) - self:getRank(31)
-end
-
----@return integer
-function LeaderboardUserHistory:getRatingChange()
-	return self:getRating(1) - self:getRating(31)
-end
-
----@return integer
-function LeaderboardUserHistory:getAccuracyChange()
-	return self:getAccuracy(1) - self:getAccuracy(31)
-end
-
 return LeaderboardUserHistory

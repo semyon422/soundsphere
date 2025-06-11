@@ -13,9 +13,35 @@ local erfunc = require("libchart.erfunc")
 ---@field history sea.LeaderboardUserHistory?
 local LeaderboardUser = class()
 
+LeaderboardUser.change_days = 31
+
 ---@return number
 function LeaderboardUser:getNormAccuracy()
 	return erfunc.erf(0.032 / (self.total_accuracy * math.sqrt(2)))
+end
+
+---@param days integer?
+---@return integer
+function LeaderboardUser:getRankChange(days)
+	local history = self.history
+	if not history then return 0 end
+	return self.rank - history:getRank(days or self.change_days)
+end
+
+---@param days integer?
+---@return integer
+function LeaderboardUser:getRatingChange(days)
+	local history = self.history
+	if not history then return 0 end
+	return self.total_rating - history:getRating(days or self.change_days)
+end
+
+---@param days integer?
+---@return integer
+function LeaderboardUser:getAccuracyChange(days)
+	local history = self.history
+	if not history then return 0 end
+	return self.total_accuracy - history:getAccuracy(days or self.change_days)
 end
 
 return LeaderboardUser

@@ -129,10 +129,14 @@ function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank, time)
 		repo:updateLeaderboardUser(lb_user)
 	end
 
-	if not no_rank then
-		-- lb_user.rank = repo:getLeaderboardUserRank(lb.id, rating)
-		repo:updateLeaderboardUserRanks()
+	if no_rank then
+		return
 	end
+
+	repo:updateLeaderboardUserRanks()
+
+	lb_user = assert(repo:getLeaderboardUser(lb.id, user_id))
+	self:updateHistory(lb_user)
 end
 
 ---@param lb sea.Leaderboard
@@ -147,8 +151,7 @@ function Leaderboards:updateHistory(lb_user, last_only)
 
 	local lb_user_his = repo:getLeaderboardUserHistory(lb_user.leaderboard_id, lb_user.user_id)
 	if not lb_user_his then
-		repo:createLeaderboardUserHistory(lb_user)
-		return
+		lb_user_his = repo:createLeaderboardUserHistory(lb_user)
 	end
 
 	local j = lb_user_his:getIndex(1, lb_user.updated_at)

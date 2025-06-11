@@ -400,9 +400,9 @@ function LeaderboardsRepo:createLeaderboardUserHistory(lb_user)
 	local row = obj
 
 	for i = 1, LeaderboardUserHistory.size do
-		row["total_rating_" .. i] = lb_user.total_rating
-		row["total_accuracy_" .. i] = lb_user.total_accuracy
-		row["rank_" .. i] = lb_user.rank
+		row["total_rating_" .. i] = 0
+		row["total_accuracy_" .. i] = 0
+		row["rank_" .. i] = lb_user.user_id
 	end
 
 	return self.models.leaderboard_user_histories:create(obj)
