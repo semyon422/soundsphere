@@ -55,6 +55,7 @@ function RankingsResource:getRankings(req, res, ctx)
 		ctx.pages_count = math.ceil(lbs:getLeaderboardUsersCount(leaderboard_id) / per_page)
 		page = math.min(page, ctx.pages_count)
 		ctx.leaderboard_users = lbs:getLeaderboardUsersFull(leaderboard_id, per_page, (page - 1) * per_page)
+		lbs:loadLeaderboardUsersHistory(leaderboard_id, ctx.leaderboard_users)
 	else
 		local order = "chartplays_count"
 		if ranking_type == "charts" then

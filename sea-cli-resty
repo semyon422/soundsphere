@@ -2,6 +2,7 @@
 cd "$(dirname "$0")"
 source ./aqua/env/openresty_setenv
 
+export DYLD_FALLBACK_LIBRARY_PATH=$PWD/bin/mac64
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD/bin/linux64
 
 resty sea/app/cli.lua $@

@@ -212,9 +212,13 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
+---@param time integer?
 ---@return sea.Chartplayview[]
-function LeaderboardsRepo:getBestChartplays(lb, user_id)
+function LeaderboardsRepo:getBestChartplays(lb, user_id, time)
 	local conds, options = self:getFilterConds(lb, user_id)
+	if time then
+		conds.submitted_at__lte = time
+	end
 	return self.models.chartplayviews:select(conds, options)
 end
 
@@ -276,6 +280,14 @@ function LeaderboardsRepo:getLeaderboardUsers(leaderboard_id, limit, offset)
 	})
 end
 
+---@param leaderboard_id integer
+---@return sea.LeaderboardUser[]
+function LeaderboardsRepo:getLeaderboardUsersAll(leaderboard_id)
+	return self.models.leaderboard_users:select({
+		leaderboard_id = assert(leaderboard_id),
+	})
+end
+
 ---@param user_id integer
 ---@return sea.LeaderboardUser[]
 function LeaderboardsRepo:getUserLeaderboardUsers(user_id)
@@ -300,6 +312,31 @@ function LeaderboardsRepo:getLeaderboardUsersFull(leaderboard_id, limit, offset)
 		self:getLeaderboardUsers(leaderboard_id, limit, offset),
 		"user"
 	)
+end
+
+---@param lb_id integer
+---@param lb_users sea.LeaderboardUser[]
+function LeaderboardsRepo:loadLeaderboardUsersHistory(lb_id, lb_users)
+	---@type integer[]
+	local user_ids = {}
+
+	---@type {[integer]: sea.LeaderboardUser}
+	local lb_user_by_user_id = {}
+
+	for _, lb_user in ipairs(lb_users) do
+		table.insert(user_ids, lb_user.user_id)
+		lb_user_by_user_id[lb_user.user_id] = lb_user
+	end
+
+	---@type sea.LeaderboardUserHistory[]
+	local hs = self.models.leaderboard_user_histories:select({
+		leaderboard_id = assert(lb_id),
+		user_id__in = user_ids,
+	})
+
+	for _, h in ipairs(hs) do
+		lb_user_by_user_id[h.user_id].history = h
+	end
 end
 
 ---@param lb_user sea.LeaderboardUser

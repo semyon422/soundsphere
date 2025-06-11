@@ -10,6 +10,7 @@ local erfunc = require("libchart.erfunc")
 ---@field total_accuracy number
 ---@field rank integer
 ---@field updated_at integer
+---@field history sea.LeaderboardUserHistory?
 local LeaderboardUser = class()
 
 ---@return number

@@ -199,6 +199,21 @@ function cmds.activity_graph()
 	end
 end
 
+function cmds.update_rank_history()
+	app.app_db.db:query("BEGIN")
+	app.domain.leaderboards:updateHistories(os.time())
+	app.app_db.db:query("COMMIT")
+end
+
+function cmds.compute_rank_history(id)
+	id = assert(tonumber(id))
+	local lb = assert(app.domain.leaderboards:getLeaderboard(id))
+
+	app.app_db.db:query("BEGIN")
+	app.domain.leaderboards:computeHistories(os.time(), lb)
+	app.app_db.db:query("COMMIT")
+end
+
 function cmds.ranks()
 	app.app_db.db:query([[
 		UPDATE leaderboard_users

@@ -147,6 +147,7 @@
 							<th></th>
 							<th></th>
 							<th></th>
+							<th></th>
 							<th><%= RatingCalc:postfix(leaderboard.rating_calc):upper() %></th>
 							<th>Accuracy</th>
 							<th>Plays</th>
@@ -155,7 +156,13 @@
 							<% for _, leaderboard_user in ipairs(leaderboard_users) do %>
 								<%
 									local user = leaderboard_user.user
+									local history = leaderboard_user.history
 								 	local rank_change = 0
+								 	local rating_change = 0
+									if history then
+										rank_change = -history:getRankChange()
+										rating_change = history:getRatingChange()
+									end
 								%>
 								<tr class="has-text">
 									<td>#<%= leaderboard_user.rank %></td>
@@ -172,12 +179,27 @@
 									<% else %>
 										<td></td>
 									<% end %>
+
 									<td class="ranking-table__flag-cell">
 										<div class="fi-<%= user.country_code %>"></div>
 									</td>
 									<td align="left" class="ranking-table__main-cell">
 										<%- Username(leaderboard_user.user, ("/users/%i?lb=%i"):format(user.id, leaderboard.id)) %>
 									</td>
+									<% if rating_change > 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-success">
+											<i class="fa fa-solid fa-arrow-up"></i>
+											<%= format.float4(rating_change) %>
+										</td>
+									<% elseif rating_change < 0 then %>
+										<td class="ranking-table__rank-change-cell has-text-danger">
+											<i class="fa fa-solid fa-arrow-down"></i>
+											<%= format.float4(math.abs(rating_change)) %>
+										</td>
+									<% else %>
+										<td></td>
+									<% end %>
+
 									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>

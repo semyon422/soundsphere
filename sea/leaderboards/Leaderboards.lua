@@ -3,6 +3,7 @@ local table_util = require("table_util")
 local LeaderboardsAccess = require("sea.leaderboards.access.LeaderboardsAccess")
 local Leaderboard = require("sea.leaderboards.Leaderboard")
 local LeaderboardUser = require("sea.leaderboards.LeaderboardUser")
+local LeaderboardUserHistory = require("sea.leaderboards.LeaderboardUserHistory")
 local LeaderboardDifftable = require("sea.leaderboards.LeaderboardDifftable")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = require("sea.leaderboards.TotalRating")
@@ -68,6 +69,12 @@ function Leaderboards:getLeaderboardUsersFull(lb_id, limit, offset)
 	return self.leaderboards_repo:getLeaderboardUsersFull(lb_id, limit, offset)
 end
 
+---@param lb_id integer
+---@param lb_users sea.LeaderboardUser[]
+function Leaderboards:loadLeaderboardUsersHistory(lb_id, lb_users)
+	self.leaderboards_repo:loadLeaderboardUsersHistory(lb_id, lb_users)
+end
+
 ---@param lb sea.Leaderboard
 ---@param user_id integer
 ---@return sea.Chartplayview[]
@@ -92,14 +99,16 @@ end
 ---@param lb sea.Leaderboard
 ---@param user_id integer
 ---@param no_rank boolean?
-function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank)
+---@param time integer?
+function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank, time)
 	local repo = self.leaderboards_repo
 	local total_rating = self.total_rating
-	local time = os.time()
 
-	local chartplays = repo:getBestChartplays(lb, user_id)
+	local chartplays = repo:getBestChartplays(lb, user_id, time)
 	total_rating:calc(chartplays)
 	local rating = total_rating:get(lb.rating_calc)
+
+	time = time or os.time()
 
 	local lb_user = repo:getLeaderboardUser(lb.id, user_id)
 	local found = not not lb_user
@@ -131,6 +140,34 @@ function Leaderboards:updateRanks(lb)
 	self.leaderboards_repo:updateLeaderboardUserRanks(lb)
 end
 
+---@param lb_user sea.LeaderboardUser
+---@param last_only boolean?
+function Leaderboards:updateHistory(lb_user, last_only)
+	local repo = self.leaderboards_repo
+
+	local lb_user_his = repo:getLeaderboardUserHistory(lb_user.leaderboard_id, lb_user.user_id)
+	if not lb_user_his then
+		repo:createLeaderboardUserHistory(lb_user)
+		return
+	end
+
+	local j = lb_user_his:getIndex(1, lb_user.updated_at)
+
+	local indexes = {j}
+	if not last_only then
+		indexes = {}
+		local i = lb_user_his:getIndex(0)
+		if i - 1 > j then
+			j = j + lb_user_his.size
+		end
+		for k = i, j do
+			table.insert(indexes, (k - 1) % lb_user_his.size + 1)
+		end
+	end
+
+	repo:updateLeaderboardUserHistory(lb_user, indexes)
+end
+
 ---@param time integer
 function Leaderboards:updateHistories(time)
 	local repo = self.leaderboards_repo
@@ -140,22 +177,31 @@ function Leaderboards:updateHistories(time)
 		local lb_users = repo:getLeaderboardUsers(lb.id)
 		for _, lb_user in ipairs(lb_users) do
 			lb_user.updated_at = time
-			local lb_user_his = repo:getLeaderboardUserHistory(lb.id, lb_user.user_id)
-			if not lb_user_his then
-				repo:createLeaderboardUserHistory(lb_user)
-			else
-				---@type integer[]
-				local indexes = {}
-				local i = lb_user_his:getIndex(0)
-				local j = lb_user_his:getIndex(1, time)
-				if i - 1 > j then
-					j = j + lb_user_his.size
-				end
-				for k = i, j do
-					table.insert(indexes, (k - 1) % lb_user_his.size + 1)
-				end
-				repo:updateLeaderboardUserHistory(lb_user, indexes)
-			end
+			self:updateHistory(lb_user)
+		end
+	end
+end
+
+---@param time integer
+---@param lb sea.Leaderboard
+function Leaderboards:computeHistories(time, lb)
+	local repo = self.leaderboards_repo
+	local day_dur = 3600 * 24
+
+	for i = LeaderboardUserHistory.size, 1, -1 do
+		print(i)
+		local updated_at = time - (i - 1) * day_dur
+
+		local lb_users = repo:getLeaderboardUsersAll(lb.id)
+		for _, lb_user in ipairs(lb_users) do
+			self:updateLeaderboardUser(lb, lb_user.user_id, true, updated_at)
+		end
+
+		repo:updateLeaderboardUserRanks()
+
+		lb_users = repo:getLeaderboardUsersAll(lb.id)
+		for _, lb_user in ipairs(lb_users) do
+			self:updateHistory(lb_user, true)
 		end
 	end
 end
