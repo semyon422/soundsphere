@@ -172,16 +172,14 @@ function Leaderboards:updateHistory(lb_user, last_only)
 end
 
 ---@param time integer
-function Leaderboards:updateHistories(time)
+---@param lb sea.Leaderboard
+function Leaderboards:updateHistories(time, lb)
 	local repo = self.leaderboards_repo
 
-	local lbs = repo:getLeaderboards()
-	for _, lb in ipairs(lbs) do
-		local lb_users = repo:getLeaderboardUsers(lb.id)
-		for _, lb_user in ipairs(lb_users) do
-			lb_user.updated_at = time
-			self:updateHistory(lb_user)
-		end
+	local lb_users = repo:getLeaderboardUsers(lb.id)
+	for _, lb_user in ipairs(lb_users) do
+		lb_user.updated_at = time
+		self:updateHistory(lb_user)
 	end
 end
 

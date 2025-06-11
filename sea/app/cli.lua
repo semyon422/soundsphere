@@ -199,10 +199,23 @@ function cmds.activity_graph()
 	end
 end
 
-function cmds.update_rank_history()
+function cmds.update_rank_history(id)
+	id = assert(tonumber(id))
+	local lb = assert(app.domain.leaderboards:getLeaderboard(id))
+
 	app.app_db.db:query("BEGIN")
-	app.domain.leaderboards:updateHistories(os.time())
+	app.domain.leaderboards:updateHistories(os.time(), lb)
 	app.app_db.db:query("COMMIT")
+end
+
+function cmds.update_rank_history_all()
+	local lbs = app.domain.leaderboards:getLeaderboards()
+	for _, lb in ipairs(lbs) do
+		print(lb.id)
+		app.app_db.db:query("BEGIN")
+		app.domain.leaderboards:updateHistories(os.time(), lb)
+		app.app_db.db:query("COMMIT")
+	end
 end
 
 function cmds.compute_rank_history(id)

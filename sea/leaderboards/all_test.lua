@@ -942,7 +942,7 @@ function test.update_histories(t)
 		updated_at = 1,
 	})
 
-	ctx.leaderboards:updateHistories(0)
+	ctx.leaderboards:updateHistories(0, ctx.leaderboard)
 
 	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
 	---@cast lb_user_his sea.LeaderboardUserHistory
@@ -954,7 +954,7 @@ function test.update_histories(t)
 
 	ctx.db.models.leaderboard_users:update({rank = 2})
 
-	ctx.leaderboards:updateHistories(3600 * 24)
+	ctx.leaderboards:updateHistories(3600 * 24, ctx.leaderboard)
 
 	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
 	---@cast lb_user_his sea.LeaderboardUserHistory
@@ -965,9 +965,9 @@ function test.update_histories(t)
 
 	ctx.db.models.leaderboard_users:update({rank = 3})
 
-	ctx.leaderboards:updateHistories(2 * 3600 * 24)
-	ctx.leaderboards:updateHistories(2 * 3600 * 24)
-	ctx.leaderboards:updateHistories(2 * 3600 * 24)
+	ctx.leaderboards:updateHistories(2 * 3600 * 24, ctx.leaderboard)
+	ctx.leaderboards:updateHistories(2 * 3600 * 24, ctx.leaderboard)
+	ctx.leaderboards:updateHistories(2 * 3600 * 24, ctx.leaderboard)
 
 	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
 	---@cast lb_user_his sea.LeaderboardUserHistory
@@ -979,7 +979,7 @@ function test.update_histories(t)
 
 	ctx.db.models.leaderboard_users:update({rank = 4})
 
-	ctx.leaderboards:updateHistories(10 * 3600 * 24)
+	ctx.leaderboards:updateHistories(10 * 3600 * 24, ctx.leaderboard)
 
 	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
 	---@cast lb_user_his sea.LeaderboardUserHistory
@@ -991,7 +991,7 @@ function test.update_histories(t)
 
 	ctx.db.models.leaderboard_users:update({rank = 5})
 
-	ctx.leaderboards:updateHistories(95 * 3600 * 24)
+	ctx.leaderboards:updateHistories(95 * 3600 * 24, ctx.leaderboard)
 
 	local lb_user_his = ctx.db.models.leaderboard_user_histories:find({user_id = 1})
 	---@cast lb_user_his sea.LeaderboardUserHistory
