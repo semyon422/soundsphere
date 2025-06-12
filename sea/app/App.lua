@@ -34,7 +34,7 @@ function App:new(app_config)
 	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key, app_config.recaptcha.required_score)
 
 	self.repos = Repos(self.app_db.models)
-	self.domain = Domain(self.repos)
+	self.domain = Domain(self.repos, app_config)
 	self.server_remote = ServerRemote(self.domain, self.sessions)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")

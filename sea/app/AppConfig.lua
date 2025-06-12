@@ -12,6 +12,12 @@ local AppConfig = {
 		required_score = 0.5,
 	},
 
+	osu_api = {
+		client_id = 0,
+		client_secret = "",
+		redirect_uri = "",
+	},
+
 	multiplayer = {
 		address = "*",
 		port = 9000,

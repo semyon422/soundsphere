@@ -328,6 +328,11 @@ function cmds.auth_codes()
 	end
 end
 
+function cmds.osu_token()
+	assert(domain.osu_api:oauth("client_credentials"))
+	print(stbl.encode(domain.osu_api.token_data))
+end
+
 function cmds.delete(id)
 	id = assert(tonumber(id))
 	compute_tasks:deleteProcess(id)
