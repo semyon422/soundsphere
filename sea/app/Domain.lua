@@ -23,8 +23,6 @@ local ChartsComputer = require("sea.compute.ChartsComputer")
 
 local UserActivityGraph = require("sea.activity.UserActivityGraph")
 
-local OsuApi = require("sea.osu.OsuApi")
-
 ---@class sea.Domain
 ---@operator call: sea.Domain
 local Domain = class()
@@ -58,8 +56,6 @@ function Domain:new(repos, app_config)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
-
-	self.osu_api = OsuApi(app_config.osu_api)
 end
 
 return Domain

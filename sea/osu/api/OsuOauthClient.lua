@@ -2,27 +2,27 @@ local class = require("class")
 local http_util = require("web.http.util")
 local json = require("web.json")
 
----@class sea.OsuApiConfig
+---@class sea.OsuOauthClientConfig
 ---@field client_id integer
 ---@field client_secret string
 ---@field redirect_uri string
 
----@class sea.OsuOauthResponse
+---@class sea.OsuTokenData
 ---@field token_type "Bearer"
 ---@field expires_in integer
 ---@field access_token string
 ---@field refresh_token string?
 
----@class sea.OsuApi
----@operator call: sea.OsuApi
-local OsuApi = class()
+---@class sea.OsuOauthClient
+---@operator call: sea.OsuOauthClient
+local OsuOauthClient = class()
 
----@param config sea.OsuApiConfig
-function OsuApi:new(config)
+---@param config sea.OsuOauthClientConfig
+function OsuOauthClient:new(config)
 	self.config = config
 end
 
-function OsuApi:getAuthorizeUrl()
+function OsuOauthClient:getAuthorizeUrl()
 	local config = self.config
 
 	return "https://osu.ppy.sh/oauth/authorize?" .. http_util.encode_query_string({
@@ -36,9 +36,9 @@ end
 
 ---@param grant_type "authorization_code"|"refresh_token"|"client_credentials"
 ---@param data string?
----@return boolean?
+---@return sea.OsuTokenData?
 ---@return string?
-function OsuApi:oauth(grant_type, data)
+function OsuOauthClient:getToken(grant_type, data)
 	local config = self.config
 
 	local client = http_util.client()
@@ -87,48 +87,10 @@ function OsuApi:oauth(grant_type, data)
 		return nil, "receive: " .. err
 	end
 
-	---@type sea.OsuOauthResponse
-	self.token_data = json.decode(body)
+	---@type sea.OsuTokenData
+	local token_data = json.decode(body)
 
-	return true
+	return token_data
 end
 
----@param route string
----@param params table?
----@return table?
----@return string?
-function OsuApi:get(route, params)
-	local token_data = assert(self.token_data, "missing token data")
-
-	local url = "https://osu.ppy.sh/api/v2" .. route
-
-	if params then
-		url = url .. "?" .. http_util.encode_query_string(params)
-	end
-
-	local client = http_util.client()
-	local req, res = client:connect(url)
-
-	req.headers:set("Authorization", "Bearer " .. token_data.access_token)
-	req.headers:set("Accept", "application/json")
-
-	local ok, err = req:send_headers()
-
-	if not ok then
-		return nil, "send: " .. err
-	end
-
-	local body, err = res:receive("*a")
-
-	if not body then
-		return nil, "receive: " .. err
-	end
-
-	if res.status ~= 200 then
-		return nil, "status ~= 200: " .. body
-	end
-
-	return json.decode(body)
-end
-
-return OsuApi
+return OsuOauthClient

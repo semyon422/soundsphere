@@ -1,6 +1,6 @@
 local Enum = require("rdb.Enum")
 
----@enum sea.BeatmapStatus
+---@enum (key) sea.BeatmapStatus
 local BeatmapStatus = {
 	loved = 4,
 	qualified = 3,
