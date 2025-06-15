@@ -357,24 +357,26 @@
 							<canvas id="rank_graph"></canvas>
 						</div>
 						<script>
-							const rankHistory = <%- json.encode(leaderboard_user_history:getRanks()) %>
-
-							const labels = []
-							const today = new Date()
-							for (let i = 0; i < 90; i++) {
-								const date = new Date(today)
-								date.setDate(date.getDate() - i)
-								labels.unshift(date.toISOString().split('T')[0])
-							}
-
-							const chronologicalRanks = [...rankHistory].reverse()
-
-							const color = window.getComputedStyle(document.body).getPropertyValue('--bulma-primary')
-							console.log(color)
-
 							function loadRankHistoryChart() {
+								const rankHistory = <%- json.encode(leaderboard_user_history:getRanks()) %>
+
+								const labels = []
+								const today = new Date()
+								for (let i = 0; i < 90; i++) {
+									const date = new Date(today)
+									date.setDate(date.getDate() - i)
+									labels.unshift(date.toISOString().split('T')[0])
+								}
+
+								const chronologicalRanks = [...rankHistory].reverse()
+
+								const color = window.getComputedStyle(document.body).getPropertyValue('--bulma-primary')
+
 								const ctx = document.getElementById('rank_graph').getContext('2d')
-								const chart = new Chart(ctx, {
+								if (window.rankHistoryChart) {
+									window.rankHistoryChart.destroy()
+								}
+								window.rankHistoryChart = new Chart(ctx, {
 									type: 'line',
 									data: {
 										labels: labels,
