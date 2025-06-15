@@ -251,4 +251,81 @@ function UsersRepo:deleteAuthCode(id)
 	return self.models.auth_codes:delete({id = assert(id)})[1]
 end
 
+--------------------------------------------------------------------------------
+
+---@param reset_before boolean?
+function UsersRepo:updateChartmetasCount(reset_before)
+	if reset_before then
+		self.models._orm.db:query([[
+			UPDATE users
+			SET chartmetas_count = 0
+		]])
+	end
+	self.models._orm.db:query([[
+		UPDATE users
+		SET chartmetas_count = count
+		FROM (
+			SELECT
+				COUNT(*) OVER (PARTITION BY user_id) AS count,
+				user_id
+			FROM chartplays
+			INNER JOIN chartmetas ON
+				chartplays.hash = chartmetas.hash AND
+				chartplays.`index` = chartmetas.`index`
+			GROUP BY chartmetas.id
+		) AS chartplays
+		WHERE users.id == user_id
+	]])
+end
+
+---@param reset_before boolean?
+function UsersRepo:updateChartplaysCount(reset_before)
+	if reset_before then
+		self.models._orm.db:query([[
+			UPDATE users
+			SET chartplays_count = 0
+		]])
+	end
+	self.models._orm.db:query([[
+		UPDATE users
+		SET chartplays_count = chartplays.count
+		FROM (
+			SELECT
+				COUNT(*) AS count,
+				user_id
+			FROM chartplays
+			GROUP BY user_id
+		) AS chartplays
+		WHERE chartplays.user_id = users.id
+	]])
+end
+
+---@param reset_before boolean?
+function UsersRepo:updatePlayTime(reset_before)
+	if reset_before then
+		self.models._orm.db:query([[
+			UPDATE users
+			SET play_time = 0
+		]])
+	end
+	self.models._orm.db:query([[
+		UPDATE users
+		SET play_time = duration
+		FROM (
+			SELECT
+				SUM(1000.0 * chartdiffs.duration / chartdiffs.rate) AS duration,
+				user_id
+			FROM chartplays
+			INNER JOIN chartdiffs ON
+				chartplays.hash = chartdiffs.hash AND
+				chartplays.`index` = chartdiffs.`index` AND
+				chartplays.modifiers = chartdiffs.modifiers AND
+				chartplays.rate = chartdiffs.rate AND
+				chartplays.mode = chartdiffs.mode
+			GROUP BY user_id
+		) AS chartplays
+		WHERE users.id == user_id
+	]])
+end
+
 return UsersRepo

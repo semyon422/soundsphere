@@ -228,83 +228,19 @@ function cmds.compute_rank_history(id)
 end
 
 function cmds.ranks()
-	app.app_db.db:query([[
-		UPDATE leaderboard_users
-		SET rank = lb_users.rank
-		FROM (
-			SELECT
-			ROW_NUMBER() OVER (PARTITION BY leaderboard_id ORDER BY total_rating DESC) AS rank,
-			id
-			FROM leaderboard_users
-		) AS lb_users
-		WHERE leaderboard_users.id = lb_users.id
-	]])
+	app.repos.leaderboards_repo:updateLeaderboardUserRanks()
 end
 
 function cmds.chartplays_count()
-	-- app.app_db.db:query([[
-	-- 	UPDATE users
-	-- 	SET chartplays_count = 0
-	-- ]])
-	app.app_db.db:query([[
-		UPDATE users
-		SET chartplays_count = chartplays.count
-		FROM (
-			SELECT
-				COUNT(*) AS count,
-				user_id
-			FROM chartplays
-			GROUP BY user_id
-		) AS chartplays
-		WHERE chartplays.user_id = users.id
-	]])
+	app.repos.users_repo:updateChartplaysCount()
 end
 
 function cmds.play_time()
-	-- app.app_db.db:query([[
-	-- 	UPDATE users
-	-- 	SET play_time = 0
-	-- ]])
-	app.app_db.db:query([[
-		UPDATE users
-		SET play_time = duration
-		FROM (
-			SELECT
-				SUM(1000.0 * chartdiffs.duration / chartdiffs.rate) AS duration,
-				user_id
-			FROM chartplays
-			INNER JOIN chartdiffs ON
-				chartplays.hash = chartdiffs.hash AND
-				chartplays.`index` = chartdiffs.`index` AND
-				chartplays.modifiers = chartdiffs.modifiers AND
-				chartplays.rate = chartdiffs.rate AND
-				chartplays.mode = chartdiffs.mode
-			GROUP BY user_id
-		) AS chartplays
-		WHERE users.id == user_id
-	]])
+	app.repos.users_repo:updatePlayTime()
 end
 
 function cmds.chartmetas_count()
-	-- app.app_db.db:query([[
-	-- 	UPDATE users
-	-- 	SET chartmetas_count = 0
-	-- ]])
-	app.app_db.db:query([[
-		UPDATE users
-		SET chartmetas_count = count
-		FROM (
-			SELECT
-				COUNT(*) OVER (PARTITION BY user_id) AS count,
-				user_id
-			FROM chartplays
-			INNER JOIN chartmetas ON
-				chartplays.hash = chartmetas.hash AND
-				chartplays.`index` = chartmetas.`index`
-			GROUP BY chartmetas.id
-		) AS chartplays
-		WHERE users.id == user_id
-	]])
+	app.repos.users_repo:updateChartmetasCount()
 end
 
 function cmds.auth_codes()
