@@ -22,18 +22,41 @@ function LeaderboardUserHistory:getIndex(index, time)
 end
 
 ---@param index integer
+---@return integer
 function LeaderboardUserHistory:getRank(index)
 	return self.rank[self:getIndex(index)]
 end
 
 ---@param index integer
+---@return number
 function LeaderboardUserHistory:getRating(index)
 	return self.total_rating[self:getIndex(index)]
 end
 
 ---@param index integer
+---@return number
 function LeaderboardUserHistory:getAccuracy(index)
 	return self.total_accuracy[self:getIndex(index)]
+end
+
+---@return integer[]
+function LeaderboardUserHistory:getRanks()
+	---@type integer[]
+	local ranks = {}
+	for i = 1, self.size do
+		ranks[i] = self:getRank(i)
+	end
+	return ranks
+end
+
+---@return number[]
+function LeaderboardUserHistory:getRatings()
+	---@type integer[]
+	local ratings = {}
+	for i = 1, self.size do
+		ratings[i] = self:getRating(i)
+	end
+	return ratings
 end
 
 return LeaderboardUserHistory

@@ -90,6 +90,7 @@ function UserResource:getUser(req, res, ctx)
 	local leaderboard_id = tonumber(ctx.query.lb) or 1
 	ctx.leaderboard = assert(self.leaderboards:getLeaderboard(leaderboard_id))
 	ctx.leaderboard_user = self.leaderboards:getLeaderboardUser(leaderboard_id, user.id)
+	ctx.leaderboard_user_history = self.leaderboards:getLeaderboardUserHistory(leaderboard_id, user.id)
 
 	local page = UserPage(self.users.users_access, ctx.session_user, user, self.leaderboards, self.dans)
 

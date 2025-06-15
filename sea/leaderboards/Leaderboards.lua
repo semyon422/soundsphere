@@ -70,6 +70,13 @@ function Leaderboards:getLeaderboardUsersFull(lb_id, limit, offset)
 end
 
 ---@param lb_id integer
+---@param user_id integer
+---@return sea.LeaderboardUserHistory?
+function Leaderboards:getLeaderboardUserHistory(lb_id, user_id)
+	return self.leaderboards_repo:getLeaderboardUserHistory(lb_id, user_id)
+end
+
+---@param lb_id integer
 ---@param lb_users sea.LeaderboardUser[]
 function Leaderboards:loadLeaderboardUsersHistory(lb_id, lb_users)
 	self.leaderboards_repo:loadLeaderboardUsersHistory(lb_id, lb_users)

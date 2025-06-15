@@ -1,4 +1,5 @@
 <% local util = require("web.http.util") %>
+<% local json = require("web.json") %>
 <% local format = require("sea.shared.format") %>
 <% local Username = require("sea.shared.http.components.Username") %>
 
@@ -351,6 +352,122 @@
 							</nav>
 						</div>
 					</div>
+					<% if leaderboard_user_history then %>
+						<div class="block border-box" style="height: 160px;">
+							<canvas id="rank_graph"></canvas>
+						</div>
+						<script>
+							const rankHistory = <%- json.encode(leaderboard_user_history:getRanks()) %>
+
+							const labels = []
+							const today = new Date()
+							for (let i = 0; i < 90; i++) {
+								const date = new Date(today)
+								date.setDate(date.getDate() - i)
+								labels.unshift(date.toISOString().split('T')[0])
+							}
+
+							const chronologicalRanks = [...rankHistory].reverse()
+
+							const color = window.getComputedStyle(document.body).getPropertyValue('--bulma-primary')
+							console.log(color)
+
+							function loadRankHistoryChart() {
+								const ctx = document.getElementById('rank_graph').getContext('2d')
+								const chart = new Chart(ctx, {
+									type: 'line',
+									data: {
+										labels: labels,
+										datasets: [{
+											label: 'Rank',
+											data: chronologicalRanks,
+											borderColor: color,
+											tension: 0.1,
+											fill: false,
+											pointRadius: 0,
+											pointHoverRadius: 5,
+											borderWidth: 2
+										}]
+									},
+									options: {
+										responsive: true,
+										maintainAspectRatio: false,
+										animation: {
+											duration: 0
+										},
+										layout: {
+											padding: {
+												top: 5,
+												bottom: 5,
+												left: 5,
+												right: 5
+											}
+										},
+										plugins: {
+											legend: {
+												display: false // hide the legend rectangle
+											},
+											tooltip: {
+												mode: 'index',
+												intersect: false,
+												displayColors: false,
+												callbacks: {
+													label: function(context) {
+														return `Rank: ${context.parsed.y}`
+													},
+													title: function(context) {
+														return context[0].label
+													}
+												}
+											}
+										},
+										scales: {
+											y: {
+												display: false,
+												beginAtZero: false,
+												reverse: true, // 1 at the top
+												title: {
+													display: true,
+													text: 'Rank'
+												},
+												ticks: {
+													display: false
+												},
+												grid: {
+													display: false
+												}
+											},
+											x: {
+												display: false,
+												title: {
+													display: true,
+													text: 'Date'
+												},
+												ticks: {
+													display: false
+												},
+												grid: {
+													display: false
+												}
+											}
+										},
+										interaction: {
+											intersect: false,
+											mode: 'index'
+										},
+										hover: {
+											mode: 'index',
+											intersect: false
+										}
+									}
+								})
+							}
+
+							document.addEventListener("htmx:load", function() {
+								loadRankHistoryChart()
+							})
+						</script>
+					<% end %>
 					<div class="user__score-container" x-data="{limit: 5}">
 						<div class="block">
 							<div class="tabs">
