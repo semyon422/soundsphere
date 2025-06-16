@@ -1,4 +1,7 @@
 local class = require("class")
+local sql_util = require("rdb.sql_util")
+local table_util = require("table_util")
+local Difftable = require("sea.difftables.Difftable")
 
 ---@class sea.DifftablesRepo
 ---@operator call: sea.DifftablesRepo
@@ -36,6 +39,14 @@ end
 ---@return sea.Difftable
 function DifftablesRepo:updateDifftable(difftable)
 	return self.models.difftables:update(difftable, {id = assert(difftable.id)})[1]
+end
+
+---@param difftable sea.Difftable
+---@return sea.Difftable
+function DifftablesRepo:updateDifftableFull(difftable)
+	local values = sql_util.null_keys(Difftable.struct)
+	table_util.copy(difftable, values)
+	return self.models.difftables:update(values, {id = assert(difftable.id)})[1]
 end
 
 ---@param id integer

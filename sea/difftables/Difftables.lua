@@ -42,6 +42,7 @@ function Difftables:create(user, dt_values)
 	dt.name = dt_values.name
 	dt.description = dt_values.description
 	dt.symbol = dt_values.symbol
+	dt.tag = dt_values.tag
 	dt.created_at = os.time()
 
 	return self.difftables_repo:createDifftable(dt)
@@ -72,8 +73,9 @@ function Difftables:update(user, id, dt_values)
 	dt.name = dt_values.name
 	dt.description = dt_values.description
 	dt.symbol = dt_values.symbol
+	dt.tag = dt_values.tag
 
-	self.difftables_repo:updateDifftable(dt)
+	self.difftables_repo:updateDifftableFull(dt)
 
 	return dt
 end

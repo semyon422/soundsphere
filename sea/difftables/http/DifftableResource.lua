@@ -86,6 +86,10 @@ function DifftableResource:updateDifftable(req, res, ctx)
 	dt.name = body_params.name
 	dt.description = body_params.description
 	dt.symbol = body_params.symbol
+	dt.tag = body_params.tag
+	if dt.tag == "" then
+		dt.tag = nil
+	end
 
 	ctx.difftable = dt
 

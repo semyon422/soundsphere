@@ -53,6 +53,10 @@ function DifftablesResource:createDifftable(req, res, ctx)
 	dt.name = body_params.name
 	dt.symbol = body_params.symbol
 	dt.description = body_params.description
+	dt.tag = body_params.tag
+	if dt.tag == "" then
+		dt.tag = nil
+	end
 
 	ctx.difftable = dt
 

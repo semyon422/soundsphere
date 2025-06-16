@@ -8,6 +8,7 @@ local types = require("sea.shared.types")
 ---@field name string
 ---@field description string
 ---@field symbol string
+---@field tag string
 ---@field created_at integer
 local Difftable = class()
 
@@ -15,6 +16,7 @@ local validate_difftable = valid.struct({
 	name = types.name,
 	description = types.description,
 	symbol = types.name,
+	tag = valid.optional(types.name),
 })
 
 ---@return true?

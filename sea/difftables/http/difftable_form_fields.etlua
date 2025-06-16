@@ -20,3 +20,10 @@
 		<textarea class="textarea" name="description"><%= difftable.description or "" %></textarea>
 	</div>
 </div>
+
+<div class="field">
+	<label class="label">Tag (optional)</label>
+	<div class="control">
+		<input class="input" type="text" name="tag" required value="<%= difftable.tag or "" %>">
+	</div>
+</div>

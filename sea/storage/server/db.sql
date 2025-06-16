@@ -142,6 +142,7 @@ CREATE TABLE IF NOT EXISTS `difftables` (
 	`name` TEXT NOT NULL,
 	`description` TEXT NOT NULL,
 	`symbol` TEXT NOT NULL,
+	`tag` TEXT,
 	`created_at` INTEGER NOT NULL,
 	UNIQUE(`name`)
 );
