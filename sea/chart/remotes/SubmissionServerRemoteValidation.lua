@@ -58,7 +58,7 @@ function SubmissionServerRemoteValidation:getBestChartplaysForChartdiff(chartdif
 	end
 	setmetatable(chartdiff_key, ChartdiffKey)
 
-	return self:getBestChartplaysForChartdiff(chartdiff_key)
+	return self.remote:getBestChartplaysForChartdiff(chartdiff_key)
 end
 
 ---@param replay_hash string
@@ -69,7 +69,7 @@ function SubmissionServerRemoteValidation:getReplayFile(replay_hash)
 		return nil, "invalid replay hash"
 	end
 
-	return self:getReplayFile(replay_hash)
+	return self.remote:getReplayFile(replay_hash)
 end
 
 return SubmissionServerRemoteValidation
