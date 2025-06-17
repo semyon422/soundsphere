@@ -41,7 +41,7 @@ function SeaClient:new(client, client_remote)
 			_obj, val.remote = val, _obj
 		end
 
-		return _obj, select(2, ...)
+		return _obj, ...
 	end
 
 	local server_peer = WebsocketPeer({send = function() return nil, "not connected" end})
