@@ -51,7 +51,7 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 			_obj, val.remote = val, _obj
 		end
 
-		return _obj, select(2, ...)
+		return _obj, ...
 	end
 
 	self.remote_handler = RemoteHandler(self.client_remote)
