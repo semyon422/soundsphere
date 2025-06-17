@@ -37,7 +37,10 @@ function MultiplayerApp:new()
 
 	local function remote_handler_transform(_, th, peer, obj, ...)
 		---@type sea.IMultiplayerServerRemote
-		local _obj = setmetatable({}, {__index = obj})
+		local __obj = obj.remote
+
+		---@type sea.IMultiplayerServerRemote
+		local _obj = setmetatable({}, {__index = __obj or obj})
 
 		---@type sea.Peer
 		local p = ...
@@ -45,6 +48,11 @@ function MultiplayerApp:new()
 		_obj.session = p.session
 		_obj.remote = p.remote
 		_obj.remote_no_return = p.remote_no_return
+
+		if __obj then
+			local val = setmetatable({}, getmetatable(obj))
+			_obj, val.remote = val, _obj
+		end
 
 		return _obj, select(2, ...)
 	end

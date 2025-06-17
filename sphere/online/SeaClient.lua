@@ -29,9 +29,18 @@ function SeaClient:new(client, client_remote)
 	self.remote_handler = RemoteHandler(client_remote)
 
 	function self.remote_handler:transform(th, peer, obj, ...)
-		local _obj = setmetatable({}, {__index = obj})
+		---@type sea.IClientRemote
+		local __obj = obj.remote
+
+		---@type sea.IClientRemote
+		local _obj = setmetatable({}, {__index = __obj or obj})
 		_obj.remote = ServerRemoteValidation(Remote(th, peer)) --[[@as sea.ServerRemote]]
-		---@cast _obj +sea.IClientRemote
+
+		if __obj then
+			local val = setmetatable({}, getmetatable(obj))
+			_obj, val.remote = val, _obj
+		end
+
 		return _obj, ...
 	end
 
@@ -45,7 +54,7 @@ function SeaClient:new(client, client_remote)
 
 	local remote = Remote(self.task_handler, self.server_peer)
 	---@cast remote -icc.Remote, +sea.ServerRemote
-	self.remote = remote
+	self.remote = ServerRemoteValidation(remote)
 
 	function self.protocol:text(payload, fin)
 		if not fin then return end

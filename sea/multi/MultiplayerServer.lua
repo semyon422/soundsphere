@@ -37,7 +37,7 @@ end
 ---@param peer sea.Peer
 function MultiplayerServer:connected(peer)
 	self:pushUsers()
-	peer.remote:setRooms(self:getRooms())
+	peer.remote_no_return:setRooms(self:getRooms())
 end
 
 ---@param peer sea.Peer

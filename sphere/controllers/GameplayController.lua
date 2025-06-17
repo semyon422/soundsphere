@@ -369,7 +369,7 @@ function GameplayController:saveScore()
 	)
 
 	local chartdiff = assert(computeContext.chartdiff)
-	local chartdiff_copy = table_util.deepcopy(chartdiff)
+	local chartdiff_copy = setmetatable(table_util.deepcopy(chartdiff), getmetatable(chartdiff))
 
 	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff, created_at)
 
@@ -388,7 +388,7 @@ function GameplayController:saveScore()
 	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
-	local chartplay_copy = table_util.deepcopy(chartplay)
+	local chartplay_copy = setmetatable(table_util.deepcopy(chartplay), Chartplay)
 
 	chartplay.user_id = 1
 	chartplay.compute_state = "valid"

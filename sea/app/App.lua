@@ -12,6 +12,7 @@ local Router = require("web.framework.router.Router")
 local Sessions = require("web.framework.Sessions")
 local Recaptcha = require("web.framework.Recaptcha")
 local etlua_util = require("web.framework.page.etlua_util")
+local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 
 ---@class sea.RequestContext
 ---@field [any] any
@@ -35,7 +36,7 @@ function App:new(app_config)
 
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos, app_config)
-	self.server_remote = ServerRemote(self.domain, self.sessions)
+	self.server_remote = ServerRemoteValidation(ServerRemote(self.domain, self.sessions))
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)
