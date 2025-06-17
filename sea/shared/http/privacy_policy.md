@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective [Date]
+Effective *May 29, 2025*.
 
 ### Introduction
 

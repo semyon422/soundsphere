@@ -1,6 +1,6 @@
 # Terms of Use
 
-Effective [Date]
+Effective *May 29, 2025*.
 
 Terms of Use ("Terms") govern your use of the [soundsphere game](https://soundsphere.xyz/download), [website](https://soundsphere.xyz), and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.
 
