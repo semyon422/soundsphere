@@ -518,7 +518,10 @@ function EditorController:save()
 	self.editorModel:genGraphs()
 
 	local encoder = ChartEncoder()
-	local data = encoder:encode({editorModel.chart})
+	local data = encoder:encode({{
+		chart = editorModel.chart,
+		chartmeta = editorModel.chartmeta,
+	}})
 
 	local chartview = selectModel.chartview
 	local path = chartview.location_path:gsub(".sph$", "") .. ".sph"
