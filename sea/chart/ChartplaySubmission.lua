@@ -10,12 +10,14 @@ local ChartplaySubmission = class()
 ---@param users sea.Users
 ---@param dans sea.Dans
 ---@param user_activity_graph sea.UserActivityGraph
-function ChartplaySubmission:new(chartplays, leaderboards, users, dans, user_activity_graph)
+---@param external_ranked sea.ExternalRanked
+function ChartplaySubmission:new(chartplays, leaderboards, users, dans, user_activity_graph, external_ranked)
 	self.chartplays = chartplays
 	self.leaderboards = leaderboards
 	self.users = users
 	self.dans = dans
 	self.user_activity_graph = user_activity_graph
+	self.external_ranked = external_ranked
 end
 
 ---@param user sea.User
@@ -28,10 +30,15 @@ end
 function ChartplaySubmission:submitChartplay(user, time, remote, chartplay_values, chartdiff_values)
 	local compute_data_loader = ComputeDataLoader(remote.compute_data_provider)
 
-	local chartplay, err = self.chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
-	if not chartplay then
+	local ctx, err = self.chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
+	if not ctx then
 		return nil, err
 	end
+
+	local chartplay = assert(ctx.chartplay)
+	local chartmeta = assert(ctx.chartmeta)
+
+	-- self.external_ranked:submit(chartmeta)
 
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)

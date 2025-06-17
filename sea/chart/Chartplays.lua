@@ -200,7 +200,7 @@ end
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param chartplay_values sea.Chartplay
 ---@param chartdiff_values sea.Chartdiff
----@return sea.Chartplay?
+---@return sea.ComputeContext?
 ---@return string?
 function Chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)
 	if user:isAnon() then
@@ -218,8 +218,8 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 
 	local chartplay = self:getCreateChartplay(user.id, time, chartplay_values)
 
-	local ok, err = self:processSubmit(user, time, compute_data_loader, chartplay, chartdiff_values)
-	if not ok then
+	local ctx, err = self:processSubmit(user, time, compute_data_loader, chartplay, chartdiff_values)
+	if not ctx then
 		chartplay.compute_state = "invalid"
 		chartplay.computed_at = time
 		charts_repo:updateChartplay(chartplay)
@@ -230,7 +230,7 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 	chartplay.computed_at = time
 	charts_repo:updateChartplay(chartplay)
 
-	return chartplay
+	return ctx
 end
 
 ---@param user sea.User
@@ -238,7 +238,7 @@ end
 ---@param compute_data_loader sea.ComputeDataLoader
 ---@param chartplay sea.Chartplay
 ---@param chartdiff_values sea.Chartdiff
----@return sea.Chartplay?
+---@return sea.ComputeContext?
 ---@return string?
 function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, chartdiff_values)
 	local charts_repo = self.charts_repo
@@ -254,6 +254,7 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 	end
 
 	local ctx = ComputeContext()
+	ctx.chartplay = chartplay
 
 	local chart_chartmeta, err = ctx:fromFileData(
 		chart_file_data.name,
@@ -332,7 +333,7 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 
 	charts_repo:createUpdateChartdiff(computed_chartdiff, time)
 
-	return chartplay
+	return ctx
 end
 
 return Chartplays

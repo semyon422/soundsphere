@@ -14,7 +14,17 @@ function test.all(t)
 		}
 	end
 
-	local bs = OsuBeatmaps()
+	local bs = OsuBeatmaps(api)
+end
+
+---@param t any
+function test.get_status(t)
+	local api = {}
+	---@cast api sea.OsuApi
+
+	local bs = OsuBeatmaps(api)
+
+	
 end
 
 return test

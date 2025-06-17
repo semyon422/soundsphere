@@ -23,4 +23,12 @@ function OsuBeatmaps:sync()
 	print(require("stbl").encode(res))
 end
 
+---@param hash string
+---@return sea.OsuBeatmap
+function OsuBeatmaps:getOrCreateOsuBeatmapByHash(hash)
+	-- get from db
+	-- or find in osu api
+	-- or create an unknown-state object
+end
+
 return OsuBeatmaps

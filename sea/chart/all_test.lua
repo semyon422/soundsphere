@@ -209,21 +209,21 @@ function test.submit_valid_score(t)
 	local user = User()
 	user.id = 1
 
-	local chartplay, err = ctx.chartplays:submit(user, 0, compute_data_loader, chartplay_values, chartdiff_values)
+	local c, err = ctx.chartplays:submit(user, 0, compute_data_loader, chartplay_values, chartdiff_values)
 
-	if t:assert(chartplay, err) then
-		---@cast chartplay -?
-		t:assert(chartplay.user_id)
-		t:assert(chartplay.compute_state == "valid")
+	if t:assert(c, err) then
+		---@cast c -?
+		t:assert(c.chartplay.user_id)
+		t:assert(c.chartplay.compute_state == "valid")
 	end
 
-	chartplay, err = ctx.chartplays:submit(user, 0, compute_data_loader, chartplay_values, chartdiff_values)
-	t:eq(chartplay, nil)
+	c, err = ctx.chartplays:submit(user, 0, compute_data_loader, chartplay_values, chartdiff_values)
+	t:eq(c, nil)
 	t:eq(err, "can submit: rate limit")
 
 	local interval = ctx.chartplays.chartplays_access.submit_interval
-	chartplay, err = ctx.chartplays:submit(user, interval, compute_data_loader, chartplay_values, chartdiff_values)
-	t:assert(chartplay, err)
+	c, err = ctx.chartplays:submit(user, interval, compute_data_loader, chartplay_values, chartdiff_values)
+	t:assert(c, err)
 end
 
 return test

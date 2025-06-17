@@ -23,6 +23,9 @@ local ChartsComputer = require("sea.compute.ChartsComputer")
 
 local UserActivityGraph = require("sea.activity.UserActivityGraph")
 
+local OsuBeatmaps = require("sea.osu.OsuBeatmaps")
+local ExternalRanked = require("sea.difftables.ExternalRanked")
+
 ---@class sea.Domain
 ---@operator call: sea.Domain
 local Domain = class()
@@ -52,7 +55,17 @@ function Domain:new(repos, app_config)
 	)
 	self.dans = Dans(repos.charts_repo, repos.dan_clears_repo)
 	self.user_activity_graph = UserActivityGraph(repos.activity_repo)
-	self.chartplay_submission = ChartplaySubmission(self.chartplays, self.leaderboards, self.users, self.dans, self.user_activity_graph)
+
+	self.osu_beatmaps = OsuBeatmaps({})
+	self.external_ranked = ExternalRanked(self.osu_beatmaps, self.difftables)
+	self.chartplay_submission = ChartplaySubmission(
+		self.chartplays,
+		self.leaderboards,
+		self.users,
+		self.dans,
+		self.user_activity_graph,
+		self.external_ranked
+	)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
