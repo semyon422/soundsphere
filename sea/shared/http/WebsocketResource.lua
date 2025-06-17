@@ -23,7 +23,10 @@ WebsocketResource.routes = {
 
 local function remote_handler_transform(_, th, peer, obj, ...)
 	---@type sea.IServerRemote
-	local _obj = setmetatable({}, {__index = obj})
+	local __obj = obj.remote
+
+	---@type sea.IServerRemote
+	local _obj = setmetatable({}, {__index = __obj or obj})
 	_obj.remote = ClientRemoteValidation(Remote(th, peer)) --[[@as sea.ClientRemote]]
 
 	---@type sea.RequestContext
@@ -31,6 +34,11 @@ local function remote_handler_transform(_, th, peer, obj, ...)
 	_obj.user = ctx.session_user
 	_obj.session = ctx.session
 	_obj.ip = ctx.ip
+
+	if __obj then
+		local val = setmetatable({}, getmetatable(obj))
+		_obj, val.remote = val, _obj
+	end
 
 	return _obj, select(2, ...)
 end

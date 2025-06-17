@@ -40,10 +40,18 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 
 	local function remote_handler_transform(_, th, peer, obj, ...)
 		---@type sea.IMultiplayerClientRemote
-		local _obj = setmetatable({}, {__index = obj})
+		local __obj = obj.remote
+
+		---@type sea.IMultiplayerClientRemote
+		local _obj = setmetatable({}, {__index = __obj or obj})
 		_obj.remote = MultiplayerServerRemoteValidation(Remote(th, peer)) --[[@as sea.MultiplayerServerRemote]]
 
-		return _obj, ...
+		if __obj then
+			local val = setmetatable({}, getmetatable(obj))
+			_obj, val.remote = val, _obj
+		end
+
+		return _obj, select(2, ...)
 	end
 
 	self.remote_handler = RemoteHandler(self.client_remote)
