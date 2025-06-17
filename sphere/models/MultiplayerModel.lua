@@ -10,7 +10,6 @@ local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
 
 local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemote")
-local MultiplayerServerRemoteValidation = require("sea.multi.remotes.MultiplayerServerRemoteValidation")
 local MultiplayerClient = require("sea.multi.MultiplayerClient")
 
 ---@class sphere.MultiplayerModel
@@ -41,7 +40,7 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 	local function remote_handler_transform(_, th, peer, obj, ...)
 		---@type sea.IMultiplayerClientRemote
 		local _obj = setmetatable({}, {__index = obj})
-		_obj.remote = MultiplayerServerRemoteValidation(Remote(th, peer)) --[[@as sea.MultiplayerServerRemote]]
+		_obj.remote = Remote(th, peer) --[[@as sea.MultiplayerServerRemote]]
 
 		return _obj, ...
 	end

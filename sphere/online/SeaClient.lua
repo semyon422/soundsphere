@@ -11,8 +11,6 @@ local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
 
-local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
-
 ---@class sphere.SeaClient
 ---@operator call: sphere.SeaClient
 local SeaClient = class()
@@ -30,7 +28,7 @@ function SeaClient:new(client, client_remote)
 
 	function self.remote_handler:transform(th, peer, obj, ...)
 		local _obj = setmetatable({}, {__index = obj})
-		_obj.remote = ServerRemoteValidation(Remote(th, peer)) --[[@as sea.ServerRemote]]
+		_obj.remote = Remote(th, peer) --[[@as sea.ServerRemote]]
 		---@cast _obj +sea.IClientRemote
 		return _obj, ...
 	end

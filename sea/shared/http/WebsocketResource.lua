@@ -4,7 +4,6 @@ local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
-local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
 
 local whitelist = require("sea.app.remotes.whitelist")
 
@@ -24,7 +23,7 @@ WebsocketResource.routes = {
 local function remote_handler_transform(_, th, peer, obj, ...)
 	---@type sea.IServerRemote
 	local _obj = setmetatable({}, {__index = obj})
-	_obj.remote = ClientRemoteValidation(Remote(th, peer)) --[[@as sea.ClientRemote]]
+	_obj.remote = Remote(th, peer) --[[@as sea.ClientRemote]]
 
 	---@type sea.RequestContext
 	local ctx = ...
