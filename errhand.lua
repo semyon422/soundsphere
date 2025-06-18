@@ -3,6 +3,7 @@ local utf8validate = require("utf8validate")
 local just = require("just")
 local imgui = require("imgui")
 local typecheck = require("typecheck")
+local version = require("version")
 local errhand = love.errhand
 
 local message = ""
@@ -49,6 +50,13 @@ local function draw()
 		error(message .. "\n" .. trace)
 	end
 	just.row()
+
+	just.indent(8)
+	just.text("Commit: " .. version.commit)
+	just.indent(8)
+	just.text("Date: " .. version.date)
+
+	just.next(0, 10)
 
 	imgui.Container("error container", w, h - (just.height - h0), _h / 3, _h, scrollY)
 	just.indent(10)
