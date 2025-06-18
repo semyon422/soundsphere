@@ -14,7 +14,10 @@ function JudgementView:load()
 	self.scoreEngine = self.game.rhythmModel.scoreEngine
 
 	local judges_source = self.scoreEngine.judgesSource
-	assert(judges_source)
+	if not judges_source then
+		return
+	end
+
 	self.totalJudges = #judges_source:getJudges()
 	---@cast judges_source +sphere.ScoreSystem, -sphere.IJudgesSource
 	self.judgesSource = judges_source
