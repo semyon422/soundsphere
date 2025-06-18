@@ -35,6 +35,7 @@ function ScoreEngine:new()
 	self.events = {}
 	self.scores = {}
 	self.sequence = {}
+	self.scoreSystemsByName = {}
 end
 
 function ScoreEngine:load()
