@@ -11,6 +11,7 @@ users_insecure.metatable = UserInsecure
 users_insecure.types = {
 	activity_timezone = Timezone,
 	is_banned = "boolean",
+	is_restricted_info = "boolean",
 	enable_gradient = "boolean",
 }
 

@@ -7,6 +7,7 @@
 ---@field latest_score_submitted_at integer
 ---@field created_at integer
 ---@field is_banned boolean
+---@field is_restricted_info boolean
 ---@field description string
 ---@field scores_count integer
 ---@field notecharts_count integer
@@ -26,6 +27,7 @@ local users = {}
 
 users.types = {
 	is_banned = "boolean",
+	is_restricted_info = "boolean",
 }
 
 users.relations = {

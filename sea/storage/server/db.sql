@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`activity_timezone` INTEGER NOT NULL,
 	`created_at` INTEGER NOT NULL,
 	`is_banned` INTEGER NOT NULL,
+	`is_restricted_info` INTEGER NOT NULL,
 	`chartplays_count` INTEGER NOT NULL,
 	`chartmetas_count` INTEGER NOT NULL,
 	`chartdiffs_count` INTEGER NOT NULL,

@@ -134,6 +134,7 @@ function ServerDatabaseMigrator:migrateUsers()
 		user.latest_activity = _user.latest_activity
 		user.created_at = _user.created_at
 		user.is_banned = _user.is_banned
+		user.is_restricted_info = _user.is_restricted_info
 		user.description = _user.description
 		user.chartplays_count = _user.scores_count -- recalculate later
 		user.chartmetas_count = _user.notecharts_count -- recalculate later

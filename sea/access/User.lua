@@ -10,6 +10,7 @@ local Timezone = require("sea.activity.Timezone")
 ---@field activity_timezone sea.Timezone
 ---@field created_at integer
 ---@field is_banned boolean
+---@field is_restricted_info boolean
 ---@field description string
 ---@field chartplays_count integer
 ---@field chartmetas_count integer
@@ -33,6 +34,7 @@ function User:new()
 	self.activity_timezone = Timezone()
 	self.description = ""
 	self.is_banned = false
+	self.is_restricted_info = false
 	self.chartplays_count = 0
 	self.chartmetas_count = 0
 	self.chartdiffs_count = 0

@@ -92,6 +92,7 @@ CREATE TABLE `users` (
 	`latest_score_submitted_at` INTEGER NOT NULL DEFAULT 0,
 	`created_at` INTEGER NOT NULL DEFAULT 0,
 	`is_banned` INTEGER NOT NULL DEFAULT 0,
+	`is_restricted_info` INTEGER NOT NULL DEFAULT 0,
 	`description` TEXT NOT NULL DEFAULT '',
 	`scores_count` INTEGER NOT NULL DEFAULT 0,
 	`notecharts_count` INTEGER NOT NULL DEFAULT 0,
