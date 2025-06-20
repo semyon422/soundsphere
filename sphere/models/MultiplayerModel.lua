@@ -38,24 +38,7 @@ function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel,
 	self.client = MultiplayerClient({}, replayBase, self)
 	self.client_remote = MultiplayerClientRemote(self.client)
 
-	local function remote_handler_transform(_, th, peer, obj, ...)
-		---@type sea.IMultiplayerClientRemote
-		local __obj = obj.remote
-
-		---@type sea.IMultiplayerClientRemote
-		local _obj = setmetatable({}, {__index = __obj or obj})
-		_obj.remote = MultiplayerServerRemoteValidation(Remote(th, peer)) --[[@as sea.MultiplayerServerRemote]]
-
-		if __obj then
-			local val = setmetatable({}, getmetatable(obj))
-			_obj, val.remote = val, _obj
-		end
-
-		return _obj, ...
-	end
-
 	self.remote_handler = RemoteHandler(self.client_remote)
-	self.remote_handler.transform = remote_handler_transform
 
 	self.task_handler = TaskHandler(self.remote_handler)
 	self.timeout = 60
@@ -64,15 +47,7 @@ end
 ---@param icc_peer icc.IPeer
 ---@param msg icc.Message
 function MultiplayerModel:handle_msg(icc_peer, msg)
-	local task_handler = self.task_handler
-
-	if msg.ret then
-		task_handler:handleReturn(msg)
-	else
-		task_handler:handleCall(icc_peer, msg)
-	end
-
-	task_handler:update()
+	return self.task_handler:handle(icc_peer, {remote = remote}, msg)
 end
 
 ---@param peer icc.IPeer
@@ -158,6 +133,7 @@ function MultiplayerModel:peerconnected(peer_id, icc_peer)
 	self.status = "connected"
 
 	local server_remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerServerRemote]]
+	server_remote = MultiplayerServerRemoteValidation(server_remote)
 	self.remote = server_remote
 	self.client.server_remote = server_remote
 

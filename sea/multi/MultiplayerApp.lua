@@ -35,30 +35,7 @@ function MultiplayerApp:new()
 	self.peers = Peers()
 	self.server = MultiplayerServer(self.multiplayer_repo, self.peers)
 
-	local function remote_handler_transform(_, th, peer, obj, ...)
-		---@type sea.IMultiplayerServerRemote
-		local __obj = obj.remote
-
-		---@type sea.IMultiplayerServerRemote
-		local _obj = setmetatable({}, {__index = __obj or obj})
-
-		---@type sea.Peer
-		local p = ...
-		_obj.user = p.user
-		_obj.session = p.session
-		_obj.remote = p.remote
-		_obj.remote_no_return = p.remote_no_return
-
-		if __obj then
-			local val = setmetatable({}, getmetatable(obj))
-			_obj, val.remote = val, _obj
-		end
-
-		return _obj, select(2, ...)
-	end
-
 	self.remote_handler = RemoteHandler(MultiplayerServerRemote(self.server), whitelist)
-	self.remote_handler.transform = remote_handler_transform
 
 	self.task_handler = TaskHandler(self.remote_handler)
 	self.task_handler.timeout = 60
@@ -70,17 +47,11 @@ end
 function MultiplayerApp:handle_msg(peer_id, icc_peer, msg)
 	local peers = self.peers
 	local peer = peers:get(peer_id)
-
-	local task_handler = self.task_handler
-
-	if msg.ret then
-		task_handler:handleReturn(msg)
-	else
-		msg:insert(peer, 3)
-		task_handler:handleCall(icc_peer, msg)
+	if not peer then
+		return
 	end
 
-	task_handler:update()
+	self.task_handler:handle(icc_peer, peer, msg)
 end
 
 ---@param peer_id sea.PeerId

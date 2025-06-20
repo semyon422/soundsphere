@@ -18,11 +18,11 @@ end
 
 ---@param user_id integer
 function RoomServerRemoteValidation:kickUser(user_id)
-	self.remote:kickLocalUser(user_id)
+	self.remote:kickUser(user_id)
 end
 
 function RoomServerRemoteValidation:startMatch()
-	self.remote:startLocalMatch()
+	self.remote:startMatch()
 end
 
 function RoomServerRemoteValidation:stopMatch()

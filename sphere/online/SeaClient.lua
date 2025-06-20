@@ -28,22 +28,6 @@ function SeaClient:new(client, client_remote)
 	self.protocol = Subprotocol()
 	self.remote_handler = RemoteHandler(client_remote)
 
-	function self.remote_handler:transform(th, peer, obj, ...)
-		---@type sea.IClientRemote
-		local __obj = obj.remote
-
-		---@type sea.IClientRemote
-		local _obj = setmetatable({}, {__index = __obj or obj})
-		_obj.remote = ServerRemoteValidation(Remote(th, peer)) --[[@as sea.ServerRemote]]
-
-		if __obj then
-			local val = setmetatable({}, getmetatable(obj))
-			_obj, val.remote = val, _obj
-		end
-
-		return _obj, ...
-	end
-
 	local server_peer = WebsocketPeer({send = function() return nil, "not connected" end})
 	self.server_peer = server_peer
 
@@ -52,9 +36,11 @@ function SeaClient:new(client, client_remote)
 
 	task_handler.timeout = 60
 
-	local remote = Remote(self.task_handler, self.server_peer)
-	---@cast remote -icc.Remote, +sea.ServerRemote
-	self.remote = ServerRemoteValidation(remote)
+	local remote = Remote(self.task_handler, self.server_peer) --[[@as sea.ServerRemote]]
+	remote = ServerRemoteValidation(remote)
+	self.remote = remote
+
+	local remote_context = {remote = remote}
 
 	function self.protocol:text(payload, fin)
 		if not fin then return end
@@ -62,13 +48,7 @@ function SeaClient:new(client, client_remote)
 		local msg = server_peer:decode(payload)
 		if not msg then return end
 
-		if msg.ret then
-			task_handler:handleReturn(msg)
-		else
-			task_handler:handleCall(server_peer, msg)
-		end
-
-		task_handler:update()
+		task_handler:handle(server_peer, remote_context, msg)
 	end
 
 	self.connected = false

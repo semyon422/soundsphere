@@ -21,33 +21,10 @@ WebsocketResource.routes = {
 	}},
 }
 
-local function remote_handler_transform(_, th, peer, obj, ...)
-	---@type sea.IServerRemote
-	local __obj = obj.remote
-
-	---@type sea.IServerRemote
-	local _obj = setmetatable({}, {__index = __obj or obj})
-	_obj.remote = ClientRemoteValidation(Remote(th, peer)) --[[@as sea.ClientRemote]]
-
-	---@type sea.RequestContext
-	local ctx = ...
-	_obj.user = ctx.session_user
-	_obj.session = ctx.session
-	_obj.ip = ctx.ip
-
-	if __obj then
-		local val = setmetatable({}, getmetatable(obj))
-		_obj, val.remote = val, _obj
-	end
-
-	return _obj, select(2, ...)
-end
-
 ---@param server_handler sea.ServerRemote
 ---@param views web.Views
 function WebsocketResource:new(server_handler, views)
 	self.remote_handler = RemoteHandler(server_handler, whitelist)
-	self.remote_handler.transform = remote_handler_transform
 	self.views = views
 end
 
@@ -62,16 +39,12 @@ function WebsocketResource:server(req, res, ctx)
 	ws.max_payload_len = 1e7
 	task_handler.timeout = 60
 
-	---@param msg icc.Message
-	local function handle_msg(msg)
-		if msg.ret then
-			task_handler:handleReturn(msg)
-		else
-			msg:insert(ctx, 3)
-			task_handler:handleCall(peer, msg)
-		end
-		task_handler:update()
-	end
+	local remote_ctx = {
+		remote = ClientRemoteValidation(Remote(task_handler, peer)),
+		user = ctx.session_user,
+		session = ctx.session,
+		ip = ctx.ip,
+	}
 
 	function ws.protocol:text(payload, fin)
 		if not fin then return end
@@ -79,7 +52,7 @@ function WebsocketResource:server(req, res, ctx)
 		local msg = peer:decode(payload)
 		if not msg then return end
 
-		local ok, err = xpcall(handle_msg, debug.traceback, msg)
+		local ok, err = xpcall(task_handler.handle, debug.traceback, task_handler, peer, remote_ctx, msg)
 		if not ok then
 			print("icc error ", err)
 		end
