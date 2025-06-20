@@ -1,4 +1,7 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
+local Room = require("sea.multi.Room")
 local MultiplayerUserServerRemoteValidation = require("sea.multi.remotes.MultiplayerUserServerRemoteValidation")
 local RoomServerRemoteValidation = require("sea.multi.remotes.RoomServerRemoteValidation")
 
@@ -46,6 +49,7 @@ end
 ---@param user_name string
 ---@return integer
 function MultiplayerServerRemoteValidation:loginOffline(user_name)
+	assert(type(user_name) == "string")
 	return self.remote:loginOffline(user_name)
 end
 
@@ -53,6 +57,9 @@ end
 ---@return integer?
 ---@return string?
 function MultiplayerServerRemoteValidation:createRoom(room_values)
+	assert(valid.format(Room.validate(room_values)))
+	setmetatable(room_values, Room)
+
 	return self.remote:createRoom(room_values)
 end
 
@@ -61,6 +68,9 @@ end
 ---@return boolean?
 ---@return string?
 function MultiplayerServerRemoteValidation:joinRoom(room_id, password)
+	assert(types.integer(room_id))
+	assert(types.string(password))
+
 	return self.remote:joinRoom(room_id, password)
 end
 

@@ -34,9 +34,6 @@ function MultiplayerUserServerRemote:setPlaying(is_playing) end
 ---@param replay_base sea.ReplayBase
 function MultiplayerUserServerRemote:setReplayBase(replay_base) end
 
----@param chartview table
-function MultiplayerUserServerRemote:setChartview(chartview) end
-
 ---@param msg string
 function MultiplayerUserServerRemote:sendMessage(msg)
 	self.mp_server:sendLocalMessage(self.user, msg)

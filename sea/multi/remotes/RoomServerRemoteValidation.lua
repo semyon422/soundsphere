@@ -1,4 +1,7 @@
 local class = require("class")
+local valid = require("valid")
+local types = require("sea.shared.types")
+local RoomUpdate = require("sea.multi.RoomUpdate")
 
 ---@class sea.RoomServerRemoteValidation: sea.RoomServerRemote
 ---@operator call: sea.RoomServerRemoteValidation
@@ -13,11 +16,13 @@ end
 ---@return boolean?
 ---@return string?
 function RoomServerRemoteValidation:updateRoom(room_values)
+	assert(valid.format(RoomUpdate.validate(room_values)))
 	return self.remote:updateRoom(room_values)
 end
 
 ---@param user_id integer
 function RoomServerRemoteValidation:kickUser(user_id)
+	assert(types.integer(user_id))
 	self.remote:kickUser(user_id)
 end
 

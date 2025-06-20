@@ -1,4 +1,6 @@
 local class = require("class")
+local User = require("sea.access.User")
+local Session = require("sea.access.Session")
 local SubmissionServerRemoteValidation = require("sea.chart.remotes.SubmissionServerRemoteValidation")
 
 ---@class sea.ServerRemoteValidation: sea.ServerRemote
@@ -15,18 +17,25 @@ end
 
 ---@return sea.User
 function ServerRemoteValidation:getUser()
-	return self.remote:getUser()
+	local user = self.remote:getUser()
+	assert(type(user) == "table")
+	return setmetatable(user, User)
 end
 
 ---@return sea.Session
 function ServerRemoteValidation:getSession()
-	return self.remote:getSession()
+	local session = self.remote:getSession()
+	assert(type(session) == "table")
+	return setmetatable(session, Session)
 end
 
 ---@param msg string
 ---@return string
 function ServerRemoteValidation:ping(msg)
-	return self.remote:ping(msg)
+	assert(type(msg) == "string")
+	local res = self.remote:ping(msg)
+	assert(type(res) == "string")
+	return res
 end
 
 return ServerRemoteValidation

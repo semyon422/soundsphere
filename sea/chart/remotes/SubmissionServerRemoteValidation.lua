@@ -20,16 +20,10 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function SubmissionServerRemoteValidation:submitChartplay(chartplay_values, chartdiff_values)
-	local ok, err = valid.format(Chartplay.validate(chartplay_values))
-	if not ok then
-		return nil, "chartplay submit: " .. err
-	end
-	setmetatable(chartplay_values, Chartplay)
+	assert(valid.format(Chartplay.validate(chartplay_values)))
+	assert(valid.format(Chartdiff.validate(chartdiff_values)))
 
-	local ok, err = valid.format(Chartdiff.validate(chartdiff_values))
-	if not ok then
-		return nil, "chartdiff submit: " .. err
-	end
+	setmetatable(chartplay_values, Chartplay)
 	setmetatable(chartdiff_values, Chartdiff)
 
 	return self.remote:submitChartplay(chartplay_values, chartdiff_values)
@@ -39,10 +33,7 @@ end
 ---@return sea.Chartplay[]?
 ---@return string?
 function SubmissionServerRemoteValidation:getBestChartplaysForChartmeta(chartmeta_key)
-	local ok, err = valid.format(ChartmetaKey.validate(chartmeta_key))
-	if not ok then
-		return nil, "validate chartmeta key: " .. err
-	end
+	assert(valid.format(ChartmetaKey.validate(chartmeta_key)))
 	setmetatable(chartmeta_key, ChartmetaKey)
 
 	return self.remote:getBestChartplaysForChartmeta(chartmeta_key)
@@ -52,10 +43,7 @@ end
 ---@return sea.Chartplay[]?
 ---@return string?
 function SubmissionServerRemoteValidation:getBestChartplaysForChartdiff(chartdiff_key)
-	local ok, err = valid.format(ChartdiffKey.validate(chartdiff_key))
-	if not ok then
-		return nil, "validate chartdiff_key: " .. err
-	end
+	assert(valid.format(ChartdiffKey.validate(chartdiff_key)))
 	setmetatable(chartdiff_key, ChartdiffKey)
 
 	return self.remote:getBestChartplaysForChartdiff(chartdiff_key)
@@ -65,9 +53,7 @@ end
 ---@return string?
 ---@return string?
 function SubmissionServerRemoteValidation:getReplayFile(replay_hash)
-	if not types.md5hash(replay_hash) then
-		return nil, "invalid replay hash"
-	end
+	assert(types.md5hash(replay_hash))
 
 	return self.remote:getReplayFile(replay_hash)
 end

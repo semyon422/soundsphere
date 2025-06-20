@@ -46,6 +46,14 @@ local computed_keys = table_util.keys(ChartplayComputed.struct)
 local computed_keys_no_msd = table_util.copy(computed_keys)
 table.remove(computed_keys_no_msd, table_util.indexof(computed_keys_no_msd, "rating_msd"))
 
+local validate_chartplay_computed = valid.struct(ChartplayComputed.struct)
+
+---@return true?
+---@return string|valid.Errors?
+function ChartplayComputed:validate()
+	return validate_chartplay_computed(self)
+end
+
 ---@param values sea.ChartplayComputed
 ---@param no_msd boolean?
 ---@return boolean?
