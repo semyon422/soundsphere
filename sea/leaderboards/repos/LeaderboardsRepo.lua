@@ -210,6 +210,7 @@ end
 ---@return sea.Chartplayview[]
 function LeaderboardsRepo:getBestChartplays(lb, user_id, time)
 	local conds, options = self:getFilterConds(lb, user_id)
+	conds.compute_state = "valid"
 	if time then
 		conds.submitted_at__lte = time
 	end
@@ -230,6 +231,7 @@ end
 function LeaderboardsRepo:getFirstPlaceChartplaysFull(lb, user_id)
 	local conds, options = self:getFilterConds(lb, user_id)
 	conds.user_id = nil
+	conds.compute_state = "valid"
 	options.group = {"hash", "`index`"}
 	options.having = {user_id = user_id}
 	local chartplayviews = self.models.chartplayviews:select(conds, options)
