@@ -21,6 +21,7 @@ end
 local Loop = Observable + {}
 
 Loop.fpslimit = 240
+Loop.unlimited_fps = false
 Loop.time = 0
 Loop.dt = 0
 Loop.eventTime = 0
@@ -185,7 +186,7 @@ function Loop:run()
 		local timingsSleep = love.timer.getTime()
 		Loop.timings.draw = timingsSleep - timingsDraw
 
-		if Loop.fpslimit > 0 then
+		if Loop.fpslimit > 0 and not Loop.unlimited_fps then
 			fpsLimitTime = math.max(fpsLimitTime + 1 / Loop.fpslimit, frameEndTime)
 			sleep(fpsLimitTime - frameEndTime)
 		end

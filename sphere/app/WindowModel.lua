@@ -66,6 +66,7 @@ function WindowModel:update()
 	end
 
 	loop.fpslimit = graphics.fps
+	loop.unlimited_fps = graphics.unlimited_fps
 	loop.asynckey = graphics.asynckey
 	loop.dwmflush = graphics.dwmflush
 end
