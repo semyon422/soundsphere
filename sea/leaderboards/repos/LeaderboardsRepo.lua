@@ -111,11 +111,8 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		else
 			table.insert(conds, {
 				"or",
+				timings__isnull = true,
 				timings_ = "chartmeta_timings",
-				{
-					timings__isnull = true,
-					chartmeta_timings__isnull = true,
-				},
 			})
 		end
 	end
@@ -132,11 +129,8 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 		else
 			table.insert(conds, {
 				"or",
+				healths__isnull = true,
 				healths_ = "chartmeta_healths",
-				{
-					healths__isnull = true,
-					chartmeta_healths__isnull = true,
-				},
 			})
 		end
 	end

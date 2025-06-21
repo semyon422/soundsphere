@@ -518,6 +518,37 @@ function test.free_timings_filter_undefined_chart(t)
 end
 
 ---@param t testing.T
+function test.free_timings_filter_undefined_score(t)
+	local ctx = create_test_ctx()
+
+	ctx.db.models.chartmetas:create({
+		format = "osu",
+		inputmode = "4key",
+		timings = Timings("osuod", 10),
+		hash = "",
+		index = 1,
+		created_at = 0,
+		computed_at = 0,
+	})
+
+	create_chartplay(ctx, {
+		rating = 1,
+	})
+
+	ctx.leaderboard.allow_free_timings = true
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+
+	ctx.leaderboard.allow_free_timings = false
+	lb_update_select(ctx)
+
+	local chartplays = ctx.leaderboards_repo:getBestChartplays(ctx.leaderboard, ctx.user.id)
+	t:eq(#chartplays, 1)
+end
+
+---@param t testing.T
 function test.free_healths_filter(t)
 	local ctx = create_test_ctx()
 
