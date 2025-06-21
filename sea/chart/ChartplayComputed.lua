@@ -31,7 +31,7 @@ end
 
 ChartplayComputed.struct = {
 	judges = valid.array(types.count, 10),
-	accuracy = types.number,
+	accuracy = types.number_or_inf,
 	max_combo = types.count,
 	miss_count = types.count,
 	not_perfect_count = types.count,

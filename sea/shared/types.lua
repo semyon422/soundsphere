@@ -106,6 +106,16 @@ function types.number(v)
 	return true
 end
 
+function types.number_or_inf(v)
+	if type(v) ~= "number" then
+		return nil, "not a number"
+	elseif v ~= v then
+		return nil, "NaN"
+	end
+
+	return true
+end
+
 function types.string(v)
 	if type(v) ~= "string" then
 		return nil, "not a string"
