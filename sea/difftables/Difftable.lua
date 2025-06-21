@@ -12,12 +12,14 @@ local types = require("sea.shared.types")
 ---@field created_at integer
 local Difftable = class()
 
-local validate_difftable = valid.struct({
+Difftable.struct = {
 	name = types.name,
 	description = types.description,
 	symbol = types.name,
 	tag = valid.optional(types.name),
-})
+}
+
+local validate_difftable = valid.struct(Difftable.struct)
 
 ---@return true?
 ---@return string[]?
