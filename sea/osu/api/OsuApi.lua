@@ -1,4 +1,7 @@
 local class = require("class")
+local table_util = require("table_util")
+local OsuApiClient = require("sea.osu.api.OsuApiClient")
+local OsuOauthClient = require("sea.osu.api.OsuOauthClient")
 
 ---@class sea.OsuCursor
 ---@field id integer
@@ -29,42 +32,81 @@ local class = require("class")
 ---@field cursor sea.OsuCursor
 ---@field cursor_string string base64(json.encode(cursor))
 
----@generic T
----@param f T
----@return T
-local function wrap_check_auth(f)
-	---@cast f fun(...: any): table?, string?
-	return function(...)
-		local res, err = f(...)
-
-		if not res then
-			return nil, err
-		end
-
-		if res.authentication then
-			return nil, "not authenticated"
-		end
-
-		return res
-	end
-end
-
 ---@class sea.OsuApi
 ---@operator call: sea.OsuApi
 local OsuApi = class()
 
----@param client sea.OsuApiClient
-function OsuApi:new(client)
-	self.client = client
+---@param config sea.OsuOauthClientConfig
+---@param grant_type sea.OsuApiGrantType
+---@param token_data sea.OsuTokenData?
+function OsuApi:new(config, grant_type, token_data)
+	token_data = token_data or {}
+
+	self.grant_type = grant_type
+	self.token_data = token_data
+
+	self.api_client = OsuApiClient()
+	self.oauth_client = OsuOauthClient(config)
+
+	self.api_client:setAccessToken(token_data.access_token)
+
+	self.token_updated = false
+end
+
+---@return boolean?
+---@return string?
+function OsuApi:reauth()
+	local grant_type = self.grant_type
+	local token_data = self.token_data
+
+	local new_token_data, err = self.oauth_client:getToken(grant_type, token_data.refresh_token)
+	if not new_token_data then
+		return nil, err
+	end
+
+	table_util.clear(token_data)
+	table_util.copy(new_token_data, token_data)
+
+	self.api_client:setAccessToken(token_data.access_token)
+
+	self.token_updated = true
+
+	return true
+end
+
+---@param route string
+---@param params table?
+---@param again boolean?
+---@return table?
+---@return string?
+function OsuApi:get(route, params, again)
+	local res, err = self.api_client:get(route, params)
+
+	if not res then
+		return nil, err
+	end
+
+	if not res.authentication then
+		return res
+	end
+
+	if again then
+		return nil, "new token does not work"
+	end
+
+	local ok, err = self:reauth()
+	if not ok then
+		return nil, "reauth: " .. err
+	end
+
+	return self:get(route, params, true)
 end
 
 ---@param params sea.OsuBeatmapsetSearchRequestParams
 ---@return sea.OsuBeatmapsetSearchResponse?
 ---@return string?
 function OsuApi:beatmapsets_search(params)
-	return self.client:get("/beatmapsets/search", params)
+	return self:get("/beatmapsets/search", params)
 end
-
-OsuApi.beatmapsets_search = wrap_check_auth(OsuApi.beatmapsets_search)
 
 return OsuApi

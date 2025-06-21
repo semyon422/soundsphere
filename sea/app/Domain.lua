@@ -23,6 +23,7 @@ local ChartsComputer = require("sea.compute.ChartsComputer")
 
 local UserActivityGraph = require("sea.activity.UserActivityGraph")
 
+local OsuApi = require("sea.osu.api.OsuApi")
 local OsuBeatmaps = require("sea.osu.OsuBeatmaps")
 local ExternalRanked = require("sea.difftables.ExternalRanked")
 
@@ -56,7 +57,8 @@ function Domain:new(repos, app_config)
 	self.dans = Dans(repos.charts_repo, repos.dan_clears_repo)
 	self.user_activity_graph = UserActivityGraph(repos.activity_repo)
 
-	self.osu_beatmaps = OsuBeatmaps({})
+	self.osu_api = OsuApi(app_config.osu_api, "client_credentials")
+	self.osu_beatmaps = OsuBeatmaps(self.osu_api)
 	self.external_ranked = ExternalRanked(self.osu_beatmaps, self.difftables)
 	self.chartplay_submission = ChartplaySubmission(
 		self.chartplays,

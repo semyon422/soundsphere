@@ -7,11 +7,18 @@ local json = require("web.json")
 ---@field client_secret string
 ---@field redirect_uri string
 
+---@alias sea.OsuApiGrantType "authorization_code"|"refresh_token"|"client_credentials"
+
 ---@class sea.OsuTokenData
 ---@field token_type "Bearer"
 ---@field expires_in integer
 ---@field access_token string
 ---@field refresh_token string?
+
+---@class sea.OsuApiOauthError
+---@field error string
+---@field error_description string
+---@field message string
 
 ---@class sea.OsuOauthClient
 ---@operator call: sea.OsuOauthClient
@@ -19,7 +26,7 @@ local OsuOauthClient = class()
 
 ---@param config sea.OsuOauthClientConfig
 function OsuOauthClient:new(config)
-	self.config = config
+	self.config = assert(config)
 end
 
 function OsuOauthClient:getAuthorizeUrl()
@@ -34,7 +41,7 @@ function OsuOauthClient:getAuthorizeUrl()
 	})
 end
 
----@param grant_type "authorization_code"|"refresh_token"|"client_credentials"
+---@param grant_type sea.OsuApiGrantType
 ---@param data string?
 ---@return sea.OsuTokenData?
 ---@return string?
@@ -77,20 +84,27 @@ function OsuOauthClient:getToken(grant_type, data)
 		return nil, "receive headers: " .. err
 	end
 
-	if res.status ~= 200 then
-		return nil, "status ~= 200: " .. res.status
-	end
-
 	local body, err = res:receive("*a")
 
 	if not body then
 		return nil, "receive: " .. err
 	end
 
-	---@type sea.OsuTokenData
-	local token_data = json.decode(body)
+	local obj, err = json.decode_safe(body)
 
-	return token_data
+	if not obj then
+		return nil, "decode json: " .. err
+	end
+
+	---@cast obj sea.OsuApiOauthError|sea.OsuTokenData
+
+	if obj.error then
+		return nil, "api error: " .. obj.error
+	end
+
+	---@cast obj -sea.OsuApiOauthError
+
+	return obj
 end
 
 return OsuOauthClient

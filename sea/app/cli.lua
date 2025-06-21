@@ -264,9 +264,10 @@ function cmds.auth_codes()
 	end
 end
 
-function cmds.osu_token()
-	assert(domain.osu_api:oauth("client_credentials"))
-	print(stbl.encode(domain.osu_api.token_data))
+function cmds.osu_api()
+	print(stbl.encode({domain.osu_api:beatmapsets_search({
+		m = 3,
+	})}))
 end
 
 function cmds.delete(id)
