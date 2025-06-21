@@ -24,8 +24,6 @@ function LogicEngine:setChart(chart)
 end
 
 function LogicEngine:load()
-	self.monotonicEventTime = -math.huge
-
 	---@type {[ncdk2.Note]: sphere.LogicalNote}
 	self.sharedLogicalNotes = {}
 
@@ -87,6 +85,10 @@ function LogicEngine:receive(event)
 	self.eventTime = event.time
 
 	if self.check1024 then
+		local ct = self.timeEngine.currentTime
+		if ct ~= math.huge and self.eventTime < ct then
+			error(("%s < %s"):format(self.eventTime, self.timeEngine.currentTime))
+		end
 		assert((self:getEventTime() * 1024) % 1 == 0)
 	end
 	self:update()
@@ -117,9 +119,7 @@ end
 
 ---@return number
 function LogicEngine:getEventTime()
-	local eventTime = self.eventTime or self.timeEngine.currentTime
-	self.monotonicEventTime = math.max(self.monotonicEventTime or eventTime, eventTime)
-	return self.monotonicEventTime
+	return self.eventTime or self.timeEngine.currentTime
 end
 
 ---@return number
