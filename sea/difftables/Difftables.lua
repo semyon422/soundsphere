@@ -38,7 +38,17 @@ function Difftables:create(user, dt_values)
 		return nil, err
 	end
 
-	local dt = Difftable()
+	local dt = self.difftables_repo:getDifftableByName(dt_values.name)
+	if dt then
+		return nil, "name taken"
+	end
+
+	dt = self.difftables_repo:getDifftableByTag(dt_values.tag)
+	if dt then
+		return nil, "tag taken"
+	end
+
+	dt = Difftable()
 	dt.name = dt_values.name
 	dt.description = dt_values.description
 	dt.symbol = dt_values.symbol
@@ -61,13 +71,18 @@ function Difftables:update(user, id, dt_values)
 
 	local dt = self.difftables_repo:getDifftableByName(dt_values.name)
 	if dt and dt.id ~= id then
-		return nil, "name_taken"
+		return nil, "name taken"
+	end
+
+	dt = self.difftables_repo:getDifftableByTag(dt_values.tag)
+	if dt and dt.id ~= id then
+		return nil, "tag taken"
 	end
 
 	dt = dt or self.difftables_repo:getDifftable(id)
 
 	if not dt then
-		return nil, "not_found"
+		return nil, "not found"
 	end
 
 	dt.name = dt_values.name

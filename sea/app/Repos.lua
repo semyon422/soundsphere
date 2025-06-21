@@ -8,6 +8,7 @@ local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 local ComputeTasksRepo = require("sea.compute.repos.ComputeTasksRepo")
 local DanClearsRepo = require("sea.dan.repos.DanClearsRepo")
 local ActivityRepo = require("sea.activity.repos.ActivityRepo")
+local OsuRepo = require("sea.osu.repos.OsuRepo")
 
 ---@class sea.Repos
 ---@operator call: sea.Repos
@@ -24,6 +25,7 @@ function Repos:new(models)
 	self.compute_tasks_repo = ComputeTasksRepo(models)
 	self.dan_clears_repo = DanClearsRepo(models)
 	self.activity_repo = ActivityRepo(models)
+	self.osu_repo = OsuRepo(models)
 end
 
 return Repos

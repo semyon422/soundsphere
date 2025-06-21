@@ -58,8 +58,8 @@ function Domain:new(repos, app_config)
 	self.user_activity_graph = UserActivityGraph(repos.activity_repo)
 
 	self.osu_api = OsuApi(app_config.osu_api, "client_credentials")
-	self.osu_beatmaps = OsuBeatmaps(self.osu_api)
-	self.external_ranked = ExternalRanked(self.osu_beatmaps, self.difftables)
+	self.osu_beatmaps = OsuBeatmaps(self.osu_api, repos.osu_repo)
+	self.external_ranked = ExternalRanked(self.osu_beatmaps, repos.difftables_repo)
 	self.chartplay_submission = ChartplaySubmission(
 		self.chartplays,
 		self.leaderboards,

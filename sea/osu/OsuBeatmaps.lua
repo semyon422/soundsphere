@@ -1,12 +1,15 @@
 local class = require("class")
+local OsuBeatmap = require("sea.osu.OsuBeatmap")
 
 ---@class sea.OsuBeatmaps
 ---@operator call: sea.OsuBeatmaps
 local OsuBeatmaps = class()
 
 ---@param api sea.OsuApi
-function OsuBeatmaps:new(api)
+---@param osu_repo sea.OsuRepo
+function OsuBeatmaps:new(api, osu_repo)
 	self.api = api
+	self.osu_repo = osu_repo
 end
 
 function OsuBeatmaps:sync()
@@ -24,11 +27,41 @@ function OsuBeatmaps:sync()
 end
 
 ---@param hash string
----@return sea.OsuBeatmap
-function OsuBeatmaps:getOrCreateOsuBeatmapByHash(hash)
-	-- get from db
-	-- or find in osu api
-	-- or create an unknown-state object
+---@param time integer
+---@return sea.OsuBeatmap?
+---@return string?
+function OsuBeatmaps:getOrCreateOsuBeatmapByHash(hash, time)
+	local api = self.api
+	local repo = self.osu_repo
+
+	local osu_beatmap = repo:getBeatmapByHash(hash)
+	if osu_beatmap then
+		return osu_beatmap
+	end
+
+	local beatmap, err = api:beatmaps_lookup({
+		checksum = hash,
+	})
+
+	if not beatmap then
+		return nil, "beatmaps lookup: " .. err
+	end
+
+	if not beatmap.id then
+		-- or create an unknown-state object
+		return nil, "not found"
+	end
+
+	osu_beatmap = OsuBeatmap()
+	osu_beatmap.id = beatmap.id
+	osu_beatmap.beatmapset_id = beatmap.beatmapset_id
+	osu_beatmap.hash = beatmap.checksum
+	osu_beatmap.status = beatmap.status
+	osu_beatmap.updated_at = time
+
+	osu_beatmap = repo:createBeatmap(osu_beatmap)
+
+	return osu_beatmap
 end
 
 return OsuBeatmaps

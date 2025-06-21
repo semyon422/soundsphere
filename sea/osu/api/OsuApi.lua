@@ -7,31 +7,6 @@ local OsuOauthClient = require("sea.osu.api.OsuOauthClient")
 ---@field id integer
 ---@field approved_date integer unix time ms
 
---- https://github.com/ppy/osu-web/blob/master/app/Libraries/Search/BeatmapsetSearchRequestParams.php
----@class sea.OsuBeatmapsetSearchRequestParams
----@field c string?
----@field e string?
----@field g integer?
----@field l integer?
----@field m integer?
----@field nsfw boolean?
----@field page integer?
----@field played string?
----@field q string?
----@field query string?
----@field r sea.BeatmapStatus?
----@field s string?
----@field sort string?
-
----@class sea.OsuBeatmapsetSearchResponse
----@field beatmapsets sea.OsuApiBeatmapset[]
----@field search {sort: string}
----@field recommended_difficulty number?
----@field error string?
----@field total integer
----@field cursor sea.OsuCursor
----@field cursor_string string base64(json.encode(cursor))
-
 ---@class sea.OsuApi
 ---@operator call: sea.OsuApi
 local OsuApi = class()
@@ -102,11 +77,48 @@ function OsuApi:get(route, params, again)
 	return self:get(route, params, true)
 end
 
+--- https://github.com/ppy/osu-web/blob/master/app/Libraries/Search/BeatmapsetSearchRequestParams.php
+---@class sea.OsuBeatmapsetSearchRequestParams
+---@field c string?
+---@field e string?
+---@field g integer?
+---@field l integer?
+---@field m integer?
+---@field nsfw boolean?
+---@field page integer?
+---@field played string?
+---@field q string?
+---@field query string?
+---@field r sea.BeatmapStatus?
+---@field s string?
+---@field sort string?
+
+---@class sea.OsuBeatmapsetSearchResponse
+---@field beatmapsets sea.OsuApiBeatmapset[]
+---@field search {sort: string}
+---@field recommended_difficulty number?
+---@field error string?
+---@field total integer
+---@field cursor sea.OsuCursor
+---@field cursor_string string base64(json.encode(cursor))
+
 ---@param params sea.OsuBeatmapsetSearchRequestParams
 ---@return sea.OsuBeatmapsetSearchResponse?
 ---@return string?
 function OsuApi:beatmapsets_search(params)
 	return self:get("/beatmapsets/search", params)
+end
+
+---@class sea.OsuBeatmapsLookupRequestParams
+---@field checksum string?
+---@field filename string?
+---@field id integer?
+
+---@param params sea.OsuBeatmapsLookupRequestParams
+---@return sea.OsuApiBeatmap?
+---@return string?
+function OsuApi:beatmaps_lookup(params)
+	return self:get("/beatmaps/lookup", params)
 end
 
 return OsuApi

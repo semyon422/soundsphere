@@ -264,10 +264,10 @@ function cmds.auth_codes()
 	end
 end
 
-function cmds.osu_api()
-	print(stbl.encode({domain.osu_api:beatmapsets_search({
-		m = 3,
-	})}))
+function cmds.osu_api_check(hash)
+	assert(hash)
+	local beatmap = domain.osu_beatmaps:getOrCreateOsuBeatmapByHash(hash, os.time())
+	print(stbl.encode(beatmap))
 end
 
 function cmds.delete(id)

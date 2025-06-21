@@ -44,6 +44,7 @@ function test.basic(t)
 	dt_values.name = "Difftable"
 	dt_values.description = "test"
 	dt_values.symbol = "*"
+	dt_values.tag = ""
 
 	local difftable, err = ctx.difftables:create(ctx.user, dt_values)
 	if not t:assert(difftable, err) then

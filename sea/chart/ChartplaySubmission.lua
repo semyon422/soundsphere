@@ -38,7 +38,7 @@ function ChartplaySubmission:submitChartplay(user, time, remote, chartplay_value
 	local chartplay = assert(ctx.chartplay)
 	local chartmeta = assert(ctx.chartmeta)
 
-	-- self.external_ranked:submit(chartmeta)
+	self.external_ranked:submit(chartmeta, time)
 
 	if not chartplay.custom then
 		self.leaderboards:addChartplay(chartplay)

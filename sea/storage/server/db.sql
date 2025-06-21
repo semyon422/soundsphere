@@ -190,3 +190,17 @@ CREATE TABLE IF NOT EXISTS `dan_clears` (
 	`rate` INTEGER NOT NULL,
 	`chartplay_ids` TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS `osu_beatmapsets` (
+	`id` INTEGER NOT NULL,
+	`status` INTEGER NOT NULL,
+	`updated_at` INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS `osu_beatmaps` (
+	`id` INTEGER NOT NULL,
+	`beatmapset_id` INTEGER NOT NULL,
+	`status` INTEGER NOT NULL,
+	`hash` TEXT NOT NULL,
+	`updated_at` INTEGER NOT NULL
+);

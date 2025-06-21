@@ -29,6 +29,12 @@ function DifftablesRepo:getDifftableByName(name)
 	return self.models.difftables:find({name = assert(name)})
 end
 
+---@param tag string
+---@return sea.Difftable?
+function DifftablesRepo:getDifftableByTag(tag)
+	return self.models.difftables:find({tag = assert(tag)})
+end
+
 ---@param difftable sea.Difftable
 ---@return sea.Difftable
 function DifftablesRepo:createDifftable(difftable)
