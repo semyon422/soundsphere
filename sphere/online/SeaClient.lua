@@ -18,7 +18,7 @@ local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 local SeaClient = class()
 
 SeaClient.threaded = true
-SeaClient.reconnect_interval = 30
+SeaClient.reconnect_interval = 10
 
 ---@param client sphere.OnlineClient
 ---@param client_remote sea.ClientRemote
