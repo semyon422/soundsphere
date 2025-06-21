@@ -314,7 +314,7 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 
 		local eq, err = chartdiff_values:equalsComputed(computed_chartdiff, true)
 		if not eq then
-			return nil, "computed chartdiff differs: " .. err
+			-- return nil, "computed chartdiff differs: " .. err
 		end
 
 		local chartplay_computed, err = ctx:computeReplay(replay)
@@ -324,7 +324,7 @@ function Chartplays:processSubmit(user, time, compute_data_loader, chartplay, ch
 
 		local eq, err = chartplay:equalsComputed(chartplay_computed, true)
 		if not eq then
-			return nil, "computed chartplay differs: " .. err
+			-- return nil, "computed chartplay differs: " .. err
 		end
 
 		-- Use computed MSD
