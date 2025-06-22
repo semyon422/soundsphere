@@ -264,6 +264,19 @@ function cmds.auth_codes()
 	end
 end
 
+function cmds.check_chartplay(lb_id, cp_id)
+	lb_id = assert(tonumber(lb_id))
+	cp_id = assert(tonumber(cp_id))
+
+	local leaderboards_repo = app.repos.leaderboards_repo
+	local charts_repo = app.repos.charts_repo
+
+	local lb = assert(leaderboards_repo:getLeaderboard(lb_id))
+	local cp = assert(charts_repo:getChartplay(cp_id))
+
+	print(leaderboards_repo:checkChartplay(lb, cp))
+end
+
 function cmds.osu_api_check(hash)
 	assert(hash)
 	local beatmap = domain.osu_beatmaps:getOrCreateOsuBeatmapByHash(hash, os.time())

@@ -182,14 +182,14 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 
 	---@type rdb.Options
 	local options = {
-		group = {"hash"},
+		group = {"hash", "`index`"},
 		limit = 100,
-		order = {rating_column .. " DESC"}, -- TODO: rating_calculator
+		order = {rating_column .. " DESC"},
 		columns = {"*", ("MAX(%s) AS _rating"):format(rating_column)},
 	}
 
 	if difftable_ids[1] then
-		options.columns[3] = "MAX(difftable_level) AS difftable_level"
+		-- options.columns[3] = "MAX(difftable_level) AS difftable_level"
 	end
 
 	return conds, options
