@@ -127,7 +127,7 @@ function GameplayController:load()
 
 	rhythmModel:setScoring(judgement, config.gameplay.ratingHitTimingWindow)
 	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
-	rhythmModel:setTimeToPrepare(config.gameplay.time.prepare)
+	rhythmModel:setTimeToPrepare(math.max(config.gameplay.time.prepare, -(tonumber(chartmeta.audio_offset) or 0)))
 	rhythmModel:setVisualTimeRate(config.gameplay.speed)
 	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
 
