@@ -54,24 +54,38 @@ function test.basic(t)
 	---@cast difftable -?
 	t:eq(difftable.name, "Difftable")
 
-	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, 12)
+	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, 0, difftable.id, "", 1, 12)
 	if not t:assert(dt_cm, err) then
 		return
 	end
 
 	---@cast dt_cm -?
 	t:eq(dt_cm.level, 12)
+	t:eq(dt_cm.is_deleted, false)
+	t:eq(dt_cm.created_at, 0)
+	t:eq(dt_cm.updated_at, 0)
 
-	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, 10)
+	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, 1, difftable.id, "", 1, 10)
 	if not t:assert(dt_cm, err) then
 		return
 	end
 
 	---@cast dt_cm -?
 	t:eq(dt_cm.level, 10)
+	t:eq(dt_cm.is_deleted, false)
+	t:eq(dt_cm.created_at, 0)
+	t:eq(dt_cm.updated_at, 1)
 
-	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, difftable.id, "", 1, nil)
-	t:assert(not dt_cm)
+	local dt_cm, err = ctx.difftables:deleteDifftableChartmeta(ctx.user, 2, difftable.id, "", 1)
+	if not t:assert(dt_cm, err) then
+		return
+	end
+
+	---@cast dt_cm -?
+	t:eq(dt_cm.level, 10)
+	t:eq(dt_cm.is_deleted, true)
+	t:eq(dt_cm.created_at, 0)
+	t:eq(dt_cm.updated_at, 2)
 end
 
 return test

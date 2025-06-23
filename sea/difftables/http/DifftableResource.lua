@@ -28,12 +28,22 @@ end
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
 function DifftableResource:getDifftable(req, res, ctx)
-	ctx.difftable = self.difftables:getDifftable(tonumber(ctx.path_params.difftable_id))
+	local difftable_id = tonumber(ctx.path_params.difftable_id)
+	if not difftable_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.difftable = self.difftables:getDifftable(difftable_id)
 	if not ctx.difftable then
 		res.status = 404
 		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
 		return
 	end
+
+	ctx.difftable_chartmetas = self.difftables:getDifftableChartmetasFull(ctx.session_user, os.time(), difftable_id)
+
 	self.views:render_send(res, "sea/difftables/http/difftable.etlua", ctx, true)
 end
 

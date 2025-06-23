@@ -64,6 +64,35 @@ end
 --------------------------------------------------------------------------------
 
 ---@param difftable_id integer
+---@param since integer?
+---@param include_deleted boolean?
+---@return sea.DifftableChartmeta[]
+function DifftablesRepo:getDifftableChartmetas(difftable_id, since, include_deleted)
+	---@type rdb.Conditions
+	local conds = {
+		difftable_id = assert(difftable_id),
+		is_deleted = false,
+	}
+	if since then
+		conds.updated_at__gte = since
+	end
+	if include_deleted then
+		conds.is_deleted = nil
+	end
+
+	return self.models.difftable_chartmetas:select(conds)
+end
+
+---@param difftable_id integer
+---@param since integer?
+---@param include_deleted boolean?
+---@return sea.DifftableChartmeta[]
+function DifftablesRepo:getDifftableChartmetasFull(difftable_id, since, include_deleted)
+	local dt_cms = self:getDifftableChartmetas(difftable_id, since, include_deleted)
+	return self.models.difftable_chartmetas:preload(dt_cms, "user", "chartmeta")
+end
+
+---@param difftable_id integer
 ---@param hash string
 ---@param index integer
 ---@return sea.DifftableChartmeta?

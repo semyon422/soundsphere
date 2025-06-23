@@ -111,28 +111,56 @@ function Difftables:delete(user, id)
 end
 
 ---@param user sea.User
+---@param time integer
+---@param difftable_id integer
+---@param since integer?
+---@param include_deleted boolean?
+---@return sea.DifftableChartmeta[]?
+---@return string?
+function Difftables:getDifftableChartmetas(user, time, difftable_id, since, include_deleted)
+	local can, err = self.difftables_access:canManage(user, time)
+	if not can then
+		return nil, err
+	end
+
+	return self.difftables_repo:getDifftableChartmetas(difftable_id, since, include_deleted)
+end
+
+---@param user sea.User
+---@param time integer
+---@param difftable_id integer
+---@param since integer?
+---@param include_deleted boolean?
+---@return sea.DifftableChartmeta[]?
+---@return string?
+function Difftables:getDifftableChartmetasFull(user, time, difftable_id, since, include_deleted)
+	local can, err = self.difftables_access:canManage(user, time)
+	if not can then
+		return nil, err
+	end
+
+	return self.difftables_repo:getDifftableChartmetasFull(difftable_id, since, include_deleted)
+end
+
+---@param user sea.User
+---@param time integer
 ---@param difftable_id integer
 ---@param hash string
 ---@param index integer
 ---@param level number?
 ---@return sea.DifftableChartmeta?
 ---@return string?
-function Difftables:setDifftableChartmeta(user, difftable_id, hash, index, level)
-	local time = os.time()
-
+function Difftables:setDifftableChartmeta(user, time, difftable_id, hash, index, level)
 	local can, err = self.difftables_access:canManage(user, time)
 	if not can then
 		return nil, err
 	end
 
-	if not level then
-		self.difftables_repo:deleteDifftableChartmeta(difftable_id, hash, index)
-		return
-	end
-
 	local dt_cm = self.difftables_repo:getDifftableChartmeta(difftable_id, hash, index)
 	if dt_cm then
-		dt_cm.level = level
+		dt_cm.level = level or dt_cm.level
+		dt_cm.is_deleted = false
+		dt_cm.updated_at = time
 		return self.difftables_repo:updateDifftableChartmeta(dt_cm)
 	end
 
@@ -141,10 +169,36 @@ function Difftables:setDifftableChartmeta(user, difftable_id, hash, index, level
 	dt_cm.difftable_id = difftable_id
 	dt_cm.hash = hash
 	dt_cm.index = index
-	dt_cm.level = level
+	dt_cm.level = level or 0
+	dt_cm.is_deleted = false
 	dt_cm.created_at = time
+	dt_cm.updated_at = time
 
 	return self.difftables_repo:createDifftableChartmeta(dt_cm)
+end
+
+---@param user sea.User
+---@param time integer
+---@param difftable_id integer
+---@param hash string
+---@param index integer
+---@return sea.DifftableChartmeta?
+---@return string?
+function Difftables:deleteDifftableChartmeta(user, time, difftable_id, hash, index)
+	local can, err = self.difftables_access:canManage(user, time)
+	if not can then
+		return nil, err
+	end
+
+	local dt_cm = self.difftables_repo:getDifftableChartmeta(difftable_id, hash, index)
+	if not dt_cm then
+		return nil, "not found"
+	end
+
+	dt_cm.is_deleted = true
+	dt_cm.updated_at = time
+
+	return self.difftables_repo:updateDifftableChartmeta(dt_cm)
 end
 
 return Difftables

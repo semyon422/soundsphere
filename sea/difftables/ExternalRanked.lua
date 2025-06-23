@@ -51,7 +51,9 @@ function ExternalRanked:submit(chartmeta, time)
 		dt_cm.hash = chartmeta.hash
 		dt_cm.index = chartmeta.index
 		dt_cm.level = 0
+		dt_cm.is_deleted = false
 		dt_cm.created_at = time
+		dt_cm.updated_at = time
 
 		self.difftables_repo:createDifftableChartmeta(dt_cm)
 	end

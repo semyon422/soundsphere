@@ -24,7 +24,8 @@ chartdiffs.notes_count,
 chartplays.*
 FROM chartplays
 LEFT JOIN chartmetas ON
-chartmetas.hash = chartplays.hash
+chartmetas.hash = chartplays.hash AND
+chartmetas.`index` = chartplays.`index`
 LEFT JOIN chartdiffs ON
 chartdiffs.hash = chartplays.hash AND
 chartdiffs.`index` = chartplays.`index` AND
@@ -32,7 +33,8 @@ chartdiffs.mode = chartplays.mode AND
 chartdiffs.modifiers = chartplays.modifiers AND
 chartdiffs.rate = chartplays.rate
 LEFT JOIN difftable_chartmetas ON
-difftable_chartmetas.hash = chartplays.hash
+difftable_chartmetas.hash = chartplays.hash AND
+difftable_chartmetas.`index` = chartplays.`index`
 ]]
 
 chartplayviews.metatable = Chartplayview
