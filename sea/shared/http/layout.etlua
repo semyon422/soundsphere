@@ -11,7 +11,7 @@
 		<meta property="og:title" content="<%= title %>" />
 		<meta property="og:image" content="<%= image %>" />
 		<meta property="og:logo" content="https://soundsphere.xyz/static/images/logo.webp" />
-		<meta property="og:description" content="<%= meta_description %>" />
+		<meta property="og:description" content="<%= description %>" />
 		<meta property="og:type" content="game" />
 		<meta property="og:url" content="https://soundsphere.xyz/" />
 		<link rel="stylesheet" href="/style.css?v=<%= version %>" />
