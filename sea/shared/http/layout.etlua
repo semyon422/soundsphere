@@ -1,15 +1,26 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="/style.css?v=<%= version %>">
-		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css">
+		<%
+			local title = meta_title or "soundsphere"
+			local image = meta_image or "https://soundsphere.xyz/static/images/home/meta-image.webp"
+			local description = meta_description or "The most advanced VSRG for any use case. It has everything you need to become a master of VSRGs."
+		%>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta property="og:title" content="<%= title %>" />
+		<meta property="og:image" content="<%= image %>" />
+		<meta property="og:logo" content="https://soundsphere.xyz/static/images/logo.webp" />
+		<meta property="og:description" content="<%= description %>" />
+		<meta property="og:type" content="game" />
+		<meta property="og:url" content="https://soundsphere.xyz/" />
+		<link rel="stylesheet" href="/style.css?v=<%= version %>" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@95,100..900&display=swap" rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@100..900&display=swap" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css2?family=Saira:wdth,wght@95,100..900&display=swap" rel="stylesheet" />
 		<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 		<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 		<script src="https://unpkg.com/htmx.org@2.0.0"></script>
@@ -24,7 +35,7 @@
 		<% if is_captcha_enabled then %>
 			<script src="https://www.google.com/recaptcha/api.js"></script>
 		<% end %>
-		<title>soundsphere</title>
+		<title><%= title %></title>
 		<style>
 			[x-cloak] { display: none !important; }
 		</style>
