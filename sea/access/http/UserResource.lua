@@ -118,6 +118,11 @@ function UserResource:getUser(req, res, ctx)
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
 	ctx.scores, ctx.total_rating = page:getScores(ctx.leaderboard, user.id, ctx.query.scores)
 
+	ctx.meta_title = ("soundsphere - %s's profile"):format(ctx.user.name or "Unknown")
+	if ctx.user.avatar and ctx.user.avatar ~= "" then
+		ctx.meta_image = ctx.user.avatar
+	end
+
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 
