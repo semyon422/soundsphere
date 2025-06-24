@@ -11,6 +11,7 @@ local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
 local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataProvider")
 
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
+local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
@@ -28,7 +29,8 @@ function CacheModel:new(difficultyModel)
 
 	self.gdb = GameDatabase(migrations)
 
-	self.chartsRepo = ChartsRepo(self.gdb.models, ChartsRepo)
+	self.chartsRepo = ChartsRepo(self.gdb.models)
+	self.difftablesRepo = DifftablesRepo(self.gdb.models)
 
 	self.chartviewsRepo = ChartviewsRepo(self.gdb)
 	self.locationsRepo = LocationsRepo(self.gdb)

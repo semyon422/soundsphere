@@ -8,7 +8,7 @@ SELECT
 	difftable_chartmetas.*,
 	chartmetas.id AS chartmeta_id
 FROM difftable_chartmetas
-INNER JOIN chartmetas ON
+LEFT JOIN chartmetas ON
 	chartmetas.hash = difftable_chartmetas.hash AND
 	chartmetas.`index` = difftable_chartmetas.`index`
 ]]

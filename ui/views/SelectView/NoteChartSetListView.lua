@@ -41,6 +41,10 @@ end
 function NoteChartSetListView:drawItem(i, w, h)
 	local item = self.items[i]
 
+	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
+		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)
+	end
+
 	if item.lamp then
 		love.graphics.circle("fill", 22, 36, 7)
 		love.graphics.circle("line", 22, 36, 7)

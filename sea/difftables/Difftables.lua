@@ -115,15 +115,15 @@ end
 ---@param difftable_id integer
 ---@param since integer?
 ---@param include_deleted boolean?
+---@param limit integer?
 ---@return sea.DifftableChartmeta[]?
 ---@return string?
-function Difftables:getDifftableChartmetas(user, time, difftable_id, since, include_deleted)
-	local can, err = self.difftables_access:canManage(user, time)
-	if not can then
-		return nil, err
+function Difftables:getDifftableChartmetas(user, time, difftable_id, include_deleted, since, limit)
+	if user:isAnon() then
+		return nil, "not allowed"
 	end
 
-	return self.difftables_repo:getDifftableChartmetas(difftable_id, since, include_deleted)
+	return self.difftables_repo:getDifftableChartmetas(difftable_id, include_deleted, since, limit)
 end
 
 ---@param user sea.User
@@ -133,13 +133,12 @@ end
 ---@param include_deleted boolean?
 ---@return sea.DifftableChartmeta[]?
 ---@return string?
-function Difftables:getDifftableChartmetasFull(user, time, difftable_id, since, include_deleted)
-	local can, err = self.difftables_access:canManage(user, time)
-	if not can then
-		return nil, err
+function Difftables:getDifftableChartmetasFull(user, time, difftable_id, include_deleted, since)
+	if user:isAnon() then
+		return nil, "not allowed"
 	end
 
-	return self.difftables_repo:getDifftableChartmetasFull(difftable_id, since, include_deleted)
+	return self.difftables_repo:getDifftableChartmetasFull(difftable_id, include_deleted, since)
 end
 
 ---@param user sea.User

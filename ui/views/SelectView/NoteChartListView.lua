@@ -100,6 +100,10 @@ function NoteChartListView:drawItem(i, w, h)
 	local items = self.items
 	local item = items[i]
 
+	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
+		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)
+	end
+
 	just.indent(18)
 
 	local baseTimeRate = self.game.replayBase.rate

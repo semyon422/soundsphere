@@ -210,6 +210,16 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 
 	local objs = model:select(where, options)
 
+	for _, obj in ipairs(objs) do
+		local hash, index = obj.hash, obj.index
+		if hash and index then
+			obj.difftable_chartmetas = self.models.difftable_chartmetas:select({
+				hash = hash,
+				index = index,
+			})
+		end
+	end
+
 	return objs
 end
 

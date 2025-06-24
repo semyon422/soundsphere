@@ -32,12 +32,17 @@ end
 ---@return table
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local chartviewsRepo = self.cacheModel.chartviewsRepo
+	local difftablesRepo = self.cacheModel.difftablesRepo
+
 	local _chartview = chartviewsRepo.chartviews[itemIndex - 1]
 	local chartview = chartviewsRepo:getChartview(_chartview)
 	if not chartview then
 		return {}
 	end
+
 	chartview.lamp = _chartview.lamp
+	chartview.difftable_chartmetas = difftablesRepo:getDifftableChartmetasForChartmeta(chartview.hash, chartview.index)
+
 	return chartview
 end
 

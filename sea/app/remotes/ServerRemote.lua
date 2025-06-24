@@ -2,6 +2,7 @@ local class = require("class")
 local SubmissionServerRemote = require("sea.chart.remotes.SubmissionServerRemote")
 local AuthServerRemote = require("sea.access.remotes.AuthServerRemote")
 local LeaderboardsServerRemote = require("sea.leaderboards.remotes.LeaderboardsServerRemote")
+local DifftablesServerRemote = require("sea.difftables.remotes.DifftablesServerRemote")
 
 ---@class sea.ServerRemote: sea.IServerRemote
 ---@operator call: sea.ServerRemote
@@ -13,6 +14,7 @@ function ServerRemote:new(domain, sessions)
 	self.auth = AuthServerRemote(domain.users, sessions)
 	self.submission = SubmissionServerRemote(domain.chartplay_submission, domain.chartplays)
 	self.leaderboards = LeaderboardsServerRemote(domain.leaderboards)
+	self.difftables = DifftablesServerRemote(domain.difftables)
 end
 
 ---@return sea.User

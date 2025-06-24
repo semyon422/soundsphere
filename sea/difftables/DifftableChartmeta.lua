@@ -11,6 +11,7 @@ local class = require("class")
 ---@field is_deleted boolean
 ---@field created_at integer
 ---@field updated_at integer
+---@field change_index integer
 --- joined/preloaded
 ---@field chartmeta_id integer?
 ---@field chartmeta sea.Chartmeta?

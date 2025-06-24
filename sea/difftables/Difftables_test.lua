@@ -64,6 +64,7 @@ function test.basic(t)
 	t:eq(dt_cm.is_deleted, false)
 	t:eq(dt_cm.created_at, 0)
 	t:eq(dt_cm.updated_at, 0)
+	t:eq(dt_cm.change_index, 1)
 
 	local dt_cm, err = ctx.difftables:setDifftableChartmeta(ctx.user, 1, difftable.id, "", 1, 10)
 	if not t:assert(dt_cm, err) then
@@ -75,6 +76,7 @@ function test.basic(t)
 	t:eq(dt_cm.is_deleted, false)
 	t:eq(dt_cm.created_at, 0)
 	t:eq(dt_cm.updated_at, 1)
+	t:eq(dt_cm.change_index, 2)
 
 	local dt_cm, err = ctx.difftables:deleteDifftableChartmeta(ctx.user, 2, difftable.id, "", 1)
 	if not t:assert(dt_cm, err) then
@@ -86,6 +88,7 @@ function test.basic(t)
 	t:eq(dt_cm.is_deleted, true)
 	t:eq(dt_cm.created_at, 0)
 	t:eq(dt_cm.updated_at, 2)
+	t:eq(dt_cm.change_index, 3)
 end
 
 return test

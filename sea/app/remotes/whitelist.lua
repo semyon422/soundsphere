@@ -18,6 +18,10 @@ local whitelist = {
 		getLeaderboards = true,
 		getUserLeaderboardUsers = true,
 	},
+	difftables = {
+		getDifftables = true,
+		getDifftableChartmetas = true,
+	},
 	getUser = true,
 	getSession = true,
 }

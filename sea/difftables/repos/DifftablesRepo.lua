@@ -63,32 +63,51 @@ end
 
 --------------------------------------------------------------------------------
 
----@param difftable_id integer
----@param since integer?
----@param include_deleted boolean?
 ---@return sea.DifftableChartmeta[]
-function DifftablesRepo:getDifftableChartmetas(difftable_id, since, include_deleted)
+function DifftablesRepo:getDifftableChartmetasAll()
+	return self.models.difftable_chartmetas:select()
+end
+
+---@param hash string
+---@param index integer
+---@return sea.DifftableChartmeta[]
+function DifftablesRepo:getDifftableChartmetasForChartmeta(hash, index)
+	return self.models.difftable_chartmetas:select({
+		hash = assert(hash),
+		index = assert(index),
+	})
+end
+
+---@param difftable_id integer
+---@param include_deleted boolean?
+---@param since integer?
+---@param limit integer?
+---@return sea.DifftableChartmeta[]
+function DifftablesRepo:getDifftableChartmetas(difftable_id, include_deleted, since, limit)
 	---@type rdb.Conditions
 	local conds = {
 		difftable_id = assert(difftable_id),
 		is_deleted = false,
 	}
 	if since then
-		conds.updated_at__gte = since
+		conds.change_index__gte = since
 	end
 	if include_deleted then
 		conds.is_deleted = nil
 	end
 
-	return self.models.difftable_chartmetas:select(conds)
+	return self.models.difftable_chartmetas:select(conds, {
+		order = {"change_index ASC"},
+		limit = limit,
+	})
 end
 
 ---@param difftable_id integer
----@param since integer?
 ---@param include_deleted boolean?
+---@param since integer?
 ---@return sea.DifftableChartmeta[]
-function DifftablesRepo:getDifftableChartmetasFull(difftable_id, since, include_deleted)
-	local dt_cms = self:getDifftableChartmetas(difftable_id, since, include_deleted)
+function DifftablesRepo:getDifftableChartmetasFull(difftable_id, include_deleted, since)
+	local dt_cms = self:getDifftableChartmetas(difftable_id, include_deleted, since)
 	return self.models.difftable_chartmetas:preload(dt_cms, "user", "chartmeta")
 end
 
@@ -104,16 +123,42 @@ function DifftablesRepo:getDifftableChartmeta(difftable_id, hash, index)
 	})
 end
 
+---@param difftable_id integer
+---@return integer
+function DifftablesRepo:getNextChangeIndex(difftable_id)
+	---@type sea.DifftableChartmeta?
+	local dt_cm = self.models.difftable_chartmetas:find({
+		difftable_id = assert(difftable_id),
+	}, {
+		order = {"change_index DESC"},
+		limit = 1,
+	})
+	return (dt_cm and dt_cm.change_index or 0) + 1
+end
+
+---@param difftable_chartmetas sea.DifftableChartmeta[]
+function DifftablesRepo:insertDifftableChartmetas(difftable_chartmetas)
+	self.models.difftable_chartmetas:insert(difftable_chartmetas, "replace")
+end
+
 ---@param difftable_chartmeta sea.DifftableChartmeta
 ---@return sea.DifftableChartmeta
 function DifftablesRepo:createDifftableChartmeta(difftable_chartmeta)
-	return self.models.difftable_chartmetas:create(difftable_chartmeta)
+	self.models._orm.db:query("BEGIN")
+	difftable_chartmeta.change_index = self:getNextChangeIndex(difftable_chartmeta.difftable_id)
+	local dt_cm = self.models.difftable_chartmetas:create(difftable_chartmeta)
+	self.models._orm.db:query("COMMIT")
+	return dt_cm
 end
 
 ---@param difftable_chartmeta sea.DifftableChartmeta
 ---@return sea.DifftableChartmeta
 function DifftablesRepo:updateDifftableChartmeta(difftable_chartmeta)
-	return self.models.difftable_chartmetas:update(difftable_chartmeta, {id = assert(difftable_chartmeta.id)})[1]
+	self.models._orm.db:query("BEGIN")
+	difftable_chartmeta.change_index = self:getNextChangeIndex(difftable_chartmeta.difftable_id)
+	local dt_cm = self.models.difftable_chartmetas:update(difftable_chartmeta, {id = assert(difftable_chartmeta.id)})[1]
+	self.models._orm.db:query("COMMIT")
+	return dt_cm
 end
 
 ---@param difftable_id integer

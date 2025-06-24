@@ -2,6 +2,7 @@ local class = require("class")
 local User = require("sea.access.User")
 local Session = require("sea.access.Session")
 local SubmissionServerRemoteValidation = require("sea.chart.remotes.SubmissionServerRemoteValidation")
+local DifftablesServerRemoteValidation = require("sea.difftables.remotes.DifftablesServerRemoteValidation")
 
 ---@class sea.ServerRemoteValidation: sea.ServerRemote
 ---@operator call: sea.ServerRemoteValidation
@@ -13,6 +14,7 @@ function ServerRemoteValidation:new(remote)
 	self.auth = remote.auth
 	self.submission = SubmissionServerRemoteValidation(remote.submission)
 	self.leaderboards = remote.leaderboards
+	self.difftables = DifftablesServerRemoteValidation(remote.difftables)
 end
 
 ---@return sea.User
