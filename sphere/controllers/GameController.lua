@@ -210,7 +210,9 @@ function GameController:load()
 		self.onlineModel:load()
 		self.onlineModel.authManager:checkSession()
 		self.online_wrapper:updateLeaderboards()
-		print("sync difftables", self.difftables_sync:sync())
+		if not love.filesystem.read("disable_difftables_sync.txt") then
+			print("sync difftables", self.difftables_sync:sync())
+		end
 	end)
 
 	self.noteSkinModel:load()
