@@ -132,7 +132,7 @@ function AuthManager:logoutAsync()
 	local server_remote = sea_client.remote
 	local config = self.config
 
-	server_remote.auth:logout()
+	pcall(server_remote.auth.logout, server_remote.auth)
 
 	config.session = {}
 	config.user = {}
