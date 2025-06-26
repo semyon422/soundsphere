@@ -125,11 +125,11 @@ function UserResource:getUser(req, res, ctx)
 	end
 
 	if #ctx.general_stats ~= 0 then
-		local s = ""
-		for _, v in ipairs(ctx.general_stats) do
-			s = ("%s | %s: %s"):format(s, v.label, v.value)
+		local s = {}
+		for i, v in ipairs(ctx.general_stats) do
+			s[i] = ("%s: %s"):format(v.label, v.value)
 		end
-		ctx.meta_tags["description"] = s
+		ctx.meta_tags["description"] = table.concat(s, " | ")
 	end
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
