@@ -28,6 +28,7 @@ end
 ---@param ctx sea.RequestContext
 function TeamsResource:getTeams(req, res, ctx)
 	ctx.teams = self.teams:getTeams()
+	ctx.meta_tags["title"] = "Teams - soundsphere"
 	self.views:render_send(res, "sea/teams/http/teams.etlua", ctx, true)
 end
 
@@ -37,6 +38,7 @@ end
 function TeamsResource:getCreateTeam(req, res, ctx)
 	ctx.can_create = self.teams.teams_access:canCreate(ctx.session_user, os.time())
 	ctx.main_container_type = "vertically_centered"
+	ctx.meta_tags["title"] = "Create a team - soundsphere"
 	self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
 end
 

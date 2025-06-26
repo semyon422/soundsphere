@@ -47,6 +47,7 @@ function PolicyResource:getPage(req, res, ctx)
 	for _, v in ipairs(self.policies) do
 		if v.key == policy_key then
 			ctx.policy_filename = v.filename
+			ctx.meta_tags["title"] = ("%s - soundsphere"):format(v.name)
 		end
 	end
 

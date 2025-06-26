@@ -118,9 +118,18 @@ function UserResource:getUser(req, res, ctx)
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
 	ctx.scores, ctx.total_rating = page:getScores(ctx.leaderboard, user.id, ctx.query.scores)
 
-	ctx.meta_title = ("soundsphere - %s's profile"):format(ctx.user.name or "Unknown")
+	ctx.meta_tags["title"] = ("%s's profile - soundsphere"):format(ctx.user.name or "Unknown")
+	ctx.meta_tags["profile:username"] = ctx.user.name
 	if ctx.user.avatar and ctx.user.avatar ~= "" then
-		ctx.meta_image = ctx.user.avatar
+		ctx.meta_tags["og:image"] = ctx.user.avatar
+	end
+
+	if #ctx.general_stats ~= 0 then
+		local s = ""
+		for _, v in ipairs(ctx.general_stats) do
+			s = ("%s | %s: %s"):format(s, v.label, v.value)
+		end
+		ctx.meta_tags["description"] = s
 	end
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
