@@ -45,6 +45,7 @@ function RankingsResource:getRankings(req, res, ctx)
 
 	---@type sea.RankingType
 	local ranking_type = query.ranking_type or "rating"
+	local leaderboard_name = ""
 
 	local per_page = self.users_per_page
 	ctx.users_per_page = per_page
@@ -56,12 +57,16 @@ function RankingsResource:getRankings(req, res, ctx)
 		page = math.min(page, ctx.pages_count)
 		ctx.leaderboard_users = lbs:getLeaderboardUsersFull(leaderboard_id, per_page, (page - 1) * per_page)
 		lbs:loadLeaderboardUsersHistory(leaderboard_id, ctx.leaderboard_users)
+		leaderboard_name = ctx.leaderboard.name
 	else
 		local order = "chartplays_count"
+		leaderboard_name = "Play Count"
 		if ranking_type == "charts" then
 			order = "chartmetas_count"
+			leaderboard_name = "Charts"
 		elseif ranking_type == "play_time" then
 			order = "play_time"
+			leaderboard_name = "Play Time"
 		end
 		ctx.pages_count = math.ceil(self.users:getUsersCount() / per_page)
 		page = math.min(page, ctx.pages_count)
@@ -69,14 +74,12 @@ function RankingsResource:getRankings(req, res, ctx)
 	end
 
 	ctx.page_num = page
-
-	-- local first = (page - 1) * self.users_per_page
-	-- local last = math.min(first + self.users_per_page, #self.testUsers)
-
 	ctx.ranking_type_tabs = self.ranking_type_tabs
 
 	ctx.ranking_type = ranking_type
 	ctx.display_leaderboards = ranking_type == "rating"
+
+	ctx.meta_tags["title"] = ("%s Leaderboard - soundsphere"):format(leaderboard_name)
 
 	self.views:render_send(res, "sea/leaderboards/http/rankings.etlua", ctx, true)
 end

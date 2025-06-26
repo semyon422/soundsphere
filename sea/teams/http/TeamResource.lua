@@ -69,6 +69,7 @@ function TeamResource:getTeamPage(req, res, ctx)
 	ctx.edit_description = can_update and ctx.query.edit_description == "true"
 
 	ctx.main_container_type = "none"
+	ctx.meta_tags["title"] = ("%s team - soundsphere"):format(team.name)
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
 end
 

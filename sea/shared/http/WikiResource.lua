@@ -84,11 +84,13 @@ function WikiResource:getPage(req, res, ctx)
 	end
 
 	local selected_page ---@type string?
+	local selected_page_name = ""
 
 	for _, category in ipairs(meta.categories) do
 		for _, p in ipairs(category.pages) do
 			if p.filename == ctx.path_params.page then
 				selected_page = p.filename
+				selected_page_name = p.name
 				break
 			end
 		end
@@ -104,6 +106,8 @@ function WikiResource:getPage(req, res, ctx)
 	ctx.language_metadatas = language_metadatas
 	ctx.categories = meta.categories
 	ctx.markdown_file_path = ("sea/wiki/%s/%s.md"):format(selected_language_code, selected_page)
+
+	ctx.meta_tags["title"] = ("%s - soundsphere Wiki"):format(selected_page_name)
 
 	self.views:render_send(res, "sea/shared/http/wiki.etlua", ctx, true)
 end

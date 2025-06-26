@@ -23,6 +23,7 @@ local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 ---@field session_user sea.User
 ---@field session sea.Session?
 ---@field version any
+---@field meta_tags {[string]: string} HTML meta tags
 
 ---@class sea.App
 ---@operator call: sea.App
@@ -144,6 +145,7 @@ function App:handle(req, res, ip)
 		session = self.domain.users:getSession(),
 		session_user = self.domain.users:getUser(),
 		version = self:getVersion(),
+		meta_tags = {}
 	}
 
 	self:handleSession(req, ctx)
