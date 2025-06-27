@@ -1,5 +1,5 @@
 # Adding skins
-soundsphere supports **osu!** skins and adding them to the game is quite easy. 
+<%= brand.name %> supports **osu!** skins and adding them to the game is quite easy. 
 
 First you need to find your favorite **osu!** skin on the internet and download it. Downloaded skins can be in two formats: `.zip` and `.osk`. You will need to unzip the files from these archives into the folder. `.osk` is actually a `.zip` archive, and is extracted in the same way as `.zip`.  
 
@@ -15,7 +15,7 @@ skin_folder/
 The `skin.ini` file should be in the root of the folder.
 
 ## Installing skins
-1. Go to the folder with soundsphere installed.
+1. Go to the folder with <%= brand.name %> installed.
 2. Go to the `userdata/skins/` folder.
 3. Put the unzipped skin into it.
 4. Restart the game if it was running during the skin installation.

@@ -3,6 +3,7 @@ local http_util = require("web.http.util")
 local json = require("web.json")
 local types = require("sea.shared.types")
 local Team = require("sea.teams.Team")
+local brand = require("brand")
 
 ---@class sea.TeamResource: web.IResource
 ---@operator call: sea.TeamResource
@@ -69,7 +70,7 @@ function TeamResource:getTeamPage(req, res, ctx)
 	ctx.edit_description = can_update and ctx.query.edit_description == "true"
 
 	ctx.main_container_type = "none"
-	ctx.meta_tags["title"] = ("%s team - soundsphere"):format(team.name)
+	ctx.meta_tags["title"] = ("%s team - %s"):format(team.name, brand.name)
 	self.views:render_send(res, "sea/teams/http/team.etlua", ctx, true)
 end
 

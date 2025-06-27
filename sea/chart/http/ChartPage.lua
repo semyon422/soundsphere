@@ -1,5 +1,6 @@
 local class = require("class")
 local time_util = require("time_util")
+local brand = require("brand")
 
 local ModifierModel = require("sphere.models.ModifierModel")
 
@@ -53,7 +54,7 @@ function ChartPage:getGameName()
 	elseif f == "o2jam" then
 		return "o2jam"
 	elseif f == "sphere" then
-		return "soundsphere"
+		return brand:lower()
 	elseif f == "quaver" then
 		return "Quaver"
 	elseif f == "stepmania" then

@@ -1,6 +1,7 @@
 local IResource = require("web.framework.IResource")
 local http_util = require("web.http.util")
 local Team = require("sea.teams.Team")
+local brand = require("brand")
 
 ---@class sea.TeamsResource: web.IResource
 ---@operator call: sea.TeamsResource
@@ -28,7 +29,7 @@ end
 ---@param ctx sea.RequestContext
 function TeamsResource:getTeams(req, res, ctx)
 	ctx.teams = self.teams:getTeams()
-	ctx.meta_tags["title"] = "Teams - soundsphere"
+	ctx.meta_tags["title"] = "Teams - " .. brand.name
 	self.views:render_send(res, "sea/teams/http/teams.etlua", ctx, true)
 end
 
@@ -38,7 +39,7 @@ end
 function TeamsResource:getCreateTeam(req, res, ctx)
 	ctx.can_create = self.teams.teams_access:canCreate(ctx.session_user, os.time())
 	ctx.main_container_type = "vertically_centered"
-	ctx.meta_tags["title"] = "Create a team - soundsphere"
+	ctx.meta_tags["title"] = "Create a team - " .. brand.name
 	self.views:render_send(res, "sea/teams/http/teams_create.etlua", ctx, true)
 end
 

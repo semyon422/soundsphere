@@ -30,7 +30,7 @@ There you will see several types of filters.
 
 ## Filters by charts played and mods applied
 The game has a unique feature to show played charts as individual charts.  
-For example: the normal chart list is more like a file view. If you create a chart, it is saved to a file. Charts are merged into a set of charts if they are in the same folder as the song. soundsphere allows you to show played charts as separate charts. This is useful if you want to see and play what you have played before with the same mod combination. This feature will become much more useful with more charts played.
+For example: the normal chart list is more like a file view. If you create a chart, it is saved to a file. Charts are merged into a set of charts if they are in the same folder as the song. <%= brand.name %> allows you to show played charts as separate charts. This is useful if you want to see and play what you have played before with the same mod combination. This feature will become much more useful with more charts played.
 
 To change the chart display mode, in the chart selection list, which is the list down the middle, click on the `charts` button.  
 There are three modes to choose from: 

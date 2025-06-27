@@ -9,6 +9,7 @@ local types = require("sea.shared.types")
 local Roles = require("sea.access.Roles")
 local Timezone = require("sea.activity.Timezone")
 local ActivityDate = require("sea.activity.ActivityDate")
+local brand = require("brand")
 
 ---@class sea.UserResource: web.IResource
 ---@operator call: sea.UserResource
@@ -118,7 +119,7 @@ function UserResource:getUser(req, res, ctx)
 	ctx.leaderboards = self.leaderboards:getLeaderboards()
 	ctx.scores, ctx.total_rating = page:getScores(ctx.leaderboard, user.id, ctx.query.scores)
 
-	ctx.meta_tags["title"] = ("%s's profile - soundsphere"):format(ctx.user.name or "Unknown")
+	ctx.meta_tags["title"] = ("%s's profile - %s"):format(ctx.user.name or "Unknown", brand.name)
 	ctx.meta_tags["profile:username"] = ctx.user.name
 	if ctx.user.avatar and ctx.user.avatar ~= "" then
 		ctx.meta_tags["og:image"] = ctx.user.avatar

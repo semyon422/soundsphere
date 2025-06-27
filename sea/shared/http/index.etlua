@@ -3,7 +3,7 @@
 		<div class="columns is-desktop welcome__main-columns">
 			<div class="column welcome__left-column">
 				<div class="welcome__hero">
-					<h1 class="exo-2-bold welcome__game-name">SOUNDSPHERE</h1>
+					<h1 class="exo-2-bold welcome__game-name"><%= brand.name:upper() %></h1>
 					<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
 					<div class="level welcome__buttons-level">
 						<div class="level-item buttons are-medium">
@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	<div class="welcome__bottom-text has-text-grey">
-		<p>See why soundsphere is a better choice</p>
+		<p>See why <%= brand.name %> is a better choice</p>
 		<i class="fas fa-chevron-down"></i>
 	</div>
 </div>

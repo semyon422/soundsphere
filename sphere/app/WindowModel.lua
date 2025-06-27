@@ -1,6 +1,7 @@
 local class = require("class")
 local Cursor = require("sphere.app.Cursor")
 local loop = require("loop")
+local brand = require("brand")
 
 ---@class sphere.WindowModel
 ---@operator call: sphere.WindowModel
@@ -37,7 +38,7 @@ function WindowModel:load(graphics)
 	end
 
 	self:setIcon()
-	love.window.setTitle("soundsphere")
+	love.window.setTitle(brand.name)
 
 	self.fullscreen = flags.fullscreen
 	self.fullscreentype = flags.fullscreentype

@@ -1,4 +1,5 @@
 local IResource = require("web.framework.IResource")
+local brand = require("brand")
 
 ---@class sea.WikiResource: web.IResource
 ---@operator call: sea.WikiResource
@@ -107,7 +108,7 @@ function WikiResource:getPage(req, res, ctx)
 	ctx.categories = meta.categories
 	ctx.markdown_file_path = ("sea/wiki/%s/%s.md"):format(selected_language_code, selected_page)
 
-	ctx.meta_tags["title"] = ("%s - soundsphere Wiki"):format(selected_page_name)
+	ctx.meta_tags["title"] = ("%s - %s Wiki"):format(selected_page_name, brand.name)
 
 	self.views:render_send(res, "sea/shared/http/wiki.etlua", ctx, true)
 end

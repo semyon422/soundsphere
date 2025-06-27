@@ -47,11 +47,11 @@
 <div class="columns is-vcentered" style="padding-bottom: 1em;">
 	<div class="column is-two-fifths">
 		<div class="download__inner-container">
-			<h1 class="title">Download soundsphere</h1>
+			<h1 class="title">Download <%= brand.name %></h1>
 			<h2 class="subtitle">Follow the steps on this page to install the game.</h2>
 
 			<div class="download__download-wrapper">
-				<a href="/soundsphere.zip" id="download-button" class="button is-link is-medium is-fullwidth">Download for Windows</a>
+				<a href="/<%= brand.repo_zip %>" id="download-button" class="button is-link is-medium is-fullwidth">Download for Windows</a>
 				<div class="download__os-compatibility">
 					<p style="flex-grow: 1">Available for:</p>
 					<a onclick="setDownloadButton('windows');" class="fab fa-windows download__os-icon"></a>
@@ -72,7 +72,7 @@
 			<ul>
 				<li><strong>game-win64</strong> - For Windows</li>
 				<li><strong>game-appimage</strong> or <strong>game-linux</strong> - For Linux</li>
-				<li><strong>xattr -cr soundsphere.app</strong>, then <strong>soundsphere.app</strong> - For macOS</li>
+				<li><strong>xattr -cr <%= brand.macos_app %></strong>, then <strong><%= brand.macos_app %></strong> - For macOS</li>
 			</ul>
 			<p>You can find a variety of methods for adding songs and skins in our <a href="wiki">Wiki</a>.</p>
 		</div>
@@ -84,15 +84,15 @@ function setDownloadButton(os) {
 	const button = document.getElementById("download-button")
 	if (os == "windows") {
 		button.innerText = "Download for Windows"
-		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere.zip");
+		button.setAttribute("href", "<%= brand.repo_url %>/<%= brand.repo_zip %>");
 	}
 	else if (os == "linux") {
 		button.innerText = "Download for Linux"
-		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere.zip");
+		button.setAttribute("href", "<%= brand.repo_url %>/<%= brand.repo_zip %>");
 	}
 	else if (os == "macos") {
 		button.innerText = "Download for macOS"
-		button.setAttribute("href", "https://dl.soundsphere.xyz/soundsphere_macos.zip");
+		button.setAttribute("href", "<%= brand.repo_url %>/<%= brand.repo_macos_zip %>");
 	}
 }
 

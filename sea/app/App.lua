@@ -13,6 +13,7 @@ local Sessions = require("web.framework.Sessions")
 local Recaptcha = require("web.framework.Recaptcha")
 local etlua_util = require("web.framework.page.etlua_util")
 local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
+local brand = require("brand")
 
 ---@class sea.RequestContext
 ---@field [any] any
@@ -24,6 +25,7 @@ local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 ---@field session sea.Session?
 ---@field version any
 ---@field meta_tags {[string]: string} HTML meta tags
+---@field brand sea.Brand
 
 ---@class sea.App
 ---@operator call: sea.App
@@ -145,7 +147,8 @@ function App:handle(req, res, ip)
 		session = self.domain.users:getSession(),
 		session_user = self.domain.users:getUser(),
 		version = self:getVersion(),
-		meta_tags = {}
+		meta_tags = {},
+		brand = brand,
 	}
 
 	self:handleSession(req, ctx)

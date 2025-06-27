@@ -23,7 +23,7 @@
 <div class="donate__container">
 	<div class="content">
 		<h1>Support the game and us!</h1>
-		<p>Do you not want the game to suddenly shut its doors? You can help us spread the game on social media and in chat rooms. Join our Discord server, thank the developers by adding a star to the soundsphere GitHub repository, and play our game!</p>
+		<p>Do you not want the game to suddenly shut its doors? You can help us spread the game on social media and in chat rooms. Join our Discord server, thank the developers by adding a star to the <%= brand.name %> GitHub repository, and play our game!</p>
 		<h2>Helping monetarily</h2>
 		<p>The entire project is and always will be free. However, keeping the server open costs us a lot of money. We also need to eat, so donating money would greatly benefit the project.</p>
 		<p>Below are the services you can use to donate money. Currently, we don't have a way to automatically add the Donator role to your profile, so after using one of the services, you should contact Semyon and share the link to your profile. We give <strong>one month</strong> of the Donator role <strong>for each dollar</strong> donated.</p>

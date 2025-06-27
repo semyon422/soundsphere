@@ -1,14 +1,14 @@
 # Adding charts/music
-There are 4 ways to add charts to soundsphere. We recommend to familiarize yourself with all of them.
+There are 4 ways to add charts to <%= brand.name %>. We recommend to familiarize yourself with all of them.
 
-soundsphere supports the following chart formats:
+<%= brand.name %> supports the following chart formats:
 - `.osu` - beatmaps from **osu!**
 - `.qua` - charts from **Quaver**.
 - `.sm` and `.ssc` - charts from **StepMania** and **Etterna**.
 - `.bms`, `.bme`, `.bml` and `.pms` - charts from **Lunatic Rave 2**, **beatoraja** and other **Beatmania** simulators
 - `.ojn` - charts from **o2jam**
 - `.ksh` - charts from **K-Shoot MANIA**
-- `.sph` - charts from **soundsphere**
+- `.sph` - charts from **<%= brand.name %>**
 - `.mid` and `.midi`.
 
 At the very end of the page you can find links to the chart download pages.
@@ -27,7 +27,7 @@ songs_folder/
 ├── song3/
 ```
 
-soundsphere also supports searching for charts from subfolders (**Etterna** and **StepMania**):
+<%= brand.name %> also supports searching for charts from subfolders (**Etterna** and **StepMania**):
 ```
 songs_folder/
 ├── pack1/
@@ -42,7 +42,7 @@ songs_folder/
 
 This method of adding charts requires a root folder, in the examples above it is `songs_folder`, in the case of **osu!**, **Quaver** and **Etterna** it will be the `Songs` folder.
 
-1. Start soundsphere.
+1. Start <%= brand.name %>.
 2. On the bottom left of the screen, click the folder icon.
 3. You need to create a different location for each folder. Click on the `create location` button
 4. On the right side of the menu you will be able to rename the location. Give it a suitable name.
@@ -51,14 +51,14 @@ This method of adding charts requires a root folder, in the examples above it is
 
 > After adding charts, you will need to click on the `collections` button in the bottom right corner of the screen and in the same place click on the `notecharts` button to update the list of charts. This will be fixed in the new version of the UI. This also applies to the following method.
 
-## Adding new charts to the soundsphere folder
-soundsphere has its own charts folder where you can put charts of any format. This folder is located at the path: `userdata/charts/` relative to the root of the game. You should add new charts in subfolders.
+## Adding new charts to the <%= brand.name %> folder
+<%= brand.name %> has its own charts folder where you can put charts of any format. This folder is located at the path: `userdata/charts/` relative to the root of the game. You should add new charts in subfolders.
 
 1. Go to `userdata/charts/`.
 2. Create a folder in which you will put the charts. For example, the path would be as follows: `userdata/charts/cool_songs/`.
 3. In this folder put charts or packs (subfolders with charts).
 4. Go into the game and click on the folder icon in the bottom left corner of the screen. 
-5. Make sure the `soundsphere` location is selected. Click on the `update` button on the right side menu.
+5. Make sure the `<%= brand.location_name %>` location is selected. Click on the `update` button on the right side menu.
 
 ## Adding `.osz` charts 
 1. Drag `.osz` into the game window.

@@ -1,5 +1,4 @@
-local http_util = require("web.http.util")
-local math_util = require("math_util")
+local brand = require("brand")
 local IResource = require("web.framework.IResource")
 
 ---@class sea.RankingsResource: web.IResource
@@ -79,7 +78,7 @@ function RankingsResource:getRankings(req, res, ctx)
 	ctx.ranking_type = ranking_type
 	ctx.display_leaderboards = ranking_type == "rating"
 
-	ctx.meta_tags["title"] = ("%s Leaderboard - soundsphere"):format(leaderboard_name)
+	ctx.meta_tags["title"] = ("%s Leaderboard - %s"):format(leaderboard_name, brand.name)
 
 	self.views:render_send(res, "sea/leaderboards/http/rankings.etlua", ctx, true)
 end

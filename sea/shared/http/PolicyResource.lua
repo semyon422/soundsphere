@@ -1,5 +1,5 @@
 local IResource = require("web.framework.IResource")
-local http_util = require("http_util")
+local brand = require("brand")
 
 ---@class sea.PolicyResource: web.IResource
 ---@operator call: sea.PolicyResource
@@ -47,7 +47,7 @@ function PolicyResource:getPage(req, res, ctx)
 	for _, v in ipairs(self.policies) do
 		if v.key == policy_key then
 			ctx.policy_filename = v.filename
-			ctx.meta_tags["title"] = ("%s - soundsphere"):format(v.name)
+			ctx.meta_tags["title"] = ("%s - %s"):format(v.name, brand.name)
 		end
 	end
 

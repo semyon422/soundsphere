@@ -8,4 +8,4 @@
 
 在我们的 [Discord 服务器](https://discord.gg/ubKMtTk) 的 **#bugs** 频道报告问题。必须详细描述您是如何遇到错误的，并附上错误文字。
 
-您也可以在游戏的 [官方 GitHub 仓库](https://github.com/semyon422/soundsphere) 中创建一个 Issue。
+您也可以在游戏的 [官方 GitHub 仓库](<%= brand.git_repo %>) 中创建一个 Issue。

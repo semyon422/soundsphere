@@ -106,7 +106,7 @@ end
 function LocationManager:createDefaultLocation()
 	local loc = {
 		path = "userdata/charts",
-		name = "soundsphere",
+		name = "game",
 		is_relative = true,
 		is_internal = true,
 	}

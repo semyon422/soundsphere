@@ -6,4 +6,4 @@ Make sure the game is updated to the latest version. You can only report bugs of
 
 Report on our [Discord server](https://discord.gg/ubKMtTk) in the **#bugs** channel. It is necessary to describe in detail how you got the error. It is also necessary to attach the text of the error.
 
-You can also create an Issue in [official Github repository of the game](https://github.com/semyon422/soundsphere).
+You can also create an Issue in [official Github repository of the game](<%= brand.git_repo %>).

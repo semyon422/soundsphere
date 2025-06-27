@@ -4,7 +4,7 @@ Effective *May 29, 2025*.
 
 ### Introduction
 
-Our game, soundsphere, is a free and open-source rhythm game created by a team of individuals based in Russia and hosted on servers located in the Netherlands. In order to provide our game and website to a global audience, we need to collect certain information from our users. We understand that your privacy is important, and we want to be transparent about what information we collect, how we use it, and how we protect it. This Privacy Policy explains our approach to information collection and use, and we encourage you to read it carefully to understand how we handle your personal information. By playing soundsphere and using our services, you agree to the terms of this policy, and we appreciate your trust in our game and our commitment to your privacy.
+Our game, <%= brand.name %>, is a free and open-source rhythm game created by a team of individuals based in Russia and hosted on servers located in the Netherlands. In order to provide our game and website to a global audience, we need to collect certain information from our users. We understand that your privacy is important, and we want to be transparent about what information we collect, how we use it, and how we protect it. This Privacy Policy explains our approach to information collection and use, and we encourage you to read it carefully to understand how we handle your personal information. By playing <%= brand.name %> and using our services, you agree to the terms of this policy, and we appreciate your trust in our game and our commitment to your privacy.
 
 ### Information We Collect
 

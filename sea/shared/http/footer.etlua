@@ -18,6 +18,6 @@
 		<p>•</p>
 		<a href="/policies?policy_key=dmca" class="footer__link">Copyright (DMCA)</a>
 		<p>•</p>
-		<a href="https://github.com/semyon422/soundsphere" class="footer__link">Source code</a>
+		<a href="<%= brand.git_repo %>" class="footer__link">Source code</a>
 	</div>
 </footer>

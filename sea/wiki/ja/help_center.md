@@ -8,4 +8,4 @@
 
 バグは、[Discord サーバー](https://discord.gg/ubKMtTk) の **#bugs** チャンネルで報告してください。エラーの発生状況を詳細に説明し、エラーテキストを添付してください。
 
-また、ゲームの [公式 GitHub リポジトリ](https://github.com/semyon422/soundsphere) に Issue を作成することもできます。
+また、ゲームの [公式 GitHub リポジトリ](<%= brand.git_repo %>) に Issue を作成することもできます。

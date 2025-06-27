@@ -1,16 +1,16 @@
 > 本頁由 AI 翻譯!!! 可能包含令人困惑的錯誤，但我想您仍然能夠理解這裡解釋的內容。如果您害怕機器人，請閱讀原始英文頁面！
 
 # 新增歌曲
-有四種方式可以將歌曲新增到 soundsphere。我們建議您熟悉所有這些方式。
+有四種方式可以將歌曲新增到 <%= brand.name %>。我們建議您熟悉所有這些方式。
 
-soundsphere 支援以下歌曲格式：
+<%= brand.name %> 支援以下歌曲格式：
 - `.osu` - 來自 **osu!** 的譜面
 - `.qua` - 來自 **Quaver** 的歌曲
 - `.sm` 和 `.ssc` - 來自 **StepMania** 和 **Etterna** 的歌曲
 - `.bms`, `.bme`, `.bml` 和 `.pms` - 來自 **Lunatic Rave 2**, **beatoraja** 和其他 **Beatmania** 模擬器的歌曲
 - `.ojn` - 來自 **o2jam** 的歌曲
 - `.ksh` - 來自 **K-Shoot MANIA** 的歌曲
-- `.sph` - 來自 **soundsphere** 的歌曲
+- `.sph` - 來自 **<%= brand.name %>** 的歌曲
 - `.mid` 和 `.midi`。
 
 在頁面的最後，您可以找到歌曲下載連結。
@@ -29,7 +29,7 @@ songs_folder/
 ├── song3/
 ```
 
-soundsphere 也支援從子文件夾中搜索歌曲（**Etterna** 和 **StepMania**）：
+<%= brand.name %> 也支援從子文件夾中搜索歌曲（**Etterna** 和 **StepMania**）：
 ```
 songs_folder/
 ├── pack1/
@@ -44,7 +44,7 @@ songs_folder/
 
 新增歌曲的這種方法需要一個根文件夾，在上面的例子中是 `songs_folder`，在 **osu!**, **Quaver** 和 **Etterna** 的情況下，它將是 `Songs` 文件夾。
 
-1. 啟動 soundsphere。
+1. 啟動 <%= brand.name %>。
 2. 在屏幕左下角，點擊文件夾圖標。
 3. 您需要為每個文件夾創建不同的位置。點擊 `create location` 按鈕。
 4. 在菜單的右側，您可以重命名位置。給它一個合適的名字。
@@ -53,14 +53,14 @@ songs_folder/
 
 > 新增歌曲後，您需要點擊屏幕右下角的 `collections` 按鈕，並在同一位置點擊 `notecharts` 按鈕以更新歌曲列表。這將在新版本的 UI 中得到修復。這也適用於以下方法。
 
-## 將新歌曲新增到 soundsphere 文件夾
-soundsphere 有自己的歌曲文件夾，您可以在其中放置任何格式的歌曲。此文件夾位於相對於遊戲根目錄的路徑：`userdata/charts/`。您應該在子文件夾中新增新歌曲。
+## 將新歌曲新增到 <%= brand.name %> 文件夾
+<%= brand.name %> 有自己的歌曲文件夾，您可以在其中放置任何格式的歌曲。此文件夾位於相對於遊戲根目錄的路徑：`userdata/charts/`。您應該在子文件夾中新增新歌曲。
 
 1. 前往 `userdata/charts/`。
 2. 創建一個文件夾，您將在此文件夾中放置歌曲。例如，路徑如下：`userdata/charts/cool_songs/`。
 3. 在此文件夾中放置歌曲或包（包含歌曲的子文件夾）。
 4. 進入遊戲，點擊屏幕左下角的文件夾圖標。
-5. 確保選擇了 `soundsphere` 位置。點擊右側菜單中的 `update` 按鈕。
+5. 確保選擇了 `<%= brand.location_name %>` 位置。點擊右側菜單中的 `update` 按鈕。
 
 ## 新增 `.osz` 歌曲
 1. 將 `.osz` 拖到遊戲窗口中。

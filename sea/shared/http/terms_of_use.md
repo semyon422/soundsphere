@@ -2,7 +2,7 @@
 
 Effective *May 29, 2025*.
 
-Terms of Use ("Terms") govern your use of the [soundsphere game](https://soundsphere.xyz/download), [website](https://soundsphere.xyz), and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.
+Terms of Use ("Terms") govern your use of the [<%= brand.name %> game](<%= brand.url %>/download), [website](<%= brand.url %>), and services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms.
 
 ### Prohibited activities
 
@@ -28,7 +28,7 @@ As a user of the Service, you agree not to:
 
 ### Privacy policy
 
-We care about data privacy and security. Please review our [Privacy Policy](https://soundsphere.xyz/policies/privacy). By using the Service, you agree to be bound by our Privacy Policy, which is incorporated into these Terms and Conditions.
+We care about data privacy and security. Please review our [Privacy Policy](<%= brand.url %>/policies/privacy). By using the Service, you agree to be bound by our Privacy Policy, which is incorporated into these Terms and Conditions.
 
 ### Term and termination
 
@@ -79,7 +79,7 @@ Any use of the Service in violation of the foregoing violates these Terms and Co
 
 ### Open-Source Game and Plugins
 
-1. soundsphere game is open-source and licensed under the GNU General Public License version 3 (GPLv3). You are free to modify and distribute the game code, but you must comply with the terms of the GPLv3 license.
+1. <%= brand.name %> game is open-source and licensed under the GNU General Public License version 3 (GPLv3). You are free to modify and distribute the game code, but you must comply with the terms of the GPLv3 license.
 2. You may create and use custom Lua code for plugins and game skins. However, you acknowledge that such code may be used to damage the game or steal data from other users, and we cannot control or guarantee the safety of such code.
 3. You may download plugins from within the game or from third-party websites. You acknowledge that such plugins may be malicious or unsafe, and you use them at your own risk. We do not own or develop these plugins, and we are not responsible for any damage or harm caused by their use.
 
