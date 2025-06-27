@@ -88,7 +88,9 @@ function ReplayModel:update()
 	event.baseTime = event.baseTime or event.time
 	event.time = event.baseTime + logicEngine.inputOffset
 	if timeEngine.currentTime >= event.time then
+		rhythmModel.logicEngine.check1024 = false
 		rhythmModel:receive(event)
+		rhythmModel.logicEngine.check1024 = true
 		self:step()
 		return self:update()
 	end
