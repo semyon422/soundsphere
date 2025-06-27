@@ -41,7 +41,9 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 	end
 
 	chartview.lamp = _chartview.lamp
-	chartview.difftable_chartmetas = difftablesRepo:getDifftableChartmetasForChartmeta(chartview.hash, chartview.index)
+	if chartview.hash and chartview.index then
+		chartview.difftable_chartmetas = difftablesRepo:getDifftableChartmetasForChartmeta(chartview.hash, chartview.index)
+	end
 
 	return chartview
 end
