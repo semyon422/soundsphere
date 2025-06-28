@@ -1,6 +1,7 @@
 <% local util = require("web.http.util") %>
 <% local json = require("web.json") %>
 <% local format = require("sea.shared.format") %>
+<% local math_util = require("math_util") %>
 <% local Username = require("sea.shared.http.components.Username") %>
 
 <div class="is-hidden-mobile" style="position:relative;">
@@ -92,59 +93,6 @@
 							</ul>
 						</aside>
 					</div>
-<%
---[[%>
-					<div class="block">
-						<h1 class="title">Game mode</h1>
-						<aside class="menu">
-							<ul class="menu-list">
-								<li><a class="is-active">Mania</a></li>
-								<li><a>Taiko</a></li>
-								<li><a>osu!</a></li>
-							</ul>
-						</aside>
-					</div>
-					<div class="block">
-						<h1 class="title">Leaderboard</h1>
-						<aside class="menu">
-							<p class="menu-label">All ranked</p>
-							<ul class="menu-list">
-								<li><a class="is-active">All ranked</a></li>
-								<li><a>Hardcore</a></li>
-							</ul>
-							<p class="menu-label">Other games</p>
-							<ul class="menu-list">
-								<li><a>osu!</a></li>
-								<li><a>Etterna</a></li>
-								<li><a>Quaver</a></li>
-							</ul>
-							<p class="menu-label">Tables</p>
-							<ul class="menu-list">
-								<li><a>Normal 2</a></li>
-								<li><a>Insane 2</a></li>
-								<li><a>Overjoy</a></li>
-								<li><a>Satellite</a></li>
-								<li><a>Stella</a></li>
-							</ul>
-						</aside>
-					</div>
-					<div class="block">
-						<h1 class="title">Key mode</h1>
-						<aside class="menu">
-							<p class="menu-label">Filters</p>
-							<ul class="menu-list">
-								<li><a class="is-active">All</a></li>
-							</ul>
-							<p class="menu-label">Specific key modes</p>
-							<ul class="menu-list">
-								<li><a>4K</a></li>
-								<li><a>7K1S</a></li>
-								<li><a>10K</a></li>
-							</ul>
-						</aside>
-					</div>
-<%
-]]%>
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
@@ -493,26 +441,39 @@
 								</div>
 							<% else %>
 								<% for i, v in ipairs(scores) do %>
+									<%
+										local artist_title = ("%s - %s"):format(v.artist, v.title)
+										local chart_name = ""
+
+										if v.creator and v.creator ~= "" then
+											chart_name = ("[%s] %s by %s"):format(v.inputmode, v.name, v.creator)
+										else
+											chart_name = ("[%s] %s"):format(v.inputmode, v.name)
+										end
+
+										local mods = {}
+
+										if v.rate ~= 1 then
+											table.insert(mods, ("%sX"):format(v.rate))
+										end
+										if v.const then
+											table.insert(mods, "CONST")
+										end
+										if v.tap_only then
+											table.insert(mods, "TAP")
+										end
+										table.insert(mods, v.modifiers)
+
+										local mods_line = table.concat(mods, " ")
+										local rating = v.ratingPostfix == "PP" and math_util.round(v.rating, 1) or format.float4(v.rating)
+									%>
 									<div class="user__score-panel" x-show="<%= i %> <= limit" <%= i > 5 and "x-cloak" or "" %>>
 										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
 										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-											<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
+											<p class="user__score-text"><%= artist_title %></p>
 											<div style="display: flex">
-												<% if v.creator and v.creator ~= "" then %>
-													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %> by <%= v.creator %></p>
-												<% else %>
-													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %></p>
-												<% end %>
-												<% if v.rate ~= 1 then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
-												<% end %>
-												<% if v.const then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
-												<% end %>
-												<% if v.tap_only then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
-												<% end %>
-												<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
+												<p class="user__score-text"><%= chart_name %></p>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= mods_line %></p></strong>
 											</div>
 										</div>
 										<div style="display: flex; min-width: fit-content;">
@@ -522,7 +483,7 @@
 											</div>
 											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
 											<div class="user__score-rating-box has-background-gray-light">
-												<p class="saira-bold" style="padding-left: 5px"><strong><%= format.float4(v.rating) %></strong></p>
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= rating %></strong></p>
 												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
 											</div>
 										</div>
