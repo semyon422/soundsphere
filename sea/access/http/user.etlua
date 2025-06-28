@@ -1,6 +1,7 @@
 <% local util = require("web.http.util") %>
 <% local json = require("web.json") %>
 <% local format = require("sea.shared.format") %>
+<% local erfunc = require("libchart.erfunc") %>
 <% local Username = require("sea.shared.http.components.Username") %>
 
 <div class="is-hidden-mobile" style="position:relative;">
@@ -92,59 +93,6 @@
 							</ul>
 						</aside>
 					</div>
-<%
---[[%>
-					<div class="block">
-						<h1 class="title">Game mode</h1>
-						<aside class="menu">
-							<ul class="menu-list">
-								<li><a class="is-active">Mania</a></li>
-								<li><a>Taiko</a></li>
-								<li><a>osu!</a></li>
-							</ul>
-						</aside>
-					</div>
-					<div class="block">
-						<h1 class="title">Leaderboard</h1>
-						<aside class="menu">
-							<p class="menu-label">All ranked</p>
-							<ul class="menu-list">
-								<li><a class="is-active">All ranked</a></li>
-								<li><a>Hardcore</a></li>
-							</ul>
-							<p class="menu-label">Other games</p>
-							<ul class="menu-list">
-								<li><a>osu!</a></li>
-								<li><a>Etterna</a></li>
-								<li><a>Quaver</a></li>
-							</ul>
-							<p class="menu-label">Tables</p>
-							<ul class="menu-list">
-								<li><a>Normal 2</a></li>
-								<li><a>Insane 2</a></li>
-								<li><a>Overjoy</a></li>
-								<li><a>Satellite</a></li>
-								<li><a>Stella</a></li>
-							</ul>
-						</aside>
-					</div>
-					<div class="block">
-						<h1 class="title">Key mode</h1>
-						<aside class="menu">
-							<p class="menu-label">Filters</p>
-							<ul class="menu-list">
-								<li><a class="is-active">All</a></li>
-							</ul>
-							<p class="menu-label">Specific key modes</p>
-							<ul class="menu-list">
-								<li><a>4K</a></li>
-								<li><a>7K1S</a></li>
-								<li><a>10K</a></li>
-							</ul>
-						</aside>
-					</div>
-<%
-]]%>
 				</div>
 			</div>
 			<div class="column is-three-fifths-tablet is-three-fifths-desktop is-three-quarters-widescreen">
@@ -301,36 +249,9 @@
 ]]%>
 				</div>
 				<div class="block border-box">
-					<p class="title is-4"><%= leaderboard.name %></p>
+					<p class="title is-4"><%= leaderboard.name %> Leaderboard</p>
+					<p class="subtitle is-6">Statistics specific for this leaderboard</p>
 					<div class="columns is-desktop">
-						<div class="column is-two-fifths-desktop">
-							<div class="border-box">
-								<div class="user__key-value">
-									<p>PP:</p>
-									<p><strong><%= math.floor(total_rating.rating_pp) %>pp</strong></p>
-								</div>
-								<div class="user__key-value">
-									<p>MSD:</p>
-									<p><strong><%= ("%0.2f"):format(total_rating.rating_msd) %></strong></p>
-								</div>
-								<div class="user__key-value">
-									<p>ENPS:</p>
-									<p><strong><%= ("%0.2f"):format(total_rating.rating) %></strong></p>
-								</div>
-<%
---[[%>
-								<div class="user__key-value">
-									<p>Unique scores:</p>
-									<p><strong>871</strong></p>
-								</div>
-								<div class="user__key-value">
-									<p>Play count:</p>
-									<p><strong>983</strong></p>
-								</div>
-<%
-]]%>
-							</div>
-						</div>
 						<div class="column" style="display: flex;align-items:center">
 							<nav class="level" style="width:100%">
 								<div class="level-item has-text-centered">
@@ -339,22 +260,91 @@
 										<p class="title">#<%= leaderboard_user and leaderboard_user.rank or "?" %></p>
 									</div>
 								</div>
-<%
---[[%>
 								<div class="level-item has-text-centered">
 									<div>
-										<p class="heading">Country rank</p>
-										<p class="title">#531</p>
+										<p class="heading"><%= leaderboard.rating_calc:upper() %></p>
+										<p class="title"><%= format.float4(total_rating:get(leaderboard.rating_calc)) %></p>
 									</div>
 								</div>
-<%
-]]%>
+								<div class="level-item has-text-centered">
+									<div>
+										<% local norm_accuracy = erfunc.erf(0.032 / (total_rating.accuracy * math.sqrt(2))) %>
+										<p class="heading">Accuracy</p>
+										<p class="title"><%= ("%0.02f%%"):format(norm_accuracy * 100) %></p>
+									</div>
+								</div>
 							</nav>
 						</div>
 					</div>
+					<div class="user__score-container" x-data="{limit: 5}">
+						<div class="block">
+							<div class="tabs">
+								<ul>
+									<li class="<%= query.scores == "top" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "top"}) %>">Best rating</a>
+									</li>
+									<li class="<%= query.scores == "first" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "first"}) %>">First places</a>
+									</li>
+									<li class="<%= query.scores == "recent" and "is-active" or "" %>">
+										<a href="?<%= util.query(query, {scores = "recent"}) %>">Recent</a>
+									</li>
+								</ul>
+							</div>
+							<% if #scores == 0 then %>
+								<div align="center" class="content empty-list-message">
+									<h2>There are no scores</h2>
+									<p>The player hasn't played anything yet</p>
+								</div>
+							<% else %>
+								<% for i, v in ipairs(scores) do %>
+									<div class="user__score-panel" x-show="<%= i %> <= limit" <%= i > 5 and "x-cloak" or "" %>>
+										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
+										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
+											<p class="user__score-text"><%= v.song_name %></p>
+											<div style="display: flex">
+												<p class="user__score-text"><%= v.chart_name %></p>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods_line %></p></strong>
+											</div>
+										</div>
+										<div style="display: flex; min-width: fit-content;">
+											<div class="user__score-rows" style="text-align: right;">
+												<p style="padding-left: 6px"><strong><%= ("%0.2f%%"):format(v.norm_accuracy * 100) %></strong></p>
+												<p class="has-text-grey"><%= v.time_since %></p>
+											</div>
+											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
+											<div class="user__score-rating-box has-background-gray-light">
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
+												<p class="saira-bold user__score-rating-postfix"><%= v.rating_postfix %></p>
+											</div>
+										</div>
+									</div>
+								<% end %>
+							<% end %>
+						</div>
+						<div class="block" x-show="limit == 5">
+							<a class="button" @click="limit = 20">Show 20 scores</a>
+						</div>
+						<div class="block" x-show="limit == 20">
+							<a class="button" @click="limit = 50">Show 50 scores</a>
+							<a class="button" @click="limit = 5">Hide</a>
+						</div>
+						<div class="block" x-show="limit == 50">
+							<a class="button" @click="limit = 100">Show 100 scores</a>
+							<a class="button" @click="limit = 5">Hide</a>
+						</div>
+						<div class="block" x-show="limit == 100">
+							<a class="button" @click="limit = 5">Hide</a>
+						</div>
+					</div>
 					<% if leaderboard_user_history then %>
-						<div class="block border-box" style="height: 160px;">
-							<canvas id="rank_graph"></canvas>
+						<div class="separator"></div>
+						<p class="title is-4">Rank History</p>
+						<p class="subtitle is-6">History for the past 30 days:</p>
+						<div style="height: 160px;">
+							<div class="user__history-chart has-background-dark">
+								<canvas id="rank_graph"></canvas>
+							</div>
 						</div>
 						<script>
 							function loadRankHistoryChart() {
@@ -470,81 +460,6 @@
 							})
 						</script>
 					<% end %>
-					<div class="user__score-container" x-data="{limit: 5}">
-						<div class="block">
-							<div class="tabs">
-								<ul>
-									<li class="<%= query.scores == "top" and "is-active" or "" %>">
-										<a href="?<%= util.query(query, {scores = "top"}) %>">Best rating</a>
-									</li>
-									<li class="<%= query.scores == "first" and "is-active" or "" %>">
-										<a href="?<%= util.query(query, {scores = "first"}) %>">First places</a>
-									</li>
-									<li class="<%= query.scores == "recent" and "is-active" or "" %>">
-										<a href="?<%= util.query(query, {scores = "recent"}) %>">Recent</a>
-									</li>
-								</ul>
-							</div>
-
-							<% if #scores == 0 then %>
-								<div align="center" class="content empty-list-message">
-									<h2>There are no scores</h2>
-									<p>The player hasn't played anything yet</p>
-								</div>
-							<% else %>
-								<% for i, v in ipairs(scores) do %>
-									<div class="user__score-panel" x-show="<%= i %> <= limit" <%= i > 5 and "x-cloak" or "" %>>
-										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
-										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-											<p class="user__score-text"><%= v.artist %> - <%= v.title %></p>
-											<div style="display: flex">
-												<% if v.creator and v.creator ~= "" then %>
-													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %> by <%= v.creator %></p>
-												<% else %>
-													<p class="user__score-text">[<%= v.inputmode %>] <%= v.name %></p>
-												<% end %>
-												<% if v.rate ~= 1 then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= ("%sX"):format(v.rate) %></p></strong>
-												<% end %>
-												<% if v.const then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">CONST</p></strong>
-												<% end %>
-												<% if v.tap_only then %>
-													<strong><p class="user__score-text has-text-grey" style="padding-left: 8px">TAP</p></strong>
-												<% end %>
-												<p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.modifiers %></p>
-											</div>
-										</div>
-										<div style="display: flex; min-width: fit-content;">
-											<div class="user__score-rows" style="text-align: right;">
-												<p style="padding-left: 6px"><strong><%= ("%0.2f%%"):format(v.norm_accuracy * 100) %></strong></p>
-												<p class="has-text-grey"><%= v.timeSince %></p>
-											</div>
-											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
-											<div class="user__score-rating-box has-background-gray-light">
-												<p class="saira-bold" style="padding-left: 5px"><strong><%= format.float4(v.rating) %></strong></p>
-												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
-											</div>
-										</div>
-									</div>
-								<% end %>
-							<% end %>
-						</div>
-						<div class="block" x-show="limit == 5">
-							<a class="button" @click="limit = 20">Show 20 scores</a>
-						</div>
-						<div class="block" x-show="limit == 20">
-							<a class="button" @click="limit = 50">Show 50 scores</a>
-							<a class="button" @click="limit = 5">Hide</a>
-						</div>
-						<div class="block" x-show="limit == 50">
-							<a class="button" @click="limit = 100">Show 100 scores</a>
-							<a class="button" @click="limit = 5">Hide</a>
-						</div>
-						<div class="block" x-show="limit == 100">
-							<a class="button" @click="limit = 5">Hide</a>
-						</div>
-					</div>
 				</div>
 				<% if #dan_clears ~= 0 then %>
 					<div class="block border-box">
