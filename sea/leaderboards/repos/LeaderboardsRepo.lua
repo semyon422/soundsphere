@@ -98,6 +98,9 @@ function LeaderboardsRepo:getFilterConds(lb, user_id)
 	if not lb.allow_tap_only then
 		conds.tap_only = false
 	end
+	if not lb.allow_const then
+		conds.const = false
+	end
 	if not lb.allow_free_timings then
 		if lb.timings then
 			table.insert(conds, {
