@@ -60,17 +60,17 @@
 }
 
 html[data-theme=light] {
-	--user-activity-1: #4ac26b;
+	--user-activity-1: #aceebb;
 	--user-activity-2: #4ac26b;
 	--user-activity-3: #2da44e;
 	--user-activity-4: #116329;
 }
 
 html[data-theme=dark] {
-	--user-activity-1: #116329;
-	--user-activity-2: #116329;
-	--user-activity-3: #2da44e;
-	--user-activity-4: #4ac26b;
+	--user-activity-1: #033a16;
+	--user-activity-2: #196c2e;
+	--user-activity-3: #2ea043;
+	--user-activity-4: #56d364;
 }
 
 .user__activity-color[data-activity = "0"] {
