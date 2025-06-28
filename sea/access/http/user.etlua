@@ -340,9 +340,9 @@
 					<% if leaderboard_user_history then %>
 						<div class="separator"></div>
 						<p class="title is-4">Rank History</p>
-						<p class="subtitle is-6">History for the past 30 days:</p>
+						<p class="subtitle is-6">History for the past 90 days:</p>
 						<div style="height: 160px;">
-							<div class="user__history-chart has-background-dark">
+							<div class="user__history-chart">
 								<canvas id="rank_graph"></canvas>
 							</div>
 						</div>
@@ -389,10 +389,10 @@
 										},
 										layout: {
 											padding: {
-												top: 5,
-												bottom: 5,
-												left: 5,
-												right: 5
+												top: 16,
+												bottom: 16,
+												left: 16,
+												right: 16
 											}
 										},
 										plugins: {
