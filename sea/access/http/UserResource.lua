@@ -317,7 +317,7 @@ function UserResource:updateEmail(req, res, ctx)
 	end
 
 	local ok, err = valid.format(valid.struct({
-		current_password = types.password,
+		current_password = types.password_any_length,
 		new_email = types.email,
 	})(body_params))
 
@@ -356,7 +356,7 @@ function UserResource:updatePassword(req, res, ctx)
 	end
 
 	local validate_update_password = valid.wrap_format(valid.struct({
-		current_password = types.password,
+		current_password = types.password_any_length,
 		new_password = types.password,
 		confirm_new_password = function(v)
 			return v == body_params.new_password, "not matching new_password"

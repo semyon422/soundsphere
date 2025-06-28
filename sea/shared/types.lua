@@ -66,6 +66,20 @@ function types.password(v)
 	return true
 end
 
+function types.password_any_length(v)
+	if type(v) ~= "string" then
+		return nil, "not a string"
+	end
+
+	---@type integer?
+	local len = utf8.len(v)
+	if not len then
+		return nil, "not a valid UTF-8 string"
+	end
+
+	return true
+end
+
 function types.file_name(v)
 	if type(v) ~= "string" then
 		return nil, "not a string"
