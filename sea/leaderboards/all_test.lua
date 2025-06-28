@@ -731,6 +731,9 @@ function test.difftable_filter_single(t)
 		index = 1,
 		level = 0,
 		created_at = 0,
+		updated_at = 0,
+		is_deleted = false,
+		change_index = 1,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable.id}}
@@ -770,6 +773,9 @@ function test.difftable_filter_multiple(t)
 		index = 1,
 		level = 1,
 		created_at = 0,
+		updated_at = 0,
+		is_deleted = false,
+		change_index = 1,
 	})
 
 	models.difftable_chartmetas:create({
@@ -779,6 +785,9 @@ function test.difftable_filter_multiple(t)
 		index = 1,
 		level = 2,
 		created_at = 0,
+		updated_at = 0,
+		is_deleted = false,
+		change_index = 1,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable_1.id}}
@@ -903,6 +912,9 @@ function test.total_rating_same_hash_in_difftable(t)
 		index = 1,
 		level = 1,
 		created_at = 0,
+		updated_at = 0,
+		is_deleted = false,
+		change_index = 1,
 	})
 
 	ctx.leaderboard.leaderboard_difftables = {{id = 1, leaderboard_id = 1, difftable_id = difftable.id}}
