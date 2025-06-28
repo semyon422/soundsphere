@@ -190,3 +190,7 @@ html[data-theme=dark] {
 	line-height: 60px;
 	padding-left: 2px;
 }
+
+.user__history-chart {
+	border-radius: 8px;
+}
