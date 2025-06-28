@@ -341,10 +341,8 @@
 						<div class="separator"></div>
 						<p class="title is-4">Rank History</p>
 						<p class="subtitle is-6">History for the past 90 days:</p>
-						<div style="height: 160px;">
-							<div class="user__history-chart">
-								<canvas id="rank_graph"></canvas>
-							</div>
+						<div class="user__history-chart">
+							<canvas id="rank_graph"></canvas>
 						</div>
 						<script>
 							function loadRankHistoryChart() {

@@ -194,4 +194,5 @@ html[data-theme=dark] {
 .user__history-chart {
 	border-radius: 8px;
 	background-color: var(--bulma-background);
+	height: 160px;
 }
