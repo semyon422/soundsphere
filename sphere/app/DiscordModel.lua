@@ -1,11 +1,10 @@
 local discordrpc = require("discordRPC")
 local class = require("class")
+local brand = require("brand")
 
 ---@class sphere.DiscordModel
 ---@operator call: sphere.DiscordModel
 local DiscordModel = class()
-
-DiscordModel.appId = "594443609668059149"
 
 ---@param configModel sphere.ConfigModel
 function DiscordModel:new(configModel)
@@ -41,7 +40,7 @@ end
 function DiscordModel:updateEnabled()
 	local discordPresence = self.configModel.configs.settings.miscellaneous.discordPresence
 	if discordPresence and not self.enabled then
-		discordrpc.initialize(self.appId, true)
+		discordrpc.initialize(brand.discord_app_id, true)
 		self.enabled = true
 	elseif not discordPresence and self.enabled then
 		discordrpc.clearPresence()

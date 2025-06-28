@@ -8,6 +8,7 @@ local brand = {
 	repo_macos_zip = "soundsphere_macos.zip",
 	macos_app = "soundsphere.app",
 	git_repo = "https://github.com/semyon422/soundsphere",
+	discord_app_id = "594443609668059149",
 }
 
 return brand
