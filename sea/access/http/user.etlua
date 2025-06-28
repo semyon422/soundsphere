@@ -1,7 +1,6 @@
 <% local util = require("web.http.util") %>
 <% local json = require("web.json") %>
 <% local format = require("sea.shared.format") %>
-<% local math_util = require("math_util") %>
 <% local Username = require("sea.shared.http.components.Username") %>
 
 <div class="is-hidden-mobile" style="position:relative;">
@@ -441,50 +440,24 @@
 								</div>
 							<% else %>
 								<% for i, v in ipairs(scores) do %>
-									<%
-										local artist_title = ("%s - %s"):format(v.artist, v.title)
-										local chart_name = ""
-
-										if v.creator and v.creator ~= "" then
-											chart_name = ("[%s] %s by %s"):format(v.inputmode, v.name, v.creator)
-										else
-											chart_name = ("[%s] %s"):format(v.inputmode, v.name)
-										end
-
-										local mods = {}
-
-										if v.rate ~= 1 then
-											table.insert(mods, ("%sX"):format(v.rate))
-										end
-										if v.const then
-											table.insert(mods, "CONST")
-										end
-										if v.tap_only then
-											table.insert(mods, "TAP")
-										end
-										table.insert(mods, v.modifiers)
-
-										local mods_line = table.concat(mods, " ")
-										local rating = v.ratingPostfix == "PP" and math_util.round(v.rating, 1) or format.float4(v.rating)
-									%>
 									<div class="user__score-panel" x-show="<%= i %> <= limit" <%= i > 5 and "x-cloak" or "" %>>
 										<div class="user__score-line score-background" data-grade="<%= v.grade %>"></div>
 										<div class="user__score-rows" style="display: flex; flex-grow:1; min-width: 0;">
-											<p class="user__score-text"><%= artist_title %></p>
+											<p class="user__score-text"><%= v.song_name %></p>
 											<div style="display: flex">
-												<p class="user__score-text"><%= chart_name %></p>
-												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= mods_line %></p></strong>
+												<p class="user__score-text"><%= v.chart_name %></p>
+												<strong><p class="user__score-text has-text-grey" style="padding-left: 8px"><%= v.mods_line %></p></strong>
 											</div>
 										</div>
 										<div style="display: flex; min-width: fit-content;">
 											<div class="user__score-rows" style="text-align: right;">
 												<p style="padding-left: 6px"><strong><%= ("%0.2f%%"):format(v.norm_accuracy * 100) %></strong></p>
-												<p class="has-text-grey"><%= v.timeSince %></p>
+												<p class="has-text-grey"><%= v.time_since %></p>
 											</div>
 											<p class="user__score-grade score-grade saira-bold" data-grade="<%= v.grade %>"><%= v.grade %></p>
 											<div class="user__score-rating-box has-background-gray-light">
-												<p class="saira-bold" style="padding-left: 5px"><strong><%= rating %></strong></p>
-												<p class="saira-bold user__score-rating-postfix"><%= v.ratingPostfix %></p>
+												<p class="saira-bold" style="padding-left: 5px"><strong><%= v.rating %></strong></p>
+												<p class="saira-bold user__score-rating-postfix"><%= v.rating_postfix %></p>
 											</div>
 										</div>
 									</div>

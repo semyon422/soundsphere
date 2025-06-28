@@ -1,6 +1,7 @@
 local class = require("class")
 local format = require("sea.shared.format")
 local time_util = require("time_util")
+local math_util = require("math_util")
 local dan_list = require("sea.dan.dan_list")
 local RatingCalc = require("sea.leaderboards.RatingCalc")
 local TotalRating = require("sea.leaderboards.TotalRating")
@@ -219,24 +220,45 @@ function UserPage:getScores(lb, user_id, _type)
 
 		---@type number
 		local rating = cpv[RatingCalc:column(lb.rating_calc)]
+		local artist = chartmeta and chartmeta.artist or "?"
+		local title = chartmeta and chartmeta.title or "?"
+		local name = chartmeta and chartmeta.name or "?"
+		local creator = chartmeta and chartmeta.creator
+		local rate = chartdiff and chartdiff.rate or "?"
+		local inputmode = chartdiff and Format.inputMode(chartdiff.inputmode) or "?"
+		local modifiers = ModifierModel:getString(cpv.modifiers)
+		local rating_postfix = RatingCalc:postfix(lb.rating_calc):upper()
+
+		local chart_name = ""
+
+		if creator and creator ~= "" then
+			chart_name = ("[%s] %s by %s"):format(inputmode, name, creator)
+		else
+			chart_name = ("[%s] %s"):format(inputmode, name)
+		end
+
+		local mods = {}
+
+		if rate ~= 1 then
+			table.insert(mods, ("%sX"):format(rate))
+		end
+		if cpv.const then
+			table.insert(mods, "CONST")
+		end
+		if cpv.tap_only then
+			table.insert(mods, "TAP")
+		end
+		table.insert(mods, modifiers)
 
 		scores[i] = {
-			artist = chartmeta and chartmeta.artist or "?",
-			title = chartmeta and chartmeta.title or "?",
-			name = chartmeta and chartmeta.name or "?",
-			creator = chartmeta and chartmeta.creator,
-			rate = chartdiff and chartdiff.rate or "?",
-			inputmode = chartdiff and Format.inputMode(chartdiff.inputmode) or "?",
-			modifiers = ModifierModel:getString(cpv.modifiers),
-			const = cpv.const,
-			tap_only = cpv.tap_only,
-			accuracy = cpv.accuracy,
+			song_name = ("%s - %s"):format(artist, title),
+			chart_name = chart_name,
+			mods_line = table.concat(mods, " "),
 			norm_accuracy = cpv:getNormAccuracy(),
-			exscore = cpv:getExScore(),
-			timeSince = time_util.time_ago_in_words(cpv.created_at),
+			time_since = time_util.time_ago_in_words(cpv.created_at),
 			grade = cpv:getGrade(),
-			rating = rating,
-			ratingPostfix = RatingCalc:postfix(lb.rating_calc):upper(),
+			rating = rating_postfix == "PP" and math_util.round(rating, 1) or format.float4(rating),
+			rating_postfix = rating_postfix,
 		}
 	end
 
