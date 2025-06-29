@@ -164,6 +164,7 @@ end
 function RhythmModel:setReplayBase(replayBase)
 	self.replayBase = replayBase
 	self.logicEngine.timings = replayBase.timing_values
+	self.logicEngine.nearest = replayBase.nearest
 	self.timeEngine:setBaseTimeRate(replayBase.rate)
 	self.graphicEngine.constant = replayBase.const
 	self.timeEngine.constant = replayBase.const

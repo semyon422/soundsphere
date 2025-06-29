@@ -92,8 +92,8 @@ function NoteHandler:getCurrentNote()
 		end
 	end
 
-	local timings = self.logicEngine.timings
-	if not timings.nearest then
+	local nearest = self.logicEngine.nearest
+	if not nearest then
 		for i = self.startNoteIndex, self.endNoteIndex do
 			local note = notes[i]
 			if not note.ended and note.isPlayable then
