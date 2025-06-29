@@ -31,6 +31,43 @@ function RankingsResource:new(users, leaderboards, views)
 	self.views = views
 end
 
+---@param leaderboard sea.Leaderboard
+---@return string[] rules_allowed
+---@return string[] rules_disallowed
+function RankingsResource:getRules(leaderboard)
+	local rules_allowed = {}
+	local rules_disallowed = {}
+
+	local function addRule(condition, text)
+		if condition then
+			table.insert(rules_allowed, text)
+		else
+			table.insert(rules_disallowed, text)
+		end
+	end
+
+	addRule(leaderboard.allow_const, "Constant scroll speed")
+	addRule(leaderboard.allow_pause, "Pauses")
+	addRule(leaderboard.allow_modifiers, "Modifiers")
+	addRule(leaderboard.allow_reorder, "Column reorder (Mirror, Random, etc...)")
+	addRule(leaderboard.allow_free_timings, "Score system customization")
+	addRule(not leaderboard.pass, "HP fails")
+
+	if leaderboard.judges == "fc" then
+		table.insert(rules_disallowed, "Misses")
+	elseif leaderboard.judges == "pfc" then
+		table.insert(rules_disallowed, "Not perfect hits")
+	end
+
+	if leaderboard.nearest == "disabled" then
+		table.insert(rules_disallowed, "Nearest input")
+	elseif leaderboard.nearest == "enabled" then
+		table.insert(rules_disallowed, "Enabled nearest input")
+	end
+
+	return rules_allowed, rules_disallowed
+end
+
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ctx sea.RequestContext
@@ -50,13 +87,18 @@ function RankingsResource:getRankings(req, res, ctx)
 	ctx.users_per_page = per_page
 	if ranking_type == "rating" then
 		local lbs = self.leaderboards
+		local lb = lbs:getLeaderboard(leaderboard_id)
 		ctx.leaderboards = lbs:getLeaderboards()
-		ctx.leaderboard = lbs:getLeaderboard(leaderboard_id)
+		ctx.leaderboard = lb
 		ctx.pages_count = math.ceil(lbs:getLeaderboardUsersCount(leaderboard_id) / per_page)
 		page = math.min(page, ctx.pages_count)
 		ctx.leaderboard_users = lbs:getLeaderboardUsersFull(leaderboard_id, per_page, (page - 1) * per_page)
 		lbs:loadLeaderboardUsersHistory(leaderboard_id, ctx.leaderboard_users)
 		leaderboard_name = ctx.leaderboard.name
+
+		if lb then
+			ctx.rules_allowed, ctx.rules_disallowed = self:getRules(lb)
+		end
 	else
 		local order = "chartplays_count"
 		leaderboard_name = "Play Count"

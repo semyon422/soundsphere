@@ -1,0 +1,17 @@
+.rankings__rule-allowed li::before {
+	content: "✅";
+	margin-right: 5px;
+}
+
+.rankings__rule-disallowed li::before {
+	content: "❌";
+	margin-right: 5px;
+}
+
+.rankings__rule-empty {
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+}

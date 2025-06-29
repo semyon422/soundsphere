@@ -25,24 +25,6 @@
 <div class="columns">
 	<% if display_leaderboards then %>
 		<div class="column is-one-quarter">
-<%
---[[%>
-				<div class="block">
-				<h1 class="title">Game mode</h1>
-				<aside class="menu">
-					<ul class="menu-list">
-						<% for _, v in ipairs(gamemodes) do %>
-							<% if v.id == query.mode then %>
-								<li><a class="is-active"><%= v.name %></a></li>
-							<% else %>
-								<li><a href="<%= getQueryComplex({leaderboard_id = -1, mode = v.id}) %>"><%= v.name %></a></li>
-							<% end %>
-						<% end %>
-					</ul>
-				</aside>
-			</div>
-<%
-]]%>
 			<div class="block">
 				<h1 class="title">Leaderboard</h1>
 				<aside class="menu">
@@ -57,78 +39,36 @@
 					</ul>
 				</aside>
 			</div>
-<%
---[[%>
-			<% if display_key_modes then %>
-				<div class="block">
-					<h1 class="title">Key mode</h1>
-					<aside class="menu">
-					<% for _, category in ipairs(key_modes) do %>
-						<p class="menu-label"><%= category.name %></p>
-						<ul class="menu-list">
-							<% for _, filter in ipairs(category.items) do %>
-								<% if filter.id == query.inputmode then %>
-									<li><a class="is-active"><%= filter.name %></a></li>
-								<% else %>
-									<li><a href="<%= getQuery('inputmode', filter.id) %>"><%= filter.name %></a></li>
-								<% end %>
-							<% end %>
-						</ul>
-					<% end %>
-					</aside>
-				</div>
-			<% end %>
-<%
-]]%>
 		</div>
 	<% end %>
 	<div class="column">
-		<% if false and display_leaderboards then %>
-			<div class="block">
-				<div class="card">
-					<div class="card-content">
-						<div class="content">
-							<h3>Official osu! ranked</h3>
-							This leaderboard includes ranked charts from osu! that you can download on the <a href="https://osu.ppy.sh/beatmapsets">osu! beatmaps page</a>.
-							<h3>Score requirements</h3>
-							<ul>
-								<li>
-									You should use chart specific timing windows
-								</li>
-								<li>
-									Pauses are allowed
-								</li>
-								<li>
-									Constant scroll speed is not allowed
-								</li>
-								<li>
-									0.75x, 1.0x and 1.5x are the only allowed rates
-								</li>
-							</ul>
-						</div>
-					</div>
+		<% if ranking_type == "rating" then %>
+			<div class="content">
+				<h2><%= leaderboard.name %> Leaderboard</h2>
+				<p><%= leaderboard.description == "" and "No description" or leaderboard.description %></p>
+			</div>
+			<div class="columns">
+				<div class="column">
+					<% if #rules_allowed == 0 then %>
+						<div class="rankings__rule-empty"><p>Nothing is allowed!</p></div>
+					<% else %>
+						<ul class="rankings__rule-allowed">
+							<% for _, v in ipairs(rules_allowed) do %>
+								<li><%= v %></li>
+							<% end %>
+						</ul>
+					<% end %>
 				</div>
-				<div class="block">
-					<nav class="level">
-						<div class="level-item has-text-centered">
-							<div>
-							<p class="title is-4">Rating calculator</p>
-							<p class="subtitle is-4">osu! PP</p>
-							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-							<p class="title is-4">Pauses</p>
-							<p class="subtitle is-4">Allowed</p>
-							</div>
-						</div>
-						<div class="level-item has-text-centered">
-							<div>
-							<p class="title is-4">Constant scroll speed</p>
-							<p class="subtitle is-4">Banned</p>
-							</div>
-						</div>
-					</nav>
+				<div class="column">
+					<% if #rules_disallowed == 0 then %>
+						<div class="rankings__rule-empty"><p>Nothing is disallowed!</p></div>
+					<% else %>
+						<ul class="rankings__rule-disallowed">
+							<% for _, v in ipairs(rules_disallowed) do %>
+								<li><%= v %></li>
+							<% end %>
+						</ul>
+					<% end %>
 				</div>
 			</div>
 		<% end %>
