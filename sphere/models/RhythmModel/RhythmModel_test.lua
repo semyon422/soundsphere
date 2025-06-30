@@ -570,7 +570,7 @@ test1mln()
 
 -- nearest logic
 
-logicEngine.timings.nearest = true
+logicEngine.nearest = true
 
 test1sn(0, 1)
 test1sn_bounds()
