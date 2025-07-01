@@ -103,7 +103,7 @@ function WindowModel:setFullscreen(fullscreen, fullscreentype)
 	})
 end
 
-local icon_path = "resources/icon.png"
+local icon_path = "resources/logo.png"
 function WindowModel:setIcon()
 	local info = love.filesystem.getInfo(icon_path)
 	if info then
