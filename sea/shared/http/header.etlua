@@ -4,18 +4,7 @@
 	<div class="container">
 		<div class="navbar-brand">
 			<a class="navbar-item" href="/">
-				<svg class="header__logo has-text" version="1.0" xmlns="http://www.w3.org/2000/svg"
-					 width="80.000000pt" height="80.000000pt" viewBox="0 0 80.000000 80.000000"
-					 preserveAspectRatio="xMidYMid meet">
-
-					<g transform="translate(0.000000,80.000000) scale(0.100000,-0.100000)"
-					fill="currentColor" stroke="none">
-					<path d="M400 611 l0 -109 -63 5 c-51 4 -71 1 -103 -15 -54 -27 -101 -83 -110
-					-127 -10 -53 1 -124 23 -153 78 -104 207 -124 295 -44 62 56 68 79 68 257 0
-					85 4 155 8 155 26 0 84 -89 97 -147 6 -32 8 -33 57 -33 l50 0 -7 43 c-23 139
-					-135 250 -272 271 l-43 6 0 -109z"/>
-					</g>
-				</svg>
+				<img src="/static/images/header-logo.svg" />
 				<strong class="navbar-item"><%= brand.name:upper() %></strong>
 			</a>
 		</div>

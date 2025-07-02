@@ -3,11 +3,11 @@
 		<div class="columns is-desktop welcome__main-columns">
 			<div class="column welcome__left-column">
 				<div class="welcome__hero">
-					<h1 class="exo-2-bold welcome__game-name"><%= brand.name:upper() %></h1>
-					<h3 class="exo-2-medium welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
+					<img src="/static/images/home/rizu.svg" class="welcome__game-name" />
+					<h3 class="welcome__game-description">RHYTHM GAME • COMPETITIVE SERVER • MODDING PLATFORM</h3>
 					<div class="level welcome__buttons-level">
 						<div class="level-item buttons are-medium">
-							<a href="/download"><button class="button is-rounded is-link">Download the game</button></a>
+							<a href="/download"><button class="button is-rounded is-link">Download <%= brand.name %></button></a>
 							<a href=""><button class="button is-rounded">Connect from osu!</button></a>
 						</div>
 					</div>

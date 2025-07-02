@@ -26,9 +26,12 @@
 }
 
 .welcome__game-name {
-	font-size: max(46px, 5vw);
-	color: var(--bulma-text-strong);
-	margin-bottom: 8px;
+	width: max(460px, 24vw);
+	margin-bottom: 26px;
+}
+
+html[data-theme="dark"] .welcome__game-name {
+	filter: invert();
 }
 
 .welcome__game-description {

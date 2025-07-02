@@ -213,20 +213,6 @@ main.center-vertically > * {
     "wdth" 95;
 }
 
-.exo-2-medium {
-  font-family: "Exo 2", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
-  font-style: normal;
-}
-
-.exo-2-bold {
-  font-family: "Exo 2", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 650;
-  font-style: normal;
-}
-
 .description-container {
 	width: 100%;
 	max-width: 100%;
