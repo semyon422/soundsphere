@@ -27,8 +27,11 @@
 
 .welcome__game-name {
 	width: max(460px, 24vw);
-	color: var(--bulma-text-strong);
 	margin-bottom: 26px;
+}
+
+html[data-theme="dark"] .welcome__game-name {
+	filter: invert();
 }
 
 .welcome__game-description {

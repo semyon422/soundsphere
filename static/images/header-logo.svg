@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   version="1.1"
+   id="svg1"
+   width="180"
+   height="180"
+   viewBox="0 0 180 180"
+   sodipodi:docname="apple-touch-icon.png.2025_07_02_11_31_56.0.svg"
+   inkscape:export-filename="../Dev/website/static/images/logo.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient58"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffea55;stop-opacity:1;"
+         offset="0"
+         id="stop58" />
+      <stop
+         style="stop-color:#e31e69;stop-opacity:1;"
+         offset="1"
+         id="stop59" />
+    </linearGradient>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath50">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle50"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath51">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle51"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath52">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle52"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath53">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle53"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath54">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle54"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath55">
+      <circle
+         style="fill:#000000;fill-opacity:0.688195;stroke-width:7.29707;stroke-opacity:0.265116;paint-order:markers stroke fill"
+         id="circle55"
+         cx="90"
+         cy="90"
+         r="90" />
+    </clipPath>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient58"
+       id="linearGradient59"
+       x1="90"
+       y1="0"
+       x2="90"
+       y2="180"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     showguides="false">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="180"
+       height="180"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Image"
+     id="g1">
+    <circle
+       style="fill:url(#linearGradient59);fill-opacity:1;stroke-width:8.45954;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="path55"
+       cx="90"
+       cy="90"
+       r="90" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:6.32093;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect1"
+       width="180"
+       height="8.0402842"
+       x="0"
+       y="164.14317"
+       clip-path="url(#clipPath55)" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:11.6875;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect2"
+       width="180"
+       height="6.387526"
+       x="0"
+       y="146.8653"
+       clip-path="url(#clipPath54)" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:10.6699;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect47"
+       width="180"
+       height="4.8271751"
+       x="0"
+       y="129.47557"
+       clip-path="url(#clipPath53)" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:11.2251;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect48"
+       width="180"
+       height="4.2908225"
+       x="0"
+       y="111.88319"
+       clip-path="url(#clipPath52)" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:12.0951;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect49"
+       width="179.80287"
+       height="2.6817639"
+       x="0"
+       y="94.612633"
+       clip-path="url(#clipPath51)" />
+    <rect
+       style="fill:#000000;fill-opacity:0.688195;stroke-width:11.8094;stroke-opacity:0.265116;paint-order:markers stroke fill"
+       id="rect50"
+       width="180"
+       height="1.9308701"
+       x="0"
+       y="77.020264"
+       clip-path="url(#clipPath50)" />
+  </g>
+</svg>
