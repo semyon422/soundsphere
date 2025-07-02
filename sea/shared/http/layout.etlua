@@ -18,6 +18,7 @@
 		<meta property="og:type" content="game" />
 		<meta property="og:url" content="<%= brand.url %>" />
 		<meta property="og:logo" content="<%= brand.url %>/static/images/logo.webp" />
+		<link rel="icon" href="/static/favicon.ico">
 		<link rel="stylesheet" href="/style.css?v=<%= version %>" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.1/css/bulma.min.css" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"/>
