@@ -92,7 +92,7 @@ function OsuSpriteGroup:getAnimation()
 		if not sprite_files[frame] then  -- break on holes
 			break
 		end
-		max_frame = max_frame
+		max_frame = frame
 	end
 
 	return zeroth_frame:getFramePattern(), {0, max_frame}
