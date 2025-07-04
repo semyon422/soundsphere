@@ -84,7 +84,11 @@ function ChartPreviewModel:setChartview(chartview)
 
 	local ctx = ComputeContext()
 	ctx.chart = chart
-	ctx:applyColumnOrder(self.replayBase.columns_order)
+
+	local columns_order = self.replayBase.columns_order
+	if columns_order and #columns_order == chart.inputMode:getColumns() then
+		ctx:applyColumnOrder(self.replayBase.columns_order)
+	end
 
 	local noteSkin = self:getNoteSkin(tostring(chart.inputMode))
 	self.playField = noteSkin.playField
