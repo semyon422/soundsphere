@@ -5,6 +5,7 @@ local json = require("json")
 ---@operator call: sphere.Updater
 local Updater = class()
 
+---@param updater_io sphere.UpdaterIO
 function Updater:new(updater_io)
 	self.updater_io = updater_io
 end
@@ -20,6 +21,7 @@ function Updater:mergeLists(server, client)
 		local path = file.path
 		map[path] = map[path] or {}
 		map[path].hash = file.hash
+		map[path].url = file.url
 		map[path].path = path
 	end
 	for _, file in ipairs(client) do
@@ -49,13 +51,13 @@ function Updater:getActionLists(server_filelist, client_filelist)
 
 	for _, file in ipairs(filelist) do
 		if not file.hash then
-			table.insert(remove, file.path)
+			table.insert(remove, file)
 		elseif not file.hash_old or file.hash ~= file.hash_old then
 			local _hash = self.updater_io:crc32Async(file.path)
 			if _hash ~= file.hash then
-				table.insert(download, file.path)
+				table.insert(download, file)
 			else
-				table.insert(found, file.path)
+				table.insert(found, file)
 			end
 		end
 	end
@@ -69,6 +71,10 @@ function Updater:setStatus(status)
 	print(status)
 end
 
+---@param update_url string
+---@param client_filelist sphere.FilesConfig
+---@return boolean?
+---@return sphere.FilesConfig?
 function Updater:updateFilesAsync(update_url, client_filelist)
 	self:setStatus("Checking for updates...")
 
@@ -84,29 +90,25 @@ function Updater:updateFilesAsync(update_url, client_filelist)
 		return
 	end
 
-	-- TODO: move it to server file list after few months
-	local prefix = update_url:match("^(.*)/.-$") .. "/soundsphere"
-
 	local download, remove, found = self:getActionLists(server_filelist, client_filelist)
 
-	for _, path in ipairs(found) do
-		self:setStatus("found: " .. path)
+	for _, file in ipairs(found) do
+		self:setStatus("found: " .. file.path)
 	end
 
 	local count = 0
-	for _, path in ipairs(download) do
-		local url = prefix .. "/" .. path
-		self:setStatus("download: " .. path)
-		local ok, err = self.updater_io:downloadAsync(url, path)
+	for _, file in ipairs(download) do
+		self:setStatus("download: " .. file.path)
+		local ok, err = self.updater_io:downloadAsync(file.url, file.path)
 		if not ok then
 			self:setStatus(err)
 			return
 		end
 		count = count + 1
 	end
-	for _, path in ipairs(remove) do
-		self:setStatus("remove: " .. path)
-		self.updater_io:removeAsync(path)
+	for _, file in ipairs(remove) do
+		self:setStatus("remove: " .. file.path)
+		self.updater_io:removeAsync(file.path)
 		count = count + 1
 	end
 

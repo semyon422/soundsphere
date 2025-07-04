@@ -37,8 +37,8 @@ function test.clean_download(t)
 	local uio = FakeUIO()
 
 	local server_files = {
-		{path = "a", hash = 0},
-		{path = "b", hash = 1},
+		{path = "a", hash = 0, url = "/a"},
+		{path = "b", hash = 1, url = "/b"},
 	}
 	uio.data_by_url["/files.json"] = json.encode(server_files)
 
@@ -46,24 +46,24 @@ function test.clean_download(t)
 	local ok, files = updater:updateFilesAsync("/files.json", {})
 
 	t:eq(ok, true)
-	t:assert(table_util.deepequal(files, server_files))
-	t:assert(table_util.deepequal(uio.downloaded, {
-		{"/soundsphere/a", "a"},
-		{"/soundsphere/b", "b"},
-	}))
+	t:tdeq(files, server_files)
+	t:tdeq(uio.downloaded, {
+		{"/a", "a"},
+		{"/b", "b"},
+	})
 	t:eq(#uio.removed, 0)
-	t:assert(table_util.deepequal(uio.hashed, {
+	t:tdeq(uio.hashed, {
 		"a",
 		"b",
-	}))
+	})
 end
 
 function test.no_update(t)
 	local uio = FakeUIO()
 
 	local server_files = {
-		{path = "a", hash = 0},
-		{path = "b", hash = 1},
+		{path = "a", hash = 0, url = "/a"},
+		{path = "b", hash = 1, url = "/a"},
 	}
 	uio.data_by_url["/files.json"] = json.encode(server_files)
 	uio.crc32_by_path = {
@@ -87,8 +87,8 @@ function test.add_remove_keep(t)
 	local uio = FakeUIO()
 
 	local server_files = {
-		{path = "b", hash = 1},
-		{path = "c", hash = 2},
+		{path = "b", hash = 1, url = "/b"},
+		{path = "c", hash = 2, url = "/c"},
 	}
 	uio.data_by_url["/files.json"] = json.encode(server_files)
 	uio.crc32_by_path = {
@@ -98,27 +98,27 @@ function test.add_remove_keep(t)
 
 	local updater = Updater(uio)
 	local ok, files = updater:updateFilesAsync("/files.json", {
-		{path = "a", hash = 0},
-		{path = "b", hash = 1},
+		{path = "a", hash = 0, url = "/a"},
+		{path = "b", hash = 1, url = "/b"},
 	})
 
-	t:assert(table_util.deepequal(uio.downloaded, {
-		{"/soundsphere/c", "c"},
-	}))
-	t:assert(table_util.deepequal(uio.removed, {
+	t:tdeq(uio.downloaded, {
+		{"/c", "c"},
+	})
+	t:tdeq(uio.removed, {
 		"a",
-	}))
-	t:assert(table_util.deepequal(uio.hashed, {
+	})
+	t:tdeq(uio.hashed, {
 		"c",
-	}))
+	})
 end
 
 function test.empty_local_list(t)
 	local uio = FakeUIO()
 
 	local server_files = {
-		{path = "b", hash = 1},
-		{path = "c", hash = 2},
+		{path = "b", hash = 1, url = "/b"},
+		{path = "c", hash = 2, url = "/c"},
 	}
 	uio.data_by_url["/files.json"] = json.encode(server_files)
 	uio.crc32_by_path = {
@@ -129,22 +129,22 @@ function test.empty_local_list(t)
 	local updater = Updater(uio)
 	local ok, files = updater:updateFilesAsync("/files.json", {})
 
-	t:assert(table_util.deepequal(uio.downloaded, {
-		{"/soundsphere/c", "c"},
-	}))
+	t:tdeq(uio.downloaded, {
+		{"/c", "c"},
+	})
 	t:eq(#uio.removed, 0)
-	t:assert(table_util.deepequal(uio.hashed, {
+	t:tdeq(uio.hashed, {
 		"b",
 		"c",
-	}))
+	})
 end
 
 function test.empty_local_list_wrong_hash(t)
 	local uio = FakeUIO()
 
 	local server_files = {
-		{path = "b", hash = 1},
-		{path = "c", hash = 2},
+		{path = "b", hash = 1, url = "/b"},
+		{path = "c", hash = 2, url = "/c"},
 	}
 	uio.data_by_url["/files.json"] = json.encode(server_files)
 	uio.crc32_by_path = {
@@ -154,15 +154,15 @@ function test.empty_local_list_wrong_hash(t)
 	local updater = Updater(uio)
 	local ok, files = updater:updateFilesAsync("/files.json", {})
 
-	t:assert(table_util.deepequal(uio.downloaded, {
-		{"/soundsphere/b", "b"},
-		{"/soundsphere/c", "c"},
-	}))
+	t:tdeq(uio.downloaded, {
+		{"/b", "b"},
+		{"/c", "c"},
+	})
 	t:eq(#uio.removed, 0)
-	t:assert(table_util.deepequal(uio.hashed, {
+	t:tdeq(uio.hashed, {
 		"b",
 		"c",
-	}))
+	})
 end
 
 return test
