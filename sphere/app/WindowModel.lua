@@ -106,10 +106,18 @@ end
 local icon_path = "resources/logo.png"
 function WindowModel:setIcon()
 	local info = love.filesystem.getInfo(icon_path)
-	if info then
-		local imageData = love.image.newImageData(icon_path)
-		love.window.setIcon(imageData)
+	if not info then
+		print("Load logo: not found")
+		return
 	end
+
+	local ok, imageData = pcall(love.image.newImageData, icon_path)
+	if not ok then
+		print("Load logo: " .. imageData)
+		return
+	end
+
+	love.window.setIcon(imageData)
 end
 
 ---@param enabled boolean
