@@ -11,7 +11,7 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local Wave = require("audio.Wave")
 local base36 = require("bms.base36")
 local decibel = require("decibel")
-local table_util = require("table_util")
+local md5 = require("md5")
 
 ---@class sphere.EditorController
 ---@operator call: sphere.EditorController
@@ -272,7 +272,8 @@ function EditorController:exportBmsTemplate(columns_out)
 	for _, name in ipairs(love.filesystem.getDirectoryItems(real_dir) --[=[@as string[]]=]) do
 		if name:match("^stem.+%.sph$") then
 			local dec = ChartDecoder()
-			local chart = dec:decode(assert(love.filesystem.read(path_util.join(real_dir, name))))[1]
+			local data = assert(love.filesystem.read(path_util.join(real_dir, name)))
+			local chart = dec:decode(data, md5.sumhexa(data))[1]
 			chart.name = name
 			table.insert(stem_charts, chart)
 		end
