@@ -1,6 +1,6 @@
 local class = require("class")
 
----@alias rizu.InputDeviceType "keyboard"|"gamepad"|"joystick"|"midi"
+---@alias rizu.InputDeviceType "keyboard"|"gamepad"|"joystick"|"midi"|"mouse"|"touch"
 
 ---@class rizu.InputDevice
 ---@operator call: rizu.InputDevice

@@ -11,9 +11,6 @@ local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInput
 ---@operator call: rizu.InputBinder
 local InputBinder = class()
 
-InputBinder.inputMode = ""
-InputBinder.inputs = {}
-
 ---@param config rizu.InputConfig
 ---@param input_mode string
 function InputBinder:new(config, input_mode)
