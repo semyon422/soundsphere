@@ -49,4 +49,93 @@ function test.track_active_notes(t)
 	update_and_eq_active(t, h, 10, 0)
 end
 
+---@param t testing.T
+function test.match(t)
+	local function new_note(match_event)
+		local note = InputNote()
+		note.time = 0
+		note.early_window = -1
+		note.late_window = 1
+		note.active = true
+		function note:match(event)
+			return event == match_event
+		end
+		function note:receive(event)
+			table.insert(event, self)
+		end
+		return note
+	end
+
+	local event_1 = {}
+	local event_2 = {}
+
+	local notes = {
+		new_note(event_1),
+		new_note(event_2),
+	}
+
+	local h = InputNotesHandler(notes)
+
+	update_and_eq_active(t, h, 0, 2)
+
+	h:receive(event_1)
+	t:eq(event_1[1], notes[1])
+	t:eq(#event_1, 1)
+
+	h:receive(event_2)
+	t:eq(event_2[1], notes[2])
+	t:eq(#event_2, 1)
+
+	h:receive(event_1)
+	t:eq(event_1[2], notes[1])
+	t:eq(#event_1, 2)
+end
+
+---@param t testing.T
+function test.catch(t)
+	local function new_note(id)
+		local note = InputNote()
+		---@cast note +{catched: any}
+		note.time = 0
+		note.early_window = -1
+		note.late_window = 1
+		note.active = true
+		function note:match(event)
+			return not self.catched
+		end
+		function note:catch(event)
+			return event[1] == id
+		end
+		function note:receive(event)
+			self.catched = event
+			table.insert(event, id)
+		end
+		return note
+	end
+
+	local event_1 = {}
+	local event_2 = {}
+
+	local notes = {
+		new_note(1),
+		new_note(2),
+	}
+
+	local h = InputNotesHandler(notes)
+
+	update_and_eq_active(t, h, 0, 2)
+
+	h:receive(event_1)
+	t:eq(event_1[1], 1)
+	t:eq(#event_1, 1)
+
+	h:receive(event_2)
+	t:eq(event_2[1], 2)
+	t:eq(#event_2, 1)
+
+	h:receive(event_1)
+	t:eq(event_1[2], 1)
+	t:eq(#event_1, 2)
+end
+
 return test
