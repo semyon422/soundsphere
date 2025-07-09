@@ -2,7 +2,9 @@ local class = require("class")
 local valid = require("valid")
 local types = require("sea.shared.types")
 
+---@alias sea.TimingObjectKey "ShortNote"|"LongNoteStart"|"LongNoteEnd"
 ---@alias sea.TimingObjectValues {hit: {[1]: number, [2]: number}, miss: {[1]: number, [2]: number}}
+---@alias sea.TimingResult "exactly"|"early"|"late"|"too early"|"too late"
 
 local validate_timing_object_values = valid.struct({
 	hit = valid.struct({[1] = types.number, [2] = types.number}),
@@ -25,9 +27,7 @@ end
 
 ---@class sea.TimingValues
 ---@operator call: sea.TimingValues
----@field ShortNote sea.TimingObjectValues
----@field LongNoteStart sea.TimingObjectValues
----@field LongNoteEnd sea.TimingObjectValues
+---@field [sea.TimingObjectKey] sea.TimingObjectValues
 local TimingValues = class()
 
 function TimingValues:new()
@@ -72,6 +72,43 @@ local validate_timing_values = valid.struct({
 ---@return string|valid.Errors?
 function TimingValues:validate()
 	return validate_timing_values(self)
+end
+
+---@param key sea.TimingObjectKey
+---@param dt number
+---@return sea.TimingResult
+function TimingValues:hit(key, dt)
+	---@type sea.TimingObjectValues
+	local values = self[key]
+	local hit, miss = values.hit, values.miss
+	if dt >= hit[1] and dt <= hit[2] then
+		return "exactly"
+	elseif dt >= miss[1] and dt < hit[1] then
+		return "early"
+	elseif dt > hit[2] and dt <= miss[2] then
+		return "late"
+	elseif dt < miss[1] then
+		return "too early"
+	elseif dt > miss[2] then
+		return "too late"
+	end
+	error("invalid TimingValues or dt")
+end
+
+---@param key sea.TimingObjectKey
+---@return number
+function TimingValues:getMaxTime(key)
+	---@type sea.TimingObjectValues
+	local values = self[key]
+	return values.miss[2]
+end
+
+---@param key sea.TimingObjectKey
+---@return number
+function TimingValues:getMinTime(key)
+	---@type sea.TimingObjectValues
+	local values = self[key]
+	return values.hit[1]
 end
 
 return TimingValues
