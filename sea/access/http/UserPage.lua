@@ -257,7 +257,7 @@ function UserPage:getScores(lb, user_id, _type)
 			norm_accuracy = cpv:getNormAccuracy(),
 			time_since = time_util.time_ago_in_words(cpv.created_at),
 			grade = cpv:getGrade(),
-			rating = rating_postfix == "PP" and math_util.round(rating, 1) or format.float4(rating),
+			rating = lb.rating_calc == "pp" and math_util.round(rating, 1) or ("%0.2f"):format(rating),
 			rating_postfix = rating_postfix,
 		}
 	end

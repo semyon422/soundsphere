@@ -2,6 +2,13 @@
 <% local util = require("web.http.util") %>
 <% local format = require("sea.shared.format") %>
 <% local Username = require("sea.shared.http.components.Username") %>
+<% local math_util = require("math_util") %>
+
+<%
+local function format_rating(lb, rating)
+	return lb.rating_calc == "pp" and math_util.round(rating, 1) or ("%0.2f"):format(rating)
+end
+%>
 
 <section class="hero">
 	<div class="hero-body">
@@ -124,18 +131,18 @@
 									<% if rating_change > 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-success">
 											<i class="fa fa-solid fa-arrow-up"></i>
-											<%= format.float4(rating_change) %>
+											<%= format_rating(leaderboard, rating_change) %>
 										</td>
 									<% elseif rating_change < 0 then %>
 										<td class="ranking-table__rank-change-cell has-text-danger">
 											<i class="fa fa-solid fa-arrow-down"></i>
-											<%= format.float4(math.abs(rating_change)) %>
+											<%= format_rating(leaderboard, math.abs(rating_change)) %>
 										</td>
 									<% else %>
 										<td></td>
 									<% end %>
 
-									<td class="ranking-table__more-padding has-background"><%= format.float4(leaderboard_user.total_rating) %></td>
+									<td class="ranking-table__more-padding has-background"><%= format_rating(leaderboard, leaderboard_user.total_rating) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
 								</tr>
