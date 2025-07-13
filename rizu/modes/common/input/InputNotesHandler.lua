@@ -7,16 +7,14 @@ local InputNotesHandler = class()
 
 InputNotesHandler.nearest = false
 
----@param notes rizu.InputNote[]
+---@param notes rizu.IInputNote[]
 function InputNotesHandler:new(notes)
 	self.notes = table_util.copy(notes)
-	table.sort(self.notes, function(a, b)
-		return a:getStartTime() < b:getStartTime()
-	end)
+	table.sort(self.notes)
 
 	self.note_index = 1
 
-	---@type rizu.InputNote[]
+	---@type rizu.IInputNote[]
 	self.active_notes = {}
 end
 
@@ -25,14 +23,13 @@ function InputNotesHandler:getActiveNotesCount()
 	return #self.active_notes
 end
 
----@param time number
-function InputNotesHandler:update(time)
+function InputNotesHandler:update()
 	local notes = self.notes
 	local active_notes = self.active_notes
 
 	for i = self.note_index, #notes do
 		local note = notes[i]
-		if note:isReachable(time) then
+		if note:isReachable() then
 			self.note_index = i + 1
 			if note:isActive() then
 				table.insert(active_notes, note)
@@ -43,7 +40,7 @@ function InputNotesHandler:update(time)
 	end
 
 	for _, note in ipairs(active_notes) do
-		note:update(time)
+		note:update()
 	end
 
 	for i = #active_notes, 1, -1 do
@@ -75,11 +72,11 @@ function InputNotesHandler:receive(event)
 		return
 	end
 
-	---@type rizu.InputNote?
+	---@type rizu.IInputNote?
 	local nearest_note
 	local nearest_time = math.huge
 	for _, note in ipairs(active_notes) do
-		local time = math.abs(note:getDeltaTime(event.time))
+		local time = math.abs(note:getDeltaTime())
 		if note:match(event) and time < nearest_time then
 			nearest_time = time
 			nearest_note = note

@@ -1,11 +1,16 @@
 local InputNotesHandler = require("rizu.modes.common.input.InputNotesHandler")
-local InputNote = require("rizu.modes.common.input.InputNote")
+local TestInputNote = require("rizu.modes.common.input.TestInputNote")
 
 ---@param t testing.T
 ---@param h rizu.InputNotesHandler
+---@param _t number
 ---@param n integer
 local function update_and_eq_active(t, h, _t, n)
-	h:update(_t)
+	for _, note in ipairs(h.notes) do
+		---@cast note rizu.TestInputNote
+		note.current_time = _t
+	end
+	h:update()
 	t:eq(h:getActiveNotesCount(), n)
 end
 
@@ -22,13 +27,13 @@ end
 ---@param t testing.T
 function test.track_active_notes(t)
 	local function new_note(active)
-		local note = InputNote()
+		local note = TestInputNote()
 		note.time = 0
 		note.early_window = -1
 		note.late_window = 1
 		note.active = active
-		function note:update(time)
-			if time > self:getEndTime() then
+		function note:update()
+			if self.current_time > self:getEndTime() then
 				self.active = false
 			end
 		end
@@ -52,7 +57,7 @@ end
 ---@param t testing.T
 function test.match(t)
 	local function new_note(match_event)
-		local note = InputNote()
+		local note = TestInputNote()
 		note.time = 0
 		note.early_window = -1
 		note.late_window = 1
@@ -94,7 +99,7 @@ end
 ---@param t testing.T
 function test.catch(t)
 	local function new_note(id)
-		local note = InputNote()
+		local note = TestInputNote()
 		---@cast note +{catched: any}
 		note.time = 0
 		note.early_window = -1

@@ -1,6 +1,6 @@
 local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 
----@class rizu.DiscreteKeyVirtualInputEvent
+---@class rizu.DiscreteKeyVirtualInputEvent: rizu.VirtualInputEvent
 ---@operator call: rizu.DiscreteKeyVirtualInputEvent
 local DiscreteKeyVirtualInputEvent = VirtualInputEvent + {}
 
