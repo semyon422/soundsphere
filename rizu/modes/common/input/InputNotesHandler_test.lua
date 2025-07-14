@@ -143,4 +143,48 @@ function test.catch(t)
 	t:eq(#event_1, 2)
 end
 
+---@param t testing.T
+function test.nearest(t)
+	local function new_note(time)
+		local note = TestInputNote()
+		---@cast note +{catched: any}
+		note.time = time
+		note.early_window = -10
+		note.late_window = 10
+		note.active = true
+		function note:match(event)
+			return true
+		end
+		function note:receive(event)
+			table.insert(event, time)
+		end
+		return note
+	end
+
+	local event = {}
+
+	local notes = {
+		new_note(0),
+		new_note(2),
+	}
+
+	local h = InputNotesHandler(notes)
+	h.nearest = true
+
+	update_and_eq_active(t, h, 1, 2)
+
+	h:receive(event)
+	t:eq(event[1], 0)
+
+	update_and_eq_active(t, h, 1.001, 2)
+
+	h:receive(event)
+	t:eq(event[2], 2)
+
+	update_and_eq_active(t, h, 0.999, 2)
+
+	h:receive(event)
+	t:eq(event[3], 0)
+end
+
 return test

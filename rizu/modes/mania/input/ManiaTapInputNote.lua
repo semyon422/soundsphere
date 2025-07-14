@@ -8,8 +8,6 @@ local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInput
 ---@operator call: rizu.ManiaTapInputNote
 local ManiaTapInputNote = IInputNote + {}
 
-ManiaTapInputNote.state = "clear"
-
 ---@param note ncdk2.LinkedNote
 ---@param timing_values sea.TimingValues
 ---@param time_info rizu.TimeInfo
@@ -22,6 +20,12 @@ function ManiaTapInputNote:new(note, timing_values, time_info)
 	self.time_info = time_info
 
 	self.observable = Observable()
+
+	self:reset()
+end
+
+function ManiaTapInputNote:reset()
+	self.state = "clear"
 end
 
 ---@return boolean
@@ -93,12 +97,14 @@ function ManiaTapInputNote:switchState(state)
 	local last_time_full = self:getEndTime()
 
 	-- local currentTime = math.min(time, last_time_full)
-	local deltaTime = math.min(self:getDeltaTime(), last_time)
+	local delta_time = math.min(self:getDeltaTime(), last_time)
 
 	-- send to event score engine
 
 	self.observable:send({
-		deltaTime = deltaTime,
+		delta_time = delta_time,
+		old_state = old_state,
+		new_state = state,
 	})
 
 	if not self.pressedTime and state == "passed" then
