@@ -1,12 +1,10 @@
-local Observable = require("Observable")
-local IInputNote = require("rizu.modes.common.input.IInputNote")
-local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
+local ManiaInputNote = require("rizu.modes.mania.input.ManiaInputNote")
 
 ---@alias rizu.ManiaTapInputNoteState "clear"|"missed"|"passed"
 
----@class rizu.ManiaTapInputNote: rizu.IInputNote
+---@class rizu.ManiaTapInputNote: rizu.ManiaInputNote
 ---@operator call: rizu.ManiaTapInputNote
-local ManiaTapInputNote = IInputNote + {}
+local ManiaTapInputNote = ManiaInputNote + {}
 
 ---@param note ncdk2.LinkedNote
 ---@param timing_values sea.TimingValues
@@ -15,32 +13,12 @@ function ManiaTapInputNote:new(note, timing_values, time_info)
 	assert(note:getType() == "tap")
 	assert(note:isShort())
 
-	self.note = note
-	self.timing_values = timing_values
-	self.time_info = time_info
-
-	self.observable = Observable()
-
-	self:reset()
-end
-
-function ManiaTapInputNote:reset()
-	self.state = "clear"
+	ManiaInputNote.new(self, note, timing_values, time_info)
 end
 
 ---@return boolean
 function ManiaTapInputNote:isActive()
-	return self.state ~= "clear"
-end
-
----@param event rizu.VirtualInputEvent
----@return boolean
-function ManiaTapInputNote:match(event)
-	if not DiscreteKeyVirtualInputEvent * event then
-		return false
-	end
-	---@cast event rizu.DiscreteKeyVirtualInputEvent
-	return event.key == self.note:getColumn()
+	return self.state == "clear"
 end
 
 ---@param event rizu.DiscreteKeyVirtualInputEvent
@@ -115,11 +93,6 @@ function ManiaTapInputNote:switchState(state)
 	end
 end
 
----@param a rizu.IInputNote
----@param b rizu.IInputNote
----@return boolean
-function ManiaTapInputNote.__lt(a, b)
-	return a:getStartTime() < b:getStartTime()
-end
+ManiaTapInputNote.__lt = ManiaInputNote.__lt
 
 return ManiaTapInputNote
