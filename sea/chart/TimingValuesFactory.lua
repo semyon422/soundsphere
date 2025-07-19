@@ -5,7 +5,7 @@ local OsuManiaV1Timings = require("sea.timings.osumania.OsuManiaV1Timings_v4")
 local OsuManiaV2Timings = require("sea.timings.osumania.OsuManiaV2Timings_v2")
 local SoundsphereTimings = require("sea.timings.sphere.SoundsphereTimings_v1")
 local QuaverTimings = require("sea.timings.quaver.QuaverTimings_v1")
-local LunaticRaveTimings = require("sea.timings.bmsrank.LunaticRaveTimings_v1")
+local LunaticRaveTimings = require("sea.timings.bmsrank.LunaticRaveTimings_v2")
 local EtternaTimings = require("sea.timings.stepmania.EtternaTimings_v2")
 
 ---@class sea.TimingValuesFactory
