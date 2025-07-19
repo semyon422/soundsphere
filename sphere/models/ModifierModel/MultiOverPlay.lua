@@ -10,7 +10,7 @@ local MultiOverPlay = Modifier + {}
 MultiOverPlay.name = "MultiOverPlay"
 
 MultiOverPlay.defaultValue = 2
-MultiOverPlay.values = {2, 3, 4}
+MultiOverPlay.values = {2, 3, 4, 5}
 
 MultiOverPlay.description = "1 2 1 2 -> 12 34 12 34, doubles the input mode"
 
