@@ -52,8 +52,26 @@ function InputNotesHandler:update()
 end
 
 ---@param event rizu.VirtualInputEvent
+---@return integer
+function InputNotesHandler:getNotesMaxPriority(event)
+	local priority = -math.huge
+
+	for _, note in ipairs(self.active_notes) do
+		if note:match(event) then
+			priority = math.max(priority, note:getPriority())
+		end
+	end
+
+	return priority
+end
+
+---@param event rizu.VirtualInputEvent
 function InputNotesHandler:receive(event)
 	local active_notes = self.active_notes
+
+	if not active_notes[1] then
+		return
+	end
 
 	for _, note in ipairs(active_notes) do
 		if note:catch(event) then
@@ -62,9 +80,11 @@ function InputNotesHandler:receive(event)
 		end
 	end
 
+	local priority = self:getNotesMaxPriority(event)
+
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
-			if note:match(event) then
+			if note:getPriority() == priority and note:match(event) then
 				note:receive(event)
 				return
 			end
@@ -77,7 +97,7 @@ function InputNotesHandler:receive(event)
 	local nearest_time = math.huge
 	for _, note in ipairs(active_notes) do
 		local time = math.abs(note:getDeltaTime())
-		if note:match(event) and time < nearest_time then
+		if note:getPriority() == priority and note:match(event) and time < nearest_time then
 			nearest_time = time
 			nearest_note = note
 		end

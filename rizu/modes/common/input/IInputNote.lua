@@ -9,6 +9,11 @@ function IInputNote:isActive()
 	error("not implemented")
 end
 
+---@return integer
+function IInputNote:getPriority()
+	error("not implemented")
+end
+
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function IInputNote:match(event)

@@ -30,6 +30,14 @@ function ManiaInputNote:isActive()
 	error("not implemented")
 end
 
+---@return integer
+function ManiaInputNote:getPriority()
+	if self.state == "clear" then
+		return 0
+	end
+	return -1
+end
+
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function ManiaInputNote:match(event)

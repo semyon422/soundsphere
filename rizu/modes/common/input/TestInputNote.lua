@@ -9,10 +9,16 @@ TestInputNote.current_time = 0
 TestInputNote.time = 0
 TestInputNote.early_window = -1
 TestInputNote.late_window = 1
+TestInputNote.priority = 0
 
 ---@return boolean
 function TestInputNote:isActive()
 	return self.active
+end
+
+---@return integer
+function TestInputNote:getPriority()
+	return self.priority
 end
 
 ---@param event rizu.VirtualInputEvent

@@ -187,4 +187,38 @@ function test.nearest(t)
 	t:eq(event[3], 0)
 end
 
+---@param t testing.T
+function test.priority(t)
+	local function new_note(time, priority)
+		local note = TestInputNote()
+		---@cast note +{catched: any}
+		note.time = time
+		note.early_window = -10
+		note.late_window = 10
+		note.active = true
+		note.priority = priority
+		function note:match(event)
+			return true
+		end
+		function note:receive(event)
+			table.insert(event, time)
+		end
+		return note
+	end
+
+	local event = {}
+
+	local notes = {
+		new_note(0, 0),
+		new_note(2, 1),
+	}
+
+	local h = InputNotesHandler(notes)
+
+	update_and_eq_active(t, h, 0, 2)
+
+	h:receive(event)
+	t:eq(event[1], 2)
+end
+
 return test
