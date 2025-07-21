@@ -539,7 +539,10 @@ function EditorController:saveToOsu()
 	self.editorModel:save()
 
 	local encoder = OsuChartEncoder()
-	local data = encoder:encode({editorModel.chart})
+	local data = encoder:encode({{
+		chart = editorModel.chart,
+		chartmeta = editorModel.chartmeta,
+	}})
 
 	local chartview = selectModel.chartview
 	local path = chartview.location_path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
