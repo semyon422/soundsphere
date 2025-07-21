@@ -1,5 +1,5 @@
 local Observable = require("Observable")
-local IInputNote = require("rizu.modes.common.input.IInputNote")
+local IInputNote = require("rizu.engine.input.IInputNote")
 local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
 
 ---@alias rizu.ManiaInputNoteState "clear"|"missed"|"passed"

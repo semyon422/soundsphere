@@ -1,6 +1,6 @@
 local class = require("class")
-local InputNotesHandler = require("rizu.modes.common.input.InputNotesHandler")
-local InputNoteFactory = require("rizu.modes.common.input.InputNoteFactory")
+local InputNotesHandler = require("rizu.engine.input.InputNotesHandler")
+local InputNoteFactory = require("rizu.engine.input.InputNoteFactory")
 
 ---@class rizu.InputEngine
 ---@operator call: rizu.InputDevice

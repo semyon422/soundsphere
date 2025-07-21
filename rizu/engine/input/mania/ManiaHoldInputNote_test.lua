@@ -1,7 +1,7 @@
-local ManiaHoldInputNote = require("rizu.modes.mania.input.ManiaHoldInputNote")
+local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
 local table_util = require("table_util")
 local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
-local TimeInfo = require("rizu.modes.common.TimeInfo")
+local TimeInfo = require("rizu.engine.TimeInfo")
 local TimingValues = require("sea.chart.TimingValues")
 local Note = require("ncdk2.notes.Note")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
@@ -10,18 +10,17 @@ local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
 	local time_info = TimeInfo(0, 1)
-	function time_info:setTime(time)
-		self.time = time
-	end
-
 	local timing_values = TimingValues():setSimple(1, 2)
 
 	local start_point = AbsolutePoint(0)
 	local end_point = AbsolutePoint(10)
+
 	local start_visual_point = VisualPoint(start_point)
 	local end_visual_point = VisualPoint(end_point)
+
 	local start_note = Note(start_visual_point, "key1", "hold", 1)
 	local end_note = Note(end_visual_point, "key1", "hold", -1)
+
 	local linked_note = LinkedNote(start_note, end_note)
 
 	local input_note = ManiaHoldInputNote(linked_note, timing_values, time_info)

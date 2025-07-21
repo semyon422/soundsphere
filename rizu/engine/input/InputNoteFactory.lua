@@ -1,5 +1,5 @@
-local ManiaTapInputNote = require("rizu.modes.mania.input.ManiaTapInputNote")
-local ManiaHoldInputNote = require("rizu.modes.mania.input.ManiaHoldInputNote")
+local ManiaTapInputNote = require("rizu.engine.input.mania.ManiaTapInputNote")
+local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
 
 ---@class rizu.InputNoteFactory
 ---@operator call: rizu.InputNoteFactory

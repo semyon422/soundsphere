@@ -1,5 +1,5 @@
 local table_util = require("table_util")
-local ManiaInputNote = require("rizu.modes.mania.input.ManiaInputNote")
+local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
 
 ---@alias rizu.ManiaHoldInputNoteState
 ---| "clear"

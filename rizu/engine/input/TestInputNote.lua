@@ -1,4 +1,4 @@
-local IInputNote = require("rizu.modes.common.input.IInputNote")
+local IInputNote = require("rizu.engine.input.IInputNote")
 
 ---@class rizu.TestInputNote: rizu.IInputNote
 ---@operator call: rizu.TestInputNote

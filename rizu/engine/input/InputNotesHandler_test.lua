@@ -1,5 +1,5 @@
-local InputNotesHandler = require("rizu.modes.common.input.InputNotesHandler")
-local TestInputNote = require("rizu.modes.common.input.TestInputNote")
+local InputNotesHandler = require("rizu.engine.input.InputNotesHandler")
+local TestInputNote = require("rizu.engine.input.TestInputNote")
 
 ---@param t testing.T
 ---@param h rizu.InputNotesHandler

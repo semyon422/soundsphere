@@ -1,4 +1,4 @@
-local ManiaInputNote = require("rizu.modes.mania.input.ManiaInputNote")
+local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
 
 ---@alias rizu.ManiaTapInputNoteState "clear"|"missed"|"passed"
 

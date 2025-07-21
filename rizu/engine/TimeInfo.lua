@@ -11,6 +11,10 @@ function TimeInfo:new(time, rate)
 	self.rate = rate
 end
 
+function TimeInfo:setTime(time)
+	self.time = time
+end
+
 ---@param time number
 ---@return number
 function TimeInfo:sub(time)
