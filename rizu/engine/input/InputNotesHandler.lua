@@ -29,14 +29,11 @@ function InputNotesHandler:update()
 
 	for i = self.note_index, #notes do
 		local note = notes[i]
-		if note:isReachable() then
-			self.note_index = i + 1
-			if note:isActive() then
-				table.insert(active_notes, note)
-			end
-		else
+		if note:getPos() == "early" then
 			break
 		end
+		self.note_index = i + 1
+		table.insert(active_notes, note)
 	end
 
 	for _, note in ipairs(active_notes) do
@@ -45,7 +42,7 @@ function InputNotesHandler:update()
 
 	for i = #active_notes, 1, -1 do
 		local note = active_notes[i]
-		if not note:isActive() then
+		if note:getPos() == "late" then
 			table.remove(active_notes, i)
 		end
 	end

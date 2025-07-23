@@ -4,8 +4,8 @@ local class = require("class")
 ---@operator call: rizu.IInputNote
 local IInputNote = class()
 
----@return boolean
-function IInputNote:isActive()
+---@return "early"|"now"|"late"
+function IInputNote:getPos()
 	error("not implemented")
 end
 
@@ -32,11 +32,6 @@ function IInputNote:catch(event)
 end
 
 function IInputNote:update()
-	error("not implemented")
-end
-
----@return boolean
-function IInputNote:isReachable()
 	error("not implemented")
 end
 

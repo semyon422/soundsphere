@@ -4,16 +4,21 @@ local IInputNote = require("rizu.engine.input.IInputNote")
 ---@operator call: rizu.TestInputNote
 local TestInputNote = IInputNote + {}
 
-TestInputNote.active = false
 TestInputNote.current_time = 0
 TestInputNote.time = 0
 TestInputNote.early_window = -1
 TestInputNote.late_window = 1
 TestInputNote.priority = 0
 
----@return boolean
-function TestInputNote:isActive()
-	return self.active
+---@return "early"|"now"|"late"
+function TestInputNote:getPos()
+	local t = self.current_time
+	if t < self:getStartTime() then
+		return "early"
+	elseif t > self:getEndTime() then
+		return "late"
+	end
+	return "now"
 end
 
 ---@return integer
@@ -37,11 +42,6 @@ function TestInputNote:catch(event)
 end
 
 function TestInputNote:update() end
-
----@return boolean
-function TestInputNote:isReachable()
-	return self.current_time >= self:getStartTime()
-end
 
 ---@return number
 function TestInputNote:getDeltaTime()

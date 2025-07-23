@@ -26,25 +26,17 @@ end
 
 ---@param t testing.T
 function test.track_active_notes(t)
-	local function new_note(active)
+	local function new_note()
 		local note = TestInputNote()
 		note.time = 0
 		note.early_window = -1
 		note.late_window = 1
-		note.active = active
-		function note:update()
-			if self.current_time > self:getEndTime() then
-				self.active = false
-			end
-		end
 		return note
 	end
 
 	local h = InputNotesHandler({
-		new_note(true),
-		new_note(false),
-		new_note(true),
-		new_note(false),
+		new_note(),
+		new_note(),
 	})
 
 	update_and_eq_active(t, h, -10, 0)
@@ -61,7 +53,6 @@ function test.match(t)
 		note.time = 0
 		note.early_window = -1
 		note.late_window = 1
-		note.active = true
 		function note:match(event)
 			return event == match_event
 		end
@@ -104,7 +95,6 @@ function test.catch(t)
 		note.time = 0
 		note.early_window = -1
 		note.late_window = 1
-		note.active = true
 		function note:match(event)
 			return not self.catched
 		end
@@ -151,7 +141,6 @@ function test.nearest(t)
 		note.time = time
 		note.early_window = -10
 		note.late_window = 10
-		note.active = true
 		function note:match(event)
 			return true
 		end
@@ -195,7 +184,6 @@ function test.priority(t)
 		note.time = time
 		note.early_window = -10
 		note.late_window = 10
-		note.active = true
 		note.priority = priority
 		function note:match(event)
 			return true
