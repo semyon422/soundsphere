@@ -43,7 +43,14 @@ function EventsRenderer:load()
 		visual:generateEvents()
 	end
 
+	---@type {[ncdk2.VisualPoint]: -1|1}
 	self.point_events = {}
+
+	local point_events = self.point_events
+	function self.handle_event(vp, action)
+		point_events[vp] = action
+	end
+
 	self.note_events = {}
 
 	for _, _note in ipairs(chart.notes:getLinkedNotes()) do
@@ -65,10 +72,6 @@ function EventsRenderer:load()
 		end
 	end
 
-	-- for i, note in ipairs(notes) do
-	-- 	note.nextNote = notes[i + 1]
-	-- end
-
 	self.visible_notes_map = {}
 	self.visible_notes = {}
 end
@@ -78,9 +81,10 @@ function EventsRenderer:update()
 	local currentTime = graphicEngine:getCurrentTime()
 
 	local point_events = self.point_events
-	local function f(vp, action)
-		table.insert(point_events, {vp, action})
-	end
+	local handle_event = self.handle_event
+
+	-- TODO: fix a bug with LN disappearing
+	-- when you increase play speed and LN tail get hide event
 
 	for _, visual in ipairs(self.chart:getVisuals()) do
 		local cvp = self.cvp[visual]
@@ -93,11 +97,10 @@ function EventsRenderer:update()
 		local range = math.max(-graphicEngine.range[1], graphicEngine.range[2]) / visualTimeRate
 
 		table_util.clear(point_events)
-		visual.scroller:scroll(currentTime, f)
-		visual.scroller:scale(range, f)
+		visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
+		visual.scroller:scale(range, handle_event)
 
-		for _, event in ipairs(self.point_events) do
-			local vp, action = unpack(event)
+		for vp, action in pairs(point_events) do
 			local es = self.note_events[vp]
 			if es then
 				for _, e in ipairs(es) do
