@@ -226,6 +226,11 @@ function ChartsRepo:getChartplays()
 	return self.models.chartplays:select()
 end
 
+---@return integer
+function ChartsRepo:countChartplays()
+	return self.models.chartplays:count()
+end
+
 ---@param replay_hash string
 ---@return sea.Chartplay?
 function ChartsRepo:getChartplayByReplayHash(replay_hash)

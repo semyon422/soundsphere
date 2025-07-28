@@ -170,8 +170,9 @@ function section_draw.database(self)
 	local cacheModel = self.game.cacheModel
 
 	local cacheStatus = cacheModel.cacheStatus
-	imgui.text("chartmetas: " .. cacheStatus.chartmetas)
-	imgui.text("chartdiffs: " .. cacheStatus.chartdiffs)
+	imgui.text("metas: " .. cacheStatus.chartmetas)
+	imgui.text("diffs: " .. cacheStatus.chartdiffs)
+	imgui.text("plays: " .. cacheStatus.chartplays)
 
 	if imgui.button("cacheStatus update", "update status") then
 		cacheStatus:update()
