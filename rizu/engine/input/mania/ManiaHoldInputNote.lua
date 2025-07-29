@@ -23,13 +23,12 @@ local active_states = table_util.invert({
 local ManiaHoldInputNote = ManiaInputNote + {}
 
 ---@param note ncdk2.LinkedNote
----@param timing_values sea.TimingValues
----@param time_info rizu.TimeInfo
-function ManiaHoldInputNote:new(note, timing_values, time_info)
+---@param input_info rizu.InputInfo
+function ManiaHoldInputNote:new(note, input_info)
 	assert(note:getType() == "hold")
 	assert(note:isLong())
 
-	ManiaInputNote.new(self, note, timing_values, time_info)
+	ManiaInputNote.new(self, note, input_info)
 end
 
 ---@return boolean
@@ -92,34 +91,34 @@ end
 
 ---@return number
 function ManiaHoldInputNote:getDeltaTime()
-	return self.time_info:sub(self.note:getStartTime())
+	return self.input_info:sub(self.note:getStartTime())
 end
 
 ---@return number
 function ManiaHoldInputNote:getEndDeltaTime()
-	return self.time_info:sub(self.note:getEndTime())
+	return self.input_info:sub(self.note:getEndTime())
 end
 
 ---@return number
 function ManiaHoldInputNote:getStartTime()
-	return self.note:getStartTime() + self.timing_values:getMinTime("LongNoteStart") * self.time_info.rate
+	return self.note:getStartTime() + self.input_info.timing_values:getMinTime("LongNoteStart") * self.input_info.rate
 end
 
 ---@return number
 function ManiaHoldInputNote:getEndTime()
-	return self.note:getEndTime() + self.timing_values:getMaxTime("LongNoteEnd") * self.time_info.rate
+	return self.note:getEndTime() + self.input_info.timing_values:getMaxTime("LongNoteEnd") * self.input_info.rate
 end
 
 ---@return sea.TimingResult
 function ManiaHoldInputNote:getStartResult()
 	local dt = self:getDeltaTime()
-	return self.timing_values:hit("LongNoteStart", dt)
+	return self.input_info.timing_values:hit("LongNoteStart", dt)
 end
 
 ---@return sea.TimingResult
 function ManiaHoldInputNote:getEndResult()
 	local dt = self:getEndDeltaTime()
-	return self.timing_values:hit("LongNoteEnd", dt)
+	return self.input_info.timing_values:hit("LongNoteEnd", dt)
 end
 
 ---@param state rizu.ManiaHoldInputNoteState
@@ -127,8 +126,8 @@ function ManiaHoldInputNote:switchState(state)
 	local old_state = self.state
 	self.state = state
 
-	local start_last_time = self.timing_values:getMaxTime("LongNoteStart")
-	local end_last_time = self.timing_values:getMaxTime("LongNoteEnd")
+	local start_last_time = self.input_info.timing_values:getMaxTime("LongNoteStart")
+	local end_last_time = self.input_info.timing_values:getMaxTime("LongNoteEnd")
 
 	local delta_time = 0
 	if old_state == "clear" then

@@ -7,13 +7,12 @@ local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
 local ManiaTapInputNote = ManiaInputNote + {}
 
 ---@param note ncdk2.LinkedNote
----@param timing_values sea.TimingValues
----@param time_info rizu.TimeInfo
-function ManiaTapInputNote:new(note, timing_values, time_info)
+---@param input_info rizu.InputInfo
+function ManiaTapInputNote:new(note, input_info)
 	assert(note:getType() == "tap")
 	assert(note:isShort())
 
-	ManiaInputNote.new(self, note, timing_values, time_info)
+	ManiaInputNote.new(self, note, input_info)
 end
 
 ---@return boolean
@@ -47,23 +46,23 @@ end
 
 ---@return number
 function ManiaTapInputNote:getDeltaTime()
-	return self.time_info:sub(self.note:getStartTime())
+	return self.input_info:sub(self.note:getStartTime())
 end
 
 ---@return number
 function ManiaTapInputNote:getStartTime()
-	return self.note:getStartTime() + self.timing_values:getMinTime("ShortNote") * self.time_info.rate
+	return self.note:getStartTime() + self.input_info.timing_values:getMinTime("ShortNote") * self.input_info.rate
 end
 
 ---@return number
 function ManiaTapInputNote:getEndTime()
-	return self.note:getEndTime() + self.timing_values:getMaxTime("ShortNote") * self.time_info.rate
+	return self.note:getEndTime() + self.input_info.timing_values:getMaxTime("ShortNote") * self.input_info.rate
 end
 
 ---@return sea.TimingResult
 function ManiaTapInputNote:getResult()
 	local dt = self:getDeltaTime()
-	return self.timing_values:hit("ShortNote", dt)
+	return self.input_info.timing_values:hit("ShortNote", dt)
 end
 
 ---@param state rizu.ManiaTapInputNoteState
@@ -71,7 +70,7 @@ function ManiaTapInputNote:switchState(state)
 	local old_state = self.state
 	self.state = state
 
-	local last_time = self.timing_values:getMaxTime("ShortNote")
+	local last_time = self.input_info.timing_values:getMaxTime("ShortNote")
 	local last_time_full = self:getEndTime()
 
 	-- local currentTime = math.min(time, last_time_full)

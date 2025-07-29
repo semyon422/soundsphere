@@ -1,16 +1,15 @@
 local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
 local table_util = require("table_util")
 local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
-local TimeInfo = require("rizu.engine.TimeInfo")
-local TimingValues = require("sea.chart.TimingValues")
+local InputInfo = require("rizu.engine.input.InputInfo")
 local Note = require("ncdk2.notes.Note")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
 local AbsolutePoint = require("ncdk2.tp.AbsolutePoint")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
-	local time_info = TimeInfo(0, 1)
-	local timing_values = TimingValues():setSimple(1, 2)
+	local input_info = InputInfo(0, 1)
+	input_info.timing_values:setSimple(1, 2)
 
 	local start_point = AbsolutePoint(0)
 	local end_point = AbsolutePoint(10)
@@ -23,7 +22,7 @@ local function new_test_ctx()
 
 	local linked_note = LinkedNote(start_note, end_note)
 
-	local input_note = ManiaHoldInputNote(linked_note, timing_values, time_info)
+	local input_note = ManiaHoldInputNote(linked_note, input_info)
 
 	local events = {}
 	input_note.observable:add({receive = function(self, event)
@@ -31,8 +30,7 @@ local function new_test_ctx()
 	end})
 
 	return {
-		time_info = time_info,
-		timing_values = timing_values,
+		input_info = input_info,
 		start_point = start_point,
 		end_point = end_point,
 		start_visual_point = start_visual_point,
@@ -52,7 +50,7 @@ local test = {}
 function test.too_early(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(-3)
+	ctx.input_info:setTime(-3)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
 
@@ -68,7 +66,7 @@ end
 function test.too_late(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(3)
+	ctx.input_info:setTime(3)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -78,7 +76,7 @@ function test.too_late(t)
 	}})
 	ctx.clear_events()
 
-	ctx.time_info:setTime(13)
+	ctx.input_info:setTime(13)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -92,7 +90,7 @@ end
 function test.perfect_hold(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(0)
+	ctx.input_info:setTime(0)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
 
@@ -103,7 +101,7 @@ function test.perfect_hold(t)
 	}})
 	ctx.clear_events()
 
-	ctx.time_info:setTime(10)
+	ctx.input_info:setTime(10)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", false))
 
@@ -118,7 +116,7 @@ end
 function test.early_release(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(0.5)
+	ctx.input_info:setTime(0.5)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
 
@@ -129,7 +127,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.time_info:setTime(5)
+	ctx.input_info:setTime(5)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", false))
 
@@ -163,7 +161,7 @@ end
 function test.late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(1.5)
+	ctx.input_info:setTime(1.5)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
 
@@ -174,7 +172,7 @@ function test.late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.time_info:setTime(10)
+	ctx.input_info:setTime(10)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", false))
 
@@ -189,7 +187,7 @@ end
 function test.too_late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.time_info:setTime(5)
+	ctx.input_info:setTime(5)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -208,7 +206,7 @@ function test.too_late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.time_info:setTime(10)
+	ctx.input_info:setTime(10)
 	ctx.input_note:update()
 	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", false))
 

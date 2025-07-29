@@ -9,12 +9,10 @@ local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInput
 local ManiaInputNote = IInputNote + {}
 
 ---@param note ncdk2.LinkedNote
----@param timing_values sea.TimingValues
----@param time_info rizu.TimeInfo
-function ManiaInputNote:new(note, timing_values, time_info)
+---@param input_info rizu.InputInfo
+function ManiaInputNote:new(note, input_info)
 	self.note = note
-	self.timing_values = timing_values
-	self.time_info = time_info
+	self.input_info = input_info
 
 	self.observable = Observable()
 
@@ -59,7 +57,7 @@ end
 
 ---@return number
 function ManiaInputNote:getDeltaTime()
-	return self.time_info:sub(self.note:getStartTime())
+	return self.input_info:sub(self.note:getStartTime())
 end
 
 ---@return number

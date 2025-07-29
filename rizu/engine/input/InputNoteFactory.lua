@@ -1,9 +1,10 @@
+local class = require("class")
 local ManiaTapInputNote = require("rizu.engine.input.mania.ManiaTapInputNote")
 local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
 
 ---@class rizu.InputNoteFactory
 ---@operator call: rizu.InputNoteFactory
-local InputNoteFactory = {}
+local InputNoteFactory = class()
 
 ---@type {[notechart.NoteType]: rizu.IInputNote?}
 local notes = {
@@ -18,11 +19,9 @@ local notes = {
 	sprite = nil,
 }
 
----@param timing_values sea.TimingValues
----@param time_info rizu.TimeInfo
-function InputNoteFactory:new(timing_values, time_info)
-	self.timing_values = timing_values
-	self.time_info = time_info
+---@param input_info rizu.InputInfo
+function InputNoteFactory:new(input_info)
+	self.input_info = input_info
 end
 
 ---@param note ncdk2.LinkedNote
@@ -33,7 +32,7 @@ function InputNoteFactory:getNote(note)
 		return
 	end
 
-	return Note(note, self.timing_values, self.time_info)
+	return Note(note, self.input_info)
 end
 
 return InputNoteFactory

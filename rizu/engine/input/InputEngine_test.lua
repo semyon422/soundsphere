@@ -1,8 +1,8 @@
-local InputNotesHandler = require("rizu.engine.input.InputNotesHandler")
+local InputEngine = require("rizu.engine.input.InputEngine")
 local TestInputNote = require("rizu.engine.input.TestInputNote")
 
 ---@param t testing.T
----@param h rizu.InputNotesHandler
+---@param h rizu.InputEngine
 ---@param _t number
 ---@param n integer
 local function update_and_eq_active(t, h, _t, n)
@@ -18,7 +18,7 @@ local test = {}
 
 ---@param t testing.T
 function test.no_notes(t)
-	local h = InputNotesHandler({})
+	local h = InputEngine()
 
 	t:has_not_error(h.update, h, 0)
 	t:has_not_error(h.receive, h, {})
@@ -34,7 +34,8 @@ function test.track_active_notes(t)
 		return note
 	end
 
-	local h = InputNotesHandler({
+	local h = InputEngine()
+	h:setNotes({
 		new_note(),
 		new_note(),
 	})
@@ -70,7 +71,8 @@ function test.match(t)
 		new_note(event_2),
 	}
 
-	local h = InputNotesHandler(notes)
+	local h = InputEngine()
+	h:setNotes(notes)
 
 	update_and_eq_active(t, h, 0, 2)
 
@@ -116,7 +118,8 @@ function test.catch(t)
 		new_note(2),
 	}
 
-	local h = InputNotesHandler(notes)
+	local h = InputEngine()
+	h:setNotes(notes)
 
 	update_and_eq_active(t, h, 0, 2)
 
@@ -157,7 +160,8 @@ function test.nearest(t)
 		new_note(2),
 	}
 
-	local h = InputNotesHandler(notes)
+	local h = InputEngine()
+	h:setNotes(notes)
 	h.nearest = true
 
 	update_and_eq_active(t, h, 1, 2)
@@ -201,7 +205,8 @@ function test.priority(t)
 		new_note(2, 1),
 	}
 
-	local h = InputNotesHandler(notes)
+	local h = InputEngine()
+	h:setNotes(notes)
 
 	update_and_eq_active(t, h, 0, 2)
 
