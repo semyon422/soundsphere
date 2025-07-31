@@ -553,6 +553,20 @@ local function NotechartsSubscreen(self)
 	end
 end
 
+---@param self {game: sphere.GameController}
+local function DifftablesSync(self)
+	local syncing = self.game.difftables_sync.syncing
+	if not syncing then
+		return
+	end
+
+	Layout:move("column1", "footer")
+	love.graphics.translate(0, -40)
+
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+	imgui.text("Syncing difftables...")
+end
+
 return function(self)
 	BackgroundBanner(self)
 	NoteChartSetList(self)
@@ -568,4 +582,5 @@ return function(self)
 	GroupCheckbox(self)
 	ModifierIconGrid(self)
 	NotechartsSubscreen(self)
+	DifftablesSync(self)
 end

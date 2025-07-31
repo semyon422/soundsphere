@@ -72,8 +72,10 @@ end
 ---@return integer
 ---@return integer
 function DifftablesSync:sync()
+	self.syncing = true
 	local dts = self:syncDifftables()
 	local dt_cms = self:syncDifftableChartmetas()
+	self.syncing = false
 	return dts, dt_cms
 end
 
