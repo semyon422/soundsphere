@@ -18,6 +18,9 @@ pkg.export_lua()
 pcall(pkg.export_love)
 
 require("preload")
+local json = require("web.json")
+local io_util = require("io_util")
+local table_util = require("table_util")
 local stbl = require("stbl")
 local socket = require("socket")
 local time_util = require("time_util")
@@ -261,6 +264,51 @@ function cmds.auth_codes()
 
 	for _, c in ipairs(codes) do
 		print(c.code, tonumber(c.id), c.name, c.email)
+	end
+end
+
+function cmds.import_difftable(path, tag)
+	assert(path, "missing path")
+	assert(tag, "missing tag")
+
+	local difftable = app.repos.difftables_repo:getDifftableByTag(tag)
+	if not difftable then
+		print("missing difftable")
+		return
+	end
+
+	---@type {[string]: {level: string}[]}
+	local data = json.decode(io_util.read_file(path))
+
+	for _, dt_cm in ipairs(app.repos.difftables_repo:getDifftableChartmetas(difftable.id)) do
+		data[dt_cm.hash] = nil
+	end
+
+	print(("adding %d hashes"):format(#table_util.keys(data)))
+
+	local DifftableChartmeta = require("sea.difftables.DifftableChartmeta")
+
+	local time = os.time()
+
+	---@type sea.DifftableChartmeta[]
+	local dt_cms = {}
+	for hash, charts in pairs(data) do
+		for i, chart in ipairs(charts) do
+			local dt_cm = DifftableChartmeta()
+			dt_cm.user_id = 0
+			dt_cm.difftable_id = difftable.id
+			dt_cm.hash = hash
+			dt_cm.index = i
+			dt_cm.level = tonumber(chart.level) or 0
+			dt_cm.is_deleted = false
+			dt_cm.created_at = time
+			dt_cm.updated_at = time
+			table.insert(dt_cms, dt_cm)
+		end
+	end
+
+	for _, t in ipairs(table_util.slices(dt_cms, 100)) do
+		app.repos.difftables_repo:insertDifftableChartmetas(t)
 	end
 end
 

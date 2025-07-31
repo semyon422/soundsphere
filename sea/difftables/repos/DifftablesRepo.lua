@@ -137,16 +137,33 @@ function DifftablesRepo:getNextChangeIndex(difftable_id)
 end
 
 ---@param difftable_chartmetas sea.DifftableChartmeta[]
+---@return sea.DifftableChartmeta[]
 function DifftablesRepo:insertDifftableChartmetas(difftable_chartmetas)
-	self.models.difftable_chartmetas:insert(difftable_chartmetas, "replace")
+	if not difftable_chartmetas[1] then
+		return {}
+	end
+
+	self.models._orm.db:query("BEGIN")
+
+	local change_index = self:getNextChangeIndex(difftable_chartmetas[1].difftable_id)
+
+	for i, dt_cm in ipairs(difftable_chartmetas) do
+		dt_cm.change_index = change_index + i - 1
+	end
+	local dt_cms = self.models.difftable_chartmetas:insert(difftable_chartmetas, "replace")
+
+	self.models._orm.db:query("COMMIT")
+	return dt_cms
 end
 
 ---@param difftable_chartmeta sea.DifftableChartmeta
 ---@return sea.DifftableChartmeta
 function DifftablesRepo:createDifftableChartmeta(difftable_chartmeta)
 	self.models._orm.db:query("BEGIN")
+
 	difftable_chartmeta.change_index = self:getNextChangeIndex(difftable_chartmeta.difftable_id)
 	local dt_cm = self.models.difftable_chartmetas:create(difftable_chartmeta)
+
 	self.models._orm.db:query("COMMIT")
 	return dt_cm
 end
@@ -155,8 +172,10 @@ end
 ---@return sea.DifftableChartmeta
 function DifftablesRepo:updateDifftableChartmeta(difftable_chartmeta)
 	self.models._orm.db:query("BEGIN")
+
 	difftable_chartmeta.change_index = self:getNextChangeIndex(difftable_chartmeta.difftable_id)
 	local dt_cm = self.models.difftable_chartmetas:update(difftable_chartmeta, {id = assert(difftable_chartmeta.id)})[1]
+
 	self.models._orm.db:query("COMMIT")
 	return dt_cm
 end

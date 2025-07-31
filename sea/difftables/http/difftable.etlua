@@ -19,7 +19,7 @@ Charts
 	</tr>
 	<% for _, dt_cm in ipairs(difftable_chartmetas) do %>
 		<tr>
-			<td><%= dt_cm.chartmeta.title %></td>
+			<td><%= dt_cm.chartmeta and dt_cm.chartmeta.title or "Unknown" %></td>
 			<td><%= dt_cm.level %></td>
 			<td><%- dt_cm.user and Username(dt_cm.user) or "-" %></td>
 			<td><%= os.date("!%Y.%m.%d %H:%M:%S", dt_cm.created_at) %></td>
