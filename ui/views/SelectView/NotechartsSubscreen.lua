@@ -560,8 +560,8 @@ local function DifftablesSync(self)
 		return
 	end
 
-	Layout:move("column1", "footer")
-	love.graphics.translate(0, -40)
+	local w, h = Layout:move("column1", "column1")
+	love.graphics.translate(24, h - 40)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 	imgui.text("Syncing difftables...")
