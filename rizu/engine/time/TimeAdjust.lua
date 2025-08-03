@@ -1,11 +1,35 @@
 local class = require("class")
 
+--- Monotonic time adjust
 ---@class rizu.TimeAdjust
 ---@operator call: rizu.TimeAdjust
+---@field ahead_time number?
 local TimeAdjust = class()
 
-function TimeAdjust:new()
-	
+---@param adjust_factor number? from 0 to 1
+function TimeAdjust:new(adjust_factor)
+	adjust_factor = adjust_factor or 1
+	assert(adjust_factor >= 0 and adjust_factor <= 1)
+	self.adjust_factor = adjust_factor
+end
+
+---@param time number
+---@param adjust_time number
+---@return number?
+function TimeAdjust:adjust(time, adjust_time)
+	if adjust_time == self.adjust_time then
+		return
+	end
+	self.adjust_time = adjust_time
+
+	if adjust_time >= time then -- behind
+		self.ahead_time = nil
+	else -- ahead
+		self.ahead_time = self.ahead_time or time
+		adjust_time = self.ahead_time
+	end
+
+	return time + (adjust_time - time) * self.adjust_factor
 end
 
 return TimeAdjust

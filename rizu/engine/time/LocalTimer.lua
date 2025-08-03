@@ -7,37 +7,10 @@ local LocalTimer = class()
 LocalTimer.is_playing = false
 LocalTimer.offset = 0
 LocalTimer.rate = 1
-LocalTimer.adjustRate = 0.1
 
 ---@return number
 function LocalTimer:getGlobalTime()
 	return 0
-end
-
----@return number?
-function LocalTimer:getAdjustTime() end
-
----@return number?
-function LocalTimer:tryAdjust()
-	local adjustTime = self:getAdjustTime()
-	if not adjustTime then
-		return
-	end
-	if adjustTime == self.prevAdjustTime then
-		return
-	end
-	self.prevAdjustTime = adjustTime
-	return adjustTime
-end
-
-function LocalTimer:adjust()
-	local time = self:getTime()
-
-	local adjustTime = self:tryAdjust()
-	if adjustTime and self.adjustRate > 0 then
-		time = time + (adjustTime - time) * self.adjustRate
-		self:setTime(time)
-	end
 end
 
 ---@return number
