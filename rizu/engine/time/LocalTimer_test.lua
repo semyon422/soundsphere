@@ -6,15 +6,12 @@ local test = {}
 function test.changing_time(t)
 	local timer = LocalTimer()
 
-	local time = 0
-	function timer:getGlobalTime()
-		return time
-	end
+	timer:setGlobalTime(0)
 
 	timer:play()
 	t:eq(timer:getTime(), 0)
 
-	time = 1
+	timer:setGlobalTime(1)
 	t:eq(timer:getTime(), 1)
 
 	t:eq(timer:transform(0), 0)
@@ -26,19 +23,16 @@ end
 function test.changing_time_with_rate(t)
 	local timer = LocalTimer()
 
-	local time = 0
-	function timer:getGlobalTime()
-		return time
-	end
+	timer:setGlobalTime(0)
 
 	timer:play()
 	timer:setRate(2)
 	t:eq(timer:getTime(), 0)
 
-	time = 1
+	timer:setGlobalTime(1)
 	t:eq(timer:getTime(), 2)
 
-	time = 2
+	timer:setGlobalTime(2)
 	t:eq(timer:getTime(), 4)
 
 	t:eq(timer:transform(0), 0)
@@ -81,15 +75,12 @@ end
 function test.play_pause(t)
 	local timer = LocalTimer()
 
-	local time = 0
-	function timer:getGlobalTime()
-		return time
-	end
+	timer:setGlobalTime(0)
 
 	timer:play()
 	t:eq(timer:getTime(), 0)
 
-	time = 1
+	timer:setGlobalTime(1)
 	t:eq(timer:getTime(), 1)
 	t:eq(timer:transform(1), 1)
 
@@ -101,14 +92,14 @@ function test.play_pause(t)
 
 	--
 
-	time = 2
+	timer:setGlobalTime(2)
 	t:eq(timer:getTime(), 1)
 	t:eq(timer:transform(1), 0)
 
 	--
 
 	timer:play()
-	time = 3
+	timer:setGlobalTime(3)
 	t:eq(timer:getTime(), 2)
 
 	t:eq(timer:transform(0), -1)

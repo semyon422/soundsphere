@@ -7,10 +7,17 @@ local LocalTimer = class()
 LocalTimer.is_playing = false
 LocalTimer.offset = 0
 LocalTimer.rate = 1
+LocalTimer.global_offset = 0
+LocalTimer.global_time = 0
 
 ---@return number
 function LocalTimer:getGlobalTime()
-	return 0
+	return self.global_time
+end
+
+---@param global_time number
+function LocalTimer:setGlobalTime(global_time)
+	self.global_time = global_time
 end
 
 ---@return number
