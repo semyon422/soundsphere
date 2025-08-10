@@ -125,9 +125,6 @@ end
 
 require("preload")
 
-local modloader = require("modloader")(root)
-modloader:loadMods()
-
 local love_run = require("love_run")
 love.load = function() end  -- for compatibility with old conf.lua
 local defaultLoop = love.loop or love_run()
