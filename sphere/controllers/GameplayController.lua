@@ -104,7 +104,7 @@ function GameplayController:load()
 	local judgement = configModel.configs.select.judgements
 
 	local data = assert(love.filesystem.read(chartview.location_path))
-	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
+	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index or 1))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
 	computeContext:applyModifierReorder(replayBase)
 	local chartdiff, state, diffcalc_context = computeContext:computeBase(replayBase)

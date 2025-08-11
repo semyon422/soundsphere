@@ -18,7 +18,7 @@ end
 function OffsetModel:getInputVisual(hash, index)
 	local charts_repo = self.charts_repo
 
-	local chartmeta = assert(charts_repo:getChartmetaByHashIndex(hash, index))
+	local chartmeta = charts_repo:getChartmetaByHashIndex(hash, index)
 	local chartmeta_user_data = charts_repo:getUserChartmetaUserData(hash, index, 1)
 
 	local config = self.configModel.configs.settings
@@ -28,7 +28,7 @@ function OffsetModel:getInputVisual(hash, index)
 
 	local chart_offset = chartmeta_user_data and chartmeta_user_data.local_offset or 0
 	local audio_mode_offset = g.offset_audio_mode[audio_mode] or 0
-	local format_offset = g.offset_format[chartmeta.format] or 0
+	local format_offset = chartmeta and g.offset_format[chartmeta.format] or 0
 
 	local input_offset, visual_offset = 0, 0
 	input_offset = g.offset.input + format_offset + audio_mode_offset + chart_offset
