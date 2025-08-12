@@ -1,10 +1,14 @@
-# soundsphere
+# Rizu
 Open-source rhythm game
 ## Links
-- [Website](https://soundsphere.xyz)
-- [Download](https://dl.soundsphere.xyz/soundsphere.zip)
+- [Website](https://rizu.su)
+- [Download](https://dl.rizu.su/rizu.zip)
 - [Installation guide](https://youtu.be/FvdafJSMx-s)
 - [Discord server](https://discord.gg/ubKMtTk)
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Features:
 
@@ -35,6 +39,7 @@ Open-source rhythm game
 - osu!direct
 - Multiplayer
 - Auto-updater
+- Editor
 - And much more
 
 ## Future plans:
@@ -43,8 +48,6 @@ Open-source rhythm game
 - Offset wizzard
 - More score systems and difficulty calculators
 - Flexible collections 
-- Difficulty tables
 - Multiple profiles
 - Replay import
-- Editor
 - And much more
