@@ -13,9 +13,9 @@ function test.find_file(t)
 
 	rf:addPath("dir")
 
-	t:eq(rf:findFile("audio.mp3", "audio"), "dir/audio.mp3")
-	t:eq(rf:findFile("/audio.mp3", "audio"), "dir/audio.mp3")
-	t:eq(rf:findFile("\\audio.mp3", "audio"), "dir/audio.mp3")
+	t:eq(rf:findFile("audio.mp3"), "dir/audio.mp3")
+	t:eq(rf:findFile("/audio.mp3"), "dir/audio.mp3")
+	t:eq(rf:findFile("\\audio.mp3"), "dir/audio.mp3")
 end
 
 ---@param t testing.T
@@ -29,7 +29,7 @@ function test.equal_name_found(t)
 
 	rf:addPath("dir")
 
-	t:eq(rf:findFile("audio.mp3", "audio"), "dir/audio.mp3")
+	t:eq(rf:findFile("audio.mp3"), "dir/audio.mp3")
 end
 
 ---@param t testing.T
@@ -42,7 +42,7 @@ function test.case_insensetive(t)
 
 	rf:addPath("dir")
 
-	t:eq(rf:findFile("AUDIO.MP3", "audio"), "dir/audio.mp3")
+	t:eq(rf:findFile("AUDIO.MP3"), "dir/audio.mp3")
 end
 
 ---@param t testing.T
@@ -56,7 +56,7 @@ function test.alternate_ext_ordered(t)
 
 	rf:addPath("dir")
 
-	t:eq(rf:findFile("audio.ogg", "audio"), "dir/audio.wav")
+	t:eq(rf:findFile("audio.ogg"), "dir/audio.wav")
 end
 
 ---@param t testing.T
@@ -72,7 +72,7 @@ function test.many_paths(t)
 	rf:addPath("dir1")
 	rf:addPath("dir2")
 
-	t:eq(rf:findFile("audio.ogg", "audio"), "dir1/audio.mp3")
+	t:eq(rf:findFile("audio.ogg"), "dir1/audio.mp3")
 end
 
 return test

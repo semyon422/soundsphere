@@ -66,14 +66,14 @@ function ResourceFinder:getFormat(ext)
 end
 
 ---@param req_name_ext string
----@param format string
 ---@return string?
-function ResourceFinder:findFile(req_name_ext, format)
+function ResourceFinder:findFile(req_name_ext)
 	req_name_ext = path_util.fix_separators(req_name_ext)
 	req_name_ext = req_name_ext:gsub("^/", "")
 
 	local req_name, req_ext = path_util.name_ext(req_name_ext)
-	if self:getFormat(req_ext) ~= assert(format) then
+	local format = self:getFormat(req_ext)
+	if not format then
 		return
 	end
 
