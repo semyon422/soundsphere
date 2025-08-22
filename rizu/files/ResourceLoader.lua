@@ -18,6 +18,11 @@ function ResourceLoader:new(fs, resource_finder)
 
 	---@type {[string]: true}
 	self.file_pendings = {}
+
+	---@type {[string]: string}
+	self.resources = setmetatable({}, {__index = function(t, k)
+		return self:getResource(k)
+	end})
 end
 
 ---@param resources ncdk.Resources

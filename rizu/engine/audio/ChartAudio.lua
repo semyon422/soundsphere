@@ -23,7 +23,7 @@ end
 
 function ChartAudio:sort()
 	table.sort(self.sounds, function(a, b)
-		if a.time ~= a.time then
+		if a.time ~= b.time then
 			return a.time < b.time
 		end
 		return a.name < b.name
