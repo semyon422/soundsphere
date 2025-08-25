@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS `user_locations` (
 	UNIQUE(`user_id`, `ip`)
 );
 
+CREATE TABLE IF NOT EXISTS `user_badges` (
+	`user_id` INTEGER NOT NULL,
+	`badge_id` INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS `sessions` (
 	`id` INTEGER PRIMARY KEY,
 	`user_id` INTEGER NOT NULL,
