@@ -440,4 +440,10 @@ function Users:createAndSendPasswordResetAuthCode(ip, email, time, duration, rat
 	return auth_code.code
 end
 
+---@param user sea.User
+---@return sea.UserBadge[]
+function Users:getUserBadges(user)
+	return self.users_repo:getUserBadges(user.id)
+end
+
 return Users

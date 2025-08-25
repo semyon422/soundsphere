@@ -143,6 +143,14 @@ end
 --------------------------------------------------------------------------------
 
 ---@param user_id integer
+---@return sea.UserBadge[]
+function UsersRepo:getUserBadges(user_id)
+	return self.models.user_badges:select({user_id = assert(user_id)})
+end
+
+--------------------------------------------------------------------------------
+
+---@param user_id integer
 ---@return sea.UserLocation[]
 function UsersRepo:getUserLocations(user_id)
 	return self.models.user_locations:select({

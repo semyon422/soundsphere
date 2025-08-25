@@ -133,6 +133,8 @@ function UserResource:getUser(req, res, ctx)
 		ctx.meta_tags["description"] = table.concat(s, " | ")
 	end
 
+	ctx.badges = self.users:getUserBadges(user)
+
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
 
