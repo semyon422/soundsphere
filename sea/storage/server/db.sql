@@ -126,10 +126,14 @@ CREATE TABLE IF NOT EXISTS `leaderboard_users` (
 	`user_id` INTEGER NOT NULL,
 	`total_rating` REAL NOT NULL,
 	`total_accuracy` REAL NOT NULL,
+	`total_plays` INTEGER NOT NULL,
+	`ranked_plays` INTEGER NOT NULL,
 	`rank` INTEGER NOT NULL,
 	`updated_at` INTEGER NOT NULL,
 	UNIQUE(`leaderboard_id`, `user_id`)
 );
+
+CREATE INDEX IF NOT EXISTS leaderboard_users_total_rating_idx ON leaderboard_users (`total_rating`);
 
 CREATE TABLE IF NOT EXISTS `leaderboard_difftables` (
 	`id` INTEGER PRIMARY KEY,

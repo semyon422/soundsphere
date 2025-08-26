@@ -8,6 +8,8 @@ local erfunc = require("libchart.erfunc")
 ---@field user_id integer
 ---@field total_rating number
 ---@field total_accuracy number
+---@field total_plays integer
+---@field ranked_plays integer
 ---@field rank integer
 ---@field updated_at integer
 ---@field history sea.LeaderboardUserHistory?
