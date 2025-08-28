@@ -143,7 +143,7 @@ end
 --------------------------------------------------------------------------------
 
 ---@param user_id integer
----@return sea.Badge[]
+---@return sea.UserBadge[]
 function UsersRepo:getUserBadges(user_id)
 	return self.models.user_badges:select({user_id = assert(user_id)})
 end

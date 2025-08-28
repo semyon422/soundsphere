@@ -57,13 +57,15 @@ UserResource.routes = {
 
 ---@param users sea.Users
 ---@param user_roles sea.UserRoles
+---@param user_badges sea
 ---@param leaderboards sea.Leaderboards
 ---@param dans sea.Dans
 ---@param user_activity_graph sea.UserActivityGraph
 ---@param views web.Views
-function UserResource:new(users, user_roles, leaderboards, dans, user_activity_graph, views)
+function UserResource:new(users, user_roles, user_badges, leaderboards, dans, user_activity_graph, views)
 	self.users = users
 	self.user_roles = user_roles
+	self.user_badges = user_badges
 	self.leaderboards = leaderboards
 	self.dans = dans
 	self.user_activity_graph = user_activity_graph
@@ -133,7 +135,7 @@ function UserResource:getUser(req, res, ctx)
 		ctx.meta_tags["description"] = table.concat(s, " | ")
 	end
 
-	ctx.badges = self.users:getUserBadges(user)
+	ctx.badges = self.user_badges:getUserBadges(user)
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
