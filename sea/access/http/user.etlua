@@ -80,7 +80,7 @@
 				</div>
 				<div class="user__badge-container">
 					<% for _, v in ipairs(badges) do %>
-						<img src="/static/images/badges/<%= v.badge_id %>.webp" />
+						<img src="/static/images/badges/<%= v.badge %>.webp" />
 					<% end %>
 				</div>
 				<div class="block is-hidden-mobile">
