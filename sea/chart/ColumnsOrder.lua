@@ -147,7 +147,7 @@ local transforms = {
 			a, b = math.ceil(c / 2) + 1, c
 		end
 
-		if not t[1] then
+		if i == 1 then
 			fill_range(t, a, b)
 		end
 
@@ -184,18 +184,24 @@ function ColumnsOrder:getName()
 	return "custom"
 end
 
+---@return sea.ColumnsOrder
 function ColumnsOrder:mirror()
 	return self:transform(transforms.mirror)
 end
 
+---@param n integer
+---@return sea.ColumnsOrder
 function ColumnsOrder:shift(n)
 	return self:transform(transforms.shift, n)
 end
 
+---@return sea.ColumnsOrder
 function ColumnsOrder:bracketswap()
 	return self:transform(transforms.bracketswap)
 end
 
+---@param mode "left"|"right"?
+---@return sea.ColumnsOrder
 function ColumnsOrder:random(mode)
 	return self:transform(transforms.random, {}, mode)
 end
