@@ -114,7 +114,9 @@ return ModalImView(function(self, quit)
 		co:bracketswap()
 	end
 	if imgui.button("order random", "random") then
-		co:random()
+		local shift = love.keyboard.isDown("lshift")
+		local ctrl = love.keyboard.isDown("lctrl")
+		co:random(shift and "left" or ctrl and "right")
 	end
 	just.row(false)
 
