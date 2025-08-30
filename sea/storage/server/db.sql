@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS `user_locations` (
 
 CREATE TABLE IF NOT EXISTS `user_badges` (
 	`user_id` INTEGER NOT NULL,
-	`badge` INTEGER NOT NULL
+	`badge` INTEGER NOT NULL,
+	UNIQUE (user_id, badge)
 );
 
 CREATE TABLE IF NOT EXISTS `sessions` (

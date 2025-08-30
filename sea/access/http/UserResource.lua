@@ -53,6 +53,13 @@ UserResource.routes = {
 		POST = "banUser",
 		DELETE = "unbanUser",
 	}},
+	{"/users/:user_id/badges", {
+		GET = "getUserBadges",
+		POST = "createUserBadge",
+	}},
+	{"/users/:user_id/badges/:badge_id", {
+		DELETE = "deleteUserBadge",
+	}},
 }
 
 ---@param users sea.Users
@@ -577,6 +584,104 @@ function UserResource:unbanUser(req, res, ctx)
 	end
 
 	res.headers:set("HX-Location", ("/users/%s/settings"):format(user_id))
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:getUserBadges(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user = self.users:getUser(user_id)
+	if user:isAnon() then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	ctx.user = user
+	ctx.badges = self.user_badges:getUserBadges(user)
+
+	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:createUserBadge(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user = self.users:getUser(user_id)
+	if user:isAnon() then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local body_params, err = http_util.get_form(req)
+	if not body_params then
+		---@cast err -?
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	local badge_id = body_params.badge_id or ""
+
+	local badge, err = self.user_badges:createUserBadge(ctx.session_user, user_id, badge_id)
+
+	if not badge then
+		res.status = 400
+		res:send(err)
+	end
+
+	ctx.user = user
+	ctx.badges = self.user_badges:getUserBadges(user)
+
+	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
+end
+
+---@param req web.IRequest
+---@param res web.IResponse
+---@param ctx sea.RequestContext
+function UserResource:deleteUserBadge(req, res, ctx)
+	local user_id = tonumber(ctx.path_params.user_id)
+	if not user_id then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local user = self.users:getUser(user_id)
+	if user:isAnon() then
+		res.status = 404
+		self.views:render_send(res, "sea/shared/http/not_found.etlua", ctx, true)
+		return
+	end
+
+	local badge = ctx.path_params.badge_id
+
+	local badge, err = self.user_badges:deleteUserBadge(ctx.session_user, user_id, badge)
+
+	if not badge then
+		res.status = 400
+		res:send(err)
+		return
+	end
+
+	ctx.user = user
+	ctx.badges = self.user_badges:getUserBadges(user)
+	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
 end
 
 return UserResource

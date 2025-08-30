@@ -1,0 +1,45 @@
+<% local badge_list = require("sea.access.user_badge_list") %>
+
+<section class="hero">
+	<div class="hero-body">
+		<p class="title">User badges</p>
+		<p class="subtitle"><%= user.name %></p>
+	</div>
+</section>
+
+<nav class="level">
+	<form action="/users/<%= user.id %>/badges" method="post">
+		<div class="level-left">
+			<div class="level-item">
+				<div class="control has-icons-left has-icons-right">
+				<input class="input" name="badge_id" type="text" placeholder="Badge enum string id">
+				<span class="icon is-small is-left">
+					<i class="fas fa-id-badge"></i>
+				</span>
+				</div>
+			</div>
+			<div class="level-item"><button class="button is-success">Add</button></div>
+		</div>
+		<div class="level-right">
+		</div>
+	</form>
+</nav>
+
+<table class="table is-fullwidth is-striped">
+	<thead>
+		<th>ID</th>
+		<th>Name</th>
+		<th>Description</th>
+		<th></th>
+	</thead>
+	<tbody>
+		<% for _, badge in ipairs(badges) do %>
+			<tr>
+				<td><%= badge.badge %></td>
+				<td><%= badge_list[badge.badge].name %></td>
+				<td><%= badge_list[badge.badge].description %></td>
+				<td><a hx-delete="/users/<%= user.id %>/badges/<%= badge.badge %>" hx-target="body">Remove</a></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>

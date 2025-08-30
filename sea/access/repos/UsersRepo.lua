@@ -148,6 +148,19 @@ function UsersRepo:getUserBadges(user_id)
 	return self.models.user_badges:select({user_id = assert(user_id)})
 end
 
+---@param user_id integer
+---@param user_badge sea.UserBadge
+function UsersRepo:createUserBadge(user_id, user_badge)
+	return self.models.user_badges:create({user_id = assert(user_id), badge = assert(user_badge)})
+end
+
+---@param user_id integer
+---@param user_badge sea.UserBadge
+---@return {user_id: integer, badge: sea.UserBadge}?
+function UsersRepo:deleteUserBadge(user_id, user_badge)
+	return self.models.user_badges:delete({user_id = assert(user_id), badge = assert(user_badge)})[1]
+end
+
 --------------------------------------------------------------------------------
 
 ---@param user_id integer

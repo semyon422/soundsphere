@@ -231,6 +231,7 @@
 					<% end %>
 				<% end %>
 				<a href="/users/<%= user.id%>/roles" class="button is-link">Roles</a>
+				<a href="/users/<%= user.id%>/badges" class="button is-link">Badges</a>
 			</div>
 		</div>
 	</div>
