@@ -15,27 +15,28 @@ BassSoundDecoder.bytes_per_sample = 2
 
 ---@param channel integer
 ---@return integer
----@return number
 local function get_length(channel)
+	---@type integer
 	local length = bass.BASS_ChannelGetLength(channel, 0)
 	bass_assert(length >= 0)
-	local duration = bass.BASS_ChannelBytes2Seconds(channel, length)
-	bass_assert(length >= 0)
-	return length, duration
+	return tonumber(length) ---@diagnostic disable-line: return-type-mismatch
 end
 
 ---@param data string
 function BassSoundDecoder:new(data)
 	self.data = data
 
-	self.decode_chan = bass.BASS_StreamCreateFile(true, data, 0, #data, bit.bor(bass_flags.BASS_STREAM_DECODE, bass_flags.BASS_STREAM_PRESCAN))
-	bass_assert(self.decode_chan ~= 0)
-	self.length, self.duration = get_length(self.decode_chan)
+	---@type integer
+	self.decode_channel = bass.BASS_StreamCreateFile(true, data, 0, #data, bit.bor(bass_flags.BASS_STREAM_DECODE, bass_flags.BASS_STREAM_PRESCAN))
+	bass_assert(self.decode_channel ~= 0)
+	self.length = get_length(self.decode_channel)
 
-	self.resample_chan = bass_mix.BASS_Mixer_StreamCreate(self.sample_rate, self.channels_count, bass_flags.BASS_STREAM_DECODE)
-	bass_assert(self.resample_chan ~= 0)
+	---@type integer
+	self.resample_channel = bass_mix.BASS_Mixer_StreamCreate(self.sample_rate, self.channels_count, bass_flags.BASS_STREAM_DECODE)
+	bass_assert(self.resample_channel ~= 0)
 
-	local ok = bass_mix.BASS_Mixer_StreamAddChannel(self.resample_chan, self.decode_chan, 0)
+	---@type integer
+	local ok = bass_mix.BASS_Mixer_StreamAddChannel(self.resample_channel, self.decode_channel, 0)
 	bass_assert(ok == 1)
 
 	self.position = 0
@@ -43,15 +44,16 @@ function BassSoundDecoder:new(data)
 end
 
 function BassSoundDecoder:release()
-	bass_assert(bass.BASS_StreamFree(self.resample_chan) == 1)
-	bass_assert(bass.BASS_StreamFree(self.decode_chan) == 1)
+	bass_assert(bass.BASS_StreamFree(self.resample_channel) == 1)
+	bass_assert(bass.BASS_StreamFree(self.decode_channel) == 1)
 end
 
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
 function BassSoundDecoder:getData(buf, len)
-	local data_bytes = bass.BASS_ChannelGetData(self.resample_chan, buf, len)
+	---@type integer
+	local data_bytes = bass.BASS_ChannelGetData(self.resample_channel, buf, len)
 	bass_assert(data_bytes ~= -1)
 	self.position = self.position + data_bytes
 	return data_bytes
@@ -60,7 +62,8 @@ end
 ---@param pos integer
 ---@return number
 function BassSoundDecoder:bytesToSeconds(pos)
-	pos = bass.BASS_ChannelBytes2Seconds(self.resample_chan, pos)
+	---@type number
+	pos = bass.BASS_ChannelBytes2Seconds(self.resample_channel, pos)
 	bass_assert(pos >= 0)
 	return pos
 end
@@ -68,28 +71,43 @@ end
 ---@param pos number
 ---@return integer
 function BassSoundDecoder:secondsToBytes(pos)
-	pos = bass.BASS_ChannelSeconds2Bytes(self.resample_chan, pos)
+	---@type integer
+	pos = bass.BASS_ChannelSeconds2Bytes(self.resample_channel, pos)
 	bass_assert(pos >= 0)
-	return pos
+	return tonumber(pos) ---@diagnostic disable-line: return-type-mismatch
 end
 
----@return number
-function BassSoundDecoder:getPosition()
-	return self:bytesToSeconds(self.position)
+---@return integer
+function BassSoundDecoder:getBytesPosition()
+	return self.position
 end
 
----@param position number
-function BassSoundDecoder:setPosition(position)
-	local pos = bass.BASS_ChannelSeconds2Bytes(self.decode_chan, position)
-	bass_assert(pos >= 0)
+---@param pos integer
+function BassSoundDecoder:setBytesPosition(pos)
 	self.position = pos
-	pos = bass_mix.BASS_Mixer_ChannelSetPosition(self.decode_chan, pos, bass_flags.BASS_POS_BYTE)
+	---@type integer
+	pos = bass_mix.BASS_Mixer_ChannelSetPosition(self.decode_channel, pos, bass_flags.BASS_POS_BYTE)
 	bass_assert(pos >= 0)
 end
 
----@return number
-function BassSoundDecoder:getDuration()
-	return self.duration
+---@return integer
+function BassSoundDecoder:getBytesDuration()
+	return self.length
+end
+
+---@return integer
+function BassSoundDecoder:getSampleRate()
+	return self.sample_rate
+end
+
+---@return integer
+function BassSoundDecoder:getChannelCount()
+	return self.channels_count
+end
+
+---@return integer
+function BassSoundDecoder:getBytesPerSample()
+	return self.bytes_per_sample
 end
 
 return BassSoundDecoder
