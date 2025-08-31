@@ -1,9 +1,9 @@
-local Enum = require("rdb.Enum")
+local class = require("class")
 
----@enum (key) sea.UserBadge
-local UserBadge = {
-	summer_event_2025_winner = 0,
-	summer_event_2025_top_active = 1,
-}
+---@class sea.UserBadge
+---@operator call: sea.UserBadge
+---@field user_id integer
+---@field badge sea.Badge
+local UserBadge = class()
 
-return Enum(UserBadge)
+return UserBadge

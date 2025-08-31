@@ -1,4 +1,5 @@
 local class = require("class")
+local Badge = require("sea.access.Badge")
 local UserBadge = require("sea.access.UserBadge")
 local UsersAccess = require("sea.access.access.UsersAccess")
 
@@ -20,12 +21,12 @@ end
 
 ---@param user sea.User
 ---@param target_user_id integer
----@param badge_id string
+---@param badge sea.UserBadge
 ---@return sea.UserBadge
 ---@return string err
-function UserBadges:createUserBadge(user, target_user_id, badge_id)
-	if not UserBadge:encode_safe(badge_id) then
-		return nil, ("badge doesn't exist")
+function UserBadges:createUserBadge(user, target_user_id, badge)
+	if not Badge:encode_safe(badge) then
+		return nil, "badge doesn't exist"
 	end
 
 	local target_user = self.users_repo:getUser(target_user_id)
@@ -38,13 +39,16 @@ function UserBadges:createUserBadge(user, target_user_id, badge_id)
 		return nil, "not allowed"
 	end
 
-	return self.users_repo:createUserBadge(target_user.id, badge_id)
+	local user_badge = UserBadge()
+	user_badge.user_id = target_user.id
+	user_badge.badge = badge
+	return self.users_repo:createUserBadge(user_badge)
 end
 
 ---@param user sea.User
 ---@param target_user_id integer
----@param badge_id string
-function UserBadges:deleteUserBadge(user, target_user_id, badge_id)
+---@param badge sea.Badge
+function UserBadges:deleteUserBadge(user, target_user_id, badge)
 	local target_user = self.users_repo:getUser(target_user_id)
 	if not target_user then
 		return nil, "not found"
@@ -55,7 +59,10 @@ function UserBadges:deleteUserBadge(user, target_user_id, badge_id)
 		return nil, "not allowed"
 	end
 
-	return self.users_repo:deleteUserBadge(target_user_id, badge_id)
+	local user_badge = UserBadge()
+	user_badge.user_id = target_user.id
+	user_badge.badge = badge
+	return self.users_repo:deleteUserBadge(user_badge)
 end
 
 return UserBadges
