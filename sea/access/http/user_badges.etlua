@@ -33,7 +33,7 @@
 		<th></th>
 	</thead>
 	<tbody>
-		<% for _, badge in ipairs(badges) do %>
+		<% for _, badge in ipairs(user_badges) do %>
 			<tr>
 				<td><%= badge.badge %></td>
 				<td><%= badge_list[badge.badge].name %></td>

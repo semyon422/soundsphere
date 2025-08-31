@@ -3,6 +3,7 @@ local UserPage = require("sea.access.http.UserPage")
 local UserSettingsPage = require("sea.access.http.UserSettingsPage")
 local UserUpdate = require("sea.access.UserUpdate")
 local http_util = require("web.http.util")
+local string_util = require("string_util")
 local json = require("web.json")
 local valid = require("valid")
 local types = require("sea.shared.types")
@@ -64,7 +65,7 @@ UserResource.routes = {
 
 ---@param users sea.Users
 ---@param user_roles sea.UserRoles
----@param user_badges sea
+---@param user_badges sea.UserBadges
 ---@param leaderboards sea.Leaderboards
 ---@param dans sea.Dans
 ---@param user_activity_graph sea.UserActivityGraph
@@ -142,7 +143,7 @@ function UserResource:getUser(req, res, ctx)
 		ctx.meta_tags["description"] = table.concat(s, " | ")
 	end
 
-	ctx.badges = self.user_badges:getUserBadges(user)
+	ctx.user_badges = self.user_badges:getUserBadges(user)
 
 	self.views:render_send(res, "sea/access/http/user.etlua", ctx, true)
 end
@@ -605,7 +606,7 @@ function UserResource:getUserBadges(req, res, ctx)
 	end
 
 	ctx.user = user
-	ctx.badges = self.user_badges:getUserBadges(user)
+	ctx.user_badges = self.user_badges:getUserBadges(user)
 
 	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
 end
@@ -637,16 +638,18 @@ function UserResource:createUserBadge(req, res, ctx)
 	end
 
 	local badge_id = body_params.badge_id or ""
+	badge_id = string_util.trim(badge_id)
 
 	local badge, err = self.user_badges:createUserBadge(ctx.session_user, user_id, badge_id)
 
 	if not badge then
 		res.status = 400
 		res:send(err)
+		return
 	end
 
 	ctx.user = user
-	ctx.badges = self.user_badges:getUserBadges(user)
+	ctx.user_badges = self.user_badges:getUserBadges(user)
 
 	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
 end
@@ -680,7 +683,7 @@ function UserResource:deleteUserBadge(req, res, ctx)
 	end
 
 	ctx.user = user
-	ctx.badges = self.user_badges:getUserBadges(user)
+	ctx.user_badges = self.user_badges:getUserBadges(user)
 	self.views:render_send(res, "sea/access/http/user_badges.etlua", ctx, true)
 end
 
