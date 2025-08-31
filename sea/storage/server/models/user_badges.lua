@@ -1,10 +1,10 @@
-local UserBadge = require("sea.access.UserBadge")
+local Badge = require("sea.access.Badge")
 
 ---@type rdb.ModelOptions
 local user_badges = {}
 
 user_badges.types = {
-	badge = UserBadge,
+	badge = Badge,
 }
 
 return user_badges
