@@ -20,11 +20,12 @@ function UserBadges:getUserBadges(user)
 end
 
 ---@param user sea.User
+---@param time integer
 ---@param target_user_id integer
----@param badge sea.UserBadge
+---@param badge sea.Badge
 ---@return sea.UserBadge?
 ---@return string? err
-function UserBadges:createUserBadge(user, target_user_id, badge)
+function UserBadges:createUserBadge(user, time, target_user_id, badge)
 	if not Badge:encode_safe(badge) then
 		return nil, "badge doesn't exist"
 	end
@@ -42,15 +43,17 @@ function UserBadges:createUserBadge(user, target_user_id, badge)
 	local user_badge = UserBadge()
 	user_badge.user_id = target_user.id
 	user_badge.badge = badge
+
 	return self.users_repo:createUserBadge(user_badge)
 end
 
 ---@param user sea.User
+---@param time integer
 ---@param target_user_id integer
 ---@param badge sea.Badge
 ---@return sea.UserBadge?
 ---@return string? err
-function UserBadges:deleteUserBadge(user, target_user_id, badge)
+function UserBadges:deleteUserBadge(user, time, target_user_id, badge)
 	local target_user = self.users_repo:getUser(target_user_id)
 	if not target_user then
 		return nil, "not found"
@@ -64,6 +67,7 @@ function UserBadges:deleteUserBadge(user, target_user_id, badge)
 	local user_badge = UserBadge()
 	user_badge.user_id = target_user.id
 	user_badge.badge = badge
+
 	return self.users_repo:deleteUserBadge(user_badge)
 end
 
