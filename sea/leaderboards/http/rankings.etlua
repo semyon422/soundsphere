@@ -144,7 +144,11 @@ end
 
 									<td class="ranking-table__more-padding has-background"><%= format_rating(leaderboard, leaderboard_user.total_rating) %></td>
 									<td class="ranking-table__more-padding has-text-grey"><%= ("%0.2f%%"):format(leaderboard_user:getNormAccuracy() * 100) %></td>
-									<td class="ranking-table__more-padding has-text-grey"><%= user.chartplays_count %></td>
+									<% if leaderboard_user.ranked_plays == leaderboard_user.total_plays then %>
+										<td class="ranking-table__more-padding has-text-grey"><%= leaderboard_user.ranked_plays %></td>
+									<% else %>
+										<td class="ranking-table__more-padding has-text-grey"><%= leaderboard_user.ranked_plays %> <small>/ <%= leaderboard_user.total_plays %></small></td>
+									<% end %>
 								</tr>
 							<% end %>
 						</tbody>

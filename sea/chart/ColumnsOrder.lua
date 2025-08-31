@@ -3,12 +3,15 @@ local table_util = require("table_util")
 local InputMode = require("ncdk.InputMode")
 
 ---@param t integer[]
+---@param j integer
 ---@param n integer
 ---@return integer[]
-local function fill_range(t, n)
+local function fill_range(t, j, n)
 	table_util.clear(t)
-	for i = 1, n do
-		t[i] = i
+	local c = 1
+	for i = j, n do
+		t[c] = i
+		c = c + 1
 	end
 	return t
 end
@@ -135,11 +138,24 @@ local transforms = {
 
 		return i
 	end,
-	random = function(c, i, t)
-		if i == 1 then
-			fill_range(t, c)
+	random = function(c, i, t, mode)
+		local a, b = 1, c
+
+		if mode == "left" then
+			a, b = 1, math.floor(c / 2)
+		elseif mode == "right" then
+			a, b = math.ceil(c / 2) + 1, c
 		end
-		return table.remove(t, math.random(#t))
+
+		if i == 1 then
+			fill_range(t, a, b)
+		end
+
+		if i >= a and i <= b then
+			return table.remove(t, math.random(#t))
+		end
+
+		return i
 	end
 }
 
@@ -168,20 +184,26 @@ function ColumnsOrder:getName()
 	return "custom"
 end
 
+---@return sea.ColumnsOrder
 function ColumnsOrder:mirror()
 	return self:transform(transforms.mirror)
 end
 
+---@param n integer
+---@return sea.ColumnsOrder
 function ColumnsOrder:shift(n)
 	return self:transform(transforms.shift, n)
 end
 
+---@return sea.ColumnsOrder
 function ColumnsOrder:bracketswap()
 	return self:transform(transforms.bracketswap)
 end
 
-function ColumnsOrder:random()
-	return self:transform(transforms.random, {})
+---@param mode "left"|"right"?
+---@return sea.ColumnsOrder
+function ColumnsOrder:random(mode)
+	return self:transform(transforms.random, {}, mode)
 end
 
 return ColumnsOrder

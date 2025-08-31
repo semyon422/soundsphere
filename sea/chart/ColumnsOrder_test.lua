@@ -69,6 +69,18 @@ function test.random(t)
 	local values = t:assert(ColumnsOrder("10key"):random():export())
 	table.sort(values)
 	t:eq(table.concat(values), "12345678910")
+
+	values = t:assert(ColumnsOrder("14key2scratch"):random():export())
+	table.sort(values)
+	t:eq(table.concat(values), "12345678910111213141516")
+
+	values = t:assert(ColumnsOrder("14key2scratch"):random("left"):export())
+	table.sort(values)
+	t:eq(table.concat(values), "12345678910111213141516")
+
+	values = t:assert(ColumnsOrder("14key2scratch"):random("right"):export())
+	table.sort(values)
+	t:eq(table.concat(values), "12345678910111213141516")
 end
 
 ---@param t testing.T

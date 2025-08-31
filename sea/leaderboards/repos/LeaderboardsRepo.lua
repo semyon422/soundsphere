@@ -222,6 +222,21 @@ end
 
 ---@param lb sea.Leaderboard
 ---@param user_id integer
+---@param total boolean?
+---@return integer
+function LeaderboardsRepo:getRankedChartplaysCount(lb, user_id, total)
+	local conds, options = self:getFilterConds(lb, user_id)
+	conds.compute_state = "valid"
+	options.limit = nil
+	if total then
+		options.group = nil
+		options.columns = {"*"}
+	end
+	return self.models.chartplayviews:count(conds, options)
+end
+
+---@param lb sea.Leaderboard
+---@param user_id integer
 ---@return sea.Chartplayview[]
 function LeaderboardsRepo:getBestChartplaysFull(lb, user_id)
 	local chartplayviews = self:getBestChartplays(lb, user_id)

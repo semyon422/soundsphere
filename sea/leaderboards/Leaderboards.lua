@@ -128,6 +128,8 @@ function Leaderboards:updateLeaderboardUser(lb, user_id, no_rank, time)
 
 	lb_user.total_rating = rating
 	lb_user.total_accuracy = total_rating.accuracy
+	lb_user.total_plays = repo:getRankedChartplaysCount(lb, user_id, true)
+	lb_user.ranked_plays = repo:getRankedChartplaysCount(lb, user_id)
 	lb_user.updated_at = time
 
 	if not found then
