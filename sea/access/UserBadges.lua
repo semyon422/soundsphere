@@ -22,8 +22,8 @@ end
 ---@param user sea.User
 ---@param target_user_id integer
 ---@param badge sea.UserBadge
----@return sea.UserBadge
----@return string err
+---@return sea.UserBadge?
+---@return string? err
 function UserBadges:createUserBadge(user, target_user_id, badge)
 	if not Badge:encode_safe(badge) then
 		return nil, "badge doesn't exist"
@@ -48,6 +48,8 @@ end
 ---@param user sea.User
 ---@param target_user_id integer
 ---@param badge sea.Badge
+---@return sea.UserBadge?
+---@return string? err
 function UserBadges:deleteUserBadge(user, target_user_id, badge)
 	local target_user = self.users_repo:getUser(target_user_id)
 	if not target_user then
