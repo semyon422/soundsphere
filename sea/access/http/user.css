@@ -73,23 +73,23 @@ html[data-theme=dark] {
 	--user-activity-4: #56d364;
 }
 
-.user__activity-color[data-activity = "0"] {
+.user__activity-color[data-activity="0"] {
 	background-color: var(--bulma-background);
 }
 
-.user__activity-color[data-activity = "1"] {
+.user__activity-color[data-activity="1"] {
 	background-color: var(--user-activity-1);
 }
 
-.user__activity-color[data-activity = "2"] {
+.user__activity-color[data-activity="2"] {
 	background-color: var(--user-activity-2);
 }
 
-.user__activity-color[data-activity = "3"] {
+.user__activity-color[data-activity="3"] {
 	background-color: var(--user-activity-3);
 }
 
-.user__activity-color[data-activity = "4"] {
+.user__activity-color[data-activity="4"] {
 	background-color: var(--user-activity-4);
 }
 
@@ -135,13 +135,13 @@ html[data-theme=dark] {
 	padding-left: 10px;
 }
 
-.user__score-rows > :first-child {
+.user__score-rows> :first-child {
 	margin-top: auto;
 	padding-bottom: 3px;
 	line-height: 100%;
 }
 
-.user__score-rows > :last-child {
+.user__score-rows> :last-child {
 	margin-bottom: auto;
 	padding-top: 3px;
 	line-height: 100%;
@@ -172,15 +172,14 @@ html[data-theme=dark] {
 	width: 110px;
 	font-size: 21px;
 	background-color: var(--bulma-border-weak);
-	clip-path: polygon(
-		0% 0%,
-		100% 0%,
-		100% 100%,
-		0% 100%,
-		5px 80%,
-		5px 20%
-	);
+	clip-path: polygon(0% 0%,
+			100% 0%,
+			100% 100%,
+			0% 100%,
+			5px 80%,
+			5px 20%);
 }
+
 .user__score-panel:hover .user__score-rating-box {
 	background-color: var(--bulma-border);
 }
@@ -195,4 +194,13 @@ html[data-theme=dark] {
 	border-radius: 8px;
 	background-color: var(--bulma-background);
 	height: 160px;
+}
+
+.user__badge-container {
+	width: 100%;
+	display: grid;
+	grid-template-columns: auto auto;
+	column-gap: 2px;
+	row-gap: 4px;
+	padding-bottom: 15px;
 }

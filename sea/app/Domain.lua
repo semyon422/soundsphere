@@ -2,6 +2,7 @@ local class = require("class")
 
 local Users = require("sea.access.Users")
 local UserRoles = require("sea.access.UserRoles")
+local UserBadges = require("sea.access.UserBadges")
 local IEmailSender = require("sea.access.IEmailSender")
 local BcryptPasswordHasher = require("sea.access.BcryptPasswordHasher")
 
@@ -44,6 +45,7 @@ function Domain:new(repos, app_config)
 
 	self.users = Users(repos.users_repo, BcryptPasswordHasher(), IEmailSender())
 	self.user_roles = UserRoles(repos.users_repo)
+	self.user_badges = UserBadges(repos.users_repo)
 	self.leaderboards = Leaderboards(repos.leaderboards_repo)
 	self.teams = Teams(repos.teams_repo)
 	self.difftables = Difftables(repos.difftables_repo)

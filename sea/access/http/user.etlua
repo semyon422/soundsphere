@@ -78,6 +78,11 @@
 						</div>
 					</div>
 				</div>
+				<div class="user__badge-container">
+					<% for _, v in ipairs(user_badges) do %>
+						<img src="/static/images/badges/<%= v.badge %>.webp" />
+					<% end %>
+				</div>
 				<div class="block is-hidden-mobile">
 					<div class="block">
 						<h1 class="title">Leaderboard</h1>
