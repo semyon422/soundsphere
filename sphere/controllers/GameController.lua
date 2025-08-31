@@ -22,6 +22,8 @@ local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
 
+local OffsetController = require("sphere.controllers.gameplay.OffsetController")
+
 local NotificationModel = require("sphere.ui.NotificationModel")
 local BackgroundModel = require("sphere.ui.BackgroundModel")
 local PreviewModel = require("sphere.ui.PreviewModel")
@@ -41,11 +43,15 @@ local ClientRemote = require("sea.app.remotes.ClientRemote")
 local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
 
+local LoveFilesystem = require("fs.LoveFilesystem")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
 
 function GameController:new()
+	self.fs = LoveFilesystem()
+
 	self.packageManager = PackageManager()
 
 	self.persistence = Persistence()
@@ -138,26 +144,19 @@ function GameController:new()
 	)
 	self.gameplayController = GameplayController(
 		self.rhythmModel,
-		self.selectModel,
 		self.noteSkinModel,
 		self.configModel,
-		self.difficultyModel,
 		self.replayModel,
 		self.multiplayerModel,
 		self.discordModel,
 		self.onlineModel,
-		self.resourceModel,
-		self.windowModel,
-		self.speedModel,
 		self.cacheModel,
-		self.fileFinder,
 		self.replayBase,
 		self.computeContext,
 		self.pauseModel,
-		self.offsetModel,
-		self.previewModel,
 		self.notificationModel,
-		self.seaClient
+		self.seaClient,
+		self.fs
 	)
 	self.resultController = ResultController(
 		self.selectModel,
@@ -186,6 +185,67 @@ function GameController:new()
 		self.previewModel,
 		self.replayBase
 	)
+	self.offsetController = OffsetController(
+		self.cacheModel,
+		self.computeContext,
+		self.offsetModel,
+		self.rhythmModel,
+		self.notificationModel
+	)
+end
+
+function GameController:loadGameplay()
+	local chartview = self.selectModel.chartview
+
+	self.gameplayController:load(chartview)
+	self.previewModel:stop()
+
+	love.mouse.setVisible(false)
+
+	self.windowModel:setVsyncOnSelect(false)
+	self.multiplayerModel.client:setPlaying(true)
+	self.offsetController:updateOffsets()
+
+	local noteSkin = self.gameplayController.noteSkin
+
+	local fileFinder = self.fileFinder
+	fileFinder:reset()
+
+	if self.configModel.configs.settings.gameplay.skin_resources_top_priority then
+		fileFinder:addPath(noteSkin.directoryPath)
+		fileFinder:addPath(chartview.location_dir)
+	else
+		fileFinder:addPath(chartview.location_dir)
+		fileFinder:addPath(noteSkin.directoryPath)
+	end
+	fileFinder:addPath("userdata/hitsounds")
+	fileFinder:addPath("userdata/hitsounds/midi")
+
+	self.resourceModel:load(self.computeContext.chart, function()
+		if not self.gameplayController.loaded then
+			return
+		end
+		self.gameplayController:play()
+	end)
+end
+
+function GameController:unloadGameplay()
+	self.gameplayController:unload()
+
+	love.mouse.setVisible(true)
+
+	self.windowModel:setVsyncOnSelect(true)
+	self.multiplayerModel.client:setPlaying(false)
+end
+
+---@param delta number
+function GameController:increasePlaySpeed(delta)
+	local speedModel = self.speedModel
+	speedModel:increase(delta)
+
+	local gameplay = self.configModel.configs.settings.gameplay
+	self.rhythmModel.graphicEngine:setVisualTimeRate(gameplay.speed)
+	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 
 function GameController:load()

@@ -18,7 +18,7 @@ end
 
 function GameplayView:load()
 	self.game.rhythmModel.observable:add(self.sequenceView)
-	self.game.gameplayController:load()
+	self.game:loadGameplay()
 
 	self.subscreen = ""
 	self.failed = false
@@ -32,7 +32,7 @@ function GameplayView:load()
 end
 
 function GameplayView:unload()
-	self.game.gameplayController:unload()
+	self.game:unloadGameplay()
 	self.game.rhythmModel.observable:remove(self.sequenceView)
 	self.sequenceView:unload()
 end
@@ -130,16 +130,17 @@ end
 function GameplayView:keypressed()
 	local input = self.game.configModel.configs.settings.input
 	local gameplayController = self.game.gameplayController
+	local offsetController = self.game.offsetController
 
 	local kp = just.keypressed
 	if kp(input.skipIntro) then gameplayController:skipIntro()
-	elseif kp(input.offset.decrease) then gameplayController:increaseLocalOffset(-0.001)
-	elseif kp(input.offset.increase) then gameplayController:increaseLocalOffset(0.001)
-	elseif kp(input.offset.reset) then gameplayController:resetLocalOffset()
+	elseif kp(input.offset.decrease) then offsetController:increaseLocalOffset(-0.001)
+	elseif kp(input.offset.increase) then offsetController:increaseLocalOffset(0.001)
+	elseif kp(input.offset.reset) then offsetController:resetLocalOffset()
 	-- elseif kp(input.timeRate.decrease) then gameplayController:increaseTimeRate(-0.05)
 	-- elseif kp(input.timeRate.increase) then gameplayController:increaseTimeRate(0.05)
-	elseif kp(input.playSpeed.decrease) then gameplayController:increasePlaySpeed(-1)
-	elseif kp(input.playSpeed.increase) then gameplayController:increasePlaySpeed(1)
+	elseif kp(input.playSpeed.decrease) then self.game:increasePlaySpeed(-1)
+	elseif kp(input.playSpeed.increase) then self.game:increasePlaySpeed(1)
 	end
 
 	local gameplayController = self.game.gameplayController

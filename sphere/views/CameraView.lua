@@ -3,6 +3,7 @@ local s3dc = require("s3dc")
 
 ---@class sphere.CameraView
 ---@operator call: sphere.CameraView
+---@field game sphere.GameController
 local CameraView = class()
 
 CameraView.sensitivity = 0.5
@@ -36,7 +37,13 @@ function CameraView:unload()
 	x = x / w
 	y = y / h
 	z = z / h
-	self.game.gameplayController:saveCamera(x, y, z, s3dc.angle.pitch, s3dc.angle.yaw)
+
+	local p = self.game.configModel.configs.settings.graphics.perspective
+	p.x = x
+	p.y = y
+	p.z = z
+	p.pitch = s3dc.angle.pitch
+	p.yaw = s3dc.angle.yaw
 end
 
 ---@param event table
