@@ -12,7 +12,7 @@
 		<div class="level-left">
 			<div class="level-item">
 				<div class="control has-icons-left has-icons-right">
-				<input class="input" name="badge_id" type="text" placeholder="Badge enum string id">
+				<input class="input" name="badge" type="text" placeholder="Badge enum string id">
 				<span class="icon is-small is-left">
 					<i class="fas fa-id-badge"></i>
 				</span>
@@ -33,12 +33,13 @@
 		<th></th>
 	</thead>
 	<tbody>
-		<% for _, badge in ipairs(user_badges) do %>
+		<% for _, user_badge in ipairs(user_badges) do %>
+			<% local badge = user_badge.badge %>
 			<tr>
-				<td><%= badge.badge %></td>
-				<td><%= badge_list[badge.badge].name %></td>
-				<td><%= badge_list[badge.badge].description %></td>
-				<td><a hx-delete="/users/<%= user.id %>/badges/<%= badge.badge %>" hx-target="body">Remove</a></td>
+				<td><%= badge %></td>
+				<td><%= badge_list[badge].name %></td>
+				<td><%= badge_list[badge].description %></td>
+				<td><a hx-delete="/users/<%= user.id %>/badges/<%= badge %>" hx-target="body">Remove</a></td>
 			</tr>
 		<% end %>
 	</tbody>

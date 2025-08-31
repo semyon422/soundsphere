@@ -58,7 +58,7 @@ UserResource.routes = {
 		GET = "getUserBadges",
 		POST = "createUserBadge",
 	}},
-	{"/users/:user_id/badges/:badge_id", {
+	{"/users/:user_id/badges/:badge", {
 		DELETE = "deleteUserBadge",
 	}},
 }
@@ -637,12 +637,12 @@ function UserResource:createUserBadge(req, res, ctx)
 		return
 	end
 
-	local badge_id = body_params.badge_id or ""
-	badge_id = string_util.trim(badge_id)
+	local badge = body_params.badge or ""
+	badge = string_util.trim(badge)
 
-	local badge, err = self.user_badges:createUserBadge(ctx.session_user, user_id, badge_id)
+	local user_badge, err = self.user_badges:createUserBadge(ctx.session_user, os.time(), user_id, badge)
 
-	if not badge then
+	if not user_badge then
 		res.status = 400
 		res:send(err)
 		return
@@ -672,11 +672,11 @@ function UserResource:deleteUserBadge(req, res, ctx)
 		return
 	end
 
-	local badge = ctx.path_params.badge_id
+	local badge = ctx.path_params.badge
 
-	local badge, err = self.user_badges:deleteUserBadge(ctx.session_user, user_id, badge)
+	local user_badge, err = self.user_badges:deleteUserBadge(ctx.session_user, os.time(), user_id, badge)
 
-	if not badge then
+	if not user_badge then
 		res.status = 400
 		res:send(err)
 		return
