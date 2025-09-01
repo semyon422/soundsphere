@@ -466,6 +466,9 @@ function drawSection:misc()
 	if imgui.button("error button", "error") then
 		error("error")
 	end
+	if imgui.button("test imgui", "test imgui") then
+		self.game.ui.gameView:setModal(require("ui.views.ImguiTestModalView"))
+	end
 
 	just.indent(8)
 	just.text("Commit: " .. version.commit)
