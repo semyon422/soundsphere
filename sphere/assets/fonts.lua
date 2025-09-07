@@ -1,5 +1,7 @@
 local fonts = {}
 
+fonts.dpi = 1
+
 local instances = {}
 
 local fontFamilyList = {
@@ -28,6 +30,10 @@ local function getFirstFile(list)
 	end
 end
 
+function fonts.reset()
+	instances = {}
+end
+
 ---@param filename string
 ---@param size number
 ---@return love.Font
@@ -36,7 +42,7 @@ function fonts.get(filename, size)
 		return instances[filename][size]
 	end
 	local f = fontFamilyList[filename]
-	local font = love.graphics.newFont(getFirstFile(f) or filename, size)
+	local font = love.graphics.newFont(getFirstFile(f) or filename, size, "normal", fonts.dpi)
 	instances[filename] = instances[filename] or {}
 	instances[filename][size] = font
 	if f and f.height then

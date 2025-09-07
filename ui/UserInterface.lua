@@ -1,4 +1,5 @@
 local IUserInterface = require("sphere.IUserInterface")
+local fonts = require("sphere.assets.fonts")
 
 local GameView = require("ui.views.GameView")
 local SelectView = require("ui.views.SelectView")
@@ -27,6 +28,12 @@ end
 
 function UserInterface:load()
 	self.gameView:load()
+
+	local fonts_dpi = self.configs.settings.graphics.fonts_dpi
+	if fonts_dpi ~= fonts.dpi then
+		fonts.dpi = fonts_dpi
+		fonts.reset()
+	end
 end
 
 function UserInterface:unload()
