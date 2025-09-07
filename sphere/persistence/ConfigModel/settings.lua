@@ -145,6 +145,7 @@ local settings = {
 		},
 		vsyncOnSelect = true,
 		userInterface = "Default",
+		fonts_dpi = 1,
 	},
 	input = {
 		pause = "escape",

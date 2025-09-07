@@ -7,6 +7,7 @@ local spherefonts = require("sphere.assets.fonts")
 local version = require("version")
 local audio = require("audio")
 local utf8validate = require("utf8validate")
+local fonts = require("sphere.assets.fonts")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -233,6 +234,12 @@ function drawSection:graphics()
 	g.mode.window = imgui.combo("mode.window", g.mode.window, self.modes, formatMode, "start window resolution")
 
 	g.cursor = imgui.combo("g.cursor", g.cursor, {"circle", "arrow", "system"}, nil, "cursor")
+
+	g.fonts_dpi = imgui.combo("g.fonts_dpi", g.fonts_dpi, {1, 2}, nil, "fonts DPI scale")
+	if g.fonts_dpi ~= fonts.dpi then
+		fonts.dpi = g.fonts_dpi
+		fonts.reset()
+	end
 
 	imgui.separator()
 	just.indent(10)
