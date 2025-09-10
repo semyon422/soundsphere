@@ -8,6 +8,7 @@ local ResourceFinder = require("rizu.files.ResourceFinder")
 
 local InputInfo = require("rizu.engine.input.InputInfo")
 local InputEngine = require("rizu.engine.input.InputEngine")
+local InputPauser = require("rizu.engine.input.InputPauser")
 
 local TimeEngine = require("rizu.engine.time.TimeEngine")
 
@@ -27,6 +28,7 @@ function RhythmEngine:new(fs)
 
 	self.input_info = InputInfo()
 	self.input_engine = InputEngine(self.input_info)
+	self.input_pauser = InputPauser()
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
@@ -77,6 +79,18 @@ function RhythmEngine:update()
 	self.time_engine:updateTime()
 	self.input_engine:update()
 	self.chart_audio_source:update()
+end
+
+function RhythmEngine:play()
+	self.time_engine:play()
+	self.chart_audio_source:play()
+	self.input_pauser:play()
+end
+
+function RhythmEngine:pause()
+	self.time_engine:pause()
+	self.chart_audio_source:pause()
+	self.input_pauser:pause()
 end
 
 return RhythmEngine

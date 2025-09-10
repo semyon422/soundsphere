@@ -1,7 +1,7 @@
 local table_util = require("table_util")
-local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
+local InputNote = require("rizu.engine.input.notes.InputNote")
 
----@alias rizu.ManiaHoldInputNoteState
+---@alias rizu.HoldInputNoteState
 ---| "clear"
 ---| "startMissed"
 ---| "endMissed"
@@ -10,7 +10,7 @@ local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
 ---| "endPassed"
 ---| "endMissedPassed"
 
----@type {[rizu.ManiaHoldInputNoteState]: integer}
+---@type {[rizu.HoldInputNoteState]: integer}
 local active_states = table_util.invert({
 	"clear",
 	"startMissed",
@@ -18,9 +18,9 @@ local active_states = table_util.invert({
 	"startPassedPressed",
 })
 
----@class rizu.ManiaHoldInputNote: rizu.ManiaInputNote
+---@class rizu.ManiaHoldInputNote: rizu.InputNote
 ---@operator call: rizu.ManiaHoldInputNote
-local ManiaHoldInputNote = ManiaInputNote + {}
+local ManiaHoldInputNote = InputNote + {}
 
 ---@param note ncdk2.LinkedNote
 ---@param input_info rizu.InputInfo
@@ -28,7 +28,7 @@ function ManiaHoldInputNote:new(note, input_info)
 	assert(note:getType() == "hold")
 	assert(note:isLong())
 
-	ManiaInputNote.new(self, note, input_info)
+	InputNote.new(self, note, input_info)
 end
 
 ---@return boolean
@@ -121,7 +121,7 @@ function ManiaHoldInputNote:getEndResult()
 	return self.input_info.timing_values:hit("LongNoteEnd", dt)
 end
 
----@param state rizu.ManiaHoldInputNoteState
+---@param state rizu.HoldInputNoteState
 function ManiaHoldInputNote:switchState(state)
 	local old_state = self.state
 	self.state = state
@@ -150,6 +150,6 @@ function ManiaHoldInputNote:switchState(state)
 	end
 end
 
-ManiaHoldInputNote.__lt = ManiaInputNote.__lt
+ManiaHoldInputNote.__lt = InputNote.__lt
 
 return ManiaHoldInputNote

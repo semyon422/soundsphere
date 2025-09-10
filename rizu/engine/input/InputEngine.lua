@@ -17,7 +17,7 @@ end
 function InputEngine:load(chart)
 	local input_note_factory = self.input_note_factory
 
-	---@type rizu.IInputNote[]
+	---@type rizu.InputNote[]
 	local notes = {}
 	for i, linked_note in ipairs(chart.notes:getLinkedNotes()) do
 		notes[i] = input_note_factory:getNote(linked_note)
@@ -25,14 +25,14 @@ function InputEngine:load(chart)
 	self:setNotes(notes)
 end
 
----@param notes rizu.IInputNote[]
+---@param notes rizu.InputNote[]
 function InputEngine:setNotes(notes)
 	self.notes = notes
 	table.sort(self.notes)
 
 	self.note_index = 1
 
-	---@type rizu.IInputNote[]
+	---@type rizu.InputNote[]
 	self.active_notes = {}
 end
 
@@ -107,7 +107,7 @@ function InputEngine:receive(event)
 		return
 	end
 
-	---@type rizu.IInputNote?
+	---@type rizu.InputNote?
 	local nearest_note
 	local nearest_time = math.huge
 	for _, note in ipairs(active_notes) do

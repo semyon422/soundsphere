@@ -1,10 +1,10 @@
-local ManiaInputNote = require("rizu.engine.input.mania.ManiaInputNote")
+local InputNote = require("rizu.engine.input.notes.InputNote")
 
----@alias rizu.ManiaTapInputNoteState "clear"|"missed"|"passed"
+---@alias rizu.TapInputNoteState "clear"|"missed"|"passed"
 
----@class rizu.ManiaTapInputNote: rizu.ManiaInputNote
+---@class rizu.ManiaTapInputNote: rizu.InputNote
 ---@operator call: rizu.ManiaTapInputNote
-local ManiaTapInputNote = ManiaInputNote + {}
+local ManiaTapInputNote = InputNote + {}
 
 ---@param note ncdk2.LinkedNote
 ---@param input_info rizu.InputInfo
@@ -12,7 +12,7 @@ function ManiaTapInputNote:new(note, input_info)
 	assert(note:getType() == "tap")
 	assert(note:isShort())
 
-	ManiaInputNote.new(self, note, input_info)
+	InputNote.new(self, note, input_info)
 end
 
 ---@return boolean
@@ -65,7 +65,7 @@ function ManiaTapInputNote:getResult()
 	return self.input_info.timing_values:hit("ShortNote", dt)
 end
 
----@param state rizu.ManiaTapInputNoteState
+---@param state rizu.TapInputNoteState
 function ManiaTapInputNote:switchState(state)
 	local old_state = self.state
 	self.state = state
@@ -92,6 +92,6 @@ function ManiaTapInputNote:switchState(state)
 	end
 end
 
-ManiaTapInputNote.__lt = ManiaInputNote.__lt
+ManiaTapInputNote.__lt = InputNote.__lt
 
 return ManiaTapInputNote

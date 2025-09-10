@@ -1,5 +1,5 @@
 local table_util = require("table_util")
-local ManiaTapInputNote = require("rizu.engine.input.mania.ManiaTapInputNote")
+local TapInputNote = require("rizu.engine.input.notes.TapInputNote")
 local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
 local InputInfo = require("rizu.engine.input.InputInfo")
 local Note = require("ncdk2.notes.Note")
@@ -16,7 +16,7 @@ local function new_test_ctx()
 	local note = Note(visual_point, "key1", "tap", 0)
 	local linked_note = LinkedNote(note)
 
-	local input_note = ManiaTapInputNote(linked_note, input_info)
+	local input_note = TapInputNote(linked_note, input_info)
 
 	local events = {}
 	input_note.observable:add({receive = function(self, event)

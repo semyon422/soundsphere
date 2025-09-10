@@ -1,15 +1,15 @@
 local class = require("class")
-local ManiaTapInputNote = require("rizu.engine.input.mania.ManiaTapInputNote")
-local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
+local TapInputNote = require("rizu.engine.input.notes.TapInputNote")
+local HoldInputNote = require("rizu.engine.input.notes.HoldInputNote")
 
 ---@class rizu.InputNoteFactory
 ---@operator call: rizu.InputNoteFactory
 local InputNoteFactory = class()
 
----@type {[notechart.NoteType]: rizu.IInputNote?}
+---@type {[notechart.NoteType]: rizu.InputNote?}
 local notes = {
-	tap = ManiaTapInputNote,
-	hold = ManiaHoldInputNote,
+	tap = TapInputNote,
+	hold = HoldInputNote,
 	laser = nil,
 	drumroll = nil,
 	mine = nil,
@@ -25,7 +25,7 @@ function InputNoteFactory:new(input_info)
 end
 
 ---@param note ncdk2.LinkedNote
----@return rizu.IInputNote?
+---@return rizu.InputNote?
 function InputNoteFactory:getNote(note)
 	local Note = notes[note:getType()]
 	if not Note then

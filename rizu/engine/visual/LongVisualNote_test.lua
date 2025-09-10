@@ -1,6 +1,6 @@
 local LongVisualNote = require("rizu.engine.visual.LongVisualNote")
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
-local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
+local HoldInputNote = require("rizu.engine.input.notes.HoldInputNote")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
 local Note = require("ncdk2.notes.Note")
 local Visual = require("ncdk2.visual.Visual")
@@ -31,7 +31,7 @@ local function new_ctx()
 		cvp.point.absoluteTime = time
 	end
 
-	local input_note = ManiaHoldInputNote(linked_note, {}, visual_info)
+	local input_note = HoldInputNote(linked_note, {}, visual_info)
 	visual_info.input_notes[linked_note] = input_note
 
 	return {

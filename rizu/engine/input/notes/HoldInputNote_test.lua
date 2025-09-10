@@ -1,4 +1,4 @@
-local ManiaHoldInputNote = require("rizu.engine.input.mania.ManiaHoldInputNote")
+local HoldInputNote = require("rizu.engine.input.notes.HoldInputNote")
 local table_util = require("table_util")
 local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
 local InputInfo = require("rizu.engine.input.InputInfo")
@@ -22,7 +22,7 @@ local function new_test_ctx()
 
 	local linked_note = LinkedNote(start_note, end_note)
 
-	local input_note = ManiaHoldInputNote(linked_note, input_info)
+	local input_note = HoldInputNote(linked_note, input_info)
 
 	local events = {}
 	input_note.observable:add({receive = function(self, event)

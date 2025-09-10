@@ -15,7 +15,7 @@ end
 
 function VisualNote:update() end
 
----@return rizu.IInputNote?
+---@return rizu.InputNote?
 function VisualNote:getInputNote()
 	return self.visual_info.input_notes[self.linked_note]
 end

@@ -1,8 +1,8 @@
-local IInputNote = require("rizu.engine.input.IInputNote")
+local InputNote = require("rizu.engine.input.notes.InputNote")
 
----@class rizu.TestInputNote: rizu.IInputNote
+---@class rizu.TestInputNote: rizu.InputNote
 ---@operator call: rizu.TestInputNote
-local TestInputNote = IInputNote + {}
+local TestInputNote = InputNote + {}
 
 TestInputNote.current_time = 0
 TestInputNote.time = 0
@@ -58,8 +58,8 @@ function TestInputNote:getEndTime()
 	return self.time + self.late_window
 end
 
----@param a rizu.IInputNote
----@param b rizu.IInputNote
+---@param a rizu.InputNote
+---@param b rizu.InputNote
 ---@return boolean
 function TestInputNote.__lt(a, b)
 	return a:getStartTime() < b:getStartTime()
