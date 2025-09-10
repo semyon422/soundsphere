@@ -44,7 +44,7 @@ function TimeEngine:adjustTime()
 		return
 	end
 
-	local adjusted_time = self.adjust:adjust(self.timer:getTime(), 0)
+	local adjusted_time = self.adjust:adjust(self.timer:getTime(), adjust_time)
 	if not adjusted_time then
 		return
 	end

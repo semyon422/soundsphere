@@ -33,7 +33,7 @@ function test.basic_short(t)
 0010 =2
 ]])
 
-	ve:load(chart, {-1, 1})
+	ve:load(chart)
 
 	visual_info.time = -1.001
 	ve:update()
@@ -73,7 +73,7 @@ function test.basic_long(t)
 3000 =4
 ]])
 
-	ve:load(chart, {-1, 1})
+	ve:load(chart)
 
 	visual_info.time = -1.001
 	ve:update()

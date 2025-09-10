@@ -8,6 +8,8 @@ local VisualPoint = require("ncdk2.visual.VisualPoint")
 ---@operator call: rizu.VisualEngine
 local VisualEngine = class()
 
+VisualEngine.range = 1
+
 ---@param action -1|1
 ---@return true?
 local function true_from_action(action)
@@ -44,10 +46,7 @@ function VisualEngine:addNote(linked_note, visual_note)
 end
 
 ---@param chart ncdk2.Chart
----@param range {[1]: number, [2]: number}
-function VisualEngine:load(chart, range)
-	self.range = range
-
+function VisualEngine:load(chart)
 	---@type {[ncdk2.Visual]: integer}
 	self.cvpi = {}
 	---@type {[ncdk2.Visual]: ncdk2.VisualPoint}
@@ -89,7 +88,7 @@ function VisualEngine:load(chart, range)
 end
 
 function VisualEngine:update()
-	local range = math.max(-self.range[1], self.range[2])
+	local range = self.range
 	local visual_info = self.visual_info
 
 	local visible_notes_map = self.visible_notes_map
