@@ -1,6 +1,6 @@
 local table_util = require("table_util")
 local TapInputNote = require("rizu.engine.input.notes.TapInputNote")
-local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
+local KeyVirtualInputEvent = require("rizu.input.KeyVirtualInputEvent")
 local InputInfo = require("rizu.engine.input.InputInfo")
 local Note = require("ncdk2.notes.Note")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
@@ -78,7 +78,7 @@ function test.hit_late_and_exactly_with_rate(t)
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
+	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1,
@@ -91,7 +91,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.input_info.rate = 1.5
 	t:eq(ctx.input_note:getResult(), "exactly")
 
-	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
+	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1 / 1.5, -- 0.733
@@ -127,7 +127,7 @@ function test.hit_too_early(t)
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:receive(DiscreteKeyVirtualInputEvent("key1", true))
+	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
 
 	t:tdeq(ctx.events, {{
 		delta_time = -3,

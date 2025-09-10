@@ -36,14 +36,14 @@ function ManiaHoldInputNote:isActive()
 	return not not active_states[self.state]
 end
 
----@param event rizu.DiscreteKeyVirtualInputEvent
+---@param event rizu.KeyVirtualInputEvent
 function ManiaHoldInputNote:receive(event)
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
 
 	local state = self.state
 
-	if event.state then
+	if event.value then
 		if state == "clear" then
 			if start_result == "too early" then
 				self:switchState("clear")

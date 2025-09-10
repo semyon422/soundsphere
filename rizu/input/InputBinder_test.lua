@@ -18,7 +18,7 @@ function test.all(t)
 	t:assert(not binder:getKey("key1", 2))
 
 	event = binder:transform(DiscreteKeyPhysicInputEvent(device, "d", true))
-	t:tdeq(event, {key = "key1", state = true})
+	t:tdeq(event, {pos = "key1", value = true})
 
 	binder:setKey("key1", 1)
 

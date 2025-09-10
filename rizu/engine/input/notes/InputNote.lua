@@ -1,6 +1,6 @@
 local class = require("class")
 local Observable = require("Observable")
-local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
+local KeyVirtualInputEvent = require("rizu.input.KeyVirtualInputEvent")
 
 ---@alias rizu.InputNoteState "clear"|"missed"|"passed"
 
@@ -50,9 +50,9 @@ end
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function InputNote:match(event)
-	if DiscreteKeyVirtualInputEvent * event then
-		---@cast event rizu.DiscreteKeyVirtualInputEvent
-		return event.key == self.note:getColumn()
+	if KeyVirtualInputEvent * event then
+		---@cast event rizu.KeyVirtualInputEvent
+		return event.pos == self.note:getColumn()
 	end
 
 	return false

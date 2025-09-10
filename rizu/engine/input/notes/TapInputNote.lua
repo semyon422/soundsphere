@@ -20,9 +20,9 @@ function ManiaTapInputNote:isActive()
 	return self.state == "clear"
 end
 
----@param event rizu.DiscreteKeyVirtualInputEvent
+---@param event rizu.KeyVirtualInputEvent
 function ManiaTapInputNote:receive(event)
-	if not event.state then
+	if not event.value then
 		return
 	end
 

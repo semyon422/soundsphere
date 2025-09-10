@@ -1,6 +1,6 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
-local DiscreteKeyVirtualInputEvent = require("rizu.input.DiscreteKeyVirtualInputEvent")
+local KeyVirtualInputEvent = require("rizu.input.KeyVirtualInputEvent")
 
 ---@alias rizu.InputKey string|integer
 
@@ -23,7 +23,7 @@ function InputBinder:new(config, input_mode)
 end
 
 ---@param event rizu.DiscreteKeyPhysicInputEvent
----@return rizu.DiscreteKeyVirtualInputEvent?
+---@return rizu.KeyVirtualInputEvent?
 function InputBinder:transform(event)
 	local config = self.config[self.input_mode]
 	if not config then
@@ -36,7 +36,7 @@ function InputBinder:transform(event)
 		for _, bind in pairs(binds) do
 			local _key, d_type, d_id = unpack(bind, 1, 3)
 			if _key == key and d_type == device.type and d_id == device.id then
-				return DiscreteKeyVirtualInputEvent(self.columns[i], event.state)
+				return KeyVirtualInputEvent(self.columns[i], event.state)
 			end
 		end
 	end
