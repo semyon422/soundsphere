@@ -1021,6 +1021,8 @@ function test.update_histories(t)
 		total_accuracy = 1,
 		rank = 1,
 		updated_at = 1,
+		total_plays = 1,
+		ranked_plays = 1,
 	})
 
 	ctx.leaderboards:updateHistories(0, ctx.leaderboard)
