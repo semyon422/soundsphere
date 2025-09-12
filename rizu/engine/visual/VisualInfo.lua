@@ -8,7 +8,7 @@ local class = require("class")
 ---@field visual_offset number
 ---@field shortening number
 ---@field const boolean
----@field input_notes {[ncdk2.LinkedNote]: rizu.InputNote?}
+---@field logic_notes {[ncdk2.LinkedNote]: rizu.LogicNote?}
 local VisualInfo = class()
 
 function VisualInfo:new()
@@ -18,7 +18,7 @@ function VisualInfo:new()
 	self.visual_offset = 0
 	self.shortening = 0
 	self.const = false
-	self.input_notes = {}
+	self.logic_notes = {}
 end
 
 return VisualInfo

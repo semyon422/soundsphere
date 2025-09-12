@@ -1,15 +1,14 @@
-local HoldInputNote = require("rizu.engine.input.notes.HoldInputNote")
+local HoldLogicNote = require("rizu.engine.logic.notes.HoldLogicNote")
 local table_util = require("table_util")
-local KeyVirtualInputEvent = require("rizu.input.KeyVirtualInputEvent")
-local InputInfo = require("rizu.engine.input.InputInfo")
+local LogicInfo = require("rizu.engine.logic.LogicInfo")
 local Note = require("ncdk2.notes.Note")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
 local AbsolutePoint = require("ncdk2.tp.AbsolutePoint")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
-	local input_info = InputInfo(0, 1)
-	input_info.timing_values:setSimple(1, 2)
+	local logic_info = LogicInfo(0, 1)
+	logic_info.timing_values:setSimple(1, 2)
 
 	local start_point = AbsolutePoint(0)
 	local end_point = AbsolutePoint(10)
@@ -22,7 +21,7 @@ local function new_test_ctx()
 
 	local linked_note = LinkedNote(start_note, end_note)
 
-	local input_note = HoldInputNote(linked_note, input_info)
+	local input_note = HoldLogicNote(linked_note, logic_info)
 
 	local events = {}
 	input_note.observable:add({receive = function(self, event)
@@ -30,7 +29,7 @@ local function new_test_ctx()
 	end})
 
 	return {
-		input_info = input_info,
+		logic_info = logic_info,
 		start_point = start_point,
 		end_point = end_point,
 		start_visual_point = start_visual_point,
@@ -50,9 +49,9 @@ local test = {}
 function test.too_early(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(-3)
+	ctx.logic_info:setTime(-3)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -3,
@@ -66,7 +65,7 @@ end
 function test.too_late(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(3)
+	ctx.logic_info:setTime(3)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -76,7 +75,7 @@ function test.too_late(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_info:setTime(13)
+	ctx.logic_info:setTime(13)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -90,9 +89,9 @@ end
 function test.perfect_hold(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(0)
+	ctx.logic_info:setTime(0)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -101,9 +100,9 @@ function test.perfect_hold(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_info:setTime(10)
+	ctx.logic_info:setTime(10)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", false))
+	ctx.input_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -116,9 +115,9 @@ end
 function test.early_release(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(0.5)
+	ctx.logic_info:setTime(0.5)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0.5,
@@ -127,9 +126,9 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_info:setTime(5)
+	ctx.logic_info:setTime(5)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", false))
+	ctx.input_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -138,7 +137,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -147,7 +146,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", false))
+	ctx.input_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -161,9 +160,9 @@ end
 function test.late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(1.5)
+	ctx.logic_info:setTime(1.5)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.5,
@@ -172,9 +171,9 @@ function test.late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_info:setTime(10)
+	ctx.logic_info:setTime(10)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", false))
+	ctx.input_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -187,7 +186,7 @@ end
 function test.too_late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info:setTime(5)
+	ctx.logic_info:setTime(5)
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -197,7 +196,7 @@ function test.too_late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -206,9 +205,9 @@ function test.too_late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_info:setTime(10)
+	ctx.logic_info:setTime(10)
 	ctx.input_note:update()
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", false))
+	ctx.input_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,

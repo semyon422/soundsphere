@@ -1,14 +1,13 @@
 local table_util = require("table_util")
-local TapInputNote = require("rizu.engine.input.notes.TapInputNote")
-local KeyVirtualInputEvent = require("rizu.input.KeyVirtualInputEvent")
-local InputInfo = require("rizu.engine.input.InputInfo")
+local TapLogicNote = require("rizu.engine.logic.notes.TapLogicNote")
+local LogicInfo = require("rizu.engine.logic.LogicInfo")
 local Note = require("ncdk2.notes.Note")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
 local AbsolutePoint = require("ncdk2.tp.AbsolutePoint")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
-	local input_info = InputInfo()
+	local input_info = LogicInfo()
 	input_info.timing_values:setSimple(1, 2)
 
 	local point = AbsolutePoint(0)
@@ -16,7 +15,7 @@ local function new_test_ctx()
 	local note = Note(visual_point, "key1", "tap", 0)
 	local linked_note = LinkedNote(note)
 
-	local input_note = TapInputNote(linked_note, input_info)
+	local input_note = TapLogicNote(linked_note, input_info)
 
 	local events = {}
 	input_note.observable:add({receive = function(self, event)
@@ -78,7 +77,7 @@ function test.hit_late_and_exactly_with_rate(t)
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1,
@@ -91,7 +90,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.input_info.rate = 1.5
 	t:eq(ctx.input_note:getResult(), "exactly")
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1 / 1.5, -- 0.733
@@ -127,7 +126,7 @@ function test.hit_too_early(t)
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:receive(KeyVirtualInputEvent("key1", true))
+	ctx.input_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -3,

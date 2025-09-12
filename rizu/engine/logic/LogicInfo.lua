@@ -1,15 +1,15 @@
 local class = require("class")
 local TimingValues = require("sea.chart.TimingValues")
 
----@class rizu.InputInfo
----@operator call: rizu.InputInfo
+---@class rizu.LogicInfo
+---@operator call: rizu.LogicInfo
 ---@field time number
 ---@field rate number
 ---@field input_offset number
 ---@field timing_values sea.TimingValues
-local InputInfo = class()
+local LogicInfo = class()
 
-function InputInfo:new()
+function LogicInfo:new()
 	self.time = 0
 	self.rate = 1
 	self.input_offset = 0
@@ -17,19 +17,19 @@ function InputInfo:new()
 end
 
 ---@param time number
-function InputInfo:setTime(time)
+function LogicInfo:setTime(time)
 	self.time = time
 end
 
 ---@param rate number
-function InputInfo:setRate(rate)
+function LogicInfo:setRate(rate)
 	self.rate = rate
 end
 
 ---@param time number
 ---@return number
-function InputInfo:sub(time)
+function LogicInfo:sub(time)
 	return (self.time - time) / self.rate
 end
 
-return InputInfo
+return LogicInfo

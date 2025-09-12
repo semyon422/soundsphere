@@ -1,6 +1,6 @@
 local LongVisualNote = require("rizu.engine.visual.LongVisualNote")
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
-local HoldInputNote = require("rizu.engine.input.notes.HoldInputNote")
+local HoldLogicNote = require("rizu.engine.logic.notes.HoldLogicNote")
 local LinkedNote = require("ncdk2.notes.LinkedNote")
 local Note = require("ncdk2.notes.Note")
 local Visual = require("ncdk2.visual.Visual")
@@ -31,14 +31,14 @@ local function new_ctx()
 		cvp.point.absoluteTime = time
 	end
 
-	local input_note = HoldInputNote(linked_note, {}, visual_info)
-	visual_info.input_notes[linked_note] = input_note
+	local logic_note = HoldLogicNote(linked_note, {}, visual_info)
+	visual_info.logic_notes[linked_note] = logic_note
 
 	return {
 		set_time = set_time,
 		visual_info = visual_info,
 		note = visual_note,
-		input_note = input_note,
+		logic_note = logic_note,
 		offsets = {-0.5, -0.25, 0, 0.25, 0.5},
 	}
 end
@@ -50,7 +50,7 @@ local test = {}
 function test.hold(t)
 	local ctx = new_ctx()
 
-	ctx.input_note.state = "startPassedPressed"
+	ctx.logic_note.state = "startPassedPressed"
 
 	for _, visual_offset in ipairs(ctx.offsets) do
 		ctx.visual_info.visual_offset = visual_offset
@@ -92,13 +92,13 @@ function test.hold_early_release(t)
 		for _, input_offset in ipairs(ctx.offsets) do
 			ctx.visual_info.input_offset = input_offset
 
-			ctx.input_note.state = "startPassedPressed"
+			ctx.logic_note.state = "startPassedPressed"
 			ctx.set_time(1.25 + visual_offset)
 			ctx.note:update()
 			t:eq(ctx.note.start_dt, 0)
 			t:eq(ctx.note.end_dt, -0.75)
 
-			ctx.input_note.state = "endPassed"
+			ctx.logic_note.state = "endPassed"
 			ctx.set_time(1.5 + visual_offset)
 			ctx.note:update()
 			t:eq(ctx.note.start_dt, 0)
@@ -121,7 +121,7 @@ end
 function test.shortening(t)
 	local ctx = new_ctx()
 
-	ctx.input_note.state = "startPassedPressed"
+	ctx.logic_note.state = "startPassedPressed"
 	ctx.visual_info.shortening = -0.25
 
 	ctx.set_time(0)

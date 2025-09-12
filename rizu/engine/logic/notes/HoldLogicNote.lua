@@ -1,7 +1,7 @@
 local table_util = require("table_util")
-local InputNote = require("rizu.engine.input.notes.InputNote")
+local LogicNote = require("rizu.engine.logic.notes.LogicNote")
 
----@alias rizu.HoldInputNoteState
+---@alias rizu.HoldLogicNoteState
 ---| "clear"
 ---| "startMissed"
 ---| "endMissed"
@@ -10,7 +10,7 @@ local InputNote = require("rizu.engine.input.notes.InputNote")
 ---| "endPassed"
 ---| "endMissedPassed"
 
----@type {[rizu.HoldInputNoteState]: integer}
+---@type {[rizu.HoldLogicNoteState]: integer}
 local active_states = table_util.invert({
 	"clear",
 	"startMissed",
@@ -18,32 +18,33 @@ local active_states = table_util.invert({
 	"startPassedPressed",
 })
 
----@class rizu.ManiaHoldInputNote: rizu.InputNote
----@operator call: rizu.ManiaHoldInputNote
-local ManiaHoldInputNote = InputNote + {}
+---@class rizu.ManiaHoldLogicNote: rizu.LogicNote
+---@operator call: rizu.ManiaHoldLogicNote
+local ManiaHoldLogicNote = LogicNote + {}
 
 ---@param note ncdk2.LinkedNote
----@param input_info rizu.InputInfo
-function ManiaHoldInputNote:new(note, input_info)
+---@param logic_info rizu.LogicInfo
+function ManiaHoldLogicNote:new(note, logic_info)
 	assert(note:getType() == "hold")
 	assert(note:isLong())
 
-	InputNote.new(self, note, input_info)
+	LogicNote.new(self, note, logic_info)
 end
 
 ---@return boolean
-function ManiaHoldInputNote:isActive()
+function ManiaHoldLogicNote:isActive()
 	return not not active_states[self.state]
 end
 
----@param event rizu.KeyVirtualInputEvent
-function ManiaHoldInputNote:receive(event)
+---@param value any
+---@return boolean?
+function ManiaHoldLogicNote:input(value)
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
 
 	local state = self.state
 
-	if event.value then
+	if value then
 		if state == "clear" then
 			if start_result == "too early" then
 				self:switchState("clear")
@@ -55,6 +56,8 @@ function ManiaHoldInputNote:receive(event)
 		elseif state == "startMissed" then
 			self:switchState("startMissedPressed")
 		end
+
+		return true
 	else
 		if state == "startPassedPressed" then
 			if end_result == "too early" then
@@ -73,10 +76,12 @@ function ManiaHoldInputNote:receive(event)
 				self:switchState("endMissedPassed")
 			end
 		end
+
+		return false
 	end
 end
 
-function ManiaHoldInputNote:update()
+function ManiaHoldLogicNote:update()
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
 
@@ -90,44 +95,44 @@ function ManiaHoldInputNote:update()
 end
 
 ---@return number
-function ManiaHoldInputNote:getDeltaTime()
-	return self.input_info:sub(self.note:getStartTime())
+function ManiaHoldLogicNote:getDeltaTime()
+	return self.logic_info:sub(self.note:getStartTime())
 end
 
 ---@return number
-function ManiaHoldInputNote:getEndDeltaTime()
-	return self.input_info:sub(self.note:getEndTime())
+function ManiaHoldLogicNote:getEndDeltaTime()
+	return self.logic_info:sub(self.note:getEndTime())
 end
 
 ---@return number
-function ManiaHoldInputNote:getStartTime()
-	return self.note:getStartTime() + self.input_info.timing_values:getMinTime("LongNoteStart") * self.input_info.rate
+function ManiaHoldLogicNote:getStartTime()
+	return self.note:getStartTime() + self.logic_info.timing_values:getMinTime("LongNoteStart") * self.logic_info.rate
 end
 
 ---@return number
-function ManiaHoldInputNote:getEndTime()
-	return self.note:getEndTime() + self.input_info.timing_values:getMaxTime("LongNoteEnd") * self.input_info.rate
+function ManiaHoldLogicNote:getEndTime()
+	return self.note:getEndTime() + self.logic_info.timing_values:getMaxTime("LongNoteEnd") * self.logic_info.rate
 end
 
 ---@return sea.TimingResult
-function ManiaHoldInputNote:getStartResult()
+function ManiaHoldLogicNote:getStartResult()
 	local dt = self:getDeltaTime()
-	return self.input_info.timing_values:hit("LongNoteStart", dt)
+	return self.logic_info.timing_values:hit("LongNoteStart", dt)
 end
 
 ---@return sea.TimingResult
-function ManiaHoldInputNote:getEndResult()
+function ManiaHoldLogicNote:getEndResult()
 	local dt = self:getEndDeltaTime()
-	return self.input_info.timing_values:hit("LongNoteEnd", dt)
+	return self.logic_info.timing_values:hit("LongNoteEnd", dt)
 end
 
----@param state rizu.HoldInputNoteState
-function ManiaHoldInputNote:switchState(state)
+---@param state rizu.HoldLogicNoteState
+function ManiaHoldLogicNote:switchState(state)
 	local old_state = self.state
 	self.state = state
 
-	local start_last_time = self.input_info.timing_values:getMaxTime("LongNoteStart")
-	local end_last_time = self.input_info.timing_values:getMaxTime("LongNoteEnd")
+	local start_last_time = self.logic_info.timing_values:getMaxTime("LongNoteStart")
+	local end_last_time = self.logic_info.timing_values:getMaxTime("LongNoteEnd")
 
 	local delta_time = 0
 	if old_state == "clear" then
@@ -150,6 +155,6 @@ function ManiaHoldInputNote:switchState(state)
 	end
 end
 
-ManiaHoldInputNote.__lt = InputNote.__lt
+ManiaHoldLogicNote.__lt = LogicNote.__lt
 
-return ManiaHoldInputNote
+return ManiaHoldLogicNote
