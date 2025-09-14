@@ -14,8 +14,15 @@ function InputEngine:new(active_notes)
 	self.event_catches = {}
 	---@type {[rizu.LogicNote]: rizu.VirtualInputEventId}
 	self.catched_notes = {}
+
+	---@type {[rizu.VirtualInputEventId]: boolean}
+	self.unmatched_events = {}
+
+	---@type {[rizu.VirtualInputEventId]: any}
+	self.event_values = {}
 end
 
+--- TODO: replace event with event.pos
 ---@param note rizu.LogicNote
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
@@ -38,11 +45,38 @@ function InputEngine:getNotesMaxPriority(event)
 end
 
 ---@param event rizu.VirtualInputEvent
+---@param note rizu.LogicNote
+---@return rizu.LogicNote?
+---@return boolean? catched
+function InputEngine:handle_catched_note(event, note)
+	local event_values = self.event_values
+	local unmatched_events = self.unmatched_events
+
+	if event.value ~= nil then
+		event_values[event.id] = event.value
+	end
+
+	local matched = self:match(note, event)
+	if matched and (unmatched_events[event.id] or event.value ~= nil) then
+		unmatched_events[event.id] = nil
+		local catched = note:input(event.value or event_values[event.id])
+		return note, catched
+	elseif not matched and not unmatched_events[event.id] then
+		unmatched_events[event.id] = true
+		local catched = note:input()
+		return note, catched
+	end
+
+	return note, true
+end
+
+---@param event rizu.VirtualInputEvent
 ---@return rizu.LogicNote?
 ---@return boolean? catched
 function InputEngine:receive_catched(event)
 	local active_notes = self.active_notes
 	local catched_notes = self.catched_notes
+	local event_values = self.event_values
 
 	if not active_notes[1] then
 		return
@@ -51,17 +85,23 @@ function InputEngine:receive_catched(event)
 	local catch_note = self.event_catches[event.id]
 	for _, note in ipairs(active_notes) do
 		if note == catch_note then
-			local catched = note:input(event.value)
-			return note, catched
+			return self:handle_catched_note(event, note)
 		end
 	end
+
+	local value = event.value
+	if value == nil then
+		return
+	end
+
+	event_values[event.id] = event.value
 
 	local priority = self:getNotesMaxPriority(event)
 
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
 			if note:getPriority() == priority and self:match(note, event) and not catched_notes[note] then
-				local catched = note:input(event.value)
+				local catched = note:input(value)
 				return note, catched
 			end
 		end
@@ -83,7 +123,7 @@ function InputEngine:receive_catched(event)
 		return
 	end
 
-	local catched = nearest_note:input(event.value)
+	local catched = nearest_note:input(value)
 	return nearest_note, catched
 end
 
@@ -95,12 +135,13 @@ function InputEngine:receive(event)
 		return
 	end
 
+	local _note = self.event_catches[event.id]
+	if _note then
+		self.catched_notes[_note] = nil
+	end
+
 	if not catched then
-		note = self.event_catches[event.id]
 		self.event_catches[event.id] = nil
-		if note then
-			self.catched_notes[note] = nil
-		end
 	elseif note and catched then
 		self.event_catches[event.id] = note
 		self.catched_notes[note] = event.id

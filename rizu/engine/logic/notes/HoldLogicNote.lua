@@ -77,7 +77,7 @@ function ManiaHoldLogicNote:input(value)
 			end
 		end
 
-		return false
+		return value == nil -- keep catch on unmatch
 	end
 end
 

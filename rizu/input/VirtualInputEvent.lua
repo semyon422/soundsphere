@@ -4,12 +4,12 @@ local class = require("class")
 
 ---@class rizu.VirtualInputEvent
 ---@operator call: rizu.VirtualInputEvent
----@field pos any?
+---@field pos any
 ---@field value any?
 ---@field id rizu.VirtualInputEventId?
 local VirtualInputEvent = class()
 
----@param pos any?
+---@param pos any
 ---@param value any?
 ---@param id rizu.VirtualInputEventId?
 function VirtualInputEvent:new(pos, value, id)

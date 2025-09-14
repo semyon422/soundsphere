@@ -31,8 +31,8 @@ function test.match(t)
 		return note
 	end
 
-	local event_1 = {}
-	local event_2 = {}
+	local event_1 = {value = true, id = 1}
+	local event_2 = {value = true, id = 1}
 
 	local notes = {
 		new_note(event_1),
@@ -112,7 +112,7 @@ function test.nearest(t)
 		return note
 	end
 
-	local event = {}
+	local event = {value = true, id = 1}
 
 	local notes = {
 		new_note(0, event),
@@ -154,7 +154,7 @@ function test.priority(t)
 		return note
 	end
 
-	local event = {}
+	local event = {value = true, id = 1}
 
 	local notes = {
 		new_note(0, 0, event),
@@ -173,12 +173,54 @@ function test.priority(t)
 end
 
 ---@param t testing.T
+function test.nil_value(t)
+	local function new_note(events)
+		local note = TestLogicNote()
+		note.time = 0
+		function note:input(value)
+			table.insert(events, {value})
+			return value
+		end
+		return note
+	end
+
+	local events = {}
+
+	local notes = {
+		new_note(events),
+	}
+
+	local ie = InputEngine(notes)
+	function ie:match(note, event)
+		return true
+	end
+
+	set_time(notes, 0)
+
+	ie:receive({id = 1, value = nil})
+	ie:receive({id = 1, value = true})
+	ie:receive({id = 1, value = nil})
+	ie:receive({id = 1, value = false})
+	ie:receive({id = 1, value = false})
+	ie:receive({id = 1, value = nil})
+
+	t:tdeq(events, {
+		{true},
+		{false},
+		{false},
+	})
+end
+
+---@param t testing.T
 function test.variable_match(t)
 	local function new_note(events)
 		local note = TestLogicNote()
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {value})
+			if value == nil then
+				return true -- keep catch on unmatch
+			end
 			return value
 		end
 		return note
@@ -200,19 +242,22 @@ function test.variable_match(t)
 	ie:receive({id = 1, matching = true, value = true})
 	ie:receive({id = 1, matching = false, value = nil})
 	ie:receive({id = 1, matching = true, value = nil})
+	ie:receive({id = 1, matching = true, value = nil})
+	ie:receive({id = 1, matching = true, value = nil})
+	ie:receive({id = 1, matching = false, value = nil})
+	ie:receive({id = 1, matching = false, value = nil})
+	ie:receive({id = 1, matching = true, value = nil})
+	ie:receive({id = 1, matching = true, value = nil})
 	ie:receive({id = 1, matching = true, value = false})
 
-	-- t:tdeq(events, {
-	-- 	{true},
-	-- 	{nil},
-	-- 	{true},
-	-- 	{false},
-	-- })
+	t:tdeq(events, {
+		{true},
+		{nil},
+		{true},
+		{nil},
+		{true},
+		{false},
+	})
 end
-
--- TODO:
--- complete variable_match test
--- add test for cleaning catch table for inactive notes
--- add test for nil event pos and values (no changes)
 
 return test
