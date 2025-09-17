@@ -2,13 +2,13 @@ local LogicNote = require("rizu.engine.logic.notes.LogicNote")
 
 ---@alias rizu.TapLogicNoteState "clear"|"missed"|"passed"
 
----@class rizu.ManiaTapLogicNote: rizu.LogicNote
----@operator call: rizu.ManiaTapLogicNote
-local ManiaTapLogicNote = LogicNote + {}
+---@class rizu.TapLogicNote: rizu.LogicNote
+---@operator call: rizu.TapLogicNote
+local TapLogicNote = LogicNote + {}
 
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
-function ManiaTapLogicNote:new(note, logic_info)
+function TapLogicNote:new(note, logic_info)
 	assert(note:getType() == "tap")
 	assert(note:isShort())
 
@@ -16,13 +16,13 @@ function ManiaTapLogicNote:new(note, logic_info)
 end
 
 ---@return boolean
-function ManiaTapLogicNote:isActive()
+function TapLogicNote:isActive()
 	return self.state == "clear"
 end
 
 ---@param value any
 ---@return boolean?
-function ManiaTapLogicNote:input(value)
+function TapLogicNote:input(value)
 	if not value then
 		return
 	end
@@ -38,7 +38,7 @@ function ManiaTapLogicNote:input(value)
 	end
 end
 
-function ManiaTapLogicNote:update()
+function TapLogicNote:update()
 	local result = self:getResult()
 	if result == "too late" then
 		self:switchState("missed")
@@ -46,28 +46,23 @@ function ManiaTapLogicNote:update()
 end
 
 ---@return number
-function ManiaTapLogicNote:getDeltaTime()
-	return self.logic_info:sub(self.note:getStartTime())
-end
-
----@return number
-function ManiaTapLogicNote:getStartTime()
+function TapLogicNote:getStartTime()
 	return self.note:getStartTime() + self.logic_info.timing_values:getMinTime("ShortNote") * self.logic_info.rate
 end
 
 ---@return number
-function ManiaTapLogicNote:getEndTime()
+function TapLogicNote:getEndTime()
 	return self.note:getEndTime() + self.logic_info.timing_values:getMaxTime("ShortNote") * self.logic_info.rate
 end
 
 ---@return sea.TimingResult
-function ManiaTapLogicNote:getResult()
+function TapLogicNote:getResult()
 	local dt = self:getDeltaTime()
 	return self.logic_info.timing_values:hit("ShortNote", dt)
 end
 
 ---@param state rizu.TapLogicNoteState
-function ManiaTapLogicNote:switchState(state)
+function TapLogicNote:switchState(state)
 	local old_state = self.state
 	self.state = state
 
@@ -93,6 +88,6 @@ function ManiaTapLogicNote:switchState(state)
 	end
 end
 
-ManiaTapLogicNote.__lt = LogicNote.__lt
+TapLogicNote.__lt = LogicNote.__lt
 
-return ManiaTapLogicNote
+return TapLogicNote

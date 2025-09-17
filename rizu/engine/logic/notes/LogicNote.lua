@@ -7,6 +7,8 @@ local Observable = require("Observable")
 ---@operator call: rizu.LogicNote
 local LogicNote = class()
 
+LogicNote.is_bottom = false
+
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
 function LogicNote:new(note, logic_info)
@@ -57,16 +59,6 @@ end
 
 ---@return number
 function LogicNote:getStartTime()
-	error("not implemented")
-end
-
----@return number
-function LogicNote:getEndTime()
-	error("not implemented")
-end
-
----@return sea.TimingResult
-function LogicNote:getResult()
 	error("not implemented")
 end
 

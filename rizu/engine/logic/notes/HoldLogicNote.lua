@@ -18,13 +18,13 @@ local active_states = table_util.invert({
 	"startPassedPressed",
 })
 
----@class rizu.ManiaHoldLogicNote: rizu.LogicNote
----@operator call: rizu.ManiaHoldLogicNote
-local ManiaHoldLogicNote = LogicNote + {}
+---@class rizu.HoldLogicNote: rizu.LogicNote
+---@operator call: rizu.HoldLogicNote
+local HoldLogicNote = LogicNote + {}
 
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
-function ManiaHoldLogicNote:new(note, logic_info)
+function HoldLogicNote:new(note, logic_info)
 	assert(note:getType() == "hold")
 	assert(note:isLong())
 
@@ -32,13 +32,13 @@ function ManiaHoldLogicNote:new(note, logic_info)
 end
 
 ---@return boolean
-function ManiaHoldLogicNote:isActive()
+function HoldLogicNote:isActive()
 	return not not active_states[self.state]
 end
 
 ---@param value any
 ---@return boolean?
-function ManiaHoldLogicNote:input(value)
+function HoldLogicNote:input(value)
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
 
@@ -81,7 +81,7 @@ function ManiaHoldLogicNote:input(value)
 	end
 end
 
-function ManiaHoldLogicNote:update()
+function HoldLogicNote:update()
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
 
@@ -95,39 +95,34 @@ function ManiaHoldLogicNote:update()
 end
 
 ---@return number
-function ManiaHoldLogicNote:getDeltaTime()
-	return self.logic_info:sub(self.note:getStartTime())
-end
-
----@return number
-function ManiaHoldLogicNote:getEndDeltaTime()
+function HoldLogicNote:getEndDeltaTime()
 	return self.logic_info:sub(self.note:getEndTime())
 end
 
 ---@return number
-function ManiaHoldLogicNote:getStartTime()
+function HoldLogicNote:getStartTime()
 	return self.note:getStartTime() + self.logic_info.timing_values:getMinTime("LongNoteStart") * self.logic_info.rate
 end
 
 ---@return number
-function ManiaHoldLogicNote:getEndTime()
+function HoldLogicNote:getEndTime()
 	return self.note:getEndTime() + self.logic_info.timing_values:getMaxTime("LongNoteEnd") * self.logic_info.rate
 end
 
 ---@return sea.TimingResult
-function ManiaHoldLogicNote:getStartResult()
+function HoldLogicNote:getStartResult()
 	local dt = self:getDeltaTime()
 	return self.logic_info.timing_values:hit("LongNoteStart", dt)
 end
 
 ---@return sea.TimingResult
-function ManiaHoldLogicNote:getEndResult()
+function HoldLogicNote:getEndResult()
 	local dt = self:getEndDeltaTime()
 	return self.logic_info.timing_values:hit("LongNoteEnd", dt)
 end
 
 ---@param state rizu.HoldLogicNoteState
-function ManiaHoldLogicNote:switchState(state)
+function HoldLogicNote:switchState(state)
 	local old_state = self.state
 	self.state = state
 
@@ -155,6 +150,6 @@ function ManiaHoldLogicNote:switchState(state)
 	end
 end
 
-ManiaHoldLogicNote.__lt = LogicNote.__lt
+HoldLogicNote.__lt = LogicNote.__lt
 
-return ManiaHoldLogicNote
+return HoldLogicNote
