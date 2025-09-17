@@ -43,7 +43,6 @@ function LogicNote:getPos()
 end
 
 ---@param value any
----@return boolean? catched
 function LogicNote:input(value)
 	error("not implemented")
 end

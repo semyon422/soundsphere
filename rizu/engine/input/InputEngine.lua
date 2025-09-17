@@ -15,9 +15,6 @@ function InputEngine:new(active_notes)
 	---@type {[rizu.LogicNote]: rizu.VirtualInputEventId}
 	self.catched_notes = {}
 
-	---@type {[rizu.VirtualInputEventId]: boolean}
-	self.unmatched_events = {}
-
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_values = {}
 end
@@ -50,21 +47,18 @@ end
 ---@return boolean? catched
 function InputEngine:handle_catched_note(event, note)
 	local event_values = self.event_values
-	local unmatched_events = self.unmatched_events
 
 	if event.value ~= nil then
 		event_values[event.id] = event.value
 	end
 
 	local matched = self:match(note, event)
-	if matched and (unmatched_events[event.id] or event.value ~= nil) then
-		unmatched_events[event.id] = nil
-		local catched = note:input(event.value or event_values[event.id])
-		return note, catched
-	elseif not matched and not unmatched_events[event.id] then
-		unmatched_events[event.id] = true
-		local catched = note:input()
-		return note, catched
+	if matched and event.value ~= nil then
+		note:input(event.value or event_values[event.id])
+		return note, not not event.value
+	elseif not matched then
+		note:input(false)
+		return note, false
 	end
 
 	return note, true
@@ -90,7 +84,7 @@ function InputEngine:receive_catched(event)
 	end
 
 	local value = event.value
-	if value == nil then
+	if not value then
 		return
 	end
 
@@ -101,8 +95,8 @@ function InputEngine:receive_catched(event)
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
 			if note:getPriority() == priority and self:match(note, event) and not catched_notes[note] then
-				local catched = note:input(value)
-				return note, catched
+				note:input(value)
+				return note, not not event.value
 			end
 		end
 		return
@@ -123,8 +117,8 @@ function InputEngine:receive_catched(event)
 		return
 	end
 
-	local catched = nearest_note:input(value)
-	return nearest_note, catched
+	nearest_note:input(value)
+	return nearest_note, not not event.value
 end
 
 ---@param event rizu.VirtualInputEvent

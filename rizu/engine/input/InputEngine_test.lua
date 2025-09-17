@@ -32,7 +32,7 @@ function test.match(t)
 	end
 
 	local event_1 = {value = true, id = 1}
-	local event_2 = {value = true, id = 1}
+	local event_2 = {value = true, id = 2}
 
 	local notes = {
 		new_note(event_1),
@@ -66,7 +66,6 @@ function test.catch(t)
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {id, value})
-			return value
 		end
 		return note
 	end
@@ -74,8 +73,8 @@ function test.catch(t)
 	local events = {}
 
 	local notes = {
-		new_note(1, events),
-		new_note(2, events),
+		new_note("a", events),
+		new_note("b", events),
 	}
 
 	local ie = InputEngine(notes)
@@ -92,31 +91,31 @@ function test.catch(t)
 	ie:receive({id = 1, value = false})
 
 	t:tdeq(events, {
-		{1, true},
-		{2, true},
-		{1, true},
-		{2, false},
-		{1, false},
+		{"a", true},
+		{"b", true},
+		{"a", true},
+		{"b", false},
+		{"a", false},
 	})
 end
 
 ---@param t testing.T
 function test.nearest(t)
-	local function new_note(time, event)
+	local function new_note(time, events)
 		local note = TestLogicNote()
 		---@cast note +{catched: any}
 		note.time = time
 		function note:input()
-			table.insert(event, time)
+			table.insert(events, time)
 		end
 		return note
 	end
 
-	local event = {value = true, id = 1}
+	local events = {}
 
 	local notes = {
-		new_note(0, event),
-		new_note(2, event),
+		new_note(0, events),
+		new_note(2, events),
 	}
 
 	local ie = InputEngine(notes)
@@ -127,18 +126,21 @@ function test.nearest(t)
 
 	set_time(notes, 1)
 
-	ie:receive(event)
-	t:eq(event[1], 0)
+	ie:receive({value = true, id = 1})
+	ie:receive({value = false, id = 1})
+	t:eq(events[1], 0)
 
 	set_time(notes, 1.001)
 
-	ie:receive(event)
-	t:eq(event[2], 2)
+	ie:receive({value = true, id = 1})
+	ie:receive({value = false, id = 1})
+	t:eq(events[3], 2)
 
 	set_time(notes, 0.999)
 
-	ie:receive(event)
-	t:eq(event[3], 0)
+	ie:receive({value = true, id = 1})
+	ie:receive({value = false, id = 1})
+	t:eq(events[5], 0)
 end
 
 ---@param t testing.T
@@ -199,14 +201,22 @@ function test.nil_value(t)
 
 	ie:receive({id = 1, value = nil})
 	ie:receive({id = 1, value = true})
+	ie:receive({id = 1, value = true})
 	ie:receive({id = 1, value = nil})
 	ie:receive({id = 1, value = false})
+
+	t:tdeq(events, {
+		{true},
+		{true},
+		{false},
+	})
+
 	ie:receive({id = 1, value = false})
 	ie:receive({id = 1, value = nil})
 
 	t:tdeq(events, {
 		{true},
-		{false},
+		{true},
 		{false},
 	})
 end
@@ -218,10 +228,6 @@ function test.variable_match(t)
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {value})
-			if value == nil then
-				return true -- keep catch on unmatch
-			end
-			return value
 		end
 		return note
 	end
@@ -240,7 +246,14 @@ function test.variable_match(t)
 	set_time(notes, 0)
 
 	ie:receive({id = 1, matching = true, value = true})
+	ie:receive({id = 1, matching = true, value = nil})
 	ie:receive({id = 1, matching = false, value = nil})
+
+	t:tdeq(events, {
+		{true},
+		{false},
+	})
+
 	ie:receive({id = 1, matching = true, value = nil})
 	ie:receive({id = 1, matching = true, value = nil})
 	ie:receive({id = 1, matching = true, value = nil})
@@ -251,10 +264,6 @@ function test.variable_match(t)
 	ie:receive({id = 1, matching = true, value = false})
 
 	t:tdeq(events, {
-		{true},
-		{nil},
-		{true},
-		{nil},
 		{true},
 		{false},
 	})

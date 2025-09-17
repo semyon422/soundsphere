@@ -21,7 +21,6 @@ function TapLogicNote:isActive()
 end
 
 ---@param value any
----@return boolean?
 function TapLogicNote:input(value)
 	if not value then
 		return

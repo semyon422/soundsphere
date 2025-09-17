@@ -37,7 +37,6 @@ function HoldLogicNote:isActive()
 end
 
 ---@param value any
----@return boolean?
 function HoldLogicNote:input(value)
 	local start_result = self:getStartResult()
 	local end_result = self:getEndResult()
@@ -56,8 +55,6 @@ function HoldLogicNote:input(value)
 		elseif state == "startMissed" then
 			self:switchState("startMissedPressed")
 		end
-
-		return true
 	else
 		if state == "startPassedPressed" then
 			if end_result == "too early" then
@@ -76,8 +73,6 @@ function HoldLogicNote:input(value)
 				self:switchState("endMissedPassed")
 			end
 		end
-
-		return value == nil -- keep catch on unmatch
 	end
 end
 
