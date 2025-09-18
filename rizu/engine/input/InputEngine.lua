@@ -17,14 +17,15 @@ function InputEngine:new(active_notes)
 
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_values = {}
+	---@type {[rizu.VirtualInputEventId]: any}
+	self.event_positions = {}
 end
 
---- TODO: replace event with event.pos
 ---@param note rizu.LogicNote
----@param event rizu.VirtualInputEvent
+---@param pos any
 ---@return boolean
-function InputEngine:match(note, event)
-	return note:getColumn() == event.pos
+function InputEngine:match(note, pos)
+	return note:getColumn() == pos
 end
 
 ---@param event rizu.VirtualInputEvent
@@ -33,12 +34,35 @@ function InputEngine:getNotesMaxPriority(event)
 	local priority = -math.huge
 
 	for _, note in ipairs(self.active_notes) do
-		if self:match(note, event) then
+		if self:match(note, event.pos) then
 			priority = math.max(priority, note:getPriority())
 		end
 	end
 
 	return priority
+end
+
+function InputEngine:update()
+	local active_notes = self.active_notes
+	local event_values = self.event_values
+	local event_positions = self.event_positions
+
+	for _, note in ipairs(active_notes) do
+		if note.is_bottom then
+			---@type any
+			local matching_value = false
+			for id, value in pairs(event_values) do
+				if value then
+					local pos = event_positions[id]
+					if self:match(note, pos) then
+						matching_value = value
+						break
+					end
+				end
+			end
+			note:input(matching_value)
+		end
+	end
 end
 
 ---@param event rizu.VirtualInputEvent
@@ -48,11 +72,7 @@ end
 function InputEngine:handle_catched_note(event, note)
 	local event_values = self.event_values
 
-	if event.value ~= nil then
-		event_values[event.id] = event.value
-	end
-
-	local matched = self:match(note, event)
+	local matched = self:match(note, event.pos)
 	if matched and event.value ~= nil then
 		note:input(event.value or event_values[event.id])
 		return note, not not event.value
@@ -70,7 +90,6 @@ end
 function InputEngine:receive_catched(event)
 	local active_notes = self.active_notes
 	local catched_notes = self.catched_notes
-	local event_values = self.event_values
 
 	if not active_notes[1] then
 		return
@@ -88,15 +107,13 @@ function InputEngine:receive_catched(event)
 		return
 	end
 
-	event_values[event.id] = event.value
-
 	local priority = self:getNotesMaxPriority(event)
 
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
-			if note:getPriority() == priority and self:match(note, event) and not catched_notes[note] then
+			if not note.is_bottom and note:getPriority() == priority and self:match(note, event.pos) and not catched_notes[note] then
 				note:input(value)
-				return note, not not event.value
+				return note, not not value
 			end
 		end
 		return
@@ -107,7 +124,7 @@ function InputEngine:receive_catched(event)
 	local nearest_time = math.huge
 	for _, note in ipairs(active_notes) do
 		local time = math.abs(note:getDeltaTime())
-		if note:getPriority() == priority and self:match(note, event) and not catched_notes[note] and time < nearest_time then
+		if not note.is_bottom and note:getPriority() == priority and self:match(note, event.pos) and not catched_notes[note] and time < nearest_time then
 			nearest_time = time
 			nearest_note = note
 		end
@@ -118,15 +135,26 @@ function InputEngine:receive_catched(event)
 	end
 
 	nearest_note:input(value)
-	return nearest_note, not not event.value
+	return nearest_note, not not value
 end
 
 ---@param event rizu.VirtualInputEvent
 function InputEngine:receive(event)
+	local event_values = self.event_values
+	local event_positions = self.event_positions
+
+	local value = event.value
+	if value ~= nil then
+		event_values[event.id] = value
+	end
+
+	event_positions[event.id] = event.pos
+
 	local note, catched = self:receive_catched(event)
 
-	if not event.id then
-		return
+	if event.value == false then
+		event_values[event.id] = nil
+		event_positions[event.id] = nil
 	end
 
 	local _note = self.event_catches[event.id]

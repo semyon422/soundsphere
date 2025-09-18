@@ -16,7 +16,7 @@ local test = {}
 function test.no_notes(t)
 	local ie = InputEngine({})
 
-	t:has_not_error(ie.receive, ie, {})
+	t:has_not_error(ie.receive, ie, {id = 1, pos = 1})
 end
 
 ---@param t testing.T
@@ -24,15 +24,15 @@ function test.match(t)
 	local function new_note(match_event)
 		local note = TestLogicNote()
 		note.time = 0
-		note.data = match_event
+		note.data = match_event.pos
 		function note:input(value)
 			table.insert(match_event, self)
 		end
 		return note
 	end
 
-	local event_1 = {value = true, id = 1}
-	local event_2 = {value = true, id = 2}
+	local event_1 = {value = true, id = 1, pos = 1}
+	local event_2 = {value = true, id = 2, pos = 2}
 
 	local notes = {
 		new_note(event_1),
@@ -40,8 +40,8 @@ function test.match(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match(note, event)
-		return note.data == event
+	function ie:match(note, pos)
+		return note.data == pos
 	end
 
 	set_time(notes, 0)
@@ -193,7 +193,7 @@ function test.nil_value(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match(note, event)
+	function ie:match()
 		return true
 	end
 
@@ -239,34 +239,88 @@ function test.variable_match(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match(note, event)
-		return event.matching
+	function ie:match(note, pos)
+		return pos
 	end
 
 	set_time(notes, 0)
 
-	ie:receive({id = 1, matching = true, value = true})
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = false, value = nil})
+	ie:receive({id = 1, pos = true, value = true})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = false, value = nil})
 
 	t:tdeq(events, {
 		{true},
 		{false},
 	})
 
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = false, value = nil})
-	ie:receive({id = 1, matching = false, value = nil})
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = true, value = nil})
-	ie:receive({id = 1, matching = true, value = false})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = false, value = nil})
+	ie:receive({id = 1, pos = false, value = nil})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = true, value = nil})
+	ie:receive({id = 1, pos = true, value = false})
 
 	t:tdeq(events, {
 		{true},
 		{false},
 	})
+end
+
+---@param t testing.T
+function test.bottom_notes(t)
+	---@param id string
+	---@param state {[string]: any}
+	---@return rizu.TestLogicNote
+	local function new_note(id, state)
+		local note = TestLogicNote()
+		note.is_bottom = true
+		note.time = 0
+		function note:input(value)
+			state.count = state.count + 1
+			state[id] = value
+		end
+		return note
+	end
+
+	local state = {count = 0}
+
+	local notes = {
+		new_note("a", state),
+		new_note("b", state),
+	}
+
+	local ie = InputEngine(notes)
+	function ie:match(note, pos)
+		return pos
+	end
+
+	set_time(notes, 0)
+
+	ie:update()
+	t:tdeq(state, {a = false, b = false, count = 2})
+
+	ie:receive({id = 1, pos = false, value = true})
+	ie:update()
+	t:tdeq(state, {a = false, b = false, count = 4})
+
+	ie:receive({id = 1, pos = true, value = true})
+	ie:update()
+	t:tdeq(state, {a = true, b = true, count = 6})
+
+	ie:receive({id = 1, pos = false, value = true})
+	ie:update()
+	t:tdeq(state, {a = false, b = false, count = 8})
+
+	ie:receive({id = 1, pos = false, value = false})
+	ie:update()
+	t:tdeq(state, {a = false, b = false, count = 10})
+
+	ie:receive({id = 1, pos = true, value = true})
+	ie:update()
+	t:tdeq(state, {a = true, b = true, count = 12})
 end
 
 return test
