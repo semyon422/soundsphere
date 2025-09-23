@@ -19,6 +19,9 @@ function InputEngine:new(active_notes)
 	self.event_values = {}
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_positions = {}
+
+	---@type {[rizu.LogicNote]: any}
+	self.paused_notes = {}
 end
 
 ---@param note rizu.LogicNote
@@ -42,6 +45,16 @@ function InputEngine:getNotesMaxPriority(event)
 	return priority
 end
 
+---@param note rizu.LogicNote
+---@param value any
+---@return rizu.LogicNote?
+---@return boolean? catched
+function InputEngine:input_note(note, value)
+	if not self.paused then
+		note:input(value)
+	end
+end
+
 function InputEngine:update()
 	local active_notes = self.active_notes
 	local event_values = self.event_values
@@ -60,7 +73,7 @@ function InputEngine:update()
 					end
 				end
 			end
-			note:input(matching_value)
+			self:input_note(note, matching_value)
 		end
 	end
 end
@@ -71,13 +84,14 @@ end
 ---@return boolean? catched
 function InputEngine:handle_catched_note(event, note)
 	local event_values = self.event_values
+	local paused = self.paused
 
 	local matched = self:match(note, event.pos)
 	if matched and event.value ~= nil then
-		note:input(event.value or event_values[event.id])
+		self:input_note(note, event.value or event_values[event.id])
 		return note, not not event.value
 	elseif not matched then
-		note:input(false)
+		self:input_note(note, false)
 		return note, false
 	end
 
@@ -112,7 +126,7 @@ function InputEngine:receive_catched(event)
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
 			if not note.is_bottom and note:getPriority() == priority and self:match(note, event.pos) and not catched_notes[note] then
-				note:input(value)
+				self:input_note(note, value)
 				return note, not not value
 			end
 		end
@@ -134,7 +148,7 @@ function InputEngine:receive_catched(event)
 		return
 	end
 
-	nearest_note:input(value)
+	self:input_note(nearest_note, value)
 	return nearest_note, not not value
 end
 
@@ -167,6 +181,49 @@ function InputEngine:receive(event)
 	elseif note and catched then
 		self.event_catches[event.id] = note
 		self.catched_notes[note] = event.id
+	end
+end
+
+function InputEngine:pause()
+	self.paused = true
+
+	local paused_notes = self.paused_notes
+	local event_values = self.event_values
+
+	for note, id in pairs(self.catched_notes) do
+		paused_notes[note] = event_values[id]
+	end
+end
+
+function InputEngine:resume()
+	self.paused = false
+
+	local paused_notes = self.paused_notes
+	local catched_notes = self.catched_notes
+	local event_values = self.event_values
+
+	---@type {[rizu.LogicNote]: true}
+	local handled_note = {}
+
+	for note, value in pairs(paused_notes) do
+		handled_note[note] = true
+
+		local id = catched_notes[note]
+		if id then
+			local new_value = event_values[id]
+			if value ~= new_value then
+				note:input(new_value)
+			end
+		else
+			note:input(false)
+		end
+	end
+
+	for note, id in pairs(catched_notes) do
+		if not handled_note[note] then
+			local new_value = event_values[id]
+			note:input(new_value)
+		end
 	end
 end
 
