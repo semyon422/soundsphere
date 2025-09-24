@@ -22,7 +22,7 @@ function InputBinder:new(config, input_mode)
 	self.map = im:getInputMap()
 end
 
----@param event rizu.DiscreteKeyPhysicInputEvent
+---@param event rizu.KeyPhysicInputEvent
 ---@return rizu.VirtualInputEvent?
 function InputBinder:transform(event)
 	local config = self.config[self.input_mode]
@@ -33,10 +33,11 @@ function InputBinder:transform(event)
 	local key, device = event.key, event.device
 
 	for i, binds in pairs(config) do
-		for _, bind in pairs(binds) do
+		for index, bind in pairs(binds) do
 			local _key, d_type, d_id = unpack(bind, 1, 3)
 			if _key == key and d_type == device.type and d_id == device.id then
-				return VirtualInputEvent(self.columns[i], event.state)
+				local event_id = table.concat({d_type, d_id, key, index}, "_")
+				return VirtualInputEvent(self.columns[i], event.state, event_id)
 			end
 		end
 	end
