@@ -19,6 +19,11 @@ function TimeEngine:new(const, adjust_factor, adjust_time)
 	self.timer = LocalTimer()
 end
 
+---@param adjust_factor number
+function TimeEngine:setAdjustFactor(adjust_factor)
+	self.adjust:setFactor(adjust_factor)
+end
+
 ---@param global_time number
 function TimeEngine:setGlobalTime(global_time)
 	local timer = self.timer
