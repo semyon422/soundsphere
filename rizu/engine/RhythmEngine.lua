@@ -5,12 +5,12 @@ local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
 local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
 local ResourceLoader = require("rizu.files.ResourceLoader")
 local ResourceFinder = require("rizu.files.ResourceFinder")
-
-local InputInfo = require("rizu.engine.input.InputInfo")
 local InputEngine = require("rizu.engine.input.InputEngine")
-local InputPauser = require("rizu.engine.input.InputPauser")
 
 local TimeEngine = require("rizu.engine.time.TimeEngine")
+
+local LogicInfo = require("rizu.engine.logic.LogicInfo")
+local LogicEngine = require("rizu.engine.logic.LogicEngine")
 
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
 local VisualEngine = require("rizu.engine.visual.VisualEngine")
@@ -26,9 +26,10 @@ function RhythmEngine:new(fs)
 	self.resource_finder = ResourceFinder(fs)
 	self.resource_loader = ResourceLoader(fs, self.resource_finder)
 
-	self.input_info = InputInfo()
-	self.input_engine = InputEngine(self.input_info)
-	self.input_pauser = InputPauser()
+	self.logic_info = LogicInfo()
+	self.logic_engine = LogicEngine(self.logic_info)
+
+	self.input_engine = InputEngine(self.logic_engine.active_notes)
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
@@ -41,7 +42,7 @@ end
 ---@param chart ncdk2.Chart
 ---@param dir string
 function RhythmEngine:load(chart, dir)
-	self.input_engine:load(chart)
+	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
 
 	self.resource_finder:reset()
@@ -66,31 +67,56 @@ function RhythmEngine:load(chart, dir)
 
 	local source = BassChartAudioSource(self.chart_audio_mixer)
 	self.chart_audio_source = source
-	source:play()
+	self.chart_audio_source:setVolume(self.volume.master)
 end
 
 function RhythmEngine:unload()
 	self.chart_audio_source:release()
+	self.chart_audio_mixer:release()
 end
 
 function RhythmEngine:update()
 	-- self.time_engine:setGlobalTime(0)
 
 	self.time_engine:updateTime()
+	self.visual_info.time = self.time_engine.time
+
 	self.input_engine:update()
+	self.logic_engine:update()
+	self.visual_engine:update()
 	self.chart_audio_source:update()
 end
 
 function RhythmEngine:play()
 	self.time_engine:play()
 	self.chart_audio_source:play()
-	self.input_pauser:play()
+	self.input_engine:resume()
 end
 
 function RhythmEngine:pause()
 	self.time_engine:pause()
 	self.chart_audio_source:pause()
-	self.input_pauser:pause()
+	self.input_engine:pause()
+end
+
+---@param event rizu.VirtualInputEvent
+function RhythmEngine:receive(event)
+	self.input_engine:receive(event)
+end
+
+---@param time number
+function RhythmEngine:setGlobalTime(time)
+	self.time_engine:setGlobalTime(time)
+end
+
+---@param adjust_factor number
+function RhythmEngine:setAdjustFactor(adjust_factor)
+	self.time_engine:setAdjustFactor(adjust_factor)
+end
+
+---@param volume {master: number, music: number, effects: number}
+function RhythmEngine:setVolume(volume)
+	self.volume = volume
 end
 
 return RhythmEngine
