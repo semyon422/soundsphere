@@ -6,6 +6,8 @@ local VisualPoint = require("ncdk2.visual.VisualPoint")
 ---@operator call: rizu.LongVisualNote
 local LongVisualNote = VisualNote + {}
 
+LongVisualNote.type = "long"
+
 function LongVisualNote:initHold()
 	if self.hold_index then
 		return

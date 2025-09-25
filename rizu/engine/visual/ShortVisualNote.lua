@@ -4,6 +4,8 @@ local VisualNote = require("rizu.engine.visual.VisualNote")
 ---@operator call: rizu.ShortVisualNote
 local ShortVisualNote = VisualNote + {}
 
+ShortVisualNote.type = "short"
+
 function ShortVisualNote:update()
 	local info = self.visual_info
 

@@ -1,9 +1,12 @@
 local class = require("class")
 
+---@alias rizu.VisualNoteType "short"|"long"
+
 ---@class rizu.VisualNote
 ---@operator call: rizu.VisualNote
 ---@field cvp ncdk2.VisualPoint
 ---@field visual ncdk2.Visual
+---@field type rizu.VisualNoteType
 local VisualNote = class()
 
 ---@param linked_note ncdk2.LinkedNote
