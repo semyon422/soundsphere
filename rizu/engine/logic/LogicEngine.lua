@@ -1,4 +1,5 @@
 local class = require("class")
+local table_util = require("table_util")
 local LogicNoteFactory = require("rizu.engine.logic.LogicNoteFactory")
 
 ---@class rizu.LogicEngine
@@ -8,6 +9,10 @@ local LogicEngine = class()
 ---@param logic_info rizu.LogicInfo
 function LogicEngine:new(logic_info)
 	self.input_note_factory = LogicNoteFactory(logic_info)
+
+	---@type rizu.LogicNote[]
+	self.active_notes = {}
+
 	self:setNotes({})
 end
 
@@ -18,7 +23,8 @@ function LogicEngine:load(chart)
 	---@type rizu.LogicNote[]
 	local notes = {}
 	for i, linked_note in ipairs(chart.notes:getLinkedNotes()) do
-		notes[i] = input_note_factory:getNote(linked_note)
+		local note = input_note_factory:getNote(linked_note)
+		table.insert(notes, note)
 	end
 	self:setNotes(notes)
 end
@@ -30,8 +36,7 @@ function LogicEngine:setNotes(notes)
 
 	self.note_index = 1
 
-	---@type rizu.LogicNote[]
-	self.active_notes = {}
+	table_util.clear(self.active_notes)
 end
 
 ---@return integer
@@ -63,7 +68,7 @@ function LogicEngine:update()
 
 	for i = #active_notes, 1, -1 do
 		local note = active_notes[i]
-		if note:getPos() == "late" then
+		if not note:isActive() then
 			table.remove(active_notes, i)
 		end
 	end

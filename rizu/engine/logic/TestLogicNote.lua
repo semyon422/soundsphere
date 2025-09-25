@@ -4,6 +4,7 @@ local LogicNote = require("rizu.engine.logic.notes.LogicNote")
 ---@operator call: rizu.TestLogicNote
 local TestLogicNote = LogicNote + {}
 
+TestLogicNote.active = true
 TestLogicNote.current_time = 0
 TestLogicNote.time = 0
 TestLogicNote.early_window = -1
@@ -13,7 +14,12 @@ TestLogicNote.priority = 0
 ---@type any
 TestLogicNote.data = nil
 
----@return "early"|"now"|"late"
+---@return boolean
+function TestLogicNote:isActive()
+	return self.active
+end
+
+---@return rizu.LogicNotePos
 function TestLogicNote:getPos()
 	local t = self.current_time
 	if t < self:getStartTime() then

@@ -2,6 +2,7 @@ local class = require("class")
 local Observable = require("Observable")
 
 ---@alias rizu.LogicNoteState "clear"|"missed"|"passed"
+---@alias rizu.LogicNotePos "early"|"now"|"late"
 
 ---@class rizu.LogicNote
 ---@operator call: rizu.LogicNote
@@ -37,9 +38,15 @@ function LogicNote:getPriority()
 	return -1
 end
 
----@return "early"|"now"|"late"
+---@return rizu.LogicNotePos
 function LogicNote:getPos()
-	error("not implemented")
+	local t = self.logic_info.time
+	if t < self:getStartTime() then
+		return "early"
+	elseif t > self:getEndTime() then
+		return "late"
+	end
+	return "now"
 end
 
 ---@param value any
@@ -58,6 +65,11 @@ end
 
 ---@return number
 function LogicNote:getStartTime()
+	error("not implemented")
+end
+
+---@return number
+function LogicNote:getEndTime()
 	error("not implemented")
 end
 

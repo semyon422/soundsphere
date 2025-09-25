@@ -43,6 +43,13 @@ function test.track_active_notes(t)
 	update_and_eq_active(t, h, -1, 2)
 	update_and_eq_active(t, h, 0, 2)
 	update_and_eq_active(t, h, 1, 2)
+	update_and_eq_active(t, h, 10, 2)
+
+	for _, note in ipairs(h.active_notes) do
+		---@cast note rizu.TestLogicNote
+		note.active = false
+	end
+
 	update_and_eq_active(t, h, 10, 0)
 end
 
