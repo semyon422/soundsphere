@@ -73,7 +73,7 @@ end
 function BassSoundDecoder:secondsToBytes(pos)
 	---@type integer
 	pos = bass.BASS_ChannelSeconds2Bytes(self.resample_channel, pos)
-	bass_assert(pos >= 0)
+	bass_assert(pos ~= -1)
 	return tonumber(pos) ---@diagnostic disable-line: return-type-mismatch
 end
 
