@@ -132,7 +132,7 @@ NoteSkinVsrg.colors = colors
 ---@param column number
 ---@return table
 function NoteSkinVsrg.color(timeState, noteView, column)
-	local logicalState = noteView.graphicalNote:getLogicalState()
+	local logicalState = noteView.graphicalNote:getState()
 	if logicalState == "clear" or logicalState == "skipped" then
 		return colors.clear
 	elseif logicalState == "missed" then
@@ -212,10 +212,11 @@ end
 ---@param column number
 ---@return number
 function NoteSkinVsrg:getPosition(timeState, noteView, column)
-	if self.editor then
-		return self:getTimePosition(timeState.scaledAbsoluteDeltaTime)
-	end
-	return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
+	return self:getTimePosition(timeState.dt)
+	-- if self.editor then
+	-- 	return self:getTimePosition(timeState.scaledAbsoluteDeltaTime)
+	-- end
+	-- return self:getTimePosition(timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime)
 end
 
 ---@param mx number

@@ -24,17 +24,17 @@ local NoteViewFactory = class()
 ---@type {[string]: {[sphere.GraphicalNoteType]: {[1]: table, [2]: sphere.NoteViewType}}}
 local notes = {
 	default = {
-		ShortNote = {ShortNoteView, "ShortNote"},
+		short = {ShortNoteView, "ShortNote"},
 		SoundNote = {ShortNoteView, "SoundNote"},
-		LongNote = {LongNoteView, "LongNote"},
+		long = {LongNoteView, "LongNote"},
 	},
 	animation = {
-		ShortNote = {ShortNoteView, "ShortNoteAnimation"},
-		LongNote = {ShortNoteView, "LongNoteAnimation"},
+		short = {ShortNoteView, "ShortNoteAnimation"},
+		long = {ShortNoteView, "LongNoteAnimation"},
 	},
 	lighting = {
-		ShortNote = {ShortNoteView, "ShortNoteLighting"},
-		LongNote = {ShortNoteView, "LongNoteLighting"},
+		short = {ShortNoteView, "ShortNoteLighting"},
+		long = {ShortNoteView, "LongNoteLighting"},
 	},
 	bga = {
 		ImageNote = {ImageNoteView, "ImageNote"},
@@ -48,11 +48,11 @@ for _, c in pairs(notes) do
 	end
 end
 
----@param graphicalNote sphere.GraphicalNote
+---@param visual_note rizu.VisualNote
 ---@param mode string
 ---@return sphere.NoteView?
-function NoteViewFactory:getNoteView(graphicalNote, mode)
-	return notes[mode][graphicalNote.noteType]
+function NoteViewFactory:getNoteView(visual_note, mode)
+	return notes[mode][visual_note.type]
 end
 
 return NoteViewFactory

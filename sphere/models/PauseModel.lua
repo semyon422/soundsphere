@@ -6,10 +6,10 @@ local flux = require("flux")
 local PauseModel = class()
 
 ---@param configModel sphere.ConfigModel
----@param rhythmModel sphere.RhythmModel
-function PauseModel:new(configModel, rhythmModel)
+---@param rhythm_engine rizu.RhythmEngine
+function PauseModel:new(configModel, rhythm_engine)
 	self.configModel = configModel
-	self.rhythmModel = rhythmModel
+	self.rhythm_engine = rhythm_engine
 end
 
 function PauseModel:load()
@@ -85,13 +85,13 @@ function PauseModel:startProgress(time)
 end
 
 function PauseModel:play()
-	self.rhythmModel:play()
+	self.rhythm_engine:play()
 	self.state = "play"
 	love.mouse.setVisible(false)
 end
 
 function PauseModel:pause()
-	self.rhythmModel:pause()
+	self.rhythm_engine:pause()
 	self.state = "pause"
 	love.mouse.setVisible(true)
 end

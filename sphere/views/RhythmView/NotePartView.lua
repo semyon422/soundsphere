@@ -6,7 +6,7 @@ local NotePartView = class()
 
 ---@return table
 function NotePartView:getTimeState()
-	return self.noteView.graphicalNote.startTimeState
+	return {dt = self.noteView.graphicalNote.start_dt}
 end
 
 ---@param key string

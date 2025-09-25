@@ -4,14 +4,17 @@ local gfx_util = require("gfx_util")
 
 ---@class sphere.RhythmView
 ---@operator call: sphere.RhythmView
+---@field game sphere.GameController
 local RhythmView = class()
 
 RhythmView.mode = "default"
 
 ---@param f function
 function RhythmView:processNotes(f)
-	local graphicEngine = self.game.rhythmModel.graphicEngine
-	graphicEngine:iterNotes(f, self)
+	local visual_engine = self.game.rhythm_engine.visual_engine
+	for _, note in ipairs(visual_engine.visible_notes) do
+		f(self, note)
+	end
 end
 
 ---@param note sphere.GraphicalNote

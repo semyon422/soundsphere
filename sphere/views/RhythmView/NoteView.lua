@@ -4,7 +4,7 @@ local NotePartView = require("sphere.views.RhythmView.NotePartView")
 ---@class sphere.NoteView
 ---@operator call: sphere.NoteView
 ---@field noteSkin sphere.NoteSkin
----@field graphicalNote sphere.GraphicalNote
+---@field graphicalNote rizu.VisualNote
 ---@field column number
 ---@field chords table
 local NoteView = class()

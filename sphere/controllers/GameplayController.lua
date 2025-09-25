@@ -12,6 +12,7 @@ local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local GameplayController = class()
 
 ---@param rhythmModel sphere.RhythmModel
+---@param rhythm_engine rizu.RhythmEngine
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
 ---@param replayModel sphere.ReplayModel
@@ -27,6 +28,7 @@ local GameplayController = class()
 ---@param fs fs.IFilesystem
 function GameplayController:new(
 	rhythmModel,
+	rhythm_engine,
 	noteSkinModel,
 	configModel,
 	replayModel,
@@ -42,6 +44,7 @@ function GameplayController:new(
 	fs
 )
 	self.rhythmModel = rhythmModel
+	self.rhythm_engine = rhythm_engine
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
 	self.replayModel = replayModel
@@ -62,6 +65,7 @@ function GameplayController:load(chartview)
 	self.loaded = true
 
 	local rhythmModel = self.rhythmModel
+	local rhythm_engine = self.rhythm_engine
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
 	local replayModel = self.replayModel
@@ -90,6 +94,10 @@ function GameplayController:load(chartview)
 	if config.gameplay.swapVelocityType then
 		computeContext:swapVelocityType()
 	end
+
+	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
+	rhythm_engine:setVolume(config.audio.volume)
+	rhythm_engine:load(chart, chartview.location_dir)
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
@@ -181,6 +189,8 @@ function GameplayController:unload()
 	rhythmModel:unloadAllEngines()
 	rhythmModel.inputManager:setMode("external")
 	self.replayModel:setMode("record")
+
+	self.rhythm_engine:unload()
 end
 
 ---@param dt number
@@ -188,6 +198,7 @@ function GameplayController:update(dt)
 	self.pauseModel:update()
 	self.replayModel:update()
 	self.rhythmModel:update()
+	self.rhythm_engine:update()
 end
 
 function GameplayController:discordPlay()
@@ -232,6 +243,11 @@ end
 ---@param event table
 function GameplayController:receive(event)
 	self.rhythmModel:receive(event)
+
+	if event.name == "framestarted" then
+		self.rhythm_engine:setGlobalTime(event.time)
+		return
+	end
 end
 
 function GameplayController:retry()
@@ -255,12 +271,12 @@ function GameplayController:retry()
 end
 
 function GameplayController:pause()
-	self.pauseModel:pause()
+	self.rhythm_engine:pause()
 	self:discordPause()
 end
 
 function GameplayController:play()
-	self.pauseModel:play()
+	self.rhythm_engine:play()
 	self:discordPlay()
 end
 

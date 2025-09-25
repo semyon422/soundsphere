@@ -33,10 +33,15 @@ function NoteSkin:load(inputMode) end
 
 local no_columns = {}
 
----@param note sphere.GraphicalNote
+---@param note rizu.VisualNote
 ---@return table
 function NoteSkin:getColumns(note)
-	return self.notes[note.noteType] and self.input_to_columns[note.column] or no_columns
+	local noteType = "ShortNote"
+	if note.type == "long" then
+		noteType = "LongNote"
+	end
+
+	return self.notes[noteType] and self.input_to_columns[note.linked_note:getColumn()] or no_columns
 end
 
 ---@param value any?

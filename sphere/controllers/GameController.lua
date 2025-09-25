@@ -45,12 +45,16 @@ local ReplayBase = require("sea.replays.ReplayBase")
 
 local LoveFilesystem = require("fs.LoveFilesystem")
 
+local RhythmEngine = require("rizu.engine.RhythmEngine")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
 
 function GameController:new()
 	self.fs = LoveFilesystem()
+
+	self.rhythm_engine = RhythmEngine(self.fs)
 
 	self.packageManager = PackageManager()
 
@@ -75,7 +79,7 @@ function GameController:new()
 		self.inputModel,
 		self.resourceModel
 	)
-	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythmModel)
+	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythm_engine)
 	self.replayModel = ReplayModel(self.rhythmModel)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
@@ -144,6 +148,7 @@ function GameController:new()
 	)
 	self.gameplayController = GameplayController(
 		self.rhythmModel,
+		self.rhythm_engine,
 		self.noteSkinModel,
 		self.configModel,
 		self.replayModel,
@@ -221,12 +226,12 @@ function GameController:loadGameplay()
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	self.resourceModel:load(self.computeContext.chart, function()
-		if not self.gameplayController.loaded then
-			return
-		end
-		self.gameplayController:play()
-	end)
+	-- self.resourceModel:load(self.computeContext.chart, function()
+	-- 	if not self.gameplayController.loaded then
+	-- 		return
+	-- 	end
+	-- 	self.gameplayController:play()
+	-- end)
 end
 
 function GameController:unloadGameplay()
