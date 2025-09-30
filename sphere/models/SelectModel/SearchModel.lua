@@ -45,6 +45,10 @@ local number_fields = {
 		keys = {"ln"},
 		field = "long_notes_ratio",
 		transform = function(self, v)
+			if not tonumber(v) then
+				return
+			end
+			v = tonumber(v)
 			return v / 100
 		end
 	},
@@ -56,6 +60,10 @@ local number_fields = {
 		keys = {"accuracy", "acc", "a"},
 		field = "accuracy",
 		transform = function(self, v)
+			if not tonumber(v) then
+				return
+			end
+			v = tonumber(v)
 			return v / 1000
 		end
 	},
