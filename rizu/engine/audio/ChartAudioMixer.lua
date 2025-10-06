@@ -134,6 +134,12 @@ function ChartAudioMixer:getBytesDuration()
 	return self.end_pos - self.start_pos
 end
 
+---@return integer
+function ChartAudioMixer:getSamplesDuration()
+	local mul = self:getChannelCount() * self:getBytesPerSample()
+	return self:getBytesDuration() / mul
+end
+
 ---@param pos integer
 ---@return number
 function ChartAudioMixer:bytesToSeconds(pos)

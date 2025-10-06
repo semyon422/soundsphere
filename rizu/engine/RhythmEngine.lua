@@ -21,6 +21,8 @@ local RhythmEngine = class()
 
 ---@param fs fs.IFilesystem
 function RhythmEngine:new(fs)
+	self.fs = fs
+
 	self.chart_audio = ChartAudio()
 
 	self.resource_finder = ResourceFinder(fs)
@@ -68,6 +70,12 @@ function RhythmEngine:load(chart, dir)
 	local source = BassChartAudioSource(self.chart_audio_mixer)
 	self.chart_audio_source = source
 	self.chart_audio_source:setVolume(self.volume.master)
+
+	-- local Wave = require("audio.Wave")
+	-- local wave = Wave()
+	-- wave:initBuffer(self.chart_audio_mixer:getChannelCount(), self.chart_audio_mixer:getSamplesDuration())
+	-- self.chart_audio_mixer:getData(wave.byte_ptr, self.chart_audio_mixer:getBytesDuration())
+	-- self.fs:write('audio.wav', wave:encode())
 end
 
 function RhythmEngine:unload()
