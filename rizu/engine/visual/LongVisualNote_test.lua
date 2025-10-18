@@ -28,6 +28,7 @@ local function new_ctx()
 		visual_info.time = time
 		time = time - visual_info.input_offset
 		cvp.visualTime = time
+		cvp.monotonicVisualTime = time
 		cvp.point.absoluteTime = time
 	end
 

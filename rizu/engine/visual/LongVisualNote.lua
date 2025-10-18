@@ -16,7 +16,6 @@ function LongVisualNote:initHold()
 	local vp = self.linked_note.startNote.visualPoint
 	local hold_p = Point(vp.point.absoluteTime)
 	local hold_vp = VisualPoint(hold_p)
-	hold_vp.visualTime = vp.visualTime
 
 	self.hold_p = hold_p
 	self.hold_vp = hold_vp
@@ -72,7 +71,7 @@ function LongVisualNote:getHoldVisualTime()
 	local interpolator = self.visual.interpolator
 	local points = self.visual.points
 
-	hold_vp.visualTime = cvp.visualTime - offset
+	hold_vp.monotonicVisualTime = cvp.monotonicVisualTime - offset
 	self.hold_index = interpolator:interpolate(points, self.hold_index, hold_vp, "visual")
 
 	hold_p.absoluteTime = self:clampAbsoluteTime(hold_p.absoluteTime)
