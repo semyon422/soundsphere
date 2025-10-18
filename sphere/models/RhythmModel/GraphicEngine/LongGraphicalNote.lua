@@ -108,7 +108,7 @@ function LongGraphicalNote:getFakeVisualStartTime()
 		return fakeStartVisualPoint.point.absoluteTime
 	end
 
-	fakeStartVisualPoint.visualTime = currentVisualPoint.visualTime - offsetSum / globalSpeed
+	fakeStartVisualPoint.monotonicVisualTime = currentVisualPoint.monotonicVisualTime - offsetSum / globalSpeed
 	self.fakeIndex = interpolator:interpolate(visualPoints, self.fakeIndex, fakeStartVisualPoint, "visual")
 
 	fakeStartPoint.absoluteTime = self:clampAbsoluteTime(fakeStartPoint.absoluteTime)
