@@ -15,22 +15,24 @@ function OsuSpriteLocator:addSpriteRepo(sprite_repo)
 	table.insert(self.repos, sprite_repo)
 end
 
----@param key string
+---@param keys string[]
 ---@return string?
 ---@return sphere.OsuSpriteGroup?
-function OsuSpriteLocator:getPrefixAndGroup(key)
+function OsuSpriteLocator:getPrefixAndGroup(keys)
 	for _, repo in ipairs(self.repos) do
-		local group = repo:getGroup(key)
-		if group then
-			return repo.prefix, group
+		for _, key in ipairs(keys) do
+			local group = repo:getGroup(key)
+			if group then
+				return repo.prefix, group
+			end
 		end
 	end
 end
 
----@param key string
+---@param keys string[]
 ---@return {[string]: string}
-function OsuSpriteLocator:getCharPaths(key)
-	local prefix, group = self:getPrefixAndGroup(key)
+function OsuSpriteLocator:getCharPaths(keys)
+	local prefix, group = self:getPrefixAndGroup(keys)
 	if not prefix or not group then
 		return {}
 	end
@@ -45,11 +47,11 @@ function OsuSpriteLocator:getCharPaths(key)
 	return char_paths
 end
 
----@param key string
+---@param keys string[]
 ---@param prefer_frame boolean?
 ---@return string?
-function OsuSpriteLocator:getSinglePath(key, prefer_frame)
-	local prefix, group = self:getPrefixAndGroup(key)
+function OsuSpriteLocator:getSinglePath(keys, prefer_frame)
+	local prefix, group = self:getPrefixAndGroup(keys)
 	if not prefix or not group then
 		return
 	end
@@ -62,11 +64,11 @@ function OsuSpriteLocator:getSinglePath(key, prefer_frame)
 	return path_util.join(prefix, path)
 end
 
----@param key string
+---@param keys string[]
 ---@return string?
 ---@return {[1]: integer, [2]: integer}?
-function OsuSpriteLocator:getAnimation(key)
-	local prefix, group = self:getPrefixAndGroup(key)
+function OsuSpriteLocator:getAnimation(keys)
+	local prefix, group = self:getPrefixAndGroup(keys)
 	if not prefix or not group then
 		return
 	end

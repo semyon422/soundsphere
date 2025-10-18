@@ -172,11 +172,11 @@ function OsuNoteSkin:load()
 
 	local defaultNoteImages = self:getDefaultNoteImages()
 	for _, data in ipairs(defaultNoteImages) do
-		local key, value = unpack(data)
+		local key, value, fallback_key = unpack(data)
 		if mania[key] then
 			value = mania[key]
 		end
-		local image = self:findImage(value)
+		local image = self:findImage({value, mania[fallback_key]})
 		if image then
 			table.insert(textures, {[key] = image})
 			images[key] = {key}
@@ -589,7 +589,7 @@ end
 ---@return number?
 function OsuNoteSkin:findCharFiles(prefix)
 	prefix = prefix:gsub("\\", "/"):lower()
-	return self.sprite_locator:getCharPaths(prefix)
+	return self.sprite_locator:getCharPaths({prefix})
 end
 
 function OsuNoteSkin:addCombo()
@@ -662,8 +662,8 @@ function OsuNoteSkin:getDefaultNoteImages()
 		local ni = "NoteImage" .. (i - 1)
 		local mn = "mania-note" .. getNoteType(i, keysCount, mania.SpecialStyle)
 		table.insert(images, {ni .. "L", mn .. "L"})
-		table.insert(images, {ni .. "T", mn .. "T"})
 		table.insert(images, {ni .. "H", mn .. "H"})
+		table.insert(images, {ni .. "T", mn .. "T", ni .. "H"})
 		table.insert(images, {ni, mn})
 	end
 	return images
@@ -686,7 +686,7 @@ function OsuNoteSkin:getDefaultKeyImages()
 	return pressed, released
 end
 
----@param value string?
+---@param value string|string[]?
 ---@param preferFrame boolean?
 ---@return string|table?
 function OsuNoteSkin:findImage(value, preferFrame)
@@ -694,7 +694,13 @@ function OsuNoteSkin:findImage(value, preferFrame)
 		return
 	end
 
-	value = self:removeExtLower(value:gsub("\\", "/"))
+	if type(value) ~= "table" then
+		value = {value}
+	end
+	for i, v in ipairs(value) do
+		value[i] = self:removeExtLower(v:gsub("\\", "/"))
+	end
+
 	return self.sprite_locator:getSinglePath(value, preferFrame)
 end
 
@@ -707,7 +713,7 @@ function OsuNoteSkin:findAnimation(value)
 	end
 
 	value = self:removeExtLower(value:gsub("\\", "/"))
-	return self.sprite_locator:getAnimation(value)
+	return self.sprite_locator:getAnimation({value})
 end
 
 ---@param xl number

@@ -785,8 +785,8 @@ local function BottomScreenMenu(self)
 		end
 	end
 	if imgui.TextOnlyButton("to osr", "to osr", 72 * 1.5, h) then
-		local chart = self.game.selectModel:loadChartAbsolute()
-		self.game.replayModel:saveOsr(chart.chartmeta)
+		local chart, chartmeta = self.game.selectModel:loadChartAbsolute()
+		self.game.replayModel:saveOsr(chartmeta)
 	end
 	just.row()
 end

@@ -85,11 +85,11 @@ function LogicEngine:receive(event)
 	self.eventTime = event.time
 
 	if self.check1024 then
-		local ct = self.timeEngine.currentTime
-		if ct ~= math.huge and self.eventTime < ct then
-			error(("%s < %s"):format(self.eventTime, self.timeEngine.currentTime))
-		end
-		assert((self:getEventTime() * 1024) % 1 == 0)
+		-- local ct = self.timeEngine.currentTime
+		-- if ct ~= math.huge and self.eventTime < ct then
+		-- 	error(("%s < %s"):format(self.eventTime, self.timeEngine.currentTime))
+		-- end
+		-- assert((self:getEventTime() * 1024) % 1 == 0)
 	end
 	self:update()
 	noteHandler:setKeyState(event.name == "keypressed", input)

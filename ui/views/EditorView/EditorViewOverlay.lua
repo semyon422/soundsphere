@@ -334,6 +334,9 @@ function tabs.bms(self)
 	if imgui.button("create bms template 10K", "create bms template 10K") then
 		self.game.editorController:exportBmsTemplate(10)
 	end
+	if imgui.button("export ubmsc", "export ubmsc") then
+		self.game.editorController:exportUBmsC()
+	end
 end
 
 return function(self)

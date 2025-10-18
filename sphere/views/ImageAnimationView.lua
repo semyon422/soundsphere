@@ -33,7 +33,12 @@ function ImageAnimationView:loadImages()
 		images[0] = love.graphics.newImage(fileFinder:findFile(self.image))
 	else
 		for i = range[1], range[2], range[1] < range[2] and 1 or -1 do
-			images[i] = love.graphics.newImage(fileFinder:findFile(self.image:format(i)))
+			local file = fileFinder:findFile(self.image:format(i))
+			if file then
+				images[i] = love.graphics.newImage(file)
+			else
+				print("missing", self.image:format(i))
+			end
 		end
 	end
 	self.images = images
@@ -74,6 +79,9 @@ function ImageAnimationView:draw()
 		w, h = self.quad[3], self.quad[4]
 	else
 		local image = self.images[animation.frame]
+		if not image then
+			return
+		end
 		w, h = image:getWidth(), image:getHeight()
 	end
 
