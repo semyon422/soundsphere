@@ -148,19 +148,17 @@ function ReplayModel:saveOsr(chartmeta)
 
 	osr.beatmap_hash = assert(replay.hash)
 
-	local inputMap = replay.inputMode:getInputMap()
-
 	local mania_events = {}
-	for i, e in ipairs(replay.events) do
+	for i, e in ipairs(ReplayEvents.decode(replay.events)) do
 		mania_events[i] = {
-			math.floor(e.time * 1000),
-			inputMap[e[1]],
-			not not e.name:find("pressed")
+			math.floor(e[1] * 1000),
+			e[2],
+			e[3]
 		}
 	end
 	osr:encodeManiaEvents(mania_events)
-	osr:setTimestamp(replay.time)
-	osr.player_name = replay.player
+	osr:setTimestamp(replay.created_at)
+	-- osr.player_name = replay.player
 
 	local data = osr:encode()
 
