@@ -259,6 +259,7 @@ end
 
 local ubmsc_columns = {
 	["10key"] = {6, 7, 8, 9, 10, 14, 15, 16, 17, 18},
+	["7key1scratch"] = {6, 7, 8, 9, 10, 11, 12, 5},
 }
 
 function EditorController:exportUBmsC()
