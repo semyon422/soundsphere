@@ -46,6 +46,40 @@ end
 
 local test = {}
 
+--- Do not press
+---@param t testing.T
+function test.do_not_press(t)
+	local ctx = new_ctx()
+
+	for _, visual_offset in ipairs(ctx.offsets) do
+		ctx.visual_info.visual_offset = visual_offset
+
+		for _, input_offset in ipairs(ctx.offsets) do
+			ctx.visual_info.input_offset = input_offset
+
+			ctx.set_time(0 + visual_offset)
+			ctx.note:update()
+			t:eq(ctx.note.start_dt, -1)
+			t:eq(ctx.note.end_dt, -2)
+
+			ctx.set_time(0.75 + visual_offset)
+			ctx.note:update()
+			t:eq(ctx.note.start_dt, -0.25)
+			t:eq(ctx.note.end_dt, -1.25)
+
+			ctx.set_time(1.5 + visual_offset)
+			ctx.note:update()
+			t:eq(ctx.note.start_dt, 0.5)
+			t:eq(ctx.note.end_dt, -0.5)
+
+			ctx.set_time(2.25 + visual_offset)
+			ctx.note:update()
+			t:eq(ctx.note.start_dt, 1.25)
+			t:eq(ctx.note.end_dt, 0.25)
+		end
+	end
+end
+
 --- Early press, late release, offsets
 ---@param t testing.T
 function test.hold(t)

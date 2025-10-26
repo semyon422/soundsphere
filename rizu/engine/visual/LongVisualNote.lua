@@ -17,6 +17,8 @@ function LongVisualNote:initHold()
 	local hold_p = Point(vp.point.absoluteTime)
 	local hold_vp = VisualPoint(hold_p)
 
+	hold_vp.visualTime = vp.visualTime
+
 	self.hold_p = hold_p
 	self.hold_vp = hold_vp
 	self.hold_index = 1

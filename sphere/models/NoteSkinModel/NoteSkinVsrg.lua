@@ -132,25 +132,21 @@ NoteSkinVsrg.colors = colors
 ---@param column number
 ---@return table
 function NoteSkinVsrg.color(timeState, noteView, column)
-	local logicalState = noteView.graphicalNote:getState()
-	if logicalState == "clear" or logicalState == "skipped" then
+	local visual_note = noteView.graphicalNote
+
+	local state = visual_note:getState()
+	if state == "clear" or state == "skipped" then
 		return colors.clear
-	elseif logicalState == "missed" then
+	elseif state == "missed" then
 		return colors.missed
-	elseif logicalState == "passed" then
+	elseif state == "passed" then
 		return colors.passed
 	end
 
-	local startTimeState = timeState.startTimeState or timeState
-	local endTimeState = timeState.endTimeState or timeState
-	local sdt = timeState.scaledFakeVisualDeltaTime or timeState.scaledVisualDeltaTime
-
-	if startTimeState.fakeCurrentVisualTime >= endTimeState.fakeCurrentVisualTime then
+	if visual_note.start_dt <= visual_note.end_dt then
 		return colors.transparent
-	elseif logicalState == "clear" then
-		return colors.clear
-	elseif colors[logicalState] then
-		return colors[logicalState]
+	elseif colors[state] then
+		return colors[state]
 	end
 
 	return colors.clear
