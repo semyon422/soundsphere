@@ -26,15 +26,14 @@ end
 
 ---@param global_time number
 function TimeEngine:setGlobalTime(global_time)
-	local timer = self.timer
-	timer:setGlobalTime(global_time)
+	self.timer:setGlobalTime(global_time)
 	self:adjustTime()
 	self:updateTime()
 end
 
 ---@param time number
 function TimeEngine:setTime(time)
-	self.timer:setTime(time)
+	self.timer:setTime(time, true)
 	self:updateTime()
 end
 
@@ -44,12 +43,12 @@ function TimeEngine:setRate(rate)
 end
 
 function TimeEngine:adjustTime()
-	local adjust_time = self.adjust_time()
+	local adjust_time = self.adjust_time and self.adjust_time()
 	if not adjust_time then
 		return
 	end
 
-	local adjusted_time = self.adjust:adjust(self.timer:getTime(), adjust_time)
+	local adjusted_time = self.adjust:adjust(self.timer:getTime(true), adjust_time)
 	if not adjusted_time then
 		return
 	end

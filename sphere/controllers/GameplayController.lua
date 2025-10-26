@@ -281,6 +281,8 @@ function GameplayController:retry()
 	local timings = assert(replayBase.timings or self.computeContext.chartmeta.timings)
 	self.rhythmModel.scoreEngine:createByTimings(timings, replayBase.subtimings, true)
 
+	self.rhythm_engine:retry()
+
 	self:play()
 end
 

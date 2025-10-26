@@ -9,6 +9,7 @@ LocalTimer.offset = 0
 LocalTimer.rate = 1
 LocalTimer.global_offset = 0
 LocalTimer.global_time = 0
+LocalTimer.mono_offset = -math.huge
 
 ---@return number
 function LocalTimer:getGlobalTime()
@@ -28,10 +29,15 @@ function LocalTimer:getDeltaGlobalTime()
 	return self:getGlobalTime() - self.global_offset
 end
 
+---@param no_mono boolean?
 ---@return number
-function LocalTimer:getTime()
+function LocalTimer:getTime(no_mono)
 	local dt = self:getDeltaGlobalTime()
-	return dt * self.rate + self.offset
+	local time = dt * self.rate + self.offset
+	if no_mono then
+		return time
+	end
+	return math.max(time, self.mono_offset)
 end
 
 ---@param global_time number
@@ -41,9 +47,12 @@ function LocalTimer:transform(global_time)
 end
 
 ---@param time number?
-function LocalTimer:setTime(time)
-	self.offset = time or self:getTime()
+---@param reset boolean?
+function LocalTimer:setTime(time, reset)
+	local self_time = self:getTime()
+	self.offset = time or self_time
 	self.global_offset = self:getGlobalTime()
+	self.mono_offset = not reset and math.max(self.mono_offset, self_time) or -math.huge
 end
 
 ---@param rate number

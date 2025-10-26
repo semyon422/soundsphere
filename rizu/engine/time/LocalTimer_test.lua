@@ -107,4 +107,29 @@ function test.play_pause(t)
 	t:eq(timer:transform(2), 1)
 end
 
+---@param t testing.T
+function test.monotonic(t)
+	local timer = LocalTimer()
+
+	timer:setGlobalTime(0)
+
+	timer:play()
+	t:eq(timer:getTime(), 0)
+
+	timer:setGlobalTime(1)
+	t:eq(timer:getTime(), 1)
+
+	timer:setTime(0.5)
+	t:eq(timer:getTime(), 1)
+
+	timer:setGlobalTime(1.5)
+	t:eq(timer:getTime(), 1)
+
+	timer:setGlobalTime(1.6)
+	t:eq(timer:getTime(), 1.1)
+
+	timer:setTime(0.5, true)
+	t:eq(timer:getTime(), 0.5)
+end
+
 return test

@@ -44,6 +44,8 @@ end
 ---@param chart ncdk2.Chart
 ---@param dir string
 function RhythmEngine:load(chart, dir)
+	self.chart = chart
+
 	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
 
@@ -85,9 +87,13 @@ function RhythmEngine:unload()
 	self.chart_audio_mixer:release()
 end
 
-function RhythmEngine:update()
-	-- self.time_engine:setGlobalTime(0)
+function RhythmEngine:retry()
+	self:setTime(0)
+	self.logic_engine:load(self.chart)
+	self.visual_engine:load(self.chart)
+end
 
+function RhythmEngine:update()
 	self.time_engine:updateTime()
 
 	self.logic_info.time = self.time_engine.time
@@ -153,6 +159,13 @@ end
 ---@param volume {master: number, music: number, effects: number}
 function RhythmEngine:setVolume(volume)
 	self.volume = volume
+end
+
+---@param time number
+function RhythmEngine:setTime(time)
+	self.chart_audio_source:setPosition(time)
+	self.time_engine:setTime(time)
+	self:update()
 end
 
 return RhythmEngine
