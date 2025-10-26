@@ -289,7 +289,7 @@ function ComputeContext:applyAutoKeysound()
 			end
 		end
 	end
-	chart.notes:sort()
+	chart.notes:compute()
 end
 
 return ComputeContext
