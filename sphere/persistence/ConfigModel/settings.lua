@@ -165,6 +165,7 @@ local settings = {
 		},
 		selectRandom = "f2",
 		skipIntro = "space",
+		quickQuitMod = "lshift",
 		timeRate = {
 			decrease = "f5",
 			increase = "f6"

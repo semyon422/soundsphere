@@ -133,6 +133,7 @@ function drawSection:gameplay()
 	i.pause = imgui.hotkey("pause", i.pause, "pause")
 	i.skipIntro = imgui.hotkey("skipIntro", i.skipIntro, "skip intro")
 	i.quickRestart = imgui.hotkey("quickRestart", i.quickRestart, "quick restart")
+	i.quickQuitMod = imgui.hotkey("quickQuitMod", i.quickQuitMod, "quick quit modifier")
 
 	imgui.separator()
 	imgui.text("Analog scratch (restart required)")
