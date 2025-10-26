@@ -7,11 +7,11 @@ local VisualEnhancer = require("rizu.engine.time.VisualEnhancer")
 ---@operator call: rizu.TimeEngine
 local TimeEngine = class()
 
----@param const boolean
+TimeEngine.const = false
+
 ---@param adjust_factor number
 ---@param adjust_time fun(): number?
-function TimeEngine:new(const, adjust_factor, adjust_time)
-	self.const = const
+function TimeEngine:new(adjust_factor, adjust_time)
 	self.adjust_time = adjust_time
 
 	self.adjust = TimeAdjust(adjust_factor)

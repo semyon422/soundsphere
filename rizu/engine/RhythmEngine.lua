@@ -36,7 +36,7 @@ function RhythmEngine:new(fs)
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
 
-	self.time_engine = TimeEngine(false, 0.5, function()
+	self.time_engine = TimeEngine(0.5, function()
 		return self.chart_audio_source:getPosition()
 	end)
 end
@@ -76,6 +76,8 @@ function RhythmEngine:load(chart, dir)
 	-- wave:initBuffer(self.chart_audio_mixer:getChannelCount(), self.chart_audio_mixer:getSamplesDuration())
 	-- self.chart_audio_mixer:getData(wave.byte_ptr, self.chart_audio_mixer:getBytesDuration())
 	-- self.fs:write('audio.wav', wave:encode())
+
+	self.visual_info.logic_notes = self.logic_engine.linked_to_logic
 end
 
 function RhythmEngine:unload()
@@ -87,6 +89,8 @@ function RhythmEngine:update()
 	-- self.time_engine:setGlobalTime(0)
 
 	self.time_engine:updateTime()
+
+	self.logic_info.time = self.time_engine.time
 	self.visual_info.time = self.time_engine.time
 
 	self.input_engine:update()
@@ -110,6 +114,20 @@ end
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
 	self.input_engine:receive(event)
+end
+
+---@param replay_base sea.ReplayBase
+function RhythmEngine:setReplayBase(replay_base)
+	local logic_info = self.logic_info
+
+	logic_info.timing_values = replay_base.timing_values
+
+	self.input_engine.nearest = replay_base.nearest
+
+	self.time_engine:setRate(replay_base.rate)
+	self.time_engine.const = replay_base.const
+
+	self.visual_info.const = replay_base.const
 end
 
 ---@param time number

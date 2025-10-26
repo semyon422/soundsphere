@@ -9,10 +9,10 @@ local class = require("class")
 ---@field type rizu.VisualNoteType
 local VisualNote = class()
 
----@param linked_note ncdk2.LinkedNote
+---@param note ncdk2.LinkedNote
 ---@param visual_info rizu.VisualInfo
-function VisualNote:new(linked_note, visual_info)
-	self.linked_note = linked_note
+function VisualNote:new(note, visual_info)
+	self.linked_note = note
 	self.visual_info = visual_info
 end
 

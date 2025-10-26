@@ -13,7 +13,7 @@ LogicNote.is_bottom = false
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
 function LogicNote:new(note, logic_info)
-	self.note = note
+	self.linked_note = note
 	self.logic_info = logic_info
 
 	self.observable = Observable()
@@ -60,7 +60,7 @@ end
 
 ---@return number
 function LogicNote:getDeltaTime()
-	return self.logic_info:sub(self.note:getStartTime())
+	return self.logic_info:sub(self.linked_note:getStartTime())
 end
 
 ---@return number

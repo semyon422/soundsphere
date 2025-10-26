@@ -14,6 +14,10 @@ TestLogicNote.priority = 0
 ---@type any
 TestLogicNote.data = nil
 
+function TestLogicNote:new()
+	self.linked_note = {}
+end
+
 ---@return boolean
 function TestLogicNote:isActive()
 	return self.active

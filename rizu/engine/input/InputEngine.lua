@@ -28,7 +28,7 @@ end
 ---@param pos any
 ---@return boolean
 function InputEngine:match(note, pos)
-	return note.note:getColumn() == pos
+	return note.linked_note:getColumn() == pos
 end
 
 ---@param event rizu.VirtualInputEvent

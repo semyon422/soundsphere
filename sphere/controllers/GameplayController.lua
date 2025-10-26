@@ -6,6 +6,8 @@ local Timings = require("sea.chart.Timings")
 local Healths = require("sea.chart.Healths")
 local Subtimings = require("sea.chart.Subtimings")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local InputBinder = require("rizu.input.InputBinder")
+local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
 
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
@@ -95,6 +97,9 @@ function GameplayController:load(chartview)
 		computeContext:swapVelocityType()
 	end
 
+	local input_binder = InputBinder(configModel.configs.input, chartmeta.inputmode)
+	self.input_binder = input_binder
+
 	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
 	rhythm_engine:setVolume(config.audio.volume)
 	rhythm_engine:load(chart, chartview.location_dir)
@@ -123,6 +128,8 @@ function GameplayController:load(chartview)
 
 	rhythmModel:setWindUp(state.windUp)
 	rhythmModel:setReplayBase(replayBase)
+
+	rhythm_engine:setReplayBase(replayBase)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 
@@ -242,7 +249,13 @@ end
 
 ---@param event table
 function GameplayController:receive(event)
-	self.rhythmModel:receive(event)
+	local physic_event = KeyPhysicInputEvent.fromInputChangedEvent(event)
+	if physic_event then
+		local virtual_event = self.input_binder:transform(physic_event)
+		if virtual_event then
+			self.rhythm_engine:receive(virtual_event)
+		end
+	end
 
 	if event.name == "framestarted" then
 		self.rhythm_engine:setGlobalTime(event.time)

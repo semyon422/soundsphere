@@ -37,6 +37,13 @@ function LogicEngine:setNotes(notes)
 	self.note_index = 1
 
 	table_util.clear(self.active_notes)
+
+	---@type {[ncdk2.LinkedNote]: rizu.LogicNote?}
+	local linked_to_logic = {}
+	for _, logic_note in ipairs(notes) do
+		linked_to_logic[logic_note.linked_note] = logic_note
+	end
+	self.linked_to_logic = linked_to_logic
 end
 
 ---@return integer

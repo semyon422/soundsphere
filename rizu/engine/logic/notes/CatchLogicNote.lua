@@ -40,7 +40,7 @@ end
 
 ---@return number
 function CatchLogicNote:getStartTime()
-	return self.note:getStartTime()
+	return self.linked_note:getStartTime()
 end
 
 ---@param state rizu.TapLogicNoteState
