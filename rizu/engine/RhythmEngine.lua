@@ -118,9 +118,8 @@ end
 
 ---@param replay_base sea.ReplayBase
 function RhythmEngine:setReplayBase(replay_base)
-	local logic_info = self.logic_info
-
-	logic_info.timing_values = replay_base.timing_values
+	self.logic_info.timing_values = replay_base.timing_values
+	self.logic_info.rate = replay_base.rate
 
 	self.input_engine.nearest = replay_base.nearest
 
@@ -128,6 +127,8 @@ function RhythmEngine:setReplayBase(replay_base)
 	self.time_engine.const = replay_base.const
 
 	self.visual_info.const = replay_base.const
+
+	self.chart_audio_source:setRate(replay_base.rate)
 end
 
 ---@param time number
@@ -138,6 +139,15 @@ end
 ---@param adjust_factor number
 function RhythmEngine:setAdjustFactor(adjust_factor)
 	self.time_engine:setAdjustFactor(adjust_factor)
+end
+
+---@param visual_rate number
+---@param scale_visual_rate boolean?
+function RhythmEngine:setVisualRate(visual_rate, scale_visual_rate)
+	if not scale_visual_rate then
+		visual_rate = visual_rate / self.logic_info.rate
+	end
+	self.visual_info.rate = visual_rate
 end
 
 ---@param volume {master: number, music: number, effects: number}

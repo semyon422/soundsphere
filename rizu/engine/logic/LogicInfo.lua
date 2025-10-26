@@ -17,16 +17,6 @@ function LogicInfo:new()
 end
 
 ---@param time number
-function LogicInfo:setTime(time)
-	self.time = time
-end
-
----@param rate number
-function LogicInfo:setRate(rate)
-	self.rate = rate
-end
-
----@param time number
 ---@return number
 function LogicInfo:sub(time)
 	return (self.time - time) / self.rate

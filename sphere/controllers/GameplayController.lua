@@ -130,6 +130,7 @@ function GameplayController:load(chartview)
 	rhythmModel:setReplayBase(replayBase)
 
 	rhythm_engine:setReplayBase(replayBase)
+	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
 
 	rhythmModel.inputManager.observable:add(replayModel)
 

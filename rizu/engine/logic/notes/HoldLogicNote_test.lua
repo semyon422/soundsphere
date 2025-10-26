@@ -49,7 +49,7 @@ local test = {}
 function test.too_early(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(-3)
+	ctx.logic_info.time = -3
 	ctx.input_note:update()
 	ctx.input_note:input(true)
 
@@ -65,7 +65,7 @@ end
 function test.too_late(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(3)
+	ctx.logic_info.time = 3
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -75,7 +75,7 @@ function test.too_late(t)
 	}})
 	ctx.clear_events()
 
-	ctx.logic_info:setTime(13)
+	ctx.logic_info.time = 13
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -89,7 +89,7 @@ end
 function test.perfect_hold(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(0)
+	ctx.logic_info.time = 0
 	ctx.input_note:update()
 	ctx.input_note:input(true)
 
@@ -100,7 +100,7 @@ function test.perfect_hold(t)
 	}})
 	ctx.clear_events()
 
-	ctx.logic_info:setTime(10)
+	ctx.logic_info.time = 10
 	ctx.input_note:update()
 	ctx.input_note:input(false)
 
@@ -115,7 +115,7 @@ end
 function test.early_release(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(0.5)
+	ctx.logic_info.time = 0.5
 	ctx.input_note:update()
 	ctx.input_note:input(true)
 
@@ -126,7 +126,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.logic_info:setTime(5)
+	ctx.logic_info.time = 5
 	ctx.input_note:update()
 	ctx.input_note:input(false)
 
@@ -160,7 +160,7 @@ end
 function test.late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(1.5)
+	ctx.logic_info.time = 1.5
 	ctx.input_note:update()
 	ctx.input_note:input(true)
 
@@ -171,7 +171,7 @@ function test.late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.logic_info:setTime(10)
+	ctx.logic_info.time = 10
 	ctx.input_note:update()
 	ctx.input_note:input(false)
 
@@ -186,7 +186,7 @@ end
 function test.too_late_press(t)
 	local ctx = new_test_ctx()
 
-	ctx.logic_info:setTime(5)
+	ctx.logic_info.time = 5
 	ctx.input_note:update()
 
 	t:tdeq(ctx.events, {{
@@ -205,7 +205,7 @@ function test.too_late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.logic_info:setTime(10)
+	ctx.logic_info.time = 10
 	ctx.input_note:update()
 	ctx.input_note:input(false)
 
