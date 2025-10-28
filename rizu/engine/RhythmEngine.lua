@@ -168,4 +168,15 @@ function RhythmEngine:setTime(time)
 	self:update()
 end
 
+---@param offset number
+function RhythmEngine:setInputOffset(offset)
+	self.logic_info.input_offset = offset
+	self.visual_info.input_offset = offset
+end
+
+---@param offset number
+function RhythmEngine:setVisualOffset(offset)
+	self.visual_info.visual_offset = offset
+end
+
 return RhythmEngine

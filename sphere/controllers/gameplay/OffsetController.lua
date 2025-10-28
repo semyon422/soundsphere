@@ -9,19 +9,19 @@ local OffsetController = class()
 ---@param cacheModel sphere.CacheModel
 ---@param computeContext sea.ComputeContext
 ---@param offsetModel sphere.OffsetModel
----@param rhythmModel sphere.RhythmModel
+---@param rhythm_engine rizu.RhythmEngine
 ---@param notificationModel sphere.NotificationModel
 function OffsetController:new(
 	cacheModel,
 	computeContext,
 	offsetModel,
-	rhythmModel,
+	rhythm_engine,
 	notificationModel
 )
 	self.cacheModel = cacheModel
 	self.computeContext = computeContext
 	self.offsetModel = offsetModel
-	self.rhythmModel = rhythmModel
+	self.rhythm_engine = rhythm_engine
 	self.notificationModel = notificationModel
 end
 
@@ -29,8 +29,8 @@ function OffsetController:updateOffsets()
 	local chartmeta = assert(self.computeContext.chartmeta)
 	local input_offset, visual_offset = self.offsetModel:getInputVisual(chartmeta.hash, chartmeta.index)
 
-	self.rhythmModel:setInputOffset(input_offset)
-	self.rhythmModel:setVisualOffset(visual_offset)
+	self.rhythm_engine:setInputOffset(input_offset)
+	self.rhythm_engine:setVisualOffset(visual_offset)
 end
 
 ---@param delta number

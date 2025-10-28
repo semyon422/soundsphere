@@ -194,7 +194,7 @@ function GameController:new()
 		self.cacheModel,
 		self.computeContext,
 		self.offsetModel,
-		self.rhythmModel,
+		self.rhythm_engine,
 		self.notificationModel
 	)
 end
