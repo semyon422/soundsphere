@@ -121,7 +121,7 @@ local colors = {
 	startMissed = {0.5, 0.5, 0.5, 1},
 	startMissedPressed = {0.75, 0.75, 0.75, 1},
 	startPassedPressed = {1, 1, 1, 1},
-	endPassed = {1, 1, 1, 0},
+	endPassed = {1, 1, 1, 1},
 	endMissed = {0.5, 0.5, 0.5, 1},
 	endMissedPassed = {0.5, 0.5, 0.5, 1}
 }
