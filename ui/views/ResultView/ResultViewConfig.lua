@@ -87,7 +87,7 @@ local function ScoreSources(self)
 
 	---@type sphere.GameController
 	local game = self.game
-	local scoreEngine = game.rhythmModel.scoreEngine
+	local scoreEngine = game.rhythm_engine.score_engine
 	local replayModel = game.replayModel
 
 	local show = showLoadedScore(self)
@@ -228,7 +228,7 @@ local _HpGraph = PointGraphView({
 	backgroundRadius = 4,
 	point = function(self, point)
 		local value = 0
-		local healthsSource = self.game.rhythmModel.scoreEngine.healthsSource
+		local healthsSource = self.game.rhythm_engine.score_engine.healthsSource
 		local slice = point[healthsSource:getKey()]
 		value = slice.healths / slice.max_healths
 
@@ -316,7 +316,7 @@ end
 ---@param self {game: sphere.GameController}
 local function Judgements(self)
 	local show = showLoadedScore(self)
-	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEngine = self.game.rhythm_engine.score_engine
 	local scoreItem = self.game.selectModel.scoreItem
 	local judgesSource = scoreEngine.judgesSource
 
@@ -429,7 +429,7 @@ local function JudgementsAccuracy(self)
 		return
 	end
 
-	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEngine = self.game.rhythm_engine.score_engine
 
 	local w, h = Layout:move("column1row1")
 	love.graphics.translate(36, 0)
@@ -444,12 +444,14 @@ local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
-	local rhythmModel = self.game.rhythmModel
-	local normalscore = rhythmModel.scoreEngine.scores.normalscore
+	---@type rizu.RhythmEngine
+	local rhythm_engine = self.game.rhythm_engine
+
+	local normalscore = rhythm_engine.score_engine.scores.normalscore
 
 	local chartview = self.game.selectModel.chartview
 	local scoreItem = self.game.selectModel.scoreItem
-	local scoreEngine = rhythmModel.scoreEngine
+	local scoreEngine = rhythm_engine.score_engine
 	local replay = self.game.replayModel.replay
 
 	if not scoreItem then
@@ -481,8 +483,8 @@ local function NotechartInfo(self)
 
 	local bpm = baseBpm * scoreItem.rate
 	local length = baseLength / scoreItem.rate
-	local difficulty = show and rhythmModel.chartdiff.enps_diff or scoreItem.difficulty
-	local inputMode = show and tostring(rhythmModel.chart.inputMode) or scoreItem.inputmode
+	local difficulty = show and rhythm_engine.chartdiff.enps_diff or scoreItem.difficulty
+	local inputMode = show and tostring(rhythm_engine.chart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
@@ -568,7 +570,7 @@ local function NotechartInfo(self)
 
 	if chartplay.id == scoreItem.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * rhythmModel.chartdiff.enps_diff
+		rating = s * rhythm_engine.chartdiff.enps_diff
 	end
 
 	local bestScore = ("%d"):format(topScoreItem.score)

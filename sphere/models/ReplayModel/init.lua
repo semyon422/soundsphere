@@ -16,9 +16,9 @@ local ReplayModel = class()
 ReplayModel.path = "userdata/replays"
 ReplayModel.mode = "record"
 
----@param rhythmModel sphere.RhythmModel
-function ReplayModel:new(rhythmModel)
-	self.rhythmModel = rhythmModel
+---@param rhythm_engine rizu.RhythmEngine
+function ReplayModel:new(rhythm_engine)
+	self.rhythm_engine = rhythm_engine
 	self.events = {}
 	self.eventOffset = 0
 end
@@ -29,8 +29,8 @@ function ReplayModel:load()
 	elseif self.mode == "replay" then
 		self.eventOffset = 0
 	end
-	self.inputsMap = self.rhythmModel.chart.inputMode:getInputMap()
-	self.inputs = self.rhythmModel.chart.inputMode:getInputs()
+	self.inputsMap = self.rhythm_engine.chart.inputMode:getInputMap()
+	self.inputs = self.rhythm_engine.chart.inputMode:getInputs()
 end
 
 ---@param data string
@@ -56,7 +56,7 @@ end
 function ReplayModel:receive(event)
 	if self.mode == "record" and event.virtual then
 		table.insert(self.events, {
-			event.time - self.rhythmModel.logicEngine.inputOffset,
+			event.time - self.rhythm_engine.logic_info.input_offset,
 			self.inputsMap[event[1]],
 			not not event.name:find("pressed"),
 		})
@@ -81,16 +81,16 @@ function ReplayModel:update()
 		self.inputs[_event[2]]
 	}
 
-	local rhythmModel = self.rhythmModel
-	local timeEngine = rhythmModel.timeEngine
-	local logicEngine = rhythmModel.logicEngine
+	local rhythm_engine = self.rhythm_engine
+	local time_engine = rhythm_engine.time_engine
+	local logic_engine = rhythm_engine.logic_engine
 
 	event.baseTime = event.baseTime or event.time
-	event.time = event.baseTime + logicEngine.inputOffset
-	if timeEngine.currentTime >= event.time then
-		rhythmModel.logicEngine.check1024 = false
-		rhythmModel:receive(event)
-		rhythmModel.logicEngine.check1024 = true
+	event.time = event.baseTime + rhythm_engine.logic_info.input_offset
+	if time_engine.time >= event.time then
+		logic_engine.check1024 = false
+		rhythm_engine:receive(event)
+		logic_engine.check1024 = true
 		self:step()
 		return self:update()
 	end

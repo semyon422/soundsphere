@@ -13,7 +13,6 @@ local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
 ---@operator call: sphere.GameplayController
 local GameplayController = class()
 
----@param rhythmModel sphere.RhythmModel
 ---@param rhythm_engine rizu.RhythmEngine
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
@@ -29,7 +28,6 @@ local GameplayController = class()
 ---@param seaClient sphere.SeaClient
 ---@param fs fs.IFilesystem
 function GameplayController:new(
-	rhythmModel,
 	rhythm_engine,
 	noteSkinModel,
 	configModel,
@@ -45,7 +43,6 @@ function GameplayController:new(
 	seaClient,
 	fs
 )
-	self.rhythmModel = rhythmModel
 	self.rhythm_engine = rhythm_engine
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
@@ -66,7 +63,6 @@ end
 function GameplayController:load(chartview)
 	self.loaded = true
 
-	local rhythmModel = self.rhythmModel
 	local rhythm_engine = self.rhythm_engine
 	local noteSkinModel = self.noteSkinModel
 	local configModel = self.configModel
@@ -77,7 +73,7 @@ function GameplayController:load(chartview)
 	local fs = self.fs
 
 	if replayModel.mode == "replay" then
-		replayBase = rhythmModel.replayBase
+		replayBase = rhythm_engine.replayBase
 	end
 
 	local config = configModel.configs.settings
@@ -97,50 +93,35 @@ function GameplayController:load(chartview)
 		computeContext:swapVelocityType()
 	end
 
+	self:actualizeReplayBase()
+
 	local input_binder = InputBinder(configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
 
 	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
 	rhythm_engine:setVolume(config.audio.volume)
-	rhythm_engine:load(chart, chartview.location_dir)
-
-	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
-	noteSkin:loadData()
-	self.noteSkin = noteSkin
-
-	rhythmModel.graphicEngine.eventBasedRender = config.gameplay.eventBasedRender
-	rhythmModel:setAdjustRate(config.audio.adjustRate)
-	rhythmModel:setVolume(config.audio.volume)
-	rhythmModel:setAudioMode(config.audio.mode)
-
-	rhythmModel:setScoring(judgement, config.gameplay.ratingHitTimingWindow)
-	rhythmModel:setLongNoteShortening(config.gameplay.longNoteShortening)
-	rhythmModel:setTimeToPrepare(math.max(config.gameplay.time.prepare, -(tonumber(chartmeta.audio_offset) or 0)))
-	rhythmModel:setVisualTimeRate(config.gameplay.speed)
-	rhythmModel:setVisualTimeRateScale(config.gameplay.scaleSpeed)
-
-	rhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
-	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
-	rhythmModel:setDrawRange(noteSkin.range)
-	rhythmModel.inputManager:setInputMode(tostring(chart.inputMode))
-
-	self:actualizeReplayBase()
-
-	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setReplayBase(replayBase)
-
+	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
+	rhythm_engine:setTimeToPrepare(math.max(config.gameplay.time.prepare, -(tonumber(chartmeta.audio_offset) or 0)))
+	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
+	rhythm_engine:setAudioMode(config.audio.mode)
+	rhythm_engine:setScoring(judgement)
+	rhythm_engine:setWindUp(state.windUp)
 	rhythm_engine:setReplayBase(replayBase)
 	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
 
-	rhythmModel.inputManager.observable:add(replayModel)
+	rhythm_engine:load(chart, chartview.location_dir, chartmeta, chartdiff, diffcalc_context)
 
-	rhythmModel.timeEngine:sync(love.timer.getTime())
-	rhythmModel:loadAllEngines()
+	-- rhythmModel.inputManager.observable:add(replayModel)
+
 	replayModel:load()
 	pauseModel:load()
 
 	local timings = assert(replayBase.timings or chartmeta.timings)
-	self.rhythmModel.scoreEngine:createByTimings(timings, replayBase.subtimings, true)
+	self.rhythm_engine.score_engine:createByTimings(timings, replayBase.subtimings, true)
+
+	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
+	noteSkin:loadData()
+	self.noteSkin = noteSkin
 end
 
 ---@param timings sea.Timings
@@ -193,9 +174,9 @@ function GameplayController:unload()
 		self:saveScore()
 	end
 
-	local rhythmModel = self.rhythmModel
-	rhythmModel:unloadAllEngines()
-	rhythmModel.inputManager:setMode("external")
+	-- local rhythmModel = self.rhythmModel
+	-- rhythmModel:unloadAllEngines()
+	-- rhythmModel.inputManager:setMode("external")
 	self.replayModel:setMode("record")
 
 	self.rhythm_engine:unload()
@@ -204,25 +185,23 @@ end
 ---@param dt number
 function GameplayController:update(dt)
 	self.pauseModel:update()
-	self.replayModel:update()
-	self.rhythmModel:update()
+	-- self.replayModel:update()
+	-- self.rhythmModel:update()
 	self.rhythm_engine:update()
 end
 
 function GameplayController:discordPlay()
-	local rhythmModel = self.rhythmModel
 	local computeContext = self.computeContext
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartmeta = assert(computeContext.chartmeta)
 
 	local length = math.min(chartdiff.duration, 3600 * 24)
 
-	local timeEngine = rhythmModel.timeEngine
-	self.discordModel:setPresence({
-		state = "Playing",
-		details = ("%s - %s [%s]"):format(chartmeta.artist, chartmeta.title, chartmeta.name),
-		endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate),
-	})
+	-- self.discordModel:setPresence({
+	-- 	state = "Playing",
+	-- 	details = ("%s - %s [%s]"):format(chartmeta.artist, chartmeta.title, chartmeta.name),
+	-- 	endTimestamp = math.floor(os.time() + (length - timeEngine.currentTime) / timeEngine.baseTimeRate),
+	-- })
 end
 
 function GameplayController:discordPause()
@@ -265,21 +244,17 @@ function GameplayController:receive(event)
 end
 
 function GameplayController:retry()
-	local rhythmModel = self.rhythmModel
 	local replayBase = self.replayBase
 
-	rhythmModel.inputManager:setMode("external")
+	-- rhythmModel.inputManager:setMode("external")
 	self.replayModel:setMode("record")
 
-	rhythmModel:unloadAllEngines()
-	rhythmModel.timeEngine:sync(love.timer.getTime())
-	rhythmModel:loadAllEngines()
 	self.pauseModel:load()
 	self.replayModel:load()
 	-- self.resourceModel:rewind()
 
 	local timings = assert(replayBase.timings or self.computeContext.chartmeta.timings)
-	self.rhythmModel.scoreEngine:createByTimings(timings, replayBase.subtimings, true)
+	self.rhythm_engine.score_engine:createByTimings(timings, replayBase.subtimings, true)
 
 	self.rhythm_engine:retry()
 
@@ -298,13 +273,14 @@ end
 
 ---@return boolean
 function GameplayController:hasResult()
-	return self.rhythmModel:hasResult() and self.replayModel.mode ~= "replay"
+	return self.rhythm_engine:hasResult() and self.replayModel.mode ~= "replay"
 end
 
 function GameplayController:saveScore()
-	local rhythmModel = self.rhythmModel
-	local pauseCounter = rhythmModel.pauseCounter
-	local scoreEngine = rhythmModel.scoreEngine
+	local rhythm_engine = self.rhythm_engine
+	local rhythm_engine = self.rhythm_engine
+	local pause_counter = rhythm_engine.pause_counter
+	local scoreEngine = rhythm_engine.score_engine
 	local replayBase = self.replayBase
 	local computeContext = self.computeContext
 
@@ -315,7 +291,7 @@ function GameplayController:saveScore()
 		replayBase,
 		chartmeta,
 		created_at,
-		pauseCounter.count
+		pause_counter.count
 	)
 
 	local chartdiff = assert(computeContext.chartdiff)
@@ -325,7 +301,7 @@ function GameplayController:saveScore()
 
 	local chartplay = Chartplay()
 
-	local chartplay_computed = rhythmModel:getChartplayComputed()
+	local chartplay_computed = rhythm_engine:getChartplayComputed()
 
 	chartplay:importChartplayBase(replay)
 	chartplay:importChartplayComputed(chartplay_computed)
@@ -334,7 +310,7 @@ function GameplayController:saveScore()
 	chartplay.index = chartmeta.index
 
 	chartplay.replay_hash = replay_hash
-	chartplay.pause_count = pauseCounter.count
+	chartplay.pause_count = pause_counter.count
 	chartplay.created_at = created_at
 
 	assert(valid.format(chartplay:validate()))
@@ -366,7 +342,7 @@ function GameplayController:saveScore()
 			print(require("stbl").encode(ok))
 		else
 			print("dumping events")
-			local data = require("string.buffer").encode(self.rhythmModel.scoreEngine.events)
+			local data = require("string.buffer").encode(self.rhythm_engine.score_engine.events)
 			self.fs:write("events.bin", data)
 		end
 	end
@@ -384,20 +360,20 @@ function GameplayController:saveScore()
 end
 
 function GameplayController:skip()
-	local rhythmModel = self.rhythmModel
-	local timeEngine = rhythmModel.timeEngine
+	-- local rhythmModel = self.rhythmModel
+	-- local timeEngine = rhythmModel.timeEngine
 
-	self:update(0)
+	-- self:update(0)
 
-	rhythmModel.audioEngine:unload()
-	timeEngine:play()
-	timeEngine.currentTime = math.huge
-	self.replayModel:update()
-	rhythmModel.logicEngine:update()
+	-- rhythmModel.audioEngine:unload()
+	-- timeEngine:play()
+	-- timeEngine.currentTime = math.huge
+	-- self.replayModel:update()
+	-- rhythmModel.logicEngine:update()
 end
 
 function GameplayController:skipIntro()
-	self.rhythmModel.timeEngine:skipIntro()
+	-- self.rhythmModel.timeEngine:skipIntro()
 end
 
 return GameplayController

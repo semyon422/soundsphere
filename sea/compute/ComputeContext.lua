@@ -12,7 +12,7 @@ local TempoRange = require("notechart.TempoRange")
 local Note = require("ncdk2.notes.Note")
 local Notes = require("ncdk2.notes.Notes")
 local ReplayModel = require("sphere.models.ReplayModel")
-local RhythmModel = require("sphere.models.RhythmModel")
+local RhythmEngine = require("rizu.engine.RhythmEngine")
 
 ---@class sea.ComputeContext
 ---@operator call: sea.ComputeContext
@@ -139,46 +139,46 @@ function ComputeContext:computeReplay(replay)
 	local chartmeta = assert(self.chartmeta)
 	assert(self.chartdiff)
 
-	local rhythmModel = RhythmModel()
-	local replayModel = ReplayModel(rhythmModel)
+	local rhythm_engine = RhythmEngine()
+	local replayModel = ReplayModel(rhythm_engine)
 
-	rhythmModel:setReplayBase(replay)
+	rhythm_engine:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
-	self:computePlay(rhythmModel, replayModel)
+	self:computePlay(rhythm_engine, replayModel)
 
 	local timings = assert(replay.timings or chartmeta.timings)
-	rhythmModel.scoreEngine:createByTimings(timings, replay.subtimings, true)
+	rhythm_engine.scoreEngine:createByTimings(timings, replay.subtimings, true)
 
-	local chartplay_computed = rhythmModel:getChartplayComputed()
+	local chartplay_computed = rhythm_engine:getChartplayComputed()
 
 	return chartplay_computed
 end
 
----@param rhythmModel sphere.RhythmModel
+---@param rhythm_engine rizu.RhythmEngine
 ---@param replayModel sphere.ReplayModel
-function ComputeContext:computePlay(rhythmModel, replayModel)
+function ComputeContext:computePlay(rhythm_engine, replayModel)
 	local chart = assert(self.chart)
 	local chartmeta = assert(self.chartmeta)
 	local chartdiff = assert(self.chartdiff)
 	local state = assert(self.state)
 	local diffcalc_context = assert(self.diffcalc_context)
 
-	rhythmModel:setWindUp(state.windUp)
-	rhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
-	rhythmModel:setPlayTime(chartdiff.start_time, chartdiff.duration)
+	rhythm_engine:setWindUp(state.windUp)
+	rhythm_engine:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
+	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
 
 	replayModel:setMode("replay")
-	rhythmModel.inputManager:setMode("internal")
+	rhythm_engine.inputManager:setMode("internal")
 
-	rhythmModel:loadLogicEngines()
+	rhythm_engine:loadLogicEngines()
 	replayModel:load()
 
-	rhythmModel.timeEngine.currentTime = math.huge
+	rhythm_engine.timeEngine.currentTime = math.huge
 	replayModel:update()
-	rhythmModel.logicEngine:update()
+	rhythm_engine.logicEngine:update()
 
-	rhythmModel:unloadAllEngines()
+	rhythm_engine:unloadAllEngines()
 end
 
 ---@see sphere.LogicalNoteFactory

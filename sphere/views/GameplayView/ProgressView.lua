@@ -8,32 +8,8 @@ local ProgressView = class()
 function ProgressView:draw() end
 
 ---@return number
-function ProgressView:getMin() return 0 end
-
----@return number
-function ProgressView:getMax() return 1 end
-
----@return number
-function ProgressView:getStart() return 0 end
-
----@return number
-function ProgressView:getCurrent() return 0 end
-
----@return number
-function ProgressView:getNormTime()
-	local minTime = self:getMin()
-	local maxTime = self:getMax()
-	local startTime = self:getStart()
-	local currentTime = self:getCurrent()
-
-	local time = 1
-	if currentTime < minTime then
-		time = map(currentTime, startTime, minTime, -1, 0)
-	elseif currentTime < maxTime then
-		time = map(currentTime, minTime, maxTime, 0, 1)
-	end
-
-	return math.min(math.max(time, -1), 1)
+function ProgressView:getProgress()
+	return 0
 end
 
 ---@param t number
@@ -58,7 +34,7 @@ end
 ---@return number
 function ProgressView:getForm()
 	local dir = self.direction
-	local time = self:getNormTime()
+	local time = self:getProgress()
 
 	if dir == "right-left" or dir == "down-up" then
 		time = -time

@@ -14,7 +14,7 @@ local PauseProgressBar = RectangleProgressView({
 	transform = transformFull,
 	direction = "left-right",
 	mode = "+",
-	getCurrent = function(self) return self.game.pauseModel.progress end,
+	getProgress = function(self) return self.game.pauseModel.progress end,
 })
 
 ---@param self table
@@ -48,15 +48,12 @@ local function DebugMenu(self)
 	imgui.setSize(400, h, 200, lineHeight)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local rhythmModel = self.game.rhythmModel
-	local offsync, minOffsync, maxOffsync = rhythmModel.timeEngine.timer:getAudioOffsync()
-	if offsync then
-		imgui.text("Offsync:")
-		love.graphics.setFont(spherefonts.get("Noto Sans Mono", 24))
-		just.sameline()
-		imgui.text(("%5s (%5s %5s)"):format(to_ms(offsync), to_ms(minOffsync - offsync), to_ms(maxOffsync - offsync)))
-		love.graphics.setFont(spherefonts.get("Noto Sans", 24))
-	end
+	local offsync = self.game.rhythm_engine.time_engine:getOffsync()
+	imgui.text("Offsync:")
+	love.graphics.setFont(spherefonts.get("Noto Sans Mono", 24))
+	just.sameline()
+	imgui.text(("%5s"):format(to_ms(offsync)))
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 end
 
 return function(self)

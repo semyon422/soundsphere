@@ -23,7 +23,7 @@ return ModalImView(function(self, quit)
 
 	if quit then
 		if replayBase.timings then
-			game.rhythmModel.scoreEngine:createByTimings(replayBase.timings, replayBase.subtimings, true)
+			game.rhythm_engine.score_engine:createByTimings(replayBase.timings, replayBase.subtimings, true)
 		end
 		return true
 	end
@@ -46,7 +46,7 @@ return ModalImView(function(self, quit)
 	TimingsSelectorView(game)
 
 	if replayBase.timings and imgui.button("applyTimings", "apply") then
-		game.rhythmModel.scoreEngine:createByTimings(replayBase.timings, replayBase.subtimings, true)
+		game.rhythm_engine.score_engine:createByTimings(replayBase.timings, replayBase.subtimings, true)
 	end
 
 	scrollY = imgui.Container()

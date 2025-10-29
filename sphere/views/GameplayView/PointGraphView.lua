@@ -37,7 +37,7 @@ function PointGraphView:draw(w, h)
 		return
 	end
 
-	local points = self.game.rhythmModel.scoreEngine.sequence
+	local points = self.game.rhythm_engine.score_engine.sequence
 	if self.points ~= points then
 		self.points = points
 		points = self.points
@@ -76,10 +76,10 @@ function PointGraphView:drawPoint(i, point)
 		return
 	end
 
-	local timeEngine = self.game.rhythmModel.timeEngine
-	local startTime = timeEngine.minTime
-	local endTime = timeEngine.maxTime
-	local x = (point.base.currentTime - startTime) / (endTime - startTime)
+	---@type rizu.RhythmEngine
+	local rhythm_engine = self.game.rhythm_engine
+
+	local x = rhythm_engine.play_progress:get(point.base.currentTime)
 
 	x = math.min(math.max(x, 0), 1)
 	y = math.min(math.max(y, 0), 1)

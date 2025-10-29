@@ -18,15 +18,15 @@ local MultiplayerClient = require("sea.multi.MultiplayerClient")
 local MultiplayerModel = class()
 
 ---@param cacheModel sphere.CacheModel
----@param rhythmModel sphere.RhythmModel
+---@param rhythm_engine rizu.RhythmEngine
 ---@param configModel sphere.ConfigModel
 ---@param selectModel sphere.SelectModel
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param replayBase sea.ReplayBase
-function MultiplayerModel:new(cacheModel, rhythmModel, configModel, selectModel, onlineModel, osudirectModel, replayBase)
+function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase)
 	self.cacheModel = cacheModel
-	self.rhythmModel = rhythmModel
+	self.rhythm_engine = rhythm_engine
 	self.configModel = configModel
 	self.selectModel = selectModel
 	self.onlineModel = onlineModel
@@ -79,7 +79,7 @@ function MultiplayerModel:refreshAsync()
 
 	self.client:refreshAsync()
 
-	local chartplay_computed = self.rhythmModel:getChartplayComputed(true)
+	local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)
 	remote.mp_user:setChartplayComputed(chartplay_computed)
 end
 

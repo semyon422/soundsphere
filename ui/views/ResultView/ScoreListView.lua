@@ -29,7 +29,7 @@ end
 function ScoreListView:drawItem(i, w, h)
 	local item = self.items[i]
 
-	local scoreEngine = self.game.rhythmModel.scoreEngine
+	local scoreEngine = self.game.rhythm_engine.score_engine
 	local chartplay = self.game.computeContext.chartplay
 	local loaded = chartplay and chartplay.replay_hash == item.replay_hash
 
@@ -45,17 +45,19 @@ function ScoreListView:drawItem(i, w, h)
 	local rating = item.rating
 	local timeRate = item.rate
 	local inputMode = item.inputmode
-	local rhythmModel = self.game.rhythmModel
+
+	---@type rizu.RhythmEngine
+	local rhythm_engine = self.game.rhythm_engine
 
 	if loaded then
 		local erfunc = require("libchart.erfunc")
 		local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 		local normalscore = scoreEngine.scores.normalscore
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
-		rating = s * rhythmModel.chartdiff.enps_diff
+		rating = s * rhythm_engine.chartdiff.enps_diff
 
-		timeRate = self.game.rhythmModel.timeEngine.baseTimeRate or timeRate
-		inputMode = tostring(self.game.rhythmModel.chart.inputMode) or inputMode
+		timeRate = rhythm_engine.logic_info.rate or timeRate
+		inputMode = tostring(rhythm_engine.chart.inputMode) or inputMode
 	end
 
 	if rating ~= rating then

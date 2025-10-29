@@ -17,7 +17,7 @@ function GameplayView:new(game)
 end
 
 function GameplayView:load()
-	self.game.rhythmModel.observable:add(self.sequenceView)
+	-- self.game.rhythmModel.observable:add(self.sequenceView)
 	self.game:loadGameplay()
 
 	self.subscreen = ""
@@ -33,7 +33,7 @@ end
 
 function GameplayView:unload()
 	self.game:unloadGameplay()
-	self.game.rhythmModel.observable:remove(self.sequenceView)
+	-- self.game.rhythmModel.observable:remove(self.sequenceView)
 	self.sequenceView:unload()
 end
 
@@ -57,15 +57,18 @@ function GameplayView:draw()
 	Foreground(self)
 	just.container()
 
+	---@type rizu.RhythmEngine
+	local rhythm_engine = self.game.rhythm_engine
+
 	local state = self.game.pauseModel.state
 	local multiplayerModel = self.game.multiplayerModel
 	local isPlaying = multiplayerModel.client:isInRoom() and multiplayerModel.client.is_playing
 	if
 		not love.window.hasFocus() and
 		state == "play" and
-		not self.game.rhythmModel.logicEngine.autoplay and
-		not isPlaying and
-		self.game.rhythmModel.inputManager.mode ~= "internal"
+		not rhythm_engine.autoplay and
+		not isPlaying
+		-- self.game.rhythmModel.inputManager.mode ~= "internal"
 	then
 		self.game.gameplayController:pause()
 	end
@@ -87,13 +90,13 @@ function GameplayView:update(dt)
 		self:retry()
 	end
 
-	local timeEngine = self.game.rhythmModel.timeEngine
-	if timeEngine.currentTime >= timeEngine.maxTime + 1 then
-		self:quit()
-	end
+	-- local rhythm_engine = self.game.rhythm_engine
+	-- if rhythm_engine.time_engine.time >= rhythm_engine:getEndTime() + 1 then
+	-- 	self:quit()
+	-- end
 
 	local actionOnFail = self.game.configModel.configs.settings.gameplay.actionOnFail
-	local failed = self.game.rhythmModel.scoreEngine.healthsSource:isFailed()
+	local failed = self.game.rhythm_engine.score_engine.healthsSource:isFailed()
 	if failed and not self.failed then
 		if actionOnFail == "pause" then
 			self.game.gameplayController:changePlayState("pause")

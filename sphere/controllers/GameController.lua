@@ -75,12 +75,8 @@ function GameController:new()
 		self.persistence.configModel,
 		self.persistence.fileFinder
 	)
-	self.rhythmModel = RhythmModel(
-		self.inputModel,
-		self.resourceModel
-	)
 	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythm_engine)
-	self.replayModel = ReplayModel(self.rhythmModel)
+	self.replayModel = ReplayModel(self.rhythm_engine)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
 		self.resourceModel
@@ -98,7 +94,7 @@ function GameController:new()
 	)
 	self.multiplayerModel = MultiplayerModel(
 		self.persistence.cacheModel,
-		self.rhythmModel,
+		self.rhythm_engine,
 		self.persistence.configModel,
 		self.selectModel,
 		self.onlineModel,
@@ -147,7 +143,6 @@ function GameController:new()
 		self.chartPreviewModel
 	)
 	self.gameplayController = GameplayController(
-		self.rhythmModel,
 		self.rhythm_engine,
 		self.noteSkinModel,
 		self.configModel,
@@ -166,7 +161,7 @@ function GameController:new()
 	self.resultController = ResultController(
 		self.selectModel,
 		self.replayModel,
-		self.rhythmModel,
+		self.rhythm_engine,
 		self.onlineModel,
 		self.configModel,
 		self.computeContext,
@@ -249,7 +244,7 @@ function GameController:increasePlaySpeed(delta)
 	speedModel:increase(delta)
 
 	local gameplay = self.configModel.configs.settings.gameplay
-	self.rhythmModel.graphicEngine:setVisualTimeRate(gameplay.speed)
+	self.rhythm_engine:setVisualRate(gameplay.speed)
 	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 
@@ -263,11 +258,11 @@ function GameController:load()
 	self.ui = self.uiModel.activeUI
 
 	local configModel = self.configModel
-	local rhythmModel = self.rhythmModel
+	local rhythm_engine = self.rhythm_engine
 
-	rhythmModel.judgements = configModel.configs.judgements
-	rhythmModel.hp = configModel.configs.settings.gameplay.hp
-	rhythmModel.settings = configModel.configs.settings
+	rhythm_engine.judgements = configModel.configs.judgements
+	rhythm_engine.hp = configModel.configs.settings.gameplay.hp
+	rhythm_engine.settings = configModel.configs.settings
 
 	self.replayBase:importReplayBase(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()

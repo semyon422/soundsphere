@@ -12,14 +12,14 @@ local ResultController = class()
 
 ---@param selectModel sphere.SelectModel
 ---@param replayModel sphere.ReplayModel
----@param rhythmModel sphere.RhythmModel
+---@param rhythm_engine rizu.RhythmEngine
 ---@param onlineModel sphere.OnlineModel
 ---@param configModel sphere.ConfigModel
 ---@param computeContext sea.ComputeContext
 function ResultController:new(
 	selectModel,
 	replayModel,
-	rhythmModel,
+	rhythm_engine,
 	onlineModel,
 	configModel,
 	computeContext,
@@ -27,7 +27,7 @@ function ResultController:new(
 )
 	self.selectModel = selectModel
 	self.replayModel = replayModel
-	self.rhythmModel = rhythmModel
+	self.rhythm_engine = rhythm_engine
 	self.onlineModel = onlineModel
 	self.configModel = configModel
 	self.computeContext = computeContext
@@ -89,10 +89,10 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		return
 	end
 
-	local rhythmModel = self.rhythmModel
+	local rhythm_engine = self.rhythm_engine
 
 	if mode == "retry" then
-		rhythmModel.inputManager:setMode("external")
+		-- rhythmModel.inputManager:setMode("external")
 		replayModel:setMode("record")
 		return
 	end
@@ -100,10 +100,10 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	local computeContext = self.computeContext
 
 	computeContext.chartplay = chartplay
-	rhythmModel:setReplayBase(replay)
+	rhythm_engine:setReplayBase(replay)
 	replayModel:decodeEvents(replay.events)
 
-	rhythmModel.inputManager:setMode("internal")
+	-- rhythmModel.inputManager:setMode("internal")
 	replayModel:setMode("replay")
 
 	if mode == "replay" then
@@ -118,10 +118,10 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	computeContext:applyModifierReorder(replay)
 	computeContext:computeBase(replay)
-	computeContext:computePlay(rhythmModel, replayModel)
+	computeContext:computePlay(rhythm_engine, replayModel)
 
 	self:actualizeReplayBase()
-	self.rhythmModel.scoreEngine:createByTimings(self.replayBase.timings, self.replayBase.subtimings, true)
+	self.rhythm_engine.score_engine:createByTimings(self.replayBase.timings, self.replayBase.subtimings, true)
 
 	if self.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")
@@ -136,7 +136,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		love.filesystem.write("userdata/result.gif", data)
 	end
 
-	rhythmModel.inputManager:setMode("external")
+	-- rhythmModel.inputManager:setMode("external")
 	replayModel:setMode("record")
 
 	return true

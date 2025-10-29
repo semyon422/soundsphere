@@ -167,10 +167,7 @@ function PlayfieldVsrg:addProgressBar(object)
 	if not getmetatable(object) then
 		object = RectangleProgressView(object)
 	end
-	function object:getMin() return self.game.rhythmModel.timeEngine.minTime end
-	function object:getMax() return self.game.rhythmModel.timeEngine.maxTime end
-	function object:getStart() return self.game.rhythmModel.timeEngine.startTime end
-	function object:getCurrent() return self.game.rhythmModel.timeEngine.currentTime end
+	function object:getProgress() return self.game.rhythm_engine:getProgress() end
 	return self:add(object)
 end
 
@@ -182,10 +179,7 @@ function PlayfieldVsrg:addCircleProgressBar(object)
 	if not getmetatable(object) then
 		object = CircleProgressView(object)
 	end
-	function object:getMin() return self.game.rhythmModel.timeEngine.minTime end
-	function object:getMax() return self.game.rhythmModel.timeEngine.maxTime end
-	function object:getStart() return self.game.rhythmModel.timeEngine.startTime end
-	function object:getCurrent() return self.game.rhythmModel.timeEngine.currentTime end
+	function object:getProgress() return self.game.rhythm_engine:getProgress() end
 	return self:add(object)
 end
 
@@ -197,9 +191,9 @@ function PlayfieldVsrg:addHpBar(object)
 	if not getmetatable(object) then
 		object = RectangleProgressView(object)
 	end
-	function object:getMax() return self.game.rhythmModel.scoreEngine.healthsSource:getMaxHealths() end
-	function object:getCurrent()
-		return self.game.rhythmModel.scoreEngine.healthsSource:getHealths()
+	function object:getProgress()
+		local healthsSource = self.game.rhythm_engine.score_engine.healthsSource
+		return healthsSource:getHealths() / healthsSource:getMaxHealths()
 	end
 	return self:add(object)
 end
@@ -222,7 +216,7 @@ function PlayfieldVsrg:addScore(object)
 	end
 	function object:value()
 		---@type sphere.IScoreSource
-		local score_source = self.game.rhythmModel.scoreEngine.scoreSource
+		local score_source = self.game.rhythm_engine.score_engine.scoreSource
 		self.format = score_source.score_format
 		self.multiplier = score_source.score_multiplier
 		return score_source:getScore()
@@ -241,7 +235,7 @@ function PlayfieldVsrg:addAccuracy(object)
 	end
 	function object:value()
 		---@type sphere.IAccuracySource
-		local accuracy_source = self.game.rhythmModel.scoreEngine.accuracySource
+		local accuracy_source = self.game.rhythm_engine.score_engine.accuracySource
 		self.format = accuracy_source.accuracy_format
 		self.multiplier = accuracy_source.accuracy_multiplier
 		return accuracy_source:getAccuracy()
@@ -259,7 +253,7 @@ function PlayfieldVsrg:addCombo(object)
 		object = ValueView(object)
 	end
 	function object:value()
-		return self.game.rhythmModel.scoreEngine.comboSource:getCombo()
+		return self.game.rhythm_engine.score_engine.comboSource:getCombo()
 	end
 	object.color = object.color or {1, 1, 1, 1}
 	return self:add(object)

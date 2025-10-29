@@ -26,7 +26,7 @@ function DeltaTimeJudgementView:getJudgement(judgements, deltaTime)
 end
 
 function DeltaTimeJudgementView:update()
-	local scores = self.game.rhythmModel.scoreEngine.scores
+	local scores = self.game.rhythm_engine.score_engine.scores
 	local judge = scores.base
 
 	if judge.hitCount == self.judgementCounter then

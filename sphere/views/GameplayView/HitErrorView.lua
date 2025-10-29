@@ -43,7 +43,7 @@ HitErrorView.colors = {
 
 function HitErrorView:load()
 	---@type sphere.ScoreEngine
-	local score_engine = self.game.rhythmModel.scoreEngine
+	local score_engine = self.game.rhythm_engine.score_engine
 
 	self.judgesSource = score_engine.judgesSource
 	self.sequence = score_engine.sequence

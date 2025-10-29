@@ -193,11 +193,11 @@ local function ChartCells(self)
 	w, h = Layout:move("column2row1")
 	love.graphics.translate(0, h / 2 - 55)
 	if imgui.TextOnlyButton("play auto", "AP", 55, 55) then
-		self.game.rhythmModel:setAutoplay(true)
+		self.game.rhythm_engine:setAutoplay(true)
 		self:play()
 	end
 	if imgui.TextOnlyButton("play pro", "PM", 55, 55) then
-		self.game.rhythmModel:setPromode(true)
+		self.game.rhythm_engine:setProMode(true)
 		self:play()
 	end
 end

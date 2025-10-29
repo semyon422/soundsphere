@@ -11,7 +11,7 @@ local flux = require("flux")
 local JudgementView = class()
 
 function JudgementView:load()
-	self.scoreEngine = self.game.rhythmModel.scoreEngine
+	self.scoreEngine = self.game.rhythm_engine.score_engine
 
 	local judges_source = self.scoreEngine.judgesSource
 	if not judges_source then

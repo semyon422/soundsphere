@@ -42,6 +42,16 @@ function TimeEngine:setRate(rate)
 	self.timer:setRate(rate)
 end
 
+---@return number
+function TimeEngine:getOffsync()
+	local adjust_time = self.adjust_time and self.adjust_time()
+	if not adjust_time then
+		return 0
+	end
+
+	return self.time - adjust_time
+end
+
 function TimeEngine:adjustTime()
 	local adjust_time = self.adjust_time and self.adjust_time()
 	if not adjust_time then
@@ -72,6 +82,7 @@ end
 
 function TimeEngine:play()
 	self.timer:play()
+	self:updateTime()
 end
 
 return TimeEngine
