@@ -6,12 +6,33 @@ local test = {}
 function test.not_init(t)
 	local timer = LocalTimer()
 
-	local err = "timer not initiated"
+	local err = "timer not initialized"
 	t:eq(t:has_error(timer.transform, timer, 0), err)
-	t:eq(t:has_error(timer.setTime, timer), err)
 	t:eq(t:has_error(timer.play, timer), err)
-	t:has_not_error(timer.pause, timer)
-	t:eq(timer:getTime(), 0)
+
+	timer:pause()
+	timer:setRate(2)
+	timer:setTime(10)
+
+	t:eq(timer:getTime(), 10)
+
+	timer:setTime(5)
+
+	timer:setGlobalTime(10)
+	t:eq(timer:getTime(), 10)
+	t:eq(timer:getTime(true), 5)
+
+	timer:play()
+	t:eq(timer:getTime(), 10)
+	t:eq(timer:getTime(true), 5)
+
+	timer:setGlobalTime(12.5)
+	t:eq(timer:getTime(), 10)
+	t:eq(timer:getTime(true), 10)
+
+	timer:setGlobalTime(15)
+	t:eq(timer:getTime(), 15)
+	t:eq(timer:getTime(true), 15)
 end
 
 ---@param t testing.T
@@ -59,10 +80,10 @@ function test.set_time(t)
 	timer:setGlobalTime(0)
 
 	timer:play()
-	assert(timer:getTime() == 0)
+	t:eq(timer:getTime(), 0)
 
 	timer:setTime(1)
-	assert(timer:getTime() == 1)
+	t:eq(timer:getTime(), 1)
 
 	t:eq(timer:transform(0), 1)
 	t:eq(timer:transform(1), 2)
@@ -76,15 +97,30 @@ function test.set_time_with_rate(t)
 	timer:setGlobalTime(0)
 
 	timer:play()
-	assert(timer:getTime() == 0)
+	t:eq(timer:getTime(), 0)
 
 	timer:setTime(1)
 	timer:setRate(2)
-	assert(timer:getTime() == 1)
+	t:eq(timer:getTime(), 1)
 
 	t:eq(timer:transform(0), 1)
 	t:eq(timer:transform(1), 3)
 	t:eq(timer:transform(2), 5)
+end
+
+---@param t testing.T
+function test.set_rate(t)
+	local timer = LocalTimer()
+
+	timer:setGlobalTime(0)
+
+	timer:play()
+
+	timer:setGlobalTime(1)
+	t:eq(timer:getTime(), 1)
+
+	timer:setRate(2)
+	t:eq(timer:getTime(), 1)
 end
 
 ---@param t testing.T
