@@ -47,7 +47,8 @@ function RhythmEngine:new(fs)
 
 	self.score_engine = ScoreEngine()
 
-	self.time_engine = TimeEngine(0.5, function()
+	self.time_engine = TimeEngine()
+	self.time_engine:setAdjustFunction(function()
 		return self.chart_audio_source:getPosition()
 	end)
 

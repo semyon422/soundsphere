@@ -9,19 +9,11 @@ local TimeEngine = class()
 
 TimeEngine.const = false
 
----@param adjust_factor number
----@param adjust_time fun(): number?
-function TimeEngine:new(adjust_factor, adjust_time)
-	self.adjust_time = adjust_time
-
-	self.adjust = TimeAdjust(adjust_factor)
+function TimeEngine:new()
+	self.adjust = TimeAdjust()
 	self.enhancer = VisualEnhancer()
 	self.timer = LocalTimer()
-end
-
----@param adjust_factor number
-function TimeEngine:setAdjustFactor(adjust_factor)
-	self.adjust:setFactor(adjust_factor)
+	self:updateTime()
 end
 
 ---@param global_time number
@@ -42,6 +34,16 @@ function TimeEngine:setRate(rate)
 	self.timer:setRate(rate)
 end
 
+---@param adjust_factor number
+function TimeEngine:setAdjustFactor(adjust_factor)
+	self.adjust:setFactor(adjust_factor)
+end
+
+---@param adjust_time fun(): number?
+function TimeEngine:setAdjustFunction(adjust_time)
+	self.adjust_time = adjust_time
+end
+
 ---@return number
 function TimeEngine:getOffsync()
 	local adjust_time = self.adjust_time and self.adjust_time()
@@ -52,7 +54,12 @@ function TimeEngine:getOffsync()
 	return self.time - adjust_time
 end
 
+---@private
 function TimeEngine:adjustTime()
+	if not self.timer.is_playing then
+		return
+	end
+
 	local adjust_time = self.adjust_time and self.adjust_time()
 	if not adjust_time then
 		return
@@ -66,6 +73,7 @@ function TimeEngine:adjustTime()
 	self.timer:setTime(adjusted_time)
 end
 
+---@private
 function TimeEngine:updateTime()
 	self.time = self.timer:getTime()
 
@@ -82,7 +90,6 @@ end
 
 function TimeEngine:play()
 	self.timer:play()
-	self:updateTime()
 end
 
 return TimeEngine

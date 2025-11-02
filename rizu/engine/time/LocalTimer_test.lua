@@ -3,6 +3,18 @@ local LocalTimer = require("rizu.engine.time.LocalTimer")
 local test = {}
 
 ---@param t testing.T
+function test.not_init(t)
+	local timer = LocalTimer()
+
+	local err = "timer not initiated"
+	t:eq(t:has_error(timer.transform, timer, 0), err)
+	t:eq(t:has_error(timer.setTime, timer), err)
+	t:eq(t:has_error(timer.play, timer), err)
+	t:has_not_error(timer.pause, timer)
+	t:eq(timer:getTime(), 0)
+end
+
+---@param t testing.T
 function test.changing_time(t)
 	local timer = LocalTimer()
 
@@ -44,6 +56,8 @@ end
 function test.set_time(t)
 	local timer = LocalTimer()
 
+	timer:setGlobalTime(0)
+
 	timer:play()
 	assert(timer:getTime() == 0)
 
@@ -58,6 +72,8 @@ end
 ---@param t testing.T
 function test.set_time_with_rate(t)
 	local timer = LocalTimer()
+
+	timer:setGlobalTime(0)
 
 	timer:play()
 	assert(timer:getTime() == 0)
