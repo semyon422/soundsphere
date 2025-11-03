@@ -1,3 +1,4 @@
+local math_util = require("math_util")
 local VisualNote = require("rizu.engine.visual.VisualNote")
 local Point = require("ncdk2.tp.Point")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
@@ -46,7 +47,22 @@ end
 function LongVisualNote:clampAbsoluteTime(time)
 	local linked_note = self.linked_note
 	local visual_info = self.visual_info
-	return math.min(math.max(time, linked_note:getStartTime()), linked_note:getEndTime() + visual_info.shortening)
+	return math_util.clamp(time, linked_note:getStartTime(), linked_note:getEndTime() + visual_info.shortening)
+end
+
+---@param cur_time number
+function LongVisualNote:getLatePressTime(cur_time)
+	self.hold_press_offset = self.hold_press_offset or cur_time
+
+	local dur = math.max(self.hold_press_offset - self.linked_note:getStartTime(), 0)
+	local press_time = cur_time - self.hold_press_offset
+
+	return cur_time + math.min(press_time - dur, 0)
+end
+
+---@param cur_time number
+function LongVisualNote:getLatePressTimeClamped(cur_time)
+	return self:clampAbsoluteTime(self:getLatePressTime(cur_time))
 end
 
 ---@return number
@@ -65,8 +81,7 @@ function LongVisualNote:getHoldVisualTime()
 	local offset = visual_info.visual_offset - visual_info.input_offset
 
 	if visual_info.const then
-		local time = cvp.point.absoluteTime - offset
-		hold_vp.point.absoluteTime = self:clampAbsoluteTime(time)
+		hold_vp.point.absoluteTime = self:getLatePressTimeClamped(cvp.point.absoluteTime - offset)
 		return hold_vp.point.absoluteTime
 	end
 
@@ -76,7 +91,7 @@ function LongVisualNote:getHoldVisualTime()
 	hold_vp.monotonicVisualTime = cvp.monotonicVisualTime - offset
 	self.hold_index = interpolator:interpolate(points, self.hold_index, hold_vp, "visual")
 
-	hold_p.absoluteTime = self:clampAbsoluteTime(hold_p.absoluteTime)
+	hold_p.absoluteTime = self:getLatePressTimeClamped(hold_p.absoluteTime)
 	self.hold_index = interpolator:interpolate(points, self.hold_index, hold_vp, "absolute")
 
 	return hold_vp:getVisualTime(cvp)
