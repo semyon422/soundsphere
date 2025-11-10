@@ -23,17 +23,6 @@ function TestLogicNote:isActive()
 	return self.active
 end
 
----@return rizu.LogicNotePos
-function TestLogicNote:getPos()
-	local t = self.current_time
-	if t < self:getStartTime() then
-		return "early"
-	elseif t > self:getEndTime() then
-		return "late"
-	end
-	return "now"
-end
-
 ---@return integer
 function TestLogicNote:getPriority()
 	return self.priority

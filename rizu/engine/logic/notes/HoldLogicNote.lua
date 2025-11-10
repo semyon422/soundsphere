@@ -96,12 +96,12 @@ end
 
 ---@return number
 function HoldLogicNote:getStartTime()
-	return self.linked_note:getStartTime() + self.logic_info.timing_values:getMinTime("LongNoteStart") * self.logic_info.rate
+	return self.linked_note:getStartTime() + self.logic_info:getNoteMinTime("LongNoteStart")
 end
 
 ---@return number
 function HoldLogicNote:getEndTime()
-	return self.linked_note:getEndTime() + self.logic_info.timing_values:getMaxTime("LongNoteEnd") * self.logic_info.rate
+	return self.linked_note:getEndTime() + self.logic_info:getNoteMaxTime("LongNoteEnd")
 end
 
 ---@return sea.TimingResult

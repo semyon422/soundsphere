@@ -4,7 +4,6 @@ local class = require("class")
 ---@operator call: rizu.VisualInfo
 ---@field time number
 ---@field rate number
----@field input_offset number
 ---@field visual_offset number
 ---@field shortening number
 ---@field const boolean
@@ -14,7 +13,6 @@ local VisualInfo = class()
 function VisualInfo:new()
 	self.time = 0
 	self.rate = 1
-	self.input_offset = 0
 	self.visual_offset = 0
 	self.shortening = 0
 	self.const = false

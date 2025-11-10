@@ -46,12 +46,12 @@ end
 
 ---@return number
 function TapLogicNote:getStartTime()
-	return self.linked_note:getStartTime() + self.logic_info.timing_values:getMinTime("ShortNote") * self.logic_info.rate
+	return self.linked_note:getStartTime() + self.logic_info:getNoteMinTime("ShortNote")
 end
 
 ---@return number
 function TapLogicNote:getEndTime()
-	return self.linked_note:getEndTime() + self.logic_info.timing_values:getMaxTime("ShortNote") * self.logic_info.rate
+	return self.linked_note:getEndTime() + self.logic_info:getNoteMaxTime("ShortNote")
 end
 
 ---@return sea.TimingResult

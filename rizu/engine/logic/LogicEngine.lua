@@ -62,7 +62,7 @@ function LogicEngine:update()
 
 	for i = self.note_index, #notes do
 		local note = notes[i]
-		if note:getPos() == "early" then
+		if note:isEarly() then
 			break
 		end
 		self.note_index = i + 1

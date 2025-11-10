@@ -1,17 +1,35 @@
 local LogicEngine = require("rizu.engine.logic.LogicEngine")
-local TestLogicNote = require("rizu.engine.logic.TestLogicNote")
+local LogicInfo = require("rizu.engine.logic.LogicInfo")
+local ChartFactory = require("notechart.ChartFactory")
 
----@param t testing.T
----@param h rizu.LogicEngine
----@param _t number
----@param n integer
-local function update_and_eq_active(t, h, _t, n)
-	for _, note in ipairs(h.notes) do
-		---@cast note rizu.TestLogicNote
-		note.current_time = _t
-	end
-	h:update()
-	t:eq(h:getActiveNotesCount(), n)
+local cf = ChartFactory()
+local test_chart_header = [[
+# metadata
+title Title
+artist Artist
+name Name
+creator Creator
+input 4key
+
+# notes
+]]
+
+---@param notes string
+---@return ncdk2.Chart
+local function get_chart(notes)
+	return assert(cf:getCharts("chart.sph", test_chart_header .. notes))[1].chart
+end
+
+local offsets = {-0.5, -0.25, 0, 0.25, 0.5}
+
+local function iter_offsets(logic_info)
+	---@type fun(): boolean, number, number
+	return coroutine.wrap(function()
+		for _, input_offset in ipairs(offsets) do
+			logic_info.input_offset = input_offset
+			coroutine.yield(input_offset)
+		end
+	end)
 end
 
 local test = {}
@@ -25,32 +43,44 @@ end
 
 ---@param t testing.T
 function test.track_active_notes(t)
-	local function new_note()
-		local note = TestLogicNote()
-		note.time = 0
-		note.early_window = -1
-		note.late_window = 1
-		return note
+	local logic_info = LogicInfo()
+	logic_info.timing_values:setSimple(1)
+
+	local le = LogicEngine(logic_info)
+
+	local chart = get_chart([[
+1000 =0
+0100 =1
+0010 =2
+]])
+
+	for logic_offset in iter_offsets(logic_info) do
+		le:load(chart)
+
+		logic_info.time = -1.001 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 0)
+
+		logic_info.time = -1 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 1)
+
+		logic_info.time = 0.999 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 2)
+
+		logic_info.time = 1 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 3)
+
+		logic_info.time = 2.001 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 1)
+
+		logic_info.time = 3.001 + logic_offset
+		le:update()
+		t:eq(le:getActiveNotesCount(), 0)
 	end
-
-	local h = LogicEngine()
-	h:setNotes({
-		new_note(),
-		new_note(),
-	})
-
-	update_and_eq_active(t, h, -10, 0)
-	update_and_eq_active(t, h, -1, 2)
-	update_and_eq_active(t, h, 0, 2)
-	update_and_eq_active(t, h, 1, 2)
-	update_and_eq_active(t, h, 10, 2)
-
-	for _, note in ipairs(h.active_notes) do
-		---@cast note rizu.TestLogicNote
-		note.active = false
-	end
-
-	update_and_eq_active(t, h, 10, 0)
 end
 
 return test

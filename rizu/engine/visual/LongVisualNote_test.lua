@@ -26,7 +26,6 @@ local function new_ctx()
 	---@param time number
 	local function set_time(time)
 		visual_info.time = time
-		time = time - visual_info.input_offset
 		cvp.visualTime = time
 		cvp.monotonicVisualTime = time
 		cvp.point.absoluteTime = time
@@ -50,10 +49,7 @@ local function new_ctx()
 					visual_info.const = const
 					for _, visual_offset in ipairs(offsets) do
 						visual_info.visual_offset = visual_offset
-						for _, input_offset in ipairs(offsets) do
-							visual_info.input_offset = input_offset
-							coroutine.yield(const, visual_offset, input_offset)
-						end
+						coroutine.yield(const, visual_offset)
 					end
 				end
 			end)
@@ -68,7 +64,7 @@ local test = {}
 function test.do_not_press(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset, input_offset in ctx.iter() do
+	for const, visual_offset in ctx.iter() do
 		ctx.set_time(0 + visual_offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, -1)
@@ -96,7 +92,7 @@ end
 function test.hold(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset, input_offset in ctx.iter() do
+	for const, visual_offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
 
 		ctx.set_time(0 + visual_offset)
@@ -126,7 +122,7 @@ end
 function test.hold_late_press(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset, input_offset in ctx.iter() do
+	for const, visual_offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
 
 		ctx.set_time(1.25 + visual_offset)
@@ -161,7 +157,7 @@ end
 function test.hold_early_release(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset, input_offset in ctx.iter() do
+	for const, visual_offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
 		ctx.set_time(1 + visual_offset)
 		ctx.note:update()

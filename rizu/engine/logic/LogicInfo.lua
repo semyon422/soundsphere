@@ -19,7 +19,19 @@ end
 ---@param time number
 ---@return number
 function LogicInfo:sub(time)
-	return (self.time - time) / self.rate
+	return (self.time - time - self.input_offset) / self.rate
+end
+
+---@param key sea.TimingObjectKey
+---@return number
+function LogicInfo:getNoteMinTime(key)
+	return self.timing_values:getMinTime(key) * self.rate
+end
+
+---@param key sea.TimingObjectKey
+---@return number
+function LogicInfo:getNoteMaxTime(key)
+	return self.timing_values:getMaxTime(key) * self.rate
 end
 
 return LogicInfo

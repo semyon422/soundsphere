@@ -77,8 +77,7 @@ function LongVisualNote:getHoldVisualTime()
 		return self:getVisualTime(hold_vp)
 	end
 
-	-- Important: `cvp.point.absoluteTime` must be equal `time - input_offset`
-	local offset = visual_info.visual_offset - visual_info.input_offset
+	local offset = visual_info.visual_offset
 
 	if visual_info.const then
 		hold_vp.point.absoluteTime = self:getLatePressTimeClamped(cvp.point.absoluteTime - offset)

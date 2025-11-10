@@ -98,12 +98,12 @@ function VisualEngine:update()
 	table_util.clear(point_events)
 
 	for visual, cvp in pairs(self.cvp) do
-		cvp.point.absoluteTime = visual_info.time - visual_info.input_offset
+		cvp.point.absoluteTime = visual_info.time
 		self.cvpi[visual] = visual.interpolator:interpolate(
 			visual.points, self.cvpi[visual], cvp, "absolute"
 		)
 
-		visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
+		visual.scroller:scroll(cvp.point.absoluteTime - visual_info.visual_offset, handle_event)
 		visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
 	end
 

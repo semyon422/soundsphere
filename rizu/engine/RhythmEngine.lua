@@ -264,7 +264,6 @@ end
 ---@param offset number
 function RhythmEngine:setInputOffset(offset)
 	self.logic_info.input_offset = offset
-	self.visual_info.input_offset = offset
 end
 
 ---@param offset number
