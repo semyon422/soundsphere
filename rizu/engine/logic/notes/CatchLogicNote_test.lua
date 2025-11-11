@@ -7,28 +7,28 @@ local AbsolutePoint = require("ncdk2.tp.AbsolutePoint")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
-	local input_info = LogicInfo()
-	input_info.timing_values:setSimple(1, 2)
+	local logic_info = LogicInfo()
+	logic_info.timing_values:setSimple(1, 2)
 
 	local point = AbsolutePoint(0)
 	local visual_point = VisualPoint(point)
 	local note = Note(visual_point, "key1", "catch", 0)
 	local linked_note = LinkedNote(note)
 
-	local input_note = CatchLogicNote(linked_note, input_info)
+	local logic_note = CatchLogicNote(linked_note, logic_info)
 
 	local events = {}
-	input_note.observable:add({receive = function(self, event)
+	logic_note.observable:add({receive = function(self, event)
 		table.insert(events, event)
 	end})
 
 	return {
-		input_info = input_info,
+		logic_info = logic_info,
 		point = point,
 		visual_point = visual_point,
 		note = note,
 		linked_note = linked_note,
-		input_note = input_note,
+		logic_note = logic_note,
 		events = events,
 		clear_events = function() table_util.clear(events) end,
 	}
@@ -40,16 +40,16 @@ local test = {}
 function test.passed_exact(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
-	ctx.input_info.time = -1
-	ctx.input_note:update()
+	ctx.logic_info.time = -1
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {})
 	ctx.clear_events()
 
-	ctx.input_info.time = 1
-	ctx.input_note:update()
+	ctx.logic_info.time = 1
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,

@@ -25,9 +25,9 @@ local offsets = {-0.5, -0.25, 0, 0.25, 0.5}
 local function iter_offsets(logic_info)
 	---@type fun(): boolean, number, number
 	return coroutine.wrap(function()
-		for _, input_offset in ipairs(offsets) do
-			logic_info.input_offset = input_offset
-			coroutine.yield(input_offset)
+		for _, offset in ipairs(offsets) do
+			logic_info.offset = offset
+			coroutine.yield(offset)
 		end
 	end)
 end

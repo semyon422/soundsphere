@@ -103,7 +103,7 @@ function VisualEngine:update()
 			visual.points, self.cvpi[visual], cvp, "absolute"
 		)
 
-		visual.scroller:scroll(cvp.point.absoluteTime - visual_info.visual_offset, handle_event)
+		visual.scroller:scroll(cvp.point.absoluteTime - visual_info.offset, handle_event)
 		visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
 	end
 

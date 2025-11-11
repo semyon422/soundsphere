@@ -7,28 +7,28 @@ local AbsolutePoint = require("ncdk2.tp.AbsolutePoint")
 local VisualPoint = require("ncdk2.visual.VisualPoint")
 
 local function new_test_ctx()
-	local input_info = LogicInfo()
-	input_info.timing_values:setSimple(1, 2)
+	local logic_info = LogicInfo()
+	logic_info.timing_values:setSimple(1, 2)
 
 	local point = AbsolutePoint(0)
 	local visual_point = VisualPoint(point)
 	local note = Note(visual_point, "key1", "tap", 0)
 	local linked_note = LinkedNote(note)
 
-	local input_note = TapLogicNote(linked_note, input_info)
+	local logic_note = TapLogicNote(linked_note, logic_info)
 
 	local events = {}
-	input_note.observable:add({receive = function(self, event)
+	logic_note.observable:add({receive = function(self, event)
 		table.insert(events, event)
 	end})
 
 	return {
-		input_info = input_info,
+		logic_info = logic_info,
 		point = point,
 		visual_point = visual_point,
 		note = note,
 		linked_note = linked_note,
-		input_note = input_note,
+		logic_note = logic_note,
 		events = events,
 		clear_events = function() table_util.clear(events) end,
 	}
@@ -40,9 +40,9 @@ local test = {}
 function test.too_late(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info.time = 2.5
-	t:eq(ctx.input_note:getResult(), "too late")
-	ctx.input_note:update()
+	ctx.logic_info.time = 2.5
+	t:eq(ctx.logic_note:getResult(), "too late")
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 2,
@@ -51,14 +51,14 @@ function test.too_late(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:reset()
-	ctx.input_info.rate = 1.5
-	ctx.input_note:update()
+	ctx.logic_note:reset()
+	ctx.logic_info.rate = 1.5
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_info.time = 3.5
-	ctx.input_note:update()
+	ctx.logic_info.time = 3.5
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 2,
@@ -71,13 +71,13 @@ end
 function test.hit_late_and_exactly_with_rate(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info.time = 1.1
-	t:eq(ctx.input_note:getResult(), "late")
-	ctx.input_note:update()
+	ctx.logic_info.time = 1.1
+	t:eq(ctx.logic_note:getResult(), "late")
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1,
@@ -86,11 +86,11 @@ function test.hit_late_and_exactly_with_rate(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:reset()
-	ctx.input_info.rate = 1.5
-	t:eq(ctx.input_note:getResult(), "exactly")
+	ctx.logic_note:reset()
+	ctx.logic_info.rate = 1.5
+	t:eq(ctx.logic_note:getResult(), "exactly")
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.1 / 1.5, -- 0.733
@@ -103,30 +103,30 @@ end
 function test.hit_bounds(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info.time = -2
-	t:eq(ctx.input_note:getResult(), "early")
+	ctx.logic_info.time = -2
+	t:eq(ctx.logic_note:getResult(), "early")
 
-	ctx.input_info.time = -1
-	t:eq(ctx.input_note:getResult(), "exactly")
+	ctx.logic_info.time = -1
+	t:eq(ctx.logic_note:getResult(), "exactly")
 
-	ctx.input_info.time = 1
-	t:eq(ctx.input_note:getResult(), "exactly")
+	ctx.logic_info.time = 1
+	t:eq(ctx.logic_note:getResult(), "exactly")
 
-	ctx.input_info.time = 2
-	t:eq(ctx.input_note:getResult(), "late")
+	ctx.logic_info.time = 2
+	t:eq(ctx.logic_note:getResult(), "late")
 end
 
 ---@param t testing.T
 function test.hit_too_early(t)
 	local ctx = new_test_ctx()
 
-	ctx.input_info.time = -3
-	t:eq(ctx.input_note:getResult(), "too early")
-	ctx.input_note:update()
+	ctx.logic_info.time = -3
+	t:eq(ctx.logic_note:getResult(), "too early")
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {})
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -3,

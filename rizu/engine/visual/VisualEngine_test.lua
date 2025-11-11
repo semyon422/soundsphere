@@ -27,9 +27,9 @@ local offsets = {-0.5, -0.25, 0, 0.25, 0.5}
 local function iter_offsets(visual_info)
 	---@type fun(): boolean, number, number
 	return coroutine.wrap(function()
-		for _, visual_offset in ipairs(offsets) do
-			visual_info.visual_offset = visual_offset
-			coroutine.yield(visual_offset)
+		for _, offset in ipairs(offsets) do
+			visual_info.offset = offset
+			coroutine.yield(offset)
 		end
 	end)
 end
@@ -45,30 +45,30 @@ function test.basic_short(t)
 0010 =2
 ]])
 
-	for visual_offset in iter_offsets(visual_info) do
+	for offset in iter_offsets(visual_info) do
 		ve:load(chart)
 
-		visual_info.time = -1.001 + visual_offset
+		visual_info.time = -1.001 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 0)
 
-		visual_info.time = -1 + visual_offset
+		visual_info.time = -1 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 0.999 + visual_offset
+		visual_info.time = 0.999 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 2)
 
-		visual_info.time = 1 + visual_offset
+		visual_info.time = 1 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 2)
 
-		visual_info.time = 2.001 + visual_offset
+		visual_info.time = 2.001 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 3 + visual_offset
+		visual_info.time = 3 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 0)
 	end
@@ -87,26 +87,26 @@ function test.basic_long(t)
 3000 =4
 ]])
 
-	for visual_offset in iter_offsets(visual_info) do
+	for offset in iter_offsets(visual_info) do
 		ve:load(chart)
 
-		visual_info.time = -1.001 + visual_offset
+		visual_info.time = -1.001 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 0)
 
-		visual_info.time = -1 + visual_offset
+		visual_info.time = -1 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 2 + visual_offset
+		visual_info.time = 2 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 4.999 + visual_offset
+		visual_info.time = 4.999 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 5 + visual_offset
+		visual_info.time = 5 + offset
 		ve:update()
 		t:eq(#ve.visible_notes, 0)
 	end

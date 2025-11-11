@@ -47,9 +47,9 @@ local function new_ctx()
 			return coroutine.wrap(function()
 				for _, const in ipairs({false, true}) do
 					visual_info.const = const
-					for _, visual_offset in ipairs(offsets) do
-						visual_info.visual_offset = visual_offset
-						coroutine.yield(const, visual_offset)
+					for _, offset in ipairs(offsets) do
+						visual_info.offset = offset
+						coroutine.yield(const, offset)
 					end
 				end
 			end)
@@ -64,23 +64,23 @@ local test = {}
 function test.do_not_press(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset in ctx.iter() do
-		ctx.set_time(0 + visual_offset)
+	for const, offset in ctx.iter() do
+		ctx.set_time(0 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, -1)
 		t:eq(ctx.note.end_dt, -2)
 
-		ctx.set_time(0.75 + visual_offset)
+		ctx.set_time(0.75 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, -0.25)
 		t:eq(ctx.note.end_dt, -1.25)
 
-		ctx.set_time(1.5 + visual_offset)
+		ctx.set_time(1.5 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0.5)
 		t:eq(ctx.note.end_dt, -0.5)
 
-		ctx.set_time(2.25 + visual_offset)
+		ctx.set_time(2.25 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 1.25)
 		t:eq(ctx.note.end_dt, 0.25)
@@ -92,25 +92,25 @@ end
 function test.hold(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset in ctx.iter() do
+	for const, offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
 
-		ctx.set_time(0 + visual_offset)
+		ctx.set_time(0 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, -1)
 		t:eq(ctx.note.end_dt, -2)
 
-		ctx.set_time(0.75 + visual_offset)
+		ctx.set_time(0.75 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, -0.25)
 		t:eq(ctx.note.end_dt, -1.25)
 
-		ctx.set_time(1.5 + visual_offset)
+		ctx.set_time(1.5 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0)
 		t:eq(ctx.note.end_dt, -0.5)
 
-		ctx.set_time(2.25 + visual_offset)
+		ctx.set_time(2.25 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0.25)
 		t:eq(ctx.note.end_dt, 0.25)
@@ -122,30 +122,30 @@ end
 function test.hold_late_press(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset in ctx.iter() do
+	for const, offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
 
-		ctx.set_time(1.25 + visual_offset)
+		ctx.set_time(1.25 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0.25)
 		t:eq(ctx.note.end_dt, -0.75)
 
-		ctx.set_time(1.3 + visual_offset)
+		ctx.set_time(1.3 + offset)
 		ctx.note:update()
 		t:aeq(ctx.note.start_dt, 0.2, 1e-6)
 		t:aeq(ctx.note.end_dt, -0.7, 1e-6)
 
-		ctx.set_time(1.4 + visual_offset)
+		ctx.set_time(1.4 + offset)
 		ctx.note:update()
 		t:aeq(ctx.note.start_dt, 0.1, 1e-6)
 		t:aeq(ctx.note.end_dt, -0.6, 1e-6)
 
-		ctx.set_time(1.5 + visual_offset)
+		ctx.set_time(1.5 + offset)
 		ctx.note:update()
 		t:aeq(ctx.note.start_dt, 0, 1e-6)
 		t:aeq(ctx.note.end_dt, -0.5, 1e-6)
 
-		ctx.set_time(1.75 + visual_offset)
+		ctx.set_time(1.75 + offset)
 		ctx.note:update()
 		t:aeq(ctx.note.start_dt, 0, 1e-6)
 		t:aeq(ctx.note.end_dt, -0.25, 1e-6)
@@ -157,25 +157,25 @@ end
 function test.hold_early_release(t)
 	local ctx = new_ctx()
 
-	for const, visual_offset in ctx.iter() do
+	for const, offset in ctx.iter() do
 		ctx.logic_note.state = "startPassedPressed"
-		ctx.set_time(1 + visual_offset)
+		ctx.set_time(1 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0)
 		t:eq(ctx.note.end_dt, -1)
 
 		ctx.logic_note.state = "endPassed"
-		ctx.set_time(1.5 + visual_offset)
+		ctx.set_time(1.5 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0)
 		t:eq(ctx.note.end_dt, -0.5)
 
-		ctx.set_time(1.75 + visual_offset)
+		ctx.set_time(1.75 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0)
 		t:eq(ctx.note.end_dt, -0.25)
 
-		ctx.set_time(2.25 + visual_offset)
+		ctx.set_time(2.25 + offset)
 		ctx.note:update()
 		t:eq(ctx.note.start_dt, 0.25)
 		t:eq(ctx.note.end_dt, 0.25)

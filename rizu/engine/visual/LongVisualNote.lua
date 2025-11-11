@@ -32,15 +32,11 @@ function LongVisualNote:update()
 
 	local end_visual_time = self:getVisualTime(self.linked_note.endNote.visualPoint)
 
-	local time = visual_info.time
-	local rate = visual_info.rate
-	local visual_offset = visual_info.visual_offset
-
 	local hold_visual_time = self:getHoldVisualTime()
-	self.start_dt = (time - hold_visual_time - visual_offset) * rate
+	self.start_dt = visual_info:sub(hold_visual_time)
 
 	hold_visual_time = math.max(hold_visual_time, end_visual_time + visual_info.shortening)
-	self.end_dt = (time - hold_visual_time - visual_offset) * rate
+	self.end_dt = visual_info:sub(hold_visual_time)
 end
 
 ---@param time number
@@ -77,17 +73,15 @@ function LongVisualNote:getHoldVisualTime()
 		return self:getVisualTime(hold_vp)
 	end
 
-	local offset = visual_info.visual_offset
-
 	if visual_info.const then
-		hold_vp.point.absoluteTime = self:getLatePressTimeClamped(cvp.point.absoluteTime - offset)
+		hold_vp.point.absoluteTime = self:getLatePressTimeClamped(cvp.point.absoluteTime - visual_info.offset)
 		return hold_vp.point.absoluteTime
 	end
 
 	local interpolator = self.visual.interpolator
 	local points = self.visual.points
 
-	hold_vp.monotonicVisualTime = cvp.monotonicVisualTime - offset
+	hold_vp.monotonicVisualTime = cvp.monotonicVisualTime - visual_info.offset
 	self.hold_index = interpolator:interpolate(points, self.hold_index, hold_vp, "visual")
 
 	hold_p.absoluteTime = self:getLatePressTimeClamped(hold_p.absoluteTime)

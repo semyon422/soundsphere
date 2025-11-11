@@ -263,12 +263,12 @@ end
 
 ---@param offset number
 function RhythmEngine:setInputOffset(offset)
-	self.logic_info.input_offset = offset
+	self.logic_info.offset = offset
 end
 
 ---@param offset number
 function RhythmEngine:setVisualOffset(offset)
-	self.visual_info.visual_offset = offset
+	self.visual_info.offset = offset
 end
 
 ---@param shortening number

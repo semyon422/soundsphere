@@ -21,10 +21,10 @@ local function new_test_ctx()
 
 	local linked_note = LinkedNote(start_note, end_note)
 
-	local input_note = HoldLogicNote(linked_note, logic_info)
+	local logic_note = HoldLogicNote(linked_note, logic_info)
 
 	local events = {}
-	input_note.observable:add({receive = function(self, event)
+	logic_note.observable:add({receive = function(self, event)
 		table.insert(events, event)
 	end})
 
@@ -37,7 +37,7 @@ local function new_test_ctx()
 		start_note = start_note,
 		end_note = end_note,
 		linked_note = linked_note,
-		input_note = input_note,
+		logic_note = logic_note,
 		events = events,
 		clear_events = function() table_util.clear(events) end,
 	}
@@ -50,8 +50,8 @@ function test.too_early(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = -3
-	ctx.input_note:update()
-	ctx.input_note:input(true)
+	ctx.logic_note:update()
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -3,
@@ -66,7 +66,7 @@ function test.too_late(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = 3
-	ctx.input_note:update()
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 2,
@@ -76,7 +76,7 @@ function test.too_late(t)
 	ctx.clear_events()
 
 	ctx.logic_info.time = 13
-	ctx.input_note:update()
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 2,
@@ -90,8 +90,8 @@ function test.perfect_hold(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = 0
-	ctx.input_note:update()
-	ctx.input_note:input(true)
+	ctx.logic_note:update()
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -101,8 +101,8 @@ function test.perfect_hold(t)
 	ctx.clear_events()
 
 	ctx.logic_info.time = 10
-	ctx.input_note:update()
-	ctx.input_note:input(false)
+	ctx.logic_note:update()
+	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -116,8 +116,8 @@ function test.early_release(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = 0.5
-	ctx.input_note:update()
-	ctx.input_note:input(true)
+	ctx.logic_note:update()
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0.5,
@@ -127,8 +127,8 @@ function test.early_release(t)
 	ctx.clear_events()
 
 	ctx.logic_info.time = 5
-	ctx.input_note:update()
-	ctx.input_note:input(false)
+	ctx.logic_note:update()
+	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -137,7 +137,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -146,7 +146,7 @@ function test.early_release(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:input(false)
+	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -161,8 +161,8 @@ function test.late_press(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = 1.5
-	ctx.input_note:update()
-	ctx.input_note:input(true)
+	ctx.logic_note:update()
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 1.5,
@@ -172,8 +172,8 @@ function test.late_press(t)
 	ctx.clear_events()
 
 	ctx.logic_info.time = 10
-	ctx.input_note:update()
-	ctx.input_note:input(false)
+	ctx.logic_note:update()
+	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
@@ -187,7 +187,7 @@ function test.too_late_press(t)
 	local ctx = new_test_ctx()
 
 	ctx.logic_info.time = 5
-	ctx.input_note:update()
+	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
 		delta_time = 2,
@@ -196,7 +196,7 @@ function test.too_late_press(t)
 	}})
 	ctx.clear_events()
 
-	ctx.input_note:input(true)
+	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
 		delta_time = -5,
@@ -206,8 +206,8 @@ function test.too_late_press(t)
 	ctx.clear_events()
 
 	ctx.logic_info.time = 10
-	ctx.input_note:update()
-	ctx.input_note:input(false)
+	ctx.logic_note:update()
+	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
 		delta_time = 0,
