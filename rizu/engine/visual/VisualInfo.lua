@@ -19,10 +19,15 @@ function VisualInfo:new()
 	self.logic_notes = {}
 end
 
+---@return number
+function VisualInfo:getTime()
+	return self.time - self.offset
+end
+
 ---@param time number
 ---@return number
 function VisualInfo:sub(time)
-	return (self.time - time - self.offset) * self.rate
+	return (self:getTime() - time) * self.rate
 end
 
 return VisualInfo

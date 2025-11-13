@@ -16,10 +16,15 @@ function LogicInfo:new()
 	self.timing_values = TimingValues()
 end
 
+---@return number
+function LogicInfo:getTime()
+	return self.time - self.offset
+end
+
 ---@param time number
 ---@return number
 function LogicInfo:sub(time)
-	return (self.time - time - self.offset) / self.rate
+	return (self:getTime() - time) / self.rate
 end
 
 ---@param key sea.TimingObjectKey

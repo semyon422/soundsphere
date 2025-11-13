@@ -22,18 +22,6 @@ end
 
 local test = {}
 
-local offsets = {-0.5, -0.25, 0, 0.25, 0.5}
-
-local function iter_offsets(visual_info)
-	---@type fun(): boolean, number, number
-	return coroutine.wrap(function()
-		for _, offset in ipairs(offsets) do
-			visual_info.offset = offset
-			coroutine.yield(offset)
-		end
-	end)
-end
-
 ---@param t testing.T
 function test.basic_short(t)
 	local visual_info = VisualInfo()
@@ -45,33 +33,31 @@ function test.basic_short(t)
 0010 =2
 ]])
 
-	for offset in iter_offsets(visual_info) do
-		ve:load(chart)
+	ve:load(chart)
 
-		visual_info.time = -1.001 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 0)
+	visual_info.time = -1.001
+	ve:update()
+	t:eq(#ve.visible_notes, 0)
 
-		visual_info.time = -1 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 1)
+	visual_info.time = -1
+	ve:update()
+	t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 0.999 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 2)
+	visual_info.time = 0.999
+	ve:update()
+	t:eq(#ve.visible_notes, 2)
 
-		visual_info.time = 1 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 2)
+	visual_info.time = 1
+	ve:update()
+	t:eq(#ve.visible_notes, 2)
 
-		visual_info.time = 2.001 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 1)
+	visual_info.time = 2.001
+	ve:update()
+	t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 3 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 0)
-	end
+	visual_info.time = 3
+	ve:update()
+	t:eq(#ve.visible_notes, 0)
 end
 
 ---@param t testing.T
@@ -87,29 +73,63 @@ function test.basic_long(t)
 3000 =4
 ]])
 
-	for offset in iter_offsets(visual_info) do
-		ve:load(chart)
+	ve:load(chart)
 
-		visual_info.time = -1.001 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 0)
+	visual_info.time = -1.001
+	ve:update()
+	t:eq(#ve.visible_notes, 0)
 
-		visual_info.time = -1 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 1)
+	visual_info.time = -1
+	ve:update()
+	t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 2 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 1)
+	visual_info.time = 2
+	ve:update()
+	t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 4.999 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 1)
+	visual_info.time = 4.999
+	ve:update()
+	t:eq(#ve.visible_notes, 1)
 
-		visual_info.time = 5 + offset
-		ve:update()
-		t:eq(#ve.visible_notes, 0)
-	end
+	visual_info.time = 5
+	ve:update()
+	t:eq(#ve.visible_notes, 0)
+end
+
+---@param t testing.T
+function test.sv_should_move_with_notes(t)
+	local visual_info = VisualInfo()
+	local ve = VisualEngine(visual_info)
+
+	local chart = get_chart([[
+- =0 x1
+0100 =0.25 x0.5
+0010 =0.75 x1
+]])
+
+	ve:load(chart)
+
+	local notes = ve.visible_notes
+	---@cast notes rizu.ShortVisualNote[]
+
+	visual_info.time = 0
+	ve:update()
+	t:eq(#notes, 2)
+
+	t:eq(notes[1].start_dt, -0.25)
+	t:eq(notes[2].start_dt, -0.5)
+
+	visual_info.time = 0.25
+	ve:update()
+
+	t:eq(notes[1].start_dt, 0)
+	t:eq(notes[2].start_dt, -0.25)
+
+	visual_info.time = 0.5
+	ve:update()
+
+	t:eq(notes[1].start_dt, 0.125)
+	t:eq(notes[2].start_dt, -0.125)
 end
 
 return test

@@ -16,7 +16,7 @@ function test.all(t)
 	visual_note:update()
 	t:eq(visual_note.start_dt, -1)
 
-	visual_info.offset = -0.25 -- visually move note earlier
+	visual_info.time = 0.25
 	visual_note:update()
 	t:eq(visual_note.start_dt, -0.75)
 
