@@ -5,23 +5,13 @@ local class = require("class")
 local BottomNotesHandler = class()
 
 ---@param active_notes rizu.LogicNote[]
----@param match fun(note: rizu.LogicNote, pos: any): boolean
-function BottomNotesHandler:new(active_notes, match)
+function BottomNotesHandler:new(active_notes)
 	self.active_notes = active_notes
 
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_values = {}
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_positions = {}
-
-	self._match = match
-end
-
----@param note rizu.LogicNote
----@param pos any
----@return boolean
-function BottomNotesHandler:match(note, pos)
-	return self._match(note, pos)
 end
 
 function BottomNotesHandler:update()
@@ -36,7 +26,7 @@ function BottomNotesHandler:update()
 			for id, value in pairs(event_values) do
 				if value then
 					local pos = event_positions[id]
-					if self:match(note, pos) then
+					if note:match(pos) then
 						matching_value = value
 						break
 					end

@@ -9,7 +9,6 @@ local test = {}
 local function new_note(id, state)
 	local note = TestLogicNote()
 	note.is_bottom = true
-	note.time = 0
 	function note:input(value)
 		state.count = state.count + 1
 		state[id] = value
@@ -27,9 +26,7 @@ function test.bottom_notes(t)
 		new_note("b", state),
 	}
 
-	local h = BottomNotesHandler(notes, function(note, pos)
-		return pos
-	end)
+	local h = BottomNotesHandler(notes)
 
 	h:update()
 	t:tdeq(state, {a = false, b = false, count = 2})
@@ -64,9 +61,7 @@ function test.pause_bottom_notes_keep_pressed_id_changed(t)
 		new_note("b", state),
 	}
 
-	local h = BottomNotesHandler(notes, function(note, pos)
-		return pos
-	end)
+	local h = BottomNotesHandler(notes)
 
 	h:receive({id = 1, pos = true, value = true})
 	h:update()

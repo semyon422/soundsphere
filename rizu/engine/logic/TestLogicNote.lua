@@ -18,6 +18,12 @@ function TestLogicNote:new()
 	self.linked_note = {}
 end
 
+---@param pos any
+---@return boolean
+function TestLogicNote:match(pos)
+	return not not pos
+end
+
 ---@return boolean
 function TestLogicNote:isActive()
 	return self.active

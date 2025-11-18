@@ -13,9 +13,7 @@ InputEngine.nearest = false
 function InputEngine:new(active_notes)
 	self.active_notes = active_notes
 
-	self.bottom_notes_handler = BottomNotesHandler(active_notes, function(...)
-		return self:match(...)
-	end)
+	self.bottom_notes_handler = BottomNotesHandler(active_notes)
 
 	self.input_pauser = InputPauser()
 
@@ -25,20 +23,13 @@ function InputEngine:new(active_notes)
 	self.catched_notes = {}
 end
 
----@param note rizu.LogicNote
----@param pos any
----@return boolean
-function InputEngine:match(note, pos)
-	return note.linked_note:getColumn() == pos
-end
-
 ---@param event rizu.VirtualInputEvent
 ---@return integer
 function InputEngine:getNotesMaxPriority(event)
 	local priority = -math.huge
 
 	for _, note in ipairs(self.active_notes) do
-		if not note.is_bottom and self:match(note, event.pos) then
+		if not note.is_bottom and note:match(event.pos) then
 			priority = math.max(priority, note:getPriority())
 		end
 	end
@@ -67,7 +58,7 @@ end
 ---@return rizu.LogicNote?
 ---@return boolean? catched
 function InputEngine:handle_catched_note(event, note)
-	local matched = self:match(note, event.pos)
+	local matched = note:match(event.pos)
 	if matched and event.value ~= nil then
 		self:input_note(note, event.value)
 		return note, not not event.value
@@ -106,7 +97,7 @@ function InputEngine:receive_catched(event)
 
 	if not self.nearest then
 		for _, note in ipairs(active_notes) do
-			if not note.is_bottom and note:getPriority() == priority and self:match(note, event.pos) and not catched_notes[note] then
+			if not note.is_bottom and note:getPriority() == priority and note:match(event.pos) and not catched_notes[note] then
 				self:input_note(note, value)
 				return note, not not value
 			end
@@ -119,7 +110,7 @@ function InputEngine:receive_catched(event)
 	local nearest_time = math.huge
 	for _, note in ipairs(active_notes) do
 		local time = math.abs(note:getDeltaTime())
-		if not note.is_bottom and note:getPriority() == priority and self:match(note, event.pos) and not catched_notes[note] and time < nearest_time then
+		if not note.is_bottom and note:getPriority() == priority and note:match(event.pos) and not catched_notes[note] and time < nearest_time then
 			nearest_time = time
 			nearest_note = note
 		end

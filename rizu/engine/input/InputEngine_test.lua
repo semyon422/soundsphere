@@ -25,9 +25,11 @@ function test.match(t)
 	local function new_note(match_event)
 		local note = TestLogicNote()
 		note.time = 0
-		note.data = match_event.pos
 		function note:input(value)
 			table.insert(match_event, self)
+		end
+		function note:match(pos)
+			return match_event.pos == pos
 		end
 		return note
 	end
@@ -41,9 +43,6 @@ function test.match(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match(note, pos)
-		return note.data == pos
-	end
 
 	set_time(notes, 0)
 
@@ -68,6 +67,9 @@ function test.catch(t)
 		function note:input(value)
 			table.insert(events, {id, value})
 		end
+		function note:match()
+			return true
+		end
 		return note
 	end
 
@@ -79,9 +81,6 @@ function test.catch(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match()
-		return true
-	end
 
 	set_time(notes, 0)
 
@@ -109,6 +108,9 @@ function test.nearest(t)
 		function note:input()
 			table.insert(events, time)
 		end
+		function note:match()
+			return true
+		end
 		return note
 	end
 
@@ -121,9 +123,6 @@ function test.nearest(t)
 
 	local ie = InputEngine(notes)
 	ie.nearest = true
-	function ie:match()
-		return true
-	end
 
 	set_time(notes, 1)
 
@@ -154,6 +153,9 @@ function test.priority(t)
 		function note:input()
 			table.insert(event, time)
 		end
+		function note:match()
+			return true
+		end
 		return note
 	end
 
@@ -165,9 +167,6 @@ function test.priority(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match()
-		return true
-	end
 
 	set_time(notes, 0)
 
@@ -184,6 +183,9 @@ function test.nil_value(t)
 			table.insert(events, {value})
 			return value
 		end
+		function note:match()
+			return true
+		end
 		return note
 	end
 
@@ -194,9 +196,6 @@ function test.nil_value(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match()
-		return true
-	end
 
 	set_time(notes, 0)
 
@@ -240,9 +239,6 @@ function test.variable_match(t)
 	}
 
 	local ie = InputEngine(notes)
-	function ie:match(note, pos)
-		return pos
-	end
 
 	set_time(notes, 0)
 

@@ -20,6 +20,15 @@ function LogicNote:new(note, logic_info)
 	self:reset()
 end
 
+---@param pos any
+---@return boolean
+function LogicNote:match(pos)
+	-- TODO:
+	-- - add position data to notes
+	-- - add "circle size" to notes and to logic_info
+	return self.linked_note:getColumn() == pos
+end
+
 function LogicNote:reset()
 	self.state = "clear"
 end
