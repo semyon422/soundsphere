@@ -1,5 +1,6 @@
 local class = require("class")
 local InputMode = require("ncdk.InputMode")
+local EventIdMapper = require("rizu.input.EventIdMapper")
 local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 
 ---@alias rizu.InputKey string|integer
@@ -16,6 +17,8 @@ local InputBinder = class()
 function InputBinder:new(config, input_mode)
 	self.config = config
 	self.input_mode = input_mode
+
+	self.mapper = EventIdMapper()
 
 	local im = InputMode(input_mode)
 	self.columns = im:getInputs()
@@ -36,7 +39,11 @@ function InputBinder:transform(event)
 		for index, bind in pairs(binds) do
 			local _key, d_type, d_id = unpack(bind, 1, 3)
 			if _key == key and d_type == device.type and d_id == device.id then
-				local event_id = table.concat({d_type, d_id, key, index}, "_")
+				local id_string = table.concat({d_type, d_id, key, index}, "_")
+				local event_id = self.mapper:get(id_string)
+				if event.state == false then
+					self.mapper:free(id_string)
+				end
 				return VirtualInputEvent(self.columns[i], event.state, event_id)
 			end
 		end

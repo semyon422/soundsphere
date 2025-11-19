@@ -1,6 +1,6 @@
 local class = require("class")
 
----@alias rizu.VirtualInputEventId any
+---@alias rizu.VirtualInputEventId integer
 
 ---@class rizu.VirtualInputEvent
 ---@operator call: rizu.VirtualInputEvent
