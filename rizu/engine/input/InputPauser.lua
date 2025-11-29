@@ -8,7 +8,7 @@ function InputPauser:new()
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_values = {}
 
-	---@type {[rizu.LogicNote]: any}
+	---@type {[rizu.InputNote]: any}
 	self.paused_notes = {}
 end
 
@@ -22,7 +22,7 @@ function InputPauser:receive(id, value)
 	end
 end
 
----@param catched_notes {[rizu.LogicNote]: rizu.VirtualInputEventId}
+---@param catched_notes {[rizu.InputNote]: rizu.VirtualInputEventId}
 function InputPauser:pause(catched_notes)
 	self.paused = true
 
@@ -34,14 +34,14 @@ function InputPauser:pause(catched_notes)
 	end
 end
 
----@param catched_notes {[rizu.LogicNote]: rizu.VirtualInputEventId}
+---@param catched_notes {[rizu.InputNote]: rizu.VirtualInputEventId}
 function InputPauser:resume(catched_notes)
 	self.paused = false
 
 	local paused_notes = self.paused_notes
 	local event_values = self.event_values
 
-	---@type {[rizu.LogicNote]: true}
+	---@type {[rizu.InputNote]: true}
 	local handled_notes = {}
 
 	for note, value in pairs(paused_notes) do

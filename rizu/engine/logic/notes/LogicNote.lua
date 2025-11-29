@@ -7,8 +7,6 @@ local Observable = require("Observable")
 ---@operator call: rizu.LogicNote
 local LogicNote = class()
 
-LogicNote.is_bottom = false
-
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
 function LogicNote:new(note, logic_info)
@@ -20,15 +18,6 @@ function LogicNote:new(note, logic_info)
 	self:reset()
 end
 
----@param pos any
----@return boolean
-function LogicNote:match(pos)
-	-- TODO:
-	-- - add position data to notes
-	-- - add "circle size" to notes and to logic_info
-	return self.linked_note:getColumn() == pos
-end
-
 function LogicNote:reset()
 	self.state = "clear"
 end
@@ -36,14 +25,6 @@ end
 ---@return boolean
 function LogicNote:isActive()
 	error("not implemented")
-end
-
----@return integer
-function LogicNote:getPriority()
-	if self.state == "clear" then
-		return 0
-	end
-	return -1
 end
 
 ---@return boolean

@@ -9,6 +9,7 @@ local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
 local ResourceLoader = require("rizu.files.ResourceLoader")
 local ResourceFinder = require("rizu.files.ResourceFinder")
 local InputEngine = require("rizu.engine.input.InputEngine")
+local ActiveInputNotes = require("rizu.engine.input.ActiveInputNotes")
 
 local TimeEngine = require("rizu.engine.time.TimeEngine")
 
@@ -40,7 +41,7 @@ function RhythmEngine:new(fs)
 	self.logic_info = LogicInfo()
 	self.logic_engine = LogicEngine(self.logic_info)
 
-	self.input_engine = InputEngine(self.logic_engine.active_notes)
+	self.input_engine = InputEngine(ActiveInputNotes(self.logic_engine.active_notes))
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)

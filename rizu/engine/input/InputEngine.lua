@@ -1,5 +1,4 @@
 local class = require("class")
-local table_util = require("table_util")
 local BottomNotesHandler = require("rizu.engine.input.BottomNotesHandler")
 local InputPauser = require("rizu.engine.input.InputPauser")
 
@@ -9,7 +8,7 @@ local InputEngine = class()
 
 InputEngine.nearest = false
 
----@param active_notes rizu.LogicNote[]
+---@param active_notes rizu.ActiveInputNotes
 function InputEngine:new(active_notes)
 	self.active_notes = active_notes
 
@@ -17,9 +16,9 @@ function InputEngine:new(active_notes)
 
 	self.input_pauser = InputPauser()
 
-	---@type {[rizu.VirtualInputEventId]: rizu.LogicNote}
+	---@type {[rizu.VirtualInputEventId]: rizu.InputNote}
 	self.event_catches = {}
-	---@type {[rizu.LogicNote]: rizu.VirtualInputEventId}
+	---@type {[rizu.InputNote]: rizu.VirtualInputEventId}
 	self.catched_notes = {}
 end
 
@@ -28,8 +27,8 @@ end
 function InputEngine:getNotesMaxPriority(event)
 	local priority = -math.huge
 
-	for _, note in ipairs(self.active_notes) do
-		if not note.is_bottom and note:match(event.pos) then
+	for _, note in ipairs(self.active_notes:getNotes()) do
+		if not note.is_bottom and note:match(event) then
 			priority = math.max(priority, note:getPriority())
 		end
 	end
@@ -37,9 +36,9 @@ function InputEngine:getNotesMaxPriority(event)
 	return priority
 end
 
----@param note rizu.LogicNote
+---@param note rizu.InputNote
 ---@param value any
----@return rizu.LogicNote?
+---@return rizu.InputNote?
 ---@return boolean? catched
 function InputEngine:input_note(note, value)
 	if not self.input_pauser.paused then
@@ -54,11 +53,11 @@ function InputEngine:update()
 end
 
 ---@param event rizu.VirtualInputEvent
----@param note rizu.LogicNote
----@return rizu.LogicNote?
+---@param note rizu.InputNote
+---@return rizu.InputNote?
 ---@return boolean? catched
 function InputEngine:handle_catched_note(event, note)
-	local matched = note:match(event.pos)
+	local matched = note:match(event)
 	if matched and event.value ~= nil then
 		self:input_note(note, event.value)
 		return note, not not event.value
@@ -71,18 +70,19 @@ function InputEngine:handle_catched_note(event, note)
 end
 
 ---@param event rizu.VirtualInputEvent
----@return rizu.LogicNote?
+---@return rizu.InputNote?
 ---@return boolean? catched
 function InputEngine:receive_catched(event)
 	local active_notes = self.active_notes
 	local catched_notes = self.catched_notes
 
-	if not active_notes[1] then
+	local notes = active_notes:getNotes()
+	if not notes[1] then
 		return
 	end
 
 	local catch_note = self.event_catches[event.id]
-	for _, note in ipairs(active_notes) do
+	for _, note in ipairs(notes) do
 		if note == catch_note then
 			return self:handle_catched_note(event, note)
 		end
@@ -96,8 +96,8 @@ function InputEngine:receive_catched(event)
 	local priority = self:getNotesMaxPriority(event)
 
 	if not self.nearest then
-		for _, note in ipairs(active_notes) do
-			if not note.is_bottom and note:getPriority() == priority and note:match(event.pos) and not catched_notes[note] then
+		for _, note in ipairs(notes) do
+			if not note.is_bottom and note:getPriority() == priority and note:match(event) and not catched_notes[note] then
 				self:input_note(note, value)
 				return note, not not value
 			end
@@ -105,12 +105,12 @@ function InputEngine:receive_catched(event)
 		return
 	end
 
-	---@type rizu.LogicNote?
+	---@type rizu.InputNote?
 	local nearest_note
 	local nearest_time = math.huge
-	for _, note in ipairs(active_notes) do
+	for _, note in ipairs(notes) do
 		local time = math.abs(note:getDeltaTime())
-		if not note.is_bottom and note:getPriority() == priority and note:match(event.pos) and not catched_notes[note] and time < nearest_time then
+		if not note.is_bottom and note:getPriority() == priority and note:match(event) and not catched_notes[note] and time < nearest_time then
 			nearest_time = time
 			nearest_note = note
 		end

@@ -1,10 +1,10 @@
 local InputPauser = require("rizu.engine.input.InputPauser")
-local TestLogicNote = require("rizu.engine.logic.TestLogicNote")
+local TestInputNote = require("rizu.engine.input.notes.TestInputNote")
 
 local test = {}
 
 local function new_note(events)
-	local note = TestLogicNote()
+	local note = TestInputNote()
 	function note:input(value)
 		table.insert(events, value)
 	end

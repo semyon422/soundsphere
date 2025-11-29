@@ -1,12 +1,12 @@
-local table_util = require("table_util")
 local InputEngine = require("rizu.engine.input.InputEngine")
-local TestLogicNote = require("rizu.engine.logic.TestLogicNote")
+local FakeActiveInputNotes = require("rizu.engine.input.FakeActiveInputNotes")
+local TestInputNote = require("rizu.engine.input.notes.TestInputNote")
 
----@param notes rizu.LogicNote[]
+---@param notes rizu.InputNote[]
 ---@param time number
 local function set_time(notes, time)
 	for _, note in ipairs(notes) do
-		---@cast note rizu.TestLogicNote
+		---@cast note rizu.TestInputNote
 		note.current_time = time
 	end
 end
@@ -15,7 +15,8 @@ local test = {}
 
 ---@param t testing.T
 function test.no_notes(t)
-	local ie = InputEngine({})
+	local notes = {}
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	t:has_not_error(ie.receive, ie, {id = 1, pos = 1})
 end
@@ -23,13 +24,13 @@ end
 ---@param t testing.T
 function test.match(t)
 	local function new_note(match_event)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		note.time = 0
 		function note:input(value)
 			table.insert(match_event, self)
 		end
-		function note:match(pos)
-			return match_event.pos == pos
+		function note:match(event)
+			return match_event.pos == event.pos
 		end
 		return note
 	end
@@ -42,7 +43,7 @@ function test.match(t)
 		new_note(event_2),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	set_time(notes, 0)
 
@@ -62,7 +63,7 @@ end
 ---@param t testing.T
 function test.catch(t)
 	local function new_note(id, events)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {id, value})
@@ -80,7 +81,7 @@ function test.catch(t)
 		new_note("b", events),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	set_time(notes, 0)
 
@@ -102,7 +103,7 @@ end
 ---@param t testing.T
 function test.nearest(t)
 	local function new_note(time, events)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		---@cast note +{catched: any}
 		note.time = time
 		function note:input()
@@ -121,7 +122,7 @@ function test.nearest(t)
 		new_note(2, events),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 	ie.nearest = true
 
 	set_time(notes, 1)
@@ -146,7 +147,7 @@ end
 ---@param t testing.T
 function test.priority(t)
 	local function new_note(time, priority, event)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		---@cast note +{catched: any}
 		note.time = time
 		note.priority = priority
@@ -166,7 +167,7 @@ function test.priority(t)
 		new_note(2, 1, event),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	set_time(notes, 0)
 
@@ -177,7 +178,7 @@ end
 ---@param t testing.T
 function test.nil_value(t)
 	local function new_note(events)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {value})
@@ -195,7 +196,7 @@ function test.nil_value(t)
 		new_note(events),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	set_time(notes, 0)
 
@@ -224,7 +225,7 @@ end
 ---@param t testing.T
 function test.variable_match(t)
 	local function new_note(events)
-		local note = TestLogicNote()
+		local note = TestInputNote()
 		note.time = 0
 		function note:input(value)
 			table.insert(events, {value})
@@ -238,7 +239,7 @@ function test.variable_match(t)
 		new_note(events),
 	}
 
-	local ie = InputEngine(notes)
+	local ie = InputEngine(FakeActiveInputNotes(notes))
 
 	set_time(notes, 0)
 

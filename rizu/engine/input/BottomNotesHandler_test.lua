@@ -1,13 +1,14 @@
 local BottomNotesHandler = require("rizu.engine.input.BottomNotesHandler")
-local TestLogicNote = require("rizu.engine.logic.TestLogicNote")
+local FakeActiveInputNotes = require("rizu.engine.input.FakeActiveInputNotes")
+local TestInputNote = require("rizu.engine.input.notes.TestInputNote")
 
 local test = {}
 
 ---@param id string
 ---@param state {[string]: any}
----@return rizu.TestLogicNote
+---@return rizu.TestInputNote
 local function new_note(id, state)
-	local note = TestLogicNote()
+	local note = TestInputNote()
 	note.is_bottom = true
 	function note:input(value)
 		state.count = state.count + 1
@@ -26,7 +27,7 @@ function test.bottom_notes(t)
 		new_note("b", state),
 	}
 
-	local h = BottomNotesHandler(notes)
+	local h = BottomNotesHandler(FakeActiveInputNotes(notes))
 
 	h:update()
 	t:tdeq(state, {a = false, b = false, count = 2})
@@ -61,7 +62,7 @@ function test.pause_bottom_notes_keep_pressed_id_changed(t)
 		new_note("b", state),
 	}
 
-	local h = BottomNotesHandler(notes)
+	local h = BottomNotesHandler(FakeActiveInputNotes(notes))
 
 	h:receive({id = 1, pos = true, value = true})
 	h:update()
