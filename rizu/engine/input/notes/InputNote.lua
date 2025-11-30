@@ -19,7 +19,7 @@ end
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function InputNote:match(event)
-	return self.logic_note.linked_note:getColumn() == event.column
+	return self.logic_note:getColumn() == event.column
 end
 
 ---@param value any

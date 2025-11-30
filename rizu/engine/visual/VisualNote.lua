@@ -18,6 +18,11 @@ end
 
 function VisualNote:update() end
 
+---@return ncdk2.Column
+function VisualNote:getColumn()
+	return self.linked_note:getColumn()
+end
+
 ---@return rizu.LogicNote?
 function VisualNote:getInputNote()
 	return self.visual_info.logic_notes[self.linked_note]

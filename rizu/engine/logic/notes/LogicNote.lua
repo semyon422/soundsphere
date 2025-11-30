@@ -41,6 +41,11 @@ function LogicNote:update()
 	error("not implemented")
 end
 
+---@return ncdk2.Column
+function LogicNote:getColumn()
+	return self.linked_note:getColumn()
+end
+
 ---@return number
 function LogicNote:getDeltaTime()
 	return self.logic_info:sub(self.linked_note:getStartTime())
