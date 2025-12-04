@@ -35,6 +35,16 @@ Loop.timings = {
 	draw = 0,
 }
 
+Loop.input_debug = false
+Loop.input_events = {}
+
+local function log_input(event)
+	if not Loop.input_debug then
+		return
+	end
+	table.insert(Loop.input_events, event)
+end
+
 local dwmapi
 if love.system.getOS() == "Windows" then
 	local ffi = require("ffi")
@@ -120,6 +130,7 @@ function Loop:run()
 		if asynckeyWorking then
 			if love.window.hasFocus() then
 				for event in asynckey.events do
+					log_input({"threaded", event})
 					Loop.eventTime = event.time
 					if event.state then
 						love.keypressed(event.key, event.key)
@@ -128,12 +139,14 @@ function Loop:run()
 					end
 				end
 			else
+				log_input("asynckey.clear()")
 				asynckey.clear()
 			end
 		end
 
 		Loop.eventTime = (Loop.prevTime + Loop.time) / 2
 		for name, a, b, c, d, e, f in love.event.poll() do
+			log_input({"love.event", name, a, b, c, d, e, f})
 			if name == "quit" then
 				if not love.quit or not love.quit() then
 					Loop:quit()
@@ -146,6 +159,7 @@ function Loop:run()
 		end
 
 		for port, note, status in midiInput:events() do
+			log_input({"midi", port, note, status})
 			if status then
 				love.midipressed(note)
 			else
