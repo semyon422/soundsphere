@@ -24,7 +24,7 @@ function DifficultyModel:new()
 	self.registry:add(PreviewDiffcalc())
 end
 
----@param chartdiff table
+---@param chartdiff sea.Chartdiff
 ---@param chart ncdk2.Chart
 ---@param rate number
 ---@return sphere.DiffcalcContext

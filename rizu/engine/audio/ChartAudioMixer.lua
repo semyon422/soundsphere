@@ -42,6 +42,15 @@ function ChartAudioMixer:addSound(sound, decoder)
 	self.end_pos = math.max(self.end_pos, end_pos)
 end
 
+---@return number
+---@return number
+function ChartAudioMixer:getTimeBounds()
+	if not self.sounds[1] then
+		return 0, 0
+	end
+	return self:bytesToSeconds(self.start_pos), self:bytesToSeconds(self.start_pos)
+end
+
 function ChartAudioMixer:release()
 	for _, sound in ipairs(self.sounds) do
 		sound.decoder:release()

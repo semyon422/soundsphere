@@ -1,16 +1,9 @@
 local class = require("class")
-local osu_pp = require("libchart.osu_pp")
-local minacalc = require("libchart.minacalc")
 
-local ChartAudio = require("rizu.engine.audio.ChartAudio")
-local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
-local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
-local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
-local ResourceLoader = require("rizu.files.ResourceLoader")
-local ResourceFinder = require("rizu.files.ResourceFinder")
 local InputEngine = require("rizu.engine.input.InputEngine")
 local ActiveInputNotes = require("rizu.engine.input.ActiveInputNotes")
 
+local AudioEngine = require("rizu.engine.audio.AudioEngine")
 local TimeEngine = require("rizu.engine.time.TimeEngine")
 
 local LogicInfo = require("rizu.engine.logic.LogicInfo")
@@ -23,21 +16,12 @@ local PlayProgress = require("rizu.engine.PlayProgress")
 local PauseCounter = require("rizu.engine.PauseCounter")
 
 local ScoreEngine = require("sphere.models.RhythmModel.ScoreEngine")
-local ChartplayComputed = require("sea.chart.ChartplayComputed")
 
 ---@class rizu.RhythmEngine
 ---@operator call: rizu.RhythmEngine
 local RhythmEngine = class()
 
----@param fs fs.IFilesystem
-function RhythmEngine:new(fs)
-	self.fs = fs
-
-	self.chart_audio = ChartAudio()
-
-	self.resource_finder = ResourceFinder(fs)
-	self.resource_loader = ResourceLoader(fs, self.resource_finder)
-
+function RhythmEngine:new()
 	self.logic_info = LogicInfo()
 	self.logic_engine = LogicEngine(self.logic_info)
 
@@ -48,70 +32,34 @@ function RhythmEngine:new(fs)
 
 	self.score_engine = ScoreEngine()
 
+	self.audio_engine = AudioEngine()
+
 	self.time_engine = TimeEngine()
 	self.time_engine:setAdjustFunction(function()
-		return self.chart_audio_source:getPosition()
+		return self.audio_engine:getPosition()
 	end)
 
 	self.play_progress = PlayProgress()
 	self.pause_counter = PauseCounter()
 end
 
----@param chart ncdk2.Chart
----@param dir string
----@param chartmeta sea.Chartmeta
----@param chartdiff sea.Chartdiff
----@param diffcalc_context sphere.DiffcalcContext
-function RhythmEngine:load(chart, dir, chartmeta, chartdiff, diffcalc_context)
-	self.chart = chart
-	self.chartmeta = chartmeta
-	self.chartdiff = chartdiff
-	self.diffcalc_context = diffcalc_context
+function RhythmEngine:load()
+	local chart = self.chart
 
 	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
-
-	self.resource_finder:reset()
-	self.resource_finder:addPath(dir)
-	self.resource_loader:load(chart.resources)
-
 	self.score_engine:load()
-	self.score_engine.noteChart = chart
-	self.score_engine.chartdiff = chartdiff
-
 	self.pause_counter:new()
-
-	local ca = ChartAudio()
-
-	ca:load(chart, true)
-
-	---@type rizu.BassSoundDecoder[]
-	local decoders = {}
-	for i, sound in ipairs(ca.sounds) do
-		local data = self.resource_loader:getResource(sound.name)
-		if data then
-			decoders[i] = BassSoundDecoder(data)
-		end
-	end
-
-	self.chart_audio_mixer = ChartAudioMixer(ca.sounds, decoders)
-
-	local source = BassChartAudioSource(self.chart_audio_mixer)
-	self.chart_audio_source = source
-	self.chart_audio_source:setVolume(self.volume.master)
-	self.chart_audio_source:setRate(self.logic_info.rate)
-
-	-- local Wave = require("audio.Wave")
-	-- local wave = Wave()
-	-- wave:initBuffer(self.chart_audio_mixer:getChannelCount(), self.chart_audio_mixer:getSamplesDuration())
-	-- self.chart_audio_mixer:getData(wave.byte_ptr, self.chart_audio_mixer:getBytesDuration())
-	-- self.fs:write('audio.wav', wave:encode())
 
 	self.visual_info.logic_notes = self.logic_engine.linked_to_logic
 
-	local init_time = -self.time_to_prepare * self.logic_info.rate
-	self:setTime(init_time)
-	self.play_progress.init_time = init_time
+	---@type rizu.ReplayEvent[]
+	self.events = {}
+end
+
+---@param resources {[string]: string}
+function RhythmEngine:loadAudio(resources)
+	self.audio_engine:load(self.chart, resources)
 end
 
 ---@return boolean
@@ -131,49 +79,8 @@ function RhythmEngine:hasResult()
 		accuracy < math.huge
 end
 
----@param fast boolean?
-function RhythmEngine:getChartplayComputed(fast)
-	local chartdiff = self.chartdiff
-	if not chartdiff then
-		return ChartplayComputed()
-	end
-
-	local score_engine = self.score_engine
-	local scores = score_engine.scores
-	local judgesSource = assert(score_engine.judgesSource)
-
-	-- score_engine:createByTimings(Timings("etternaj", 4))
-
-	-- local j4 = score_engine:getScoreSystem("etterna_accuracy_j4")
-	-- ---@cast j4 sphere.EtternaAccuracy
-
-	local ns_score = scores.normalscore:getScore()
-	-- print(ns_score, scores.normalscore:getScoreForWindow(0.040), j4:getAccuracyString())
-
-	local rating_msd = 0
-	if not fast then
-		local ctx = self.diffcalc_context
-		local ssr = minacalc.calc_ssr(ctx:getSimplifiedNotes(), ctx.chart.inputMode:getColumns(), ctx.rate, ns_score)
-		rating_msd = ssr.overall
-	end
-
-	local c = ChartplayComputed()
-	c.pass = not scores.hp:isFailed()
-	c.judges = judgesSource:getJudges()
-	c.accuracy = scores.normalscore.accuracyAdjusted
-	c.max_combo = scores.base.maxCombo
-	c.miss_count = scores.base.missCount
-	c.not_perfect_count = judgesSource:getNotPerfect()
-	c.rating = ns_score * chartdiff.enps_diff
-	c.rating_pp = osu_pp.calc_no_acc(ns_score, chartdiff.osu_diff, chartdiff.notes_count)
-	c.rating_msd = rating_msd
-
-	return c
-end
-
 function RhythmEngine:unload()
-	self.chart_audio_source:release()
-	self.chart_audio_mixer:release()
+	self.audio_engine:unload()
 end
 
 function RhythmEngine:retry()
@@ -184,27 +91,25 @@ function RhythmEngine:retry()
 end
 
 function RhythmEngine:update()
-	self.time_engine:updateTime()
-
 	self.logic_info.time = self.time_engine.time
 	self.visual_info.time = self.time_engine.time
 
 	self.input_engine:update()
 	self.logic_engine:update()
 	self.visual_engine:update()
-	self.chart_audio_source:update()
+	self.audio_engine:update()
 end
 
 function RhythmEngine:play()
 	self.time_engine:play()
-	self.chart_audio_source:play()
+	self.audio_engine:play()
 	self.input_engine:resume()
 	self.pause_counter:play(self.time_engine.time)
 end
 
 function RhythmEngine:pause()
 	self.time_engine:pause()
-	self.chart_audio_source:pause()
+	self.audio_engine:pause()
 	self.input_engine:pause()
 	self.pause_counter:pause()
 end
@@ -212,23 +117,52 @@ end
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
 	self.input_engine:receive(event)
+	table.insert(self.events, {self.logic_info.time, event})
+end
+
+function RhythmEngine:getTime()
+	return self.time_engine.time
 end
 
 function RhythmEngine:getProgress()
-	return self.play_progress:get(self.time_engine.time)
+	return self.play_progress:get(self:getTime())
 end
 
----@param replay_base sea.ReplayBase
-function RhythmEngine:setReplayBase(replay_base)
-	self.logic_info.timing_values = replay_base.timing_values
-	self.logic_info.rate = replay_base.rate
+---@param chart ncdk2.Chart
+---@param chartmeta sea.Chartmeta
+function RhythmEngine:setChart(chart, chartmeta)
+	self.chart = chart
+	self.chartmeta = chartmeta
+end
 
-	self.input_engine.nearest = replay_base.nearest
+---@param timings sea.Timings?
+---@param subtimings sea.Subtimings?
+function RhythmEngine:setTimings(timings, subtimings)
+	timings = assert(timings or self.chartmeta.timings)
+	self.score_engine:createByTimings(timings, subtimings, true)
+end
 
-	self.time_engine:setRate(replay_base.rate)
-	self.time_engine.const = replay_base.const
+---@param timing_values sea.TimingValues
+function RhythmEngine:setTimingValues(timing_values)
+	self.logic_info.timing_values = timing_values
+end
 
-	self.visual_info.const = replay_base.const
+---@param rate number
+function RhythmEngine:setRate(rate)
+	self.logic_info.rate = rate
+	self.time_engine:setRate(rate)
+	self.audio_engine:setRate(rate)
+end
+
+---@param nearest boolean
+function RhythmEngine:setNearest(nearest)
+	self.input_engine.nearest = nearest
+end
+
+---@param const boolean
+function RhythmEngine:setConst(const)
+	self.time_engine.const = const
+	self.visual_info.const = const
 end
 
 ---@param time number
@@ -252,12 +186,12 @@ end
 
 ---@param volume {master: number, music: number, effects: number}
 function RhythmEngine:setVolume(volume)
-	self.volume = volume
+	self.audio_engine:setVolume(volume.master)
 end
 
 ---@param time number
 function RhythmEngine:setTime(time)
-	self.chart_audio_source:setPosition(time)
+	self.audio_engine:setPosition(time)
 	self.time_engine:setTime(time)
 	self:update()
 end
@@ -279,7 +213,11 @@ end
 
 ---@param time number
 function RhythmEngine:setTimeToPrepare(time)
-	self.time_to_prepare = time
+	local start_time = self.play_progress.start_time
+	local time_to_prepare = math.min(start_time - time, self.audio_engine:getStartTime())
+	local init_time = time_to_prepare * self.logic_info.rate
+	self:setTime(init_time)
+	self.play_progress.init_time = init_time
 end
 
 ---@param start_time number

@@ -76,7 +76,7 @@ function ScoreEngine:selectDefault()
 end
 
 ---@param t sea.Timings
----@param st sea.Subtimings
+---@param st sea.Subtimings?
 ---@param _select boolean?
 ---@return boolean?
 ---@return string?

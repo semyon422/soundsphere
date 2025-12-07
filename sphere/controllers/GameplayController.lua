@@ -9,6 +9,9 @@ local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local InputBinder = require("rizu.input.InputBinder")
 local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
 
+local ResourceLoader = require("rizu.files.ResourceLoader")
+local ResourceFinder = require("rizu.files.ResourceFinder")
+
 ---@class sphere.GameplayController
 ---@operator call: sphere.GameplayController
 local GameplayController = class()
@@ -77,7 +80,6 @@ function GameplayController:load(chartview)
 	end
 
 	local config = configModel.configs.settings
-	local judgement = configModel.configs.select.judgements
 
 	local data = assert(fs:read(chartview.location_path))
 	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index or 1))
@@ -98,26 +100,42 @@ function GameplayController:load(chartview)
 	local input_binder = InputBinder(configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
 
+	self.resource_finder = ResourceFinder(fs)
+	self.resource_loader = ResourceLoader(fs, self.resource_finder)
+
+	self.resource_finder:reset()
+	self.resource_finder:addPath(chartview.location_dir)
+	self.resource_loader:load(chart.resources)
+
+	rhythm_engine:setChart(chart, chartmeta)
+	rhythm_engine:load()
+	rhythm_engine:loadAudio(self.resource_loader.resources)
+
+	-- constant
+	rhythm_engine:setTimeToPrepare(config.gameplay.time.prepare)
+	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
+
+	-- variable ranked
 	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
 	rhythm_engine:setVolume(config.audio.volume)
 	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
-	rhythm_engine:setTimeToPrepare(math.max(config.gameplay.time.prepare, -(tonumber(chartmeta.audio_offset) or 0)))
-	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
-	rhythm_engine:setAudioMode(config.audio.mode)
-	rhythm_engine:setScoring(judgement)
-	rhythm_engine:setWindUp(state.windUp)
-	rhythm_engine:setReplayBase(replayBase)
 	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
+	rhythm_engine:setScoring(configModel.configs.select.judgements)
+	rhythm_engine:setAudioMode(config.audio.mode)
 
-	rhythm_engine:load(chart, chartview.location_dir, chartmeta, chartdiff, diffcalc_context)
+	-- variable unranked
+	rhythm_engine:setWindUp(state.windUp)
+	rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
+	rhythm_engine:setTimingValues(replayBase.timing_values)
+	rhythm_engine:setRate(replayBase.rate)
+	rhythm_engine:setNearest(replayBase.nearest)
+	rhythm_engine:setConst(replayBase.const)
+
 
 	-- rhythmModel.inputManager.observable:add(replayModel)
 
 	replayModel:load()
 	pauseModel:load()
-
-	local timings = assert(replayBase.timings or chartmeta.timings)
-	self.rhythm_engine.score_engine:createByTimings(timings, replayBase.subtimings, true)
 
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()

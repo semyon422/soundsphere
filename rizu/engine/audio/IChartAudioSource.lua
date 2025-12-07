@@ -4,18 +4,13 @@ local class = require("class")
 ---@operator call: rizu.IChartAudioSource
 local IChartAudioSource = class()
 
----@param sounds rizu.ChartAudioSound[]
----@param resources {[string]: string}
-function IChartAudioSource:new(sounds, resources)
-	self.sounds = sounds
-	self.resources = resources
-end
-
 function IChartAudioSource:release() end
 
 function IChartAudioSource:play() end
 
 function IChartAudioSource:pause() end
+
+function IChartAudioSource:update() end
 
 ---@return boolean
 function IChartAudioSource:isPlaying() return false end

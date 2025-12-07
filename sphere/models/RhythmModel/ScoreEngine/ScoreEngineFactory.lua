@@ -20,7 +20,7 @@ local err_msg = "invalid timings-subtimings pair"
 
 ---@see sea.TimingValuesFactory
 ---@param t sea.Timings
----@param st sea.Subtimings
+---@param st sea.Subtimings?
 ---@return sphere.ScoreSystem[]?
 ---@return string?
 function ScoreEngineFactory:get(t, st)
