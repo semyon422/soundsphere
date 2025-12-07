@@ -32,7 +32,7 @@ function BottomNotesHandler:update()
 			local matching_value = false
 			for id, value in pairs(event_values) do
 				if value then
-					event:new(event_columns[id], event_positions[id], event_values[id], id)
+					event:new(id, event_values[id], event_columns[id], event_positions[id])
 					if note:match(event) then
 						matching_value = value
 						break

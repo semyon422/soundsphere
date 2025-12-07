@@ -1,21 +1,21 @@
 local class = require("class")
 
 ---@alias rizu.VirtualInputEventId integer
+---@alias rizu.VirtualInputEventValue false|true|"left"|"right"
 
 ---@class rizu.VirtualInputEvent
 ---@operator call: rizu.VirtualInputEvent
----@field pos any
----@field value any?
----@field id rizu.VirtualInputEventId
 local VirtualInputEvent = class()
 
----@param pos any
----@param value any?
 ---@param id rizu.VirtualInputEventId
-function VirtualInputEvent:new(pos, value, id)
-	self.pos = pos
-	self.value = value
+---@param value rizu.VirtualInputEventValue?
+---@param column ncdk2.Column
+---@param pos [number, number]
+function VirtualInputEvent:new(id, value, column, pos)
 	self.id = id
+	self.value = value
+	self.column = column
+	self.pos = pos
 end
 
 return VirtualInputEvent
