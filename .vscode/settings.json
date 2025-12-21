@@ -29,6 +29,7 @@
 		"*/spec",
 		"*/test",
 		"*/tests",
+		"userdata/skins/ignore",
 	],
 	"Lua.completion.autoRequire": false,
 	"Lua.workspace.library": [
