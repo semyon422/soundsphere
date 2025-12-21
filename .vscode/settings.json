@@ -38,11 +38,7 @@
 		"~/.config/Code/User/globalStorage/sumneko.lua/addonManager/addons/luasocket/module/library"
 	],
 	"Lua.workspace.checkThirdParty": false,
-	"Lua.diagnostics.disable": [
-		"undefined-field",
-		"cast-local-type",
-		"duplicate-set-field"
-	],
+	"Lua.diagnostics.disable": [],
 	"Lua.runtime.pathStrict": true,
 	"coverage-gutters.showLineCoverage": true,
 	"coverage-gutters.showRulerCoverage": true,
