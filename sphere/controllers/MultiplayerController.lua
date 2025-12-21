@@ -1,5 +1,4 @@
 local class = require("class")
-local remote = require("remote")
 
 ---@class sphere.MultiplayerController
 ---@operator call: sphere.MultiplayerController
