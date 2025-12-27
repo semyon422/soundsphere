@@ -1,2 +1,2 @@
 #!/bin/bash
-cloc --exclude-dir=bin,3rd-deps,tree,share,storages --include-lang=Lua .
+cloc --exclude-dir=bin,3rd-deps,tree,share,storages,userdata --include-lang=Lua .
