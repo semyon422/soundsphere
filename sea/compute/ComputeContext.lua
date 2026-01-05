@@ -55,8 +55,6 @@ end
 
 ---@param replayBase sea.ReplayBase
 ---@param inputMode ncdk.InputMode?
----@return ncdk2.Chart?
----@return sea.Chartmeta?
 function ComputeContext:applyModifierReorder(replayBase, inputMode)
 	if not inputMode then
 		local chart = assert(self.chart)
