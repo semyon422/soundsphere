@@ -140,6 +140,9 @@ function GameplayController:load(chartview)
 	local noteSkin = noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 	self.noteSkin = noteSkin
+
+	---@type rizu.ReplayEvent[]
+	self.events = {}
 end
 
 ---@param timings sea.Timings
@@ -252,6 +255,7 @@ function GameplayController:receive(event)
 		local virtual_event = self.input_binder:transform(physic_event)
 		if virtual_event then
 			self.rhythm_engine:receive(virtual_event)
+			table.insert(self.events, {self.rhythm_engine:getTime(), virtual_event})
 		end
 	end
 

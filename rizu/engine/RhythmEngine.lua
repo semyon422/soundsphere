@@ -52,9 +52,6 @@ function RhythmEngine:load()
 	self.pause_counter:new()
 
 	self.visual_info.logic_notes = self.logic_engine.linked_to_logic
-
-	---@type rizu.ReplayEvent[]
-	self.events = {}
 end
 
 ---@param resources {[string]: string}
@@ -117,7 +114,6 @@ end
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
 	self.input_engine:receive(event)
-	table.insert(self.events, {self.logic_info.time, event})
 end
 
 function RhythmEngine:getTime()
