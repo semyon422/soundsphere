@@ -4,29 +4,27 @@ local class = require("class")
 ---@operator call: rizu.ReplayPlayer
 local ReplayPlayer = class()
 
----@param events rizu.ReplayEvent[]
-function ReplayPlayer:new(events)
-	self.events = events
+---@param frames rizu.ReplayFrame[]
+function ReplayPlayer:new(frames)
+	self.frames = frames
 	self.offset = 0
 end
 
 ---@param time number
----@return number?
----@return rizu.ReplayEvent?
+---@return rizu.ReplayFrame?
 function ReplayPlayer:play(time)
-	local event = self.events[self.offset + 1]
-	if not event then
+	local frame = self.frames[self.offset + 1]
+	if not frame then
 		return
 	end
 
-	local event_time = event[1]
-	if time < event_time then
+	if time < frame.time then
 		return
 	end
 
 	self.offset = self.offset + 1
 
-	return event_time, event[2]
+	return frame
 end
 
 return ReplayPlayer
