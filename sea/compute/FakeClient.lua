@@ -10,7 +10,8 @@ local TableStorage = require("sea.chart.storage.TableStorage")
 local ReplayBase = require("sea.replays.ReplayBase")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
 local simplify_notechart = require("libchart.simplify_notechart")
-local ReplayModel = require("sphere.models.ReplayModel")
+local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
+local ReplayFactory = require("rizu.engine.replay.ReplayFactory")
 
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -27,7 +28,6 @@ function FakeClient:new(accuracy, miss_ratio)
 
 	self.computeContext = ComputeContext()
 	self.replayBase = ReplayBase()
-	self.replayModel = ReplayModel()
 
 	local db = ServerSqliteDatabase(LjsqliteDatabase())
 	db.path = ":memory:"
@@ -46,34 +46,38 @@ end
 ---@param chart ncdk2.Chart
 ---@param accuracy number
 ---@param miss_ratio integer?
----@return sea.ReplayEvent[]
+---@return rizu.ReplayFrame[]
 function FakeClient:createFakeEvents(chart, accuracy, miss_ratio)
 	miss_ratio = miss_ratio or math.huge
 
-	---@type sea.ReplayEvent[]
-	local events = {}
+	---@type rizu.ReplayFrame[]
+	local frames = {}
 
 	math.randomseed(0)
 
 	local notes = simplify_notechart(chart, {"tap"})
 	for i, note in ipairs(notes) do
 		if i % miss_ratio ~= 0 then
-			local dt = math_util.nrandom() * accuracy
-			local press_time = math.floor((note.time + dt) * 1024) / 1024
-			local release_time = math.floor((press_time + 0.05) * 1024) / 1024
-			table.insert(events, {press_time, note.column, true})
-			table.insert(events, {release_time, note.column, false})
+			local t = note.time + math_util.nrandom() * accuracy
+			table.insert(frames, {
+				time = t,
+				event = VirtualInputEvent(1, true, note.input)
+			})
+			table.insert(frames, {
+				time = t + 0.05,
+				event = VirtualInputEvent(1, false, note.input)
+			})
 		end
 	end
 
-	table.sort(events, function(a, b)
+	table.sort(frames, function(a, b)
 		if a[1] == b[1] then
 			return a[2] < b[2]
 		end
 		return a[1] < b[1]
 	end)
 
-	return events
+	return frames
 end
 
 ---@param chartfile_name string
@@ -84,7 +88,6 @@ end
 function FakeClient:play(chartfile_name, chartfile_data, index, created_at, pause_count)
 	local computeContext = self.computeContext
 	local replayBase = self.replayBase
-	local replayModel = self.replayModel
 
 	local chart_chartmeta = assert(computeContext:fromFileData(chartfile_name, chartfile_data, index))
 	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
@@ -92,12 +95,13 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 	computeContext:applyModifierReorder(replayBase)
 	computeContext:computeBase(replayBase)
 
-	local events = self:createFakeEvents(chart, self.accuracy, self.miss_ratio)
-	replayModel.events = events
+	local frames = self:createFakeEvents(chart, self.accuracy, self.miss_ratio)
 
-	local replay, replay_data, replay_hash = replayModel:createReplay(
+	local replay, replay_data, replay_hash = ReplayFactory:createReplay(
 		replayBase,
 		chartmeta,
+		frames,
+		chart.inputMode,
 		created_at,
 		pause_count
 	)

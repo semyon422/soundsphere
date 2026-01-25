@@ -176,7 +176,7 @@ function ReplayConverter:convert(obj)
 	local replay = Replay()
 
 	replay.version = 0
-	replay.events = obj.events
+	replay.frames = obj.frames
 
 	replay.hash = obj.hash
 	replay.index = obj.index

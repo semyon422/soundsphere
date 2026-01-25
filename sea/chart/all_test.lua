@@ -19,7 +19,8 @@ local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 local User = require("sea.access.User")
 local Replay = require("sea.replays.Replay")
 local ReplayCoder = require("sea.replays.ReplayCoder")
-local ReplayEvents = require("sea.replays.ReplayEvents")
+local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
+local InputMode = require("ncdk.InputMode")
 
 local test = {}
 
@@ -82,17 +83,19 @@ input 4key
 1000 =4
 ]]
 
-local _events = {
-	{0.01, 2, true},
-	{0.1, 2, false},
-	{0.95, 3, true},
-	{1.1, 3, false},
+---@type rizu.ReplayFrame[]
+local frames = {
+	{time = 0.01, event = VirtualInputEvent(1, true, "key2")},
+	{time = 0.1, event = VirtualInputEvent(1, false, "key2")},
+	{time = 0.95, event = VirtualInputEvent(1, true, "key3")},
+	{time = 1.1, event = VirtualInputEvent(1, false, "key3")},
 }
 
-local _replayfile_data_table = {
-	version = 1,
-	timing_values = TimingValuesFactory:get(Timings("osuod", 8)),
-	events = ReplayEvents.encode(_events),
+---@type sea.Replay
+local replay = {
+	version = 2,
+	timing_values = assert(TimingValuesFactory:get(Timings("osuod", 8))),
+	frames = frames,
 	created_at = 0,
 	--
 	hash = md5.sumhexa(chartfile_data),
@@ -113,29 +116,28 @@ local _replayfile_data_table = {
 	pause_count = 0,
 	rate_type = "linear",
 }
-setmetatable(_replayfile_data_table, Replay)
----@cast _replayfile_data_table sea.Replay
-local _replayfile_data = ReplayCoder.encode(_replayfile_data_table)
+setmetatable(replay, Replay)
+local _replayfile_data = ReplayCoder.encode(replay, InputMode("4key"))
 
 local _chartplay_values = {
-	hash = _replayfile_data_table.hash,
-	index = _replayfile_data_table.index,
-	modifiers = _replayfile_data_table.modifiers,
-	rate = _replayfile_data_table.rate,
-	mode = _replayfile_data_table.mode,
+	hash = replay.hash,
+	index = replay.index,
+	modifiers = replay.modifiers,
+	rate = replay.rate,
+	mode = replay.mode,
 	--
-	nearest = _replayfile_data_table.nearest,
-	tap_only = _replayfile_data_table.tap_only,
-	timings = _replayfile_data_table.timings,
-	subtimings = _replayfile_data_table.subtimings,
-	healths = _replayfile_data_table.healths,
-	columns_order = _replayfile_data_table.columns_order,
+	nearest = replay.nearest,
+	tap_only = replay.tap_only,
+	timings = replay.timings,
+	subtimings = replay.subtimings,
+	healths = replay.healths,
+	columns_order = replay.columns_order,
 	--
-	custom = _replayfile_data_table.custom,
-	const = _replayfile_data_table.const,
-	pause_count = _replayfile_data_table.pause_count,
-	created_at = _replayfile_data_table.created_at,
-	rate_type = _replayfile_data_table.rate_type,
+	custom = replay.custom,
+	const = replay.const,
+	pause_count = replay.pause_count,
+	created_at = replay.created_at,
+	rate_type = replay.rate_type,
 	--
 	accuracy = 0.05984583644905697164,
 	replay_hash = md5.sumhexa(_replayfile_data),
@@ -190,7 +192,7 @@ setmetatable(_chartdiff_values, Chartdiff)
 function test.submit_valid_score(t)
 	local ctx = create_test_ctx()
 
-	local replayfile_data_table = setmetatable(table_util.copy(_replayfile_data_table), Replay)
+	local replayfile_data_table = setmetatable(table_util.copy(replay), Replay)
 	local replayfile_data = _replayfile_data
 	t:assert(replayfile_data_table:validate())
 

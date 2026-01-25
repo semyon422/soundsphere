@@ -13,6 +13,8 @@ local Note = require("ncdk2.notes.Note")
 local Notes = require("ncdk2.notes.Notes")
 local ReplayModel = require("sphere.models.ReplayModel")
 local RhythmEngine = require("rizu.engine.RhythmEngine")
+local ChartplayComputedFactory = require("rizu.engine.ChartplayComputedFactory")
+local ReplayPlayer = require("rizu.engine.replay.ReplayPlayer")
 
 ---@class sea.ComputeContext
 ---@operator call: sea.ComputeContext
@@ -135,48 +137,43 @@ end
 ---@return string?
 function ComputeContext:computeReplay(replay)
 	local chartmeta = assert(self.chartmeta)
-	assert(self.chartdiff)
+	local chartdiff = assert(self.chartdiff)
+	local state = assert(self.state)
+	local diffcalc_context = assert(self.diffcalc_context)
 
 	local rhythm_engine = RhythmEngine()
-	local replayModel = ReplayModel(rhythm_engine)
 
-	rhythm_engine:setReplayBase(replay)
-	replayModel:decodeEvents(replay.events)
-
-	self:computePlay(rhythm_engine, replayModel)
+	rhythm_engine:setChart(self.chart, chartmeta)
 
 	local timings = assert(replay.timings or chartmeta.timings)
-	rhythm_engine.scoreEngine:createByTimings(timings, replay.subtimings, true)
 
-	local chartplay_computed = rhythm_engine:getChartplayComputed()
+	-- variable unranked
+	rhythm_engine:setWindUp(state.windUp)
+	rhythm_engine:setTimings(timings, replay.subtimings)
+	rhythm_engine:setTimingValues(replay.timing_values)
+	rhythm_engine:setRate(replay.rate)
+	rhythm_engine:setNearest(replay.nearest)
+	rhythm_engine:setConst(replay.const)
+
+	self:computePlay(rhythm_engine, replay.events)
+
+	local cc_factory = ChartplayComputedFactory(chartdiff, diffcalc_context, rhythm_engine.score_engine)
+	local chartplay_computed = cc_factory:getChartplayComputed()
 
 	return chartplay_computed
 end
 
 ---@param rhythm_engine rizu.RhythmEngine
----@param replayModel sphere.ReplayModel
-function ComputeContext:computePlay(rhythm_engine, replayModel)
-	local chart = assert(self.chart)
-	local chartmeta = assert(self.chartmeta)
-	local chartdiff = assert(self.chartdiff)
-	local state = assert(self.state)
-	local diffcalc_context = assert(self.diffcalc_context)
+---@param events rizu.ReplayFrame[]
+function ComputeContext:computePlay(rhythm_engine, events)
+	local p = ReplayPlayer(events)
 
-	rhythm_engine:setWindUp(state.windUp)
-	rhythm_engine:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
-	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
-
-	replayModel:setMode("replay")
-	rhythm_engine.inputManager:setMode("internal")
-
-	rhythm_engine:loadLogicEngines()
-	replayModel:load()
-
-	rhythm_engine.timeEngine.currentTime = math.huge
-	replayModel:update()
-	rhythm_engine.logicEngine:update()
-
-	rhythm_engine:unloadAllEngines()
+	local frame = p:play(math.huge)
+	while frame do
+		rhythm_engine:setTime(frame.time)
+		rhythm_engine:receive(frame.event)
+		frame = p:play(math.huge)
+	end
 end
 
 ---@see sphere.LogicalNoteFactory

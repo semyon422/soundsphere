@@ -3,7 +3,6 @@ local valid = require("valid")
 local md5 = require("md5")
 local Replay = require("sea.replays.Replay")
 local ReplayCoder = require("sea.replays.ReplayCoder")
-local ReplayFrames = require("rizu.engine.replay.ReplayFrames")
 
 ---@class rizu.ReplayFactory
 ---@operator call: rizu.ReplayFactory
@@ -28,13 +27,13 @@ function ReplayFactory:createReplay(replayBase, chartmetaKey, frames, input_mode
 
 	replay.version = 2
 	replay.timing_values = replayBase.timing_values
-	replay.events = assert(ReplayFrames.encode(frames, input_mode))
+	replay.frames = frames
 	replay.created_at = created_at
 	replay.pause_count = pause_count
 
 	assert(valid.format(replay:validate()))
 
-	local data = assert(ReplayCoder.encode(replay))
+	local data = assert(ReplayCoder.encode(replay, input_mode))
 	local replay_hash = md5.sumhexa(data)
 
 	return replay, data, replay_hash

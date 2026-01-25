@@ -9,8 +9,7 @@ local ReplayEvents = {}
 local hash = string.char(0):rep(16)
 
 ---@param events sea.ReplayEvent[]
----@return string?
----@return string?
+---@return string
 function ReplayEvents.encode(events)
 	---@type {time: number, type: 1|0, input: integer}[]
 	local notes = {}
@@ -29,8 +28,7 @@ function ReplayEvents.encode(events)
 end
 
 ---@param data string
----@return sea.ReplayEvent[]?
----@return string?
+---@return sea.ReplayEvent[]
 function ReplayEvents.decode(data)
 	local uncompressed_data = zlib.inflate(data)
 	local _, _, _, notes = NanoChart:decode(uncompressed_data)

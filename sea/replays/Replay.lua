@@ -7,14 +7,14 @@ local types = require("sea.shared.types")
 ---@class sea.Replay: sea.ChartmetaKey, sea.ReplayBase
 ---@operator call: sea.Replay
 ---@field version integer
----@field events string encoded
+---@field frames rizu.ReplayFrame[]
 ---@field pause_count integer
 ---@field created_at integer
 local Replay = ChartmetaKey + ReplayBase
 
 Replay.struct = {
 	version = types.integer,
-	events = types.binary,
+	frames = function() return true end, -- TODO: validation for frames
 	pause_count = types.count,
 	created_at = types.time,
 }
