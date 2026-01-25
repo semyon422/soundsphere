@@ -40,7 +40,7 @@ function BaseScore:getMaxCombo()
 	return self.maxCombo
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:before(event)
 	self.currentTime = event.currentTime
 	self.isMiss = false
@@ -50,40 +50,40 @@ function BaseScore:before(event)
 	self.notesCount = event.notesCount
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:success(event)
 	self.hitCount = self.hitCount + 1
 	self.combo = self.combo + 1
 	self.maxCombo = math.max(self.maxCombo, self.combo)
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:breakCombo(event)
 	self.combo = 0
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:breakComboLongNote(event)
 	self.combo = 0
 	self.isLongNoteComboBreak = true
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:miss(event)
 	self.missCount = self.missCount + 1
 	self.isMiss = true
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:earlyHit(event)
 	self.earlyHitCount = self.earlyHitCount + 1
 	self.isEarlyHit = true
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function BaseScore:countLastMean(event)
 	local rb = self.meanRingBuffer
-	rb:write(event.deltaTime)
+	rb:write(event.delta_time)
 	local sum = 0
 	for i = 1, rb.size do
 		---@type number
@@ -108,14 +108,14 @@ function BaseScore:getSlice()
 end
 
 BaseScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = {"success", "countLastMean"},
 			missed = {"breakCombo", "miss"},
 			clear = "earlyHit",
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "countLastMean",
 			startMissed = "breakComboLongNote",

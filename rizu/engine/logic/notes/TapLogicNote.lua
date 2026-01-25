@@ -68,12 +68,13 @@ function TapLogicNote:switchState(state)
 	local last_time = self.logic_info.timing_values:getMaxTime("ShortNote")
 	local last_time_full = self:getEndTime()
 
-	-- local currentTime = math.min(time, last_time_full)
+	local current_time = math.min(self.logic_info.time, last_time_full)
 	local delta_time = math.min(self:getDeltaTime(), last_time)
 
 	-- send to event score engine
 
-	self.observable:send({
+	self.logic_info:addNoteChange({
+		type = "tap",
 		delta_time = delta_time,
 		old_state = old_state,
 		new_state = state,

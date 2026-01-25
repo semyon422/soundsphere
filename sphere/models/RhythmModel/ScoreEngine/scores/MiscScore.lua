@@ -19,10 +19,10 @@ function MiscScore:getKey()
 	return "misc"
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function MiscScore:hit(event)
 	---@type number
-	local deltaTime = event.deltaTime
+	local deltaTime = event.delta_time
 	self.deltaTime = deltaTime
 	if math.abs(deltaTime) > math.abs(self.maxDeltaTime) then
 		self.maxDeltaTime = deltaTime
@@ -35,12 +35,12 @@ function MiscScore:hit(event)
 	end
 end
 
----@param event any
+---@param event rizu.LogicNoteChange
 function MiscScore:miss(event)
-	self.deltaTime = event.deltaTime
+	self.deltaTime = event.delta_time
 end
 
----@param event any
+---@param event rizu.LogicNoteChange
 function MiscScore:early(event)
 	self.deltaTime = -math.huge
 end
@@ -53,14 +53,14 @@ function MiscScore:getSlice()
 end
 
 MiscScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "hit",
 			missed = "miss",
 			clear = "early",
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "hit",
 			startMissed = "miss",

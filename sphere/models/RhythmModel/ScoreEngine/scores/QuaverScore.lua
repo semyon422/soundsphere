@@ -31,12 +31,11 @@ function QuaverScore:getKey()
 	return "quaver"
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function QuaverScore:hit(event)
-	local is_release = event.newState == "endPassed" or event.newState == "endMissedPassed"
+	local is_release = event.new_state == "endPassed" or event.new_state == "endMissedPassed"
 
-	---@type number
-	local delta_time = event.deltaTime
+	local delta_time = event.delta_time
 	if is_release then
 		delta_time = delta_time / 1.5
 	end
@@ -65,14 +64,14 @@ function QuaverScore:getSlice()
 end
 
 QuaverScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "hit",
 			missed = "miss",
 			clear = nil,
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "hit",
 			startMissed = "miss",

@@ -1,12 +1,20 @@
 local class = require("class")
 local TimingValues = require("sea.chart.TimingValues")
 
+---@class rizu.LogicNoteChange
+---@field type "tap"|"hold"
+---@field delta_time number
+---@field old_state string
+---@field new_state string
+
 ---@class rizu.LogicInfo
 ---@operator call: rizu.LogicInfo
 ---@field time number
 ---@field rate number
 ---@field offset number
 ---@field timing_values sea.TimingValues
+---@field note_changes rizu.LogicNoteChange[]
+---@field on_note_change fun(change: rizu.LogicNoteChange)?
 local LogicInfo = class()
 
 function LogicInfo:new()
@@ -14,6 +22,7 @@ function LogicInfo:new()
 	self.rate = 1
 	self.offset = 0
 	self.timing_values = TimingValues()
+	self.note_changes = {}
 end
 
 ---@return number
@@ -37,6 +46,14 @@ end
 ---@return number
 function LogicInfo:getNoteMaxTime(key)
 	return self.timing_values:getMaxTime(key) * self.rate
+end
+
+---@param change rizu.LogicNoteChange
+function LogicInfo:addNoteChange(change)
+	table.insert(self.note_changes, change)
+	if self.on_note_change then
+		self.on_note_change(change)
+	end
 end
 
 return LogicInfo

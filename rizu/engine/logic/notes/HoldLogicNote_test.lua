@@ -23,10 +23,7 @@ local function new_test_ctx()
 
 	local logic_note = HoldLogicNote(linked_note, logic_info)
 
-	local events = {}
-	logic_note.observable:add({receive = function(self, event)
-		table.insert(events, event)
-	end})
+	local events = logic_info.note_changes
 
 	return {
 		logic_info = logic_info,
@@ -54,6 +51,7 @@ function test.too_early(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = -3,
 		old_state = "clear",
 		new_state = "clear",
@@ -69,6 +67,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 2,
 		old_state = "clear",
 		new_state = "startMissed",
@@ -79,6 +78,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 2,
 		old_state = "startMissed",
 		new_state = "endMissed",
@@ -94,6 +94,7 @@ function test.perfect_hold(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 0,
 		old_state = "clear",
 		new_state = "startPassedPressed",
@@ -105,6 +106,7 @@ function test.perfect_hold(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 0,
 		old_state = "startPassedPressed",
 		new_state = "endPassed",
@@ -120,6 +122,7 @@ function test.early_release(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 0.5,
 		old_state = "clear",
 		new_state = "startPassedPressed",
@@ -131,6 +134,7 @@ function test.early_release(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = -5,
 		old_state = "startPassedPressed",
 		new_state = "startMissed",
@@ -140,6 +144,7 @@ function test.early_release(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = -5,
 		old_state = "startMissed",
 		new_state = "startMissedPressed",
@@ -149,6 +154,7 @@ function test.early_release(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = -5,
 		old_state = "startMissedPressed",
 		new_state = "startMissed",
@@ -165,6 +171,7 @@ function test.late_press(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 1.5,
 		old_state = "clear",
 		new_state = "startMissedPressed",
@@ -176,6 +183,7 @@ function test.late_press(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 0,
 		old_state = "startMissedPressed",
 		new_state = "endMissedPassed",
@@ -190,6 +198,7 @@ function test.too_late_press(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 2,
 		old_state = "clear",
 		new_state = "startMissed",
@@ -199,6 +208,7 @@ function test.too_late_press(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = -5,
 		old_state = "startMissed",
 		new_state = "startMissedPressed",
@@ -210,6 +220,7 @@ function test.too_late_press(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		type = "hold",
 		delta_time = 0,
 		old_state = "startMissedPressed",
 		new_state = "endMissedPassed",

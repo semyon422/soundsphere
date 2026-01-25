@@ -1,5 +1,4 @@
 local class = require("class")
-local Observable = require("Observable")
 
 ---@alias rizu.LogicNoteState "clear"|"missed"|"passed"
 
@@ -12,8 +11,6 @@ local LogicNote = class()
 function LogicNote:new(note, logic_info)
 	self.linked_note = note
 	self.logic_info = logic_info
-
-	self.observable = Observable()
 
 	self:reset()
 end

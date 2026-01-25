@@ -92,7 +92,7 @@ function HpScore:isFailed()
 	return not _h
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function HpScore:increase(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
@@ -101,7 +101,7 @@ function HpScore:increase(event)
 	end
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function HpScore:decrease(event)
 	for _, h in ipairs(self) do
 		if h.value > 0 then
@@ -114,14 +114,14 @@ function HpScore:decrease(event)
 end
 
 HpScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "increase",
 			missed = "decrease",
 			clear = nil,
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "increase",
 			startMissed = "decrease",

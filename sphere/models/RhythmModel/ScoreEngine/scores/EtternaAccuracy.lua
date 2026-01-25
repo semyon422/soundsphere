@@ -49,7 +49,7 @@ end
 ---@param deltaTime number
 ---@return number
 function EtternaAccuracy:getPoints(deltaTime)
-	if deltaTime<= self.ridic then
+	if deltaTime <= self.ridic then
 		return self.maxPoints
 	end
 
@@ -67,9 +67,9 @@ function EtternaAccuracy:getPoints(deltaTime)
 	return self.missWeight
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function EtternaAccuracy:hit(event)
-	self.points = self.points + self:getPoints(math.abs(event.deltaTime))
+	self.points = self.points + self:getPoints(math.abs(event.delta_time))
 	self.notes = self.notes + 1
 end
 
@@ -91,14 +91,14 @@ function EtternaAccuracy:getSlice()
 end
 
 EtternaAccuracy.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "hit",
 			missed = "miss",
 			clear = nil,
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "hit",
 			startMissed = "miss",

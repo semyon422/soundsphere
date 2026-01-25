@@ -131,7 +131,8 @@ function HoldLogicNote:switchState(state)
 		delta_time = math.min(self:getEndDeltaTime(), end_last_time)
 	end
 
-	self.observable:send({
+	self.logic_info:addNoteChange({
+		type = "hold",
 		delta_time = delta_time,
 		old_state = old_state,
 		new_state = state,

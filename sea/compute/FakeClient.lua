@@ -101,7 +101,6 @@ function FakeClient:play(chartfile_name, chartfile_data, index, created_at, paus
 		replayBase,
 		chartmeta,
 		frames,
-		chart.inputMode,
 		created_at,
 		pause_count
 	)

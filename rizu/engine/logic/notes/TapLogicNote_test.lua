@@ -17,10 +17,7 @@ local function new_test_ctx()
 
 	local logic_note = TapLogicNote(linked_note, logic_info)
 
-	local events = {}
-	logic_note.observable:add({receive = function(self, event)
-		table.insert(events, event)
-	end})
+	local events = logic_info.note_changes
 
 	return {
 		logic_info = logic_info,
@@ -45,6 +42,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		type = "tap",
 		delta_time = 2,
 		old_state = "clear",
 		new_state = "missed",
@@ -61,6 +59,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		type = "tap",
 		delta_time = 2,
 		old_state = "clear",
 		new_state = "missed",
@@ -80,6 +79,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "tap",
 		delta_time = 1.1,
 		old_state = "clear",
 		new_state = "missed",
@@ -93,6 +93,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "tap",
 		delta_time = 1.1 / 1.5, -- 0.733
 		old_state = "clear",
 		new_state = "passed",
@@ -129,6 +130,7 @@ function test.hit_too_early(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		type = "tap",
 		delta_time = -3,
 		old_state = "clear",
 		new_state = "clear",

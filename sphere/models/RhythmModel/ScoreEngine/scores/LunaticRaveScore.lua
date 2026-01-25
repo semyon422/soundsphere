@@ -49,13 +49,13 @@ function LunaticRaveScore:getAccuracy()
 	return self.judge_accuracy:get(self.judge_counter.judges)
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function LunaticRaveScore:hit(event)
-	local index = self.judge_windows:get(event.deltaTime) or -1
+	local index = self.judge_windows:get(event.delta_time) or -1
 	self.judge_counter:add(index)
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function LunaticRaveScore:miss(event)
 	self.judge_counter:add(-1)
 end
@@ -68,14 +68,14 @@ function LunaticRaveScore:getSlice()
 end
 
 LunaticRaveScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "hit",
 			missed = "miss",
 			clear = "mash",
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "hit",
 			startMissed = "miss",

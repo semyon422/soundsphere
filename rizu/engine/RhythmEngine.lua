@@ -23,6 +23,7 @@ local RhythmEngine = class()
 
 function RhythmEngine:new()
 	self.logic_info = LogicInfo()
+
 	self.logic_engine = LogicEngine(self.logic_info)
 
 	self.active_input_notes = ActiveInputNotes(self.logic_engine.active_notes)
@@ -32,6 +33,9 @@ function RhythmEngine:new()
 	self.visual_engine = VisualEngine(self.visual_info)
 
 	self.score_engine = ScoreEngine()
+	function self.logic_info.on_note_change(change)
+		self.score_engine:receive(change)
+	end
 
 	self.audio_engine = AudioEngine()
 

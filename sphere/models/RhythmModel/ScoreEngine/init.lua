@@ -32,6 +32,7 @@ local ScoreEngineFactory = require("sphere.models.RhythmModel.ScoreEngine.ScoreE
 local ScoreEngine = class()
 
 function ScoreEngine:new()
+	---@type rizu.LogicNoteChange[]
 	self.events = {}
 	self.scores = {}
 	self.sequence = {}
@@ -40,6 +41,7 @@ end
 
 function ScoreEngine:load()
 	self.events = {}
+
 	---@type sphere.ScoreSystem[]
 	self.scoreSystems = {}
 
@@ -151,12 +153,8 @@ function ScoreEngine:getSlice()
 	return slice
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function ScoreEngine:receive(event)
-	if event.name ~= "NoteState" or not event.currentTime then
-		return
-	end
-
 	for _, scoreSystem in ipairs(self.scoreSystems) do
 		scoreSystem:receive(event)
 	end

@@ -23,7 +23,7 @@ function NormalscoreScore:getKey()
 	return "normalscore"
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function NormalscoreScore:after(event)
 	local ns = self.normalscore
 
@@ -66,25 +66,25 @@ function NormalscoreScore:miss(range_name)
 end
 
 NormalscoreScore.events = {
-	ShortNote = {
+	tap = {
 		clear = {
-			passed = function(self, event) self:hit("ShortNote", event.deltaTime) end,
+			passed = function(self, event) self:hit("ShortNote", event.delta_time) end,
 			missed = function(self) self:miss("ShortNote") end,
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
-			startPassedPressed = function(self, event) self:hit("LongNoteStart", event.deltaTime) end,
+			startPassedPressed = function(self, event) self:hit("LongNoteStart", event.delta_time) end,
 			startMissed = function(self) self:miss("LongNoteStart") end,
 			startMissedPressed = function(self) self:miss("LongNoteStart") end,
 		},
 		startPassedPressed = {
 			startMissed = nil,
 			endMissed = function(self) self:miss("LongNoteEnd") end,
-			endPassed = function(self, event) self:hit("LongNoteEnd", event.deltaTime) end,
+			endPassed = function(self, event) self:hit("LongNoteEnd", event.delta_time) end,
 		},
 		startMissedPressed = {
-			endMissedPassed = function(self, event) self:hit("LongNoteEnd", event.deltaTime) end,
+			endMissedPassed = function(self, event) self:hit("LongNoteEnd", event.delta_time) end,
 			startMissed = nil,
 			endMissed = function(self) self:miss("LongNoteEnd") end,
 		},

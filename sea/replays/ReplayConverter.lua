@@ -158,6 +158,9 @@ function ReplayConverter:convert(obj)
 			if obj.healths then
 				setmetatable(obj.healths, Healths)
 			end
+			if obj.timing_values then
+				setmetatable(obj.timing_values, TimingValues)
+			end
 			-- TODO: convert events for version 1
 			return (setmetatable(obj, Replay))
 		end

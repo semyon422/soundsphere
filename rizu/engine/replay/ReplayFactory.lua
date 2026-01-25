@@ -11,13 +11,12 @@ local ReplayFactory = class()
 ---@param replayBase sea.ReplayBase
 ---@param chartmetaKey sea.ChartmetaKey
 ---@param frames rizu.ReplayFrame[]
----@param input_mode ncdk.InputMode
 ---@param created_at integer
 ---@param pause_count integer
 ---@return sea.Replay
 ---@return string
 ---@return string
-function ReplayFactory:createReplay(replayBase, chartmetaKey, frames, input_mode, created_at, pause_count)
+function ReplayFactory:createReplay(replayBase, chartmetaKey, frames, created_at, pause_count)
 	local replay = Replay()
 
 	replay:importReplayBase(replayBase)
@@ -33,7 +32,7 @@ function ReplayFactory:createReplay(replayBase, chartmetaKey, frames, input_mode
 
 	assert(valid.format(replay:validate()))
 
-	local data = assert(ReplayCoder.encode(replay, input_mode))
+	local data = assert(ReplayCoder.encode(replay))
 	local replay_hash = md5.sumhexa(data)
 
 	return replay, data, replay_hash

@@ -87,7 +87,7 @@ function OsuManiaV1Score:getKey()
 	return "osu_mania_v1_od" .. self.od
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:before(event)
 	---@type integer
 	self.notes = event.notesCount
@@ -108,7 +108,7 @@ function OsuManiaV1Score:addCounter(index)
 	self.score = self.baseScore + self.bonusScore
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 ---@return integer?
 function OsuManiaV1Score:getStartCounter(event)
 	return self.pressedLongNotes[event.noteIndexType]
@@ -118,28 +118,28 @@ function OsuManiaV1Score:setStartCounter(event, counter_name)
 	self.pressedLongNotes[event.noteIndexType] = counter_name
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:miss(event)
 	self:addCounter(6)
-	if event.noteType == "LongNote" then
+	if event.type == "hold" then
 		self:setStartCounter(event, nil)
 	end
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:shortNoteHit(event)
-	local index = self.note_judge_windows:get(event.deltaTime) or 6
+	local index = self.note_judge_windows:get(event.delta_time) or 6
 	self:addCounter(index)
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:longNoteStartHit(event)
-	local index = self.head_judge_windows:get(event.deltaTime) or 6
+	local index = self.head_judge_windows:get(event.delta_time) or 6
 	self.judge_counter:add(index)
 	self:setStartCounter(event, index)
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:didntReleased(event)
 	local index = self:getStartCounter(event) or 5
 	index = math.min(index + 2, 5)
@@ -147,13 +147,14 @@ function OsuManiaV1Score:didntReleased(event)
 	self:setStartCounter(event, nil)
 end
 
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:longNoteFail(event)
 	self:setStartCounter(event, 5)
 end
 
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:longNoteRelease(event)
-	---@type number
-	local delta_time = event.deltaTime
+	local delta_time = event.delta_time
 
 	local tail = self.tail_judge_windows:get(delta_time)
 	if not tail or tail == 6 then
@@ -189,14 +190,14 @@ function OsuManiaV1Score:getSlice()
 end
 
 OsuManiaV1Score.events = {
-	ShortNote = {
+	tap = {
 		clear = {
 			passed = "shortNoteHit",
 			missed = "miss",
 			clear = nil,
 		},
 	},
-	LongNote = {
+	hold = {
 		clear = {
 			startPassedPressed = "longNoteStartHit",
 			startMissed = "longNoteFail",

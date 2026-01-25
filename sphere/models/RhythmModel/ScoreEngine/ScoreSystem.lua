@@ -10,6 +10,9 @@ local class = require("class")
 ---@field subtimings sea.Subtimings?
 local ScoreSystem = class()
 
+---@alias sphere.ScoreSystemHandler string|function|sphere.ScoreSystemHandler[]
+
+---@type {[string]: {[string]: {[string]: sphere.ScoreSystemHandler}}}
 ScoreSystem.events = {}
 
 ScoreSystem.hasAccuracy = false
@@ -28,7 +31,7 @@ function ScoreSystem:before(event) end
 function ScoreSystem:after(event) end
 
 ---@param self table
----@param handler function|string|table?
+---@param handler sphere.ScoreSystemHandler?
 ---@param event table
 local function handle(self, handler, event)
 	if type(handler) == "function" then
@@ -42,19 +45,14 @@ local function handle(self, handler, event)
 	end
 end
 
----@param event table
+---@param event rizu.LogicNoteChange
 function ScoreSystem:receive(event)
-	if event.name ~= "NoteState" or not event.currentTime then
-		return
-	end
-
 	self:before(event)
 
-	local oldState, newState = event.oldState, event.newState
 	local handler =
-		self.events[event.noteType] and
-		self.events[event.noteType][oldState] and
-		self.events[event.noteType][oldState][newState]
+		self.events[event.type] and
+		self.events[event.type][event.old_state] and
+		self.events[event.type][event.old_state][event.new_state]
 
 	handle(self, handler, event)
 
