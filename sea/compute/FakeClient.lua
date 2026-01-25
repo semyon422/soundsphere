@@ -61,20 +61,20 @@ function FakeClient:createFakeEvents(chart, accuracy, miss_ratio)
 			local t = note.time + math_util.nrandom() * accuracy
 			table.insert(frames, {
 				time = t,
-				event = VirtualInputEvent(1, true, note.input)
+				event = VirtualInputEvent(1, true, note.column)
 			})
 			table.insert(frames, {
 				time = t + 0.05,
-				event = VirtualInputEvent(1, false, note.input)
+				event = VirtualInputEvent(1, false, note.column)
 			})
 		end
 	end
 
 	table.sort(frames, function(a, b)
-		if a[1] == b[1] then
-			return a[2] < b[2]
+		if a.event.column == a.event.column then
+			return a.time < b.time
 		end
-		return a[1] < b[1]
+		return a.time < b.time
 	end)
 
 	return frames

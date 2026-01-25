@@ -148,7 +148,7 @@ end
 ---@return sea.Replay
 function ReplayConverter:convert(obj)
 	if obj.version then
-		if obj.version == 1 then
+		if obj.version == 1 or obj.version == 2 then
 			if obj.timings then
 				setmetatable(obj.timings, Timings)
 			end
@@ -158,6 +158,7 @@ function ReplayConverter:convert(obj)
 			if obj.healths then
 				setmetatable(obj.healths, Healths)
 			end
+			-- TODO: convert events for version 1
 			return (setmetatable(obj, Replay))
 		end
 		error("invalid replay version")

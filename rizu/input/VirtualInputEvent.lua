@@ -9,7 +9,7 @@ local VirtualInputEvent = class()
 
 ---@param id rizu.VirtualInputEventId
 ---@param value rizu.VirtualInputEventValue?
----@param column ncdk2.Column
+---@param column integer
 ---@param pos [number, number]
 function VirtualInputEvent:new(id, value, column, pos)
 	self.id = id

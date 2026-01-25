@@ -44,7 +44,7 @@ function InputBinder:transform(event)
 				if event.state == false then
 					self.mapper:free(id_string)
 				end
-				return VirtualInputEvent(event_id, event.state, self.columns[i], nil)
+				return VirtualInputEvent(event_id, event.state, i, nil)
 			end
 		end
 	end

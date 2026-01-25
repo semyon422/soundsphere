@@ -10,11 +10,8 @@ local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 local ReplayFrames = {}
 
 ---@param frames rizu.ReplayFrame[]
----@param input_mode ncdk.InputMode
 ---@return string
-function ReplayFrames.encode(frames, input_mode)
-	local map = input_mode:getInputMap()
-
+function ReplayFrames.encode(frames)
 	---@type rizu.BinaryEvent[]
 	local binary_events = {}
 	for i, frame in ipairs(frames) do
@@ -23,7 +20,7 @@ function ReplayFrames.encode(frames, input_mode)
 			time = frame.time,
 			id = event.id,
 			value = event.value,
-			column = map[event.column],
+			column = event.column,
 			pos = event.pos,
 		}
 	end
@@ -35,20 +32,17 @@ function ReplayFrames.encode(frames, input_mode)
 end
 
 ---@param data string
----@param input_mode ncdk.InputMode
 ---@return rizu.ReplayFrame[]
-function ReplayFrames.decode(data, input_mode)
+function ReplayFrames.decode(data)
 	local uncompressed_data = zlib.inflate(data)
 	local binary_events = BinaryEvents.decode(uncompressed_data)
-
-	local map = input_mode:getInputs()
 
 	---@type rizu.ReplayFrame[]
 	local frames = {}
 	for i, event in ipairs(binary_events) do
 		frames[i] = {
 			time = event.time,
-			event = VirtualInputEvent(event.id, event.value, map[event.column], event.pos)
+			event = VirtualInputEvent(event.id, event.value, event.column, event.pos)
 		}
 	end
 

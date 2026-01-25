@@ -25,7 +25,8 @@ function RhythmEngine:new()
 	self.logic_info = LogicInfo()
 	self.logic_engine = LogicEngine(self.logic_info)
 
-	self.input_engine = InputEngine(ActiveInputNotes(self.logic_engine.active_notes))
+	self.active_input_notes = ActiveInputNotes(self.logic_engine.active_notes)
+	self.input_engine = InputEngine(self.active_input_notes)
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
@@ -46,6 +47,7 @@ end
 function RhythmEngine:load()
 	local chart = self.chart
 
+	self.active_input_notes:setInputMap(chart.inputMode:getInputMap())
 	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
 	self.score_engine:load()

@@ -17,6 +17,11 @@ function ActiveInputNotes:new(logic_notes)
 	self.cache = {}
 end
 
+---@param input_map {[ncdk2.Column]: integer}
+function ActiveInputNotes:setInputMap(input_map)
+	self.input_map = input_map
+end
+
 ---@return boolean
 function ActiveInputNotes:hasAny()
 	return not not next(self.logic_notes)
@@ -26,6 +31,7 @@ end
 function ActiveInputNotes:update()
 	local input_notes = self.input_notes
 	local cache = self.cache
+	local input_map = assert(self.input_map, "missing input map")
 
 	table_util.clear(input_notes)
 
@@ -34,8 +40,9 @@ function ActiveInputNotes:update()
 		if input_note then
 			input_notes[i] = input_note
 		else
-			input_note = InputNote(logic_note)
+			input_note = InputNote(logic_note, input_map)
 			cache[logic_note] = input_note
+			input_notes[i] = input_note
 		end
 	end
 end

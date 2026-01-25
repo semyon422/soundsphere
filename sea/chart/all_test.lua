@@ -85,10 +85,10 @@ input 4key
 
 ---@type rizu.ReplayFrame[]
 local frames = {
-	{time = 0.01, event = VirtualInputEvent(1, true, "key2")},
-	{time = 0.1, event = VirtualInputEvent(1, false, "key2")},
-	{time = 0.95, event = VirtualInputEvent(1, true, "key3")},
-	{time = 1.1, event = VirtualInputEvent(1, false, "key3")},
+	{time = 0.01, event = VirtualInputEvent(1, true, 2)},
+	{time = 0.1, event = VirtualInputEvent(1, false, 2)},
+	{time = 0.95, event = VirtualInputEvent(1, true, 3)},
+	{time = 1.1, event = VirtualInputEvent(1, false, 3)},
 }
 
 ---@type sea.Replay
@@ -117,7 +117,7 @@ local replay = {
 	rate_type = "linear",
 }
 setmetatable(replay, Replay)
-local _replayfile_data = ReplayCoder.encode(replay, InputMode("4key"))
+local _replayfile_data = ReplayCoder.encode(replay)
 
 local _chartplay_values = {
 	hash = replay.hash,

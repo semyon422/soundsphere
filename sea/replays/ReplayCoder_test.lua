@@ -10,14 +10,14 @@ function test.all(t)
 		frames = {},
 	}
 
-	local data = t:assert(ReplayCoder.encode(replay, InputMode("4key")))
+	local data = t:assert(ReplayCoder.encode(replay))
 	if not data then
 		return
 	end
 
 	t:eq(data, '{"events":"aGVsbG8="}')
 
-	local _replay = t:assert(ReplayCoder.decode(data, InputMode("4key")))
+	local _replay = t:assert(ReplayCoder.decode(data))
 	if not _replay then
 		return
 	end

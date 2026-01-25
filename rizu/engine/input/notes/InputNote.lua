@@ -7,8 +7,10 @@ local InputNote = class()
 InputNote.is_bottom = false
 
 ---@param note rizu.LogicNote
-function InputNote:new(note)
+---@param input_map {[ncdk2.Column]: integer}
+function InputNote:new(note, input_map)
 	self.logic_note = note
+	self.input_map = input_map
 end
 
 ---@return integer
@@ -19,7 +21,7 @@ end
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function InputNote:match(event)
-	return self.logic_note:getColumn() == event.column
+	return self.input_map[self.logic_note:getColumn()] == event.column
 end
 
 ---@param value any

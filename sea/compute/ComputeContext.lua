@@ -144,6 +144,9 @@ function ComputeContext:computeReplay(replay)
 	local rhythm_engine = RhythmEngine()
 
 	rhythm_engine:setChart(self.chart, chartmeta)
+	rhythm_engine:load()
+	rhythm_engine:setGlobalTime(0)
+	rhythm_engine:play()
 
 	local timings = assert(replay.timings or chartmeta.timings)
 
@@ -155,7 +158,7 @@ function ComputeContext:computeReplay(replay)
 	rhythm_engine:setNearest(replay.nearest)
 	rhythm_engine:setConst(replay.const)
 
-	self:computePlay(rhythm_engine, replay.events)
+	self:computePlay(rhythm_engine, replay.frames)
 
 	local cc_factory = ChartplayComputedFactory(chartdiff, diffcalc_context, rhythm_engine.score_engine)
 	local chartplay_computed = cc_factory:getChartplayComputed()
@@ -164,9 +167,9 @@ function ComputeContext:computeReplay(replay)
 end
 
 ---@param rhythm_engine rizu.RhythmEngine
----@param events rizu.ReplayFrame[]
-function ComputeContext:computePlay(rhythm_engine, events)
-	local p = ReplayPlayer(events)
+---@param frames rizu.ReplayFrame[]
+function ComputeContext:computePlay(rhythm_engine, frames)
+	local p = ReplayPlayer(frames)
 
 	local frame = p:play(math.huge)
 	while frame do
@@ -213,6 +216,7 @@ function ComputeContext:applyColumnOrder(columns_order)
 		note.column = map[note.column] or note.column
 		new_notes:insert(note)
 	end
+	new_notes:compute()
 	chart.notes = new_notes
 end
 

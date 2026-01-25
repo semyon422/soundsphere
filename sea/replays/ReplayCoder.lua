@@ -9,17 +9,16 @@ local ReplayFrames = require("rizu.engine.replay.ReplayFrames")
 local ReplayCoder = {}
 
 ---@param s string
----@param input_mode ncdk.InputMode
 ---@return sea.Replay?
 ---@return string?
-function ReplayCoder.decode(s, input_mode)
+function ReplayCoder.decode(s)
 	---@type boolean, table
 	local ok, obj = pcall(json.decode, s)
 	if not ok then
 		return nil, "invalid json: " .. obj
 	end
 
-	local events = mime.unb64(obj.events)
+	local events = mime.unb64(obj.frames)
 	if not events then
 		return nil, "can't unb64"
 	end
@@ -27,7 +26,7 @@ function ReplayCoder.decode(s, input_mode)
 	if obj.version == 1 then
 		obj.frames = ReplayEvents.decode(events)
 	elseif obj.version == 2 then
-		obj.frames = ReplayFrames.decode(events, input_mode)
+		obj.frames = ReplayFrames.decode(events)
 	end
 
 	setmetatable(obj, Replay)
@@ -36,10 +35,9 @@ function ReplayCoder.decode(s, input_mode)
 end
 
 ---@param replay sea.Replay
----@param input_mode ncdk.InputMode
 ---@return string?
 ---@return string?
-function ReplayCoder.encode(replay, input_mode)
+function ReplayCoder.encode(replay)
 	local obj = table_util.copy(replay)
 	---@cast obj -sea.Replay
 
@@ -47,7 +45,7 @@ function ReplayCoder.encode(replay, input_mode)
 	if obj.version == 1 then
 		frames = ReplayEvents.encode(replay.frames)
 	elseif obj.version == 2 then
-		frames = ReplayFrames.encode(replay.frames, input_mode)
+		frames = ReplayFrames.encode(replay.frames)
 	end
 	obj.frames = mime.b64(frames)
 
