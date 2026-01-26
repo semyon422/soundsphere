@@ -143,7 +143,7 @@ function ComputeContext:computeReplay(replay)
 
 	local rhythm_engine = RhythmEngine()
 
-	rhythm_engine:setChart(self.chart, chartmeta)
+	rhythm_engine:setChart(self.chart, chartmeta, chartdiff)
 	rhythm_engine:load()
 	rhythm_engine:setGlobalTime(0)
 	rhythm_engine:play()
@@ -177,6 +177,9 @@ function ComputeContext:computePlay(rhythm_engine, frames)
 		rhythm_engine:receive(frame.event)
 		frame = p:play(math.huge)
 	end
+
+	rhythm_engine:setTime(math.huge)
+	rhythm_engine:update()
 end
 
 ---@see sphere.LogicalNoteFactory

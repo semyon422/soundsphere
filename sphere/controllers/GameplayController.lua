@@ -107,7 +107,7 @@ function GameplayController:load(chartview)
 	self.resource_finder:addPath(chartview.location_dir)
 	self.resource_loader:load(chart.resources)
 
-	rhythm_engine:setChart(chart, chartmeta)
+	rhythm_engine:setChart(chart, chartmeta, chartdiff)
 	rhythm_engine:load()
 	rhythm_engine:loadAudio(self.resource_loader.resources)
 

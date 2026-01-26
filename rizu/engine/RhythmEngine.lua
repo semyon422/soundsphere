@@ -54,7 +54,7 @@ function RhythmEngine:load()
 	self.active_input_notes:setInputMap(chart.inputMode:getInputMap())
 	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
-	self.score_engine:load()
+	self.score_engine:load(self.chartdiff)
 	self.pause_counter:new()
 
 	self.visual_info.logic_notes = self.logic_engine.linked_to_logic
@@ -132,9 +132,11 @@ end
 
 ---@param chart ncdk2.Chart
 ---@param chartmeta sea.Chartmeta
-function RhythmEngine:setChart(chart, chartmeta)
+---@param chartdiff sea.Chartdiff
+function RhythmEngine:setChart(chart, chartmeta, chartdiff)
 	self.chart = chart
 	self.chartmeta = chartmeta
+	self.chartdiff = chartdiff
 end
 
 ---@param timings sea.Timings?

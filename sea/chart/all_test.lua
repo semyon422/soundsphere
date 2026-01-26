@@ -139,14 +139,14 @@ local _chartplay_values = {
 	created_at = replay.created_at,
 	rate_type = replay.rate_type,
 	--
-	accuracy = 0.05984583644905697164,
+	accuracy = 0.059305293410162315815,
 	replay_hash = md5.sumhexa(_replayfile_data),
 	judges = {1, 0, 1, 0, 0, 3},
 	max_combo = 2,
 	miss_count = 3,
 	not_perfect_count = 4,
-	rating = 0.0037285851356950172608,
-	rating_msd = 0.20387402176856994629,
+	rating = 0.0037594122723929000729,
+	rating_msd = 0.20617003738880157471,
 	rating_pp = 0,
 	pass = true,
 }

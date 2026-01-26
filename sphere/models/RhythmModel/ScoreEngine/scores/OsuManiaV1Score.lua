@@ -87,12 +87,6 @@ function OsuManiaV1Score:getKey()
 	return "osu_mania_v1_od" .. self.od
 end
 
----@param event rizu.LogicNoteChange
-function OsuManiaV1Score:before(event)
-	---@type integer
-	self.notes = event.notesCount
-end
-
 ---@param index integer
 function OsuManiaV1Score:addCounter(index)
 	self.judge_counter:add(index)
@@ -102,8 +96,8 @@ function OsuManiaV1Score:addCounter(index)
 
 	self.totalBonus = self.totalBonus + (hitBonusValue[index] * math.sqrt(self.bonus) / 320)
 
-	self.baseScore = (500000 / self.notes) * (self.hitValue / 320)
-	self.bonusScore = (500000 / self.notes) * self.totalBonus
+	self.baseScore = (500000 / self.notes_count) * (self.hitValue / 320)
+	self.bonusScore = (500000 / self.notes_count) * self.totalBonus
 
 	self.score = self.baseScore + self.bonusScore
 end

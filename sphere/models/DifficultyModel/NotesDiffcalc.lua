@@ -9,20 +9,24 @@ NotesDiffcalc.chartdiff_field = "notes_count"
 
 ---@param ctx sphere.DiffcalcContext
 function NotesDiffcalc:compute(ctx)
-	local notes = ctx:getSimplifiedNotes()
+	local chartdiff = ctx.chartdiff
 
 	local min_time = math.huge
 	local max_time = -math.huge
 
-	local short_notes_count = 0
-	local long_notes_count = 0
-	for _, note in ipairs(notes) do
-		min_time = math.min(min_time, note.time, note.end_time or note.time)
-		max_time = math.max(max_time, note.time, note.end_time or note.time)
-		if note.end_time then
-			long_notes_count = long_notes_count + 1
-		else
-			short_notes_count = short_notes_count + 1
+	-- TODO: fix for other note types
+	local count = {
+		tap = 0,
+		hold = 0,
+	}
+
+	for _, linked_note in ipairs(ctx.chart.notes:getLinkedNotes()) do
+		local _type = linked_note:getType()
+		if count[_type] then
+			local a, b = linked_note:getStartTime(), linked_note:getEndTime()
+			min_time = math.min(min_time, a, b)
+			max_time = math.max(max_time, a, b)
+			count[_type] = count[_type] + 1
 		end
 	end
 
@@ -30,16 +34,9 @@ function NotesDiffcalc:compute(ctx)
 		min_time, max_time = 0, 0
 	end
 
-	local chartdiff = ctx.chartdiff
-
-	chartdiff.notes_count = #notes
-	chartdiff.judges_count = short_notes_count + long_notes_count * 2
-
-	-- TODO: fix for other note types
-	chartdiff.note_types_count = {
-		tap = short_notes_count,
-		hold = long_notes_count,
-	}
+	chartdiff.note_types_count = count
+	chartdiff.notes_count = count.tap + count.hold
+	chartdiff.judges_count = count.tap + count.hold * 2
 
 	chartdiff.start_time = min_time
 	chartdiff.duration = max_time - min_time

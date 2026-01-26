@@ -1,5 +1,5 @@
 local ReplayCoder = require("sea.replays.ReplayCoder")
-local InputMode = require("ncdk.InputMode")
+local json = require("web.json")
 
 local test = {}
 
@@ -15,7 +15,7 @@ function test.all(t)
 		return
 	end
 
-	t:eq(data, '{"events":"aGVsbG8="}')
+	t:tdeq(json.decode(data), {frames = "eJxjYGBgAAAABAAB", version = 2})
 
 	local _replay = t:assert(ReplayCoder.decode(data))
 	if not _replay then

@@ -39,7 +39,10 @@ function ScoreEngine:new()
 	self.scoreSystemsByName = {}
 end
 
-function ScoreEngine:load()
+---@param chartdiff sea.Chartdiff
+function ScoreEngine:load(chartdiff)
+	self.chartdiff = chartdiff
+
 	self.events = {}
 
 	---@type sphere.ScoreSystem[]
@@ -61,6 +64,7 @@ function ScoreEngine:load()
 
 	for _, v in pairs(by_name) do
 		table.insert(self.scoreSystems, v)
+		v:setNotesCount(chartdiff.notes_count)
 	end
 
 	self:select(self.judgement)
@@ -135,6 +139,8 @@ function ScoreEngine:addScoreSystem(score_system)
 
 	table.insert(self.scoreSystems, score_system)
 	by_name[key] = score_system
+
+	score_system:setNotesCount(self.chartdiff.notes_count)
 
 	for _, event in ipairs(self.events) do
 		score_system:receive(event)
