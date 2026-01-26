@@ -13,7 +13,6 @@ function BaseScore:new()
 	self.missCount = 0
 	self.earlyHitCount = 0
 
-	self.notesCount = 0
 	self.combo = 0
 	self.maxCombo = 0
 	self.currentTime = 0
@@ -42,12 +41,10 @@ end
 
 ---@param event rizu.LogicNoteChange
 function BaseScore:before(event)
-	self.currentTime = event.currentTime
+	self.currentTime = event.time
 	self.isMiss = false
 	self.isEarlyHit = false
 	self.isLongNoteComboBreak = false
-
-	self.notesCount = event.notesCount
 end
 
 ---@param event rizu.LogicNoteChange
@@ -97,7 +94,6 @@ function BaseScore:getSlice()
 		hitCount = self.hitCount,
 		missCount = self.missCount,
 		earlyHitCount = self.earlyHitCount,
-		notesCount = self.notesCount,
 		combo = self.combo,
 		maxCombo = self.maxCombo,
 		currentTime = self.currentTime,

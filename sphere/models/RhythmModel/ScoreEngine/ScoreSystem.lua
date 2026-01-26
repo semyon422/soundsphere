@@ -24,6 +24,11 @@ function ScoreSystem:getKey()
 	error("not implemented")
 end
 
+---@param notes_count integer
+function ScoreSystem:setNotesCount(notes_count)
+	self.notes_count = notes_count
+end
+
 ---@param event table
 function ScoreSystem:before(event) end
 

@@ -104,6 +104,11 @@ function HoldLogicNote:getEndTime()
 	return self.linked_note:getEndTime() + self.logic_info:getNoteMaxTime("LongNoteEnd")
 end
 
+---@return number
+function HoldLogicNote:getHeadEndTime()
+	return self.linked_note:getStartTime() + self.logic_info:getNoteMaxTime("LongNoteStart")
+end
+
 ---@return sea.TimingResult
 function HoldLogicNote:getStartResult()
 	local dt = self:getDeltaTime()
@@ -125,24 +130,28 @@ function HoldLogicNote:switchState(state)
 	local end_last_time = self.logic_info.timing_values:getMaxTime("LongNoteEnd")
 
 	local delta_time = 0
+	local current_time = 0
 	if old_state == "clear" then
+		current_time = math.min(self.logic_info.time, self:getHeadEndTime())
 		delta_time = math.min(self:getDeltaTime(), start_last_time)
 	else
+		current_time = math.min(self.logic_info.time, self:getEndTime())
 		delta_time = math.min(self:getEndDeltaTime(), end_last_time)
 	end
 
 	self.logic_info:addNoteChange({
 		type = "hold",
+		time = current_time,
 		delta_time = delta_time,
 		old_state = old_state,
 		new_state = state,
 	})
 
-	if not self.pressedTime and state == "passed" then
-		-- self.pressedTime = currentTime
+	if not self.pressed_at and (state == "startPassedPressed" or state == "startMissedPressed") then
+		self.pressed_at = current_time
 	end
-	if self.pressedTime and state ~= "passed" then
-		-- self.pressedTime = nil
+	if self.pressed_at and state ~= "startPassedPressed" and state ~= "startMissedPressed" then
+		self.pressed_at = nil
 	end
 end
 

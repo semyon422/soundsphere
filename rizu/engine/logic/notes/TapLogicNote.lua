@@ -71,20 +71,19 @@ function TapLogicNote:switchState(state)
 	local current_time = math.min(self.logic_info.time, last_time_full)
 	local delta_time = math.min(self:getDeltaTime(), last_time)
 
-	-- send to event score engine
-
 	self.logic_info:addNoteChange({
 		type = "tap",
+		time = current_time,
 		delta_time = delta_time,
 		old_state = old_state,
 		new_state = state,
 	})
 
-	if not self.pressedTime and state == "passed" then
-		-- self.pressedTime = currentTime
+	if not self.pressed_at and state == "passed" then
+		self.pressed_at = current_time
 	end
-	if self.pressedTime and state ~= "passed" then
-		-- self.pressedTime = nil
+	if self.pressed_at and state ~= "passed" then
+		self.pressed_at = nil
 	end
 end
 
