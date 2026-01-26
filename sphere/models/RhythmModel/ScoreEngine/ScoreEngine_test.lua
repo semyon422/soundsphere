@@ -10,7 +10,7 @@ function test.qwe(t)
 	local se = ScoreEngine()
 	se.judgement = "soundsphere"
 
-	se:load()
+	se:load({notes_count = 0})
 
 	local factory = ScoreEngineFactory()
 	local systems = assert(factory:get(Timings("osuod", 8.5), Subtimings("scorev", 2)))

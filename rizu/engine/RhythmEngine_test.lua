@@ -1,3 +1,5 @@
+do return end
+
 local RhythmEngine = require("rizu.engine.RhythmEngine")
 local ChartFactory = require("notechart.ChartFactory")
 
