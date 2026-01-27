@@ -33,6 +33,8 @@ pkg.add("tree/share/lua/5.1")
 pkg.export_lua()
 pkg.export_love()
 
+require("pprint").export()
+
 local luacov_runner
 if arg[2] == "test" then
 	local ok, err = pcall(require, "luacov.runner")
