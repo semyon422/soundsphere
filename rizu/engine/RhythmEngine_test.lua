@@ -1,5 +1,3 @@
-do return end
-
 local RhythmEngine = require("rizu.engine.RhythmEngine")
 local ChartFactory = require("notechart.ChartFactory")
 
@@ -32,7 +30,8 @@ function test.time_to_prepare(t)
 0010 =2
 ]])
 
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta)
+	local chartdiff = {notes_count = 2}
+	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, chartdiff)
 	re:load()
 
 	re:setPlayTime(1, 2)
