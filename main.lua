@@ -34,6 +34,7 @@ pkg.export_lua()
 pkg.export_love()
 
 require("pprint").export()
+require("coext").export()
 
 local luacov_runner
 if arg[2] == "test" then
