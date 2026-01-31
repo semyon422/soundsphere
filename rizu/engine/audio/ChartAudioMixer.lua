@@ -1,4 +1,5 @@
 local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
 local ffi = require("ffi")
 
 ---@class rizu.ChartAudioMixer: rizu.ISoundDecoder
@@ -16,6 +17,15 @@ function ChartAudioMixer:new(sounds, decoders)
 
 	for i, sound in ipairs(sounds) do
 		self:addSound(sound, decoders[i])
+	end
+
+	if not self.sounds[1] then
+		self.sounds[1] = {
+			time = 0,
+			duration = 0,
+			decoder = FakeSoundDecoder(1, 44100, 2)
+		}
+		self.empty = true
 	end
 
 	self.position = 0
@@ -83,6 +93,10 @@ end
 ---@param len integer
 ---@return integer
 function ChartAudioMixer:getData(buf, len)
+	if not self.sounds[1] then
+		return len
+	end
+
 	len = self:floorBytes(len)
 
 	---@type {[integer]: integer}

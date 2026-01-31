@@ -135,4 +135,9 @@ function WindowModel:setVsyncOnSelect(enabled)
 	end
 end
 
+---@param visible boolean
+function WindowModel:setMouseVisible(visible)
+	love.mouse.setVisible(visible)
+end
+
 return WindowModel

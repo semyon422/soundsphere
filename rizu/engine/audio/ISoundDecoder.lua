@@ -68,4 +68,6 @@ function ISoundDecoder:getBytesPerSample()
 	error("not implemented")
 end
 
+function ISoundDecoder:release() end
+
 return ISoundDecoder

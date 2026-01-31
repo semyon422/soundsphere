@@ -17,6 +17,17 @@ local function fill_wave(wave, offset, mul)
 end
 
 ---@param t testing.T
+function test.empty(t)
+	local mixer = ChartAudioMixer({}, {})
+
+	local buf_size = 20
+	local buf = ffi.new("int16_t[?]", buf_size)
+
+	t:eq(mixer:getData(buf, 3), 0)
+	t:eq(mixer:getData(buf, 4), 4)
+end
+
+---@param t testing.T
 function test.single(t)
 	---@type rizu.ChartAudioSound[]
 	local sounds = {

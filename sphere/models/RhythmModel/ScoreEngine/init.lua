@@ -22,7 +22,6 @@ local ScoreEngineFactory = require("sphere.models.RhythmModel.ScoreEngine.ScoreE
 
 ---@class sphere.ScoreEngine
 ---@operator call: sphere.ScoreEngine
----@field judgement string
 ---@field accuracySource sphere.IAccuracySource
 ---@field comboSource sphere.IComboSource
 ---@field healthsSource sphere.IHealthsSource
@@ -66,8 +65,6 @@ function ScoreEngine:load(chartdiff)
 		table.insert(self.scoreSystems, v)
 		v:setNotesCount(chartdiff.notes_count)
 	end
-
-	self:select(self.judgement)
 
 	self.sequence = {}
 end

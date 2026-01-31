@@ -3,6 +3,7 @@ local Subtimings = require("sea.chart.Subtimings")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local Healths = require("sea.chart.Healths")
 
+---@class sphere.PlayConfig
 local play = {
 	modifiers = {},
 	rate = 1,

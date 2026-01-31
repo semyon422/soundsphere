@@ -31,7 +31,9 @@ function AudioEngine:load(chart, resources)
 	end
 
 	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
-	self.source = BassChartAudioSource(self.mixer)
+	if not self.mixer.empty then
+		self.source = BassChartAudioSource(self.mixer)
+	end
 end
 
 function AudioEngine:unload()
