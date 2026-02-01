@@ -1,5 +1,5 @@
 local table_util = require("table_util")
-local GameplayLoader = require("rizu.gameplay.GameplayLoader")
+local GameplayChart = require("rizu.gameplay.GameplayChart")
 local SettingsConfig = require("sphere.persistence.ConfigModel.settings")
 local ReplayBase = require("sea.replays.ReplayBase")
 local ComputeContext = require("sea.compute.ComputeContext")
@@ -41,7 +41,7 @@ function test.all(t)
 	fs:createDirectory(dir)
 	fs:write(chartview.location_path, chartfile_data)
 
-	local gl = GameplayLoader(
+	local gl = GameplayChart(
 		config,
 		ReplayBase(),
 		ComputeContext(),
