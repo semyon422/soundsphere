@@ -23,11 +23,16 @@ function BassChartAudioSource:new(decoder)
 	self.buf_len = math.floor(bytes_per_second * 0.5)
 	self.buf = ffi.new("uint8_t[?]", self.buf_len)
 
+	ffi.gc(self.buf, function()
+		self:release()
+	end)
+
 	self.pos_offset = 0
 end
 
 function BassChartAudioSource:release()
 	bass_assert(bass.BASS_ChannelFree(self.channel) == 1)
+	ffi.gc(self.buf, nil)
 end
 
 function BassChartAudioSource:play()

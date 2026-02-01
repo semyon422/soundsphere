@@ -41,11 +41,20 @@ function BassSoundDecoder:new(data)
 
 	self.position = 0
 	self.resample_offset = 0
+
+	self.gc_proxy = newproxy(true)
+	local mt = getmetatable(self.gc_proxy)
+	function mt.__gc()
+		if not self.released then
+			self:release()
+		end
+	end
 end
 
 function BassSoundDecoder:release()
 	bass_assert(bass.BASS_StreamFree(self.resample_channel) == 1)
 	bass_assert(bass.BASS_StreamFree(self.decode_channel) == 1)
+	self.released = true
 end
 
 ---@param buf ffi.cdata*
