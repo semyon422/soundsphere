@@ -51,6 +51,8 @@ local ResourceFinder = require("rizu.files.ResourceFinder")
 
 local RhythmEngine = require("rizu.engine.RhythmEngine")
 
+local GlobalTimer = require("rizu.game.GlobalTimer")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
@@ -186,6 +188,8 @@ function GameController:new()
 
 	self.gameplayInteractor = GameplayInteractor(self)
 	self.gameInteractor = GameInteractor(self)
+
+	self.global_timer = GlobalTimer()
 end
 
 function GameController:load()
@@ -264,6 +268,10 @@ function GameController:receive(event)
 	elseif event.name == "quit" then
 		self:unload()
 		return
+	end
+
+	if event.name == "framestarted" then
+		self.global_timer:setTime(event.time)
 	end
 
 	self.ui:receive(event)

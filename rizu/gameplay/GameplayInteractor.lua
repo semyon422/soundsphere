@@ -46,8 +46,6 @@ function GameplayInteractor:loadGameplay(chartview)
 		game.resource_loader.resources
 	):loadEngine()
 
-	local chartmeta = assert(game.computeContext.chartmeta)
-
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
 
@@ -77,6 +75,9 @@ function GameplayInteractor:loadGameplay(chartview)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
+	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
+	self:play()
+
 	self.loaded = true
 end
 
@@ -99,9 +100,13 @@ function GameplayInteractor:update()
 	if not self.loaded then
 		return
 	end
+
 	local game = self.game
-	game.pauseModel:update()
+
+	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 	game.rhythm_engine:update()
+
+	game.pauseModel:update()
 end
 
 ---@param delta number
@@ -184,17 +189,13 @@ function GameplayInteractor:receive(event)
 	if physic_event then
 		local virtual_event = self.input_binder:transform(physic_event)
 		if virtual_event then
+			game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 			game.rhythm_engine:receive(virtual_event)
 			table.insert(self.frames, {
 				time = game.rhythm_engine:getTime(),
 				event = virtual_event
 			})
 		end
-	end
-
-	if event.name == "framestarted" then
-		game.rhythm_engine:setGlobalTime(event.time)
-		return
 	end
 end
 
