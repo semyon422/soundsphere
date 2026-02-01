@@ -150,10 +150,10 @@ function GameplayInteractor:retry()
 	-- self.replayModel:load()
 	-- self.resourceModel:rewind()
 
+	game.rhythm_engine:retry()
+
 	local timings = assert(replayBase.timings or game.computeContext.chartmeta.timings)
 	game.rhythm_engine.score_engine:createByTimings(timings, replayBase.subtimings, true)
-
-	game.rhythm_engine:retry()
 
 	self:play()
 end

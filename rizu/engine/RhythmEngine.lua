@@ -87,10 +87,8 @@ function RhythmEngine:unload()
 end
 
 function RhythmEngine:retry()
-	self:setTime(0)
-	self.logic_engine:load(self.chart)
-	self.visual_engine:load(self.chart)
-	self.pause_counter:new()
+	self:setTime(self.play_progress.init_time)
+	self:load()
 end
 
 function RhythmEngine:update()
