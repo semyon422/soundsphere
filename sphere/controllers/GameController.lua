@@ -5,7 +5,6 @@ local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local SelectModel = require("sphere.models.SelectModel")
-local RhythmModel = require("sphere.models.RhythmModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
@@ -17,7 +16,6 @@ local JoystickModel = require("sphere.models.JoystickModel")
 local OffsetModel = require("sphere.models.OffsetModel")
 
 local SelectController = require("sphere.controllers.SelectController")
-local GameplayController = require("sphere.controllers.GameplayController")
 local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
@@ -44,6 +42,12 @@ local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
 
 local LoveFilesystem = require("fs.LoveFilesystem")
+
+local GameplayInteractor = require("rizu.gameplay.GameplayInteractor")
+local GameInteractor = require("rizu.game.GameInteractor")
+
+local ResourceLoader = require("rizu.files.ResourceLoader")
+local ResourceFinder = require("rizu.files.ResourceFinder")
 
 local RhythmEngine = require("rizu.engine.RhythmEngine")
 
@@ -142,22 +146,6 @@ function GameController:new()
 		self.previewModel,
 		self.chartPreviewModel
 	)
-	self.gameplayController = GameplayController(
-		self.rhythm_engine,
-		self.noteSkinModel,
-		self.configModel,
-		self.replayModel,
-		self.multiplayerModel,
-		self.discordModel,
-		self.onlineModel,
-		self.cacheModel,
-		self.replayBase,
-		self.computeContext,
-		self.pauseModel,
-		self.notificationModel,
-		self.seaClient,
-		self.fs
-	)
 	self.resultController = ResultController(
 		self.selectModel,
 		self.replayModel,
@@ -192,60 +180,12 @@ function GameController:new()
 		self.rhythm_engine,
 		self.notificationModel
 	)
-end
 
-function GameController:loadGameplay()
-	local chartview = self.selectModel.chartview
+	self.resource_finder = ResourceFinder(self.fs)
+	self.resource_loader = ResourceLoader(self.fs, self.resource_finder)
 
-	self.gameplayController:load(chartview)
-	self.previewModel:stop()
-
-	love.mouse.setVisible(false)
-
-	self.windowModel:setVsyncOnSelect(false)
-	self.multiplayerModel.client:setPlaying(true)
-	self.offsetController:updateOffsets()
-
-	local noteSkin = self.gameplayController.noteSkin
-
-	local fileFinder = self.fileFinder
-	fileFinder:reset()
-
-	if self.configModel.configs.settings.gameplay.skin_resources_top_priority then
-		fileFinder:addPath(noteSkin.directoryPath)
-		fileFinder:addPath(chartview.location_dir)
-	else
-		fileFinder:addPath(chartview.location_dir)
-		fileFinder:addPath(noteSkin.directoryPath)
-	end
-	fileFinder:addPath("userdata/hitsounds")
-	fileFinder:addPath("userdata/hitsounds/midi")
-
-	-- self.resourceModel:load(self.computeContext.chart, function()
-	-- 	if not self.gameplayController.loaded then
-	-- 		return
-	-- 	end
-	-- 	self.gameplayController:play()
-	-- end)
-end
-
-function GameController:unloadGameplay()
-	self.gameplayController:unload()
-
-	love.mouse.setVisible(true)
-
-	self.windowModel:setVsyncOnSelect(true)
-	self.multiplayerModel.client:setPlaying(false)
-end
-
----@param delta number
-function GameController:increasePlaySpeed(delta)
-	local speedModel = self.speedModel
-	speedModel:increase(delta)
-
-	local gameplay = self.configModel.configs.settings.gameplay
-	self.rhythm_engine:setVisualRate(gameplay.speed)
-	self.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
+	self.gameplayInteractor = GameplayInteractor(self)
+	self.gameInteractor = GameInteractor(self)
 end
 
 function GameController:load()
@@ -258,11 +198,6 @@ function GameController:load()
 	self.ui = self.uiModel.activeUI
 
 	local configModel = self.configModel
-	local rhythm_engine = self.rhythm_engine
-
-	rhythm_engine.judgements = configModel.configs.judgements
-	rhythm_engine.hp = configModel.configs.settings.gameplay.hp
-	rhythm_engine.settings = configModel.configs.settings
 
 	self.replayBase:importReplayBase(configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
@@ -301,6 +236,7 @@ function GameController:update(dt)
 	self.joystickModel:update(dt)
 
 	self.multiplayerController:update()
+	self.gameplayInteractor:update()
 	self.osudirectModel:update()
 
 	self.cacheModel:update()

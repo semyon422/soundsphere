@@ -37,6 +37,7 @@ end
 
 ---@param path string
 function ResourceFinder:addPath(path)
+	path = assert(path, "missing path")
 	table.insert(self.paths, path)
 	self.path_files[path] = self:getFilesRecursive(path)
 end

@@ -1,0 +1,61 @@
+local class = require("class")
+
+---@class rizu.RhythmEngineLoader
+---@operator call: rizu.RhythmEngineLoader
+local RhythmEngineLoader = class()
+
+---@param rhythm_engine rizu.RhythmEngine
+---@param replayBase sea.ReplayBase
+---@param computeContext sea.ComputeContext
+---@param config sphere.SettingsConfig
+---@param resources {[string]: string}
+function RhythmEngineLoader:new(
+	rhythm_engine,
+	replayBase,
+	computeContext,
+	config,
+	resources
+)
+	self.rhythm_engine = rhythm_engine
+	self.replayBase = replayBase
+	self.computeContext = computeContext
+	self.config = config
+	self.resources = resources
+end
+
+function RhythmEngineLoader:loadEngine()
+	local rhythm_engine = self.rhythm_engine
+	local computeContext = self.computeContext
+	local replayBase = self.replayBase
+	local config = self.config
+
+	local chart = assert(computeContext.chart)
+	local chartmeta = assert(computeContext.chartmeta)
+	local chartdiff = assert(computeContext.chartdiff)
+	local state = computeContext.state
+
+	rhythm_engine:setChart(chart, chartmeta, chartdiff)
+	rhythm_engine:load()
+	rhythm_engine:loadAudio(self.resources)
+
+	-- constant
+	rhythm_engine:setTimeToPrepare(config.gameplay.time.prepare)
+	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
+
+	-- variable ranked
+	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
+	rhythm_engine:setVolume(config.audio.volume)
+	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
+	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
+	rhythm_engine:setAudioMode(config.audio.mode)
+
+	-- variable unranked
+	-- rhythm_engine:setWindUp(state.windUp)
+	rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
+	rhythm_engine:setTimingValues(replayBase.timing_values)
+	rhythm_engine:setRate(replayBase.rate)
+	rhythm_engine:setNearest(replayBase.nearest)
+	rhythm_engine:setConst(replayBase.const)
+end
+
+return RhythmEngineLoader

@@ -17,7 +17,7 @@ local function BottomScreenMenu(self)
 
 	just.row(true)
 	if imgui.TextOnlyButton("continue", "continue", w, h) then
-		self.game.gameplayController:play()
+		self.game.gameplayInteractor:play()
 	end
 	if imgui.TextOnlyButton("retry", "retry", w, h) then
 		self:retry()

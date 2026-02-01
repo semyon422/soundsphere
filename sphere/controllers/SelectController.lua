@@ -102,6 +102,7 @@ end
 function SelectController:unload()
 	self.replayBase:exportReplayBase(self.configModel.configs.play)
 	self.configModel:write()
+	self.previewModel:stop()
 end
 
 function SelectController:update()

@@ -237,11 +237,6 @@ function RhythmEngine:setAudioMode(audio_mode)
 	self.audio_mode = audio_mode
 end
 
----@param judgement_name string
-function RhythmEngine:setScoring(judgement_name)
-	self.score_engine.judgement = judgement_name
-end
-
 ---@param wind_up string
 function RhythmEngine:setWindUp(wind_up)
 end

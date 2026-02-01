@@ -1,5 +1,4 @@
 local class = require("class")
-local serpent = require("serpent")
 local stbl = require("stbl")
 
 ---@class sphere.Configs
@@ -112,20 +111,11 @@ function ConfigModel:readFile(path)
 	return love.filesystem.load(path)()
 end
 
-local serpentOptions = {
-	indent = "\t",
-	comment = false,
-	sortkeys = true,
-	numformat = "%.16g"
-}
-local serpentFormat = "return %s\n"
-
 ---@param path string
 ---@param config table
 ---@return boolean
 function ConfigModel:writeFile(path, config)
-	return assert(love.filesystem.write(path, serpentFormat:format(stbl.encode(config))))
-	-- return assert(love.filesystem.write(path, serpentFormat:format(serpent.block(config, serpentOptions))))
+	return assert(love.filesystem.write(path, ("return %s\n"):format(stbl.encode(config))))
 end
 
 return ConfigModel

@@ -18,7 +18,7 @@ end
 
 function GameplayView:load()
 	-- self.game.rhythmModel.observable:add(self.sequenceView)
-	self.game:loadGameplay()
+	self.game.gameInteractor:loadGameplaySelectedChart()
 
 	self.subscreen = ""
 	self.failed = false
@@ -32,13 +32,13 @@ function GameplayView:load()
 end
 
 function GameplayView:unload()
-	self.game:unloadGameplay()
+	self.game.gameplayInteractor:unloadGameplay()
 	-- self.game.rhythmModel.observable:remove(self.sequenceView)
 	self.sequenceView:unload()
 end
 
 function GameplayView:retry()
-	self.game.gameplayController:retry()
+	self.game.gameplayInteractor:retry()
 	self.sequenceView:unload()
 	self.sequenceView:load()
 end
@@ -70,14 +70,12 @@ function GameplayView:draw()
 		not isPlaying
 		-- self.game.rhythmModel.inputManager.mode ~= "internal"
 	then
-		self.game.gameplayController:pause()
+		self.game.gameplayInteractor:pause()
 	end
 end
 
 ---@param dt number
 function GameplayView:update(dt)
-	self.game.gameplayController:update(dt)
-
 	local state = self.game.pauseModel.state
 	if state == "play" then
 		self.subscreen = ""
@@ -99,7 +97,7 @@ function GameplayView:update(dt)
 	local failed = self.game.rhythm_engine.score_engine.healthsSource:isFailed()
 	if failed and not self.failed then
 		if actionOnFail == "pause" then
-			self.game.gameplayController:changePlayState("pause")
+			self.game.gameplayInteractor:changePlayState("pause")
 			self.failed = true
 		elseif actionOnFail == "quit" then
 			self:quit()
@@ -116,12 +114,12 @@ end
 
 ---@param event table
 function GameplayView:receive(event)
-	self.game.gameplayController:receive(event)
+	self.game.gameplayInteractor:receive(event)
 	self.sequenceView:receive(event)
 end
 
 function GameplayView:quit()
-	if self.game.gameplayController:hasResult() then
+	if self.game.gameplayInteractor:hasResult() then
 		self:changeScreen("resultView")
 	elseif self.game.multiplayerModel.client:isInRoom() then
 		self:changeScreen("multiplayerView")
@@ -132,52 +130,50 @@ end
 
 function GameplayView:keypressed()
 	local input = self.game.configModel.configs.settings.input
-	local gameplayController = self.game.gameplayController
 	local offsetController = self.game.offsetController
+	local gameplayInteractor = self.game.gameplayInteractor
 
 	local kp = just.keypressed
-	if kp(input.skipIntro) then gameplayController:skipIntro()
+	if kp(input.skipIntro) then gameplayInteractor:skipIntro()
 	elseif kp(input.offset.decrease) then offsetController:increaseLocalOffset(-0.001)
 	elseif kp(input.offset.increase) then offsetController:increaseLocalOffset(0.001)
 	elseif kp(input.offset.reset) then offsetController:resetLocalOffset()
-	-- elseif kp(input.timeRate.decrease) then gameplayController:increaseTimeRate(-0.05)
-	-- elseif kp(input.timeRate.increase) then gameplayController:increaseTimeRate(0.05)
-	elseif kp(input.playSpeed.decrease) then self.game:increasePlaySpeed(-1)
-	elseif kp(input.playSpeed.increase) then self.game:increasePlaySpeed(1)
+	-- elseif kp(input.timeRate.decrease) then gameplayInteractor:increaseTimeRate(-0.05)
+	-- elseif kp(input.timeRate.increase) then gameplayInteractor:increaseTimeRate(0.05)
+	elseif kp(input.playSpeed.decrease) then gameplayInteractor:increasePlaySpeed(-1)
+	elseif kp(input.playSpeed.increase) then gameplayInteractor:increasePlaySpeed(1)
 	end
-
-	local gameplayController = self.game.gameplayController
 
 	local shift = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")
 	local ctrl = love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl")
 	local state = self.game.pauseModel.state
 	if state == "play" then
-		if kp(input.pause) and not shift then gameplayController:changePlayState("pause")
+		if kp(input.pause) and not shift then gameplayInteractor:changePlayState("pause")
 		elseif kp(input.pause) and ctrl then self:quit()
-		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
+		elseif kp(input.quickRestart) then gameplayInteractor:changePlayState("retry")
 		end
 	elseif state == "pause" then
-		if kp(input.pause) and not shift then gameplayController:changePlayState("play")
+		if kp(input.pause) and not shift then gameplayInteractor:changePlayState("play")
 		elseif kp(input.pause) and ctrl then self:quit()
-		elseif kp(input.quickRestart) then gameplayController:changePlayState("retry")
+		elseif kp(input.quickRestart) then gameplayInteractor:changePlayState("retry")
 		end
 	elseif state == "pause-play" and kp(input.pause) then
-		gameplayController:changePlayState("pause")
+		gameplayInteractor:changePlayState("pause")
 	end
 end
 
 function GameplayView:keyreleased()
 	local state = self.game.pauseModel.state
 	local input = self.game.configModel.configs.settings.input
-	local gameplayController = self.game.gameplayController
+	local gameplayInteractor = self.game.gameplayInteractor
 
 	local kr = just.keyreleased
 	if state == "play-pause" and kr(input.pause) then
-		gameplayController:changePlayState("play")
+		gameplayInteractor:changePlayState("play")
 	elseif state == "pause-retry" and kr(input.quickRestart) then
-		gameplayController:changePlayState("pause")
+		gameplayInteractor:changePlayState("pause")
 	elseif state == "play-retry" and kr(input.quickRestart) then
-		gameplayController:changePlayState("play")
+		gameplayInteractor:changePlayState("play")
 	end
 end
 
