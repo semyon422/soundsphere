@@ -1,3 +1,4 @@
+---@param t {[string]: any|table}
 function love.conf(t)
 	t.identity = nil
 	t.appendidentity = true
