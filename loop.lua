@@ -88,13 +88,6 @@ function Loop:run()
 	local midiInputFactory = MidiInputFactory()
 	local midiInput = midiInputFactory:getMidiInput()
 
-	setmetatable(_G, {
-		__newindex = function(a, b, c)
-			print("__newindex", a, b, c, debug.traceback())
-			rawset(a, b, c)
-		end
-	})
-
 	return function()
 		if Loop.quitting then
 			return Loop:quittingLoop()

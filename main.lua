@@ -128,6 +128,13 @@ end
 
 require("preload")
 
+pcall(require, "luamidi")
+
+setmetatable(_G, {__newindex = function(a, b, c)
+	print("__newindex", a, b, c, debug.traceback())
+	rawset(a, b, c)
+end})
+
 local love_run = require("love_run")
 love.load = function() end  -- for compatibility with old conf.lua
 local defaultLoop = love.loop or love_run()
