@@ -18,7 +18,15 @@ function ReplayCoder.decode(s)
 		return nil, "invalid json: " .. obj
 	end
 
-	local events = mime.unb64(obj.frames)
+	local frames = ""
+	if obj.version == 1 then
+		frames = obj.events
+		obj.events = nil
+	elseif obj.version == 2 then
+		frames = obj.frames
+	end
+
+	local events = mime.unb64(frames)
 	if not events then
 		return nil, "can't unb64"
 	end
@@ -44,10 +52,11 @@ function ReplayCoder.encode(replay)
 	local frames = ""
 	if obj.version == 1 then
 		frames = ReplayEvents.encode(replay.frames)
+		obj.events = mime.b64(frames)
 	elseif obj.version == 2 then
 		frames = ReplayFrames.encode(replay.frames)
+		obj.frames = mime.b64(frames)
 	end
-	obj.frames = mime.b64(frames)
 
 	---@type boolean, string
 	local ok, str = pcall(json.encode, obj)

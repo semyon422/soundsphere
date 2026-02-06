@@ -1,4 +1,6 @@
 local zlib = require("zlib")
+local valid = require("valid")
+local types = require("sea.shared.types")
 local BinaryEvents = require("rizu.engine.replay.BinaryEvents")
 local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 
@@ -8,6 +10,11 @@ local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 
 ---@class rizu.ReplayFrames
 local ReplayFrames = {}
+
+ReplayFrames.frame_struct = {
+	time = types.number,
+	event = valid.struct(VirtualInputEvent.struct),
+}
 
 ---@param frames rizu.ReplayFrame[]
 ---@return string

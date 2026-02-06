@@ -72,7 +72,7 @@ local function is_columns_order(v)
 	end
 	return true
 end
-is_columns_order = valid.optional(valid.compose(valid.array(types.index, 100), is_columns_order))
+is_columns_order = valid.optional(valid.compose(valid.array(valid.index, 100), is_columns_order))
 chart_types.columns_order = is_columns_order
 
 assert(is_columns_order())

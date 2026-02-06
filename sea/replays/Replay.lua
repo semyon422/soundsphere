@@ -2,6 +2,7 @@ local valid = require("valid")
 local table_util = require("table_util")
 local ReplayBase = require("sea.replays.ReplayBase")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
+local ReplayFrames = require("rizu.engine.replay.ReplayFrames")
 local types = require("sea.shared.types")
 
 ---@class sea.Replay: sea.ChartmetaKey, sea.ReplayBase
@@ -14,7 +15,7 @@ local Replay = ChartmetaKey + ReplayBase
 
 Replay.struct = {
 	version = types.integer,
-	frames = function() return true end, -- TODO: validation for frames
+	frames = valid.array(valid.struct(ReplayFrames.frame_struct), 2e6),
 	pause_count = types.count,
 	created_at = types.time,
 }

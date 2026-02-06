@@ -349,10 +349,10 @@ function test.update_email(t)
 	---@cast su -?
 	user = users:getUser(su.user.id)
 
-	_, err = users:updateEmail(user, "wrong password", "new_email@example.com", time)
+	local _, err = users:updateEmail(user, "wrong password", "new_email@example.com", time)
 	t:eq(err, "invalid credentials")
 
-	_, err = users:updateEmail(user, "password", "new_email@example.com", time)
+	local _, err = users:updateEmail(user, "password", "new_email@example.com", time)
 	user = users.users_repo:getUserInsecure(user.id)
 	---@cast user -?
 	t:eq(user.email, "new_email@example.com")
@@ -376,15 +376,16 @@ function test.update_password(t)
 
 	local su, err = users:register(ctx.anon_user, "127.0.0.1", time, user_values)
 	---@cast su -?
-	local player = users:getUser(su.user.id)
+	user = users:getUser(su.user.id)
+	---@cast user -?
 
-	_, err = users:updatePassword(player, "wrong password", "new_password", time)
+	local _, err = users:updatePassword(user, "wrong password", "new_password", time)
 	t:eq(err, "invalid credentials")
 
-	_, err = users:updatePassword(player, "password", "new_password", time)
-	player = users.users_repo:getUserInsecure(player.id)
-	---@cast player -?
-	t:eq(player.password, "new_password")
+	local _, err = users:updatePassword(user, "password", "new_password", time)
+	local _user = users.users_repo:getUserInsecure(user.id)
+	---@cast _user -?
+	t:eq(_user.password, "new_password")
 end
 
 ---@param t testing.T
