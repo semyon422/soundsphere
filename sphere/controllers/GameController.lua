@@ -148,15 +148,7 @@ function GameController:new()
 		self.previewModel,
 		self.chartPreviewModel
 	)
-	self.resultController = ResultController(
-		self.selectModel,
-		self.replayModel,
-		self.rhythm_engine,
-		self.onlineModel,
-		self.configModel,
-		self.computeContext,
-		self.replayBase
-	)
+	self.resultController = ResultController(self)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
 		self.configModel,

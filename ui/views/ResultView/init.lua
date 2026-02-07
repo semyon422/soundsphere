@@ -48,14 +48,7 @@ ResultView.loadScore = thread.coro(function(self, itemIndex)
 		return
 	end
 	loading = true
-	local scoreEntry = self.game.selectModel.scoreItem
-	if itemIndex then
-		scoreEntry = self.game.selectModel.scoreLibrary.items[itemIndex]
-	end
-	self.game.resultController:replayNoteChartAsync("result", scoreEntry)
-	if itemIndex then
-		self.game.selectModel:scrollScore(nil, itemIndex)
-	end
+	self.game.gameInteractor:loadScoreAsync(itemIndex)
 	loading = false
 end)
 
@@ -65,9 +58,8 @@ ResultView.play = thread.coro(function(self, mode)
 		return
 	end
 	playing = true
-	local scoreEntry = self.game.selectModel.scoreItem
-	local isResult = self.game.resultController:replayNoteChartAsync(mode, scoreEntry)
-	if isResult then
+	self.game.resultController:replayNoteChartAsync(mode, self.game.selectModel.scoreItem)
+	if mode == "result" then
 		return self.view:reload()
 	end
 	self:changeScreen("gameplayView")

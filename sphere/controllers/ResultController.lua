@@ -1,58 +1,37 @@
 local class = require("class")
 local thread = require("thread")
 local simplify_notechart = require("libchart.simplify_notechart")
-local Timings = require("sea.chart.Timings")
-local Healths = require("sea.chart.Healths")
-local Subtimings = require("sea.chart.Subtimings")
-local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+local GameplayTimings = require("rizu.gameplay.GameplayTimings")
+local GameplayChart = require("rizu.gameplay.GameplayChart")
+local ReplayLoader = require("sea.replays.ReplayLoader")
 
 ---@class sphere.ResultController
 ---@operator call: sphere.ResultController
 local ResultController = class()
 
----@param selectModel sphere.SelectModel
----@param replayModel sphere.ReplayModel
----@param rhythm_engine rizu.RhythmEngine
----@param onlineModel sphere.OnlineModel
----@param configModel sphere.ConfigModel
----@param computeContext sea.ComputeContext
-function ResultController:new(
-	selectModel,
-	replayModel,
-	rhythm_engine,
-	onlineModel,
-	configModel,
-	computeContext,
-	replayBase
-)
-	self.selectModel = selectModel
-	self.replayModel = replayModel
-	self.rhythm_engine = rhythm_engine
-	self.onlineModel = onlineModel
-	self.configModel = configModel
-	self.computeContext = computeContext
-	self.replayBase = replayBase
+---@param game sphere.GameController
+function ResultController:new(game)
+	self.game = game
 end
 
 function ResultController:load()
-	self.selectModel:pullScore()
+	local selectModel = self.game.selectModel
 
-	local selectModel = self.selectModel
+	selectModel:pullScore()
+
 	local scoreItemIndex = selectModel.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
 	if not scoreItem then
 		return
 	end
 
-	self.selectModel:scrollScore(nil, scoreItemIndex)
+	selectModel:scrollScore(nil, scoreItemIndex)
 end
 
 function ResultController:unload()
-	local config = self.configModel.configs.select
+	local config = self.game.configModel.configs.select
 	config.chartplay_id = config.select_chartplay_id
 end
-
-local readAsync = thread.async(function(...) return love.filesystem.read(...) end)
 
 ---@param chartplay sea.Chartplay
 ---@return string?
@@ -60,122 +39,99 @@ function ResultController:getReplayDataAsync(chartplay)
 	---@type string?
 	local content
 	if chartplay.user_name then
-		local remote = self.onlineModel.authManager.sea_client.remote
+		local remote = self.game.onlineModel.authManager.sea_client.remote
 		content = remote.submission:getReplayFile(chartplay.replay_hash)
 	elseif chartplay.replay_hash then
-		content = readAsync(self.replayModel.path .. "/" .. chartplay.replay_hash)
+		content = self.game.fs:read("userdata/replays/" .. chartplay.replay_hash)
 	end
 
 	return content
 end
 
----@param mode string
+---@param mode "replay"|"retry"|"result"
 ---@param chartplay sea.Chartplay
 ---@return boolean?
 function ResultController:replayNoteChartAsync(mode, chartplay)
-	if not chartplay or not self.selectModel:notechartExists() then
+	local game = self.game
+
+	if not chartplay or not game.selectModel:notechartExists() then
 		return
 	end
 
-	local content = self:getReplayDataAsync(chartplay)
-	if not content then
+	local replay_data = self:getReplayDataAsync(chartplay)
+	if not replay_data then
 		return
 	end
 
-	local replayModel = self.replayModel
+	-- local replayModel = self.replayModel
 
-	local replay = replayModel:loadReplay(content)
+	local replay, err = ReplayLoader.load(replay_data)
+	print("here", replay, err)
 	if not replay then
 		return
 	end
 
-	local rhythm_engine = self.rhythm_engine
-
 	if mode == "retry" then
 		-- rhythmModel.inputManager:setMode("external")
-		replayModel:setMode("record")
+		-- replayModel:setMode("record")
 		return
 	end
 
-	local computeContext = self.computeContext
+	local computeContext = game.computeContext
 
 	computeContext.chartplay = chartplay
-	rhythm_engine:setReplayBase(replay)
-	replayModel:decodeEvents(replay.events)
+	-- rhythm_engine:setReplayBase(replay)
+	-- replayModel:decodeEvents(replay.events)
 
 	-- rhythmModel.inputManager:setMode("internal")
-	replayModel:setMode("replay")
+	-- replayModel:setMode("replay")
 
 	if mode == "replay" then
 		return
 	end
 
-	local chartview = self.selectModel.chartview
+	local chartview = game.selectModel.chartview
 
-	local data = assert(love.filesystem.read(chartview.location_path))
-	local chart_chartmeta = assert(computeContext:fromFileData(chartview.chartfile_name, data, chartview.index))
-	local chart, chartmeta = chart_chartmeta.chart, chart_chartmeta.chartmeta
+	GameplayChart(
+		game.configModel.configs.settings,
+		replay,
+		game.computeContext,
+		game.fs,
+		chartview
+	):load()
 
-	computeContext:applyModifierReorder(replay)
-	computeContext:computeBase(replay)
-	computeContext:computePlay(rhythm_engine, replayModel)
+	local chart = assert(game.computeContext.chart)
+	local chartmeta = assert(game.computeContext.chartmeta)
 
-	self:actualizeReplayBase()
-	self.rhythm_engine.score_engine:createByTimings(self.replayBase.timings, self.replayBase.subtimings, true)
+	GameplayTimings(
+		game.configModel.configs.settings,
+		replay,
+		chartmeta
+	):load()
 
-	if self.configModel.configs.settings.miscellaneous.generateGifResult then
+	local chartplay_computed, err = game.computeContext:computeReplay(replay)
+
+	if self.game.configModel.configs.settings.miscellaneous.generateGifResult then
 		local GifResult = require("libchart.GifResult")
 		local gif_result = GifResult()
-		gif_result:setBackgroundData(love.filesystem.read(self.selectModel:getBackgroundPath()))
+		local bg_path = game.selectModel:getBackgroundPath()
+		if bg_path then
+			local bg_data = game.fs:read(bg_path)
+			if bg_data then
+				gif_result:setBackgroundData(bg_data)
+			end
+		end
 		local data = gif_result:create(
-			self.selectModel.chartview,
+			chartview,
 			chartplay,
 			simplify_notechart(chart, {"tap", "hold", "laser"}),
 			chart.inputMode:getColumns()
 		)
-		love.filesystem.write("userdata/result.gif", data)
+		game.fs:write("userdata/result.gif", data)
 	end
 
 	-- rhythmModel.inputManager:setMode("external")
-	replayModel:setMode("record")
-
-	return true
-end
-
----@param timings sea.Timings
-function ResultController:setReplayBaseTimings(timings)
-	local replayBase = self.replayBase
-	local settings = self.configModel.configs.settings
-
-	---@type sea.Subtimings?
-	local subtimings
-	local subtimings_config = settings.subtimings[timings.name]
-	if subtimings_config then
-		local name = subtimings_config[1]
-		local value = subtimings_config[name]
-		subtimings = Subtimings(name, value)
-	end
-
-	replayBase.timings = timings
-	replayBase.subtimings = subtimings
-	replayBase.timing_values = assert(TimingValuesFactory:get(timings, subtimings))
-end
-
-function ResultController:actualizeReplayBaseTimings()
-	local chartmeta = assert(self.computeContext.chartmeta)
-	local settings = self.configModel.configs.settings
-
-	local timings = chartmeta.timings
-	timings = timings or Timings(unpack(settings.format_timings[chartmeta.format]))
-	self:setReplayBaseTimings(timings)
-end
-
-function ResultController:actualizeReplayBase()
-	local config = self.configModel.configs.settings.replay_base
-
-	if config.auto_timings then
-		self:actualizeReplayBaseTimings()
-	end
+	-- replayModel:setMode("record")
 end
 
 return ResultController
