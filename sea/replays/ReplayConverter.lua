@@ -8,6 +8,7 @@ local Subtimings = require("sea.chart.Subtimings")
 local TimingValues = require("sea.chart.TimingValues")
 local Healths = require("sea.chart.Healths")
 local Replay = require("sea.replays.Replay")
+local VirtualInputEvent = require("rizu.input.VirtualInputEvent")
 
 -- LEGACY CODE
 -- tests for every replay version are required
@@ -144,6 +145,21 @@ function ReplayConverter:convertModifiers(replay)
 	ModifierModel:fixOldFormat(replay.modifiers)
 end
 
+---@param events [number, integer, boolean][]
+function ReplayConverter:convertEvents(events)
+	---@type rizu.ReplayFrame[]
+	local frames = {}
+
+	for i, e in ipairs(events) do
+		frames[i] = {
+			time = e[1],
+			event = VirtualInputEvent(1, e[3], e[2]),
+		}
+	end
+
+	return frames
+end
+
 ---@param obj table
 ---@return sea.Replay
 function ReplayConverter:convert(obj)
@@ -161,7 +177,10 @@ function ReplayConverter:convert(obj)
 			if obj.timing_values then
 				setmetatable(obj.timing_values, TimingValues)
 			end
-			-- TODO: convert events for version 1
+			if obj.events then
+				obj.frames = self:convertEvents(obj.events)
+				obj.events = nil
+			end
 			return (setmetatable(obj, Replay))
 		end
 		error("invalid replay version")

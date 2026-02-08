@@ -18,26 +18,20 @@ function ReplayCoder.decode(s)
 		return nil, "invalid json: " .. obj
 	end
 
-	local frames = ""
-	if obj.version == 1 then
-		frames = obj.events
-		obj.events = nil
-	elseif obj.version == 2 then
-		frames = obj.frames
-	end
+	local replay = setmetatable(obj, Replay)
 
-	local events = mime.unb64(frames)
-	if not events then
+	local events = mime.unb64(obj.events) -- v1
+	local frames = mime.unb64(obj.frames) -- v2
+
+	if not events and not frames then
 		return nil, "can't unb64"
 	end
 
-	if obj.version == 1 then
-		obj.frames = ReplayEvents.decode(events)
-	elseif obj.version == 2 then
-		obj.frames = ReplayFrames.decode(events)
+	if events then
+		replay.events = ReplayEvents.decode(events)
+	elseif frames then
+		replay.frames = ReplayFrames.decode(frames)
 	end
-
-	setmetatable(obj, Replay)
 
 	return obj
 end
@@ -48,14 +42,12 @@ end
 function ReplayCoder.encode(replay)
 	local obj = table_util.copy(replay)
 	---@cast obj -sea.Replay
+	---@cast replay +{events: {}}
 
-	local frames = ""
-	if obj.version == 1 then
-		frames = ReplayEvents.encode(replay.frames)
-		obj.events = mime.b64(frames)
-	elseif obj.version == 2 then
-		frames = ReplayFrames.encode(replay.frames)
-		obj.frames = mime.b64(frames)
+	if replay.events then -- v1
+		obj.events = mime.b64(ReplayEvents.encode(replay.events))
+	elseif replay.frames then -- v2
+		obj.frames = mime.b64(ReplayFrames.encode(replay.frames))
 	end
 
 	---@type boolean, string

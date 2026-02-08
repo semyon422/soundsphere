@@ -32,7 +32,11 @@ end
 ---@param notes rizu.LogicNote[]
 function LogicEngine:setNotes(notes)
 	self.notes = notes
-	table.sort(self.notes)
+	table.sort(notes)
+
+	for i, note in ipairs(notes) do
+		note.index = i
+	end
 
 	self.note_index = 1
 

@@ -2,6 +2,7 @@ local class = require("class")
 local TimingValues = require("sea.chart.TimingValues")
 
 ---@class rizu.LogicNoteChange
+---@field index integer
 ---@field type "tap"|"hold"
 ---@field time number
 ---@field delta_time number

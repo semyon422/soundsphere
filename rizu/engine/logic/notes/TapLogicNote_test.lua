@@ -42,6 +42,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "tap",
 		time = 2,
 		delta_time = 2,
@@ -60,6 +61,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "tap",
 		time = 2 * 1.5,
 		delta_time = 2,
@@ -81,6 +83,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "tap",
 		time = 1.1,
 		delta_time = 1.1,
@@ -96,6 +99,7 @@ function test.hit_late_and_exactly_with_rate(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "tap",
 		time = 1.1,
 		delta_time = 1.1 / 1.5, -- 0.733
@@ -134,6 +138,7 @@ function test.hit_too_early(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "tap",
 		time = -3,
 		delta_time = -3,

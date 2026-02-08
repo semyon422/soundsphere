@@ -88,7 +88,7 @@ local function ScoreSources(self)
 	---@type sphere.GameController
 	local game = self.game
 	local scoreEngine = game.rhythm_engine.score_engine
-	local replayModel = game.replayModel
+	local replay = game.resultController.replay
 
 	local show = showLoadedScore(self)
 	local scoreItem = game.selectModel.scoreItem
@@ -97,7 +97,7 @@ local function ScoreSources(self)
 		return
 	end
 
-	local timings, subtimings = replayModel.replay.timings, replayModel.replay.subtimings
+	local timings, subtimings = replay.timings, replay.subtimings
 	if not show and scoreItem then
 		timings, subtimings = scoreItem.timings, scoreItem.subtimings
 	end
@@ -444,15 +444,18 @@ local function NotechartInfo(self)
 	local erfunc = require("libchart.erfunc")
 	local ratingHitTimingWindow = self.game.configModel.configs.settings.gameplay.ratingHitTimingWindow
 
-	---@type rizu.RhythmEngine
-	local rhythm_engine = self.game.rhythm_engine
+	---@type sphere.GameController
+	local game = self.game
+
+	local rhythm_engine = game.rhythm_engine
+	local computeContext = game.computeContext
 
 	local normalscore = rhythm_engine.score_engine.scores.normalscore
 
-	local chartview = self.game.selectModel.chartview
-	local scoreItem = self.game.selectModel.scoreItem
+	local chartview = game.selectModel.chartview
+	local scoreItem = game.selectModel.scoreItem
 	local scoreEngine = rhythm_engine.score_engine
-	local replay = self.game.replayModel.replay
+	local replay = game.resultController.replay
 
 	if not scoreItem then
 		return
@@ -483,8 +486,8 @@ local function NotechartInfo(self)
 
 	local bpm = baseBpm * scoreItem.rate
 	local length = baseLength / scoreItem.rate
-	local difficulty = show and rhythm_engine.chartdiff.enps_diff or scoreItem.difficulty
-	local inputMode = show and tostring(rhythm_engine.chart.inputMode) or scoreItem.inputmode
+	local difficulty = show and computeContext.chartdiff.enps_diff or scoreItem.difficulty
+	local inputMode = show and tostring(computeContext.chart.inputMode) or scoreItem.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
@@ -738,7 +741,7 @@ local function ModifierIconGrid(self)
 	love.graphics.translate(36, 0)
 
 	local selectModel = self.game.selectModel
-	local replay = self.game.replayModel.replay
+	local replay = self.game.resultController.replay
 
 	local modifiers = replay and replay.modifiers
 
@@ -787,8 +790,9 @@ local function BottomScreenMenu(self)
 		end
 	end
 	if imgui.TextOnlyButton("to osr", "to osr", 72 * 1.5, h) then
-		local chart, chartmeta = self.game.selectModel:loadChartAbsolute()
-		self.game.replayModel:saveOsr(chartmeta)
+		error("fix this")
+		-- local chart, chartmeta = self.game.selectModel:loadChartAbsolute()
+		-- self.game.resultController:saveOsr(chartmeta)
 	end
 	just.row()
 end

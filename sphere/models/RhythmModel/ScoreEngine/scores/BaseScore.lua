@@ -94,6 +94,7 @@ function BaseScore:getSlice()
 		hitCount = self.hitCount,
 		missCount = self.missCount,
 		earlyHitCount = self.earlyHitCount,
+		notesCount = self.notes_count,
 		combo = self.combo,
 		maxCombo = self.maxCombo,
 		currentTime = self.currentTime,

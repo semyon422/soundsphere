@@ -140,6 +140,7 @@ function HoldLogicNote:switchState(state)
 	end
 
 	self.logic_info:addNoteChange({
+		index = self.index,
 		type = "hold",
 		time = current_time,
 		delta_time = delta_time,

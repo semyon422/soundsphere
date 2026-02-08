@@ -70,7 +70,7 @@ function OsuManiaV1Score:new(od)
 	}
 	self.tail_judge_windows = JudgeWindows(self.tailWindows)
 
-	---@type {[string]: integer}
+	---@type {[integer]: integer}
 	self.pressedLongNotes = {}
 
 	self.baseScore = 0
@@ -105,11 +105,12 @@ end
 ---@param event rizu.LogicNoteChange
 ---@return integer?
 function OsuManiaV1Score:getStartCounter(event)
-	return self.pressedLongNotes[event.noteIndexType]
+	return self.pressedLongNotes[event.index]
 end
 
+---@param event rizu.LogicNoteChange
 function OsuManiaV1Score:setStartCounter(event, counter_name)
-	self.pressedLongNotes[event.noteIndexType] = counter_name
+	self.pressedLongNotes[event.index] = counter_name
 end
 
 ---@param event rizu.LogicNoteChange

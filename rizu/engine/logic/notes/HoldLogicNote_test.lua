@@ -51,6 +51,7 @@ function test.too_early(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = -3,
 		delta_time = -3,
@@ -68,6 +69,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 2,
 		delta_time = 2,
@@ -80,6 +82,7 @@ function test.too_late(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 12,
 		delta_time = 2,
@@ -97,6 +100,7 @@ function test.perfect_hold(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 0,
 		delta_time = 0,
@@ -110,6 +114,7 @@ function test.perfect_hold(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 10,
 		delta_time = 0,
@@ -127,6 +132,7 @@ function test.early_release(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 0.5,
 		delta_time = 0.5,
@@ -140,6 +146,7 @@ function test.early_release(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 5,
 		delta_time = -5,
@@ -151,6 +158,7 @@ function test.early_release(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 5,
 		delta_time = -5,
@@ -162,6 +170,7 @@ function test.early_release(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 5,
 		delta_time = -5,
@@ -180,6 +189,7 @@ function test.late_press(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 1.5,
 		delta_time = 1.5,
@@ -193,6 +203,7 @@ function test.late_press(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 10,
 		delta_time = 0,
@@ -209,6 +220,7 @@ function test.too_late_press(t)
 	ctx.logic_note:update()
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 2,
 		delta_time = 2,
@@ -220,6 +232,7 @@ function test.too_late_press(t)
 	ctx.logic_note:input(true)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 5,
 		delta_time = -5,
@@ -233,6 +246,7 @@ function test.too_late_press(t)
 	ctx.logic_note:input(false)
 
 	t:tdeq(ctx.events, {{
+		index = 0,
 		type = "hold",
 		time = 10,
 		delta_time = 0,

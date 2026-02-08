@@ -37,7 +37,7 @@ return ModalImView(function(self, quit)
 
 	imgui.Container(window_id, w, h, _h / 3, _h * 2, scrollY)
 
-	local replay = game.replayModel.replay
+	local replay = game.resultController.replay
 	if replay then
 		imgui.text("hash: " .. tostring(replay.hash))
 		imgui.text("index: " .. tostring(replay.index))

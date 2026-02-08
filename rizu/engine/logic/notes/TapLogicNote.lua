@@ -72,6 +72,7 @@ function TapLogicNote:switchState(state)
 	local delta_time = math.min(self:getDeltaTime(), last_time)
 
 	self.logic_info:addNoteChange({
+		index = self.index,
 		type = "tap",
 		time = current_time,
 		delta_time = delta_time,

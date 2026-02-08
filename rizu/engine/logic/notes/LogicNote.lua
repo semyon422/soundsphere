@@ -6,6 +6,8 @@ local class = require("class")
 ---@operator call: rizu.LogicNote
 local LogicNote = class()
 
+LogicNote.index = 0
+
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
 function LogicNote:new(note, logic_info)
