@@ -98,15 +98,6 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		chartview
 	):load()
 
-	local chart = assert(game.computeContext.chart)
-	local chartmeta = assert(game.computeContext.chartmeta)
-
-	GameplayTimings(
-		game.configModel.configs.settings,
-		replay,
-		chartmeta
-	):load()
-
 	RhythmEngineLoader(
 		game.rhythm_engine,
 		replay,
@@ -118,6 +109,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	game.computeContext:computePlay(game.rhythm_engine, replay.frames)
 
 	if self.game.configModel.configs.settings.miscellaneous.generateGifResult then
+		local chart = assert(game.computeContext.chart)
 		local GifResult = require("libchart.GifResult")
 		local gif_result = GifResult()
 		local bg_path = game.selectModel:getBackgroundPath()
