@@ -64,8 +64,6 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		return
 	end
 
-	-- local replayModel = self.replayModel
-
 	local replay, err = ReplayLoader.load(replay_data)
 	self.replay = replay -- TODO: move it somewhere else
 
@@ -74,8 +72,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	end
 
 	if mode == "retry" then
-		-- rhythmModel.inputManager:setMode("external")
-		-- replayModel:setMode("record")
+		game.gameplayInteractor.replaying = false
 		return
 	end
 
@@ -83,10 +80,9 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	computeContext.chartplay = chartplay
 	-- rhythm_engine:setReplayBase(replay)
-	-- replayModel:decodeEvents(replay.events)
 
-	-- rhythmModel.inputManager:setMode("internal")
-	-- replayModel:setMode("replay")
+	game.gameplayInteractor.replaying = true
+	game.gameplayInteractor:setReplayFrames(replay.frames)
 
 	if mode == "replay" then
 		return
@@ -140,8 +136,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		game.fs:write("userdata/result.gif", data)
 	end
 
-	-- rhythmModel.inputManager:setMode("external")
-	-- replayModel:setMode("record")
+	game.gameplayInteractor.replaying = false
 end
 
 return ResultController

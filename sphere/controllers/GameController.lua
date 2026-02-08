@@ -6,7 +6,6 @@ local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local SelectModel = require("sphere.models.SelectModel")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
-local ReplayModel = require("sphere.models.ReplayModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
 local TimeRateModel = require("sphere.models.TimeRateModel")
@@ -82,7 +81,6 @@ function GameController:new()
 		self.persistence.fileFinder
 	)
 	self.pauseModel = PauseModel(self.persistence.configModel, self.rhythm_engine)
-	self.replayModel = ReplayModel(self.rhythm_engine)
 	self.editorModel = EditorModel(
 		self.persistence.configModel,
 		self.resourceModel

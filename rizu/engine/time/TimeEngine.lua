@@ -76,6 +76,7 @@ end
 ---@private
 function TimeEngine:updateTime()
 	self.time = self.timer:getTime()
+	self.time_no_mono = self.timer:getTime(true)
 
 	local enh_time = self.time
 	if not self.const then

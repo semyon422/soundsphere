@@ -4,6 +4,7 @@ local GameplayTimings = require("rizu.gameplay.GameplayTimings")
 local RhythmEngineLoader = require("rizu.gameplay.RhythmEngineLoader")
 local InputBinder = require("rizu.input.InputBinder")
 local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
+local ReplayPlayer = require("rizu.engine.replay.ReplayPlayer")
 
 ---@class rizu.GameplayInteractor
 ---@operator call: rizu.GameplayInteractor
@@ -49,7 +50,6 @@ function GameplayInteractor:loadGameplay(chartview)
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
 
-	-- replayModel:load()
 	game.pauseModel:load()
 
 	local noteSkin = game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
@@ -81,6 +81,11 @@ function GameplayInteractor:loadGameplay(chartview)
 	self.loaded = true
 end
 
+---@param frames rizu.ReplayFrame[]
+function GameplayInteractor:setReplayFrames(frames)
+	self.replay_player = ReplayPlayer(frames)
+end
+
 function GameplayInteractor:unloadGameplay()
 	self.loaded = false
 	local game = self.game
@@ -104,6 +109,22 @@ function GameplayInteractor:update()
 	local game = self.game
 
 	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
+
+	local replay_player = self.replay_player
+	if self.replaying and replay_player then
+		local next_time = game.rhythm_engine:getTime(true)
+		local offset = game.rhythm_engine.logic_offset
+		local replay_to = next_time - offset
+		local frame = replay_player:play(replay_to)
+		while frame do
+			game.rhythm_engine:setTimeNoAudio(frame.time + offset)
+			game.rhythm_engine:receive(frame.event)
+			frame = replay_player:play(replay_to)
+		end
+		assert(next_time >= game.rhythm_engine:getTime(true))
+		game.rhythm_engine:setTimeNoAudio(next_time)
+	end
+
 	game.rhythm_engine:update()
 
 	game.pauseModel:update()
@@ -124,7 +145,7 @@ end
 ---@return boolean
 function GameplayInteractor:hasResult()
 	local game = self.game
-	return game.rhythm_engine:hasResult() -- and game.replayModel.mode ~= "replay"
+	return game.rhythm_engine:hasResult() and not self.replaying
 end
 
 function GameplayInteractor:play()
@@ -143,11 +164,9 @@ function GameplayInteractor:retry()
 	local game = self.game
 	local replayBase = game.replayBase
 
-	-- rhythmModel.inputManager:setMode("external")
-	-- self.replayModel:setMode("record")
+	self.replaying = false
 
 	game.pauseModel:load()
-	-- self.replayModel:load()
 	-- self.resourceModel:rewind()
 
 	game.rhythm_engine:retry()
@@ -184,6 +203,10 @@ end
 
 ---@param event table
 function GameplayInteractor:receive(event)
+	if self.replaying then
+		return
+	end
+
 	local game = self.game
 	local physic_event = KeyPhysicInputEvent.fromInputChangedEvent(event)
 	if physic_event then

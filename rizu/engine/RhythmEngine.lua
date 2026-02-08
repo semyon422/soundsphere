@@ -21,6 +21,9 @@ local ScoreEngine = require("sphere.models.RhythmModel.ScoreEngine")
 ---@operator call: rizu.RhythmEngine
 local RhythmEngine = class()
 
+RhythmEngine.logic_offset = 0
+RhythmEngine.visual_offset = 0
+
 function RhythmEngine:new()
 	self.logic_info = LogicInfo()
 
@@ -92,8 +95,8 @@ function RhythmEngine:retry()
 end
 
 function RhythmEngine:update()
-	self.logic_info.time = self.time_engine.time
-	self.visual_info.time = self.time_engine.time
+	self.logic_info.time = self.time_engine.time - self.logic_offset
+	self.visual_info.time = self.time_engine.time - self.visual_offset
 
 	self.input_engine:update()
 	self.logic_engine:update()
@@ -120,7 +123,12 @@ function RhythmEngine:receive(event)
 	self.input_engine:receive(event)
 end
 
-function RhythmEngine:getTime()
+---@param no_mono boolean?
+---@return number
+function RhythmEngine:getTime(no_mono)
+	if no_mono then
+		return self.time_engine.time_no_mono
+	end
 	return self.time_engine.time
 end
 
@@ -194,18 +202,23 @@ end
 ---@param time number
 function RhythmEngine:setTime(time)
 	self.audio_engine:setPosition(time)
+	self:setTimeNoAudio(time)
+end
+
+---@param time number
+function RhythmEngine:setTimeNoAudio(time)
 	self.time_engine:setTime(time)
 	self:update()
 end
 
 ---@param offset number
 function RhythmEngine:setInputOffset(offset)
-	self.logic_info.offset = offset
+	self.logic_offset = offset
 end
 
 ---@param offset number
 function RhythmEngine:setVisualOffset(offset)
-	self.visual_info.offset = offset
+	self.visual_offset = offset
 end
 
 ---@param shortening number

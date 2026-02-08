@@ -13,7 +13,6 @@ local TimingValues = require("sea.chart.TimingValues")
 ---@operator call: rizu.LogicInfo
 ---@field time number
 ---@field rate number
----@field offset number
 ---@field timing_values sea.TimingValues
 ---@field note_changes rizu.LogicNoteChange[]
 ---@field on_note_change fun(change: rizu.LogicNoteChange)?
@@ -22,14 +21,13 @@ local LogicInfo = class()
 function LogicInfo:new()
 	self.time = 0
 	self.rate = 1
-	self.offset = 0
 	self.timing_values = TimingValues()
 	self.note_changes = {}
 end
 
 ---@return number
 function LogicInfo:getTime()
-	return self.time - self.offset
+	return self.time
 end
 
 ---@param time number

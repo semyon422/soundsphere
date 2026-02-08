@@ -151,9 +151,10 @@ function ReplayConverter:convertEvents(events)
 	local frames = {}
 
 	for i, e in ipairs(events) do
+		local id, value, column = e[2], e[3], e[2]
 		frames[i] = {
 			time = e[1],
-			event = VirtualInputEvent(1, e[3], e[2]),
+			event = VirtualInputEvent(id, value, column),
 		}
 	end
 
