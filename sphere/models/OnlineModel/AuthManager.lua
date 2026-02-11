@@ -1,6 +1,6 @@
 local class = require("class")
 local thread = require("thread")
-local inspect = require("inspect")
+local pprint = require("pprint")
 
 ---@class sphere.AuthManager
 ---@operator call: sphere.AuthManager
@@ -18,7 +18,7 @@ function AuthManager:checkUserAsync()
 	local user = sea_client.remote:getUser()
 	sea_client.client:setUser(user)
 	self.config.user = user
-	print("user", inspect(user))
+	print("user = " .. pprint.dump(user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 
@@ -35,7 +35,7 @@ function AuthManager:checkSessionAsync()
 	end
 
 	self.config.session = server_remote:getSession()
-	print("session", inspect(self.config.session))
+	print("session = " .. pprint.dump(self.config.session))
 
 	self:checkUserAsync()
 end

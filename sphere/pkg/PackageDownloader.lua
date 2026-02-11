@@ -3,6 +3,7 @@ local thread = require("thread")
 local path_util = require("path_util")
 local http_util = require("http_util")
 local fs_util = require("fs_util")
+local pprint = require("pprint")
 
 ---@class sphere.PackageDownloader
 ---@operator call: sphere.PackageDownloader
@@ -22,7 +23,7 @@ function PackageDownloader:download(pkg_info)
 	pkg_info.isDownloading = false
 
 	if code == 302 then
-		print(require("inspect")(headers))
+		pprint(headers)
 	end
 
 	if not data then

@@ -1,6 +1,7 @@
 local thread = require("thread")
 local class = require("class")
 local physfs = require("physfs")
+local pprint = require("pprint")
 local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
@@ -127,7 +128,7 @@ function CacheModel:update()
 end
 
 local runTaskAsync = thread.async(function(task)
-	print(require("inspect")(task))
+	pprint(task)
 	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
 	local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 
