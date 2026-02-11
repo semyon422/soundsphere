@@ -177,7 +177,6 @@ function ComputeContext:computePlay(rhythm_engine, frames)
 	end
 
 	rhythm_engine:setTime(math.huge)
-	rhythm_engine:update()
 end
 
 ---@see sphere.LogicalNoteFactory

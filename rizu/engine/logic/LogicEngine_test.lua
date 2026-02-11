@@ -39,32 +39,35 @@ function test.track_active_notes(t)
 	local chart = get_chart([[
 1000 =0
 0100 =1
-0010 =2
+1000 =2
+0100 =3
+1000 =4
+0100 =5
 ]])
 
 	le:load(chart)
 
 	logic_info.time = -1.001
 	le:update()
-	t:eq(le:getActiveNotesCount(), 0)
+	t:eq(le:getActiveNotesCount(), 2)
 
 	logic_info.time = -1
 	le:update()
-	t:eq(le:getActiveNotesCount(), 1)
+	t:eq(le:getActiveNotesCount(), 3)
 
 	logic_info.time = 0.999
 	le:update()
-	t:eq(le:getActiveNotesCount(), 2)
+	t:eq(le:getActiveNotesCount(), 4)
 
 	logic_info.time = 1
 	le:update()
-	t:eq(le:getActiveNotesCount(), 3)
+	t:eq(le:getActiveNotesCount(), 5)
 
 	logic_info.time = 2.001
 	le:update()
-	t:eq(le:getActiveNotesCount(), 1)
+	t:eq(le:getActiveNotesCount(), 4)
 
-	logic_info.time = 3.001
+	logic_info.time = 10
 	le:update()
 	t:eq(le:getActiveNotesCount(), 0)
 end

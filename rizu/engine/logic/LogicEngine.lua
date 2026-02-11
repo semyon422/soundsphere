@@ -10,6 +10,7 @@ local LogicEngine = class()
 function LogicEngine:new(logic_info)
 	self.input_note_factory = LogicNoteFactory(logic_info)
 
+	-- Must be constant
 	---@type rizu.LogicNote[]
 	self.active_notes = {}
 
@@ -26,6 +27,7 @@ function LogicEngine:load(chart)
 		local note = input_note_factory:getNote(linked_note)
 		table.insert(notes, note)
 	end
+
 	self:setNotes(notes)
 end
 
@@ -34,13 +36,32 @@ function LogicEngine:setNotes(notes)
 	self.notes = notes
 	table.sort(notes)
 
+	-- The *only* reason to process columns separately
+	-- is to process spam (clear->clear) and keysounds for early notes.
+	---@type {[ncdk2.Column]: rizu.LogicNote[]}
+	local column_notes = {}
+	self.column_notes = column_notes
+
 	for i, note in ipairs(notes) do
 		note.index = i
+
+		local column = note:getColumn()
+		column_notes[column] = column_notes[column] or {}
+		table.insert(column_notes[column], note)
 	end
 
-	self.note_index = 1
+	---@type {[ncdk2.Column]: integer}
+	local column_note_indexes = {}
+	self.column_note_indexes = column_note_indexes
+
+	for column in pairs(column_notes) do
+		column_note_indexes[column] = 1
+	end
 
 	table_util.clear(self.active_notes)
+
+	---@type {[rizu.LogicNote]: true}
+	self.tracked_notes = {}
 
 	---@type {[ncdk2.LinkedNote]: rizu.LogicNote?}
 	local linked_to_logic = {}
@@ -61,20 +82,34 @@ function LogicEngine:getActiveNotes()
 end
 
 function LogicEngine:update()
-	local notes = self.notes
+	local column_notes = self.column_notes
+	local column_note_indexes = self.column_note_indexes
 	local active_notes = self.active_notes
+	local tracked_notes = self.tracked_notes
 
-	for i = self.note_index, #notes do
-		local note = notes[i]
-		if note:isEarly() then
-			break
+	for column, notes in pairs(column_notes) do
+		local idx = column_note_indexes[column]
+		while idx <= #notes do
+			local note = notes[idx]
+
+			if not tracked_notes[note] then
+				table.insert(active_notes, note)
+				tracked_notes[note] = true
+			end
+
+			if note:isEarly() then
+				break
+			else
+				idx = idx + 1
+			end
 		end
-		self.note_index = i + 1
-		table.insert(active_notes, note)
+		column_note_indexes[column] = idx
 	end
 
 	for _, note in ipairs(active_notes) do
-		note:update()
+		if note:isActive() then
+			note:update()
+		end
 	end
 
 	for i = #active_notes, 1, -1 do

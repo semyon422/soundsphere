@@ -69,7 +69,7 @@ end
 ---@param b rizu.LogicNote
 ---@return boolean
 function LogicNote.__lt(a, b)
-	return a:getStartTime() < b:getStartTime()
+	return a.linked_note < b.linked_note
 end
 
 return LogicNote
