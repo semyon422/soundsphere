@@ -90,21 +90,14 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	local chartview = game.selectModel.chartview
 
-	GameplayChart(
-		game.configModel.configs.settings,
-		replay,
-		game.computeContext,
-		game.fs,
-		chartview
-	):load()
+	GameplayChart(game.configModel.configs.settings, game.fs, chartview):load(replayBase, game.computeContext)
 
 	RhythmEngineLoader(
-		game.rhythm_engine,
 		replay,
 		game.computeContext,
 		game.configModel.configs.settings,
 		{}
-	):loadEngine()
+	):load(game.rhythm_engine)
 
 	game.computeContext:computePlay(game.rhythm_engine, replay.frames)
 

@@ -41,15 +41,9 @@ function test.all(t)
 	fs:createDirectory(dir)
 	fs:write(chartview.location_path, chartfile_data)
 
-	local gl = GameplayChart(
-		config,
-		ReplayBase(),
-		ComputeContext(),
-		fs,
-		chartview
-	)
+	local gl = GameplayChart(config, fs, chartview)
 
-	gl:load()
+	gl:load(ReplayBase(), ComputeContext())
 end
 
 return test

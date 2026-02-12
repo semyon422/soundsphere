@@ -4,27 +4,19 @@ local class = require("class")
 ---@operator call: rizu.RhythmEngineLoader
 local RhythmEngineLoader = class()
 
----@param rhythm_engine rizu.RhythmEngine
 ---@param replayBase sea.ReplayBase
 ---@param computeContext sea.ComputeContext
 ---@param config sphere.SettingsConfig
 ---@param resources {[string]: string}
-function RhythmEngineLoader:new(
-	rhythm_engine,
-	replayBase,
-	computeContext,
-	config,
-	resources
-)
-	self.rhythm_engine = rhythm_engine
+function RhythmEngineLoader:new(replayBase, computeContext, config, resources)
 	self.replayBase = replayBase
 	self.computeContext = computeContext
 	self.config = config
 	self.resources = resources
 end
 
-function RhythmEngineLoader:loadEngine()
-	local rhythm_engine = self.rhythm_engine
+---@param rhythm_engine rizu.RhythmEngine
+function RhythmEngineLoader:load(rhythm_engine)
 	local computeContext = self.computeContext
 	local replayBase = self.replayBase
 	local config = self.config

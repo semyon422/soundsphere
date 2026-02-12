@@ -18,13 +18,7 @@ end
 function GameplayInteractor:loadGameplay(chartview)
 	local game = self.game
 
-	GameplayChart(
-		game.configModel.configs.settings,
-		game.replayBase,
-		game.computeContext,
-		game.fs,
-		chartview
-	):load()
+	GameplayChart(game.configModel.configs.settings, game.fs, chartview):load(game.replayBase, game.computeContext)
 
 	local chart = assert(game.computeContext.chart)
 	local chartmeta = assert(game.computeContext.chartmeta)
@@ -38,12 +32,11 @@ function GameplayInteractor:loadGameplay(chartview)
 	game.resource_loader:load(chart.resources)
 
 	RhythmEngineLoader(
-		game.rhythm_engine,
 		game.replayBase,
 		game.computeContext,
 		game.configModel.configs.settings,
 		game.resource_loader.resources
-	):loadEngine()
+	):load(game.rhythm_engine)
 
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
