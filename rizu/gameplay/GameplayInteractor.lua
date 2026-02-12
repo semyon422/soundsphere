@@ -29,11 +29,13 @@ function GameplayInteractor:loadGameplay(chartview)
 	local chart = assert(game.computeContext.chart)
 	local chartmeta = assert(game.computeContext.chartmeta)
 
-	GameplayTimings(
-		game.configModel.configs.settings,
-		game.replayBase,
-		chartmeta
-	):load()
+	if not self.replaying then
+		GameplayTimings(
+			game.configModel.configs.settings,
+			game.replayBase,
+			chartmeta
+		):load()
+	end
 
 	game.resource_finder:reset()
 	game.resource_finder:addPath(chartview.location_dir)
@@ -170,9 +172,7 @@ function GameplayInteractor:retry()
 	-- self.resourceModel:rewind()
 
 	game.rhythm_engine:retry()
-
-	local timings = assert(replayBase.timings or game.computeContext.chartmeta.timings)
-	game.rhythm_engine.score_engine:createByTimings(timings, replayBase.subtimings, true)
+	game.rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
 
 	self:play()
 end
