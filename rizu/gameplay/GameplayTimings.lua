@@ -8,53 +8,41 @@ local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
 local GameplayTimings = class()
 
 ---@param config sphere.SettingsConfig
----@param replayBase sea.ReplayBase
 ---@param chartmeta sea.Chartmeta
-function GameplayTimings:new(
-	config,
-	replayBase,
-	chartmeta
-)
+function GameplayTimings:new(config, chartmeta)
 	self.config = config
-	self.replayBase = replayBase
 	self.chartmeta = chartmeta
 end
 
-function GameplayTimings:load()
+---@param replayBase sea.ReplayBase
+function GameplayTimings:apply(replayBase)
 	local config = self.config
-	if config.replay_base.auto_timings then
-		self:actualizeReplayBaseTimings()
-	end
-end
+	local chartmeta = self.chartmeta
 
----@param timings sea.Timings
-function GameplayTimings:setReplayBaseTimings(timings)
-	local replayBase = self.replayBase
+	if not config.replay_base.auto_timings then
+		return
+	end
+
+	local timings = chartmeta.timings
+	timings = timings or Timings(unpack(config.format_timings[chartmeta.format]))
+
+	replayBase.timings = timings
+	if chartmeta.timings then
+		replayBase.timings = nil
+	end
 
 	---@type sea.Subtimings?
 	local subtimings
-	local subtimings_config = self.config.subtimings[timings.name]
+	local subtimings_config = config.subtimings[timings.name]
 	if subtimings_config then
 		local name = subtimings_config[1]
 		local value = subtimings_config[name]
 		subtimings = Subtimings(name, value)
 	end
 
-	replayBase.timings = timings
 	replayBase.subtimings = subtimings
+
 	replayBase.timing_values = assert(TimingValuesFactory:get(timings, subtimings))
-end
-
-function GameplayTimings:actualizeReplayBaseTimings()
-	local chartmeta = self.chartmeta
-
-	local timings = chartmeta.timings
-	timings = timings or Timings(unpack(self.config.format_timings[chartmeta.format]))
-	self:setReplayBaseTimings(timings)
-
-	if chartmeta.timings then
-		self.replayBase.timings = nil
-	end
 end
 
 return GameplayTimings

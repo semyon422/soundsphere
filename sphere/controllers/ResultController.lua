@@ -1,7 +1,5 @@
 local class = require("class")
-local thread = require("thread")
 local simplify_notechart = require("libchart.simplify_notechart")
-local GameplayTimings = require("rizu.gameplay.GameplayTimings")
 local GameplayChart = require("rizu.gameplay.GameplayChart")
 local ReplayLoader = require("sea.replays.ReplayLoader")
 local RhythmEngineLoader = require("rizu.gameplay.RhythmEngineLoader")

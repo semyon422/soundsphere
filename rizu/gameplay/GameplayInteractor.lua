@@ -30,11 +30,7 @@ function GameplayInteractor:loadGameplay(chartview)
 	local chartmeta = assert(game.computeContext.chartmeta)
 
 	if not self.replaying then
-		GameplayTimings(
-			game.configModel.configs.settings,
-			game.replayBase,
-			chartmeta
-		):load()
+		GameplayTimings(game.configModel.configs.settings, chartmeta):apply(game.replayBase)
 	end
 
 	game.resource_finder:reset()
