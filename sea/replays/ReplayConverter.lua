@@ -187,6 +187,11 @@ function ReplayConverter:convert(obj)
 		error("invalid replay version")
 	end
 
+	if obj.events then
+		obj.frames = self:convertEvents(obj.events)
+		obj.events = nil
+	end
+
 	obj.rate = obj.rate or 1
 	if not obj.const then
 		obj.const = false
