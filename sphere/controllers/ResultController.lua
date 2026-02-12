@@ -71,6 +71,9 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		return
 	end
 
+	local replayBase = game.replayBase
+	replayBase:importReplayBase(replay) -- for UI timings selector
+
 	if mode == "retry" then
 		game.gameplayInteractor.replaying = false
 		return
@@ -79,7 +82,6 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	local computeContext = game.computeContext
 
 	computeContext.chartplay = chartplay
-	-- rhythm_engine:setReplayBase(replay)
 
 	game.gameplayInteractor.replaying = true
 	game.gameplayInteractor:setReplayFrames(replay.frames)
