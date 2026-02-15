@@ -5,6 +5,7 @@ local whitelist = {
 		checkSession = true,
 		updateSession = true,
 		loginSession = true,
+		loginByToken = true,
 		login = true,
 		logout = true,
 	},
