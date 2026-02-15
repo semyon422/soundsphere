@@ -2,6 +2,7 @@ local class = require("class")
 local valid = require("valid")
 local table_util = require("table_util")
 local UserInsecure = require("sea.access.UserInsecure")
+local Session = require("sea.access.Session")
 
 ---@class sea.AuthServerRemote: sea.IServerRemote
 ---@operator call: sea.AuthServerRemote
@@ -29,6 +30,34 @@ local function clear_copy(src, dst)
 	table_util.copy(src, dst)
 end
 
+---@param token string
+---@return boolean?
+---@return string?
+function AuthServerRemote:loginByToken(token)
+	local session_data, err = self.sessions:decode(token)
+	if not session_data then
+		return nil, err
+	end
+
+	local ok, err = Session.validate(session_data)
+	if not ok then
+		return nil, err
+	end
+
+	---@cast session_data +sea.Session
+
+	local session = self.users:checkSession(session_data)
+	if not session then
+		return
+	end
+
+	clear_copy(session, self.session)
+	clear_copy(self.users:getUser(session.user_id), self.user)
+
+	return true
+end
+
+---@deprecated
 ---@param req_session sea.Session
 ---@return boolean?
 function AuthServerRemote:loginSession(req_session)
