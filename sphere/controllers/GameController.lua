@@ -197,7 +197,6 @@ function GameController:load()
 	self.modifierSelectModel:updateAdded()
 
 	self.seaClient:load(self.persistence.configModel.configs.urls.websocket, function()
-		self.onlineModel:load()
 		self.onlineModel.authManager:checkSession()
 		self.online_wrapper:updateLeaderboards()
 		if not love.filesystem.read("disable_difftables_sync.txt") then

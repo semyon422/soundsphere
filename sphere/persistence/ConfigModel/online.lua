@@ -2,7 +2,7 @@
 local online = {
 	session = {},
 	user = {},
-	token = "",
+	tokens = {},
 	quick_login_key = "",
 }
 

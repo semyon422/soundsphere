@@ -4,12 +4,14 @@ local pprint = require("pprint")
 
 ---@class sphere.AuthManager
 ---@operator call: sphere.AuthManager
----@field config table
+---@field configModel sphere.ConfigModel
 local AuthManager = class()
 
 ---@param sea_client sphere.SeaClient
-function AuthManager:new(sea_client)
+---@param configModel sphere.ConfigModel
+function AuthManager:new(sea_client, configModel)
 	self.sea_client = sea_client
+	self.configModel = configModel
 end
 
 function AuthManager:checkUserAsync()
@@ -17,7 +19,7 @@ function AuthManager:checkUserAsync()
 	local sea_client = self.sea_client
 	local user = sea_client.remote:getUser()
 	sea_client.client:setUser(user)
-	self.config.user = user
+	self.configModel.configs.online.user = user
 	print("user = " .. pprint.dump(user))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
@@ -26,81 +28,27 @@ function AuthManager:checkSessionAsync()
 	print("check session")
 
 	local server_remote = self.sea_client.remote
-	local config = self.config
+	local config = self.configModel.configs.online
+	local urls = self.configModel.configs.urls
 
-	local ok = server_remote.auth:loginSession(config.session)
-	if not ok then
-		print("invalid session")
+	local token = config.tokens[urls.websocket]
+	if not token then
+		print("no token for current server")
 		return
 	end
 
-	self.config.session = server_remote:getSession()
-	print("session = " .. pprint.dump(self.config.session))
+	local ok = server_remote.auth:loginByToken(token)
+	if not ok then
+		print("invalid token")
+		return
+	end
+
+	config.session = server_remote:getSession()
+	print("session = " .. pprint.dump(config.session))
 
 	self:checkUserAsync()
 end
 AuthManager.checkSession = thread.coro(AuthManager.checkSessionAsync)
-
-function AuthManager:quickGetKeyAsync()
-	local api = self.webApi.api
-	local config = self.config
-	config.quick_login_key = ""
-
-	print("GET " .. api.auth.quick)
-	local response, code, headers = api.auth.quick:_get()
-	if not response then
-		print(code, headers)
-		return
-	end
-
-	config.quick_login_key = response.key
-	local url = api.html.auth.quick .. "?method=POST&key=" .. response.key
-	print(url)
-	love.system.openURL(url)
-end
-AuthManager.quickGetKey = thread.coro(AuthManager.quickGetKeyAsync)
-
-function AuthManager:quickGetTokenAsync()
-	local api = self.webApi.api
-	local config = self.config
-	local key = config.quick_login_key
-
-	print("PUT " .. api.auth.quick .. "?key=" .. key)
-	local response, code, headers = api.auth.quick:_put({
-		key = key,
-	})
-	if not response then
-		print(code, headers)
-		return
-	end
-
-	if code ~= 200 then
-		print(response.message)
-		if code >= 400 and code < 500 then
-			self:quickGetKeyAsync()
-		end
-		return
-	end
-
-	config.quick_login_key = ""
-	config.token = response.token or ""
-	config.session = response.session or {}
-
-	self:checkUserAsync()
-end
-AuthManager.quickGetToken = thread.coro(AuthManager.quickGetTokenAsync)
-
-function AuthManager:quickLogin()
-	-- print("quick login")
-	-- local config = self.config
-	-- local key = config.quick_login_key
-
-	-- if key and #key ~= 0 then
-	-- 	self:quickGetToken()
-	-- else
-	-- 	self:quickGetKey()
-	-- end
-end
 
 ---@param email string
 ---@param password string
@@ -109,7 +57,8 @@ function AuthManager:loginAsync(email, password)
 
 	local sea_client = self.sea_client
 	local server_remote = sea_client.remote
-	local config = self.config
+	local config = self.configModel.configs.online
+	local urls = self.configModel.configs.urls
 
 	local ret, err = server_remote.auth:login(email, password)
 	if not ret then
@@ -119,7 +68,7 @@ function AuthManager:loginAsync(email, password)
 
 	config.session = ret.session
 	config.user = ret.user
-	config.token = ret.token
+	config.tokens[urls.websocket] = ret.token
 
 	self:checkSessionAsync()
 end
@@ -130,13 +79,14 @@ function AuthManager:logoutAsync()
 
 	local sea_client = self.sea_client
 	local server_remote = sea_client.remote
-	local config = self.config
+	local config = self.configModel.configs.online
+	local urls = self.configModel.configs.urls
 
 	pcall(server_remote.auth.logout, server_remote.auth)
 
 	config.session = {}
 	config.user = {}
-	config.token = ""
+	config.tokens[urls.websocket] = nil
 
 	sea_client.client:setUser()
 end
