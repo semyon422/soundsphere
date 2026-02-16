@@ -1,8 +1,8 @@
 local IResource = require("web.framework.IResource")
 local brand = require("brand")
 
----@class sea.http.DiscordResource: web.IResource
----@operator call: sea.http.DiscordResource
+---@class sea.DiscordResource: web.IResource
+---@operator call: sea.DiscordResource
 local DiscordResource = IResource + {}
 
 DiscordResource.routes = {
