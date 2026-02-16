@@ -18,6 +18,7 @@ local brand = require("brand")
 ---@class sea.RequestContext
 ---@field [any] any
 ---@field ip string
+---@field port integer
 ---@field time integer
 ---@field path_params {[string]: string}
 ---@field query {[string]: string}
@@ -113,7 +114,8 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ip string
-function App:handle(req, res, ip)
+---@param port integer
+function App:handle(req, res, ip, port)
 	local parsed_uri = socket_url.parse(req.uri)
 
 	local resource, path_params, methods = self.router:getResource(parsed_uri.path)
@@ -143,6 +145,7 @@ function App:handle(req, res, ip)
 		path_params = path_params,
 		query = http_util.decode_query_string(parsed_uri.query),
 		ip = ip,
+		port = port,
 		time = os.time(),
 		session = self.domain.users:getSession(),
 		session_user = self.domain.users:getUser(),

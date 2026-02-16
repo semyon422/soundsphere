@@ -13,11 +13,12 @@ end
 ---@param req web.IRequest
 ---@param res web.IResponse
 ---@param ip string
-local function handler(req, res, ip)
+---@param port integer
+local function handler(req, res, ip, port)
 	if not app then
 		init()
 	end
-	app:handle(req, res, ip)
+	app:handle(req, res, ip, port)
 end
 
 return handler
