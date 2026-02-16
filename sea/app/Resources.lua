@@ -6,6 +6,7 @@ local DownloadResource = require("sea.shared.http.DownloadResource")
 local PolicyResource = require("sea.shared.http.PolicyResource")
 local WikiResource = require("sea.shared.http.WikiResource")
 local DonateResource = require("sea.shared.http.DonateResource")
+local DiscordResource = require("sea.shared.http.DiscordResource")
 
 local AuthResource = require("sea.access.http.AuthResource")
 
@@ -48,6 +49,7 @@ function Resources:new(domain, server_remote, views, sessions, app_config)
 	self.policy = PolicyResource(views, app_config.responsible_person)
 	self.wiki = WikiResource(views)
 	self.donate = DonateResource(views)
+	self.discord = DiscordResource()
 
 	self.auth = AuthResource(sessions, domain.users, views)
 
@@ -83,6 +85,7 @@ function Resources:getList()
 		self.policy,
 		self.wiki,
 		self.donate,
+		self.discord,
 
 		self.auth,
 

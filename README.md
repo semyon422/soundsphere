@@ -4,7 +4,7 @@ Open-source rhythm game
 - [Website](https://rizu.su)
 - [Download](https://dl.rizu.su/rizu.zip)
 - [Installation guide](https://youtu.be/FvdafJSMx-s)
-- [Discord server](https://discord.gg/ubKMtTk)
+- [Discord server](https://rizu.su/discord)
 
 ## License
 

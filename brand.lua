@@ -9,6 +9,7 @@ local brand = {
 	macos_app = "rizu.app",
 	git_repo = "https://github.com/semyon422/soundsphere",
 	discord_app_id = "594443609668059149",
+	discord_url = "https://discord.gg/ubKMtTk",
 }
 
 return brand
