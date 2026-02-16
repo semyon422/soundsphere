@@ -145,6 +145,30 @@ function love.run()
 end
 
 if arg[2] == "test" then
+	local stbl = require("stbl")
+	local utf8validate = require("utf8validate")
+	local typecheck = require("typecheck")
+
+	function love.errhand(msg)
+		if type(msg) ~= "string" then
+			if type(msg) ~= "table" then
+				msg = tostring(msg)
+			else
+				local _ = false
+				_, msg = pcall(stbl.encode, msg)
+			end
+		end
+		local message = utf8validate(msg)
+		local trace = debug.traceback()
+
+		message = typecheck.fix_traceback(message)
+		trace = typecheck.fix_traceback(trace)
+
+		print(message .. "\n" .. trace)
+		os.exit()
+		return function() end
+	end
+
 	local Testing = require("testing.Testing")
 	local BaseTestingIO = require("testing.BaseTestingIO")
 
