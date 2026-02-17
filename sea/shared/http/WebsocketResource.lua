@@ -23,9 +23,11 @@ WebsocketResource.routes = {
 
 ---@param server_handler sea.ServerRemote
 ---@param views web.Views
-function WebsocketResource:new(server_handler, views)
+---@param player_counter sea.PlayerCounter
+function WebsocketResource:new(server_handler, views, player_counter)
 	self.remote_handler = RemoteHandler(server_handler, whitelist)
 	self.views = views
+	self.player_counter = player_counter
 end
 
 ---@param req web.IRequest
@@ -64,10 +66,14 @@ function WebsocketResource:server(req, res, ctx)
 		return
 	end
 
+	self.player_counter:increment()
+
 	local ok, err = ws:loop()
 	if not ok then
 		print(err)
 	end
+
+	self.player_counter:decrement()
 end
 
 ---@param req web.IRequest

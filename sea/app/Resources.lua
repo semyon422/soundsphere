@@ -42,7 +42,8 @@ local Resources = class()
 ---@param views web.Views
 ---@param sessions web.Sessions
 ---@param app_config sea.AppConfig
-function Resources:new(domain, server_remote, views, sessions, app_config)
+---@param player_counter sea.PlayerCounter
+function Resources:new(domain, server_remote, views, sessions, app_config, player_counter)
 	self.index = IndexResource(views)
 	self.style = StyleResource()
 	self.download = DownloadResource(views)
@@ -74,7 +75,7 @@ function Resources:new(domain, server_remote, views, sessions, app_config)
 	self.chartdiff = ChartdiffResource(nil, views)
 	self.chartplay = ChartplayResource(nil, views)
 
-	self.websocket = WebsocketResource(server_remote, views)
+	self.websocket = WebsocketResource(server_remote, views, player_counter)
 end
 
 function Resources:getList()

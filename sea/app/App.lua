@@ -14,6 +14,9 @@ local Recaptcha = require("web.framework.Recaptcha")
 local etlua_util = require("web.framework.page.etlua_util")
 local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 local brand = require("brand")
+local PlayerCounter = require("sea.app.PlayerCounter")
+local NginxSharedDict = require("web.nginx.NginxSharedDict")
+local FakeSharedDict = require("web.nginx.FakeSharedDict")
 
 ---@class sea.RequestContext
 ---@field [any] any
@@ -27,6 +30,7 @@ local brand = require("brand")
 ---@field version any
 ---@field meta_tags {[string]: string} HTML meta tags
 ---@field brand sea.Brand
+---@field players_online integer
 
 ---@class sea.App
 ---@operator call: sea.App
@@ -38,12 +42,20 @@ function App:new(app_config)
 	self.sessions = Sessions("sea", app_config.sessions_secret)
 	self.recaptcha = Recaptcha(app_config.recaptcha.secret_key, app_config.recaptcha.site_key, app_config.recaptcha.required_score)
 
+	local dict
+	if ngx and ngx.shared and ngx.shared.players then
+		dict = NginxSharedDict(ngx.shared.players)
+	else
+		dict = FakeSharedDict()
+	end
+	self.player_counter = PlayerCounter(dict)
+
 	self.repos = Repos(self.app_db.models)
 	self.domain = Domain(self.repos, app_config)
 	self.server_remote = ServerRemoteValidation(ServerRemote(self.domain, self.sessions))
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
-	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)
+	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config, self.player_counter)
 
 	local router = Router()
 	self.router = router
@@ -152,6 +164,7 @@ function App:handle(req, res, ip, port)
 		version = self:getVersion(),
 		meta_tags = {},
 		brand = brand,
+		players_online = self.player_counter:get(),
 	}
 
 	self:handleSession(req, ctx)
