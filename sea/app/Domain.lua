@@ -27,6 +27,7 @@ local UserActivityGraph = require("sea.activity.UserActivityGraph")
 local OsuApi = require("sea.osu.api.OsuApi")
 local OsuBeatmaps = require("sea.osu.OsuBeatmaps")
 local ExternalRanked = require("sea.difftables.ExternalRanked")
+local UserConnections = require("sea.app.UserConnections")
 
 ---@class sea.Domain
 ---@operator call: sea.Domain
@@ -73,6 +74,8 @@ function Domain:new(repos, app_config)
 
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
+
+	self.user_connections = UserConnections(repos.user_connections_repo)
 end
 
 return Domain

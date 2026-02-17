@@ -9,13 +9,15 @@ local ComputeTasksRepo = require("sea.compute.repos.ComputeTasksRepo")
 local DanClearsRepo = require("sea.dan.repos.DanClearsRepo")
 local ActivityRepo = require("sea.activity.repos.ActivityRepo")
 local OsuRepo = require("sea.osu.repos.OsuRepo")
+local UserConnectionsRepo = require("sea.app.repos.UserConnectionsRepo")
 
 ---@class sea.Repos
 ---@operator call: sea.Repos
 local Repos = class()
 
 ---@param models rdb.Models
-function Repos:new(models)
+---@param shared_memory web.SharedMemory
+function Repos:new(models, shared_memory)
 	self.users_repo = UsersRepo(models)
 	self.leaderboards_repo = LeaderboardsRepo(models)
 	self.teams_repo = TeamsRepo(models)
@@ -26,6 +28,7 @@ function Repos:new(models)
 	self.dan_clears_repo = DanClearsRepo(models)
 	self.activity_repo = ActivityRepo(models)
 	self.osu_repo = OsuRepo(models)
+	self.user_connections_repo = UserConnectionsRepo(shared_memory:get("players"))
 end
 
 return Repos
