@@ -52,6 +52,9 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **Indentation:** Tabs should be used for indentation.
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
 *   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended. Avoid using nested class definitions like `sea.app.repos.UserConnectionsRepo`, prefer using `sea.UserConnectionsRepo`.
+*   **Shared Memory:** Use the `web.SharedMemory` class (`aqua/web/nginx/SharedMemory.lua`) to access OpenResty shared dictionaries. Dictionaries must be defined in `nginx_config.lua` under the `shared_dicts` table to be automatically included in the generated `nginx.conf`.
+*   **Repository Pattern for Shared Memory:** Follow the repository pattern for shared memory access. Create a dedicated repo class (e.g., `sea.UserConnectionsRepo`) that wraps the `ISharedDict` and provides semantic methods. These repos should be initialized in `sea.Repos` using the `SharedMemory` instance passed from `App`.
+*   **ICC / Remotes:** Classes ending in `Remote` (e.g., `ServerRemote`) are used for websocket-based communication (ICC). They typically have a corresponding `Validation` wrapper (e.g., `ServerRemoteValidation`) and require methods to be whitelisted in `sea/app/remotes/whitelist.lua`.
 *   **Test Files:** Test files are important and should not be deleted.
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 
