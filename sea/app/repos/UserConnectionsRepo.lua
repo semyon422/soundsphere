@@ -7,41 +7,58 @@ local UserConnectionsRepo = class()
 ---@param dict web.ISharedDict
 function UserConnectionsRepo:new(dict)
 	self.dict = dict
-	self.global_key = "players_online"
 end
 
-function UserConnectionsRepo:increment()
-	self.dict:incr(self.global_key, 1, 0)
-end
-
-function UserConnectionsRepo:decrement()
-	self.dict:incr(self.global_key, -1, 0)
-end
-
-function UserConnectionsRepo:getGlobalCount()
-	return tonumber(self.dict:get(self.global_key)) or 0
+---@private
+function UserConnectionsRepo:_getConnKey(ip, port)
+	return "c:" .. tostring(ip) .. ":" .. tonumber(port)
 end
 
 ---@private
 function UserConnectionsRepo:_getUserKey(user_id)
-	return "u:" .. tostring(user_id) .. ":c"
+	return "u:" .. tostring(user_id)
+end
+
+---@param ip string
+---@param port integer
+---@param ttl integer
+function UserConnectionsRepo:setConnection(ip, port, ttl)
+	self.dict:set(self:_getConnKey(ip, port), true, ttl)
+end
+
+---@param ip string
+---@param port integer
+function UserConnectionsRepo:removeConnection(ip, port)
+	self.dict:delete(self:_getConnKey(ip, port))
 end
 
 ---@param user_id integer
-function UserConnectionsRepo:incrementUser(user_id)
-	self.dict:incr(self:_getUserKey(user_id), 1, 0)
+---@param ttl integer
+function UserConnectionsRepo:setUserOnline(user_id, ttl)
+	self.dict:set(self:_getUserKey(user_id), true, ttl)
 end
 
 ---@param user_id integer
-function UserConnectionsRepo:decrementUser(user_id)
-	self.dict:incr(self:_getUserKey(user_id), -1, 0)
+function UserConnectionsRepo:setUserOffline(user_id)
+	self.dict:delete(self:_getUserKey(user_id))
+end
+
+---@return integer
+function UserConnectionsRepo:getGlobalCount()
+	local keys = self.dict:get_keys(0)
+	local count = 0
+	for _, key in ipairs(keys) do
+		if key:sub(1, 2) == "c:" then
+			count = count + 1
+		end
+	end
+	return count
 end
 
 ---@param user_id integer
 ---@return boolean
 function UserConnectionsRepo:isUserOnline(user_id)
-	local count = tonumber(self.dict:get(self:_getUserKey(user_id))) or 0
-	return count > 0
+	return self.dict:get(self:_getUserKey(user_id)) ~= nil
 end
 
 return UserConnectionsRepo

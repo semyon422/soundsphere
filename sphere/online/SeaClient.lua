@@ -109,6 +109,7 @@ function SeaClient:load(url, on_connect)
 			local state = self.sphws_ret:getState()
 			if state == "open" then
 				self.sphws_ret.ws:send("ping")
+				self.remote:heartbeat()
 			end
 			delay.sleep(10)
 		end

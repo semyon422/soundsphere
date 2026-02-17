@@ -56,7 +56,7 @@ function AuthServerRemote:loginByToken(token)
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
-	self.user_connections:onUserConnect(self.user.id)
+	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	return true
 end
@@ -77,7 +77,7 @@ function AuthServerRemote:loginSession(req_session)
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
-	self.user_connections:onUserConnect(self.user.id)
+	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	return true
 end
@@ -104,7 +104,7 @@ function AuthServerRemote:login(email, password)
 	clear_copy(su.session, self.session)
 	clear_copy(su.user, self.user)
 
-	self.user_connections:onUserConnect(self.user.id)
+	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	return {
 		session = su.session,
@@ -116,7 +116,17 @@ end
 ---@return true?
 ---@return string?
 function AuthServerRemote:logout()
-	return self.users:logout(self.user, self.session.id)
+	local old_id = self.user.id
+	local ok, err = self.users:logout(self.user, self.session.id)
+	if not ok then
+		return nil, err
+	end
+
+	if old_id then
+		self.user_connections:onUserDisconnect(old_id)
+	end
+
+	return true
 end
 
 return AuthServerRemote

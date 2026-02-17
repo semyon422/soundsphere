@@ -15,6 +15,7 @@ function ServerRemote:new(domain, sessions)
 	self.submission = SubmissionServerRemote(domain.chartplay_submission, domain.chartplays)
 	self.leaderboards = LeaderboardsServerRemote(domain.leaderboards)
 	self.difftables = DifftablesServerRemote(domain.difftables)
+	self.user_connections = domain.user_connections
 end
 
 ---@return sea.User
@@ -30,7 +31,12 @@ end
 ---@param msg string
 ---@return string
 function ServerRemote:ping(msg)
+	self:heartbeat()
 	return msg .. "world" .. self.user.id
+end
+
+function ServerRemote:heartbeat()
+	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 end
 
 return ServerRemote

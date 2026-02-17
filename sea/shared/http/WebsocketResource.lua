@@ -46,6 +46,7 @@ function WebsocketResource:server(req, res, ctx)
 		user = ctx.session_user,
 		session = ctx.session,
 		ip = ctx.ip,
+		port = ctx.port,
 	}
 
 	function ws.protocol:text(payload, fin)
@@ -66,14 +67,14 @@ function WebsocketResource:server(req, res, ctx)
 		return
 	end
 
-	self.user_connections:onConnect(not remote_ctx.user:isAnon() and remote_ctx.user.id or nil)
+	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 
 	local ok, err = ws:loop()
 	if not ok then
 		print(err)
 	end
 
-	self.user_connections:onDisconnect(not remote_ctx.user:isAnon() and remote_ctx.user.id or nil)
+	self.user_connections:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 end
 
 ---@param req web.IRequest

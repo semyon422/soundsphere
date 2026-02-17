@@ -40,4 +40,8 @@ function ServerRemoteValidation:ping(msg)
 	return res
 end
 
+function ServerRemoteValidation:heartbeat()
+	return self.remote:heartbeat()
+end
+
 return ServerRemoteValidation

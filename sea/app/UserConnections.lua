@@ -4,35 +4,48 @@ local class = require("class")
 ---@operator call: sea.UserConnections
 local UserConnections = class()
 
+UserConnections.ttl = 90
+
 ---@param repo sea.UserConnectionsRepo
 function UserConnections:new(repo)
 	self.repo = repo
 end
 
+---@param ip string
+---@param port integer
 ---@param user_id? integer
-function UserConnections:onConnect(user_id)
-	self.repo:increment()
-	if user_id then
-		self.repo:incrementUser(user_id)
-	end
+function UserConnections:onConnect(ip, port, user_id)
+	self:heartbeat(ip, port, user_id)
 end
 
+---@param ip string
+---@param port integer
 ---@param user_id? integer
-function UserConnections:onDisconnect(user_id)
-	self.repo:decrement()
+function UserConnections:onDisconnect(ip, port, user_id)
+	self.repo:removeConnection(ip, port)
 	if user_id then
-		self.repo:decrementUser(user_id)
+		self.repo:setUserOffline(user_id)
 	end
 end
 
 ---@param user_id integer
 function UserConnections:onUserConnect(user_id)
-	self.repo:incrementUser(user_id)
+	self.repo:setUserOnline(user_id, self.ttl)
 end
 
 ---@param user_id integer
 function UserConnections:onUserDisconnect(user_id)
-	self.repo:decrementUser(user_id)
+	self.repo:setUserOffline(user_id)
+end
+
+---@param ip string
+---@param port integer
+---@param user_id? integer
+function UserConnections:heartbeat(ip, port, user_id)
+	self.repo:setConnection(ip, port, self.ttl)
+	if user_id then
+		self.repo:setUserOnline(user_id, self.ttl)
+	end
 end
 
 function UserConnections:getOnlineCount()
