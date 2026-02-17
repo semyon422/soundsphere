@@ -44,4 +44,10 @@ function ServerRemoteValidation:heartbeat()
 	return self.remote:heartbeat()
 end
 
+---@param msg string
+function ServerRemoteValidation:printAll(msg)
+	assert(type(msg) == "string")
+	return self.remote:printAll(msg)
+end
+
 return ServerRemoteValidation

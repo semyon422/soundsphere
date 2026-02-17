@@ -25,7 +25,8 @@ WebsocketResource.routes = {
 ---@param views web.Views
 ---@param user_connections sea.UserConnections
 function WebsocketResource:new(server_handler, views, user_connections)
-	self.remote_handler = RemoteHandler(server_handler, whitelist)
+	self.remote_handler = user_connections.remote_handler
+	self.task_handler = user_connections.task_handler
 	self.views = views
 	self.user_connections = user_connections
 end
@@ -36,7 +37,7 @@ end
 function WebsocketResource:server(req, res, ctx)
 	local ws = Websocket(req.soc, req, res, "server")
 	local peer = WebsocketPeer(ws)
-	local task_handler = TaskHandler(self.remote_handler)
+	local task_handler = self.task_handler
 
 	ws.max_payload_len = 1e7
 	task_handler.timeout = 60
@@ -69,10 +70,29 @@ function WebsocketResource:server(req, res, ctx)
 
 	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 
+	local queue = self.user_connections.repo:getQueue(remote_ctx.ip, remote_ctx.port)
+
+	local co = ngx.thread.spawn(function()
+		while true do
+			local msg = queue:pop()
+			if msg then
+				local payload = peer:encode(msg)
+				local ok, err = ws:send("text", payload)
+				if not ok then
+					break
+				end
+			else
+				ngx.sleep(0.01)
+			end
+		end
+	end)
+
 	local ok, err = ws:loop()
 	if not ok then
 		print(err)
 	end
+
+	ngx.thread.kill(co)
 
 	self.user_connections:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 end

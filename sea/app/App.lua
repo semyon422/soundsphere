@@ -15,6 +15,9 @@ local etlua_util = require("web.framework.page.etlua_util")
 local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 local brand = require("brand")
 local SharedMemory = require("web.nginx.SharedMemory")
+local RemoteHandler = require("icc.RemoteHandler")
+local TaskHandler = require("icc.TaskHandler")
+local whitelist = require("sea.app.remotes.whitelist")
 
 ---@class sea.RequestContext
 ---@field [any] any
@@ -45,6 +48,9 @@ function App:new(app_config)
 	self.repos = Repos(self.app_db.models, self.shared_memory)
 	self.domain = Domain(self.repos, app_config)
 	self.server_remote = ServerRemoteValidation(ServerRemote(self.domain, self.sessions))
+
+	local whitelist = require("sea.app.remotes.whitelist")
+	self.domain.user_connections:setup(self.server_remote, whitelist)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)

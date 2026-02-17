@@ -1,4 +1,5 @@
 local class = require("class")
+local SharedMemoryQueue = require("icc.SharedMemoryQueue")
 
 ---@class sea.UserConnectionsRepo
 ---@operator call: sea.UserConnectionsRepo
@@ -15,21 +16,49 @@ function UserConnectionsRepo:_getConnKey(ip, port)
 end
 
 ---@private
+function UserConnectionsRepo:_getQueueKey(ip, port)
+	return "q:" .. tostring(ip) .. ":" .. tonumber(port)
+end
+
+---@private
 function UserConnectionsRepo:_getUserKey(user_id)
 	return "u:" .. tostring(user_id)
 end
 
 ---@param ip string
 ---@param port integer
+---@param user_id? integer
 ---@param ttl integer
-function UserConnectionsRepo:setConnection(ip, port, ttl)
-	self.dict:set(self:_getConnKey(ip, port), true, ttl)
+function UserConnectionsRepo:setConnection(ip, port, user_id, ttl)
+	self.dict:set(self:_getConnKey(ip, port), user_id or true, ttl)
+end
+
+---@param ip string
+---@param port integer
+---@return boolean
+function UserConnectionsRepo:hasConnection(ip, port)
+	return self.dict:get(self:_getConnKey(ip, port)) ~= nil
+end
+
+---@param ip string
+---@param port integer
+---@return integer|true|nil
+function UserConnectionsRepo:getConnectionUser(ip, port)
+	return self.dict:get(self:_getConnKey(ip, port))
 end
 
 ---@param ip string
 ---@param port integer
 function UserConnectionsRepo:removeConnection(ip, port)
 	self.dict:delete(self:_getConnKey(ip, port))
+	self.dict:delete(self:_getQueueKey(ip, port))
+end
+
+---@param ip string
+---@param port integer
+---@return icc.SharedMemoryQueue
+function UserConnectionsRepo:getQueue(ip, port)
+	return SharedMemoryQueue(self.dict, self:_getQueueKey(ip, port))
 end
 
 ---@param user_id integer

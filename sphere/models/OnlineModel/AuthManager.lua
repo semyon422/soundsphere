@@ -21,6 +21,8 @@ function AuthManager:checkUserAsync()
 	sea_client.client:setUser(user)
 	self.configModel.configs.online.user = user
 	print("user = " .. pprint.dump(user))
+
+	sea_client.remote:printAll("Hello from " .. (user and user.name or "unknown"))
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 

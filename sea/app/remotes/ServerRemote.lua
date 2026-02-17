@@ -16,6 +16,7 @@ function ServerRemote:new(domain, sessions)
 	self.leaderboards = LeaderboardsServerRemote(domain.leaderboards)
 	self.difftables = DifftablesServerRemote(domain.difftables)
 	self.user_connections = domain.user_connections
+	self.domain = domain
 end
 
 ---@return sea.User
@@ -37,6 +38,11 @@ end
 
 function ServerRemote:heartbeat()
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+end
+
+---@param msg string
+function ServerRemote:printAll(msg)
+	self.domain:printAll(msg)
 end
 
 return ServerRemote

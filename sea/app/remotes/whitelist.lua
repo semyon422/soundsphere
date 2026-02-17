@@ -26,6 +26,7 @@ local whitelist = {
 	getUser = true,
 	getSession = true,
 	heartbeat = true,
+	printAll = true,
 }
 
 return whitelist

@@ -78,4 +78,12 @@ function Domain:new(repos, app_config)
 	self.user_connections = UserConnections(repos.user_connections_repo)
 end
 
+---@param msg string
+function Domain:printAll(msg)
+	local peers = self.user_connections:getPeers()
+	for _, peer in ipairs(peers) do
+		peer.remote_no_return:print(msg)
+	end
+end
+
 return Domain
