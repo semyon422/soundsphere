@@ -51,7 +51,7 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 
 *   **Indentation:** Tabs should be used for indentation.
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
-*   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended.
+*   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended. Avoid using nested class definitions like `sea.app.repos.UserConnectionsRepo`, prefer using `sea.UserConnectionsRepo`.
 *   **Test Files:** Test files are important and should not be deleted.
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 
