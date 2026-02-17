@@ -66,14 +66,14 @@ function WebsocketResource:server(req, res, ctx)
 		return
 	end
 
-	self.user_connections:onConnect()
+	self.user_connections:onConnect(not remote_ctx.user:isAnon() and remote_ctx.user.id or nil)
 
 	local ok, err = ws:loop()
 	if not ok then
 		print(err)
 	end
 
-	self.user_connections:onDisconnect()
+	self.user_connections:onDisconnect(not remote_ctx.user:isAnon() and remote_ctx.user.id or nil)
 end
 
 ---@param req web.IRequest

@@ -10,9 +10,11 @@ local AuthServerRemote = class()
 
 ---@param users sea.Users
 ---@param sessions web.Sessions
-function AuthServerRemote:new(users, sessions)
+---@param user_connections sea.UserConnections
+function AuthServerRemote:new(users, sessions, user_connections)
 	self.users = users
 	self.sessions = sessions
+	self.user_connections = user_connections
 end
 
 ---@return sea.Session?
@@ -54,6 +56,8 @@ function AuthServerRemote:loginByToken(token)
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
+	self.user_connections:onUserConnect(self.user.id)
+
 	return true
 end
 
@@ -72,6 +76,8 @@ function AuthServerRemote:loginSession(req_session)
 
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
+
+	self.user_connections:onUserConnect(self.user.id)
 
 	return true
 end
@@ -97,6 +103,8 @@ function AuthServerRemote:login(email, password)
 
 	clear_copy(su.session, self.session)
 	clear_copy(su.user, self.user)
+
+	self.user_connections:onUserConnect(self.user.id)
 
 	return {
 		session = su.session,
