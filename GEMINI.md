@@ -52,6 +52,36 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **Indentation:** Tabs should be used for indentation.
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
 *   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended.
+*   **Test Files:** Test files are important and should not be deleted.
+*   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
+
+### Testing
+
+The project uses a custom testing framework. Test files should follow these conventions:
+
+1.  **File Naming:** Test files should be named with a `_test.lua` suffix (e.g., `MyModule_test.lua`).
+2.  **Structure:** A test file should return a table containing test functions. Each test function receives a `t` object of type `testing.T`.
+3.  **Assertions:** Use the methods provided by the `t` object for assertions:
+    *   `t:eq(got, expected, msg?)`: Equality check (`==`).
+    *   `t:ne(got, expected, msg?)`: Inequality check (`!=`).
+    *   `t:tdeq(got, expected, msg?)`: Deep equality check for tables.
+    *   `t:has_error(func, ...)`: Asserts that calling `func(...)` raises an error.
+    *   `t:has_not_error(func, ...)`: Asserts that calling `func(...)` does not raise an error.
+    *   `t:assert(cond, err_msg?)`: Basic assertion.
+
+Example:
+
+```lua
+local MyModule = require("MyModule")
+local test = {}
+
+---@param t testing.T
+function test.my_feature(t)
+    t:eq(MyModule.add(1, 1), 2)
+end
+
+return test
+```
 
 ### Web Development
 
