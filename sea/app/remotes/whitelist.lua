@@ -27,6 +27,7 @@ local whitelist = {
 	getSession = true,
 	heartbeat = true,
 	printAll = true,
+	getRandomNumbersFromAllClients = true,
 }
 
 return whitelist

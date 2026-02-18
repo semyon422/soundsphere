@@ -50,4 +50,11 @@ function ServerRemoteValidation:printAll(msg)
 	return self.remote:printAll(msg)
 end
 
+---@return number[]
+function ServerRemoteValidation:getRandomNumbersFromAllClients()
+	local res = self.remote:getRandomNumbersFromAllClients()
+	assert(type(res) == "table")
+	return res
+end
+
 return ServerRemoteValidation

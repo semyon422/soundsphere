@@ -1,3 +1,7 @@
+local pprint = require("pprint")
+pprint.colored = false
+pprint.export()
+
 local App = require("sea.app.App")
 
 local app_config = require("app_config")

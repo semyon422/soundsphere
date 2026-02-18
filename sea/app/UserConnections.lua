@@ -3,23 +3,19 @@ local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
 local Remote = require("icc.Remote")
 local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
-local QueuePeer = require("icc.QueuePeer")
-local Message = require("icc.Message")
+local Queues = require("icc.Queues")
 
 ---@class sea.Peer
 ---@field remote sea.ClientRemoteValidation
 ---@field remote_no_return sea.ClientRemoteValidation
----@field queue icc.SharedMemoryQueue
 local Peer = class()
 
 ---@param th icc.TaskHandler
----@param queue icc.SharedMemoryQueue
-function Peer:new(th, queue)
-	local icc_peer = QueuePeer(queue)
+---@param icc_peer icc.ContextQueuePeer
+function Peer:new(th, icc_peer)
 	local remote = Remote(th, icc_peer)
 	self.remote = ClientRemoteValidation(remote)
 	self.remote_no_return = ClientRemoteValidation(-remote)
-	self.queue = queue
 end
 
 ---@class sea.UserConnections
@@ -33,6 +29,9 @@ UserConnections.ttl = 90
 ---@param repo sea.UserConnectionsRepo
 function UserConnections:new(repo)
 	self.repo = repo
+	self.queues = Queues(function(id)
+		return self:getQueueFromSid(id)
+	end)
 end
 
 ---@param server_remote sea.ServerRemote
@@ -91,38 +90,45 @@ end
 
 ---@param ip string
 ---@param port integer
+function UserConnections:getId(ip, port)
+	return ip .. ":" .. port
+end
+
+---@param sid string
+---@return icc.SharedMemoryQueue
+function UserConnections:getQueueFromSid(sid)
+	local ip, port = sid:match("^(.+):(%d+)$")
+	port = tonumber(port)
+	---@cast port -?
+	return self.repo:getQueue(ip, port)
+end
+
+---@param ip string
+---@param port integer
+---@param caller_ip string
+---@param caller_port integer
 ---@return sea.Peer?
-function UserConnections:getPeer(ip, port)
+function UserConnections:getPeer(ip, port, caller_ip, caller_port)
 	if not self.repo:hasConnection(ip, port) then
 		return
 	end
-	return Peer(self.task_handler, self.repo:getQueue(ip, port))
+	local icc_peer = self.queues:getPeer(self:getId(ip, port), self:getId(caller_ip, caller_port))
+	return Peer(self.task_handler, icc_peer)
 end
 
+---@param caller_ip string
+---@param caller_port integer
 ---@return sea.Peer[]
-function UserConnections:getPeers()
+function UserConnections:getPeers(caller_ip, caller_port)
 	local keys = self.repo.dict:get_keys(0)
 	local peers = {}
+	local sid = self:getId(caller_ip, caller_port)
 	for _, key in ipairs(keys) do
 		local ip, port = key:match("^c:(.+):(%d+)$")
+		port = tonumber(port)
 		if ip and port then
-			table.insert(peers, Peer(self.task_handler, self.repo:getQueue(ip, tonumber(port))))
-		end
-	end
-	return peers
-end
-
----@param user_id integer
----@return sea.Peer[]
-function UserConnections:getPeersForUser(user_id)
-	local keys = self.repo.dict:get_keys(0)
-	local peers = {}
-	for _, key in ipairs(keys) do
-		local ip, port = key:match("^c:(.+):(%d+)$")
-		if ip and port then
-			if self.repo:getConnectionUser(ip, tonumber(port)) == user_id then
-				table.insert(peers, Peer(self.task_handler, self.repo:getQueue(ip, tonumber(port))))
-			end
+			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
+			table.insert(peers, Peer(self.task_handler, icc_peer))
 		end
 	end
 	return peers

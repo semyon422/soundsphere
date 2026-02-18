@@ -18,4 +18,11 @@ function ClientRemoteValidation:print(...)
 	return self.remote:print(...)
 end
 
+---@return number
+function ClientRemoteValidation:getRandomNumber()
+	local res = self.remote:getRandomNumber()
+	assert(type(res) == "number")
+	return res
+end
+
 return ClientRemoteValidation

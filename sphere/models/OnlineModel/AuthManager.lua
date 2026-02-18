@@ -23,6 +23,10 @@ function AuthManager:checkUserAsync()
 	print("user = " .. pprint.dump(user))
 
 	sea_client.remote:printAll("Hello from " .. (user and user.name or "unknown"))
+
+	local nums = sea_client.remote:getRandomNumbersFromAllClients()
+	print("random numbers from all clients:")
+	pprint(nums)
 end
 AuthManager.checkUser = thread.coro(AuthManager.checkUserAsync)
 

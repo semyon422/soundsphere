@@ -17,4 +17,9 @@ function ClientRemote:print(...)
 	print(...)
 end
 
+---@return number
+function ClientRemote:getRandomNumber()
+	return math.random()
+end
+
 return ClientRemote

@@ -79,11 +79,30 @@ function Domain:new(repos, app_config)
 end
 
 ---@param msg string
-function Domain:printAll(msg)
-	local peers = self.user_connections:getPeers()
+---@param caller_ip string
+---@param caller_port integer
+function Domain:printAll(msg, caller_ip, caller_port)
+	local peers = self.user_connections:getPeers(caller_ip, caller_port)
 	for _, peer in ipairs(peers) do
 		peer.remote_no_return:print(msg)
 	end
+end
+
+---@param caller_ip string
+---@param caller_port integer
+---@return number[]
+function Domain:getRandomNumbersFromAllClients(caller_ip, caller_port)
+	local peers = self.user_connections:getPeers(caller_ip, caller_port)
+	local numbers = {}
+	for _, peer in ipairs(peers) do
+		local ok, num = pcall(peer.remote.getRandomNumber, peer.remote)
+		if ok then
+			table.insert(numbers, num)
+		else
+			print("Error getting random number from peer:", num)
+		end
+	end
+	return numbers
 end
 
 return Domain

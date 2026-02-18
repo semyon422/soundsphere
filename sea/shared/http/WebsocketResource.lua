@@ -1,12 +1,10 @@
 local WebsocketPeer = require("icc.WebsocketPeer")
-local TaskHandler = require("icc.TaskHandler")
-local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
+local RemoteHandler = require("icc.RemoteHandler")
+local TaskHandler = require("icc.TaskHandler")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
 local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
-
-local whitelist = require("sea.app.remotes.whitelist")
 
 ---@class sea.WebsocketResource: web.IResource
 ---@operator call: sea.WebsocketResource
@@ -69,17 +67,23 @@ function WebsocketResource:server(req, res, ctx)
 	end
 
 	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
+	local queues = self.user_connections.queues
 
-	local queue = self.user_connections.repo:getQueue(remote_ctx.ip, remote_ctx.port)
+	local sid = remote_ctx.ip .. ":" .. remote_ctx.port
+
+	local _remote_handler = RemoteHandler(remote_ctx.remote)
+	local _task_handler = TaskHandler(_remote_handler)
 
 	local co = ngx.thread.spawn(function()
 		while true do
-			local msg = queue:pop()
+			local msg, return_peer = queues:pop(sid)
 			if msg then
-				local payload = peer:encode(msg)
-				local ok, err = ws:send("text", payload)
-				if not ok then
-					break
+				if not msg.ret then
+					assert(return_peer)
+					_task_handler:handleCall(return_peer, {}, msg)
+				else
+					assert(not return_peer)
+					self.task_handler:handleReturn(msg)
 				end
 			else
 				ngx.sleep(0.01)

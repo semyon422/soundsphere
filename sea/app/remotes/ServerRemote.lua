@@ -42,7 +42,12 @@ end
 
 ---@param msg string
 function ServerRemote:printAll(msg)
-	self.domain:printAll(msg)
+	self.domain:printAll(msg, self.ip, self.port)
+end
+
+---@return number[]
+function ServerRemote:getRandomNumbersFromAllClients()
+	return self.domain:getRandomNumbersFromAllClients(self.ip, self.port)
 end
 
 return ServerRemote
