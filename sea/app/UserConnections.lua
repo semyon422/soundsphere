@@ -134,4 +134,41 @@ function UserConnections:getPeers(caller_ip, caller_port)
 	return peers
 end
 
+---@param user_id integer
+---@param caller_ip string
+---@param caller_port integer
+---@return sea.Peer[]
+function UserConnections:getPeersForUser(user_id, caller_ip, caller_port)
+	local keys = self.repo.dict:get_keys(0)
+	local peers = {}
+	local sid = self:getId(caller_ip, caller_port)
+	for _, key in ipairs(keys) do
+		local ip, port = key:match("^c:(.+):(%d+)$")
+		port = tonumber(port)
+		if ip and port then
+			if self.repo:getConnectionUser(ip, port) == user_id then
+				local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
+				table.insert(peers, Peer(self.task_handler, icc_peer))
+			end
+		end
+	end
+	return peers
+end
+
+---@param sid string
+---@param client_remote sea.ClientRemoteValidation
+function UserConnections:processQueue(sid, client_remote)
+	local msg, return_peer = self.queues:pop(sid)
+	if not msg then return end
+
+	if not msg.ret then
+		assert(return_peer)
+		local handler = RemoteHandler(client_remote)
+		TaskHandler(handler):handleCall(return_peer, {}, msg)
+	else
+		assert(not return_peer)
+		self.task_handler:handleReturn(msg)
+	end
+end
+
 return UserConnections

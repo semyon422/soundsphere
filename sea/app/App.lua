@@ -23,6 +23,7 @@ local whitelist = require("sea.app.remotes.whitelist")
 ---@field [any] any
 ---@field ip string
 ---@field port integer
+---@field sid string ip:port
 ---@field time integer
 ---@field path_params {[string]: string}
 ---@field query {[string]: string}
@@ -156,6 +157,7 @@ function App:handle(req, res, ip, port)
 		query = http_util.decode_query_string(parsed_uri.query),
 		ip = ip,
 		port = port,
+		sid = ip .. ":" .. port,
 		time = os.time(),
 		session = self.domain.users:getSession(),
 		session_user = self.domain.users:getUser(),
@@ -169,6 +171,7 @@ function App:handle(req, res, ip, port)
 
 	local ok, err = xpcall(resource[_method], debug.traceback, resource, req, res, ctx)
 	if not ok then
+		print(err)
 		local body = ("<pre>%s</pre>"):format(err)
 		res.status = 500
 		res:set_chunked_encoding()

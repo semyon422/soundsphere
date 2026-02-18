@@ -67,27 +67,15 @@ function WebsocketResource:server(req, res, ctx)
 	end
 
 	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
-	local queues = self.user_connections.queues
-
-	local sid = remote_ctx.ip .. ":" .. remote_ctx.port
-
-	local _remote_handler = RemoteHandler(remote_ctx.remote)
-	local _task_handler = TaskHandler(_remote_handler)
 
 	local co = ngx.thread.spawn(function()
 		while true do
-			local msg, return_peer = queues:pop(sid)
-			if msg then
-				if not msg.ret then
-					assert(return_peer)
-					_task_handler:handleCall(return_peer, {}, msg)
-				else
-					assert(not return_peer)
-					self.task_handler:handleReturn(msg)
-				end
-			else
-				ngx.sleep(0.01)
+			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.sid, remote_ctx.remote)
+			if not ok then
+				print("queue process error", err)
+				break
 			end
+			ngx.sleep(0.01)
 		end
 	end)
 
