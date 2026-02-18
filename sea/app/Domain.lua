@@ -28,8 +28,10 @@ local OsuApi = require("sea.osu.api.OsuApi")
 local OsuBeatmaps = require("sea.osu.OsuBeatmaps")
 local ExternalRanked = require("sea.difftables.ExternalRanked")
 local UserConnections = require("sea.app.UserConnections")
+local Multiplayer = require("sea.app.Multiplayer")
 
 ---@class sea.Domain
+---@field multiplayer sea.Multiplayer
 ---@operator call: sea.Domain
 local Domain = class()
 
@@ -76,6 +78,7 @@ function Domain:new(repos, app_config)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
 
 	self.user_connections = UserConnections(repos.user_connections_repo)
+	self.multiplayer = Multiplayer(repos.multiplayer_repo, self.user_connections)
 end
 
 ---@param msg string

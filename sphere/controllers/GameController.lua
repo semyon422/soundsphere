@@ -105,6 +105,7 @@ function GameController:new()
 		self.persistence.osudirectModel,
 		self.replayBase
 	)
+	self.client_remote.multiplayer = self.multiplayerModel.client_remote
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
 		self.persistence.cacheModel.chartsRepo

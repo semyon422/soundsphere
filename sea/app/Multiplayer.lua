@@ -4,53 +4,47 @@ local RoomUpdate = require("sea.multi.RoomUpdate")
 local RoomUser = require("sea.multi.RoomUser")
 local MultiplayerAccess = require("sea.multi.access.MultiplayerAccess")
 
----@class sea.MultiplayerServer
----@operator call: sea.MultiplayerServer
-local MultiplayerServer = class()
+---@class sea.Multiplayer
+---@operator call: sea.Multiplayer
+local Multiplayer = class()
 
 ---@param multiplayer_repo sea.MultiplayerRepo
----@param peers sea.Peers
-function MultiplayerServer:new(multiplayer_repo, peers)
+---@param user_connections sea.UserConnections
+function Multiplayer:new(multiplayer_repo, user_connections)
 	self.multiplayer_repo = multiplayer_repo
-	self.peers = peers
+	self.user_connections = user_connections
 	self.multiplayer_access = MultiplayerAccess()
 end
 
-function MultiplayerServer:iterPeers()
-	return self.peers:iter()
-end
-
----@param user sea.User
----@param user_name string
----@return integer
-function MultiplayerServer:loginOffline(user, user_name)
-	user.id = -math.random(1, 1e9)
-	user.name = ("%s (%s)"):format(user_name, -user.id)
-	self:pushUsers()
-	return user.id
-end
-
-function MultiplayerServer:update()
-
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:getPeers(caller_ip, caller_port)
+	return self.user_connections:getPeers(caller_ip, caller_port)
 end
 
 ---@param peer sea.Peer
-function MultiplayerServer:connected(peer)
-	self:pushUsers()
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:connected(peer, caller_ip, caller_port)
+	self:pushUsers(caller_ip, caller_port)
 	peer.remote_no_return:setRooms(self:getRooms())
 end
 
 ---@param peer sea.Peer
-function MultiplayerServer:disconnected(peer)
-	self:leaveRoom(peer.user)
-	self:pushUsers()
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:disconnected(peer, caller_ip, caller_port)
+	self:leaveRoom(peer.user, caller_ip, caller_port)
+	self:pushUsers(caller_ip, caller_port)
 end
 
+---@param caller_ip string
+---@param caller_port integer
 ---@return sea.User[]
-function MultiplayerServer:getUsers()
+function Multiplayer:getUsers(caller_ip, caller_port)
 	---@type sea.User[]
 	local users = {}
-	for _, p in self.peers:iter() do
+	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
 		if not p.user:isAnon() then
 			table.insert(users, p.user)
 		end
@@ -62,9 +56,11 @@ function MultiplayerServer:getUsers()
 end
 
 ---@param user_id integer
+---@param caller_ip string
+---@param caller_port integer
 ---@return sea.Peer?
-function MultiplayerServer:getPeerByUserId(user_id)
-	for _, p in self.peers:iter() do
+function Multiplayer:getPeerByUserId(user_id, caller_ip, caller_port)
+	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
 		if p.user.id == user_id then
 			return p
 		end
@@ -72,7 +68,9 @@ function MultiplayerServer:getPeerByUserId(user_id)
 end
 
 ---@param room_id integer
-function MultiplayerServer:iterRoomPeers(room_id)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:iterRoomPeers(room_id, caller_ip, caller_port)
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 
 	---@type {[integer]: true}
@@ -83,7 +81,7 @@ function MultiplayerServer:iterRoomPeers(room_id)
 
 	---@type sea.Peer[]
 	local peers = {}
-	for _, p in self:iterPeers() do
+	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
 		if user_ids[p.user.id] then
 			table.insert(peers, p)
 		end
@@ -93,7 +91,7 @@ function MultiplayerServer:iterRoomPeers(room_id)
 end
 
 ---@return sea.Room[]
-function MultiplayerServer:getRooms()
+function Multiplayer:getRooms()
 	local rooms = self.multiplayer_repo:getRooms()
 	for _, room in ipairs(rooms) do
 		room.password = nil
@@ -103,36 +101,44 @@ end
 
 ---@param id integer
 ---@return sea.Room?
-function MultiplayerServer:getRoom(id)
+function Multiplayer:getRoom(id)
 	return self.multiplayer_repo:getRoom(id)
 end
 
-function MultiplayerServer:pushUsers()
-	local users = self:getUsers()
-	for _, p in self.peers:iter() do
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:pushUsers(caller_ip, caller_port)
+	local users = self:getUsers(caller_ip, caller_port)
+	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
 		p.remote_no_return:setUsers(users)
 	end
 end
 
-function MultiplayerServer:pushRooms()
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:pushRooms(caller_ip, caller_port)
 	local rooms = self:getRooms()
-	for _, p in self.peers:iter() do
+	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
 		p.remote_no_return:setRooms(rooms)
 	end
 end
 
 ---@param room_id integer
-function MultiplayerServer:pushRoomUsers(room_id)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:pushRoomUsers(room_id, caller_ip, caller_port)
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
-	for _, p in self:iterRoomPeers(room_id) do
+	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
 		p.remote_no_return:setRoomUsers(room_users)
 	end
 end
 
 ---@param room_id integer
 ---@param room sea.Room|sea.RoomUpdate
-function MultiplayerServer:syncRoomParts(room_id, room)
-	for _, p in self:iterRoomPeers(room_id) do
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:syncRoomParts(room_id, room, caller_ip, caller_port)
+	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
 		if room.rules then
 			p.remote_no_return:syncRules()
 		end
@@ -147,9 +153,11 @@ end
 
 ---@param user sea.User
 ---@param room_values sea.Room
+---@param caller_ip string
+---@param caller_port integer
 ---@return integer?
 ---@return string?
-function MultiplayerServer:createRoom(user, room_values)
+function Multiplayer:createRoom(user, room_values, caller_ip, caller_port)
 	if not self.multiplayer_access:canCreateRoom(user) then
 		return nil, "not allowed"
 	end
@@ -157,9 +165,9 @@ function MultiplayerServer:createRoom(user, room_values)
 	room_values.host_user_id = user.id
 
 	local room = self.multiplayer_repo:createRoom(room_values)
-	self:pushRooms()
+	self:pushRooms(caller_ip, caller_port)
 
-	self:joinRoom(user, room.id, room.password)
+	self:joinRoom(user, room.id, room.password, caller_ip, caller_port)
 
 	return room.id
 end
@@ -167,9 +175,11 @@ end
 ---@param user sea.User
 ---@param room_id integer
 ---@param room_values sea.RoomUpdate
+---@param caller_ip string
+---@param caller_port integer
 ---@return true?
 ---@return string?
-function MultiplayerServer:updateRoom(user, room_id, room_values)
+function Multiplayer:updateRoom(user, room_id, room_values, caller_ip, caller_port)
 	local room = self.multiplayer_repo:getRoom(room_id)
 	if not room then
 		return nil, "not found"
@@ -182,18 +192,21 @@ function MultiplayerServer:updateRoom(user, room_id, room_values)
 	room_values.id = room_id
 
 	self.multiplayer_repo:updateRoom(room_values)
-	self:pushRooms()
+	self:pushRooms(caller_ip, caller_port)
 
-	self:syncRoomParts(room_id, room_values)
+	self:syncRoomParts(room_id, room_values, caller_ip, caller_port)
 
 	return true
 end
 
+---@param user sea.User
 ---@param room_id integer
 ---@param password string
+---@param caller_ip string
+---@param caller_port integer
 ---@return true?
 ---@return string?
-function MultiplayerServer:joinRoom(user, room_id, password)
+function Multiplayer:joinRoom(user, room_id, password, caller_ip, caller_port)
 	local room = self.multiplayer_repo:getRoom(room_id)
 	if not room then
 		return nil, "not found"
@@ -215,8 +228,8 @@ function MultiplayerServer:joinRoom(user, room_id, password)
 	room_user = RoomUser(room.id, user.id)
 	room_user = self.multiplayer_repo:createRoomUser(room_user)
 
-	self:pushRoomUsers(room_id)
-	self:syncRoomParts(room_id, room)
+	self:pushRoomUsers(room_id, caller_ip, caller_port)
+	self:syncRoomParts(room_id, room, caller_ip, caller_port)
 
 	return true
 end
@@ -224,9 +237,11 @@ end
 ---@param user sea.User
 ---@param room_id integer
 ---@param target_user_id integer
+---@param caller_ip string
+---@param caller_port integer
 ---@return true?
 ---@return string?
-function MultiplayerServer:kickUser(user, room_id, target_user_id)
+function Multiplayer:kickUser(user, room_id, target_user_id, caller_ip, caller_port)
 	local room = self.multiplayer_repo:getRoom(room_id)
 	if not room then
 		return nil, "not found"
@@ -246,15 +261,15 @@ function MultiplayerServer:kickUser(user, room_id, target_user_id)
 	if room.host_user_id == target_user_id and room_users[1] then
 		room.host_user_id = room_users[1].user_id
 		self.multiplayer_repo:updateRoom(room)
-		self:pushRooms()
-		self:pushRoomUsers(room_id)
+		self:pushRooms(caller_ip, caller_port)
+		self:pushRoomUsers(room_id, caller_ip, caller_port)
 	elseif #room_users == 0 then
 		self.multiplayer_repo:deleteRoom(room_id)
-		self:pushRooms()
-		self:pushRoomUsers(room_id)
+		self:pushRooms(caller_ip, caller_port)
+		self:pushRoomUsers(room_id, caller_ip, caller_port)
 	end
 
-	local peer = self:getPeerByUserId(target_user_id)
+	local peer = self:getPeerByUserId(target_user_id, caller_ip, caller_port)
 	if peer then
 		peer.remote_no_return:setRoomUsers({})
 	end
@@ -264,7 +279,7 @@ end
 
 ---@param user sea.User
 ---@return integer?
-function MultiplayerServer:getRoomId(user)
+function Multiplayer:getRoomId(user)
 	if user:isAnon() then
 		return
 	end
@@ -276,9 +291,11 @@ function MultiplayerServer:getRoomId(user)
 end
 
 ---@param user sea.User
+---@param caller_ip string
+---@param caller_port integer
 ---@return true?
 ---@return string?
-function MultiplayerServer:leaveRoom(user)
+function Multiplayer:leaveRoom(user, caller_ip, caller_port)
 	if user:isAnon() then
 		return
 	end
@@ -288,11 +305,11 @@ function MultiplayerServer:leaveRoom(user)
 		return nil, "is not in a room"
 	end
 
-	return self:kickUser(user, room_id, user.id)
+	return self:kickUser(user, room_id, user.id, caller_ip, caller_port)
 end
 
 ---@return sea.Room?
-function MultiplayerServer:getCurrentRoom(user)
+function Multiplayer:getCurrentRoom(user)
 	local id = self:getRoomId(user)
 	if id then
 		return self:getRoom(id)
@@ -302,48 +319,58 @@ end
 ---@param user sea.User
 ---@param room_id integer
 ---@param msg string
-function MultiplayerServer:sendMessage(user, room_id, msg)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:sendMessage(user, room_id, msg, caller_ip, caller_port)
 	msg = ("%s: %s"):format(user.name, msg)
 
-	for _, p in self:iterRoomPeers(room_id) do
+	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
 		p.remote_no_return:addMessage(msg)
 	end
 end
 
 ---@param user sea.User
 ---@param msg string
-function MultiplayerServer:sendLocalMessage(user, msg)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:sendLocalMessage(user, msg, caller_ip, caller_port)
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return
 	end
-	self:sendMessage(user, room_id, msg)
+	self:sendMessage(user, room_id, msg, caller_ip, caller_port)
 end
 
 ---@param user sea.User
 ---@param room_values sea.RoomUpdate
+---@param caller_ip string
+---@param caller_port integer
 ---@return boolean?
 ---@return string?
-function MultiplayerServer:updateLocalRoom(user, room_values)
+function Multiplayer:updateLocalRoom(user, room_values, caller_ip, caller_port)
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return
 	end
-	return self:updateRoom(user, room_id, room_values)
+	return self:updateRoom(user, room_id, room_values, caller_ip, caller_port)
 end
 
 ---@param user sea.User
 ---@param target_user_id integer
-function MultiplayerServer:kickLocalUser(user, target_user_id)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:kickLocalUser(user, target_user_id, caller_ip, caller_port)
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return
 	end
-	self:kickUser(user, room_id, target_user_id)
+	self:kickUser(user, room_id, target_user_id, caller_ip, caller_port)
 end
 
 ---@param user sea.User
-function MultiplayerServer:switchReady(user)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:switchReady(user, caller_ip, caller_port)
 	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
 	if not room_user then
 		return
@@ -352,12 +379,14 @@ function MultiplayerServer:switchReady(user)
 	room_user.is_ready = not room_user.is_ready
 	self.multiplayer_repo:updateRoomUser(room_user)
 
-	self:pushRoomUsers(room_user.room_id)
+	self:pushRoomUsers(room_user.room_id, caller_ip, caller_port)
 end
 
 ---@param user sea.User
 ---@param found boolean
-function MultiplayerServer:setChartFound(user, found)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:setChartFound(user, found, caller_ip, caller_port)
 	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
 	if not room_user then
 		return
@@ -366,12 +395,14 @@ function MultiplayerServer:setChartFound(user, found)
 	room_user.chart_found = found
 	self.multiplayer_repo:updateRoomUser(room_user)
 
-	self:pushRoomUsers(room_user.room_id)
+	self:pushRoomUsers(room_user.room_id, caller_ip, caller_port)
 end
 
 ---@param user sea.User
 ---@param chartplay_computed sea.ChartplayComputed
-function MultiplayerServer:setChartplayComputed(user, chartplay_computed)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:setChartplayComputed(user, chartplay_computed, caller_ip, caller_port)
 	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
 	if not room_user then
 		return
@@ -380,19 +411,21 @@ function MultiplayerServer:setChartplayComputed(user, chartplay_computed)
 	room_user.chartplay_computed = chartplay_computed
 	self.multiplayer_repo:updateRoomUser(room_user)
 
-	self:pushRoomUsers(room_user.room_id)
+	self:pushRoomUsers(room_user.room_id, caller_ip, caller_port)
 end
 
 ---@param user sea.User
-function MultiplayerServer:startLocalMatch(user)
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:startLocalMatch(user, caller_ip, caller_port)
 	local room_id = self:getRoomId(user)
 	if not room_id then
 		return
 	end
 
-	for _, p in self:iterRoomPeers(room_id) do
+	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
 		p.remote_no_return:startMatch()
 	end
 end
 
-return MultiplayerServer
+return Multiplayer

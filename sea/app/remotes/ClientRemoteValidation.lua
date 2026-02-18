@@ -1,8 +1,10 @@
 local class = require("class")
 local OnlineClientRemoteValidation = require("sphere.online.remotes.OnlineClientRemoteValidation")
 local ComputeDataProviderRemoteValidation = require("sea.compute.remotes.ComputeDataProviderRemoteValidation")
+local MultiplayerClientRemoteValidation = require("sea.multi.remotes.MultiplayerClientRemoteValidation")
 
 ---@class sea.ClientRemoteValidation: sea.ClientRemote
+---@field multiplayer sea.MultiplayerClientRemoteValidation
 ---@operator call: sea.ClientRemoteValidation
 local ClientRemoteValidation = class()
 
@@ -11,6 +13,7 @@ function ClientRemoteValidation:new(remote)
 	self.remote = remote
 	self.client = OnlineClientRemoteValidation(remote.client)
 	self.compute_data_provider = ComputeDataProviderRemoteValidation(remote.compute_data_provider)
+	self.multiplayer = MultiplayerClientRemoteValidation(remote.multiplayer)
 end
 
 ---@param ... any

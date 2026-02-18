@@ -10,8 +10,10 @@ local DanClearsRepo = require("sea.dan.repos.DanClearsRepo")
 local ActivityRepo = require("sea.activity.repos.ActivityRepo")
 local OsuRepo = require("sea.osu.repos.OsuRepo")
 local UserConnectionsRepo = require("sea.app.repos.UserConnectionsRepo")
+local MultiplayerRepo = require("sea.app.repos.MultiplayerRepo")
 
 ---@class sea.Repos
+---@field multiplayer_repo sea.MultiplayerRepo
 ---@operator call: sea.Repos
 local Repos = class()
 
@@ -29,6 +31,7 @@ function Repos:new(models, shared_memory)
 	self.activity_repo = ActivityRepo(models)
 	self.osu_repo = OsuRepo(models)
 	self.user_connections_repo = UserConnectionsRepo(shared_memory:get("players"))
+	self.multiplayer_repo = MultiplayerRepo(shared_memory:get("mp_rooms"), shared_memory:get("mp_room_users"))
 end
 
 return Repos

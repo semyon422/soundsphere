@@ -76,7 +76,7 @@ function section_draw.rooms(self, inner_w)
 	local chartview = game.selectModel.chartview
 
 	local close
-	local status = multiplayerModel.status
+	local status = tostring(multiplayerModel.status)
 	if status ~= "connected" then
 		imgui.text(status)
 	elseif not mp_client:isLoggedIn() then

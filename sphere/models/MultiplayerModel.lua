@@ -1,16 +1,8 @@
 local class = require("class")
 local delay = require("delay")
-local thread = require("thread")
-local enet = require("enet")
-
 local icc_co = require("icc.co")
-local EnetPeer = require("icc.EnetPeer")
-local TaskHandler = require("icc.TaskHandler")
-local RemoteHandler = require("icc.RemoteHandler")
-local Remote = require("icc.Remote")
 
 local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemote")
-local MultiplayerServerRemoteValidation = require("sea.multi.remotes.MultiplayerServerRemoteValidation")
 local MultiplayerClient = require("sea.multi.MultiplayerClient")
 
 ---@class sphere.MultiplayerModel
@@ -33,144 +25,50 @@ function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectMode
 	self.osudirectModel = osudirectModel
 	self.replayBase = replayBase
 
-	self.status = "disconnected"
+	self.sea_client = onlineModel.sea_client
+	self.remote = self.sea_client.remote
+	self.task_handler = self.sea_client.task_handler
 
-	self.client = MultiplayerClient({}, replayBase, self)
+	self.client = MultiplayerClient(self.remote, replayBase, self)
 	self.client_remote = MultiplayerClientRemote(self.client)
-
-	self.remote_handler = RemoteHandler(self.client_remote)
-
-	self.task_handler = TaskHandler(self.remote_handler)
-	self.timeout = 60
-end
-
----@param icc_peer icc.IPeer
----@param msg icc.Message
-function MultiplayerModel:handle_msg(icc_peer, msg)
-	return self.task_handler:handle(icc_peer, {remote = remote}, msg)
-end
-
----@param peer icc.IPeer
----@param msg icc.Message
-function MultiplayerModel:handle_peer(peer, msg)
-	local ok, err = xpcall(self.handle_msg, debug.traceback, self, peer, msg)
-	if not ok then
-		print("icc error ", err)
-	end
 end
 
 function MultiplayerModel:load()
-	self.host = enet.host_create()
 	self.stopRefresh = delay.every(0.5, self.refreshAsync, self)
 end
 
 function MultiplayerModel:unload()
-	self:disconnect()
-	self.host:flush()
-	self.host = nil
 	self.stopRefresh()
 end
 
 function MultiplayerModel:refreshAsync()
-	local remote = self.remote
-	if not remote then
+	if not self.sea_client.connected then
 		return
 	end
 
+	local user = self.onlineModel:getUser()
+	self.client.user_id = user and user.id
 	self.client:refreshAsync()
 
-	local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)
-	remote.mp_user:setChartplayComputed(chartplay_computed)
+	-- local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)
+	-- self.remote.multiplayer:setChartplayComputed(chartplay_computed)
 end
 
-local toipAsync = thread.async(function(host)
-	local socket = require("socket")
-	return socket.dns.toip(host)
-end)
-
-local connecting = false
 function MultiplayerModel:connect()
-	if connecting or self.status == "connecting" then
-		return
-	end
-	self.status = "connecting"
-	connecting = true
-	local url = self.configModel.configs.urls.multiplayer
-	local host, port = url:match("^(.+):(.-)$")
-	local ip = toipAsync(host or "")
-	local status, err = pcall(self.host.connect, self.host, ("%s:%s"):format(ip, port))
-	if not status then
-		self.status = err
-		return
-	end
-	self.server = err
-	connecting = false
 end
-MultiplayerModel.connect = icc_co.callwrap(MultiplayerModel.connect)
 
 function MultiplayerModel:disconnect()
-	if self.status == "connected" then
-		self.server:disconnect()
-		self.status = "disconnecting"
-	end
-end
-
-function MultiplayerModel:loginOfflineAsync()
-	local user = self.configModel.configs.online.user
-
-	local name = "username"
-	if user and user.name then
-		name = user.name
-	end
-
-	self.client:loginOffline(name)
-end
-
----@param peer_id string
----@param icc_peer icc.IPeer
-function MultiplayerModel:peerconnected(peer_id, icc_peer)
-	print("multiplayer connected")
-	self.status = "connected"
-
-	local server_remote = Remote(self.task_handler, icc_peer) --[[@as sea.MultiplayerServerRemote]]
-	server_remote = MultiplayerServerRemoteValidation(server_remote)
-	self.remote = server_remote
-	self.client.server_remote = server_remote
-
-	self:loginOfflineAsync()
-end
-MultiplayerModel.peerconnected = icc_co.callwrap(MultiplayerModel.peerconnected)
-
----@param peer any
-function MultiplayerModel:peerdisconnected(peer)
-	print("disconnected")
-	self.status = "disconnected"
 end
 
 function MultiplayerModel:update()
-	if not self.server then
-		return
-	end
+end
 
-	local host = self.host
-	local ok, event = pcall(host.service, host)
-	while ok and event do
-		if event.type == "connect" then
-			local peer = EnetPeer(event.peer)
-			self:peerconnected(tostring(event.peer), peer)
-		elseif event.type == "disconnect" then
-			self:peerdisconnected(tostring(event.peer))
-		elseif event.type == "receive" then
-			local peer = EnetPeer(event.peer)
-			local msg = peer:decode(event.data)
-			if msg then
-				self:handle_peer(peer, msg)
-			end
-		end
-		ok, event = pcall(host.service, host)
+function MultiplayerModel:getStatus()
+	if self.sea_client.connected then
+		return "connected"
+	else
+		return "disconnected"
 	end
-
-	self.task_handler:update()
 end
 
 function MultiplayerModel:selectChart()
@@ -196,7 +94,7 @@ function MultiplayerModel:selectChart()
 		self.chartview = chartview
 		selectModel:setConfig(chartview)
 		selectModel:pullNoteChartSet(true)
-		self.remote.mp_user:setChartFound(true)
+		self.remote.multiplayer:setChartFound(true)
 		return
 	end
 	selectModel:setConfig({
@@ -206,11 +104,14 @@ function MultiplayerModel:selectChart()
 	})
 	self.chartview = nil
 	selectModel:pullNoteChartSet(true)
-	self.remote.mp_user:setChartFound(false)
+	self.remote.multiplayer:setChartFound(false)
 end
 
 MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
-	local setId = self.room.notechart.osuSetId
+	local room = self.client:getMyRoom()
+	if not room then return end
+
+	local setId = room.notechart.osuSetId
 	if self.downloadingBeatmap or not setId then
 		return
 	end
@@ -221,7 +122,7 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 	}
 	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
 	self.downloadingBeatmap.status = "done"
-	self.remote.mp_user:setChartFound(false)
+	self.remote.multiplayer:setChartFound(false)
 
 	self.cacheModel:startUpdateAsync("downloads", 1)
 	self:selectChart()
