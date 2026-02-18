@@ -15,9 +15,14 @@ end
 ---@return { [integer]: any }
 function MultiplayerRepo:getRooms()
 	local rooms = {}
-	local rooms_json = self.rooms_dict:get_values()
-	for _, room_json in pairs(rooms_json) do
-		table.insert(rooms, stbl.decode(room_json))
+	local keys = self.rooms_dict:get_keys(0)
+	for _, key in ipairs(keys) do
+		if key ~= "id" then
+			local room_json = self.rooms_dict:get(key)
+			if room_json then
+				table.insert(rooms, stbl.decode(room_json))
+			end
+		end
 	end
 	return rooms
 end
@@ -35,7 +40,7 @@ end
 ---@param room table
 ---@return table
 function MultiplayerRepo:createRoom(room)
-	local id = self.rooms_dict:incr("id", 1)
+	local id = self.rooms_dict:incr("id", 1, 0)
 	room.id = id
 	self.rooms_dict:set(tostring(id), stbl.encode(room))
 	return room
@@ -71,11 +76,14 @@ end
 ---@return any[]
 function MultiplayerRepo:getRoomUsers(room_id)
 	local room_users = {}
-	local room_users_json = self.room_users_dict:get_values()
-	for _, room_user_json in pairs(room_users_json) do
-		local room_user = stbl.decode(room_user_json)
-		if room_user.room_id == room_id then
-			table.insert(room_users, room_user)
+	local keys = self.room_users_dict:get_keys(0)
+	for _, key in ipairs(keys) do
+		local room_user_json = self.room_users_dict:get(key)
+		if room_user_json then
+			local room_user = stbl.decode(room_user_json)
+			if room_user.room_id == room_id then
+				table.insert(room_users, room_user)
+			end
 		end
 	end
 	return room_users

@@ -75,6 +75,11 @@ function MultiplayerServerRemote:setChartFound(found)
 	return true
 end
 
+---@param is_playing boolean
+function MultiplayerServerRemote:setPlaying(is_playing)
+	self.multiplayer:setPlaying(self.user, is_playing, self.ip, self.port)
+end
+
 ---@param msg string
 function MultiplayerServerRemote:sendMessage(msg)
 	self.multiplayer:sendLocalMessage(self.user, msg, self.ip, self.port)
@@ -94,6 +99,10 @@ end
 
 function MultiplayerServerRemote:startMatch()
 	self.multiplayer:startLocalMatch(self.user, self.ip, self.port)
+end
+
+function MultiplayerServerRemote:stopMatch()
+	self.multiplayer:stopLocalMatch(self.user, self.ip, self.port)
 end
 
 return MultiplayerServerRemote

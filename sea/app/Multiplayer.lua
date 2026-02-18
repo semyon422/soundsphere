@@ -27,7 +27,7 @@ end
 ---@param caller_port integer
 function Multiplayer:connected(peer, caller_ip, caller_port)
 	self:pushUsers(caller_ip, caller_port)
-	peer.remote_no_return:setRooms(self:getRooms())
+	peer.remote_no_return.multiplayer:setRooms(self:getRooms())
 end
 
 ---@param peer sea.Peer
@@ -110,7 +110,7 @@ end
 function Multiplayer:pushUsers(caller_ip, caller_port)
 	local users = self:getUsers(caller_ip, caller_port)
 	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
-		p.remote_no_return:setUsers(users)
+		p.remote_no_return.multiplayer:setUsers(users)
 	end
 end
 
@@ -119,7 +119,7 @@ end
 function Multiplayer:pushRooms(caller_ip, caller_port)
 	local rooms = self:getRooms()
 	for _, p in ipairs(self:getPeers(caller_ip, caller_port)) do
-		p.remote_no_return:setRooms(rooms)
+		p.remote_no_return.multiplayer:setRooms(rooms)
 	end
 end
 
@@ -129,7 +129,7 @@ end
 function Multiplayer:pushRoomUsers(room_id, caller_ip, caller_port)
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
-		p.remote_no_return:setRoomUsers(room_users)
+		p.remote_no_return.multiplayer:setRoomUsers(room_users)
 	end
 end
 
@@ -140,13 +140,13 @@ end
 function Multiplayer:syncRoomParts(room_id, room, caller_ip, caller_port)
 	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
 		if room.rules then
-			p.remote_no_return:syncRules()
+			p.remote_no_return.multiplayer:syncRules()
 		end
 		if room.chartmeta_key then
-			p.remote_no_return:syncChart()
+			p.remote_no_return.multiplayer:syncChart()
 		end
 		if room.replay_base then
-			p.remote_no_return:syncReplayBase()
+			p.remote_no_return.multiplayer:syncReplayBase()
 		end
 	end
 end
@@ -271,7 +271,7 @@ function Multiplayer:kickUser(user, room_id, target_user_id, caller_ip, caller_p
 
 	local peer = self:getPeerByUserId(target_user_id, caller_ip, caller_port)
 	if peer then
-		peer.remote_no_return:setRoomUsers({})
+		peer.remote_no_return.multiplayer:setRoomUsers({})
 	end
 
 	return true
@@ -325,7 +325,7 @@ function Multiplayer:sendMessage(user, room_id, msg, caller_ip, caller_port)
 	msg = ("%s: %s"):format(user.name, msg)
 
 	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
-		p.remote_no_return:addMessage(msg)
+		p.remote_no_return.multiplayer:addMessage(msg)
 	end
 end
 
@@ -415,6 +415,22 @@ function Multiplayer:setChartplayComputed(user, chartplay_computed, caller_ip, c
 end
 
 ---@param user sea.User
+---@param is_playing boolean
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:setPlaying(user, is_playing, caller_ip, caller_port)
+	local room_user = self.multiplayer_repo:getRoomUserByUserId(user.id)
+	if not room_user then
+		return
+	end
+
+	room_user.is_playing = is_playing
+	self.multiplayer_repo:updateRoomUser(room_user)
+
+	self:pushRoomUsers(room_user.room_id, caller_ip, caller_port)
+end
+
+---@param user sea.User
 ---@param caller_ip string
 ---@param caller_port integer
 function Multiplayer:startLocalMatch(user, caller_ip, caller_port)
@@ -424,7 +440,21 @@ function Multiplayer:startLocalMatch(user, caller_ip, caller_port)
 	end
 
 	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
-		p.remote_no_return:startMatch()
+		p.remote_no_return.multiplayer:startMatch()
+	end
+end
+
+---@param user sea.User
+---@param caller_ip string
+---@param caller_port integer
+function Multiplayer:stopLocalMatch(user, caller_ip, caller_port)
+	local room_id = self:getRoomId(user)
+	if not room_id then
+		return
+	end
+
+	for _, p in self:iterRoomPeers(room_id, caller_ip, caller_port) do
+		p.remote_no_return.multiplayer:stopMatch()
 	end
 end
 

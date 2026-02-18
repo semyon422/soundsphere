@@ -31,6 +31,8 @@ function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectMode
 
 	self.client = MultiplayerClient(self.remote, replayBase, self)
 	self.client_remote = MultiplayerClientRemote(self.client)
+
+	self.status = "disconnected"
 end
 
 function MultiplayerModel:load()
@@ -42,6 +44,7 @@ function MultiplayerModel:unload()
 end
 
 function MultiplayerModel:refreshAsync()
+	self.status = self:getStatus()
 	if not self.sea_client.connected then
 		return
 	end
@@ -50,6 +53,7 @@ function MultiplayerModel:refreshAsync()
 	self.client.user_id = user and user.id
 	self.client:refreshAsync()
 
+	-- disabled because not implemented yet
 	-- local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)
 	-- self.remote.multiplayer:setChartplayComputed(chartplay_computed)
 end

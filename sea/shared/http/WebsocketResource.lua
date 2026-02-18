@@ -22,11 +22,13 @@ WebsocketResource.routes = {
 ---@param server_handler sea.ServerRemote
 ---@param views web.Views
 ---@param user_connections sea.UserConnections
-function WebsocketResource:new(server_handler, views, user_connections)
+---@param domain? sea.Domain
+function WebsocketResource:new(server_handler, views, user_connections, domain)
 	self.remote_handler = user_connections.remote_handler
 	self.task_handler = user_connections.task_handler
 	self.views = views
 	self.user_connections = user_connections
+	self.domain = domain
 end
 
 ---@param req web.IRequest
@@ -68,6 +70,13 @@ function WebsocketResource:server(req, res, ctx)
 
 	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 
+	if self.domain then
+		local peer = self.user_connections:getPeer(remote_ctx.ip, remote_ctx.port, remote_ctx.ip, remote_ctx.port)
+		if peer then
+			self.domain.multiplayer:connected(peer, remote_ctx.ip, remote_ctx.port)
+		end
+	end
+
 	local co = ngx.thread.spawn(function()
 		while true do
 			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.sid, remote_ctx.remote)
@@ -85,6 +94,13 @@ function WebsocketResource:server(req, res, ctx)
 	end
 
 	ngx.thread.kill(co)
+
+	if self.domain then
+		local peer = self.user_connections:getPeer(remote_ctx.ip, remote_ctx.port, remote_ctx.ip, remote_ctx.port)
+		if peer then
+			self.domain.multiplayer:disconnected(peer, remote_ctx.ip, remote_ctx.port)
+		end
+	end
 
 	self.user_connections:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 end

@@ -4,18 +4,22 @@ local Remote = require("icc.Remote")
 local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
 local Queues = require("icc.Queues")
+local User = require("sea.access.User")
 
 ---@class sea.Peer
 ---@field remote sea.ClientRemoteValidation
 ---@field remote_no_return sea.ClientRemoteValidation
+---@field user sea.User
 local Peer = class()
 
 ---@param th icc.TaskHandler
 ---@param icc_peer icc.ContextQueuePeer
-function Peer:new(th, icc_peer)
+---@param user sea.User
+function Peer:new(th, icc_peer, user)
 	local remote = Remote(th, icc_peer)
 	self.remote = ClientRemoteValidation(remote)
 	self.remote_no_return = ClientRemoteValidation(-remote)
+	self.user = user
 end
 
 ---@class sea.UserConnections
@@ -27,8 +31,10 @@ local UserConnections = class()
 UserConnections.ttl = 90
 
 ---@param repo sea.UserConnectionsRepo
-function UserConnections:new(repo)
+---@param users_repo sea.UsersRepo
+function UserConnections:new(repo, users_repo)
 	self.repo = repo
+	self.users_repo = users_repo
 	self.queues = Queues(function(id)
 		return self:getQueueFromSid(id)
 	end)
@@ -103,6 +109,16 @@ function UserConnections:getQueueFromSid(sid)
 	return self.repo:getQueue(ip, port)
 end
 
+---@private
+---@param user_id integer|true|nil
+---@return sea.User
+function UserConnections:_getUser(user_id)
+	if type(user_id) == "number" then
+		return self.users_repo:getUser(user_id) or User()
+	end
+	return User()
+end
+
 ---@param ip string
 ---@param port integer
 ---@param caller_ip string
@@ -112,8 +128,10 @@ function UserConnections:getPeer(ip, port, caller_ip, caller_port)
 	if not self.repo:hasConnection(ip, port) then
 		return
 	end
+	local user_id = self.repo:getConnectionUser(ip, port)
+	local user = self:_getUser(user_id)
 	local icc_peer = self.queues:getPeer(self:getId(ip, port), self:getId(caller_ip, caller_port))
-	return Peer(self.task_handler, icc_peer)
+	return Peer(self.task_handler, icc_peer, user)
 end
 
 ---@param caller_ip string
@@ -127,8 +145,10 @@ function UserConnections:getPeers(caller_ip, caller_port)
 		local ip, port = key:match("^c:(.+):(%d+)$")
 		port = tonumber(port)
 		if ip and port then
+			local user_id = self.repo:getConnectionUser(ip, port)
+			local user = self:_getUser(user_id)
 			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-			table.insert(peers, Peer(self.task_handler, icc_peer))
+			table.insert(peers, Peer(self.task_handler, icc_peer, user))
 		end
 	end
 	return peers
@@ -142,13 +162,14 @@ function UserConnections:getPeersForUser(user_id, caller_ip, caller_port)
 	local keys = self.repo.dict:get_keys(0)
 	local peers = {}
 	local sid = self:getId(caller_ip, caller_port)
+	local user = self:_getUser(user_id)
 	for _, key in ipairs(keys) do
 		local ip, port = key:match("^c:(.+):(%d+)$")
 		port = tonumber(port)
 		if ip and port then
 			if self.repo:getConnectionUser(ip, port) == user_id then
 				local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-				table.insert(peers, Peer(self.task_handler, icc_peer))
+				table.insert(peers, Peer(self.task_handler, icc_peer, user))
 			end
 		end
 	end

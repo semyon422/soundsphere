@@ -77,7 +77,7 @@ function Domain:new(repos, app_config)
 	self.charts_computer = ChartsComputer(self.compute_data_loader, repos.charts_repo)
 	self.compute_tasks = ComputeTasks(repos.compute_tasks_repo)
 
-	self.user_connections = UserConnections(repos.user_connections_repo)
+	self.user_connections = UserConnections(repos.user_connections_repo, repos.users_repo)
 	self.multiplayer = Multiplayer(repos.multiplayer_repo, self.user_connections)
 end
 

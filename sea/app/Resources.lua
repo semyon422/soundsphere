@@ -74,7 +74,7 @@ function Resources:new(domain, server_remote, views, sessions, app_config)
 	self.chartdiff = ChartdiffResource(nil, views)
 	self.chartplay = ChartplayResource(nil, views)
 
-	self.websocket = WebsocketResource(server_remote, views, domain.user_connections)
+	self.websocket = WebsocketResource(server_remote, views, domain.user_connections, domain)
 end
 
 function Resources:getList()

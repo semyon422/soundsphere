@@ -105,6 +105,12 @@ function MultiplayerServerRemoteValidation:setChartFound(found)
 	return self.remote:setChartFound(found)
 end
 
+---@param is_playing boolean
+function MultiplayerServerRemoteValidation:setPlaying(is_playing)
+	assert(type(is_playing) == "boolean")
+	return self.remote:setPlaying(is_playing)
+end
+
 ---@param msg string
 function MultiplayerServerRemoteValidation:sendMessage(msg)
 	assert(type(msg) == "string")
@@ -133,6 +139,10 @@ end
 
 function MultiplayerServerRemoteValidation:startMatch()
 	return self.remote:startMatch()
+end
+
+function MultiplayerServerRemoteValidation:stopMatch()
+	return self.remote:stopMatch()
 end
 
 return MultiplayerServerRemoteValidation
