@@ -35,7 +35,6 @@ end
 ---@param caller_port integer
 function Multiplayer:disconnected(peer, caller_ip, caller_port)
 	self:leaveRoom(peer.user, caller_ip, caller_port)
-	self:pushUsers(caller_ip, caller_port)
 end
 
 ---@param caller_ip string

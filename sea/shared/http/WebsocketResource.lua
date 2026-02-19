@@ -103,6 +103,10 @@ function WebsocketResource:server(req, res, ctx)
 	end
 
 	self.user_connections:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
+
+	if self.domain then
+		self.domain.multiplayer:pushUsers(remote_ctx.ip, remote_ctx.port)
+	end
 end
 
 ---@param req web.IRequest
