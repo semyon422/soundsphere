@@ -1,6 +1,5 @@
 local WebsocketPeer = require("icc.WebsocketPeer")
 local Remote = require("icc.Remote")
-local RemoteHandler = require("icc.RemoteHandler")
 local TaskHandler = require("icc.TaskHandler")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
@@ -19,16 +18,13 @@ WebsocketResource.routes = {
 	}},
 }
 
----@param server_handler sea.ServerRemote
+---@param domain sea.Domain
 ---@param views web.Views
----@param user_connections sea.UserConnections
----@param domain? sea.Domain
-function WebsocketResource:new(server_handler, views, user_connections, domain)
-	self.remote_handler = user_connections.remote_handler
-	self.task_handler = user_connections.task_handler
-	self.views = views
-	self.user_connections = user_connections
+function WebsocketResource:new(domain, views)
 	self.domain = domain
+	self.views = views
+	self.user_connections = domain.user_connections
+	self.task_handler = self.user_connections.task_handler
 end
 
 ---@param req web.IRequest
@@ -68,14 +64,7 @@ function WebsocketResource:server(req, res, ctx)
 		return
 	end
 
-	self.user_connections:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
-
-	if self.domain then
-		local peer = self.user_connections:getPeer(remote_ctx.ip, remote_ctx.port, remote_ctx.ip, remote_ctx.port)
-		if peer then
-			self.domain.multiplayer:connected(peer, remote_ctx.ip, remote_ctx.port)
-		end
-	end
+	self.domain:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 
 	local co = ngx.thread.spawn(function()
 		while true do
@@ -95,18 +84,7 @@ function WebsocketResource:server(req, res, ctx)
 
 	ngx.thread.kill(co)
 
-	if self.domain then
-		local peer = self.user_connections:getPeer(remote_ctx.ip, remote_ctx.port, remote_ctx.ip, remote_ctx.port)
-		if peer then
-			self.domain.multiplayer:disconnected(peer, remote_ctx.ip, remote_ctx.port)
-		end
-	end
-
-	self.user_connections:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
-
-	if self.domain then
-		self.domain.multiplayer:pushUsers(remote_ctx.ip, remote_ctx.port)
-	end
+	self.domain:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
 end
 
 ---@param req web.IRequest

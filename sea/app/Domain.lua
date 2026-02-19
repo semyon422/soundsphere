@@ -81,6 +81,29 @@ function Domain:new(repos, app_config)
 	self.multiplayer = Multiplayer(repos.multiplayer_repo, self.user_connections)
 end
 
+---@param ip string
+---@param port integer
+---@param user_id? integer
+function Domain:onConnect(ip, port, user_id)
+	self.user_connections:onConnect(ip, port, user_id)
+	local peer = self.user_connections:getPeer(ip, port, ip, port)
+	if peer then
+		self.multiplayer:connected(peer, ip, port)
+	end
+end
+
+---@param ip string
+---@param port integer
+---@param user_id? integer
+function Domain:onDisconnect(ip, port, user_id)
+	local peer = self.user_connections:getPeer(ip, port, ip, port)
+	if peer then
+		self.multiplayer:disconnected(peer, ip, port)
+	end
+	self.user_connections:onDisconnect(ip, port, user_id)
+	self.multiplayer:pushUsers(ip, port)
+end
+
 ---@param msg string
 ---@param caller_ip string
 ---@param caller_port integer
