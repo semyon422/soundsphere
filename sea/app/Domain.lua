@@ -38,6 +38,7 @@ local Domain = class()
 ---@param repos sea.Repos
 ---@param app_config sea.AppConfig
 function Domain:new(repos, app_config)
+	self.repos = repos
 	self.users_repo = repos.users_repo
 	self.charts_repo = repos.charts_repo
 
@@ -79,6 +80,22 @@ function Domain:new(repos, app_config)
 
 	self.user_connections = UserConnections(repos.user_connections_repo, repos.users_repo)
 	self.multiplayer = Multiplayer(repos.multiplayer_repo, self.user_connections)
+end
+
+---@param f function
+---@param ... any
+---@return any ...
+function Domain:transaction(f, ...)
+	local orm = self.repos.users_repo.models._orm
+	orm:begin()
+	local results = {xpcall(f, debug.traceback, ...)}
+	if results[1] then
+		orm:commit()
+		return select(2, unpack(results))
+	else
+		orm.db:exec("ROLLBACK")
+		error(results[2])
+	end
 end
 
 ---@param ip string

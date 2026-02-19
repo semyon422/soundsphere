@@ -6,9 +6,11 @@ local SubmissionServerRemote = class()
 
 ---@param chartplay_submission sea.ChartplaySubmission
 ---@param chartplays sea.Chartplays
-function SubmissionServerRemote:new(chartplay_submission, chartplays)
+---@param domain sea.Domain
+function SubmissionServerRemote:new(chartplay_submission, chartplays, domain)
 	self.chartplay_submission = chartplay_submission
 	self.chartplays = chartplays
+	self.domain = domain
 end
 
 ---@param chartplay sea.Chartplay
@@ -16,7 +18,9 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function SubmissionServerRemote:submitChartplay(chartplay, chartdiff)
-	return self.chartplay_submission:submitChartplay(self.user, os.time(), self.remote, chartplay, chartdiff)
+	return self.domain:transaction(function()
+		return self.chartplay_submission:submitChartplay(self.user, os.time(), self.remote, chartplay, chartdiff)
+	end)
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
