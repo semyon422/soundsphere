@@ -46,9 +46,9 @@ function MultiplayerModel:refreshAsync()
 		return
 	end
 
-	-- local user = self.onlineModel:getUser()
-	-- self.client.user_id = user and user.id
-	-- self.client:refreshAsync()
+	local user = self.onlineModel:getUser()
+	self.client.user_id = user and user.id
+	self.client:refreshAsync()
 
 	-- disabled because not implemented yet
 	-- local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)

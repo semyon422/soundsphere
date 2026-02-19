@@ -78,6 +78,9 @@ function GameController:new()
 	self.online_wrapper = OnlineWrapper(self.online_client, self.seaClient.remote)
 
 	self.onlineModel = OnlineModel(self.persistence.configModel, self.seaClient)
+
+	self.multiplayer_client.server_remote = self.seaClient.remote
+
 	self.noteSkinModel = NoteSkinModel(self.persistence.configModel, self.packageManager)
 	self.inputModel = InputModel(self.persistence.configModel)
 	self.resourceModel = ResourceModel(
@@ -92,6 +95,9 @@ function GameController:new()
 	self.speedModel = SpeedModel(self.persistence.configModel)
 	self.computeContext = ComputeContext()
 	self.replayBase = ReplayBase()
+
+	self.multiplayer_client.replay_base = self.replayBase
+
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
 	self.selectModel = SelectModel(
@@ -100,6 +106,9 @@ function GameController:new()
 		self.onlineModel,
 		self.replayBase
 	)
+
+	self.multiplayer_client.chart_selector = self.selectModel
+
 	self.multiplayerModel = MultiplayerModel(
 		self.persistence.cacheModel,
 		self.rhythm_engine,

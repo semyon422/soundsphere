@@ -3,6 +3,7 @@ local valid = require("valid")
 local table_util = require("table_util")
 local UserInsecure = require("sea.access.UserInsecure")
 local Session = require("sea.access.Session")
+local User = require("sea.access.User")
 
 ---@class sea.AuthServerRemote: sea.IServerRemote
 ---@operator call: sea.AuthServerRemote
@@ -11,7 +12,7 @@ local AuthServerRemote = class()
 ---@param users sea.Users
 ---@param sessions web.Sessions
 ---@param user_connections sea.UserConnections
----@param on_auth? fun(ip: string, port: integer)
+---@param on_auth? fun(ip: string, port: integer, old_user: sea.User)
 function AuthServerRemote:new(users, sessions, user_connections, on_auth)
 	self.users = users
 	self.sessions = sessions
@@ -55,13 +56,15 @@ function AuthServerRemote:loginByToken(token)
 		return
 	end
 
+	local old_user = table_util.copy(self.user, User())
+
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port)
+		self.on_auth(self.ip, self.port, old_user)
 	end
 
 	return true
@@ -80,13 +83,15 @@ function AuthServerRemote:loginSession(req_session)
 		return
 	end
 
+	local old_user = table_util.copy(self.user, User())
+
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port)
+		self.on_auth(self.ip, self.port, old_user)
 	end
 
 	return true
@@ -111,13 +116,15 @@ function AuthServerRemote:login(email, password)
 		return nil, err
 	end
 
+	local old_user = table_util.copy(self.user, User())
+
 	clear_copy(su.session, self.session)
 	clear_copy(su.user, self.user)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port)
+		self.on_auth(self.ip, self.port, old_user)
 	end
 
 	return {
@@ -130,6 +137,7 @@ end
 ---@return true?
 ---@return string?
 function AuthServerRemote:logout()
+	local old_user = table_util.copy(self.user, User())
 	local old_id = self.user.id
 	local ok, err = self.users:logout(self.user, self.session.id)
 	if not ok then
@@ -146,7 +154,7 @@ function AuthServerRemote:logout()
 	end
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port)
+		self.on_auth(self.ip, self.port, old_user)
 	end
 
 	return true

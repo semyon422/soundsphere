@@ -115,8 +115,13 @@ end
 
 ---@param room_id integer
 ---@param user_id integer
+---@return any?
 function MultiplayerRepo:deleteRoomUser(room_id, user_id)
-	self.room_users_dict:delete(tostring(user_id))
+	local room_user = self:getRoomUser(room_id, user_id)
+	if room_user then
+		self.room_users_dict:delete(tostring(user_id))
+	end
+	return room_user
 end
 
 return MultiplayerRepo

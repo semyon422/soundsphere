@@ -257,14 +257,15 @@ function Multiplayer:kickUser(user, room_id, target_user_id, caller_ip, caller_p
 
 	local room_users = self.multiplayer_repo:getRoomUsers(room_id)
 
-	if room.host_user_id == target_user_id and room_users[1] then
-		room.host_user_id = room_users[1].user_id
-		self.multiplayer_repo:updateRoom(room)
-		self:pushRooms(caller_ip, caller_port)
-		self:pushRoomUsers(room_id, caller_ip, caller_port)
-	elseif #room_users == 0 then
+	if #room_users == 0 then
 		self.multiplayer_repo:deleteRoom(room_id)
 		self:pushRooms(caller_ip, caller_port)
+	else
+		if room.host_user_id == target_user_id then
+			room.host_user_id = room_users[1].user_id
+			self.multiplayer_repo:updateRoom(room)
+			self:pushRooms(caller_ip, caller_port)
+		end
 		self:pushRoomUsers(room_id, caller_ip, caller_port)
 	end
 

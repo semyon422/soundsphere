@@ -104,6 +104,19 @@ function Domain:onDisconnect(ip, port, user_id)
 	self.multiplayer:pushUsers(ip, port)
 end
 
+---@param ip string
+---@param port integer
+---@param old_user sea.User
+function Domain:onAuth(ip, port, old_user)
+	local peer = self.user_connections:getPeer(ip, port, ip, port)
+	if peer then
+		if old_user and not old_user:isAnon() and old_user.id ~= peer.user.id then
+			self.multiplayer:leaveRoom(old_user, ip, port)
+		end
+		self.multiplayer:connected(peer, ip, port)
+	end
+end
+
 ---@param msg string
 ---@param caller_ip string
 ---@param caller_port integer
