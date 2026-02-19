@@ -1,12 +1,12 @@
 local class = require("class")
 
----@class sea.MultiplayerClientRemoteValidation: sea.MultiplayerClientRemote
+---@class sea.MultiplayerClientRemoteValidation: sea.IClientRemote
 ---@operator call: sea.MultiplayerClientRemoteValidation
 local MultiplayerClientRemoteValidation = class()
 
 ---@param remote sea.MultiplayerClientRemote
 function MultiplayerClientRemoteValidation:new(remote)
-	self.remote = remote
+	self.remote = assert(remote)
 end
 
 ---@param ... any

@@ -1,5 +1,6 @@
 local class = require("class")
 local OnlineClientRemote = require("sphere.online.remotes.OnlineClientRemote")
+local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemote")
 
 ---@class sea.ClientRemote: sea.IClientRemote
 ---@field multiplayer sea.MultiplayerClientRemote
@@ -8,8 +9,10 @@ local ClientRemote = class()
 
 ---@param client sphere.OnlineClient
 ---@param cacheModel sphere.CacheModel
-function ClientRemote:new(client, cacheModel)
+---@param multipalyer_client sea.MultiplayerClient
+function ClientRemote:new(client, cacheModel, multipalyer_client)
 	self.client = OnlineClientRemote(client)
+	self.multiplayer = MultiplayerClientRemote(multipalyer_client)
 	self.compute_data_provider = cacheModel.computeDataProvider
 end
 

@@ -36,6 +36,7 @@ local OnlineClient = require("sphere.online.OnlineClient")
 local OnlineWrapper = require("sphere.online.OnlineWrapper")
 local DifftablesSync = require("sea.difftables.DifftablesSync")
 local ClientRemote = require("sea.app.remotes.ClientRemote")
+local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
 
 local ComputeContext = require("sea.compute.ComputeContext")
 local ReplayBase = require("sea.replays.ReplayBase")
@@ -51,6 +52,8 @@ local ResourceFinder = require("rizu.files.ResourceFinder")
 local RhythmEngine = require("rizu.engine.RhythmEngine")
 
 local GlobalTimer = require("rizu.game.GlobalTimer")
+
+local MultiplayerClient = require("sea.multi.MultiplayerClient")
 
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
@@ -68,7 +71,8 @@ function GameController:new()
 	self.uiModel = UserInterfaceModel(self)
 
 	self.online_client = OnlineClient()
-	self.client_remote = ClientRemote(self.online_client, self.persistence.cacheModel)
+	self.multiplayer_client = MultiplayerClient()
+	self.client_remote = ClientRemoteValidation(ClientRemote(self.online_client, self.persistence.cacheModel, self.multiplayer_client))
 	self.seaClient = SeaClient(self.online_client, self.client_remote)
 	self.difftables_sync = DifftablesSync(self.seaClient.remote.difftables, self.persistence.cacheModel.difftablesRepo)
 	self.online_wrapper = OnlineWrapper(self.online_client, self.seaClient.remote)
@@ -103,9 +107,9 @@ function GameController:new()
 		self.selectModel,
 		self.onlineModel,
 		self.persistence.osudirectModel,
-		self.replayBase
+		self.replayBase,
+		self.multiplayer_client
 	)
-	self.client_remote.multiplayer = self.multiplayerModel.client_remote
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
 		self.persistence.cacheModel.chartsRepo

@@ -71,7 +71,7 @@ function MultiplayerClient:syncChart()
 	-- 	-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
 	-- end
 
-	self.chart_selector:selectChart(hash, index)
+	-- self.chart_selector:selectChart(hash, index)
 end
 
 function MultiplayerClient:syncReplayBase()

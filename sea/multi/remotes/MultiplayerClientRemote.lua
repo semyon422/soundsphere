@@ -1,6 +1,6 @@
 local class = require("class")
 
----@class sea.MultiplayerClientRemote
+---@class sea.MultiplayerClientRemote: sea.IClientRemote
 ---@operator call: sea.MultiplayerClientRemote
 local MultiplayerClientRemote = class()
 
@@ -26,6 +26,7 @@ end
 
 ---@param users sea.User[]
 function MultiplayerClientRemote:setUsers(users)
+	print("users online: " .. pprint.dump(users))
 	self.client:setUsers(users)
 end
 

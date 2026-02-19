@@ -12,8 +12,8 @@ local ClientRemoteValidation = class()
 function ClientRemoteValidation:new(remote)
 	self.remote = remote
 	self.client = OnlineClientRemoteValidation(remote.client)
-	self.compute_data_provider = ComputeDataProviderRemoteValidation(remote.compute_data_provider)
 	self.multiplayer = MultiplayerClientRemoteValidation(remote.multiplayer)
+	self.compute_data_provider = ComputeDataProviderRemoteValidation(remote.compute_data_provider)
 end
 
 ---@param ... any

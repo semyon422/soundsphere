@@ -2,9 +2,6 @@ local class = require("class")
 local delay = require("delay")
 local icc_co = require("icc.co")
 
-local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemote")
-local MultiplayerClient = require("sea.multi.MultiplayerClient")
-
 ---@class sphere.MultiplayerModel
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
@@ -16,7 +13,8 @@ local MultiplayerModel = class()
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param replayBase sea.ReplayBase
-function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase)
+---@param multiplayer_client sea.MultiplayerClient
+function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase, multiplayer_client)
 	self.cacheModel = cacheModel
 	self.rhythm_engine = rhythm_engine
 	self.configModel = configModel
@@ -29,8 +27,7 @@ function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectMode
 	self.remote = self.sea_client.remote
 	self.task_handler = self.sea_client.task_handler
 
-	self.client = MultiplayerClient(self.remote, replayBase, self)
-	self.client_remote = MultiplayerClientRemote(self.client)
+	self.client = multiplayer_client
 
 	self.status = "disconnected"
 end
@@ -49,9 +46,9 @@ function MultiplayerModel:refreshAsync()
 		return
 	end
 
-	local user = self.onlineModel:getUser()
-	self.client.user_id = user and user.id
-	self.client:refreshAsync()
+	-- local user = self.onlineModel:getUser()
+	-- self.client.user_id = user and user.id
+	-- self.client:refreshAsync()
 
 	-- disabled because not implemented yet
 	-- local chartplay_computed = self.rhythm_engine:getChartplayComputed(true)

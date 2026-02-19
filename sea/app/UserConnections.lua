@@ -44,7 +44,7 @@ end
 ---@param whitelist icc.RemoteHandlerWhitelist
 function UserConnections:setup(server_remote, whitelist)
 	self.remote_handler = RemoteHandler(server_remote, whitelist)
-	self.task_handler = TaskHandler(self.remote_handler)
+	self.task_handler = TaskHandler(self.remote_handler, "server")
 end
 
 ---@param ip string
@@ -185,7 +185,7 @@ function UserConnections:processQueue(sid, client_remote)
 	if not msg.ret then
 		assert(return_peer)
 		local handler = RemoteHandler(client_remote)
-		TaskHandler(handler):handleCall(return_peer, {}, msg)
+		TaskHandler(handler, "client-proxy"):handleCall(return_peer, {}, msg)
 	else
 		assert(not return_peer)
 		self.task_handler:handleReturn(msg)

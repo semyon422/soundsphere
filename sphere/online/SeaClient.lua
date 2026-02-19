@@ -31,7 +31,7 @@ function SeaClient:new(client, client_remote)
 	local server_peer = WebsocketPeer({send = function() return nil, "not connected" end})
 	self.server_peer = server_peer
 
-	local task_handler = TaskHandler(self.remote_handler)
+	local task_handler = TaskHandler(self.remote_handler, "client")
 	self.task_handler = task_handler
 
 	task_handler.timeout = 60
