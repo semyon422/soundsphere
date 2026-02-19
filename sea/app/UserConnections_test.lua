@@ -2,6 +2,7 @@ local UserConnections = require("sea.app.UserConnections")
 local UserConnectionsRepo = require("sea.app.repos.UserConnectionsRepo")
 local FakeSharedDict = require("web.nginx.FakeSharedDict")
 local Message = require("icc.Message")
+local User = require("sea.access.User")
 
 local test = {}
 
@@ -9,7 +10,15 @@ local test = {}
 function test.full_call(t)
 	local dict = FakeSharedDict()
 	local repo = UserConnectionsRepo(dict)
-	local uc = UserConnections(repo)
+	local users_repo = {
+		getUser = function(self, id)
+			local u = User()
+			u.id = id
+			u.name = "user" .. id
+			return u
+		end
+	}
+	local uc = UserConnections(repo, users_repo)
 
 	-- Setup handlers
 	local tbl = {
