@@ -11,10 +11,12 @@ local AuthServerRemote = class()
 ---@param users sea.Users
 ---@param sessions web.Sessions
 ---@param user_connections sea.UserConnections
-function AuthServerRemote:new(users, sessions, user_connections)
+---@param on_auth? fun(ip: string, port: integer)
+function AuthServerRemote:new(users, sessions, user_connections, on_auth)
 	self.users = users
 	self.sessions = sessions
 	self.user_connections = user_connections
+	self.on_auth = on_auth
 end
 
 ---@return sea.Session?
@@ -58,6 +60,10 @@ function AuthServerRemote:loginByToken(token)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
+	if self.on_auth then
+		self.on_auth(self.ip, self.port)
+	end
+
 	return true
 end
 
@@ -78,6 +84,10 @@ function AuthServerRemote:loginSession(req_session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+
+	if self.on_auth then
+		self.on_auth(self.ip, self.port)
+	end
 
 	return true
 end
@@ -106,6 +116,10 @@ function AuthServerRemote:login(email, password)
 
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
+	if self.on_auth then
+		self.on_auth(self.ip, self.port)
+	end
+
 	return {
 		session = su.session,
 		user = su.user,
@@ -122,8 +136,17 @@ function AuthServerRemote:logout()
 		return nil, err
 	end
 
+	clear_copy(Session(), self.session)
+	clear_copy(User(), self.user)
+
+	self.user_connections:heartbeat(self.ip, self.port, nil)
+
 	if old_id then
 		self.user_connections:onUserDisconnect(old_id)
+	end
+
+	if self.on_auth then
+		self.on_auth(self.ip, self.port)
 	end
 
 	return true

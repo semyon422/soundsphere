@@ -13,7 +13,9 @@ local ServerRemote = class()
 ---@param domain sea.Domain
 ---@param sessions web.Sessions
 function ServerRemote:new(domain, sessions)
-	self.auth = AuthServerRemote(domain.users, sessions, domain.user_connections)
+	self.auth = AuthServerRemote(domain.users, sessions, domain.user_connections, function(ip, port)
+		domain.multiplayer:pushUsers(ip, port)
+	end)
 	self.submission = SubmissionServerRemote(domain.chartplay_submission, domain.chartplays)
 	self.leaderboards = LeaderboardsServerRemote(domain.leaderboards)
 	self.difftables = DifftablesServerRemote(domain.difftables)
