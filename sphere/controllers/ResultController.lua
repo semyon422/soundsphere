@@ -59,6 +59,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	local replay_data = self:getReplayDataAsync(chartplay)
 	if not replay_data then
+		print("missing replay data")
 		return
 	end
 
@@ -66,6 +67,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 	self.replay = replay -- TODO: move it somewhere else
 
 	if not replay then
+		print("load replay:", err)
 		return
 	end
 
