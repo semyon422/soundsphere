@@ -35,6 +35,8 @@ function RhythmEngine:new()
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
 
+	self.auto_key_sound = true
+
 	self.score_engine = ScoreEngine()
 	function self.logic_info.on_note_change(change)
 		self.score_engine:receive(change)
@@ -67,7 +69,13 @@ end
 
 ---@param resources {[string]: string}
 function RhythmEngine:loadAudio(resources)
-	self.audio_engine:load(self.chart, resources)
+	self.chart_resources = resources
+	self.audio_engine:load(self.chart, resources, self.auto_key_sound)
+end
+
+---@param enabled boolean
+function RhythmEngine:setAutoKeySound(enabled)
+	self.auto_key_sound = enabled
 end
 
 ---@return boolean
@@ -92,8 +100,9 @@ function RhythmEngine:unload()
 end
 
 function RhythmEngine:retry()
-	self:setTime(self.play_progress.init_time)
 	self:load()
+	self:loadAudio(self.chart_resources)
+	self:setTime(self.play_progress.init_time)
 end
 
 function RhythmEngine:update()
@@ -122,7 +131,17 @@ end
 
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
-	self.input_engine:receive(event)
+	local input_note, catched = self.input_engine:receive(event)
+
+	if not self.auto_key_sound and event.value == true and catched then
+		local logic_note = input_note and input_note.logic_note
+
+		if logic_note and logic_note.linked_note.startNote.data.sounds then
+			for _, sound in ipairs(logic_note.linked_note.startNote.data.sounds) do
+				self.audio_engine:playSample(sound[1], sound[2])
+			end
+		end
+	end
 end
 
 ---@param no_mono boolean?

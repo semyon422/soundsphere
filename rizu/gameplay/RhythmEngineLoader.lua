@@ -27,6 +27,7 @@ function RhythmEngineLoader:load(rhythm_engine)
 	local state = computeContext.state
 
 	rhythm_engine:setChart(chart, chartmeta, chartdiff)
+	rhythm_engine:setAutoKeySound(config.gameplay.autoKeySound)
 	rhythm_engine:load()
 	rhythm_engine:loadAudio(self.resources)
 

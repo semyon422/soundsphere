@@ -125,6 +125,8 @@ function InputEngine:receive_catched(event)
 end
 
 ---@param event rizu.VirtualInputEvent
+---@return rizu.InputNote?
+---@return boolean? catched
 function InputEngine:receive(event)
 	self.bottom_notes_handler:receive(event)
 	self.input_pauser:receive(event.id, event.value)
@@ -141,6 +143,8 @@ function InputEngine:receive(event)
 		self.event_catches[event.id] = note
 		self.catched_notes[note] = event.id
 	end
+
+	return note, catched
 end
 
 function InputEngine:pause()

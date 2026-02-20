@@ -52,9 +52,12 @@ function BassSoundDecoder:new(data)
 end
 
 function BassSoundDecoder:release()
+	if self.released then
+		return
+	end
+	self.released = true
 	bass_assert(bass.BASS_StreamFree(self.resample_channel) == 1)
 	bass_assert(bass.BASS_StreamFree(self.decode_channel) == 1)
-	self.released = true
 end
 
 ---@param buf ffi.cdata*
