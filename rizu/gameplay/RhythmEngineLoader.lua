@@ -39,8 +39,8 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:setConst(replayBase.const)
 
 	-- constant
-	rhythm_engine:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
+	rhythm_engine:setTimeToPrepare(config.gameplay.time.prepare)
 
 	-- variable ranked
 	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
