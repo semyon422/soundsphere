@@ -228,6 +228,7 @@ end
 
 ---@param time number
 function RhythmEngine:setTimeToPrepare(time)
+	self.prepare_time = time
 	local start_time = self.play_progress.start_time
 	local time_to_prepare = math.min(start_time - time, self.audio_engine:getStartTime())
 	local init_time = time_to_prepare * self.logic_info.rate
@@ -258,6 +259,13 @@ end
 
 ---@param pro_mode boolean
 function RhythmEngine:setProMode(pro_mode)
+end
+
+function RhythmEngine:skipIntro()
+	local skip_to = self.play_progress.start_time - (self.prepare_time or 0)
+	if self:getTime() < skip_to then
+		self:setTime(skip_to)
+	end
 end
 
 return RhythmEngine

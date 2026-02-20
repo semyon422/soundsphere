@@ -167,7 +167,7 @@ function GameplayInteractor:retry()
 end
 
 function GameplayInteractor:skipIntro()
-	-- self.rhythmModel.timeEngine:skipIntro()
+	self.game.rhythm_engine:skipIntro()
 end
 
 function GameplayInteractor:skip()
