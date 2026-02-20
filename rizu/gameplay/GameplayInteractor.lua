@@ -129,7 +129,7 @@ function GameplayInteractor:increasePlaySpeed(delta)
 	speedModel:increase(delta)
 
 	local gameplay = game.configModel.configs.settings.gameplay
-	game.rhythm_engine:setVisualRate(gameplay.speed)
+	game.rhythm_engine:setVisualRate(gameplay.speed, gameplay.scaleSpeed)
 	game.notificationModel:notify("scroll speed: " .. speedModel.format[gameplay.speedType]:format(speedModel:get()))
 end
 

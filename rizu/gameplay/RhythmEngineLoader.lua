@@ -30,6 +30,14 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:load()
 	rhythm_engine:loadAudio(self.resources)
 
+	-- variable unranked
+	-- rhythm_engine:setWindUp(state.windUp)
+	rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
+	rhythm_engine:setTimingValues(replayBase.timing_values)
+	rhythm_engine:setRate(replayBase.rate)
+	rhythm_engine:setNearest(replayBase.nearest)
+	rhythm_engine:setConst(replayBase.const)
+
 	-- constant
 	rhythm_engine:setTimeToPrepare(config.gameplay.time.prepare)
 	rhythm_engine:setPlayTime(chartdiff.start_time, chartdiff.duration)
@@ -40,14 +48,6 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
 	rhythm_engine:setAudioMode(config.audio.mode)
-
-	-- variable unranked
-	-- rhythm_engine:setWindUp(state.windUp)
-	rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
-	rhythm_engine:setTimingValues(replayBase.timing_values)
-	rhythm_engine:setRate(replayBase.rate)
-	rhythm_engine:setNearest(replayBase.nearest)
-	rhythm_engine:setConst(replayBase.const)
 end
 
 return RhythmEngineLoader
