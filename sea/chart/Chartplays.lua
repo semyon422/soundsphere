@@ -216,6 +216,10 @@ function Chartplays:submit(user, time, compute_data_loader, chartplay_values, ch
 		return nil, "can submit: " .. err
 	end
 
+	-- It is important to save the submitted chartplay early, even before 
+	-- validation/processing. This ensures we have a record of the player's 
+	-- attempt and result, which can be re-processed or recovered later 
+	-- if subsequent steps (like chart retrieval or rank calculation) fail.
 	local chartplay = self:getCreateChartplay(user.id, time, chartplay_values)
 
 	local ctx, err = self:processSubmit(user, time, compute_data_loader, chartplay, chartdiff_values)

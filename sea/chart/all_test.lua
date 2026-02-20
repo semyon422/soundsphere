@@ -3,6 +3,7 @@ local md5 = require("md5")
 local Chartplay = require("sea.chart.Chartplay")
 local Chartdiff = require("sea.chart.Chartdiff")
 local Chartplays = require("sea.chart.Chartplays")
+local ChartplaySubmission = require("sea.chart.ChartplaySubmission")
 local TableStorage = require("sea.chart.storage.TableStorage")
 local Timings = require("sea.chart.Timings")
 local Subtimings = require("sea.chart.Subtimings")
@@ -13,6 +14,17 @@ local ComputeDataProvider = require("sea.compute.ComputeDataProvider")
 local ComputeDataLoader = require("sea.compute.ComputeDataLoader")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local ChartfilesRepo = require("sea.chart.repos.ChartfilesRepo")
+local Users = require("sea.access.Users")
+local UsersRepo = require("sea.access.repos.UsersRepo")
+local UserInsecure = require("sea.access.UserInsecure")
+local Leaderboards = require("sea.leaderboards.Leaderboards")
+local LeaderboardsRepo = require("sea.leaderboards.repos.LeaderboardsRepo")
+local UserActivityGraph = require("sea.activity.UserActivityGraph")
+local ActivityRepo = require("sea.activity.repos.ActivityRepo")
+local ExternalRanked = require("sea.difftables.ExternalRanked")
+local Dans = require("sea.dan.Dans")
+local DanClearsRepo = require("sea.dan.repos.DanClearsRepo")
+local FakePasswordHasher = require("sea.access.FakePasswordHasher")
 
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
@@ -38,6 +50,10 @@ local function create_test_ctx()
 
 	local charts_repo = ChartsRepo(models)
 	local chartfiles_repo = ChartfilesRepo(models)
+	local users_repo = UsersRepo(models)
+	local leaderboards_repo = LeaderboardsRepo(models)
+	local activity_repo = ActivityRepo(models)
+	local dan_clears_repo = DanClearsRepo(models)
 
 	local charts_storage = TableStorage()
 	local replays_storage = TableStorage()
@@ -53,6 +69,16 @@ local function create_test_ctx()
 		replays_storage
 	)
 
+	local leaderboards = Leaderboards(leaderboards_repo)
+	local users = Users(users_repo, FakePasswordHasher(), nil)
+	local dans = Dans(charts_repo, dan_clears_repo)
+	local user_activity_graph = UserActivityGraph(activity_repo)
+	local external_ranked = ExternalRanked(nil, nil)
+	-- Mock external_ranked:submit to do nothing
+	external_ranked.submit = function() end
+
+	local submission = ChartplaySubmission(chartplays, leaderboards, users, dans, user_activity_graph, external_ranked)
+
 	local user = User()
 	user.id = 1
 
@@ -60,7 +86,11 @@ local function create_test_ctx()
 		db = db,
 		charts_repo = charts_repo,
 		chartfiles_repo = chartfiles_repo,
+		users_repo = users_repo,
 		chartplays = chartplays,
+		leaderboards = leaderboards,
+		users = users,
+		submission = submission,
 		user = user,
 	}
 end
@@ -117,7 +147,7 @@ local replay = {
 	rate_type = "linear",
 }
 setmetatable(replay, Replay)
-local _replayfile_data = ReplayCoder.encode(replay)
+local _replayfile_data = assert(ReplayCoder.encode(replay))
 
 local _chartplay_values = {
 	hash = replay.hash,
@@ -196,7 +226,9 @@ function test.submit_valid_score(t)
 	local replayfile_data = _replayfile_data
 	t:assert(replayfile_data_table:validate())
 
-	local compute_data_provider = FakeComputeDataProvider(chartfile_name, chartfile_data, replayfile_data)
+	local compute_data_provider = FakeComputeDataProvider()
+	compute_data_provider:addChart(replay.hash, chartfile_name, chartfile_data)
+	compute_data_provider:addReplay(md5.sumhexa(replayfile_data), replayfile_data)
 	local compute_data_loader = ComputeDataLoader(compute_data_provider)
 
 	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
@@ -226,6 +258,42 @@ function test.submit_valid_score(t)
 	local interval = ctx.chartplays.chartplays_access.submit_interval
 	c, err = ctx.chartplays:submit(user, interval, compute_data_loader, chartplay_values, chartdiff_values)
 	t:assert(c, err)
+end
+
+---@param t testing.T
+function test.submit_chartplay_save_on_retrieval_failure(t)
+	local ctx = create_test_ctx()
+
+	local user_values = UserInsecure()
+	user_values.name = "test"
+	user_values.email = "test@test.com"
+	user_values.password = "password"
+
+	local res, err = ctx.users:register(User(), "127.0.0.1", 1000, user_values)
+	t:assert(res, "Registration should succeed: " .. tostring(err))
+	---@cast res -?
+	local user = res.user
+
+	-- Provider that will return nil for everything
+	local compute_data_provider = FakeComputeDataProvider()
+	local remote = {compute_data_provider = compute_data_provider, client = {setLeaderboardUsers = function() end}}
+
+	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
+	local chartdiff_values = setmetatable(table_util.copy(_chartdiff_values), Chartdiff)
+
+	local res, err = ctx.submission:submitChartplay(user, 2000, remote, chartplay_values, chartdiff_values)
+	---@cast err -?
+
+	t:eq(res, nil, "Submission should have failed due to retrieval error")
+	t:assert(err:find("not found"), "Error message should reflect retrieval failure, got: " .. tostring(err))
+
+	-- Verify partial save: chartplays table should contain the record
+	local count = ctx.charts_repo:countChartplays()
+	t:eq(count, 1, "Chartplay should be saved even if retrieval fails")
+
+	local chartplay = ctx.charts_repo:getRecentChartplays(user.id, 1)[1]
+	t:assert(chartplay, "Chartplay record should exist")
+	t:eq(chartplay.compute_state, "invalid", "Chartplay state should be 'invalid' due to processing failure")
 end
 
 return test
