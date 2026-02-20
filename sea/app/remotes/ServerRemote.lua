@@ -5,7 +5,7 @@ local LeaderboardsServerRemote = require("sea.leaderboards.remotes.LeaderboardsS
 local DifftablesServerRemote = require("sea.difftables.remotes.DifftablesServerRemote")
 local MultiplayerServerRemote = require("sea.app.remotes.MultiplayerServerRemote")
 
----@class sea.ServerRemote: sea.IServerRemote
+---@class sea.ServerRemote: sea.IServerRemoteContext
 ---@field multiplayer sea.MultiplayerServerRemote
 ---@operator call: sea.ServerRemote
 local ServerRemote = class()
@@ -13,8 +13,8 @@ local ServerRemote = class()
 ---@param domain sea.Domain
 ---@param sessions web.Sessions
 function ServerRemote:new(domain, sessions)
-	self.auth = AuthServerRemote(domain.users, sessions, domain.user_connections, function(ip, port, old_user)
-		domain:onAuth(ip, port, old_user)
+	self.auth = AuthServerRemote(domain.users, sessions, domain.user_connections, function(peer, old_user)
+		domain:onAuth(peer, old_user)
 	end)
 	self.submission = SubmissionServerRemote(domain.chartplay_submission, domain.chartplays)
 	self.leaderboards = LeaderboardsServerRemote(domain.leaderboards)
@@ -47,12 +47,12 @@ end
 
 ---@param msg string
 function ServerRemote:printAll(msg)
-	self.domain:printAll(msg, self.ip, self.port)
+	self.domain:printAll(msg, self.peer)
 end
 
 ---@return number[]
 function ServerRemote:getRandomNumbersFromAllClients()
-	return self.domain:getRandomNumbersFromAllClients(self.ip, self.port)
+	return self.domain:getRandomNumbersFromAllClients(self.peer)
 end
 
 return ServerRemote

@@ -281,7 +281,8 @@ function test.submit_chartplay_save_on_retrieval_failure(t)
 	local chartplay_values = setmetatable(table_util.copy(_chartplay_values), Chartplay)
 	local chartdiff_values = setmetatable(table_util.copy(_chartdiff_values), Chartdiff)
 
-	local res, err = ctx.submission:submitChartplay(user, 2000, remote, chartplay_values, chartdiff_values)
+	local peer = {user = user, remote = remote}
+	local res, err = ctx.submission:submitChartplay(peer, chartplay_values, chartdiff_values)
 	---@cast err -?
 
 	t:eq(res, nil, "Submission should have failed due to retrieval error")

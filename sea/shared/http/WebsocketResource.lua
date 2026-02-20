@@ -3,7 +3,7 @@ local Remote = require("icc.Remote")
 local TaskHandler = require("icc.TaskHandler")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
-local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
+local Peer = require("sea.app.Peer")
 
 ---@class sea.WebsocketResource: web.IResource
 ---@operator call: sea.WebsocketResource
@@ -38,13 +38,7 @@ function WebsocketResource:server(req, res, ctx)
 	ws.max_payload_len = 1e7
 	task_handler.timeout = 60
 
-	local remote_ctx = {
-		remote = ClientRemoteValidation(Remote(task_handler, peer)),
-		user = ctx.session_user,
-		session = ctx.session,
-		ip = ctx.ip,
-		port = ctx.port,
-	}
+	local remote_ctx = Peer(task_handler, peer, ctx.session_user, ctx.ip, ctx.port, ctx.session)
 
 	function ws.protocol:text(payload, fin)
 		if not fin then return end
@@ -64,11 +58,11 @@ function WebsocketResource:server(req, res, ctx)
 		return
 	end
 
-	self.domain:onConnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
+	self.domain:onConnect(remote_ctx)
 
 	local co = ngx.thread.spawn(function()
 		while true do
-			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.sid, remote_ctx.remote)
+			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.peer_id, remote_ctx.remote)
 			if not ok then
 				print("queue process error", err)
 				break
@@ -84,7 +78,7 @@ function WebsocketResource:server(req, res, ctx)
 
 	ngx.thread.kill(co)
 
-	self.domain:onDisconnect(remote_ctx.ip, remote_ctx.port, remote_ctx.user.id)
+	self.domain:onDisconnect(remote_ctx)
 end
 
 ---@param req web.IRequest

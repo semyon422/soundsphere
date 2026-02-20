@@ -2,7 +2,7 @@ local class = require("class")
 local OnlineClientRemote = require("sphere.online.remotes.OnlineClientRemote")
 local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemote")
 
----@class sea.ClientRemote: sea.IClientRemote
+---@class sea.ClientRemote: sea.IClientRemoteContext
 ---@field multiplayer sea.MultiplayerClientRemote
 ---@operator call: sea.ClientRemote
 local ClientRemote = class()

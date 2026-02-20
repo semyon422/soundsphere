@@ -15,15 +15,12 @@ local etlua_util = require("web.framework.page.etlua_util")
 local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
 local brand = require("brand")
 local SharedMemory = require("web.nginx.SharedMemory")
-local RemoteHandler = require("icc.RemoteHandler")
-local TaskHandler = require("icc.TaskHandler")
-local whitelist = require("sea.app.remotes.whitelist")
 
 ---@class sea.RequestContext
 ---@field [any] any
 ---@field ip string
 ---@field port integer
----@field sid string ip:port
+---@field peer_id string ip:port
 ---@field time integer
 ---@field path_params {[string]: string}
 ---@field query {[string]: string}
@@ -157,7 +154,7 @@ function App:handle(req, res, ip, port)
 		query = http_util.decode_query_string(parsed_uri.query),
 		ip = ip,
 		port = port,
-		sid = ip .. ":" .. port,
+		peer_id = ip .. ":" .. port,
 		time = os.time(),
 		session = self.domain.users:getSession(),
 		session_user = self.domain.users:getUser(),

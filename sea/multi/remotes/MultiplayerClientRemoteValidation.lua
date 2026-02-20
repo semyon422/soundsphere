@@ -1,6 +1,6 @@
 local class = require("class")
 
----@class sea.MultiplayerClientRemoteValidation: sea.IClientRemote
+---@class sea.MultiplayerClientRemoteValidation: sea.IClientRemoteContext
 ---@operator call: sea.MultiplayerClientRemoteValidation
 local MultiplayerClientRemoteValidation = class()
 

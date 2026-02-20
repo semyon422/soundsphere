@@ -20,14 +20,14 @@ function ChartplaySubmission:new(chartplays, leaderboards, users, dans, user_act
 	self.external_ranked = external_ranked
 end
 
----@param user sea.User
----@param time integer
----@param remote sea.ClientRemote
+---@param peer sea.Peer
 ---@param chartplay_values sea.Chartplay
 ---@param chartdiff_values sea.Chartdiff
 ---@return sea.Chartplay?
 ---@return string?
-function ChartplaySubmission:submitChartplay(user, time, remote, chartplay_values, chartdiff_values)
+function ChartplaySubmission:submitChartplay(peer, chartplay_values, chartdiff_values)
+	local user, remote = peer.user, peer.remote
+	local time = os.time()
 	local compute_data_loader = ComputeDataLoader(remote.compute_data_provider)
 
 	local ctx, err = self.chartplays:submit(user, time, compute_data_loader, chartplay_values, chartdiff_values)

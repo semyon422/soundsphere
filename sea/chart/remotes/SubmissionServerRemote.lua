@@ -1,6 +1,6 @@
 local class = require("class")
 
----@class sea.SubmissionServerRemote: sea.IServerRemote
+---@class sea.SubmissionServerRemote: sea.IServerRemoteContext
 ---@operator call: sea.SubmissionServerRemote
 local SubmissionServerRemote = class()
 
@@ -16,7 +16,7 @@ end
 ---@return sea.Chartplay?
 ---@return string?
 function SubmissionServerRemote:submitChartplay(chartplay, chartdiff)
-	return self.chartplay_submission:submitChartplay(self.user, os.time(), self.remote, chartplay, chartdiff)
+	return self.chartplay_submission:submitChartplay(self.peer, chartplay, chartdiff)
 end
 
 ---@param chartmeta_key sea.ChartmetaKey

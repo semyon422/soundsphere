@@ -5,22 +5,7 @@ local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
 local Queues = require("icc.Queues")
 local User = require("sea.access.User")
-
----@class sea.Peer
----@field remote sea.ClientRemoteValidation
----@field remote_no_return sea.ClientRemoteValidation
----@field user sea.User
-local Peer = class()
-
----@param th icc.TaskHandler
----@param icc_peer icc.ContextQueuePeer
----@param user sea.User
-function Peer:new(th, icc_peer, user)
-	local remote = Remote(th, icc_peer)
-	self.remote = ClientRemoteValidation(remote)
-	self.remote_no_return = ClientRemoteValidation(-remote)
-	self.user = user
-end
+local Peer = require("sea.app.Peer")
 
 ---@class sea.UserConnections
 ---@operator call: sea.UserConnections
@@ -131,7 +116,7 @@ function UserConnections:getPeer(ip, port, caller_ip, caller_port)
 	local user_id = self.repo:getConnectionUser(ip, port)
 	local user = self:_getUser(user_id)
 	local icc_peer = self.queues:getPeer(self:getId(ip, port), self:getId(caller_ip, caller_port))
-	return Peer(self.task_handler, icc_peer, user)
+	return Peer(self.task_handler, icc_peer, user, ip, port)
 end
 
 ---@param caller_ip string
@@ -148,7 +133,7 @@ function UserConnections:getPeers(caller_ip, caller_port)
 			local user_id = self.repo:getConnectionUser(ip, port)
 			local user = self:_getUser(user_id)
 			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-			table.insert(peers, Peer(self.task_handler, icc_peer, user))
+			table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
 		end
 	end
 	return peers
@@ -169,7 +154,7 @@ function UserConnections:getPeersForUser(user_id, caller_ip, caller_port)
 		if ip and port then
 			if self.repo:getConnectionUser(ip, port) == user_id then
 				local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-				table.insert(peers, Peer(self.task_handler, icc_peer, user))
+				table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
 			end
 		end
 	end

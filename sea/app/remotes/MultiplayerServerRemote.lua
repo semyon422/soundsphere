@@ -1,6 +1,6 @@
 local class = require("class")
 
----@class sea.MultiplayerServerRemote: sea.IServerRemote
+---@class sea.MultiplayerServerRemote: sea.IServerRemoteContext
 ---@operator call: sea.MultiplayerServerRemote
 local MultiplayerServerRemote = class()
 
@@ -21,7 +21,7 @@ end
 
 ---@return sea.User[]
 function MultiplayerServerRemote:getUsers()
-	return self.multiplayer:getUsers(self.ip, self.port)
+	return self.multiplayer:getUsers(self.peer)
 end
 
 ---@return sea.User
@@ -38,7 +38,7 @@ end
 ---@return integer?
 ---@return string?
 function MultiplayerServerRemote:createRoom(room_values)
-	return self.multiplayer:createRoom(self.user, room_values, self.ip, self.port)
+	return self.multiplayer:createRoom(self.peer, room_values)
 end
 
 ---@param room_id integer
@@ -46,13 +46,13 @@ end
 ---@return boolean?
 ---@return string?
 function MultiplayerServerRemote:joinRoom(room_id, password)
-	return self.multiplayer:joinRoom(self.user, room_id, password, self.ip, self.port)
+	return self.multiplayer:joinRoom(self.peer, room_id, password)
 end
 
 ---@return boolean?
 ---@return string?
 function MultiplayerServerRemote:leaveRoom()
-	return self.multiplayer:leaveRoom(self.user, self.ip, self.port)
+	return self.multiplayer:leaveRoom(self.peer)
 end
 
 ---@return sea.Room?
@@ -62,47 +62,47 @@ end
 
 ---@param chartplay_computed sea.ChartplayComputed
 function MultiplayerServerRemote:setChartplayComputed(chartplay_computed)
-	self.multiplayer:setChartplayComputed(self.user, chartplay_computed, self.ip, self.port)
+	self.multiplayer:setChartplayComputed(self.peer, chartplay_computed)
 end
 
 function MultiplayerServerRemote:switchReady()
-	self.multiplayer:switchReady(self.user, self.ip, self.port)
+	self.multiplayer:switchReady(self.peer)
 end
 
 ---@param found boolean
 function MultiplayerServerRemote:setChartFound(found)
-	self.multiplayer:setChartFound(self.user, found, self.ip, self.port)
+	self.multiplayer:setChartFound(self.peer, found)
 	return true
 end
 
 ---@param is_playing boolean
 function MultiplayerServerRemote:setPlaying(is_playing)
-	self.multiplayer:setPlaying(self.user, is_playing, self.ip, self.port)
+	self.multiplayer:setPlaying(self.peer, is_playing)
 end
 
 ---@param msg string
 function MultiplayerServerRemote:sendMessage(msg)
-	self.multiplayer:sendLocalMessage(self.user, msg, self.ip, self.port)
+	self.multiplayer:sendLocalMessage(self.peer, msg)
 end
 
 ---@param room_values sea.RoomUpdate
 ---@return boolean?
 ---@return string?
 function MultiplayerServerRemote:updateRoom(room_values)
-	return self.multiplayer:updateLocalRoom(self.user, room_values, self.ip, self.port)
+	return self.multiplayer:updateLocalRoom(self.peer, room_values)
 end
 
 ---@param user_id integer
 function MultiplayerServerRemote:kickUser(user_id)
-	self.multiplayer:kickLocalUser(self.user, user_id, self.ip, self.port)
+	self.multiplayer:kickLocalUser(self.peer, user_id)
 end
 
 function MultiplayerServerRemote:startMatch()
-	self.multiplayer:startLocalMatch(self.user, self.ip, self.port)
+	self.multiplayer:startLocalMatch(self.peer)
 end
 
 function MultiplayerServerRemote:stopMatch()
-	self.multiplayer:stopLocalMatch(self.user, self.ip, self.port)
+	self.multiplayer:stopLocalMatch(self.peer)
 end
 
 return MultiplayerServerRemote

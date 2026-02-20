@@ -98,57 +98,41 @@ function Domain:transaction(f, ...)
 	end
 end
 
----@param ip string
----@param port integer
----@param user_id? integer
-function Domain:onConnect(ip, port, user_id)
-	self.user_connections:onConnect(ip, port, user_id)
-	local peer = self.user_connections:getPeer(ip, port, ip, port)
-	if peer then
-		self.multiplayer:connected(peer, ip, port)
-	end
+---@param peer sea.Peer
+function Domain:onConnect(peer)
+	self.user_connections:onConnect(peer.ip, peer.port, peer.user.id)
+	self.multiplayer:connected(peer)
 end
 
----@param ip string
----@param port integer
----@param user_id? integer
-function Domain:onDisconnect(ip, port, user_id)
-	local peer = self.user_connections:getPeer(ip, port, ip, port)
-	if peer then
-		self.multiplayer:disconnected(peer, ip, port)
-	end
-	self.user_connections:onDisconnect(ip, port, user_id)
-	self.multiplayer:pushUsers(ip, port)
+---@param peer sea.Peer
+function Domain:onDisconnect(peer)
+	self.multiplayer:disconnected(peer)
+	self.user_connections:onDisconnect(peer.ip, peer.port, peer.user.id)
+	self.multiplayer:pushUsers(peer)
 end
 
----@param ip string
----@param port integer
+---@param peer sea.Peer
 ---@param old_user sea.User
-function Domain:onAuth(ip, port, old_user)
-	local peer = self.user_connections:getPeer(ip, port, ip, port)
-	if peer then
-		if old_user and not old_user:isAnon() and old_user.id ~= peer.user.id then
-			self.multiplayer:leaveRoom(old_user, ip, port)
-		end
-		self.multiplayer:connected(peer, ip, port)
+function Domain:onAuth(peer, old_user)
+	if old_user and not old_user:isAnon() and old_user.id ~= peer.user.id then
+		self.multiplayer:leaveRoom(peer, old_user)
 	end
+	self.multiplayer:connected(peer)
 end
 
 ---@param msg string
----@param caller_ip string
----@param caller_port integer
-function Domain:printAll(msg, caller_ip, caller_port)
-	local peers = self.user_connections:getPeers(caller_ip, caller_port)
+---@param caller_peer sea.Peer
+function Domain:printAll(msg, caller_peer)
+	local peers = self.user_connections:getPeers(caller_peer.ip, caller_peer.port)
 	for _, peer in ipairs(peers) do
 		peer.remote_no_return:print(msg)
 	end
 end
 
----@param caller_ip string
----@param caller_port integer
+---@param caller_peer sea.Peer
 ---@return number[]
-function Domain:getRandomNumbersFromAllClients(caller_ip, caller_port)
-	local peers = self.user_connections:getPeers(caller_ip, caller_port)
+function Domain:getRandomNumbersFromAllClients(caller_peer)
+	local peers = self.user_connections:getPeers(caller_peer.ip, caller_peer.port)
 	local numbers = {}
 	for _, peer in ipairs(peers) do
 		local ok, num = pcall(peer.remote.getRandomNumber, peer.remote)

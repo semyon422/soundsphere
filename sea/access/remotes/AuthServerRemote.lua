@@ -5,14 +5,14 @@ local UserInsecure = require("sea.access.UserInsecure")
 local Session = require("sea.access.Session")
 local User = require("sea.access.User")
 
----@class sea.AuthServerRemote: sea.IServerRemote
+---@class sea.AuthServerRemote: sea.IServerRemoteContext
 ---@operator call: sea.AuthServerRemote
 local AuthServerRemote = class()
 
 ---@param users sea.Users
 ---@param sessions web.Sessions
 ---@param user_connections sea.UserConnections
----@param on_auth? fun(ip: string, port: integer, old_user: sea.User)
+---@param on_auth? fun(peer: sea.Peer, old_user: sea.User)
 function AuthServerRemote:new(users, sessions, user_connections, on_auth)
 	self.users = users
 	self.sessions = sessions
@@ -64,7 +64,7 @@ function AuthServerRemote:loginByToken(token)
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port, old_user)
+		self.on_auth(self.peer, old_user)
 	end
 
 	return true
@@ -91,7 +91,7 @@ function AuthServerRemote:loginSession(req_session)
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port, old_user)
+		self.on_auth(self.peer, old_user)
 	end
 
 	return true
@@ -124,7 +124,7 @@ function AuthServerRemote:login(email, password)
 	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port, old_user)
+		self.on_auth(self.peer, old_user)
 	end
 
 	return {
@@ -154,7 +154,7 @@ function AuthServerRemote:logout()
 	end
 
 	if self.on_auth then
-		self.on_auth(self.ip, self.port, old_user)
+		self.on_auth(self.peer, old_user)
 	end
 
 	return true
