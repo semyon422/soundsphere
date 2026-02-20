@@ -35,14 +35,23 @@ function ActiveInputNotes:update()
 
 	table_util.clear(input_notes)
 
+	---@type {[rizu.LogicNote]: true}
+	local current_logic_notes = {}
+
 	for i, logic_note in ipairs(self.logic_notes) do
+		current_logic_notes[logic_note] = true
 		local input_note = cache[logic_note]
-		if input_note then
-			input_notes[i] = input_note
-		else
+		if not input_note then
 			input_note = InputNote(logic_note, input_map)
 			cache[logic_note] = input_note
-			input_notes[i] = input_note
+		end
+		input_notes[i] = input_note
+	end
+
+	-- Clean up cache to prevent memory leak
+	for logic_note in pairs(cache) do
+		if not current_logic_notes[logic_note] then
+			cache[logic_note] = nil
 		end
 	end
 end

@@ -87,19 +87,16 @@ function BassChartAudioSource:update()
 	local available = bass.BASS_ChannelGetData(self.channel, nil, bass_flags.BASS_DATA_AVAILABLE)
 
 	local need_bytes = self.buf_len - available
-	if need_bytes == 0 then
+	if need_bytes <= 0 then
 		return
 	end
 
 	ffi.fill(self.buf, need_bytes, 0)
 
-	local data_bytes = self.decoder:getData(self.buf, need_bytes)
-	if data_bytes == 0 then
-		return
-	end
+	self.decoder:getData(self.buf, need_bytes)
 
 	---@type integer
-	local bytes = bass.BASS_StreamPutData(self.channel, self.buf, data_bytes)
+	local bytes = bass.BASS_StreamPutData(self.channel, self.buf, need_bytes)
 	bass_assert(bytes ~= -1)
 end
 

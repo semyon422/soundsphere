@@ -112,11 +112,22 @@ function LogicEngine:update()
 		end
 	end
 
-	for i = #active_notes, 1, -1 do
+	-- Efficient O(N) in-place filtering
+	local n = #active_notes
+	local j = 1
+	for i = 1, n do
 		local note = active_notes[i]
-		if not note:isActive() then
-			table.remove(active_notes, i)
+		if note:isActive() then
+			if i ~= j then
+				active_notes[j] = note
+			end
+			j = j + 1
+		else
+			tracked_notes[note] = nil
 		end
+	end
+	for i = n, j, -1 do
+		active_notes[i] = nil
 	end
 end
 

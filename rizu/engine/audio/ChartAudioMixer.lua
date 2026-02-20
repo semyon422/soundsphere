@@ -29,6 +29,11 @@ function ChartAudioMixer:new(sounds, decoders)
 	end
 
 	self.position = 0
+
+	self.dec_buf_len = 0
+	self.dec_buf = nil
+
+	self.first_active_sound_index = 1
 end
 
 ---@private
@@ -102,31 +107,40 @@ function ChartAudioMixer:getData(buf, len)
 	---@type {[integer]: integer}
 	buf = ffi.cast("int16_t*", buf)
 
-	local dec_buf = ffi.new("int16_t[?]", len / 2)
-
-	-- TOOO: optimize sounds iteration
+	if self.dec_buf_len < len then
+		self.dec_buf_len = len
+		self.dec_buf = ffi.new("int16_t[?]", len / 2)
+	end
+	local dec_buf = self.dec_buf
 
 	local pos = self.position
-	for _, sound in ipairs(self.sounds) do
+	local first_active_idx = self.first_active_sound_index
+
+	for i = first_active_idx, #self.sounds do
+		local sound = self.sounds[i]
 		local start_pos = self:secondsToBytes(sound.time)
 		local end_pos = start_pos + sound.decoder:getBytesDuration()
 
-		if start_pos > pos + len then
-			break
-		end
-
-		local need_bytes = math.min(pos + len, end_pos) - math.max(pos, start_pos)
-		local offset = math.max(start_pos - pos, 0)
-		offset = offset / 2
-
-		if need_bytes > 0 then
-			local sound_pos = math.max(pos - start_pos, 0)
-			if sound_pos >= 0 and sound_pos ~= sound.decoder:getBytesPosition() then
-				sound.decoder:setBytesPosition(sound_pos)
+		if end_pos < pos then
+			if i == self.first_active_sound_index then
+				self.first_active_sound_index = i + 1
 			end
+		elseif start_pos > pos + len then
+			break
+		else
+			local need_bytes = math.min(pos + len, end_pos) - math.max(pos, start_pos)
+			local offset = math.max(start_pos - pos, 0)
+			offset = offset / 2
 
-			local bytes = sound.decoder:getData(dec_buf, need_bytes)
-			add_buffer(buf + offset, dec_buf, bytes / 2)
+			if need_bytes > 0 then
+				local sound_pos = math.max(pos - start_pos, 0)
+				if sound_pos ~= sound.decoder:getBytesPosition() then
+					sound.decoder:setBytesPosition(sound_pos)
+				end
+
+				local bytes = sound.decoder:getData(dec_buf, need_bytes)
+				add_buffer(buf + offset, dec_buf, bytes / 2)
+			end
 		end
 	end
 
@@ -150,6 +164,12 @@ end
 ---@param pos number
 function ChartAudioMixer:setPosition(pos)
 	self.position = self:secondsToBytes(pos)
+
+	-- Reset first_active_sound_index when seeking backwards
+	if self.position < (self.last_position or 0) then
+		self.first_active_sound_index = 1
+	end
+	self.last_position = self.position
 end
 
 ---@return integer
