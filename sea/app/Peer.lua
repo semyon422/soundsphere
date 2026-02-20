@@ -2,16 +2,10 @@ local class = require("class")
 local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
 local Remote = require("icc.Remote")
 
----@class sea.Peer
+---@class sea.Peer: sea.IServerRemoteContext
 ---@operator call: sea.Peer
----@field remote sea.ClientRemote
----@field remote_no_return sea.ClientRemote
----@field user sea.User
----@field session sea.Session?
----@field ip string
----@field port integer
----@field peer_id string ip:port
----@field peer sea.Peer
+---@field remote sea.ClientRemoteValidation
+---@field remote_no_return sea.ClientRemoteValidation
 local Peer = class()
 
 ---@param th icc.TaskHandler
