@@ -156,4 +156,58 @@ function test.multiple(t)
 	clean()
 end
 
+---@param t testing.T
+function test.complex(t)
+	local sounds = {
+		{time = 0},
+		{time = 0},
+		{time = 1},
+	}
+	local decoders = {
+		FakeSoundDecoder(4, 1),
+		FakeSoundDecoder(4, 1),
+		FakeSoundDecoder(4, 1),
+	}
+
+	-- Sample 0: Positive clipping (20000 + 20000 = 40000 -> 32767)
+	decoders[1].wave:setSampleInt(0, 1, 20000)
+	decoders[1].wave:setSampleInt(0, 2, 20000)
+	decoders[2].wave:setSampleInt(0, 1, 20000)
+	decoders[2].wave:setSampleInt(0, 2, 20000)
+
+	-- Sample 1: Negative clipping (-20000 + -20000 = -40000 -> -32768)
+	decoders[1].wave:setSampleInt(1, 1, -20000)
+	decoders[1].wave:setSampleInt(1, 2, -20000)
+	decoders[2].wave:setSampleInt(1, 1, -20000)
+	decoders[2].wave:setSampleInt(1, 2, -20000)
+
+	-- Sample 2: 3-way overlap at time 2 (but we can test it at any point after time 1)
+	-- Since time=1 is Sample 1 (if sample_rate=1), let's use Sample 2.
+	-- sounds[3].time = 1 means it starts at Sample 1.
+	-- So at Sample 2, all 3 are active.
+	decoders[1].wave:setSampleInt(2, 1, 10)
+	decoders[1].wave:setSampleInt(2, 2, 10)
+	decoders[2].wave:setSampleInt(2, 1, 20)
+	decoders[2].wave:setSampleInt(2, 2, 20)
+	decoders[3].wave:setSampleInt(1, 1, 30)
+	decoders[3].wave:setSampleInt(1, 2, 30)
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[10]")
+
+	-- 1. Test Positive Clipping
+	t:eq(mixer:getData(buf, 4), 4) -- Sample 0
+	t:eq(buf[0], 32767)
+	t:eq(buf[1], 32767)
+
+	-- 2. Test Negative Clipping
+	t:eq(mixer:getData(buf, 4), 4) -- Sample 1
+	t:eq(buf[0], -32768)
+	t:eq(buf[1], -32768)
+
+	-- 3. Test 3-way Overlap
+	t:eq(mixer:getData(buf, 4), 4) -- Sample 2
+	t:eq(buf[0], 60)
+	t:eq(buf[1], 60)
+end
 return test

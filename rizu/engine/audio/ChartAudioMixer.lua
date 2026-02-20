@@ -26,6 +26,8 @@ function ChartAudioMixer:new(sounds, decoders)
 			decoder = FakeSoundDecoder(1, 44100, 2)
 		}
 		self.empty = true
+		self.start_pos = 0
+		self.end_pos = 0
 	end
 
 	self.position = 0
@@ -63,7 +65,7 @@ function ChartAudioMixer:getTimeBounds()
 	if not self.sounds[1] then
 		return 0, 0
 	end
-	return self:bytesToSeconds(self.start_pos), self:bytesToSeconds(self.start_pos)
+	return self:bytesToSeconds(self.start_pos), self:bytesToSeconds(self.end_pos)
 end
 
 function ChartAudioMixer:release()
@@ -106,6 +108,8 @@ function ChartAudioMixer:getData(buf, len)
 
 	---@type {[integer]: integer}
 	buf = ffi.cast("int16_t*", buf)
+
+	ffi.fill(buf, len, 0)
 
 	if self.dec_buf_len < len then
 		self.dec_buf_len = len
@@ -163,13 +167,13 @@ end
 
 ---@param pos number
 function ChartAudioMixer:setPosition(pos)
-	self.position = self:secondsToBytes(pos)
+	local new_pos = self:secondsToBytes(pos)
 
 	-- Reset first_active_sound_index when seeking backwards
-	if self.position < (self.last_position or 0) then
+	if new_pos < self.position then
 		self.first_active_sound_index = 1
 	end
-	self.last_position = self.position
+	self.position = new_pos
 end
 
 ---@return integer
