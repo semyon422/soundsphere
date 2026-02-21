@@ -76,8 +76,8 @@ function test.states_and_updates(t)
 	t:eq(v_killed.state, View.State.Active)
 	t:eq(v_detached.state, View.State.Active)
 
-	v_killed.state = View.State.Killed
-	v_detached.state = View.State.Detached
+	v_killed:kill()
+	v_detached:detach()
 
 	engine:update(0.016, 0, 0)
 
@@ -92,6 +92,13 @@ function test.states_and_updates(t)
 	t:eq(engine.removal_deferred[1], v_killed)
 	t:eq(#engine.detach_deferred, 1)
 	t:eq(engine.detach_deferred[1], v_detached)
+
+	-- Only one will remain
+	t:eq(#engine.root.children, 1)
+	t:eq(engine.root.children[1], v_active)
+
+	-- Verify destroyed
+	t:eq(v_killed.children, nil)
 end
 
 return test

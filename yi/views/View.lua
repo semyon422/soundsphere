@@ -117,6 +117,14 @@ function View:updateTransforms()
 	end
 end
 
+function View:kill()
+	self.state = State.Killed
+end
+
+function View:detach()
+	self.state = State.Detached
+end
+
 ---@return number
 function View:getWidth()
 	return self.layout_box.x.preferred_size

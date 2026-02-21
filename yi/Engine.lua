@@ -67,6 +67,23 @@ function Engine:updateView(view, dt)
 	end
 end
 
+---@private
+---@param view yi.View
+---@param kill boolean
+function Engine:remove(view, kill)
+	local parent = view.parent
+	if parent then
+		local idx = table_util.indexof(parent.children, view)
+		if idx then
+			table.remove(parent.children, idx)
+		end
+	end
+
+	if kill then
+		view:destroy()
+	end
+end
+
 ---@param dt number
 ---@param mouse_x number
 ---@param mouse_y number
@@ -82,7 +99,15 @@ function Engine:update(dt, mouse_x, mouse_y)
 
 	-- Phase 3: Layout resolution
 	-- Phase 4: Transform updates
+
 	-- Phase 5: Cleanup
+	for i = 1, #self.removal_deferred do
+		self:remove(self.removal_deferred[i], true)
+	end
+
+	for i = 1, #self.detach_deferred do
+		self:remove(self.detach_deferred[i], false)
+	end
 end
 
 function Engine:draw() end
