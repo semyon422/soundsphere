@@ -185,6 +185,11 @@ function RhythmEngine:setRate(rate)
 	self.audio_engine:setRate(rate)
 end
 
+---@param enabled boolean
+function RhythmEngine:setAudioEnabled(enabled)
+	self.audio_engine:setEnabled(enabled)
+end
+
 ---@param nearest boolean
 function RhythmEngine:setNearest(nearest)
 	self.input_engine.nearest = nearest

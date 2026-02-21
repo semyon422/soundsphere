@@ -31,12 +31,14 @@ function GameplayInteractor:loadGameplay(chartview)
 	game.resource_finder:addPath(chartview.location_dir)
 	game.resource_loader:load(chart.resources)
 
-	RhythmEngineLoader(
+	local loader = RhythmEngineLoader(
 		game.replayBase,
 		game.computeContext,
 		game.configModel.configs.settings,
 		game.resource_loader.resources
-	):load(game.rhythm_engine)
+	)
+	loader:setAudioEnabled(true)
+	loader:load(game.rhythm_engine)
 
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder

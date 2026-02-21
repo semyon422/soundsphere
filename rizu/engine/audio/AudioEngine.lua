@@ -1,11 +1,8 @@
 local class = require("class")
 local Wave = require("audio.Wave")
 local ChartAudio = require("rizu.engine.audio.ChartAudio")
-local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
-local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
 local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
 local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
-local BassMixerSource = require("rizu.engine.audio.BassMixerSource")
 
 ---@class rizu.AudioEngine
 ---@operator call: rizu.AudioEngine
@@ -13,22 +10,40 @@ local BassMixerSource = require("rizu.engine.audio.BassMixerSource")
 ---@field foregroundSource rizu.IChartAudioSource
 local AudioEngine = class()
 
+AudioEngine.DecoderClass = require("rizu.engine.audio.FakeSoundDecoder")
+AudioEngine.SourceClass = require("rizu.engine.audio.FakeChartAudioSource")
+AudioEngine.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
+
 AudioEngine.source = IChartAudioSource()
 AudioEngine.foregroundSource = IChartAudioSource()
 AudioEngine.music_volume = 1
 AudioEngine.effects_volume = 1
 
 function AudioEngine:new()
+	---@type {[string]: audio.Wave}
 	self.soundDataCache = {}
 end
 
+---@param enabled boolean
+function AudioEngine:setEnabled(enabled)
+	if enabled then
+		self.DecoderClass = require("rizu.engine.audio.BassSoundDecoder")
+		self.SourceClass = require("rizu.engine.audio.BassChartAudioSource")
+		self.MixerSourceClass = require("rizu.engine.audio.BassMixerSource")
+	else
+		self.DecoderClass = require("rizu.engine.audio.FakeSoundDecoder")
+		self.SourceClass = require("rizu.engine.audio.FakeChartAudioSource")
+		self.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
+	end
+end
+
 ---@param chart ncdk2.Chart
----@param resources {[string]: string}
+---@param resources {[string]: string}?
 ---@param auto_key_sound boolean?
 function AudioEngine:load(chart, resources, auto_key_sound)
-	self.resources = resources
+	self.resources = resources or {}
 
-	self.foregroundSource = BassMixerSource()
+	self.foregroundSource = self.MixerSourceClass()
 	self.foregroundSource:setVolume(self.effects_volume)
 
 	local chart_audio = ChartAudio()
@@ -36,18 +51,18 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 
 	chart_audio:load(chart, auto_key_sound)
 
-	---@type {[integer]: rizu.BassSoundDecoder}
+	---@type {[integer]: rizu.ISoundDecoder}
 	local decoders = {}
 	for i, sound in ipairs(chart_audio.sounds) do
-		local data = resources[sound.name]
+		local data = self.resources[sound.name]
 		if data then
-			decoders[i] = BassSoundDecoder(data)
+			decoders[i] = self.DecoderClass(data)
 		end
 	end
 
 	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
 	if not self.mixer.empty then
-		self.source = BassChartAudioSource(self.mixer)
+		self.source = self.SourceClass(self.mixer)
 		self.source:setVolume(self.music_volume)
 	end
 end
@@ -56,12 +71,15 @@ end
 ---@param volume number?
 ---@param offset number?
 function AudioEngine:playSample(name, volume, offset)
+	if not self.resources then
+		return
+	end
 	local data = self.resources[name]
 	if not data then
 		return
 	end
 
-	local decoder = BassSoundDecoder(data)
+	local decoder = self.DecoderClass(data)
 	if offset and offset > 0 then
 		decoder:setPosition(offset)
 	end
@@ -69,16 +87,23 @@ function AudioEngine:playSample(name, volume, offset)
 end
 
 function AudioEngine:unload()
-	self.source:release()
-	self.source = IChartAudioSource()
+	if self.source then
+		self.source:release()
+		self.source = IChartAudioSource()
+	end
 
 	if self.mixer then
 		self.mixer:release()
 		self.mixer = nil
 	end
 
-	self.foregroundSource:release()
+	if self.foregroundSource then
+		self.foregroundSource:release()
+		self.foregroundSource = IChartAudioSource()
+	end
 
+	self.chart_audio = nil
+	self.resources = nil
 	self.soundDataCache = {}
 end
 
