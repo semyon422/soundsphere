@@ -57,8 +57,7 @@ end
 ---@param chords table
 ---@param column number
 function ShortNoteView:fillChords(chords, column)
-	local startNote = self.graphicalNote.linked_note.startNote
-	local time = startNote:getTime()
+	local time = self.graphicalNote.linked_note.startNote:getTime()
 
 	chords[time] = chords[time] or {}
 	local chord = chords[time]

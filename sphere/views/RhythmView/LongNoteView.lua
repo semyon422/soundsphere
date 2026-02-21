@@ -102,8 +102,9 @@ end
 ---@param chords table
 ---@param column number
 function LongNoteView:fillChords(chords, column)
-	local startNote = self.graphicalNote.startNote
-	local endNote = self.graphicalNote.endNote
+	local note = self.graphicalNote.linked_note
+	local startNote = note.startNote
+	local endNote = note.endNote
 
 	if startNote then
 		local time = startNote:getTime()

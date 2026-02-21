@@ -27,13 +27,12 @@ function RhythmView:fillChord(note)
 
 	noteView.noteSkin = noteSkin
 	noteView.graphicalNote = note
-
-	local column = noteSkin:getColumns(note)[1]
-	noteView.column = column
 	noteView.chords = self.chords
 
-	if column and column <= noteSkin.columnsCount and noteView.fillChords and noteView:isVisible() then
-		noteView:fillChords(self.chords, column)
+	for _, column in ipairs(noteSkin:getColumns(note)) do
+		if column and column <= noteSkin.columnsCount and noteView.fillChords and noteView:isVisible() then
+			noteView:fillChords(self.chords, column)
+		end
 	end
 end
 
