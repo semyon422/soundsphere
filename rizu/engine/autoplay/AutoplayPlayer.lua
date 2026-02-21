@@ -48,7 +48,7 @@ function AutoplayPlayer:update(engine, next_time)
 	local notes_to_check = {}
 	for _, note in ipairs(active_notes) do
 		-- Only consider notes that haven't been "started" yet by autoplay
-		if note.state == "clear" then
+		if note.state == "clear" and note:isPlayable() then
 			table.insert(notes_to_check, note)
 		end
 	end

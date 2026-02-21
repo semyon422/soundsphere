@@ -48,29 +48,30 @@ function TestChartFactory:create(inputmode_str, notes_table)
 
 		if n.column then
 			local column = inputMap[n.column] or inputMap[1]
+			local note_type = n.type or (n.end_time and "hold" or "tap")
 
 			if n.end_time then
 				-- Long Note
-				local start_note = Note(vp, column, "hold", 1)
+				local start_note = Note(vp, column, note_type, 1)
 				
 				local end_point = layer:getPoint(n.end_time)
 				local end_vp = visual:getPoint(end_point)
-				local end_note = Note(end_vp, column, "hold", -1)
+				local end_note = Note(end_vp, column, note_type, -1)
 				
 				chart.notes:insert(start_note)
 				chart.notes:insert(end_note)
 				
-				note_types_count.hold = note_types_count.hold + 1
+				note_types_count[note_type] = (note_types_count[note_type] or 0) + 1
 				notes_count = notes_count + 1
 				judges_count = judges_count + 2
 				min_time = math.min(min_time, n.time)
 				max_time = math.max(max_time, n.end_time)
 			else
 				-- Tap Note
-				local note = Note(vp, column, "tap", 0)
+				local note = Note(vp, column, note_type, 0)
 				chart.notes:insert(note)
 				
-				note_types_count.tap = note_types_count.tap + 1
+				note_types_count[note_type] = (note_types_count[note_type] or 0) + 1
 				notes_count = notes_count + 1
 				judges_count = judges_count + 1
 				min_time = math.min(min_time, n.time)

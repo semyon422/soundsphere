@@ -14,6 +14,7 @@ local VirtualInputEvent = class()
 ---@param column integer
 ---@param pos [number, number]?
 function VirtualInputEvent:new(id, value, column, pos)
+	assert(id, "VirtualInputEvent requires an id")
 	self.id = id
 	self.value = value
 	self.column = column

@@ -1,6 +1,7 @@
 local class = require("class")
 local TapLogicNote = require("rizu.engine.logic.notes.TapLogicNote")
 local HoldLogicNote = require("rizu.engine.logic.notes.HoldLogicNote")
+local SimpleLogicNote = require("rizu.engine.logic.notes.SimpleLogicNote")
 
 ---@class rizu.LogicNoteFactory
 ---@operator call: rizu.LogicNoteFactory
@@ -10,13 +11,13 @@ local LogicNoteFactory = class()
 local notes = {
 	tap = TapLogicNote,
 	hold = HoldLogicNote,
-	laser = nil,
-	drumroll = nil,
-	mine = nil,
-	shade = nil,
-	fake = nil,
-	sample = nil,
-	sprite = nil,
+	laser = HoldLogicNote,
+	drumroll = HoldLogicNote,
+	mine = SimpleLogicNote,
+	shade = SimpleLogicNote,
+	fake = SimpleLogicNote,
+	sample = SimpleLogicNote,
+	sprite = SimpleLogicNote,
 }
 
 ---@param logic_info rizu.LogicInfo

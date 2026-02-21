@@ -16,7 +16,7 @@ function BottomNotesHandler:new(active_notes)
 	---@type {[rizu.VirtualInputEventId]: any}
 	self.event_values = {}
 
-	self.event = VirtualInputEvent()
+	self.event = VirtualInputEvent(0)
 end
 
 function BottomNotesHandler:update()

@@ -27,6 +27,11 @@ function LogicNote:isActive()
 end
 
 ---@return boolean
+function LogicNote:isPlayable()
+	return true
+end
+
+---@return boolean
 function LogicNote:isEarly()
 	return self.logic_info:sub(self:getStartTime()) < 0
 end

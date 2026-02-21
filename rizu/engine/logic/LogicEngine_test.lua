@@ -56,4 +56,26 @@ function test.track_active_notes(t)
 	t:eq(le:getActiveNotesCount(), 0)
 end
 
+---@param t testing.T
+function test.simple_logic_note_auto_clear(t)
+	local logic_info = LogicInfo()
+	local le = LogicEngine(logic_info)
+
+	local res = tcf:create("4key", {
+		{time = 1, column = 1, type = "shade"},
+	})
+
+	le:load(res.chart)
+
+	-- Note added at t=0 (with default 1s scroll range)
+	logic_info.time = 0
+	le:update()
+	t:eq(le:getActiveNotesCount(), 1)
+	
+	-- Note should be passed at t=1
+	logic_info.time = 1.0
+	le:update()
+	t:eq(le:getActiveNotesCount(), 0)
+end
+
 return test

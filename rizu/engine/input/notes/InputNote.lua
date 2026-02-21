@@ -21,7 +21,7 @@ end
 ---@param event rizu.VirtualInputEvent
 ---@return boolean
 function InputNote:match(event)
-	return self.input_map[self.logic_note:getColumn()] == event.column
+	return self.logic_note:isPlayable() and self.input_map[self.logic_note:getColumn()] == event.column
 end
 
 ---@param value any

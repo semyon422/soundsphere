@@ -25,7 +25,6 @@ local HoldLogicNote = LogicNote + {}
 ---@param note ncdk2.LinkedNote
 ---@param logic_info rizu.LogicInfo
 function HoldLogicNote:new(note, logic_info)
-	assert(note:getType() == "hold")
 	assert(note:isLong())
 
 	LogicNote.new(self, note, logic_info)
