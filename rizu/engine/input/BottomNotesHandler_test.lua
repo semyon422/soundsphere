@@ -74,4 +74,21 @@ function test.pause_bottom_notes_keep_pressed_id_changed(t)
 	t:tdeq(state, {a = true, b = true, count = 4})
 end
 
+---@param t testing.T
+function test.is_column_pressed(t)
+	local notes = {}
+	local h = BottomNotesHandler(FakeActiveInputNotes(notes))
+
+	h:receive({id = 1, column = 1, value = true})
+	t:assert(h:isColumnPressed(1))
+	t:assert(not h:isColumnPressed(2))
+
+	h:receive({id = 2, column = 2, value = "left"})
+	t:assert(h:isColumnPressed(2))
+
+	h:receive({id = 1, column = 1, value = false})
+	t:assert(not h:isColumnPressed(1))
+	t:assert(h:isColumnPressed(2))
+end
+
 return test

@@ -65,4 +65,15 @@ function BottomNotesHandler:receive(event)
 	end
 end
 
+---@param column integer
+---@return boolean
+function BottomNotesHandler:isColumnPressed(column)
+	for id, col in pairs(self.event_columns) do
+		if col == column and self.event_values[id] then
+			return true
+		end
+	end
+	return false
+end
+
 return BottomNotesHandler

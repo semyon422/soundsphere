@@ -155,4 +155,10 @@ function InputEngine:resume()
 	self.input_pauser:resume(self.catched_notes)
 end
 
+---@param column integer
+---@return boolean
+function InputEngine:isColumnPressed(column)
+	return self.bottom_notes_handler:isColumnPressed(column)
+end
+
 return InputEngine

@@ -44,6 +44,13 @@ function InputView:receive(event)
 	end
 end
 
+function InputView:draw()
+	local re = self.game and self.game.rhythm_engine
+	if re and self.column then
+		self:switchPressed(re:isColumnPressed(self.column))
+	end
+end
+
 ---@param value boolean
 function InputView:switchPressed(value)
 	if self.pressed then

@@ -240,6 +240,12 @@ function RhythmEngine:setInputOffset(offset)
 	self.logic_offset = offset
 end
 
+---@param column integer
+---@return boolean
+function RhythmEngine:isColumnPressed(column)
+	return self.input_engine:isColumnPressed(column)
+end
+
 ---@param offset number
 function RhythmEngine:setVisualOffset(offset)
 	self.visual_offset = offset

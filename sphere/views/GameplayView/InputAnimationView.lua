@@ -6,31 +6,22 @@ local InputAnimationView = class()
 
 function InputAnimationView:load()
 	self.count = 0
+	self.last_pressed = false
 end
 
----@param event table
-function InputAnimationView:receive(event)
-	local key = event and event[1]
-
-	local found
-	for _, input in ipairs(self.inputs) do
-		if key == input then
-			found = true
-			break
+function InputAnimationView:draw()
+	local re = self.game and self.game.rhythm_engine
+	if re and self.column then
+		local pressed = re:isColumnPressed(self.column)
+		if pressed ~= self.last_pressed then
+			self:switchPressed(pressed)
+			self.last_pressed = pressed
 		end
 	end
-	if not found then
-		return
-	end
+end
 
-	if event.name == "keypressed" then
-		self.count = self.count + 1
-	elseif event.name == "keyreleased" then
-		self.count = self.count - 1
-	end
-
-	self.count = math.max(self.count, 0)  -- first event can be release
-	if self.count > 0 then
+function InputAnimationView:switchPressed(pressed)
+	if pressed then
 		-- if self.released then
 		-- 	self.released:setTime(math.huge)
 		-- end
