@@ -56,8 +56,6 @@ end
 function RhythmEngine:load()
 	local chart = self.chart
 
-	self:pause()
-
 	self.active_input_notes:setInputMap(chart.inputMode:getInputMap())
 	self.logic_engine:load(chart)
 	self.visual_engine:load(chart)
