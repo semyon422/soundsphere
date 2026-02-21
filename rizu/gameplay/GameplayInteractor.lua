@@ -181,6 +181,7 @@ function GameplayInteractor:retry()
 
 	game.rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
 
+	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 	self:play()
 end
 

@@ -44,34 +44,6 @@ function test.time_to_prepare(t)
 end
 
 ---@param t testing.T
-function test.retry(t)
-	local re = RhythmEngine()
-
-	local chart_chartmeta = get_chart([[
-0100 =1
-0010 =2
-]])
-
-	local chartdiff = {notes_count = 2}
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, chartdiff)
-	re:load()
-
-	re:setPlayTime(1, 2)
-	re:setTimeToPrepare(2)
-
-	re:setGlobalTime(0)
-	re:play()
-
-	t:eq(re:getTime(), -1)
-
-	re:setGlobalTime(1)
-	t:eq(re:getTime(), 0)
-
-	re:retry()
-	t:eq(re:getTime(), -1)
-end
-
----@param t testing.T
 function test.skip_intro(t)
 	local re = RhythmEngine()
 
@@ -113,22 +85,23 @@ function test.visual_rate_with_rate(t)
 end
 ---@param t testing.T
 function test.state_reset(t)
-	local re = RhythmEngine()
-
 	local chart_chartmeta = get_chart([[
 1000 =1
 0100 =50
 ]])
+	local chartdiff = {start_time = 1, duration = 2, notes_count = 2}
 
-	local chartdiff = {start_time = 1, duration = 2}
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, chartdiff)
+	local function create_and_run()
+		local re = RhythmEngine()
+		re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, chartdiff)
+		re.audio_engine.getStartTime = function() return 100 end
+		re:load()
+		re:setPlayTime(1, 2)
+		re:setTimeToPrepare(0.5)
+		return re
+	end
 
-	re.audio_engine.getStartTime = function() return 100 end
-
-	re:load()
-	re:setPlayTime(1, 2)
-	re:setTimeToPrepare(0.5)
-
+	local re = create_and_run()
 	re:setGlobalTime(0)
 	re:play()
 	re:setGlobalTime(1)
@@ -139,10 +112,13 @@ function test.state_reset(t)
 	t:assert(#re.visual_engine.visible_notes > 0)
 	t:assert(#re.logic_engine.active_notes > 0)
 
-	re:retry()
+	re:unload()
+	re = create_and_run()
 
-	-- After retry, it should be clean and time reset to init_time (1)
+	-- After recreation (retry), it should be clean and time reset to init_time (0.5)
 	t:eq(re:getTime(), 0.5)
+	-- Initial state: only first note might be visible depending on implementation
+	-- but it shouldn't have the 1.5s state.
 	t:eq(#re.visual_engine.visible_notes, 1)
 	t:eq(#re.logic_engine.active_notes, 2)
 end

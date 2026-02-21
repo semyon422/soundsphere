@@ -106,12 +106,6 @@ function RhythmEngine:unload()
 	self.score_engine = nil
 end
 
-function RhythmEngine:retry()
-	self:load()
-	self:loadAudio(self.chart_resources)
-	self:setTime(self.play_progress.init_time)
-end
-
 function RhythmEngine:update()
 	self.logic_info.time = self.time_engine.time - self.logic_offset
 	self.visual_info.time = self.time_engine.time - self.visual_offset

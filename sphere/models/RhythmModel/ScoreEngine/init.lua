@@ -42,8 +42,6 @@ end
 function ScoreEngine:load(chartdiff)
 	self.chartdiff = chartdiff
 
-	self.events = {}
-
 	---@type sphere.ScoreSystem[]
 	self.scoreSystems = {}
 
@@ -65,8 +63,6 @@ function ScoreEngine:load(chartdiff)
 		table.insert(self.scoreSystems, v)
 		v:setNotesCount(chartdiff.notes_count)
 	end
-
-	self.sequence = {}
 end
 
 function ScoreEngine:selectDefault()
