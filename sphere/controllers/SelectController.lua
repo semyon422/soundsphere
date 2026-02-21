@@ -113,7 +113,8 @@ function SelectController:update()
 	local selectModel = self.selectModel
 	if selectModel:isChanged() then
 		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
-		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
+		local audio_path, preview_time, mode = selectModel:getAudioPathPreview()
+		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, selectModel.chartview)
 		self.previewModel:onLoad(function()
 			self.chartPreviewModel:setChartview(selectModel.chartview)
 		end)
