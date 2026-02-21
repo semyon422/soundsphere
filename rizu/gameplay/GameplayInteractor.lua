@@ -4,9 +4,8 @@ local GameplayTimings = require("rizu.gameplay.GameplayTimings")
 local RhythmEngineLoader = require("rizu.gameplay.RhythmEngineLoader")
 local InputBinder = require("rizu.input.InputBinder")
 local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
-local ReplayPlayer = require("rizu.engine.replay.ReplayPlayer")
-local ReplayRecorder = require("rizu.engine.replay.ReplayRecorder")
-local AutoplayPlayer = require("rizu.engine.autoplay.AutoplayPlayer")
+local GameplaySession = require("rizu.gameplay.GameplaySession")
+local ScoreSaver = require("rizu.gameplay.ScoreSaver")
 
 ---@class rizu.GameplayInteractor
 ---@operator call: rizu.GameplayInteractor
@@ -15,8 +14,18 @@ local GameplayInteractor = class()
 ---@param game sphere.GameController
 function GameplayInteractor:new(game)
 	self.game = game
-	self.autoplay_player = AutoplayPlayer()
-	self.replay_recorder = ReplayRecorder()
+	self.replaying = false
+	self.autoplay = false
+
+	self.score_saver = ScoreSaver(
+		game.fs,
+		game.rhythm_engine,
+		game.persistence.cacheModel,
+		game.persistence.configModel,
+		game.seaClient,
+		game.replayBase,
+		game.computeContext
+	)
 end
 
 function GameplayInteractor:loadGameplay(chartview)
@@ -35,19 +44,7 @@ function GameplayInteractor:loadGameplay(chartview)
 	game.resource_finder:addPath(chartview.location_dir)
 	game.resource_loader:load(chart.resources)
 
-	local autoplay = game.rhythm_engine and game.rhythm_engine.autoplay
-
-	game:recreateRhythmEngine()
-
-	local loader = RhythmEngineLoader(
-		game.replayBase,
-		game.computeContext,
-		game.configModel.configs.settings,
-		game.resource_loader.resources
-	)
-	loader:setAudioEnabled(true)
-	loader:setAutoplay(autoplay)
-	loader:load(game.rhythm_engine)
+	self:load(self.autoplay)
 
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
 	self.input_binder = input_binder
@@ -57,8 +54,6 @@ function GameplayInteractor:loadGameplay(chartview)
 	local noteSkin = game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
 	self.noteSkin = noteSkin
-
-	self.replay_recorder:clear()
 
 	game.multiplayerModel.client:setPlaying(true)
 	game.offsetController:updateOffsets()
@@ -76,19 +71,57 @@ function GameplayInteractor:loadGameplay(chartview)
 	fileFinder:addPath("userdata/hitsounds")
 	fileFinder:addPath("userdata/hitsounds/midi")
 
-	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 	self:play()
 
 	self.loaded = true
 end
 
+---@param autoplay boolean?
+function GameplayInteractor:load(autoplay)
+	local game = self.game
+
+	game:recreateRhythmEngine()
+
+	local loader = RhythmEngineLoader(
+		game.replayBase,
+		game.computeContext,
+		game.configModel.configs.settings,
+		game.resource_loader.resources
+	)
+	loader:setAudioEnabled(not self.audio_disabled)
+	loader:load(game.rhythm_engine)
+
+	self.gameplay_session = GameplaySession(game.rhythm_engine)
+	
+	local play_type = "manual"
+	if self.replaying then
+		play_type = "replay"
+	elseif autoplay then
+		play_type = "auto"
+	end
+	
+	self.gameplay_session:setPlayType(play_type)
+	if play_type == "replay" and self.replay_frames then
+		self.gameplay_session:setReplayFrames(self.replay_frames)
+	end
+
+	self.score_saver.rhythm_engine = game.rhythm_engine
+
+	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
+end
+
 ---@param frames rizu.ReplayFrame[]
 function GameplayInteractor:setReplayFrames(frames)
-	self.replay_player = ReplayPlayer(frames)
+	self.replay_frames = frames
+	if self.gameplay_session then
+		self.gameplay_session:setReplayFrames(frames)
+	end
 end
 
 function GameplayInteractor:unloadGameplay()
 	self.loaded = false
+	self.replaying = false
+	self.autoplay = false
 	local game = self.game
 
 	game.discordModel:setPresence({})
@@ -108,21 +141,7 @@ function GameplayInteractor:update()
 	end
 
 	local game = self.game
-
-	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
-
-	local next_time = game.rhythm_engine:getTime(true)
-
-	if game.rhythm_engine.autoplay then
-		self.autoplay_player:update(game.rhythm_engine, next_time)
-	end
-
-	if self.replaying and self.replay_player then
-		self.replay_player:update(game.rhythm_engine, next_time)
-	end
-
-	game.rhythm_engine:update()
-
+	self.gameplay_session:update(game.global_timer:getTime())
 	game.pauseModel:update()
 end
 
@@ -140,19 +159,20 @@ end
 
 ---@return boolean
 function GameplayInteractor:hasResult()
-	local game = self.game
-	return game.rhythm_engine:hasResult() and not self.replaying
+	return self.gameplay_session:hasResult()
+end
+
+function GameplayInteractor:saveScore()
+	self.score_saver:saveScore()
 end
 
 function GameplayInteractor:play()
-	local game = self.game
-	game.rhythm_engine:play()
+	self.gameplay_session:play()
 	-- self:discordPlay()
 end
 
 function GameplayInteractor:pause()
-	local game = self.game
-	game.rhythm_engine:pause()
+	self.gameplay_session:pause()
 	-- self:discordPause()
 end
 
@@ -160,33 +180,17 @@ function GameplayInteractor:retry()
 	local game = self.game
 	local replayBase = game.replayBase
 
-	self.replaying = false
-
 	game.pauseModel:load()
 	-- self.resourceModel:rewind()
 
-	local autoplay = game.rhythm_engine and game.rhythm_engine.autoplay
-
-	game:recreateRhythmEngine()
-
-	local loader = RhythmEngineLoader(
-		game.replayBase,
-		game.computeContext,
-		game.configModel.configs.settings,
-		game.resource_loader.resources
-	)
-	loader:setAudioEnabled(true)
-	loader:setAutoplay(autoplay)
-	loader:load(game.rhythm_engine)
+	self:load(self.autoplay)
 
 	game.rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
-
-	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 	self:play()
 end
 
 function GameplayInteractor:skipIntro()
-	self.game.rhythm_engine:skipIntro()
+	self.gameplay_session:skipIntro()
 end
 
 function GameplayInteractor:skip()
@@ -211,18 +215,12 @@ end
 
 ---@param event table
 function GameplayInteractor:receive(event)
-	if self.replaying or self.game.rhythm_engine.autoplay then
-		return
-	end
-
 	local game = self.game
 	local physic_event = KeyPhysicInputEvent.fromInputChangedEvent(event)
 	if physic_event then
 		local virtual_event = self.input_binder:transform(physic_event)
 		if virtual_event then
-			game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
-			game.rhythm_engine:receive(virtual_event)
-			self.replay_recorder:record(game.rhythm_engine:getTime(), virtual_event)
+			self.gameplay_session:receive(virtual_event, game.global_timer:getTime())
 		end
 	end
 end

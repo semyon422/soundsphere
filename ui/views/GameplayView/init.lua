@@ -66,7 +66,7 @@ function GameplayView:draw()
 	if
 		not love.window.hasFocus() and
 		state == "play" and
-		not rhythm_engine.autoplay and
+		not self.game.gameplayInteractor.autoplay and
 		not isPlaying
 		-- self.game.rhythmModel.inputManager.mode ~= "internal"
 	then

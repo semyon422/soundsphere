@@ -23,8 +23,4 @@ function ReplayRecorder:getFrames()
 	return self.frames
 end
 
-function ReplayRecorder:clear()
-	self.frames = {}
-end
-
 return ReplayRecorder

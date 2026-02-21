@@ -78,14 +78,11 @@ end
 
 ---@return boolean
 function RhythmEngine:hasResult()
-	local logic_engine = self.logic_engine
 	local time_engine = self.time_engine
 	local base = self.score_engine.scores.base
 	local accuracy = self.score_engine.scores.normalscore.accuracyAdjusted
 
 	return
-		not logic_engine.autoplay and
-		not logic_engine.promode and
 		not time_engine.wind_up and
 		time_engine.time >= self.play_progress.start_time and
 		base.hitCount > 0 and
@@ -278,15 +275,6 @@ end
 
 ---@param wind_up string
 function RhythmEngine:setWindUp(wind_up)
-end
-
----@param autoplay boolean
-function RhythmEngine:setAutoplay(autoplay)
-	self.autoplay = autoplay
-end
-
----@param pro_mode boolean
-function RhythmEngine:setProMode(pro_mode)
 end
 
 function RhythmEngine:skipIntro()

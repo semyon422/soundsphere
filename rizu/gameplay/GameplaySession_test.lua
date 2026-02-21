@@ -1,0 +1,144 @@
+local GameplaySession = require("rizu.gameplay.GameplaySession")
+local RhythmEngine = require("rizu.engine.RhythmEngine")
+local ChartFactory = require("notechart.ChartFactory")
+local TimingValues = require("sea.chart.TimingValues")
+
+local cf = ChartFactory()
+local test_chart_header = [[
+# metadata
+title Title
+artist Artist
+name Name
+creator Creator
+input 4key
+
+# notes
+0000 =0
+0000 =1
+]]
+
+---@param notes string
+---@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}
+local function get_chart(notes)
+	return assert(cf:getCharts("chart.sph", test_chart_header .. notes))[1]
+end
+
+local test = {}
+
+---@param t testing.T
+function test.basic_lifecycle(t)
+	local re = RhythmEngine()
+	local gc = GameplaySession(re)
+	
+	local chart_chartmeta = get_chart([[
+1000 =2
+0100 =3
+]])
+	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 2})
+	re:setTimingValues(TimingValues())
+	re:load()
+	re:setAudioEnabled(false)
+
+	-- Test play/pause
+	local play_called = false
+	local pause_called = false
+	re.play = function() play_called = true end
+	re.pause = function() pause_called = true end
+
+	gc:play()
+	t:assert(play_called)
+
+	gc:pause()
+	t:assert(pause_called)
+
+	-- Test update
+	gc:update(100)
+	t:eq(re.time_engine.timer.global_time, 100)
+end
+
+---@param t testing.T
+function test.autoplay(t)
+	local re = RhythmEngine()
+	local gc = GameplaySession(re)
+	
+	local chart_chartmeta = get_chart([[
+1000 =2
+0100 =3
+]])
+	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 2})
+	re:setTimingValues(TimingValues())
+	re:load()
+	re:setAudioEnabled(false)
+	re.time_engine:setAdjustFunction(nil)
+	gc:setPlayType("auto")
+
+	local received_events = {}
+	re.receive = function(self, event)
+		table.insert(received_events, event)
+	end
+
+	-- Initial time setup
+	gc:update(0)
+	re:play()
+	re:setTime(0)
+	
+	-- Manually advance time by updating GameplaySession with new global time
+	gc:update(2.1) -- trigger note at =2
+	
+	t:assert(#received_events >= 2, "Autoplay should have triggered note events")
+end
+
+---@param t testing.T
+function test.input_recording(t)
+	local re = RhythmEngine()
+	local gc = GameplaySession(re)
+	
+	local chart_chartmeta = get_chart([[
+1000 =2
+]])
+	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 1})
+	re:setTimingValues(TimingValues())
+	re:load()
+	re:setAudioEnabled(false)
+
+	local event = {id = 1, value = true}
+	gc:receive(event, 0)
+
+	t:eq(#gc.replay_recorder.frames, 1)
+	t:eq(gc.replay_recorder.frames[1].event, event)
+end
+
+---@param t testing.T
+function test.has_result(t)
+	local re = RhythmEngine()
+	local gc = GameplaySession(re)
+	
+	local chart_chartmeta = get_chart([[
+1000 =2
+]])
+	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 1})
+	re:setTimingValues(TimingValues())
+	re:load()
+	re:setAudioEnabled(false)
+	re:setPlayTime(0, 10)
+
+	-- Should not have result initially
+	t:assert(not gc:hasResult())
+
+	-- Mock score engine to have some hits
+	re.score_engine.scores.base.hitCount = 1
+	re:setTime(5)
+	re.score_engine.scores.normalscore.accuracyAdjusted = 0.95
+	
+	t:assert(gc:hasResult())
+	
+	-- Should NOT have result if replaying
+	gc:setPlayType("replay")
+	t:assert(not gc:hasResult())
+	
+	-- Should NOT have result if autoplay
+	gc:setPlayType("auto")
+	t:assert(not gc:hasResult())
+end
+
+return test
