@@ -34,6 +34,7 @@ function ChartAudioMixer:new(sounds, decoders)
 
 	self.dec_buf_len = 0
 	self.dec_buf = nil
+	self.mix_buf = nil
 
 	self.first_active_sound_index = 1
 end
@@ -74,24 +75,33 @@ function ChartAudioMixer:release()
 	end
 end
 
----@param dst {[integer]: integer}
+---@param dst {[integer]: number}
 ---@param src {[integer]: integer}
 ---@param size integer
-local function add_buffer(dst, src, size)
-	---@type {[integer]: integer}
-	local dst_ptr = ffi.cast("int16_t*", dst)
+local function add_buffer_float(dst, src, size)
 	---@type {[integer]: integer}
 	local src_ptr = ffi.cast("int16_t*", src)
 
 	for i = 0, size - 1 do
-		local sum = dst_ptr[i] + src_ptr[i]
+		dst[i] = dst[i] + src_ptr[i]
+	end
+end
 
-		if sum > 32767 then
+---@param dst {[integer]: integer}
+---@param src {[integer]: number}
+---@param size integer
+local function apply_mix(dst, src, size)
+	---@type {[integer]: integer}
+	local dst_ptr = ffi.cast("int16_t*", dst)
+
+	for i = 0, size - 1 do
+		local val = src[i]
+		if val > 32767 then
 			dst_ptr[i] = 32767
-		elseif sum < -32768 then
+		elseif val < -32768 then
 			dst_ptr[i] = -32768
 		else
-			dst_ptr[i] = sum
+			dst_ptr[i] = val
 		end
 	end
 end
@@ -105,17 +115,18 @@ function ChartAudioMixer:getData(buf, len)
 	end
 
 	len = self:floorBytes(len)
-
-	---@type {[integer]: integer}
-	buf = ffi.cast("int16_t*", buf)
-
-	ffi.fill(buf, len, 0)
+	local samples = len / 2
 
 	if self.dec_buf_len < len then
 		self.dec_buf_len = len
-		self.dec_buf = ffi.new("int16_t[?]", len / 2)
+		self.dec_buf = ffi.new("int16_t[?]", samples)
+		self.mix_buf = ffi.new("float[?]", samples)
 	end
+
 	local dec_buf = self.dec_buf
+	local mix_buf = self.mix_buf
+
+	ffi.fill(mix_buf, samples * 4, 0)
 
 	local pos = self.position
 	local first_active_idx = self.first_active_sound_index
@@ -143,10 +154,12 @@ function ChartAudioMixer:getData(buf, len)
 				end
 
 				local bytes = sound.decoder:getData(dec_buf, need_bytes)
-				add_buffer(buf + offset, dec_buf, bytes / 2)
+				add_buffer_float(mix_buf + offset, dec_buf, bytes / 2)
 			end
 		end
 	end
+
+	apply_mix(buf, mix_buf, samples)
 
 	self.position = self.position + len
 

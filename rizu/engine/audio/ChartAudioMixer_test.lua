@@ -210,4 +210,35 @@ function test.complex(t)
 	t:eq(buf[0], 60)
 	t:eq(buf[1], 60)
 end
+
+---@param t testing.T
+function test.no_intermediate_clipping(t)
+	local sounds = {
+		{time = 0},
+		{time = 0},
+		{time = 0},
+	}
+	local decoders = {
+		FakeSoundDecoder(1, 1),
+		FakeSoundDecoder(1, 1),
+		FakeSoundDecoder(1, 1),
+	}
+
+	-- 20000 + 20000 - 20000 should be 20000.
+	-- If it clipped at each step: (20000 + 20000) -> 32767, 32767 - 20000 = 12767.
+	decoders[1].wave:setSampleInt(0, 1, 20000)
+	decoders[1].wave:setSampleInt(0, 2, 20000)
+	decoders[2].wave:setSampleInt(0, 1, 20000)
+	decoders[2].wave:setSampleInt(0, 2, 20000)
+	decoders[3].wave:setSampleInt(0, 1, -20000)
+	decoders[3].wave:setSampleInt(0, 2, -20000)
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[4]")
+
+	t:eq(mixer:getData(buf, 4), 4)
+	t:eq(buf[0], 20000)
+	t:eq(buf[1], 20000)
+end
+
 return test
