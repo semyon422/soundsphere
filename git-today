@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Get the current git user
+AUTHOR=$(git config user.name)
+
+# Define the start of today
+SINCE="00:00:00"
+TODAY=$(date +%Y-%m-%d)
+
+# Calculate committed additions and deletions
+STATS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --numstat --pretty=tformat: | 
+    awk '{add += $1; del += $2} END {printf "%d %d", add, del}')
+
+ADDITIONS=$(echo $STATS | awk '{print $1}')
+DELETIONS=$(echo $STATS | awk '{print $2}')
+
+# Count the number of commits
+COMMITS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --oneline | wc -l | xargs)
+
+# Output the result
+BOLD='\033[1m'
+NC='\033[0m'
+
+echo -e "Today you've made a total of ${BOLD}${ADDITIONS:-0} additions${NC} and ${BOLD}${DELETIONS:-0} deletions${NC} across ${BOLD}${COMMITS:-0} commits${NC}."
