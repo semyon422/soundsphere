@@ -49,7 +49,7 @@ The project uses a custom decorator system (`aqua/deco.lua`) for features like p
 
 The `.editorconfig` file in the root of the repository specifies the coding style for the project. It is recommended to use an editor with EditorConfig support to ensure consistent coding style.
 
-*   **Indentation:** Tabs should be used for indentation.
+*   **Indentation:** Tabs should be used for indentation. Do not add indentation to empty lines.
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
 *   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended. Avoid using nested class definitions like `sea.app.repos.UserConnectionsRepo`, prefer using `sea.UserConnectionsRepo`.
 *   **Shared Memory:** Use the `web.SharedMemory` class (`aqua/web/nginx/SharedMemory.lua`) to access OpenResty shared dictionaries. Dictionaries must be defined in `nginx_config.lua` under the `shared_dicts` table to be automatically included in the generated `nginx.conf`.
@@ -66,6 +66,7 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
     *   **Asynchronous Delivery:** Use `ngx.thread.spawn` within websocket resources to create background loops that pop messages from shared memory queues and deliver them to clients.
 *   **Test Files:** Test files are important and should not be deleted.
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
+*   **Variable Naming (Conflicts with Globals):** Avoid using Lua global names (e.g., `type`, `table`, `string`, `pairs`) for local variables. If you must use such a name, prefix it with an underscore (e.g., `_type`).
 
 ### Testing
 
