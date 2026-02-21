@@ -5,6 +5,7 @@ local RhythmEngineLoader = require("rizu.gameplay.RhythmEngineLoader")
 local InputBinder = require("rizu.input.InputBinder")
 local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
 local ReplayPlayer = require("rizu.engine.replay.ReplayPlayer")
+local ReplayRecorder = require("rizu.engine.replay.ReplayRecorder")
 local AutoplayPlayer = require("rizu.engine.autoplay.AutoplayPlayer")
 
 ---@class rizu.GameplayInteractor
@@ -15,6 +16,7 @@ local GameplayInteractor = class()
 function GameplayInteractor:new(game)
 	self.game = game
 	self.autoplay_player = AutoplayPlayer()
+	self.replay_recorder = ReplayRecorder()
 end
 
 function GameplayInteractor:loadGameplay(chartview)
@@ -51,8 +53,7 @@ function GameplayInteractor:loadGameplay(chartview)
 	noteSkin:loadData()
 	self.noteSkin = noteSkin
 
-	---@type rizu.ReplayFrame[]
-	self.frames = {}
+	self.replay_recorder:clear()
 
 	game.multiplayerModel.client:setPlaying(true)
 	game.offsetController:updateOffsets()
@@ -111,18 +112,8 @@ function GameplayInteractor:update()
 		self.autoplay_player:update(game.rhythm_engine, next_time)
 	end
 
-	local replay_player = self.replay_player
-	if self.replaying and replay_player then
-		local offset = game.rhythm_engine.logic_offset
-		local replay_to = next_time - offset
-		local frame = replay_player:play(replay_to)
-		while frame do
-			game.rhythm_engine:setTimeNoAudio(frame.time + offset)
-			game.rhythm_engine:receive(frame.event)
-			frame = replay_player:play(replay_to)
-		end
-		assert(next_time >= game.rhythm_engine:getTime(true))
-		game.rhythm_engine:setTimeNoAudio(next_time)
+	if self.replaying and self.replay_player then
+		self.replay_player:update(game.rhythm_engine, next_time)
 	end
 
 	game.rhythm_engine:update()
@@ -212,10 +203,7 @@ function GameplayInteractor:receive(event)
 		if virtual_event then
 			game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 			game.rhythm_engine:receive(virtual_event)
-			table.insert(self.frames, {
-				time = game.rhythm_engine:getTime(),
-				event = virtual_event
-			})
+			self.replay_recorder:record(game.rhythm_engine:getTime(), virtual_event)
 		end
 	end
 end
