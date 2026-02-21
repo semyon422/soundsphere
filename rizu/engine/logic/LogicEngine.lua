@@ -8,6 +8,7 @@ local LogicEngine = class()
 
 ---@param logic_info rizu.LogicInfo
 function LogicEngine:new(logic_info)
+	self.logic_info = logic_info
 	self.input_note_factory = LogicNoteFactory(logic_info)
 
 	-- Must be constant
@@ -81,11 +82,18 @@ function LogicEngine:getActiveNotes()
 	return self.active_notes
 end
 
-function LogicEngine:update()
+---@param target_time number?
+function LogicEngine:updateActiveNotes(target_time)
 	local column_notes = self.column_notes
 	local column_note_indexes = self.column_note_indexes
 	local active_notes = self.active_notes
 	local tracked_notes = self.tracked_notes
+	local logic_info = self.logic_info
+
+	local old_time = logic_info.time
+	if target_time then
+		logic_info.time = target_time
+	end
 
 	for column, notes in pairs(column_notes) do
 		local idx = column_note_indexes[column]
@@ -106,11 +114,23 @@ function LogicEngine:update()
 		column_note_indexes[column] = idx
 	end
 
+	if target_time then
+		logic_info.time = old_time
+	end
+end
+
+function LogicEngine:processActiveNotes()
+	local active_notes = self.active_notes
 	for _, note in ipairs(active_notes) do
 		if note:isActive() then
 			note:update()
 		end
 	end
+end
+
+function LogicEngine:filterActiveNotes()
+	local active_notes = self.active_notes
+	local tracked_notes = self.tracked_notes
 
 	-- Efficient O(N) in-place filtering
 	local n = #active_notes
@@ -129,6 +149,12 @@ function LogicEngine:update()
 	for i = n, j, -1 do
 		active_notes[i] = nil
 	end
+end
+
+function LogicEngine:update()
+	self:updateActiveNotes()
+	self:processActiveNotes()
+	self:filterActiveNotes()
 end
 
 return LogicEngine

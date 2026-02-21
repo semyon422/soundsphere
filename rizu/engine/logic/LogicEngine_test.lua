@@ -24,7 +24,7 @@ local test = {}
 
 ---@param t testing.T
 function test.no_notes(t)
-	local h = LogicEngine()
+	local h = LogicEngine(LogicInfo())
 
 	t:has_not_error(h.update, h)
 end

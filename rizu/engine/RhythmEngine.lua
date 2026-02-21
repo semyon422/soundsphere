@@ -281,6 +281,7 @@ end
 
 ---@param autoplay boolean
 function RhythmEngine:setAutoplay(autoplay)
+	self.autoplay = autoplay
 end
 
 ---@param pro_mode boolean

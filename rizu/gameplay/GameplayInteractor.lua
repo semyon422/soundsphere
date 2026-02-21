@@ -5,6 +5,7 @@ local RhythmEngineLoader = require("rizu.gameplay.RhythmEngineLoader")
 local InputBinder = require("rizu.input.InputBinder")
 local KeyPhysicInputEvent = require("rizu.input.KeyPhysicInputEvent")
 local ReplayPlayer = require("rizu.engine.replay.ReplayPlayer")
+local AutoplayPlayer = require("rizu.engine.autoplay.AutoplayPlayer")
 
 ---@class rizu.GameplayInteractor
 ---@operator call: rizu.GameplayInteractor
@@ -13,6 +14,7 @@ local GameplayInteractor = class()
 ---@param game sphere.GameController
 function GameplayInteractor:new(game)
 	self.game = game
+	self.autoplay_player = AutoplayPlayer()
 end
 
 function GameplayInteractor:loadGameplay(chartview)
@@ -103,9 +105,14 @@ function GameplayInteractor:update()
 
 	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 
+	local next_time = game.rhythm_engine:getTime(true)
+
+	if game.rhythm_engine.autoplay then
+		self.autoplay_player:update(game.rhythm_engine, next_time)
+	end
+
 	local replay_player = self.replay_player
 	if self.replaying and replay_player then
-		local next_time = game.rhythm_engine:getTime(true)
 		local offset = game.rhythm_engine.logic_offset
 		local replay_to = next_time - offset
 		local frame = replay_player:play(replay_to)
@@ -194,7 +201,7 @@ end
 
 ---@param event table
 function GameplayInteractor:receive(event)
-	if self.replaying then
+	if self.replaying or self.game.rhythm_engine.autoplay then
 		return
 	end
 
