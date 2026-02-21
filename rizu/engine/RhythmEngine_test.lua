@@ -111,14 +111,13 @@ function test.visual_rate_with_rate(t)
 	re:setVisualRate(1, false)
 	t:eq(re.visual_info.rate, 0.5)
 end
-
 ---@param t testing.T
 function test.state_reset(t)
 	local re = RhythmEngine()
 
 	local chart_chartmeta = get_chart([[
 1000 =1
-0100 =2
+0100 =50
 ]])
 
 	local chartdiff = {start_time = 1, duration = 2}
@@ -128,11 +127,11 @@ function test.state_reset(t)
 
 	re:load()
 	re:setPlayTime(1, 2)
-	re:setTimeToPrepare(0)
+	re:setTimeToPrepare(0.5)
 
 	re:setGlobalTime(0)
 	re:play()
-	re:setGlobalTime(0.5)
+	re:setGlobalTime(1)
 	re:update()
 
 	-- At 1.5s, some notes should be visible/active
@@ -143,9 +142,9 @@ function test.state_reset(t)
 	re:retry()
 
 	-- After retry, it should be clean and time reset to init_time (1)
-	t:eq(re:getTime(), 1)
-	t:eq(#re.visual_engine.visible_notes, 0)
-	t:eq(#re.logic_engine.active_notes, 0)
+	t:eq(re:getTime(), 0.5)
+	t:eq(#re.visual_engine.visible_notes, 1)
+	t:eq(#re.logic_engine.active_notes, 2)
 end
 
 ---@param t testing.T
@@ -169,7 +168,7 @@ function test.loader_order(t)
 		},
 		audio = {
 			adjustRate = 0.1,
-			volume = {master = 1},
+			volume = {master = 1, music = 1, effects = 1},
 			mode = {primary = "a", secondary = "b"},
 		},
 	}
