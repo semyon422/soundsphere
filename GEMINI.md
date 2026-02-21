@@ -111,3 +111,43 @@ The website is built with a custom Lua-based framework.
 *   **HTMX:** The frontend uses HTMX. For links that need to perform a full page navigation (like external links or redirects), you must add `hx-boost="false"` to the `<a>` tag to prevent HTMX from intercepting the click. For external links, using the full URL is sufficient.
 *   **Markdown:** Wiki pages (`sea/wiki/`) are written in a Markdown dialect that is processed by `etlua`. This allows embedding Lua code, for example, to get configuration from `brand.lua`: `[link](<%= brand.url %>/some/path)`.
 *   **Class Annotations:** EmmyLua annotations are used for classes. Web resources should have a class annotation following the pattern `---@class sea.MyResource: web.IResource`.
+
+### Gameplay Architecture
+
+The gameplay logic is centered around the single-play session attempt.
+
+*   **`rizu.GameplaySession`**: The core logic for a single gameplay attempt. It coordinates the `RhythmEngine` (logic), `AutoplayPlayer`/`ReplayPlayer` (automated input), and `ReplayRecorder` (output).
+    *   **Lifecycle**: A new instance of `GameplaySession` must be created for every play or retry. It is initialized with a `RhythmEngine` instance.
+    *   **Play Types**: Use `setPlayType(type)` where type is `"manual"`, `"auto"`, or `"replay"`. This determines the source of input events and ensures exclusive update logic.
+*   **`rizu.gameplay.GameplayInteractor`**: Acts as a bridge between the monolithic `GameController`/UI and the `GameplaySession`. It handles peripheral concerns like Discord Rich Presence, UI notifications, and starting/stopping the session.
+*   **Rhythm Engine States**:
+    *   `RhythmEngine:hasResult()`: Determines if the current play should produce a score. It requires a minimum hit count and valid accuracy.
+    *   `autoplay` and `promode` flags are managed at the session level, not inside the core engine logic (though older `sphere` code might still have legacy flags).
+
+### SPH Chart Format
+
+The `.sph` format is a text-based format for rhythm game charts.
+
+*   **Notes Section**: Lines in the `# notes` section follow the format `"XXXX =Y"`.
+    *   `XXXX`: A bitmask or representation of notes in columns.
+    *   `Y`: The absolute time of the line in seconds.
+*   **Timing**: The engine requires at least **two lines** in the `# notes` section to compute the timing and average beat duration (tempo). The SPH format **does not support explicit tempo declarations**; tempo is always computed based on the time difference between lines.
+
+### Gameplay Testing Patterns
+
+When writing tests for gameplay logic or the rhythm engine:
+
+*   **Time Advancement**: Use `GameplaySession:update(global_time)` to advance time.
+*   **Mocking Audio**: When testing without real audio, the `TimeEngine` may attempt to sync with a non-existent or fake audio source.
+    *   **Snap-back Prevention**: Disable the time adjustment function to prevent the clock from snapping back to 0: `re.time_engine:setAdjustFunction(nil)`.
+*   **Initialization Order**: Always set the global time (`re:setGlobalTime(t)`) before calling `re:play()` or `re:update()` to ensure internal timers are correctly initialized.
+*   **SPH Test Charts**: Use a minimal multi-line header to ensure `ChartDecoder` can calculate a non-zero tempo:
+    ```lua
+    local test_chart = [[
+    # metadata
+    input 4key
+    # notes
+    0000 =0
+    0000 =1
+    ]]
+    ```
