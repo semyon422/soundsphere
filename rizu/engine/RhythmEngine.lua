@@ -217,7 +217,7 @@ end
 
 ---@param volume {master: number, music: number, effects: number}
 function RhythmEngine:setVolume(volume)
-	self.audio_engine:setVolume(volume.master)
+	self.audio_engine:setVolume(volume.master * volume.music, volume.master * volume.effects)
 end
 
 ---@param time number

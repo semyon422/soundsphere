@@ -15,6 +15,8 @@ local AudioEngine = class()
 
 AudioEngine.source = IChartAudioSource()
 AudioEngine.foregroundSource = IChartAudioSource()
+AudioEngine.music_volume = 1
+AudioEngine.effects_volume = 1
 
 function AudioEngine:new()
 	self.soundDataCache = {}
@@ -27,6 +29,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 	self.resources = resources
 
 	self.foregroundSource = BassMixerSource()
+	self.foregroundSource:setVolume(self.effects_volume)
 
 	local chart_audio = ChartAudio()
 	self.chart_audio = chart_audio
@@ -45,6 +48,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
 	if not self.mixer.empty then
 		self.source = BassChartAudioSource(self.mixer)
+		self.source:setVolume(self.music_volume)
 	end
 end
 
@@ -122,10 +126,13 @@ function AudioEngine:setRate(rate)
 	self.foregroundSource:setRate(rate)
 end
 
----@param volume number
-function AudioEngine:setVolume(volume)
-	self.source:setVolume(volume)
-	self.foregroundSource:setVolume(volume)
+---@param music_volume number
+---@param effects_volume number
+function AudioEngine:setVolume(music_volume, effects_volume)
+	self.music_volume = music_volume
+	self.effects_volume = effects_volume
+	self.source:setVolume(music_volume)
+	self.foregroundSource:setVolume(effects_volume)
 end
 
 ---@param position number
