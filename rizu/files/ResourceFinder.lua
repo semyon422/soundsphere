@@ -1,13 +1,14 @@
 local class = require("class")
 local path_util = require("path_util")
 
----@alias rizu.ResourceFormat "audio"|"image"|"video"
+---@alias rizu.ResourceFormat "audio"|"image"|"video"|"ojm"
 
 ---@type {[rizu.ResourceFormat]: string[]}
 local format_extensions = {
 	audio = {"wav", "ogg", "mp3"},
 	image = {"png", "bmp", "jpg"},
 	video = {"mpg", "avi", "mp4", "mpeg", "wmv"},
+	ojm = {"ojm"},
 }
 
 ---@type {[string]: rizu.ResourceFormat}
@@ -17,6 +18,15 @@ for format, list in pairs(format_extensions) do
 		extension_format[list[i]] = format
 	end
 end
+
+---@type {[string]: rizu.ResourceFormat}
+local type_to_format = {
+	sound = "audio",
+	audio = "audio",
+	image = "image",
+	video = "video",
+	ojm = "ojm",
+}
 
 ---@class rizu.ResourceFinder
 ---@operator call: rizu.ResourceFinder
@@ -67,13 +77,16 @@ function ResourceFinder:getFormat(ext)
 end
 
 ---@param req_name_ext string
+---@param format string?
 ---@return string?
-function ResourceFinder:findFile(req_name_ext)
+function ResourceFinder:findFile(req_name_ext, format)
 	req_name_ext = path_util.fix_separators(req_name_ext)
 	req_name_ext = req_name_ext:gsub("^/", "")
 
 	local req_name, req_ext = path_util.name_ext(req_name_ext)
-	local format = self:getFormat(req_ext)
+	local inferred_format = self:getFormat(req_ext)
+
+	format = inferred_format or type_to_format[format]
 	if not format then
 		return
 	end

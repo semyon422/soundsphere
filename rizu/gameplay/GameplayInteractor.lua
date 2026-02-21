@@ -41,8 +41,29 @@ function GameplayInteractor:loadGameplay(chartview)
 		GameplayTimings(game.configModel.configs.settings, chartmeta):apply(game.replayBase)
 	end
 
+	local noteSkin = game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
+	noteSkin:loadData()
+	self.noteSkin = noteSkin
+
 	game.resource_finder:reset()
-	game.resource_finder:addPath(chartview.location_dir)
+	game.fileFinder:reset()
+
+	local paths = {}
+	if game.configModel.configs.settings.gameplay.skin_resources_top_priority then
+		table.insert(paths, noteSkin.directoryPath)
+		table.insert(paths, chartview.location_dir)
+	else
+		table.insert(paths, chartview.location_dir)
+		table.insert(paths, noteSkin.directoryPath)
+	end
+	table.insert(paths, "userdata/hitsounds")
+	table.insert(paths, "userdata/hitsounds/midi")
+
+	for _, path in ipairs(paths) do
+		game.resource_finder:addPath(path)
+		game.fileFinder:addPath(path)
+	end
+
 	game.resource_loader:load(chart.resources)
 
 	self:load(self.autoplay)
@@ -52,25 +73,8 @@ function GameplayInteractor:loadGameplay(chartview)
 
 	game.pauseModel:load()
 
-	local noteSkin = game.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
-	noteSkin:loadData()
-	self.noteSkin = noteSkin
-
 	game.multiplayerModel.client:setPlaying(true)
 	game.offsetController:updateOffsets()
-
-	local fileFinder = game.fileFinder
-	fileFinder:reset()
-
-	if game.configModel.configs.settings.gameplay.skin_resources_top_priority then
-		fileFinder:addPath(noteSkin.directoryPath)
-		fileFinder:addPath(chartview.location_dir)
-	else
-		fileFinder:addPath(chartview.location_dir)
-		fileFinder:addPath(noteSkin.directoryPath)
-	end
-	fileFinder:addPath("userdata/hitsounds")
-	fileFinder:addPath("userdata/hitsounds/midi")
 
 	self:play()
 

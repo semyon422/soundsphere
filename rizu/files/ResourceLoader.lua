@@ -34,10 +34,10 @@ function ResourceLoader:load(resources)
 	---@type string[]
 	local new_paths = {}
 
-	for _, paths in resources:iter() do
+	for _type, paths in resources:iter() do
 		local name = paths[1]
 		for _, path in ipairs(paths) do
-			local found_path = resource_finder:findFile(path)
+			local found_path = resource_finder:findFile(path, _type)
 			if found_path then
 				file_paths[name] = found_path
 				table.insert(new_paths, found_path)
