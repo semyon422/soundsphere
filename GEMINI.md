@@ -141,13 +141,14 @@ When writing tests for gameplay logic or the rhythm engine:
 *   **Mocking Audio**: When testing without real audio, the `TimeEngine` may attempt to sync with a non-existent or fake audio source.
     *   **Snap-back Prevention**: Disable the time adjustment function to prevent the clock from snapping back to 0: `re.time_engine:setAdjustFunction(nil)`.
 *   **Initialization Order**: Always set the global time (`re:setGlobalTime(t)`) before calling `re:play()` or `re:update()` to ensure internal timers are correctly initialized.
-*   **SPH Test Charts**: Use a minimal multi-line header to ensure `ChartDecoder` can calculate a non-zero tempo:
+*   **TestChartFactory**: Use `sea.chart.TestChartFactory` for programmatic chart creation in tests. It produces minimal `Chart`, `Chartmeta`, and `Chartdiff` without parsing files.
     ```lua
-    local test_chart = [[
-    # metadata
-    input 4key
-    # notes
-    0000 =0
-    0000 =1
-    ]]
+    local TestChartFactory = require("sea.chart.TestChartFactory")
+    local tcf = TestChartFactory()
+    local res = tcf:create("4key", {
+        {time = 1, column = 1}, -- Tap note
+        {time = 2, column = 2, end_time = 3}, -- Long note
+        {time = 4, velocity = {0.5}}, -- SV change (current=0.5, local=1, global=1)
+    })
+    -- Use res.chart, res.chartmeta, res.chartdiff
     ```

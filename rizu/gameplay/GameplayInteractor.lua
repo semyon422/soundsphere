@@ -16,6 +16,7 @@ function GameplayInteractor:new(game)
 	self.game = game
 	self.replaying = false
 	self.autoplay = false
+	self.audio_disabled = false
 
 	self.score_saver = ScoreSaver(
 		game.fs,

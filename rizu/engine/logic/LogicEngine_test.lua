@@ -1,24 +1,8 @@
 local LogicEngine = require("rizu.engine.logic.LogicEngine")
 local LogicInfo = require("rizu.engine.logic.LogicInfo")
-local ChartFactory = require("notechart.ChartFactory")
+local TestChartFactory = require("sea.chart.TestChartFactory")
 
-local cf = ChartFactory()
-local test_chart_header = [[
-# metadata
-title Title
-artist Artist
-name Name
-creator Creator
-input 4key
-
-# notes
-]]
-
----@param notes string
----@return ncdk2.Chart
-local function get_chart(notes)
-	return assert(cf:getCharts("chart.sph", test_chart_header .. notes))[1].chart
-end
+local tcf = TestChartFactory()
 
 local test = {}
 
@@ -36,16 +20,16 @@ function test.track_active_notes(t)
 
 	local le = LogicEngine(logic_info)
 
-	local chart = get_chart([[
-1000 =0
-0100 =1
-1000 =2
-0100 =3
-1000 =4
-0100 =5
-]])
+	local res = tcf:create("4key", {
+		{time = 0, column = 1},
+		{time = 1, column = 2},
+		{time = 2, column = 1},
+		{time = 3, column = 2},
+		{time = 4, column = 1},
+		{time = 5, column = 2},
+	})
 
-	le:load(chart)
+	le:load(res.chart)
 
 	logic_info.time = -1.001
 	le:update()

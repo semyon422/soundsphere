@@ -1,27 +1,9 @@
 local GameplaySession = require("rizu.gameplay.GameplaySession")
 local RhythmEngine = require("rizu.engine.RhythmEngine")
-local ChartFactory = require("notechart.ChartFactory")
+local TestChartFactory = require("sea.chart.TestChartFactory")
 local TimingValues = require("sea.chart.TimingValues")
 
-local cf = ChartFactory()
-local test_chart_header = [[
-# metadata
-title Title
-artist Artist
-name Name
-creator Creator
-input 4key
-
-# notes
-0000 =0
-0000 =1
-]]
-
----@param notes string
----@return {chart: ncdk2.Chart, chartmeta: sea.Chartmeta}
-local function get_chart(notes)
-	return assert(cf:getCharts("chart.sph", test_chart_header .. notes))[1]
-end
+local tcf = TestChartFactory()
 
 local test = {}
 
@@ -30,11 +12,11 @@ function test.basic_lifecycle(t)
 	local re = RhythmEngine()
 	local gc = GameplaySession(re)
 	
-	local chart_chartmeta = get_chart([[
-1000 =2
-0100 =3
-]])
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 2})
+	local res = tcf:create("4key", {
+		{time = 2, column = 1},
+		{time = 3, column = 2},
+	})
+	re:setChart(res.chart, res.chartmeta, res.chartdiff)
 	re:setTimingValues(TimingValues())
 	re:load()
 	re:setAudioEnabled(false)
@@ -61,11 +43,11 @@ function test.autoplay(t)
 	local re = RhythmEngine()
 	local gc = GameplaySession(re)
 	
-	local chart_chartmeta = get_chart([[
-1000 =2
-0100 =3
-]])
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 2})
+	local res = tcf:create("4key", {
+		{time = 2, column = 1},
+		{time = 3, column = 2},
+	})
+	re:setChart(res.chart, res.chartmeta, res.chartdiff)
 	re:setTimingValues(TimingValues())
 	re:load()
 	re:setAudioEnabled(false)
@@ -93,10 +75,10 @@ function test.input_recording(t)
 	local re = RhythmEngine()
 	local gc = GameplaySession(re)
 	
-	local chart_chartmeta = get_chart([[
-1000 =2
-]])
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 1})
+	local res = tcf:create("4key", {
+		{time = 2, column = 1},
+	})
+	re:setChart(res.chart, res.chartmeta, res.chartdiff)
 	re:setTimingValues(TimingValues())
 	re:load()
 	re:setAudioEnabled(false)
@@ -113,10 +95,10 @@ function test.has_result(t)
 	local re = RhythmEngine()
 	local gc = GameplaySession(re)
 	
-	local chart_chartmeta = get_chart([[
-1000 =2
-]])
-	re:setChart(chart_chartmeta.chart, chart_chartmeta.chartmeta, {notes_count = 1})
+	local res = tcf:create("4key", {
+		{time = 2, column = 1},
+	})
+	re:setChart(res.chart, res.chartmeta, res.chartdiff)
 	re:setTimingValues(TimingValues())
 	re:load()
 	re:setAudioEnabled(false)
