@@ -101,4 +101,52 @@ function test.states_and_updates(t)
 	t:eq(v_killed.children, nil)
 end
 
+---@param t testing.T
+function test.layout_and_transforms(t)
+	local inputs = Inputs()
+	local ctx = Context({}, inputs)
+	local engine = Engine(inputs, ctx)
+	engine:load()
+
+	-- Set root size
+	engine.root.layout_box:setWidth(1000)
+	engine.root.layout_box:setHeight(1000)
+
+	local v1 = engine.root:add(MockView())
+	v1.layout_box:setWidth(100)
+	v1.layout_box:setHeight(100)
+	v1.transform:setX(10)
+	v1.transform:setY(20)
+
+	local v2 = v1:add(MockView())
+	v2.layout_box:setWidth(50)
+	v2.layout_box:setHeight(50)
+	v2.transform:setX(5)
+	v2.transform:setY(5)
+
+	-- First update to resolve initial layout and transforms
+	engine:update(0.016, 0, 0)
+
+	local x, y = v1.transform.love_transform:transformPoint(0, 0)
+	t:eq(x, 10)
+	t:eq(y, 20)
+
+	local x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
+	t:eq(x2, 15) -- 10 + 5
+	t:eq(y2, 25) -- 20 + 5
+
+	-- Change V1 position via transform
+	v1.transform:setX(50)
+	v1.transform:setY(60)
+	engine:update(0.016, 0, 0)
+
+	x, y = v1.transform.love_transform:transformPoint(0, 0)
+	t:eq(x, 50)
+	t:eq(y, 60)
+
+	x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
+	t:eq(x2, 55) -- 50 + 5
+	t:eq(y2, 65) -- 60 + 5
+end
+
 return test

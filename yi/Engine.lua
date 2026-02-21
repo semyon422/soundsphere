@@ -97,10 +97,20 @@ function Engine:update(dt, mouse_x, mouse_y)
 
 	self:updateView(self.root, dt)
 
-	-- Phase 3: Layout resolution
-	-- Phase 4: Transform updates
+	local updated_roots = self.layout_engine:updateLayout(self.layout_update_requesters)
 
-	-- Phase 5: Cleanup
+	if updated_roots then
+		for node, _ in pairs(updated_roots) do
+			---@cast node yi.View
+			node:updateTransforms()
+		end
+	end
+
+	for i = 1, #self.transform_update_requesters do
+		local view = self.transform_update_requesters[i]
+		view:updateTransforms()
+	end
+
 	for i = 1, #self.removal_deferred do
 		self:remove(self.removal_deferred[i], true)
 	end
