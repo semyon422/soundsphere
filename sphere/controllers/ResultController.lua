@@ -94,6 +94,8 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 
 	GameplayChart(game.configModel.configs.settings, game.fs, chartview):load(replayBase, game.computeContext)
 
+	game:recreateRhythmEngine()
+
 	RhythmEngineLoader(
 		replay,
 		game.computeContext,

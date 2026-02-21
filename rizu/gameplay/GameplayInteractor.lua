@@ -35,6 +35,10 @@ function GameplayInteractor:loadGameplay(chartview)
 	game.resource_finder:addPath(chartview.location_dir)
 	game.resource_loader:load(chart.resources)
 
+	local autoplay = game.rhythm_engine and game.rhythm_engine.autoplay
+
+	game:recreateRhythmEngine()
+
 	local loader = RhythmEngineLoader(
 		game.replayBase,
 		game.computeContext,
@@ -42,6 +46,7 @@ function GameplayInteractor:loadGameplay(chartview)
 		game.resource_loader.resources
 	)
 	loader:setAudioEnabled(true)
+	loader:setAutoplay(autoplay)
 	loader:load(game.rhythm_engine)
 
 	local input_binder = InputBinder(game.configModel.configs.input, chartmeta.inputmode)
@@ -160,7 +165,20 @@ function GameplayInteractor:retry()
 	game.pauseModel:load()
 	-- self.resourceModel:rewind()
 
-	game.rhythm_engine:retry()
+	local autoplay = game.rhythm_engine and game.rhythm_engine.autoplay
+
+	game:recreateRhythmEngine()
+
+	local loader = RhythmEngineLoader(
+		game.replayBase,
+		game.computeContext,
+		game.configModel.configs.settings,
+		game.resource_loader.resources
+	)
+	loader:setAudioEnabled(true)
+	loader:setAutoplay(autoplay)
+	loader:load(game.rhythm_engine)
+
 	game.rhythm_engine:setTimings(replayBase.timings, replayBase.subtimings)
 
 	self:play()

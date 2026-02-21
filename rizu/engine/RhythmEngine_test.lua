@@ -192,4 +192,13 @@ function test.loader_order(t)
 	t:eq(re:getTime(), 8)
 end
 
+---@param t testing.T
+function test.double_unload(t)
+	local re = RhythmEngine()
+	t:has_not_error(function()
+		re:unload()
+		re:unload()
+	end)
+end
+
 return test

@@ -94,7 +94,16 @@ function RhythmEngine:hasResult()
 end
 
 function RhythmEngine:unload()
-	self.audio_engine:unload()
+	if self.audio_engine then
+		self.audio_engine:unload()
+		self.audio_engine = nil
+	end
+
+	self.visual_engine = nil
+	self.logic_engine = nil
+	self.input_engine = nil
+	self.time_engine = nil
+	self.score_engine = nil
 end
 
 function RhythmEngine:retry()

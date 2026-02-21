@@ -12,6 +12,11 @@ function PauseModel:new(configModel, rhythm_engine)
 	self.rhythm_engine = rhythm_engine
 end
 
+---@param rhythm_engine rizu.RhythmEngine
+function PauseModel:setRhythmEngine(rhythm_engine)
+	self.rhythm_engine = rhythm_engine
+end
+
 function PauseModel:load()
 	self.state = "play"
 	self.progress = 0

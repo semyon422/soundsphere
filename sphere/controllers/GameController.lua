@@ -256,6 +256,14 @@ function GameController:update(dt)
 	self.seaClient:update()
 end
 
+function GameController:recreateRhythmEngine()
+	if self.rhythm_engine then
+		self.rhythm_engine:unload()
+	end
+	self.rhythm_engine = RhythmEngine(self.fs)
+	self.pauseModel:setRhythmEngine(self.rhythm_engine)
+end
+
 function GameController:draw()
 	self.ui:draw()
 end

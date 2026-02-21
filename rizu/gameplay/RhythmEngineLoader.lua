@@ -20,6 +20,11 @@ function RhythmEngineLoader:setAudioEnabled(enabled)
 	self.audioEnabled = enabled
 end
 
+---@param enabled boolean
+function RhythmEngineLoader:setAutoplay(enabled)
+	self.autoplay = enabled
+end
+
 ---@param rhythm_engine rizu.RhythmEngine
 function RhythmEngineLoader:load(rhythm_engine)
 	local computeContext = self.computeContext
@@ -34,6 +39,7 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:setChart(chart, chartmeta, chartdiff)
 	rhythm_engine:setAutoKeySound(config.gameplay.autoKeySound)
 	rhythm_engine:setAudioEnabled(self.audioEnabled)
+	rhythm_engine:setAutoplay(self.autoplay)
 	rhythm_engine:load()
 	rhythm_engine:loadAudio(self.resources)
 
