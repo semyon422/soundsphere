@@ -136,4 +136,12 @@ function AudioPreviewPlayer:setVolume(volume)
 	end
 end
 
+---@return number
+function AudioPreviewPlayer:getPosition()
+	if self.audio_source then
+		return self.audio_source:getPosition()
+	end
+	return self.pending_seek or 0
+end
+
 return AudioPreviewPlayer

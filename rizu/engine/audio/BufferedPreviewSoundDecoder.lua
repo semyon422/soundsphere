@@ -112,10 +112,8 @@ function BufferedPreviewSoundDecoder:getData(buf, len)
 		end
 	end
 
-	-- If there is no data for some reason (underrun), it should give empty data (silence)
-	if total_read < len then
-		ffi.fill(dst + total_read, len - total_read, 0)
-		total_read = len
+	if total_read == 0 and not self.eof then
+		return 0
 	end
 
 	self.position = self.position + total_read

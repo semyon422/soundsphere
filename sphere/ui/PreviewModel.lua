@@ -58,15 +58,14 @@ function PreviewModel:update()
 	local muteOnUnfocus = settings.miscellaneous.muteOnUnfocus
 	local hasFocus = love.window.hasFocus()
 
-	local dt = love.timer.getDelta() * self.rate
-
 	if hasFocus or not muteOnUnfocus then
+		local start_time = self.chartview and self.chartview.start_time or 0
 		local duration = self.chartview and self.chartview.duration or 0
 		if duration > 0 then
-			self.manual_time = self.manual_time + dt
-			if self.manual_time > duration then
-				self.manual_time = self.position
-				self.audioPreviewPlayer:seek(self.position)
+			self.manual_time = self.audioPreviewPlayer:getPosition()
+			if self.manual_time > start_time + duration then
+				self.manual_time = 0
+				self.audioPreviewPlayer:seek(self.manual_time)
 			end
 		end
 		self.audioPreviewPlayer:resume()
