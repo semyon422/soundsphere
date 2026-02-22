@@ -41,7 +41,7 @@ end
 function ResourceFinder:reset()
 	---@type string[]
 	self.paths = {}
-	---@type {[string]: string[]}
+	---@type {[string]: {lookup: {[string]: string}, stems: {[string]: {[string]: string}}}}
 	self.path_files = {}
 end
 
@@ -49,13 +49,36 @@ end
 function ResourceFinder:addPath(path)
 	path = assert(path, "missing path")
 	table.insert(self.paths, path)
-	self.path_files[path] = self:getFilesRecursive(path)
+	local files = self:getFilesRecursive(path)
+
+	---@type {lookup: {[string]: string}, stems: {[string]: {[string]: string}}}
+	local index = {
+		lookup = {},
+		stems = {},
+	}
+
+	for _, name_ext in ipairs(files) do
+		local name_ext_lower = name_ext:lower()
+		index.lookup[name_ext_lower] = name_ext
+
+		local name, ext = path_util.name_ext(name_ext)
+		if ext then
+			local name_lower = name:lower()
+			local ext_lower = ext:lower()
+			if not index.stems[name_lower] then
+				index.stems[name_lower] = {}
+			end
+			index.stems[name_lower][ext_lower] = name_ext
+		end
+	end
+
+	self.path_files[path] = index
 end
 
 ---@param path string
 ---@param list table?
 ---@param prefix string?
----@return table
+---@return string[]
 function ResourceFinder:getFilesRecursive(path, list, prefix)
 	list = list or {}
 	prefix = prefix or ""
@@ -92,6 +115,8 @@ function ResourceFinder:findFile(req_name_ext, format)
 	end
 
 	local extensions = format_extensions[format]
+	local req_name_ext_lower = req_name_ext:lower()
+	local req_name_lower = req_name:lower()
 
 	for _, path in ipairs(self.paths) do
 		local req_path = path .. "/" .. req_name_ext
@@ -99,19 +124,22 @@ function ResourceFinder:findFile(req_name_ext, format)
 			return req_path
 		end
 
-		local files = self.path_files[path]
-
-		for _, name_ext in ipairs(files) do
-			if name_ext:lower() == req_name_ext:lower() then
-				return path .. "/" .. name_ext
+		local index = self.path_files[path]
+		if index then
+			-- 1. Case-insensitive exact match
+			local exact = index.lookup[req_name_ext_lower]
+			if exact then
+				return path .. "/" .. exact
 			end
-		end
 
-		for _, check_ext in ipairs(extensions) do
-			for _, name_ext in ipairs(files) do
-				local _name, _ext = path_util.name_ext(name_ext)
-				if _ext and _name:lower() == req_name:lower() and _ext:lower() == check_ext then
-					return path .. "/" .. name_ext
+			-- 2. Match with format extensions
+			local stem_match = index.stems[req_name_lower]
+			if stem_match then
+				for _, check_ext in ipairs(extensions) do
+					local found = stem_match[check_ext] -- extensions in format_extensions are already lower
+					if found then
+						return path .. "/" .. found
+					end
 				end
 			end
 		end
