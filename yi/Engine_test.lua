@@ -2,6 +2,7 @@ local Engine = require("yi.Engine")
 local View = require("yi.views.View")
 local Context = require("yi.Context")
 local Inputs = require("ui.input.Inputs")
+local LayoutBox = require("ui.layout.LayoutBox")
 
 local test = {}
 
@@ -147,6 +148,71 @@ function test.layout_and_transforms(t)
 	x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
 	t:eq(x2, 55) -- 50 + 5
 	t:eq(y2, 65) -- 60 + 5
+end
+
+---@param t testing.T
+function test.layout_update_on_removal(t)
+	local inputs = Inputs()
+	local ctx = Context({}, inputs)
+	local engine = Engine(inputs, ctx)
+	engine:load()
+
+	-- Set root size
+	engine.root.layout_box:setWidth(1000)
+	engine.root.layout_box:setHeight(1000)
+
+	local container = engine.root:add(MockView())
+	container.layout_box:setArrange(LayoutBox.Arrange.FlexRow)
+	container.layout_box:setWidth(200)
+	container.layout_box:setHeight(100)
+
+	local v1 = container:add(MockView())
+	v1.layout_box:setWidth(50)
+	v1.layout_box:setHeight(50)
+
+	local v2 = container:add(MockView())
+	v2.layout_box:setWidth(50)
+	v2.layout_box:setHeight(50)
+
+	-- First update to resolve initial layout
+	engine:update(0.016, 0, 0)
+
+	-- Check initial positions
+	local x1, y1 = v1.transform.love_transform:transformPoint(0, 0)
+	t:eq(x1, 0)
+	t:eq(y1, 0)
+
+	local x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
+	t:eq(x2, 50)
+	t:eq(y2, 0)
+
+	-- Kill v1
+	v1:kill()
+	engine:update(0.016, 0, 0)
+
+	-- Now v2 should have moved to (0, 0) relative to container
+	x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
+	t:eq(x2, 0)
+	t:eq(y2, 0)
+
+	-- Add v3 and detach it
+	local v3 = container:add(MockView())
+	v3.layout_box:setWidth(50)
+	v3.layout_box:setHeight(50)
+
+	engine:update(0.016, 0, 0)
+	-- v2 is at (0, 0), v3 is at (50, 0)
+	x2, y2 = v2.transform.love_transform:transformPoint(0, 0)
+	t:eq(x2, 0)
+	local x3, y3 = v3.transform.love_transform:transformPoint(0, 0)
+	t:eq(x3, 50)
+
+	v2:detach()
+	engine:update(0.016, 0, 0)
+
+	-- v3 should move to (0, 0)
+	x3, y3 = v3.transform.love_transform:transformPoint(0, 0)
+	t:eq(x3, 0)
 end
 
 return test

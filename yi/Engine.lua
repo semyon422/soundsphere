@@ -2,6 +2,7 @@ local class = require("class")
 local View = require("yi.views.View")
 local ViewState = View.State
 local LayoutEngine = require("ui.layout.LayoutEngine")
+local LayoutEnums = require("ui.layout.Enums")
 local CommandBuffer = require("yi.renderer.CommandBuffer")
 local Renderer = require("yi.renderer")
 local table_util = require("table_util")
@@ -82,6 +83,8 @@ function Engine:remove(view, kill)
 		if idx then
 			table.remove(parent.children, idx)
 			self.rebuild_command_buffer = true
+			parent.layout_box:markDirty(LayoutEnums.Axis.Both)
+			table.insert(self.layout_update_requesters, parent)
 		end
 	end
 
@@ -103,6 +106,14 @@ function Engine:update(dt, mouse_x, mouse_y)
 
 	self:updateView(self.root, dt)
 
+	for i = 1, #self.removal_deferred do
+		self:remove(self.removal_deferred[i], true)
+	end
+
+	for i = 1, #self.detach_deferred do
+		self:remove(self.detach_deferred[i], false)
+	end
+
 	local updated_roots = self.layout_engine:updateLayout(self.layout_update_requesters)
 
 	if updated_roots then
@@ -115,14 +126,6 @@ function Engine:update(dt, mouse_x, mouse_y)
 	for i = 1, #self.transform_update_requesters do
 		local view = self.transform_update_requesters[i]
 		view:updateTransforms()
-	end
-
-	for i = 1, #self.removal_deferred do
-		self:remove(self.removal_deferred[i], true)
-	end
-
-	for i = 1, #self.detach_deferred do
-		self:remove(self.detach_deferred[i], false)
 	end
 
 	if self.rebuild_command_buffer then
@@ -140,9 +143,22 @@ function Engine:updateRootDimensions()
 	self.root:setHeight(love.graphics.getHeight())
 end
 
+---@type ui.ModifierKeys
+local modifiers = {
+	control = false,
+	shift = false,
+	super = false,
+	alt = false
+}
+
 function Engine:receive(event)
 	if event.name == "resize" then
 		self:updateRootDimensions()
+	elseif event.name ~= "framestarted" then
+		modifiers.control = love.keyboard.isDown("lctrl", "rctrl")
+		modifiers.shift = love.keyboard.isDown("lshift", "rshift")
+		modifiers.alt = love.keyboard.isDown("lalt", "ralt")
+		self.inputs:receive(event, modifiers)
 	end
 end
 
