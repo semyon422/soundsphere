@@ -1,7 +1,6 @@
 local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
-local audio = require("audio")
 local AudioPreviewPlayer = require("rizu.gameplay.AudioPreviewPlayer")
 
 ---@class sphere.PreviewModel
@@ -11,6 +10,7 @@ local PreviewModel = class()
 PreviewModel.preview_time = 0
 PreviewModel.position = 0
 PreviewModel.mode = "absolute"
+PreviewModel.manual_time = 0
 
 ---@param configModel sphere.ConfigModel
 function PreviewModel:new(configModel)
@@ -32,7 +32,7 @@ end
 ---@param mode string?
 ---@param chartview table?
 function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode, chartview)
-	if self.audio_path ~= audio_path or not self.audio or self.chartview ~= chartview then
+	if self.audio_path ~= audio_path or self.chartview ~= chartview then
 		self.audio_path = audio_path
 		self.preview_time = preview_time
 		self.mode = mode
@@ -57,53 +57,32 @@ function PreviewModel:update()
 	local hasFocus = love.window.hasFocus()
 
 	local dt = love.timer.getDelta() * self.rate
-	local audio = self.audio
-	if audio then
-		if not audio:isPlaying() and hasFocus then
-			audio:seek(self.position)
-			if not audio:play() then
-				self.audio = nil -- invalid audio
-				return
+
+	if hasFocus or not muteOnUnfocus then
+		local duration = self.chartview and self.chartview.duration or 0
+		if duration > 0 then
+			self.manual_time = self.manual_time + dt
+			if self.manual_time > duration then
+				self.manual_time = self.position
+				self.audioPreviewPlayer:seek(self.position)
 			end
-			self.audioPreviewPlayer:seek(self.position)
-		elseif audio:isPlaying() and not hasFocus and muteOnUnfocus then
-			audio:pause()
-			self.audioPreviewPlayer:pause()
-		elseif audio:isPlaying() and hasFocus then
-			self.audioPreviewPlayer:resume()
 		end
+		self.audioPreviewPlayer:resume()
 	else
-		if hasFocus or not muteOnUnfocus then
-			local duration = self.chartview and self.chartview.duration or 0
-			if duration > 0 then
-				self.manual_time = (self.manual_time or self.position) + dt
-				if self.manual_time > duration then
-					self.manual_time = self.position
-					self.audioPreviewPlayer:seek(self.position)
-				end
-			end
-			self.audioPreviewPlayer:resume()
-		elseif not hasFocus and muteOnUnfocus then
-			self.audioPreviewPlayer:pause()
-		end
+		self.audioPreviewPlayer:pause()
 	end
 
-	local time = self:getTime()
-	self.audioPreviewPlayer:update(time)
+	self.audioPreviewPlayer:update(self.manual_time)
 
 	local volumeConfig = settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 	if self.volume ~= volume then
-		if audio then audio:setVolume(volume) end
 		self.audioPreviewPlayer:setVolume(volume)
 		self.volume = volume
 	end
 
 	local target_rate = self.target_rate
 	if self.rate ~= target_rate then
-		if audio then
-			audio:setRate(target_rate)
-		end
 		self.audioPreviewPlayer:setRate(target_rate)
 		self.rate = target_rate
 	end
@@ -115,10 +94,7 @@ function PreviewModel:setRate(rate)
 end
 
 function PreviewModel:getTime()
-	if not self.audio then
-		return self.manual_time or 0
-	end
-	return self.audio:getPosition()
+	return self.manual_time
 end
 
 function PreviewModel:loadPreviewDebounce()
@@ -140,23 +116,7 @@ function PreviewModel:loadPreview()
 		return
 	end
 
-	if self.audio then
-		if self.path ~= path then
-			self:stop()
-		else
-			loadingPreview = false
-			return
-		end
-	end
-
 	self.audioPreviewPlayer:stop()
-
-	local audio
-	if path:find("^http") then
-		audio = self:loadAudio(path, "http")
-	else
-		audio = self:loadAudio(path)
-	end
 
 	loadingPreview = false
 	if path ~= self.audio_path then
@@ -169,61 +129,22 @@ function PreviewModel:loadPreview()
 
 	local position = self.preview_time
 	if self.mode == "relative" then
-		-- audio is needed for relative position
-		if audio then
-			position = audio:getDuration() * position
-		else
-			position = 0
-		end
+		position = (self.chartview and self.chartview.duration or 0) * position
 	end
 	position = math.max(position, 0)
 	self.position = position
+	self.manual_time = position
 
 	local hash = self.chartview and self.chartview.hash
-	local has_audio_preview = false
 	if hash then
 		local preview_path = "userdata/audio_previews/" .. hash .. ".audio_preview"
 		local data = love.filesystem.read(preview_path)
 		if data then
 			self.audioPreviewPlayer:load(data, self.chartview.location_dir)
-			has_audio_preview = true
-		end
-	end
-
-	if not audio then
-		if has_audio_preview then
-			self.manual_time = position
 			self.audioPreviewPlayer:setVolume(volume)
 			self.audioPreviewPlayer:setRate(self.rate)
 			self.audioPreviewPlayer:seek(position)
 		else
-			if self.chartview and self.chartview.hash then
-				if not self.attempted_hashes[hash] then
-					self:generateAudioPreview(self.chartview)
-				end
-			end
-			return
-		end
-	else
-		self.audio = audio
-		self.path = path
-
-		audio:seek(position)
-		audio:setVolume(volume)
-		if audio.setRate then
-			audio:setRate(self.rate)
-		else
-			audio:setPitch(self.rate)
-		end
-		if not audio:play() then
-			self.audio = nil -- invalid audio
-		end
-
-		if has_audio_preview then
-			self.audioPreviewPlayer:setVolume(volume)
-			self.audioPreviewPlayer:setRate(self.rate)
-			self.audioPreviewPlayer:seek(position)
-		elseif self.chartview and self.chartview.hash then
 			if not self.attempted_hashes[hash] then
 				self:generateAudioPreview(self.chartview)
 			end
@@ -304,49 +225,7 @@ end
 
 function PreviewModel:stop()
 	self.audioPreviewPlayer:stop()
-	if not self.audio then
-		return
-	end
-	self.audio:stop()
-	self.audio:release()
-	self.audio = nil
-end
-
-local loadHttp = thread.async(function(url)
-	local http = require("http")
-	local body = http.request(url)
-	if not body then
-		return
-	end
-
-	require("love.filesystem")
-	require("love.audio")
-	require("love.sound")
-	local fileData = love.filesystem.newFileData(body, url:match("^.+/(.-)$"))
-	local status, source = pcall(love.audio.newSource, fileData, "static")
-	if status then
-		return source
-	end
-end)
-
-local function loadAudio(path)
-	local status, source = pcall(audio.newFileSource, path)
-	if status then
-		return source
-	end
-end
-
----@param path string
----@param type string?
----@return love.Source?
-function PreviewModel:loadAudio(path, type)
-	local source
-	if type == "http" then
-		source = loadHttp(path)
-	else
-		source = loadAudio(path)
-	end
-	return source
+	self.manual_time = 0
 end
 
 return PreviewModel

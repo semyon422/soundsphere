@@ -46,12 +46,12 @@ function test.generate(t)
 	t:eq(#preview.events, 2)
 	
 	t:eq(preview.events[1].time, 1.0)
-	t:eq(preview.events[1].sample_index, 0)
+	t:eq(preview.events[1].sample_index, 1)
 	t:eq(preview.events[1].duration, 1.0)
 	t:eq(preview.events[1].volume, 1.0)
 	
 	t:eq(preview.events[2].time, 2.0)
-	t:eq(preview.events[2].sample_index, 0)
+	t:eq(preview.events[2].sample_index, 1)
 	t:eq(preview.events[2].duration, 1.0)
 	t:assert(math.abs(preview.events[2].volume - 0.5) < 0.01)
 end

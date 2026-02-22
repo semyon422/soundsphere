@@ -1,0 +1,191 @@
+local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local ffi = require("ffi")
+
+---@class rizu.BufferedPreviewSoundDecoder: rizu.ISoundDecoder
+---@field private decoder rizu.ISoundDecoder
+---@field private buffer_limit_seconds number
+---@field private buffer_limit_bytes integer
+---@field private chunk_size integer
+---@field private chunks {data: ffi.cdata*, size: integer, pos: integer}[]
+---@field private total_buffered_bytes integer
+---@field private position integer
+---@field private eof boolean
+---@field private preloader_co thread
+---@field private pending_position integer?
+---@field private sample_rate integer
+---@field private channels integer
+---@field private bytes_per_sample integer
+---@field private duration number
+local BufferedPreviewSoundDecoder = ISoundDecoder + {}
+
+---@param decoder rizu.ISoundDecoder
+---@param buffer_seconds number?
+function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
+	self.decoder = decoder
+	self.buffer_limit_seconds = buffer_seconds or 1
+	self.is_preloading = false
+
+	-- Cache metadata. We assume these are available without yielding or
+	-- handle them being called in a coroutine context if necessary.
+	self.sample_rate = decoder:getSampleRate()
+	self.channels = decoder:getChannelCount()
+	self.bytes_per_sample = decoder:getBytesPerSample()
+	self.duration = decoder:getDuration()
+
+	self.buffer_limit_bytes = self:secondsToBytes(self.buffer_limit_seconds)
+	self.chunk_size = 4096 -- bytes
+
+	self.chunks = {}
+	self.total_buffered_bytes = 0
+	self.position = 0
+	self.eof = false
+	self.pending_position = nil
+
+	self.preloader_co = coroutine.create(function()
+		while true do
+			-- Handle pending seek
+			if self.pending_position then
+				local pos = self.pending_position
+				self.pending_position = nil
+				self.is_preloading = true
+				self.decoder:setBytesPosition(pos)
+				self.is_preloading = false
+				-- chunks are cleared in setBytesPosition for immediate effect in getData
+			end
+
+			-- Fill buffer if not full and not at EOF
+			if not self.eof and self.total_buffered_bytes < self.buffer_limit_bytes then
+				self.is_preloading = true
+				local data = self.decoder:getDataString(self.chunk_size)
+				self.is_preloading = false
+				local read = #data
+
+				-- If a seek was requested while we were yielding in getDataString, discard this data
+				if not self.pending_position then
+					if read > 0 then
+						local buf = ffi.new("int8_t[?]", read)
+						ffi.copy(buf, data, read)
+						table.insert(self.chunks, {data = buf, size = read, pos = 0})
+						self.total_buffered_bytes = self.total_buffered_bytes + read
+					elseif read == 0 then
+						self.eof = true
+					end
+				end
+			else
+				-- Buffer full or EOF, wait for more space or a seek
+				coroutine.yield()
+			end
+		end
+	end)
+end
+
+---@param buf ffi.cdata*
+---@param len integer
+---@return integer
+function BufferedPreviewSoundDecoder:getData(buf, len)
+	-- Try to advance preloader. We use standard coroutine.resume to NOT
+	-- propagate yields from the underlying decoder, keeping this call non-blocking.
+	-- We must not resume if it's currently waiting for an ICC response (is_preloading = true).
+	if not self.is_preloading and coroutine.status(self.preloader_co) == "suspended" then
+		local ok, err = coroutine.resume(self.preloader_co)
+		if not ok then
+			error(err)
+		end
+	end
+
+	local total_read = 0
+	local dst = ffi.cast("int8_t*", buf)
+
+	-- Consume data from preloaded chunks
+	while total_read < len and #self.chunks > 0 do
+		local chunk = self.chunks[1]
+		local to_copy = math.min(len - total_read, chunk.size - chunk.pos)
+		ffi.copy(dst + total_read, chunk.data + chunk.pos, to_copy)
+
+		chunk.pos = chunk.pos + to_copy
+		total_read = total_read + to_copy
+		self.total_buffered_bytes = self.total_buffered_bytes - to_copy
+
+		if chunk.pos >= chunk.size then
+			table.remove(self.chunks, 1)
+		end
+	end
+
+	-- If there is no data for some reason (underrun), it should give empty data (silence)
+	if total_read < len then
+		ffi.fill(dst + total_read, len - total_read, 0)
+		total_read = len
+	end
+
+	self.position = self.position + total_read
+	return total_read
+end
+
+function BufferedPreviewSoundDecoder:getSampleRate() return self.sample_rate end
+function BufferedPreviewSoundDecoder:getChannelCount() return self.channels end
+function BufferedPreviewSoundDecoder:getBytesPerSample() return self.bytes_per_sample end
+function BufferedPreviewSoundDecoder:getDuration() return self.duration end
+
+function BufferedPreviewSoundDecoder:getBytesDuration()
+	return self:secondsToBytes(self.duration)
+end
+
+function BufferedPreviewSoundDecoder:getPosition()
+	return self:bytesToSeconds(self.position)
+end
+
+function BufferedPreviewSoundDecoder:getBytesPosition()
+	return self.position
+end
+
+---@param pos integer
+function BufferedPreviewSoundDecoder:setBytesPosition(pos)
+	self.pending_position = pos
+	self.chunks = {}
+	self.total_buffered_bytes = 0
+	self.position = pos
+	self.eof = false
+
+	-- Resume preloader immediately to process the seek if it was waiting
+	-- at the end of the loop. If it's currently preloading (waiting for ICC),
+	-- it will handle the pending seek once the current operation finishes.
+	if not self.is_preloading and coroutine.status(self.preloader_co) == "suspended" then
+		local ok, err = coroutine.resume(self.preloader_co)
+		if not ok then
+			error(err)
+		end
+	end
+end
+
+---@param pos integer
+---@return number
+function BufferedPreviewSoundDecoder:bytesToSeconds(pos)
+	return pos / (self.sample_rate * self.channels * self.bytes_per_sample)
+end
+
+---@param pos number
+---@return integer
+function BufferedPreviewSoundDecoder:secondsToBytes(pos)
+	return math.floor(pos * self.sample_rate) * self.channels * self.bytes_per_sample
+end
+
+function BufferedPreviewSoundDecoder:release()
+	local decoder = self.decoder
+	if decoder then
+		-- If we are not in a coroutine, we cannot yield. 
+		-- If it's a Remote, use a no-return call to avoid yielding.
+		if not coroutine.running() then
+			local mt = getmetatable(decoder)
+			if mt and mt.__unm then
+				(-decoder):release()
+			else
+				decoder:release()
+			end
+		else
+			decoder:release()
+		end
+	end
+	self.preloader_co = nil
+end
+
+return BufferedPreviewSoundDecoder

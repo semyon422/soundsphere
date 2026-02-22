@@ -7,9 +7,9 @@ function test.encode_decode(t)
 	local preview = AudioPreview()
 	preview.samples = {"sample1.wav", "sample2.ogg", "dir/sample3.mp3"}
 	preview.events = {
-		{time = 0.0, sample_index = 0, duration = 0.5, volume = 1.0},
-		{time = 1.0, sample_index = 1, duration = 1.2, volume = 0.8},
-		{time = 2.5, sample_index = 2, duration = 0.1, volume = 0.5},
+		{time = 0.0, sample_index = 1, duration = 0.5, volume = 1.0},
+		{time = 1.0, sample_index = 2, duration = 1.2, volume = 0.8},
+		{time = 2.5, sample_index = 3, duration = 0.1, volume = 0.5},
 	}
 
 	local data = preview:encode()

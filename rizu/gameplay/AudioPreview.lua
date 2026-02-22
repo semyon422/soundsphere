@@ -35,7 +35,7 @@ function AudioPreview._encode_async(self)
 	u.u32 = #self.events
 	for _, event in ipairs(self.events) do
 		u.f32 = event.time
-		u.u16 = event.sample_index
+		u.u16 = event.sample_index - 1
 		u.f32 = event.duration
 		u.u8 = math.floor(event.volume * 255 + 0.5)
 	end
@@ -65,7 +65,7 @@ function AudioPreview._decode_async(self)
 	for i = 1, event_count do
 		self.events[i] = {
 			time = u.f32,
-			sample_index = u.u16,
+			sample_index = u.u16 + 1,
 			duration = u.f32,
 			volume = u.u8 / 255,
 		}

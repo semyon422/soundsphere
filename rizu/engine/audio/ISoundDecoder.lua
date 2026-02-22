@@ -1,4 +1,5 @@
 local class = require("class")
+local ffi = require("ffi")
 
 ---@class rizu.ISoundDecoder
 ---@operator call: rizu.ISoundDecoder
@@ -9,6 +10,14 @@ local ISoundDecoder = class()
 ---@return integer
 function ISoundDecoder:getData(buf, len)
 	error("not implemented")
+end
+
+---@param len integer
+---@return string
+function ISoundDecoder:getDataString(len)
+	local buf = ffi.new("int8_t[?]", len)
+	local read = self:getData(buf, len)
+	return ffi.string(buf, read)
 end
 
 ---@param pos integer

@@ -1,7 +1,7 @@
 local class = require("class")
 local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
 local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
-local rbtree = require("aqua.rbtree")
+local rbtree = require("rbtree")
 local ffi = require("ffi")
 
 local next_entry_id = 1

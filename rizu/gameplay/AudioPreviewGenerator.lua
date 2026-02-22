@@ -83,7 +83,7 @@ function AudioPreviewGenerator:generate(chart, chart_dir, hash)
 				if duration > 0 then
 					table.insert(preview.events, {
 						time = note:getTime(),
-						sample_index = samples_map[path] - 1,
+						sample_index = samples_map[path],
 						duration = duration,
 						volume = volume,
 					})
