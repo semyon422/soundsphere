@@ -28,10 +28,22 @@ function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
 
 	-- Cache metadata. We assume these are available without yielding or
 	-- handle them being called in a coroutine context if necessary.
-	self.sample_rate = decoder:getSampleRate()
-	self.channels = decoder:getChannelCount()
-	self.bytes_per_sample = decoder:getBytesPerSample()
-	self.duration = decoder:getDuration()
+	local function load_metadata()
+		self.sample_rate = decoder:getSampleRate()
+		self.channels = decoder:getChannelCount()
+		self.bytes_per_sample = decoder:getBytesPerSample()
+		self.duration = decoder:getDuration()
+	end
+	local ok, err = pcall(load_metadata)
+	if not ok then
+		-- Metadata fetch failed, likely due to reset. 
+		-- We still need to initialize fields to avoid errors in bytesToSeconds.
+		self.sample_rate = 44100
+		self.channels = 2
+		self.bytes_per_sample = 2
+		self.duration = 0
+		-- If it's not a reset, we might want to know, but for previews it's often better to just fail silently or with defaults
+	end
 
 	self.buffer_limit_bytes = self:secondsToBytes(self.buffer_limit_seconds)
 	self.chunk_size = 4096 -- bytes
@@ -49,7 +61,7 @@ function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
 				local pos = self.pending_position
 				self.pending_position = nil
 				self.is_preloading = true
-				self.decoder:setBytesPosition(pos)
+				pcall(self.decoder.setBytesPosition, self.decoder, pos)
 				self.is_preloading = false
 				-- chunks are cleared in setBytesPosition for immediate effect in getData
 			end
@@ -57,20 +69,30 @@ function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
 			-- Fill buffer if not full and not at EOF
 			if not self.eof and self.total_buffered_bytes < self.buffer_limit_bytes then
 				self.is_preloading = true
-				local data = self.decoder:getDataString(self.chunk_size)
+				local _ok, data = pcall(self.decoder.getDataString, self.decoder, self.chunk_size)
 				self.is_preloading = false
-				local read = #data
 
-				-- If a seek was requested while we were yielding in getDataString, discard this data
-				if not self.pending_position then
-					if read > 0 then
-						local buf = ffi.new("int8_t[?]", read)
-						ffi.copy(buf, data, read)
-						table.insert(self.chunks, {data = buf, size = read, pos = 0})
-						self.total_buffered_bytes = self.total_buffered_bytes + read
-					elseif read == 0 then
-						self.eof = true
+				if _ok then
+					local read = #data
+
+					-- If a seek was requested while we were yielding in getDataString, discard this data
+					if not self.pending_position then
+						if read > 0 then
+							local buf = ffi.new("int8_t[?]", read)
+							ffi.copy(buf, data, read)
+							table.insert(self.chunks, {data = buf, size = read, pos = 0})
+							self.total_buffered_bytes = self.total_buffered_bytes + read
+						elseif read == 0 then
+							self.eof = true
+						end
 					end
+				else
+					-- getDataString failed
+					if tostring(data):find("ThreadRemote reset") then
+						return -- Terminate preloader cleanly on reset
+					end
+					-- For other errors, we might want to yield and retry or just terminate
+					coroutine.yield()
 				end
 			else
 				-- Buffer full or EOF, wait for more space or a seek
@@ -171,18 +193,9 @@ end
 function BufferedPreviewSoundDecoder:release()
 	local decoder = self.decoder
 	if decoder then
-		-- If we are not in a coroutine, we cannot yield. 
-		-- If it's a Remote, use a no-return call to avoid yielding.
-		if not coroutine.running() then
-			local mt = getmetatable(decoder)
-			if mt and mt.__unm then
-				(-decoder):release()
-			else
-				decoder:release()
-			end
-		else
-			decoder:release()
-		end
+		coroutine.wrap(function()
+			pcall(decoder.release, decoder)
+		end)()
 	end
 	self.preloader_co = nil
 end

@@ -229,4 +229,9 @@ function PreviewModel:stop()
 	self.manual_time = 0
 end
 
+function PreviewModel:release()
+	self:stop()
+	self.audioPreviewPlayer:release()
+end
+
 return PreviewModel

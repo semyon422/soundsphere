@@ -7,11 +7,13 @@ local thread = require("thread")
 ---@class rizu.gameplay.AudioPreviewPlayer
 ---@operator call: rizu.gameplay.AudioPreviewPlayer
 ---@field pending_seek number?
+---@field private thread threadremote.ThreadRemote?
 local AudioPreviewPlayer = class()
 
 AudioPreviewPlayer.volume = 1
 AudioPreviewPlayer.rate = 1
 AudioPreviewPlayer.is_playing = false
+AudioPreviewPlayer.load_generation = 0
 
 function AudioPreviewPlayer:new(configModel)
 	self.configModel = configModel
@@ -23,9 +25,16 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 	self:stop()
 	self.pending_seek = nil
 
-	-- Unique ID for thread remote
-	local thread_id = "preview_player_" .. tostring(love.timer.getTime())
-	self.thread = ThreadRemote(thread_id, {})
+	self.load_generation = self.load_generation + 1
+	local generation = self.load_generation
+
+	if not self.thread then
+		-- Persistent ID for the thread remote
+		local thread_id = "preview_player_" .. tostring(self)
+		self.thread = ThreadRemote(thread_id, {})
+	else
+		self.thread:reset()
+	end
 
 	self.thread:start(function(remote, dir, preview_path)
 		local PreviewSoundDecoder = require("rizu.engine.audio.PreviewSoundDecoder")
@@ -52,7 +61,22 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 	thread.coro(function()
 		-- BufferedPreviewSoundDecoder(self.thread.remote) calls metadata methods
 		-- which will yield and wait for thread remote update.
-		local buffered = BufferedPreviewSoundDecoder(self.thread.remote)
+		---@type boolean, rizu.BufferedPreviewSoundDecoder|string
+		local ok, buffered = pcall(BufferedPreviewSoundDecoder --[[@as function]], self.thread.remote)
+		if generation ~= self.load_generation then
+			if ok and buffered then
+				---@cast buffered -string
+				buffered:release()
+			end
+			return
+		end
+		---@cast buffered -string
+
+		if not ok then
+			-- Probably ThreadRemote stopped/reset
+			return
+		end
+
 		self.buffered_decoder = buffered
 
 		self.audio_source = BassChartAudioSource(buffered)
@@ -117,7 +141,14 @@ function AudioPreviewPlayer:stop()
 		self.buffered_decoder:release()
 		self.buffered_decoder = nil
 	end
-	self.thread = nil
+end
+
+function AudioPreviewPlayer:release()
+	self:stop()
+	if self.thread then
+		self.thread:stop()
+		self.thread = nil
+	end
 end
 
 ---@param rate number

@@ -231,6 +231,7 @@ function GameController:load()
 end
 
 function GameController:unload()
+	self.previewModel:release()
 	self.multiplayerController:unload()
 	self.ui:unload()
 	self.app:unload()
