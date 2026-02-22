@@ -3,9 +3,9 @@
 # Get the current git user
 AUTHOR=$(git config user.name)
 
-# Define the start of today
+# Define the start of today (work day starts at 5:00 AM)
 SINCE="05:00:00"
-TODAY=$(date +%Y-%m-%d)
+TODAY=$(date -d "5 hours ago" +%Y-%m-%d)
 
 # Calculate committed additions and deletions
 STATS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --numstat --pretty=tformat: | 
