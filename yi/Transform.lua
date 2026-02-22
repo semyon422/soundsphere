@@ -73,6 +73,13 @@ function Transform:update(layout_box, parent_transform, parent_layout_box)
 	self.dirty = false
 end
 
+---@param x number
+---@param y number
+---@return number
+---@return number
+function Transform:inverseTransformPoint(x, y)
+	return self.love_transform:inverseTransformPoint(x, y)
+end
 
 function Transform:setX(v)
 	if self.x ~= v then

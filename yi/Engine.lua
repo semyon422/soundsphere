@@ -2,6 +2,8 @@ local class = require("class")
 local View = require("yi.views.View")
 local ViewState = View.State
 local LayoutEngine = require("ui.layout.LayoutEngine")
+local CommandBuffer = require("yi.renderer.CommandBuffer")
+local Renderer = require("yi.renderer")
 local table_util = require("table_util")
 
 ---@class yi.Engine
@@ -24,6 +26,7 @@ function Engine:new(inputs, ctx)
 	self.root = View()
 	self.root.id = "root"
 
+	self.rebuild_command_buffer = true
 	self.layout_update_requesters = {}
 	self.transform_update_requesters = {}
 	self.removal_deferred = {}
@@ -32,6 +35,7 @@ end
 
 function Engine:load()
 	self.root:mount(self.ctx)
+	self:updateRootDimensions()
 end
 
 ---@private
@@ -59,6 +63,7 @@ function Engine:updateView(view, dt)
 	elseif state == ViewState.Loaded then
 		view.state = ViewState.Active
 		view:loadComplete()
+		self.rebuild_command_buffer = true
 		self:updateView(view, dt)
 	elseif state == ViewState.Killed then
 		table.insert(self.removal_deferred, view)
@@ -76,6 +81,7 @@ function Engine:remove(view, kill)
 		local idx = table_util.indexof(parent.children, view)
 		if idx then
 			table.remove(parent.children, idx)
+			self.rebuild_command_buffer = true
 		end
 	end
 
@@ -118,14 +124,25 @@ function Engine:update(dt, mouse_x, mouse_y)
 	for i = 1, #self.detach_deferred do
 		self:remove(self.detach_deferred[i], false)
 	end
+
+	if self.rebuild_command_buffer then
+		self.rebuild_command_buffer = false
+		self.command_buffer = CommandBuffer(self.root)
+	end
 end
 
-function Engine:draw() end
+function Engine:draw()
+	Renderer(self.command_buffer)
+end
+
+function Engine:updateRootDimensions()
+	self.root:setWidth(love.graphics.getWidth())
+	self.root:setHeight(love.graphics.getHeight())
+end
 
 function Engine:receive(event)
 	if event.name == "resize" then
-		self.root:setWidth(event.width)
-		self.root:setHeight(event.height)
+		self:updateRootDimensions()
 	end
 end
 

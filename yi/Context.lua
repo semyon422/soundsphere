@@ -11,11 +11,11 @@ function Context:new(game, inputs)
 	self.inputs = assert(inputs)
 end
 
----@param top yi.View
----@param modals yi.View
----@param screens yi.View
 ---@param background yi.Background
-function Context:setLayers(top, modals, screens, background)
+---@param screens yi.Screens
+---@param modals yi.View
+---@param top yi.View
+function Context:setLayers(background, screens, modals, top)
 	self.top = top
 	self.modals = modals
 	self.screens = screens

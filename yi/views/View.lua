@@ -122,7 +122,11 @@ function View:kill()
 end
 
 function View:detach()
-	self.state = State.Detached
+	if self.state == State.Active then
+		self.state = State.Detached
+	else
+		error("Can't detach not active view")
+	end
 end
 
 ---@return number
@@ -378,9 +382,11 @@ View.Setters = {
 
 	handles_mouse_input = true,
 	handles_keyboard_input = true,
+	color = true,
+	background_color = true,
+	corner_radius = true,
 	mouse = function(self, v) self.handles_mouse_input = v end,
 	keyboard = function(self, v) self.handles_keyboard_input = v end
 }
-
 
 return View
