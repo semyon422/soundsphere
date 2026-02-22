@@ -75,6 +75,13 @@ function View:add(view, params)
 	return view
 end
 
+---@param views yi.View[]
+function View:addArray(views)
+	for i = 1, #views do
+		self:add(views[i])
+	end
+end
+
 --- Takes a table with parameters and applies them using setters
 ---@param params {[string]: any}
 function View:setup(params)
@@ -127,6 +134,24 @@ function View:detach()
 	else
 		error("Can't detach not active view")
 	end
+end
+
+---@return yi.Context
+function View:getContext()
+	if not self.ctx then
+		error("Context is not available")
+	end
+	return self.ctx
+end
+
+---@return sphere.GameController
+function View:getGame()
+	return self:getContext().game
+end
+
+---@return ui.Inputs
+function View:getInputs()
+	return self:getContext().inputs
 end
 
 ---@return number
@@ -332,6 +357,63 @@ function View:setGridSpan(col_span, row_span)
 	self.layout_box:setGridSpan(col_span, row_span)
 end
 
+---@param x number
+function View:setX(x)
+	self.transform:setX(x)
+end
+
+---@param y number
+function View:setY(y)
+	self.transform:setY(y)
+end
+
+---@param sx number
+function View:setScaleX(sx)
+	self.transform:setScaleX(sx)
+end
+
+---@param sy number
+function View:setScaleY(sy)
+	self.transform:setScaleY(sy)
+end
+
+---@param a number
+function View:setAngle(a)
+	self.transform:setAngle(a)
+end
+
+---@enum (key) ui.PivotString
+local pivots = {
+	top_left = {x = 0, y = 0},
+	top_center = {x = 0.5, y = 0},
+	top_right = {x = 1, y = 0},
+	center_left = {x = 0, y = 0.5},
+	center = {x = 0.5, y = 0.5},
+	center_right = {x = 1, y = 0.5},
+	bottom_left = {x = 0, y = 1},
+	bottom_center = {x = 0.5, y = 1},
+	bottom_right = {x = 1, y = 1},
+}
+
+---@param v ui.PivotString
+function View:setOrigin(v)
+	local o = pivots[v]
+	self.transform:setOrigin(o.x, o.y)
+end
+
+---@param v ui.PivotString
+function View:setAnchor(v)
+	local a = pivots[v]
+	self.transform:setAnchor(a.x, a.y)
+end
+
+---@param v ui.PivotString
+function View:setPivot(v)
+	local p = pivots[v]
+	self.transform:setAnchor(p.x, p.y)
+	self.transform:setOrigin(p.x, p.y)
+end
+
 View.Setters = {
 	width = View.setWidth,
 	height = View.setHeight,
@@ -340,6 +422,7 @@ View.Setters = {
 	min_height = View.setMinHeight,
 	max_height = View.setMaxHeight,
 
+	-- Tailwind CSS
 	w = View.setWidth,
 	h = View.setHeight,
 	min_w = View.setMinWidth,
@@ -347,16 +430,17 @@ View.Setters = {
 	min_h = View.setMinHeight,
 	max_h = View.setMaxHeight,
 
-	x = function(self, v) self.transform:setX(v) end,
-	y = function(self, v) self.transform:setY(v) end,
-	angle = function(self, v) self.transform:setAngle(v) end,
-	scale_x = function(self, v) self.transform:setScaleX(v) end,
-	scale_y = function(self, v) self.transform:setScaleY(v) end,
-	origin_x = function(self, v) self.transform:setOriginX(v) end,
-	origin_y = function(self, v) self.transform:setOriginY(v) end,
-	anchor_x = function(self, v) self.transform:setAnchorX(v) end,
-	anchor_y = function(self, v) self.transform:setAnchorY(v) end,
+	-- Transform
+	x = View.setX,
+	y = View.setY,
+	angle = View.setAngle,
+	scale_x = View.setScaleX,
+	scale_y = View.setScaleY,
+	anchor = View.setAnchor,
+	origin = View.setOrigin,
+	pivot = View.setPivot,
 
+	-- General layout settings
 	arrange = View.setArrange,
 	display = View.setArrange,
 	padding = View.setPaddings,
@@ -380,6 +464,7 @@ View.Setters = {
 	cell = View.setGridCell,
 	span = View.setGridSpan,
 
+	-- View
 	handles_mouse_input = true,
 	handles_keyboard_input = true,
 	color = true,
