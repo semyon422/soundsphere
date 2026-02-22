@@ -380,11 +380,20 @@ function ChartAudioMixer:getPosition()
 	return self:bytesToSeconds(self.position)
 end
 
+---@return integer
+function ChartAudioMixer:getBytesPosition()
+	return self.position
+end
+
 ---@param pos number
 function ChartAudioMixer:setPosition(pos)
-	local new_pos = self:secondsToBytes(pos)
-	if new_pos ~= self.position then
-		self.position = new_pos
+	self:setBytesPosition(self:secondsToBytes(pos))
+end
+
+---@param pos integer
+function ChartAudioMixer:setBytesPosition(pos)
+	if pos ~= self.position then
+		self.position = pos
 		self:resetActiveSet()
 	end
 end
