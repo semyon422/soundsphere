@@ -30,6 +30,10 @@ function UserInterface:load()
 
 	self.ctx:setLayers(background, screens, modals, top)
 	self.engine:load()
+
+	screens:set("select")
+
+	self.screens = screens
 end
 
 ---@param dt number
@@ -44,6 +48,7 @@ end
 
 ---@param event table
 function UserInterface:receive(event)
+	self.screens:receive(event) -- :sob:
 	self.engine:receive(event)
 end
 
