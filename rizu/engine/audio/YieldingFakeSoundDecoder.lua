@@ -1,6 +1,7 @@
 local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
 
 ---@class rizu.YieldingFakeSoundDecoder: rizu.ISoundDecoder
+---@operator call: rizu.YieldingFakeSoundDecoder
 ---@field private decoder rizu.ISoundDecoder
 local YieldingFakeSoundDecoder = ISoundDecoder + {}
 

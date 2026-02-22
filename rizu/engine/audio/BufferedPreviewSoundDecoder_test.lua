@@ -60,6 +60,7 @@ function test.non_blocking_yield(t)
 	-- It calls decoder:getSampleRate(), getChannelCount(), getBytesPerSample(), getDuration()
 	-- If they yield, BufferedPreviewSoundDecoder:new() will yield.
 
+	---@type rizu.BufferedPreviewSoundDecoder
 	local buffered
 	local co = coroutine.create(function()
 		buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
@@ -77,13 +78,10 @@ function test.non_blocking_yield(t)
 
 	-- First getData will resume the preloader.
 	-- The preloader will call underlying:getData which will yield.
-	-- BufferedPreviewSoundDecoder:getData should then return silence.
+	-- BufferedPreviewSoundDecoder:getData should then return 0 (stall).
 	local read = buffered:getData(read_buf, read_len)
 
-	t:eq(read, read_len, "Should return full length (silence)")
-	for i = 0, read_len - 1 do
-		t:eq(read_buf[i], 0, "Data should be silence (0) at index " .. i)
-	end
+	t:eq(read, 0, "Should return 0 (stall)")
 
 	-- Manually resume the preloader since we are in a mock test with no external driver
 	coroutine.resume(buffered.preloader_co)
@@ -92,6 +90,42 @@ function test.non_blocking_yield(t)
 	local read2 = buffered:getData(read_buf, read_len)
 	t:eq(read2, read_len, "Should return full length (real data now)")
 	t:eq(read_buf[0], 7, "Should have read real data (7)")
+end
+
+---@param t testing.T
+function test.metadata_pcall(t)
+	local underlying = {
+		getSampleRate = function() error("Metadata failed") end,
+		getChannelCount = function() return 2 end,
+		getBytesPerSample = function() return 2 end,
+		getDuration = function() return 10 end,
+		secondsToBytes = function(_, s) return math.floor(s * 44100) * 2 * 2 end,
+	}
+
+	local buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+
+	t:eq(buffered:getSampleRate(), 44100, "Should fallback to default sample rate")
+	t:eq(buffered:getDuration(), 0, "Should fallback to 0 duration")
+end
+
+---@param t testing.T
+function test.reset_signal(t)
+	local underlying = {
+		getSampleRate = function() return 44100 end,
+		getChannelCount = function() return 2 end,
+		getBytesPerSample = function() return 2 end,
+		getDuration = function() return 10 end,
+		secondsToBytes = function(_, s) return math.floor(s * 44100) * 2 * 2 end,
+		getDataString = function() error("ThreadRemote reset") end,
+	}
+
+	local buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+
+	-- First getData resumes preloader
+	buffered:getData(ffi.new("int8_t[1024]"), 1024)
+
+	-- Preloader should be dead now because of the reset error
+	t:eq(coroutine.status(buffered.preloader_co), "dead", "Preloader should terminate on reset")
 end
 
 ---@param t testing.T
@@ -110,7 +144,7 @@ function test.seek(t)
 	local read_len = 100
 	local read_buf = ffi.new("int8_t[?]", read_len)
 
-	-- Since FakeSoundDecoder doesn't yield, setBytesPosition already triggered 
+	-- Since FakeSoundDecoder doesn't yield, setBytesPosition already triggered
 	-- the preloader to seek AND fetch one chunk (chunk_size=4096).
 	-- So the data should be available IMMEDIATELY.
 	buffered:getData(read_buf, read_len)
