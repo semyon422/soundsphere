@@ -11,8 +11,9 @@ local function fill_wave(wave, offset, mul)
 	offset = offset or 0
 	mul = mul or 1
 	for i = 0, wave.samples_count - 1 do
-		wave:setSampleInt(i, 1, offset + i * mul)
-		wave:setSampleInt(i, 2, offset + i * mul)
+		for c = 1, wave.channels_count do
+			wave:setSampleInt(i, c, offset + i * mul)
+		end
 	end
 end
 
@@ -239,6 +240,258 @@ function test.no_intermediate_clipping(t)
 	t:eq(mixer:getData(buf, 4), 4)
 	t:eq(buf[0], 20000)
 	t:eq(buf[1], 20000)
+end
+
+---@param t testing.T
+function test.dynamic(t)
+	local mixer = ChartAudioMixer({}, {})
+	t:assert(mixer.empty)
+
+	local decoder = FakeSoundDecoder(4, 1, 1)
+	fill_wave(decoder.wave, 10)
+
+	mixer:addSound({time = 1}, decoder)
+	t:assert(not mixer.empty)
+	t:eq(mixer:getSamplesDuration(), 4)
+	t:eq(mixer:getPosition(), 0)
+
+	local buf = ffi.new("int16_t[10]")
+	local function clean()
+		ffi.fill(buf, 20, 0)
+	end
+
+	-- Time 0: no sound (starts at 1)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+	clean()
+
+	-- Time 1: sound starts
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 10)
+	clean()
+
+	-- Dynamic removal
+	mixer:removeSound(decoder)
+	t:assert(mixer.empty)
+
+	mixer:setPosition(1)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+end
+
+---@param t testing.T
+function test.seeking(t)
+	local sounds = {
+		{time = 1},
+		{time = 5},
+	}
+	local decoders = {
+		FakeSoundDecoder(2, 1, 1), -- duration 2, ends at 3
+		FakeSoundDecoder(2, 1, 1), -- duration 2, ends at 7
+	}
+	fill_wave(decoders[1].wave, 10)
+	fill_wave(decoders[2].wave, 100)
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[2]")
+
+	-- Seek to 0 (before everything)
+	mixer:setPosition(0)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+
+	-- Seek to 1 (start of first sound)
+	mixer:setPosition(1)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 10)
+
+	-- Seek to 2 (middle of first sound)
+	mixer:setPosition(2)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 11)
+
+	-- Seek to 4 (between sounds)
+	mixer:setPosition(4)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+
+	-- Seek to 5 (start of second sound)
+	mixer:setPosition(5)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 100)
+
+	-- Seek to 6 (middle of second sound)
+	mixer:setPosition(6)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 101)
+
+	-- Seek to 8 (after everything)
+	mixer:setPosition(8)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+
+	-- Seek backwards from 8 to 2
+	mixer:setPosition(2)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 11)
+end
+
+---@param t testing.T
+function test.dynamic_playback(t)
+	-- Use a sound to initialize format to 1Hz, 1ch
+	local init_dec = FakeSoundDecoder(1, 1, 1)
+	local mixer = ChartAudioMixer({{time = -100}}, {init_dec})
+	mixer:setPosition(0)
+
+	local buf = ffi.new("int16_t[2]")
+
+	local dec1 = FakeSoundDecoder(2, 1, 1)
+	fill_wave(dec1.wave, 10)
+
+	-- Start playing empty (except the far away init sound)
+	t:eq(mixer:getData(buf, 2), 2) -- pos 0 -> 1
+	t:eq(buf[0], 0)
+
+	-- Add sound that starts at 0 while we are at 1
+	mixer:addSound({time = 0}, dec1)
+	t:eq(mixer:getPosition(), 1)
+	t:eq(mixer:getData(buf, 2), 2) -- pos 1 -> 2
+	t:eq(buf[0], 11) -- second sample of dec1
+
+	-- Add another sound that starts at 3
+	local dec2 = FakeSoundDecoder(2, 1, 1)
+	fill_wave(dec2.wave, 100)
+	mixer:addSound({time = 3}, dec2)
+
+	t:eq(mixer:getData(buf, 2), 2) -- pos 2 -> 3
+	t:eq(buf[0], 0) -- gap
+
+	t:eq(mixer:getData(buf, 2), 2) -- pos 3 -> 4
+	t:eq(buf[0], 100) -- first sample of dec2
+
+	-- Remove dec2 while playing it
+	mixer:removeSound(dec2)
+	t:eq(mixer:getData(buf, 2), 2) -- pos 4 -> 5
+	t:eq(buf[0], 0)
+end
+
+---@param t testing.T
+function test.overlap_seeking(t)
+	local sounds = {
+		{time = 0},
+		{time = 1},
+	}
+	local decoders = {
+		FakeSoundDecoder(3, 1, 1), -- 0 to 3
+		FakeSoundDecoder(3, 1, 1), -- 1 to 4
+	}
+	fill_wave(decoders[1].wave, 10) -- 10, 11, 12
+	fill_wave(decoders[2].wave, 100) -- 100, 101, 102
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[2]")
+
+	-- pos 0: 10
+	mixer:setPosition(0)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 10)
+
+	-- pos 1: 11 + 100 = 111
+	mixer:setPosition(1)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 111)
+
+	-- pos 2: 12 + 101 = 113
+	mixer:setPosition(2)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 113)
+
+	-- pos 3: 102
+	mixer:setPosition(3)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 102)
+
+	-- pos 4: 0
+	mixer:setPosition(4)
+	t:eq(mixer:getData(buf, 2), 2)
+	t:eq(buf[0], 0)
+end
+
+---@param t testing.T
+function test.many_sounds(t)
+	local n = 100
+	local sounds = {}
+	local decoders = {}
+	for i = 1, n do
+		table.insert(sounds, {time = i})
+		local dec = FakeSoundDecoder(1, 1, 1)
+		dec.wave:setSampleInt(0, 1, i)
+		table.insert(decoders, dec)
+	end
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[2]")
+
+	for i = 1, n do
+		mixer:setPosition(i)
+		t:eq(mixer:getData(buf, 2), 2)
+		t:eq(buf[0], i)
+	end
+end
+
+---@param t testing.T
+function test.simultaneous(t)
+	local n = 5
+	local sounds = {}
+	local decoders = {}
+	for i = 1, n do
+		table.insert(sounds, {time = 0})
+		local dec = FakeSoundDecoder(1, 1, 1)
+		dec.wave:setSampleInt(0, 1, 10 ^ (i - 1))
+		table.insert(decoders, dec)
+	end
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buf = ffi.new("int16_t[2]")
+
+	t:eq(mixer:getData(buf, 2), 2)
+	-- Sum: 1 + 10 + 100 + 1000 + 10000 = 11111
+	t:eq(buf[0], 11111)
+
+	-- Remove middle sound (100)
+	mixer:removeSound(decoders[3])
+	mixer:setPosition(0)
+	t:eq(mixer:getData(buf, 2), 2)
+	-- Sum: 1 + 10 + 1000 + 10000 = 11011
+	t:eq(buf[0], 11011)
+end
+
+---@param t testing.T
+function test.id_consistency(t)
+	local mixer = ChartAudioMixer({}, {})
+	local dec1 = FakeSoundDecoder(1, 1, 1)
+	local dec2 = FakeSoundDecoder(1, 1, 1)
+
+	mixer:addSound({time = 0}, dec1)
+	mixer:addSound({time = 0}, dec2)
+
+	local entry1 = mixer.decoder_to_entry[dec1]
+	local entry2 = mixer.decoder_to_entry[dec2]
+
+	t:assert(entry1.id ~= entry2.id, "Entries should have unique IDs")
+
+	-- Ensure they are in the trees
+	t:assert(mixer.tree_start.size == 2)
+	t:assert(mixer.tree_end.size == 2)
+
+	-- Remove and re-add to check if ID logic still works
+	mixer:removeSound(dec1)
+	t:assert(mixer.tree_start.size == 1)
+	mixer:addSound({time = 0}, dec1)
+	t:assert(mixer.tree_start.size == 2)
+
+	local entry1_new = mixer.decoder_to_entry[dec1]
+	t:assert(entry1_new.id > entry2.id, "New entry should have a larger ID")
 end
 
 return test
