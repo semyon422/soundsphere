@@ -4,6 +4,7 @@ local ResourceFinder = require("rizu.files.ResourceFinder")
 local LazySoundDecoder = require("rizu.engine.audio.LazySoundDecoder")
 
 ---@class rizu.PreviewSoundDecoder: rizu.ISoundDecoder
+---@operator call: rizu.PreviewSoundDecoder
 ---@field private mixer rizu.ChartAudioMixer
 local PreviewSoundDecoder = ISoundDecoder + {}
 

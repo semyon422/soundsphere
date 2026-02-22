@@ -1,65 +1,64 @@
 local class = require("class")
-local ThreadRemote = require("aqua.threadremote.ThreadRemote")
+local ThreadRemote = require("threadremote.ThreadRemote")
 local BufferedPreviewSoundDecoder = require("rizu.engine.audio.BufferedPreviewSoundDecoder")
 local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
-local LoveFilesystem = require("fs.LoveFilesystem")
 local thread = require("thread")
 
 ---@class rizu.gameplay.AudioPreviewPlayer
 ---@operator call: rizu.gameplay.AudioPreviewPlayer
+---@field pending_seek number?
 local AudioPreviewPlayer = class()
+
+AudioPreviewPlayer.volume = 1
+AudioPreviewPlayer.rate = 1
+AudioPreviewPlayer.is_playing = false
 
 function AudioPreviewPlayer:new(configModel)
 	self.configModel = configModel
-	self.fs = LoveFilesystem()
-	self.thread = nil
-	self.buffered_decoder = nil
-	---@type rizu.BassChartAudioSource?
-	self.audio_source = nil
-	self.volume = 1
-	self.rate = 1
-	self.is_playing = false
-	self.last_time = 0
-	self.pending_seek = nil
 end
 
----@param preview_data string
+---@param preview_path string
 ---@param chart_dir string
-function AudioPreviewPlayer:load(preview_data, chart_dir)
+function AudioPreviewPlayer:load(preview_path, chart_dir)
 	self:stop()
 	self.pending_seek = nil
 
 	-- Unique ID for thread remote
 	local thread_id = "preview_player_" .. tostring(love.timer.getTime())
 	self.thread = ThreadRemote(thread_id, {})
-	
-	self.thread:start(function(remote, dir, preview_data)
+
+	self.thread:start(function(remote, dir, preview_path)
 		local PreviewSoundDecoder = require("rizu.engine.audio.PreviewSoundDecoder")
 		local AudioPreview = require("rizu.gameplay.AudioPreview")
 		local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
 		local LoveFilesystem = require("fs.LoveFilesystem")
+		local fs = LoveFilesystem()
+
+		local preview_data = fs:read(preview_path)
+		if not preview_data then
+			error("AudioPreviewPlayer: could not read preview file " .. tostring(preview_path))
+		end
 
 		local preview = AudioPreview()
 		preview:decode(preview_data)
 
-		local fs = LoveFilesystem()
 		local decoder = PreviewSoundDecoder(fs, dir, preview, function(_, path)
-			return BassSoundDecoder(love.filesystem.read(path))
+			return BassSoundDecoder(fs:read(path))
 		end)
 
 		return decoder
-	end, chart_dir, preview_data)
+	end, chart_dir, preview_path)
 
 	thread.coro(function()
 		-- BufferedPreviewSoundDecoder(self.thread.remote) calls metadata methods
 		-- which will yield and wait for thread remote update.
 		local buffered = BufferedPreviewSoundDecoder(self.thread.remote)
 		self.buffered_decoder = buffered
-		
+
 		self.audio_source = BassChartAudioSource(buffered)
 		self.audio_source:setVolume(self.volume)
 		self.audio_source:setRate(self.rate)
-		
+
 		if self.pending_seek then
 			self.audio_source:setPosition(self.pending_seek)
 			self.pending_seek = nil
@@ -71,7 +70,7 @@ function AudioPreviewPlayer:load(preview_data, chart_dir)
 	end)()
 end
 
-function AudioPreviewPlayer:update(time)
+function AudioPreviewPlayer:update()
 	if self.thread then
 		self.thread:update()
 	end
@@ -80,20 +79,12 @@ function AudioPreviewPlayer:update(time)
 		return
 	end
 
-	-- Drift check and sync
-	-- BassChartAudioSource provides getPosition() which accounts for buffer
-	local stream_time = self.audio_source:getPosition()
-	
-	-- If time drifts more than 100ms, seek the audio source to resync.
-	if math.abs(stream_time - time) > 0.1 then
-		self:seek(time)
-	end
-
 	if self.is_playing then
 		self.audio_source:update()
 	end
 end
 
+---@param time number
 function AudioPreviewPlayer:seek(time)
 	if not self.audio_source then
 		self.pending_seek = time
@@ -129,6 +120,7 @@ function AudioPreviewPlayer:stop()
 	self.thread = nil
 end
 
+---@param rate number
 function AudioPreviewPlayer:setRate(rate)
 	self.rate = rate
 	if self.audio_source then
@@ -136,6 +128,7 @@ function AudioPreviewPlayer:setRate(rate)
 	end
 end
 
+---@param volume number
 function AudioPreviewPlayer:setVolume(volume)
 	self.volume = volume
 	if self.audio_source then

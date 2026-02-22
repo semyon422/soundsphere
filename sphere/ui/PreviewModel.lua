@@ -16,7 +16,9 @@ PreviewModel.manual_time = 0
 function PreviewModel:new(configModel)
 	self.configModel = configModel
 	self.audioPreviewPlayer = AudioPreviewPlayer(configModel)
+	---@type {[string]: boolean?}
 	self.generating_hashes = {}
+	---@type {[string]: boolean?}
 	self.attempted_hashes = {}
 end
 
@@ -46,7 +48,7 @@ function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode, chartv
 	end
 end
 
----@param f function
+---@param f function?
 function PreviewModel:onLoad(f)
 	self._on_load = f
 end
@@ -72,7 +74,7 @@ function PreviewModel:update()
 		self.audioPreviewPlayer:pause()
 	end
 
-	self.audioPreviewPlayer:update(self.manual_time)
+	self.audioPreviewPlayer:update()
 
 	local volumeConfig = settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
@@ -101,7 +103,7 @@ function PreviewModel:loadPreviewDebounce()
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
 
-local loadingPreview
+local loadingPreview = false
 function PreviewModel:loadPreview()
 	if loadingPreview then
 		return
@@ -127,7 +129,7 @@ function PreviewModel:loadPreview()
 	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 
-	local position = self.preview_time
+	local position = self.preview_time or 0
 	if self.mode == "relative" then
 		position = (self.chartview and self.chartview.duration or 0) * position
 	end
@@ -135,12 +137,12 @@ function PreviewModel:loadPreview()
 	self.position = position
 	self.manual_time = position
 
+	---@type string?
 	local hash = self.chartview and self.chartview.hash
 	if hash then
 		local preview_path = "userdata/audio_previews/" .. hash .. ".audio_preview"
-		local data = love.filesystem.read(preview_path)
-		if data then
-			self.audioPreviewPlayer:load(data, self.chartview.location_dir)
+		if love.filesystem.getInfo(preview_path) then
+			self.audioPreviewPlayer:load(preview_path, self.chartview.location_dir)
 			self.audioPreviewPlayer:setVolume(volume)
 			self.audioPreviewPlayer:setRate(self.rate)
 			self.audioPreviewPlayer:seek(position)

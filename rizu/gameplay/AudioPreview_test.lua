@@ -32,7 +32,7 @@ function test.encode_decode(t)
 		t:eq(e2.sample_index, e1.sample_index)
 		t:assert(math.abs(e2.duration - e1.duration) < 1e-6)
 		-- volume is quantized to 1/255
-		t:assert(math.abs(e2.volume - e1.volume) < 1/250)
+		t:assert(math.abs(e2.volume - e1.volume) < 1 / 250)
 	end
 end
 
@@ -40,10 +40,10 @@ end
 function test.empty(t)
 	local preview = AudioPreview()
 	local data = preview:encode()
-	
+
 	local preview2 = AudioPreview()
 	preview2:decode(data)
-	
+
 	t:eq(#preview2.samples, 0)
 	t:eq(#preview2.events, 0)
 end

@@ -2,6 +2,7 @@ local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
 local ffi = require("ffi")
 
 ---@class rizu.BufferedPreviewSoundDecoder: rizu.ISoundDecoder
+---@operator call: rizu.BufferedPreviewSoundDecoder
 ---@field private decoder rizu.ISoundDecoder
 ---@field private buffer_limit_seconds number
 ---@field private buffer_limit_bytes integer
