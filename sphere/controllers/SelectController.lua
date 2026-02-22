@@ -134,10 +134,6 @@ function SelectController:update()
 		self:applyModifierMeta()
 	end
 
-	if #self.configModel.configs.online.token == 0 then
-		return
-	end
-
 	-- local time = love.timer.getTime()
 	-- if not self.startTime or time - self.startTime > 600 then
 	-- 	self:updateSession()
