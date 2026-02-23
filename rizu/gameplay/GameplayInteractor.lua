@@ -20,7 +20,6 @@ function GameplayInteractor:new(game)
 
 	self.score_saver = ScoreSaver(
 		game.fs,
-		game.rhythm_engine,
 		game.persistence.cacheModel,
 		game.persistence.configModel,
 		game.seaClient,
@@ -110,8 +109,6 @@ function GameplayInteractor:load(autoplay)
 		self.gameplay_session:setReplayFrames(self.replay_frames)
 	end
 
-	self.score_saver.rhythm_engine = game.rhythm_engine
-
 	game.rhythm_engine:setGlobalTime(game.global_timer:getTime())
 end
 
@@ -136,7 +133,6 @@ function GameplayInteractor:unloadGameplay()
 		self:saveScore()
 	end
 
-	game.rhythm_engine:unload()
 	game.multiplayerModel.client:setPlaying(false)
 end
 
@@ -168,7 +164,7 @@ function GameplayInteractor:hasResult()
 end
 
 function GameplayInteractor:saveScore()
-	self.score_saver:saveScore()
+	self.score_saver:saveScore(self.gameplay_session)
 end
 
 function GameplayInteractor:play()
@@ -199,7 +195,7 @@ function GameplayInteractor:skipIntro()
 end
 
 function GameplayInteractor:skip()
-	-- self.rhythmModel.timeEngine:skipIntro()
+	self.game.rhythm_engine:setTime(math.huge)
 end
 
 ---@param state "play"|"pause"|"retry"

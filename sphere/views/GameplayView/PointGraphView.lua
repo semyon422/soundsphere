@@ -37,7 +37,12 @@ function PointGraphView:draw(w, h)
 		return
 	end
 
-	local points = self.game.rhythm_engine.score_engine.sequence
+	local rhythm_engine = self.game.rhythm_engine
+	if not rhythm_engine or not rhythm_engine.score_engine then
+		return
+	end
+
+	local points = rhythm_engine.score_engine.sequence
 	if self.points ~= points then
 		self.points = points
 		points = self.points
