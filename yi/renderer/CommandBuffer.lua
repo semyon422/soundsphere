@@ -8,19 +8,18 @@ local buf = {} ---@type yi.CommandBuffer
 ---@param view yi.View
 local function traverse(view)
 	local has_state =
-		view.stencil or
 		view.background_color or
 		view.draw
+
+	if view.stencil then
+		insert(buf, C.STENCIL_START)
+		insert(buf, view)
+	end
 
 	if has_state then
 		insert(buf, C.PUSH_STATE)
 		insert(buf, C.APPLY_TRANSFORM)
 		insert(buf, view.transform.love_transform)
-	end
-
-	if view.stencil then
-		insert(buf, C.STENCIL_START)
-		insert(buf, view)
 	end
 
 	if view.background_color then

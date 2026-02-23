@@ -475,6 +475,7 @@ View.Setters = {
 	color = true,
 	background_color = true,
 	corner_radius = true,
+	stencil = true,
 	mouse = function(self, v) self.handles_mouse_input = v end,
 	keyboard = function(self, v) self.handles_keyboard_input = v end
 }

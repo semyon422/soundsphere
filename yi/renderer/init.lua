@@ -63,6 +63,7 @@ return function(buf)
 			i = i + 2
 		elseif v == C.STENCIL_END then
 			love.graphics.setStencilTest()
+			i = i + 1
 		end
 	end
 end
