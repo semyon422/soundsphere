@@ -5,8 +5,6 @@ if arg[2] == "cli" then
 	return
 end
 
-require("hooks")
-
 require("mime")
 require("ltn12")
 require("enet")

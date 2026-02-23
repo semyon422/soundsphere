@@ -2,8 +2,8 @@ local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
 local Wave = require("audio.Wave")
 local ffi = require("ffi")
 
----@class rizu.SoundDecoder: rizu.ISoundDecoder
----@operator call: rizu.SoundDecoder
+---@class rizu.FakeSoundDecoder: rizu.ISoundDecoder
+---@operator call: rizu.FakeSoundDecoder
 local FakeSoundDecoder = ISoundDecoder + {}
 
 ---@param samples_count integer

@@ -151,7 +151,7 @@ function SelectModel:getAudioPathPreview()
 
 	local audio_path = chartview.audio_path
 	if not audio_path or audio_path == "" then
-		return path_util.join(chartview.real_dir, "preview.ogg"), 0, mode
+		return "", 0.4, "relative"
 	end
 
 	local full_path = path_util.join(chartview.real_dir, audio_path)

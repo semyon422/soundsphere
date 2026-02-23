@@ -113,7 +113,8 @@ function SelectController:update()
 	local selectModel = self.selectModel
 	if selectModel:isChanged() then
 		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
-		self.previewModel:setAudioPathPreview(selectModel:getAudioPathPreview())
+		local audio_path, preview_time, mode = selectModel:getAudioPathPreview()
+		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, selectModel.chartview)
 		self.previewModel:onLoad(function()
 			self.chartPreviewModel:setChartview(selectModel.chartview)
 		end)
@@ -131,10 +132,6 @@ function SelectController:update()
 	if self.modifierSelectModel:isChanged() then
 		self.multiplayerModel.client:updateReplayBase()
 		self:applyModifierMeta()
-	end
-
-	if #self.configModel.configs.online.token == 0 then
-		return
 	end
 
 	-- local time = love.timer.getTime()

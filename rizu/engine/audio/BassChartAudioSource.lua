@@ -91,13 +91,12 @@ function BassChartAudioSource:update()
 		return
 	end
 
-	ffi.fill(self.buf, need_bytes, 0)
-
-	self.decoder:getData(self.buf, need_bytes)
-
-	---@type integer
-	local bytes = bass.BASS_StreamPutData(self.channel, self.buf, need_bytes)
-	bass_assert(bytes ~= -1)
+	local read = self.decoder:getData(self.buf, need_bytes)
+	if read > 0 then
+		---@type integer
+		local bytes = bass.BASS_StreamPutData(self.channel, self.buf, read)
+		bass_assert(bytes ~= -1)
+	end
 end
 
 return BassChartAudioSource
