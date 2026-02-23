@@ -46,7 +46,8 @@ function VisualEngine:addNote(linked_note, visual_note)
 end
 
 ---@param chart ncdk2.Chart
-function VisualEngine:load(chart)
+---@param lazy_scrollers boolean?
+function VisualEngine:load(chart, lazy_scrollers)
 	---@type {[ncdk2.Visual]: integer}
 	self.cvpi = {}
 	---@type {[ncdk2.Visual]: ncdk2.VisualPoint}
@@ -65,7 +66,7 @@ function VisualEngine:load(chart)
 	for _, visual in ipairs(chart:getVisuals()) do
 		self.cvpi[visual] = 1
 		self.cvp[visual] = VisualPoint(Point())
-		visual:generateEvents()
+		visual:generateEvents(lazy_scrollers)
 	end
 
 	local point_events = self.point_events
