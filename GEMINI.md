@@ -145,8 +145,6 @@ The `.sph` format is a text-based format for rhythm game charts.
 When writing tests for gameplay logic or the rhythm engine:
 
 *   **Time Advancement**: Use `GameplaySession:update(global_time)` to advance time.
-*   **Mocking Audio**: When testing without real audio, the `TimeEngine` may attempt to sync with a non-existent or fake audio source.
-    *   **Snap-back Prevention**: Disable the time adjustment function to prevent the clock from snapping back to 0: `re.time_engine:setAdjustFunction(nil)`.
 *   **Initialization Order**: Always set the global time (`re:setGlobalTime(t)`) before calling `re:play()` or `re:update()` to ensure internal timers are correctly initialized.
 *   **TestChartFactory**: Use `sea.chart.TestChartFactory` for programmatic chart creation in tests. It produces minimal `Chart`, `Chartmeta`, and `Chartdiff` without parsing files.
     ```lua

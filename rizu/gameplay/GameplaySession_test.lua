@@ -51,7 +51,6 @@ function test.autoplay(t)
 	re:setTimingValues(TimingValues())
 	re:load()
 	re:setAudioEnabled(false)
-	re.time_engine:setAdjustFunction(nil)
 	gc:setPlayType("auto")
 
 	local received_events = {}

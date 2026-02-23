@@ -152,7 +152,6 @@ end
 ---@param t testing.T
 function test.logic_time_sync_on_receive(t)
 	local re = RhythmEngine()
-	re.time_engine:setAdjustFunction(nil)
 	
 	local res = tcf:create("4key", {})
 	re:setChart(res.chart, res.chartmeta, res.chartdiff)

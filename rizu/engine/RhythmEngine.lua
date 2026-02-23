@@ -45,9 +45,6 @@ function RhythmEngine:new()
 	self.audio_engine = AudioEngine()
 
 	self.time_engine = TimeEngine()
-	self.time_engine:setAdjustFunction(function()
-		return self.audio_engine:getPosition()
-	end)
 
 	self.play_progress = PlayProgress()
 	self.pause_counter = PauseCounter()
@@ -69,6 +66,10 @@ end
 function RhythmEngine:loadAudio(resources)
 	self.chart_resources = resources
 	self.audio_engine:load(self.chart, resources, self.auto_key_sound)
+
+	self.time_engine:setAdjustFunction(function()
+		return self.audio_engine:getPosition()
+	end)
 end
 
 ---@param enabled boolean
