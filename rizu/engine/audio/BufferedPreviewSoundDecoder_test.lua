@@ -152,4 +152,34 @@ function test.seek(t)
 	t:eq(read_buf[0], 50000 % 120 + 1, "Data should match after seek")
 end
 
+---@param t testing.T
+function test.negative_start(t)
+	local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
+	local sample_rate = 1
+	local channels = 1
+
+	-- Sound at time -5, duration 10 (ends at 5)
+	local sounds = {{time = -5}}
+	local decoders = {FakeSoundDecoder(10, sample_rate, channels)}
+	-- Fill decoder with data 1, 2, 3, ...
+	for i = 0, 9 do
+		decoders[1].wave:setSampleInt(i, 1, i + 1)
+	end
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	local buffered = BufferedPreviewSoundDecoder(mixer, 100)
+	
+	t:eq(buffered:getPosition(), -5, "Buffered should start at decoder's position (-5)")
+	t:eq(buffered:getDuration(), 10, "Duration should match underlying decoder's duration")
+
+	local buf = ffi.new("int16_t[20]")
+	local read = buffered:getData(buf, 20)
+	t:eq(read, 20, "Should read 20 bytes (10 seconds)")
+	t:eq(buffered:getPosition(), 5, "Buffered position should be 5 after 10 seconds from -5")
+	
+	for i = 0, 9 do
+		t:eq(buf[i], i + 1, "Sample " .. i .. " should be correct")
+	end
+end
+
 return test

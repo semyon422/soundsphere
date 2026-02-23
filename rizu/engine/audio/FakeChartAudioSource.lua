@@ -6,7 +6,7 @@ local FakeChartAudioSource = IChartAudioSource + {}
 
 function FakeChartAudioSource:new(decoder)
 	self.decoder = decoder
-	self.position = 0
+	self.position = decoder and decoder:getPosition() or 0
 	self.playing = false
 	self.rate = 1
 	self.volume = 1

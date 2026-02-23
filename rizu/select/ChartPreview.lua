@@ -100,7 +100,6 @@ function ChartPreview:setChartview(chartview)
 
 	self.visual_engine:load(chart)
 
-	self.audio_offset = chartview.audio_offset or 0
 	self.chart = chart
 end
 
@@ -116,7 +115,7 @@ function ChartPreview:update()
 	end
 	self.visual_info.rate = visual_rate
 
-	self.visual_info.time = self.previewModel:getTime() + self.audio_offset
+	self.visual_info.time = self.previewModel:getTime()
 	self.visual_engine:update()
 end
 

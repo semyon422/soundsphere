@@ -50,7 +50,8 @@ function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
 
 	self.chunks = {}
 	self.total_buffered_bytes = 0
-	self.position = 0
+	local pos_ok, pos = pcall(decoder.getBytesPosition, decoder)
+	self.position = pos_ok and pos or 0
 	self.eof = false
 	self.pending_position = nil
 
