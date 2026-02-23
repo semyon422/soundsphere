@@ -32,13 +32,10 @@ function EventsRenderer:load()
 	local graphicEngine = self.graphicEngine
 	local chart = self.chart
 
-	---@type {[ncdk2.Visual]: integer}
-	self.cvpi = {}
 	---@type {[ncdk2.Visual]: ncdk2.VisualPoint}
 	self.cvp = {}
 
 	for _, visual in ipairs(self.chart:getVisuals()) do
-		self.cvpi[visual] = 1
 		self.cvp[visual] = VisualPoint(Point())
 		visual:generateEvents()
 	end
@@ -89,9 +86,7 @@ function EventsRenderer:update()
 	for _, visual in ipairs(self.chart:getVisuals()) do
 		local cvp = self.cvp[visual]
 		cvp.point.absoluteTime = currentTime - graphicEngine:getInputOffset()
-		self.cvpi[visual] = visual.interpolator:interpolate(
-			visual.points, self.cvpi[visual], cvp, "absolute"
-		)
+		visual.interpolator:interpolate(visual.points, cvp, "absolute")
 
 		local visualTimeRate = graphicEngine.visualTimeRate * cvp.globalSpeed
 		local range = math.max(-graphicEngine.range[1], graphicEngine.range[2]) / visualTimeRate
