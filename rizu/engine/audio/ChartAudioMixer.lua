@@ -125,6 +125,7 @@ function ChartAudioMixer:new(sounds, decoders)
 		self.dummy_decoder = FakeSoundDecoder(1, 44100, 2)
 	end
 
+	self.position = self.start_pos
 	self:resetActiveSet()
 end
 

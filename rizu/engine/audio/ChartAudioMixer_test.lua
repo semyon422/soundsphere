@@ -494,4 +494,32 @@ function test.id_consistency(t)
 	t:assert(entry1_new.id > entry2.id, "New entry should have a larger ID")
 end
 
+---@param t testing.T
+function test.negative_start(t)
+	-- 1Hz, 1ch for simplicity
+	local sample_rate = 1
+	local channels = 1
+
+	-- Sound at time -5, duration 10 (ends at 5)
+	local sounds = {{time = -5}}
+	local decoders = {FakeSoundDecoder(10, sample_rate, channels)}
+	-- Fill decoder with data 1, 2, 3, ...
+	for i = 0, 9 do
+		decoders[1].wave:setSampleInt(i, 1, i + 1)
+	end
+
+	local mixer = ChartAudioMixer(sounds, decoders)
+	t:eq(mixer:getPosition(), -5, "Mixer should start at start_pos (-5)")
+	t:eq(mixer:getDuration(), 10, "Duration should be end_pos - start_pos (10s)")
+
+	local buf = ffi.new("int16_t[20]")
+	local read = mixer:getData(buf, 20)
+	t:eq(read, 20, "Should read all 10 samples (20 bytes)")
+	t:eq(mixer:getPosition(), 5, "Mixer should reach 5s after reading 10s from -5s")
+
+	for i = 0, 9 do
+		t:eq(buf[i], i + 1, "Sample " .. i .. " should be correct")
+	end
+end
+
 return test
