@@ -98,6 +98,16 @@ function PreviewModel:getTime()
 	return self.manual_time
 end
 
+---@param size integer
+function PreviewModel:setFFTSize(size)
+	self.audioPreviewPlayer:setFFTSize(size)
+end
+
+---@return ffi.cdata*?
+function PreviewModel:getFFT()
+	return self.audioPreviewPlayer:getFFT()
+end
+
 function PreviewModel:loadPreviewDebounce()
 	delay.debounce(self, "loadDebounce", 0.1, self.loadPreview, self)
 end
