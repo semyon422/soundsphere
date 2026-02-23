@@ -15,7 +15,7 @@ end
 
 ---@param background yi.Background
 ---@param screens yi.Screens
----@param modals yi.View
+---@param modals yi.Modals
 ---@param top yi.View
 function Context:setLayers(background, screens, modals, top)
 	self.top = top

@@ -6,12 +6,15 @@ local Resources = require("yi.Resources")
 local Engine = require("yi.Engine")
 local Background = require("yi.views.Background")
 local Screens = require("yi.views.Screens")
+local Modals = require("yi.views.Modals")
 
 local Label = require("yi.views.Label")
 
 ---@class yi.UserInterface
 ---@overload fun(game: sphere.GameController): yi.UserInterface
 local UserInterface = IUserInterface + {}
+
+UserInterface.gameView = {} -- For imgui modals
 
 ---@param game sphere.GameController
 function UserInterface:new(game)
@@ -29,7 +32,7 @@ function UserInterface:load()
 
 	local background = root:add(Background())
 	local screens = root:add(Screens())
-	local modals = root:add(View())
+	local modals = root:add(Modals())
 	local top = root:add(View()) -- Cursor, Tooltip, Notifications, Dropdown items
 
 	self.ctx:setLayers(background, screens, modals, top)
