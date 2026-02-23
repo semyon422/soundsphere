@@ -9,11 +9,6 @@ function MultiplayerClientRemoteValidation:new(remote)
 	self.remote = assert(remote)
 end
 
----@param ... any
-function MultiplayerClientRemoteValidation:print(...)
-	self.remote:print(...)
-end
-
 ---@param rooms sea.Room[]
 function MultiplayerClientRemoteValidation:setRooms(rooms)
 	self.remote:setRooms(rooms)

@@ -27,9 +27,11 @@ end
 
 ---@param server_remote sea.ServerRemote
 ---@param whitelist icc.RemoteHandlerWhitelist
-function UserConnections:setup(server_remote, whitelist)
+---@param client_whitelist icc.RemoteHandlerWhitelist
+function UserConnections:setup(server_remote, whitelist, client_whitelist)
 	self.remote_handler = RemoteHandler(server_remote, whitelist)
 	self.task_handler = TaskHandler(self.remote_handler, "server")
+	self.client_whitelist = client_whitelist
 end
 
 ---@param ip string
@@ -169,7 +171,7 @@ function UserConnections:processQueue(sid, client_remote)
 
 	if not msg.ret then
 		assert(return_peer)
-		local handler = RemoteHandler(client_remote)
+		local handler = RemoteHandler(client_remote, self.client_whitelist)
 		TaskHandler(handler, "client-proxy"):handleCall(return_peer, {}, msg)
 	else
 		assert(not return_peer)

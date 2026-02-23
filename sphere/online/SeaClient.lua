@@ -12,6 +12,7 @@ local RemoteHandler = require("icc.RemoteHandler")
 local Remote = require("icc.Remote")
 
 local ServerRemoteValidation = require("sea.app.remotes.ServerRemoteValidation")
+local client_whitelist = require("sea.app.remotes.client_whitelist")
 
 ---@class sphere.SeaClient
 ---@operator call: sphere.SeaClient
@@ -26,7 +27,7 @@ function SeaClient:new(client, client_remote)
 	self.client = client
 
 	self.protocol = Subprotocol()
-	self.remote_handler = RemoteHandler(client_remote)
+	self.remote_handler = RemoteHandler(client_remote, client_whitelist)
 
 	local server_peer = WebsocketPeer({send = function() return nil, "not connected" end})
 	self.server_peer = server_peer

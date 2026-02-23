@@ -48,7 +48,8 @@ function App:new(app_config)
 	self.server_remote = ServerRemoteValidation(ServerRemote(self.domain, self.sessions))
 
 	local whitelist = require("sea.app.remotes.whitelist")
-	self.domain.user_connections:setup(self.server_remote, whitelist)
+	local client_whitelist = require("sea.app.remotes.client_whitelist")
+	self.domain.user_connections:setup(self.server_remote, whitelist, client_whitelist)
 
 	local views = Views(etlua_util.autoload(), "sea/shared/http/layout.etlua")
 	self.resources = Resources(self.domain, self.server_remote, views, self.sessions, app_config)

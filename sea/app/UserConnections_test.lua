@@ -26,7 +26,8 @@ function test.full_call(t)
 			return 42
 		end
 	}
-	uc:setup(tbl, {getRandomNumber = true})
+	local whitelist = {getRandomNumber = true}
+	uc:setup(tbl, whitelist, whitelist)
 
 	local ip1, port1 = "1.1.1.1", 1
 	local sid1 = ip1 .. ":" .. port1
