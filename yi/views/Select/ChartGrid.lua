@@ -1,6 +1,7 @@
 local ElasticList = require("yi.views.Select.ElasticList")
 
 ---@class yi.ChartGrid : yi.ElasticList
+---@operator call: yi.ChartGrid
 local ChartGrid = ElasticList + {}
 
 function ChartGrid:load()

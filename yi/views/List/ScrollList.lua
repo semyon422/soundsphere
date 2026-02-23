@@ -79,7 +79,7 @@ end
 
 function ScrollList:onMouseClick(e)
 	local _, imy = self.transform:inverseTransformPoint(e.x, e.y)
-	local clicked_index = math.floor(self:yToIndex(imy) + 0.5)
+	local clicked_index = math.floor(self:yToIndex(imy))
 
 	local count = self:getItemCount()
 	if clicked_index >= 1 and clicked_index <= count then
