@@ -68,6 +68,12 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 *   **Variable Naming (Conflicts with Globals):** Avoid using Lua global names (e.g., `type`, `table`, `string`, `pairs`) for local variables. If you must use such a name, prefix it with an underscore (e.g., `_type`).
 
+### Performance & Benchmarking
+
+The project prioritizes high-performance Lua code, especially within the gameplay engine.
+
+*   **Benchmarking:** When making core changes, use isolated benchmark scripts (running with `luajit`) to verify that optimizations are not elided by the JIT and that they provide measurable improvements.
+
 ### Testing
 
 The project uses a custom testing framework. Test files should follow these conventions:
