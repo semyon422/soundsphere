@@ -5,6 +5,8 @@ local ChartSetList = require("yi.views.Select.ChartSetList")
 local Button = require("yi.views.Select.Button")
 local Image = require("yi.views.Image")
 local Cell = require("yi.views.Select.Cell")
+local Tag = require("yi.views.Select.Tag")
+local Colors = require("yi.Colors")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -65,7 +67,8 @@ function Select:load()
 	local function play() self.parent:set("gameplay") end
 
 	local res = self:getResources()
-	self.chart_set_list = ChartSetList()
+	self.ranked_tag = Tag()
+	self.chart_format_tag = Tag()
 	self.title = Label(res:getFont("black", 72), "LOADING...")
 	self.artist = Label(res:getFont("bold", 58), "LOADING...")
 	self.difficilty_cell = Cell("Difficulty")
@@ -73,22 +76,29 @@ function Select:load()
 	self.bpm_cell = Cell("BPM")
 	self.duration_cell = Cell("Duration")
 	self.notes_cell = Cell("Notes")
+	self.chart_set_list = ChartSetList()
 
 	local gradient = love.graphics.newImage("yi/assets/gradient.png")
-	
+
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 0.7}}),
 		h(View(), info_side, {
-			h(View(), {arrange = "flex_col"}, {
-				self.title,
-				self.artist,
-			}),
-			h(View(), {arrange = "flex_row", gap = 10}, {
-				self.difficilty_cell,
-				self.mode_cell,
-				self.bpm_cell,
-				self.duration_cell,
-				self.notes_cell
+			h(View(), {arrange = "flex_col", gap = 15}, {
+				h(View(), {arrange = "flex_row", gap = 10}, {
+					self.ranked_tag,
+					self.chart_format_tag
+				}),
+				h(View(), {arrange = "flex_col"}, {
+					self.title,
+					h(self.artist, {y = -5, color = Colors.lines}),
+				}),
+				h(View(), {arrange = "flex_row", gap = 10}, {
+					self.difficilty_cell,
+					self.mode_cell,
+					self.bpm_cell,
+					self.duration_cell,
+					self.notes_cell
+				}),
 			}),
 			h(View(), {arrange = "flex_row", align_items = "stretch", gap = 10}, {
 				h(Button(open_config), small_button, {
@@ -159,6 +169,20 @@ function Select:setChartview(chartview)
 	end
 
 	self.prev_chart_hash = chartview.hash
+
+	local is_ranked = chartview.difftable_chartmetas and #chartview.difftable_chartmetas > 0
+
+	if is_ranked then
+		self.ranked_tag:setText("RANKED")
+		self.ranked_tag:setBackgroundColor(Colors.accent)
+		self.ranked_tag:setTextColor({0, 0, 0, 1})
+	else
+		self.ranked_tag:setText("UNRANKED")
+		self.ranked_tag:setBackgroundColor(Colors.lines)
+		self.ranked_tag:setTextColor(Colors.text)
+	end
+
+	self.chart_format_tag:setText((chartview.format or "unknown"):upper())
 
 	self.title:setText(chartview.title)
 	self.artist:setText(chartview.artist)

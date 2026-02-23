@@ -419,6 +419,26 @@ function View:setPivot(v)
 	self.transform:setOrigin(p.x, p.y)
 end
 
+---@param v yi.Color
+function View:setColor(v)
+	local c = self.color or {}
+	c[1] = v[1]
+	c[2] = v[2]
+	c[3] = v[3]
+	c[4] = v[4]
+	self.color = c
+end
+
+---@param v yi.Color
+function View:setBackgroundColor(v)
+	local c = self.background_color or {}
+	c[1] = v[1]
+	c[2] = v[2]
+	c[3] = v[3]
+	c[4] = v[4]
+	self.background_color = c
+end
+
 View.Setters = {
 	width = View.setWidth,
 	height = View.setHeight,
@@ -472,8 +492,8 @@ View.Setters = {
 	-- View
 	handles_mouse_input = true,
 	handles_keyboard_input = true,
-	color = true,
-	background_color = true,
+	color = View.setColor,
+	background_color = View.setBackgroundColor,
 	corner_radius = true,
 	stencil = true,
 	mouse = function(self, v) self.handles_mouse_input = v end,

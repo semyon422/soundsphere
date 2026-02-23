@@ -11,7 +11,7 @@ function Cell:new(label_text)
 	View.new(self)
 	self:setHeight(70)
 	self:setWidth(140)
-	self.background_color = Colors.panels
+	self:setBackgroundColor(Colors.panels)
 	self.label_text = label_text
 end
 
