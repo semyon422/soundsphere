@@ -104,13 +104,17 @@ function RhythmEngine:unload()
 end
 
 function RhythmEngine:update()
-	self.logic_info.time = self.time_engine.time - self.logic_offset
-	self.visual_info.time = self.time_engine.time - self.visual_offset
+	self:syncTime()
 
 	self.input_engine:update()
 	self.logic_engine:update()
 	self.visual_engine:update()
 	self.audio_engine:update()
+end
+
+function RhythmEngine:syncTime()
+	self.logic_info.time = self.time_engine.time - self.logic_offset
+	self.visual_info.time = self.time_engine.time - self.visual_offset
 end
 
 function RhythmEngine:play()
@@ -129,6 +133,7 @@ end
 
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
+	self:syncTime()
 	local input_note, catched = self.input_engine:receive(event)
 
 	if not self.auto_key_sound and event.value == true and catched then
