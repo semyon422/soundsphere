@@ -7,8 +7,10 @@ local ResourceFinder = require("rizu.files.ResourceFinder")
 local AudioPreviewGenerator = class()
 
 ---@param fs fs.IFilesystem
-function AudioPreviewGenerator:new(fs)
+---@param decoder_factory fun(fs: fs.IFilesystem, path: string): rizu.ISoundDecoder
+function AudioPreviewGenerator:new(fs, decoder_factory)
 	self.fs = assert(fs, "missing fs")
+	self.decoder_factory = assert(decoder_factory, "missing decoder_factory")
 end
 
 ---@param chart ncdk2.Chart
@@ -89,24 +91,9 @@ function AudioPreviewGenerator:getDuration(path, finder, durs)
 		return 0
 	end
 
-	local content = self.fs:read(full_path)
-	if not content then
-		print("AudioPreviewGenerator: could not read " .. tostring(full_path))
-		durs[path] = 0
-		return 0
-	end
-
-	-- no fs access, just in-memory object
-	local ok, fileData = pcall(love.filesystem.newFileData, content, full_path)
-	if not ok then
-		print("AudioPreviewGenerator: newFileData failed for " .. tostring(full_path) .. ": " .. tostring(fileData))
-		durs[path] = 0
-		return 0
-	end
-
-	local ok, decoder = pcall(love.sound.newDecoder, fileData)
+	local ok, decoder = pcall(self.decoder_factory, self.fs, full_path)
 	if not ok or not decoder then
-		print("AudioPreviewGenerator: newDecoder failed for " .. tostring(path) .. ": " .. tostring(decoder))
+		print("AudioPreviewGenerator: decoder_factory failed for " .. tostring(path) .. ": " .. tostring(decoder))
 		durs[path] = 0
 		return 0
 	end
@@ -117,6 +104,7 @@ function AudioPreviewGenerator:getDuration(path, finder, durs)
 	end
 
 	durs[path] = duration
+	decoder:release()
 
 	return duration
 end

@@ -162,16 +162,19 @@ end
 local generateAudioPreviewAsync = thread.async(function(chartview_data)
 	print("AudioPreview: generating " .. chartview_data.hash)
 	local AudioPreviewGenerator = require("rizu.gameplay.AudioPreviewGenerator")
+	local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
 	local ChartFactory = require("notechart.ChartFactory")
 	local LoveFilesystem = require("fs.LoveFilesystem")
 
-	require("love.sound")
 	require("love.filesystem")
 
 	local fs = LoveFilesystem()
-	local generator = AudioPreviewGenerator(fs)
+	local generator = AudioPreviewGenerator(fs, function(_, path)
+		local data = fs:read(path)
+		return BassSoundDecoder(data)
+	end)
 
-	local content = love.filesystem.read(chartview_data.location_path)
+	local content = fs:read(chartview_data.location_path)
 	if not content then
 		print("AudioPreview: could not read " .. tostring(chartview_data.location_path))
 		return false

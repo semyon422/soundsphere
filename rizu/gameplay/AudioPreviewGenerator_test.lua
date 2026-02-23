@@ -3,13 +3,17 @@ local Wave = require("audio.Wave")
 local AudioPreviewGenerator = require("rizu.gameplay.AudioPreviewGenerator")
 local AudioPreview = require("rizu.gameplay.AudioPreview")
 local TestChartFactory = require("sea.chart.TestChartFactory")
+local WaveSoundDecoder = require("rizu.engine.audio.WaveSoundDecoder")
 
 local test = {}
 
 ---@param t testing.T
 function test.generate(t)
 	local fs = FakeFilesystem()
-	local generator = AudioPreviewGenerator(fs)
+	local generator = AudioPreviewGenerator(fs, function(f, p)
+		local data = f:read(p)
+		return WaveSoundDecoder(data)
+	end)
 
 	-- Create a fake wav file (1 second)
 	local wave = Wave()
