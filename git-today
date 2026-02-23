@@ -8,14 +8,16 @@ SINCE="05:00:00"
 TODAY=$(date -d "5 hours ago" +%Y-%m-%d)
 
 # Calculate committed additions and deletions
-STATS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --numstat --pretty=tformat: | 
+STATS=$( (git log --author="$AUTHOR" --since="$TODAY $SINCE" --numstat --pretty=tformat:;
+          git submodule foreach --quiet --recursive "git log --author=\"$AUTHOR\" --since=\"$TODAY $SINCE\" --numstat --pretty=tformat:") |
     awk '{add += $1; del += $2} END {printf "%d %d", add, del}')
 
 ADDITIONS=$(echo $STATS | awk '{print $1}')
 DELETIONS=$(echo $STATS | awk '{print $2}')
 
 # Count the number of commits
-COMMITS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --oneline | wc -l | xargs)
+COMMITS=$( (git log --author="$AUTHOR" --since="$TODAY $SINCE" --oneline;
+            git submodule foreach --quiet --recursive "git log --author=\"$AUTHOR\" --since=\"$TODAY $SINCE\" --oneline") | wc -l | xargs)
 
 # Output the result
 BOLD='\033[1m'
@@ -24,7 +26,8 @@ NC='\033[0m'
 WORK_TIME_STRING=""
 if [ "$COMMITS" -gt 1 ]; then
     # Get commit timestamps
-    TIMESTAMPS=$(git log --author="$AUTHOR" --since="$TODAY $SINCE" --pretty=format:%ct)
+    TIMESTAMPS=$( (git log --author="$AUTHOR" --since="$TODAY $SINCE" --pretty=format:%ct;
+                   git submodule foreach --quiet --recursive "git log --author=\"$AUTHOR\" --since=\"$TODAY $SINCE\" --pretty=format:%ct") )
 
     # Find first and last commit timestamp
     FIRST_COMMIT_TIME=$(echo "$TIMESTAMPS" | sort -n | head -1)
