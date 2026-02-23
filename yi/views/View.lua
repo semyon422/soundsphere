@@ -136,6 +136,11 @@ function View:detach()
 	end
 end
 
+---@param view yi.View
+function View:attach(view)
+	table.insert(self.children, view)
+end
+
 ---@return yi.Context
 function View:getContext()
 	if not self.ctx then
