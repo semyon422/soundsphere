@@ -3,6 +3,7 @@ local Label = require("yi.views.Label")
 local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.Select.ChartSetList")
 local Button = require("yi.views.Select.Button")
+local Image = require("yi.views.Image")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -85,7 +86,10 @@ function Select:load()
 		self.parent:set("gameplay")
 	end
 
+	local gradient = love.graphics.newImage("yi/assets/gradient.png")
+
 	self:addArray({
+		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 0.7}}),
 		h(View(), info_side, {
 			h(View(), {arrange = "flex_col"}, {
 				self.title,
