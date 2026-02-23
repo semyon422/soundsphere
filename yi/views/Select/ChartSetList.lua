@@ -53,6 +53,11 @@ function ChartSetList:drawItem(index, y, is_selected)
 	love.graphics.setColor((index % 2) == 0 and Colors.panels or Colors.panels_alt)
 	love.graphics.rectangle("fill", 0, y, w, self.item_height)
 
+	if is_selected then
+		love.graphics.setColor(Colors.accent[1], Colors.accent[2], Colors.accent[3], 0.2)
+		love.graphics.rectangle("fill", 0, y, w, self.item_height)
+	end
+
 	local title_h = self.title_font:getHeight()
 	local gap = 2
 	local padding = 25

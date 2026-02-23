@@ -4,6 +4,7 @@ local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.Select.ChartSetList")
 local Button = require("yi.views.Select.Button")
 local Image = require("yi.views.Image")
+local Cell = require("yi.views.Select.Cell")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -55,45 +56,39 @@ function Select:load()
 	self:setWidth("100%")
 	self:setHeight("100%")
 
+	local modals = self:getContext().modals
+	local function open_config() modals:setImguiModal(ImGuiSettings) end
+	local function open_mods() modals:setImguiModal(ImGuiModifiers) end
+	local function open_inputs() modals:setImguiModal(ImGuiInputs) end
+	local function open_skins() modals:setImguiModal(ImGuiSkins) end
+	local function open_gameplay() modals:setImguiModal(ImGuiGameplayConfig) end
+	local function play() self.parent:set("gameplay") end
+
 	local res = self:getResources()
 	self.chart_set_list = ChartSetList()
 	self.title = Label(res:getFont("black", 72), "LOADING...")
 	self.artist = Label(res:getFont("bold", 58), "LOADING...")
-
-	local modals = self:getContext().modals
-
-	local function open_config()
-		modals:setImguiModal(ImGuiSettings)
-	end
-
-	local function open_mods()
-		modals:setImguiModal(ImGuiModifiers)
-	end
-
-	local function open_inputs()
-		modals:setImguiModal(ImGuiInputs)
-	end
-
-	local function open_skins()
-		modals:setImguiModal(ImGuiSkins)
-	end
-
-	local function open_gameplay()
-		modals:setImguiModal(ImGuiGameplayConfig)
-	end
-
-	local function play()
-		self.parent:set("gameplay")
-	end
+	self.difficilty_cell = Cell("Difficulty")
+	self.mode_cell = Cell("Mode")
+	self.bpm_cell = Cell("BPM")
+	self.duration_cell = Cell("Duration")
+	self.notes_cell = Cell("Notes")
 
 	local gradient = love.graphics.newImage("yi/assets/gradient.png")
-
+	
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 0.7}}),
 		h(View(), info_side, {
 			h(View(), {arrange = "flex_col"}, {
 				self.title,
 				self.artist,
+			}),
+			h(View(), {arrange = "flex_row", gap = 10}, {
+				self.difficilty_cell,
+				self.mode_cell,
+				self.bpm_cell,
+				self.duration_cell,
+				self.notes_cell
 			}),
 			h(View(), {arrange = "flex_row", align_items = "stretch", gap = 10}, {
 				h(Button(open_config), small_button, {
@@ -167,6 +162,17 @@ function Select:setChartview(chartview)
 
 	self.title:setText(chartview.title)
 	self.artist:setText(chartview.artist)
+	self.difficilty_cell:setValueText(("%0.02f"):format(chartview.difficulty))
+
+	local input_mode = chartview.inputmode:gsub("key", "K"):gsub("scratch", "S")
+	self.mode_cell:setValueText(input_mode)
+	self.bpm_cell:setValueText(("%i"):format(chartview.tempo))
+
+	local minutes = chartview.duration / 60
+	local seconds = chartview.duration % 60
+	self.duration_cell:setValueText(("%i:%02i"):format(minutes, seconds))
+
+	self.notes_cell:setValueText(tostring(chartview.notes_count))
 end
 
 function Select:onChartChanged()
