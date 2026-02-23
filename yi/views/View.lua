@@ -154,6 +154,11 @@ function View:getInputs()
 	return self:getContext().inputs
 end
 
+---@return yi.Resources
+function View:getResources()
+	return self:getContext().resources
+end
+
 ---@return number
 function View:getWidth()
 	return self.layout_box.x.preferred_size

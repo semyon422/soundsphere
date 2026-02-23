@@ -6,9 +6,11 @@ local Context = class()
 
 ---@param game sphere.GameController
 ---@param inputs ui.Inputs
-function Context:new(game, inputs)
+---@param resources yi.Resources
+function Context:new(game, inputs, resources)
 	self.game = assert(game)
 	self.inputs = assert(inputs)
+	self.resources = resources
 end
 
 ---@param background yi.Background

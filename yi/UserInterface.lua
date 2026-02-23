@@ -2,9 +2,12 @@ local IUserInterface = require("sphere.IUserInterface")
 local Context = require("yi.Context")
 local View = require("yi.views.View")
 local Inputs = require("ui.input.Inputs")
+local Resources = require("yi.Resources")
 local Engine = require("yi.Engine")
 local Background = require("yi.views.Background")
 local Screens = require("yi.views.Screens")
+
+local Label = require("yi.views.Label")
 
 ---@class yi.UserInterface
 ---@overload fun(game: sphere.GameController): yi.UserInterface
@@ -14,8 +17,9 @@ local UserInterface = IUserInterface + {}
 function UserInterface:new(game)
 	self.game = game
 
+	self.resources = Resources()
 	self.inputs = Inputs()
-	self.ctx = Context(self.game, self.inputs)
+	self.ctx = Context(self.game, self.inputs, self.resources)
 	self.engine = Engine(self.inputs, self.ctx)
 end
 
