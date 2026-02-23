@@ -215,4 +215,27 @@ function test.layout_update_on_removal(t)
 	t:eq(x3, 0)
 end
 
+---@param t testing.T
+function test.arranges(t)
+	local inputs = Inputs()
+	local ctx = Context({}, inputs)
+	local engine = Engine(inputs, ctx)
+	engine:load()
+
+	engine.root.layout_box:setDimensions(1000, 1000)
+
+	local container = engine.root:add(MockView())
+	container.layout_box:setArrange(LayoutBox.Arrange.FlexCol)
+
+	local n1 = container:add(MockView())
+	local n2 = container:add(MockView())
+	n1.layout_box:setDimensions(64, 32)
+	n2.layout_box:setDimensions(64, 32)
+
+	engine:update(0.016, 0, 0)
+
+	t:eq(container.layout_box.x.size, 64)
+	t:eq(container.layout_box.y.size, 64)
+end
+
 return test
