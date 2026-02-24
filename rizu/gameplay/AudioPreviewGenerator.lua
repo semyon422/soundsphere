@@ -84,7 +84,29 @@ function AudioPreviewGenerator:generateFromFiles(chart, finder, hash)
 	---@type {[string]: number}
 	local sample_durations = {}
 
-	for _, note in ipairs(chart.notes.notes) do
+	local notes = chart.notes.notes
+	local audio_notes = {}
+	for _, note in ipairs(notes) do
+		if note.column == "audio" then
+			---@type [any, number][]
+			local sounds = note.data.sounds
+			if sounds then
+				for _, sound_data in ipairs(sounds) do
+					local path = sound_data[1]
+					if type(path) == "string" and finder:findFile(path, "audio") then
+						table.insert(audio_notes, note)
+						break
+					end
+				end
+			end
+		end
+	end
+
+	if #audio_notes > 0 then
+		notes = audio_notes
+	end
+
+	for _, note in ipairs(notes) do
 		---@type [string, number][]
 		local sounds = note.data.sounds
 		if sounds then
