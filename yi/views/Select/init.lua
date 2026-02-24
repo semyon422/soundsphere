@@ -35,8 +35,8 @@ local info_side = {
 local small_button = {
 	arrange = "flex_col",
 	align_items = "center",
-	padding = {5, 10, 5, 10},
-	width = 100,
+	padding = {5, 0, 5, 0},
+	width = 110,
 	shrink = 1
 }
 
@@ -47,7 +47,6 @@ local play_button_inner = {
 	arrange = "flex_row",
 	justify_content = "center",
 	align_items = "center",
-	padding = {5, 10, 5, 10},
 }
 
 function Select:load()
@@ -127,7 +126,7 @@ function Select:load()
 					Label(res:getFont("icons", 24), ""),
 					Label(res:getFont("bold", 16), "GAMEPLAY"),
 				}),
-				h(Button(play), {grow = 1, shrink = 10}, {
+				h(Button(play), {grow = 1, shrink = 10, min_w = 130}, {
 					h(Spectrum(), {width = "100%", height = "100%"}),
 					h(View(), play_button_inner, {
 						Label(res:getFont("icons", 24), ""),
