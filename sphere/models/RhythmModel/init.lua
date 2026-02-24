@@ -206,6 +206,7 @@ function RhythmModel:setNoteChart(chart, chartmeta, chartdiff, diffcalc_context)
 	self.scoreEngine.chartdiff = chartdiff
 	self.logicEngine:setChart(chart)
 	self.graphicEngine:setChart(chart)
+	self.audioEngine.format = chartmeta.format
 end
 
 ---@param start_time number

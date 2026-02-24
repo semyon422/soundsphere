@@ -224,9 +224,9 @@ function RhythmEngine:setVisualRate(visual_rate, scale_visual_rate)
 	self.visual_info.rate = visual_rate
 end
 
----@param volume {master: number, music: number, effects: number}
+---@param volume {master: number, music: number, keysounds: number}
 function RhythmEngine:setVolume(volume)
-	self.audio_engine:setVolume(volume.master * volume.music, volume.master * volume.effects)
+	self.audio_engine:setVolume(volume.master * volume.music, volume.master * volume.keysounds)
 end
 
 ---@param time number

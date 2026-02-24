@@ -90,13 +90,13 @@ function AudioManager:update(force)
 		end
 	end
 
+	local keysounds_volume = self.volume.keysounds * (self.volume.keysounds_format[self.format] or 1)
 	for placedSource in pairs(sources) do
 		if not self.sources[placedSource] then
 			self.sources[placedSource] = true
 		end
 		placedSource.source:setRate(self.timer.rate)
-		local volume = self.volume.effects
-		placedSource.source:setVolume(self.volume.master * volume * placedSource.volume)
+		placedSource.source:setVolume(self.volume.master * keysounds_volume * placedSource.volume)
 	end
 
 	if forcePosition then

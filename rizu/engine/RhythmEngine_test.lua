@@ -121,7 +121,7 @@ function test.loader_order(t)
 		},
 		audio = {
 			adjustRate = 0.1,
-			volume = {master = 1, music = 1, effects = 1},
+			volume = {master = 1, music = 1, keysounds = 1, keysounds_format = {}},
 			mode = {primary = "a", secondary = "b"},
 		},
 	}

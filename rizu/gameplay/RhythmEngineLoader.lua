@@ -51,7 +51,14 @@ function RhythmEngineLoader:load(rhythm_engine)
 
 	-- variable ranked
 	rhythm_engine:setAdjustFactor(config.audio.adjustRate)
-	rhythm_engine:setVolume(config.audio.volume)
+
+	local volume = {
+		master = config.audio.volume.master,
+		music = config.audio.volume.music,
+		keysounds = config.audio.volume.keysounds * (config.audio.volume.keysounds_format[chartmeta.format] or 1),
+	}
+	rhythm_engine:setVolume(volume)
+
 	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
 	rhythm_engine:setAudioMode(config.audio.mode)

@@ -349,13 +349,20 @@ function drawSection:audio()
 	if a.volumeType == "linear" then
 		v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master")
 		v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music")
-		v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects")
+		v.keysounds = imgui.slider1("v.keysounds", v.keysounds, "%0.2f", 0, 1, 0.01, "keysounds")
 		v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome")
 	elseif a.volumeType == "logarithmic" then
 		v.master = imgui.lfslider("v.master", v.master, "%ddB", -60, 0, 1, "master")
 		v.music = imgui.lfslider("v.music", v.music, "%ddB", -60, 0, 1, "music")
-		v.effects = imgui.lfslider("v.effects", v.effects, "%ddB", -60, 0, 1, "effects")
+		v.keysounds = imgui.lfslider("v.keysounds", v.keysounds, "%ddB", -60, 0, 1, "keysounds")
 		v.metronome = imgui.lfslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, "metronome")
+	end
+
+	imgui.separator()
+	imgui.text("keysounds per format")
+	local kf = v.keysounds_format
+	for _, format in ipairs({"sphere", "osu", "o2jam", "bms", "stepmania", "quaver", "midi", "ksm"}) do
+		kf[format] = imgui.lfslider("kf." .. format, kf[format], "%ddB", -60, 0, 1, format)
 	end
 
 	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")
