@@ -10,8 +10,7 @@ local test = {}
 ---@param t testing.T
 function test.generate(t)
 	local fs = FakeFilesystem()
-	local generator = AudioPreviewGenerator(fs, function(f, p)
-		local data = f:read(p)
+	local generator = AudioPreviewGenerator(fs, function(data)
 		return WaveSoundDecoder(data)
 	end)
 
