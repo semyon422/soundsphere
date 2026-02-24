@@ -1,41 +1,21 @@
-local class = require("class")
-local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
-local Remote = require("icc.Remote")
+local InternalPeer = require("sea.app.InternalPeer")
 
----@class sea.Peer: sea.IServerRemoteContext
+---@class sea.Peer: sea.InternalPeer
 ---@operator call: sea.Peer
----@field remote sea.ClientRemoteValidation
----@field remote_no_return sea.ClientRemoteValidation
-local Peer = class()
+local Peer = InternalPeer + {}
 
 ---@param th icc.TaskHandler
 ---@param icc_peer icc.IPeer
 ---@param user sea.User
 ---@param ip string
 ---@param port integer
+---@param peer_id string
 ---@param session sea.Session?
-function Peer:new(th, icc_peer, user, ip, port, session)
-	self.__th = th
-	self.__icc_peer = icc_peer
-	self.user = user
-	self.session = session
+function Peer:new(th, icc_peer, user, ip, port, peer_id, session)
+	InternalPeer.new(self, th, icc_peer, user, peer_id)
 	self.ip = ip
 	self.port = port
-	self.peer_id = ip .. ":" .. port
-	self.peer = self
-end
-
-function Peer:__index(k)
-	local v = Peer[k]
-	if v ~= nil then return v end
-
-	if k == "remote" then
-		self.remote = ClientRemoteValidation(Remote(self.__th, self.__icc_peer))
-		return self.remote
-	elseif k == "remote_no_return" then
-		self.remote_no_return = ClientRemoteValidation(-Remote(self.__th, self.__icc_peer))
-		return self.remote_no_return
-	end
+	self.session = session
 end
 
 return Peer

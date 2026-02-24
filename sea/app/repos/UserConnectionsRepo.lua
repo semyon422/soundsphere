@@ -11,13 +11,13 @@ function UserConnectionsRepo:new(dict)
 end
 
 ---@private
-function UserConnectionsRepo:_getConnKey(ip, port)
-	return "c:" .. tostring(ip) .. ":" .. tonumber(port)
+function UserConnectionsRepo:_getConnKey(peer_id)
+	return "c:" .. tostring(peer_id)
 end
 
 ---@private
-function UserConnectionsRepo:_getQueueKey(ip, port)
-	return "q:" .. tostring(ip) .. ":" .. tonumber(port)
+function UserConnectionsRepo:_getQueueKey(peer_id)
+	return "q:" .. tostring(peer_id)
 end
 
 ---@private
@@ -25,40 +25,35 @@ function UserConnectionsRepo:_getUserKey(user_id)
 	return "u:" .. tostring(user_id)
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@param user_id? integer
 ---@param ttl integer
-function UserConnectionsRepo:setConnection(ip, port, user_id, ttl)
-	self.dict:set(self:_getConnKey(ip, port), user_id or true, ttl)
+function UserConnectionsRepo:setConnection(peer_id, user_id, ttl)
+	self.dict:set(self:_getConnKey(peer_id), user_id or true, ttl)
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@return boolean
-function UserConnectionsRepo:hasConnection(ip, port)
-	return self.dict:get(self:_getConnKey(ip, port)) ~= nil
+function UserConnectionsRepo:hasConnection(peer_id)
+	return self.dict:get(self:_getConnKey(peer_id)) ~= nil
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@return integer|true|nil
-function UserConnectionsRepo:getConnectionUser(ip, port)
-	return self.dict:get(self:_getConnKey(ip, port))
+function UserConnectionsRepo:getConnectionUser(peer_id)
+	return self.dict:get(self:_getConnKey(peer_id))
 end
 
----@param ip string
----@param port integer
-function UserConnectionsRepo:removeConnection(ip, port)
-	self.dict:delete(self:_getConnKey(ip, port))
-	self.dict:delete(self:_getQueueKey(ip, port))
+---@param peer_id string
+function UserConnectionsRepo:removeConnection(peer_id)
+	self.dict:delete(self:_getConnKey(peer_id))
+	self.dict:delete(self:_getQueueKey(peer_id))
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@return icc.SharedMemoryQueue
-function UserConnectionsRepo:getQueue(ip, port)
-	return SharedMemoryQueue(self.dict, self:_getQueueKey(ip, port))
+function UserConnectionsRepo:getQueue(peer_id)
+	return SharedMemoryQueue(self.dict, self:_getQueueKey(peer_id))
 end
 
 ---@param user_id integer
@@ -72,7 +67,7 @@ function UserConnectionsRepo:setUserOffline(user_id)
 	self.dict:delete(self:_getUserKey(user_id))
 end
 
----@param callback fun(ip: string, port: integer, user_id: integer|true)
+---@param callback fun(user_id: integer|true, peer_id: string)
 function UserConnectionsRepo:forEachConnection(callback)
 	local keys = self.dict:get_keys(0)
 	for _, key in ipairs(keys) do
@@ -80,10 +75,7 @@ function UserConnectionsRepo:forEachConnection(callback)
 			local user_id = self.dict:get(key)
 			if user_id ~= nil then
 				---@cast user_id -string
-				local ip, port = key:match("^c:(.+):(%d+)$")
-				if ip and port then
-					callback(ip, assert(tonumber(port)), user_id)
-				end
+				callback(user_id, key:sub(3))
 			end
 		end
 	end

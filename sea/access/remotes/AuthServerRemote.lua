@@ -61,7 +61,7 @@ function AuthServerRemote:loginByToken(token)
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
-	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+	self.user_connections:heartbeat(self.peer_id, self.user.id)
 
 	if self.on_auth then
 		self.on_auth(self.peer, old_user)
@@ -88,7 +88,7 @@ function AuthServerRemote:loginSession(req_session)
 	clear_copy(session, self.session)
 	clear_copy(self.users:getUser(session.user_id), self.user)
 
-	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+	self.user_connections:heartbeat(self.peer_id, self.user.id)
 
 	if self.on_auth then
 		self.on_auth(self.peer, old_user)
@@ -121,7 +121,7 @@ function AuthServerRemote:login(email, password)
 	clear_copy(su.session, self.session)
 	clear_copy(su.user, self.user)
 
-	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+	self.user_connections:heartbeat(self.peer_id, self.user.id)
 
 	if self.on_auth then
 		self.on_auth(self.peer, old_user)
@@ -147,7 +147,7 @@ function AuthServerRemote:logout()
 	clear_copy(Session(), self.session)
 	clear_copy(User(), self.user)
 
-	self.user_connections:heartbeat(self.ip, self.port, nil)
+	self.user_connections:heartbeat(self.peer_id, nil)
 
 	if old_id then
 		self.user_connections:onUserDisconnect(old_id)

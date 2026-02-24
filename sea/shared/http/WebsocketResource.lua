@@ -1,6 +1,4 @@
 local WebsocketPeer = require("icc.WebsocketPeer")
-local Remote = require("icc.Remote")
-local TaskHandler = require("icc.TaskHandler")
 local IResource = require("web.framework.IResource")
 local Websocket = require("web.ws.Websocket")
 local Peer = require("sea.app.Peer")
@@ -38,7 +36,7 @@ function WebsocketResource:server(req, res, ctx)
 	ws.max_payload_len = 1e7
 	task_handler.timeout = 60
 
-	local remote_ctx = Peer(task_handler, peer, ctx.session_user, ctx.ip, ctx.port, ctx.session)
+	local remote_ctx = Peer(task_handler, peer, ctx.session_user, ctx.ip, ctx.port, ctx.peer_id, ctx.session)
 
 	function ws.protocol:text(payload, fin)
 		if not fin then return end
@@ -60,9 +58,10 @@ function WebsocketResource:server(req, res, ctx)
 
 	self.domain:onConnect(remote_ctx)
 
+	local client_task_handler = self.user_connections:createClientTaskHandler(remote_ctx.remote)
 	local co = ngx.thread.spawn(function()
 		while true do
-			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.peer_id, remote_ctx.remote)
+			local ok, err = xpcall(self.user_connections.processQueue, debug.traceback, self.user_connections, ctx.peer_id, client_task_handler)
 			if not ok then
 				print("queue process error", err)
 				break
