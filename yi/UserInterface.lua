@@ -36,7 +36,7 @@ function UserInterface:load()
 	self.ctx:setLayers(background, screens, modals, top)
 	self.engine:load()
 
-	screens:set("select")
+	screens:set("menu")
 
 	self.screens = screens
 end

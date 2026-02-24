@@ -31,6 +31,7 @@ View.State = {
 	Active = 3,
 	Detached = 4,
 	Killed = 5,
+	Destoryed = 6
 }
 
 local State = View.State
@@ -101,6 +102,11 @@ end
 function View:load() end
 
 function View:loadComplete() end
+
+function View:destroy()
+	Node.destroy(self)
+	self.state = State.Destoryed
+end
 
 ---@param dt number
 function View:update(dt) end
@@ -324,49 +330,6 @@ function View:setGrow(v)
 	self.layout_box:setGrow(v)
 end
 
----@param v (number|string)[]
-function View:setGridColumns(v)
-	self.layout_box:setGridColumns(v)
-end
-
----@param v (number|string)[]
-function View:setGridRows(v)
-	self.layout_box:setGridRows(v)
-end
-
----@param v number
-function View:setGridColumn(v)
-	self.layout_box:setGridColumn(v)
-end
-
----@param v number
-function View:setGridRow(v)
-	self.layout_box:setGridRow(v)
-end
-
----@param v number
-function View:setGridColSpan(v)
-	self.layout_box:setGridColSpan(v)
-end
-
----@param v number
-function View:setGridRowSpan(v)
-	self.layout_box:setGridRowSpan(v)
-end
-
----@param col number
----@param row number
-function View:setGridCell(col, row)
-	self.layout_box:setGridColumn(col)
-	self.layout_box:setGridRow(row)
-end
-
----@param col_span number
----@param row_span number
-function View:setGridSpan(col_span, row_span)
-	self.layout_box:setGridSpan(col_span, row_span)
-end
-
 ---@param x number
 function View:setX(x)
 	self.transform:setX(x)
@@ -484,16 +447,6 @@ View.Setters = {
 	justify_content = View.setJustifyContent,
 	grow = View.setGrow,
 
-	-- Grid
-	cols = View.setGridColumns,
-	rows = View.setGridRows,
-	col = View.setGridColumn,
-	row = View.setGridRow,
-	col_span = View.setGridColSpan,
-	row_span = View.setGridRowSpan,
-	cell = View.setGridCell,
-	span = View.setGridSpan,
-
 	-- View
 	handles_mouse_input = true,
 	handles_keyboard_input = true,
@@ -501,6 +454,7 @@ View.Setters = {
 	background_color = View.setBackgroundColor,
 	corner_radius = true,
 	stencil = true,
+	id = true,
 	mouse = function(self, v) self.handles_mouse_input = v end,
 	keyboard = function(self, v) self.handles_keyboard_input = v end
 }

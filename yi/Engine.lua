@@ -70,6 +70,8 @@ function Engine:updateView(view, dt)
 		table.insert(self.removal_deferred, view)
 	elseif state == ViewState.Detached then
 		table.insert(self.detach_deferred, view)
+	elseif state == ViewState.Destoryed then
+		error("DO NOT CALL View:destroy() manually!!!")
 	end
 end
 

@@ -234,22 +234,18 @@ function Select:updateChartview()
 end
 
 function Select:onChartChanged()
-	print("chart changed")
 	self:updateChartview()
 end
 
 function Select:onChartSetChanged()
-	print("set changed")
 	self.chart_grid:reloadItems()
 end
 
 function Select:onLibraryReloaded()
-	print("library reloaded")
 	self.chart_set_list:reloadItems()
 end
 
 function Select:onRateChanged()
-	print("rate changed")
 	self:updateChartview()
 end
 
@@ -287,7 +283,6 @@ function Select:observeGameMutations()
 		self:onRateChanged()
 	end
 end
-
 
 function Select:receive(event)
 	self.select_controller:receive(event)
