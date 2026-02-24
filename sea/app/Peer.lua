@@ -15,15 +15,27 @@ local Peer = class()
 ---@param port integer
 ---@param session sea.Session?
 function Peer:new(th, icc_peer, user, ip, port, session)
-	local remote = Remote(th, icc_peer)
-	self.remote = ClientRemoteValidation(remote)
-	self.remote_no_return = ClientRemoteValidation(-remote)
+	self.__th = th
+	self.__icc_peer = icc_peer
 	self.user = user
 	self.session = session
 	self.ip = ip
 	self.port = port
 	self.peer_id = ip .. ":" .. port
 	self.peer = self
+end
+
+function Peer:__index(k)
+	local v = Peer[k]
+	if v ~= nil then return v end
+
+	if k == "remote" then
+		self.remote = ClientRemoteValidation(Remote(self.__th, self.__icc_peer))
+		return self.remote
+	elseif k == "remote_no_return" then
+		self.remote_no_return = ClientRemoteValidation(-Remote(self.__th, self.__icc_peer))
+		return self.remote_no_return
+	end
 end
 
 return Peer

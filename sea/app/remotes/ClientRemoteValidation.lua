@@ -11,9 +11,22 @@ local ClientRemoteValidation = class()
 ---@param remote sea.ClientRemote
 function ClientRemoteValidation:new(remote)
 	self.remote = remote
-	self.client = OnlineClientRemoteValidation(remote.client)
-	self.multiplayer = MultiplayerClientRemoteValidation(remote.multiplayer)
-	self.compute_data_provider = ComputeDataProviderRemoteValidation(remote.compute_data_provider)
+end
+
+function ClientRemoteValidation:__index(k)
+	local v = ClientRemoteValidation[k]
+	if v ~= nil then return v end
+
+	if k == "client" then
+		self.client = OnlineClientRemoteValidation(self.remote.client)
+		return self.client
+	elseif k == "multiplayer" then
+		self.multiplayer = MultiplayerClientRemoteValidation(self.remote.multiplayer)
+		return self.multiplayer
+	elseif k == "compute_data_provider" then
+		self.compute_data_provider = ComputeDataProviderRemoteValidation(self.remote.compute_data_provider)
+		return self.compute_data_provider
+	end
 end
 
 ---@param ... any
