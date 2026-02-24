@@ -125,19 +125,19 @@ end
 ---@param caller_port integer
 ---@return sea.Peer[]
 function UserConnections:getPeers(caller_ip, caller_port)
-	local keys = self.repo.dict:get_keys(0)
 	local peers = {}
 	local sid = self:getId(caller_ip, caller_port)
-	for _, key in ipairs(keys) do
-		local ip, port = key:match("^c:(.+):(%d+)$")
-		port = tonumber(port)
-		if ip and port then
-			local user_id = self.repo:getConnectionUser(ip, port)
-			local user = self:_getUser(user_id)
-			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-			table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
+	---@type {[integer|true]: sea.User}
+	local users_cache = {}
+	self.repo:forEachConnection(function(ip, port, user_id)
+		local user = users_cache[user_id]
+		if user == nil then
+			user = self:_getUser(user_id)
+			users_cache[user_id] = user
 		end
-	end
+		local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
+		table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
+	end)
 	return peers
 end
 
@@ -146,20 +146,15 @@ end
 ---@param caller_port integer
 ---@return sea.Peer[]
 function UserConnections:getPeersForUser(user_id, caller_ip, caller_port)
-	local keys = self.repo.dict:get_keys(0)
 	local peers = {}
 	local sid = self:getId(caller_ip, caller_port)
 	local user = self:_getUser(user_id)
-	for _, key in ipairs(keys) do
-		local ip, port = key:match("^c:(.+):(%d+)$")
-		port = tonumber(port)
-		if ip and port then
-			if self.repo:getConnectionUser(ip, port) == user_id then
-				local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-				table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
-			end
+	self.repo:forEachConnection(function(ip, port, conn_user_id)
+		if conn_user_id == user_id then
+			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
+			table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
 		end
-	end
+	end)
 	return peers
 end
 

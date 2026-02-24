@@ -72,15 +72,29 @@ function UserConnectionsRepo:setUserOffline(user_id)
 	self.dict:delete(self:_getUserKey(user_id))
 end
 
----@return integer
-function UserConnectionsRepo:getGlobalCount()
+---@param callback fun(ip: string, port: integer, user_id: integer|true)
+function UserConnectionsRepo:forEachConnection(callback)
 	local keys = self.dict:get_keys(0)
-	local count = 0
 	for _, key in ipairs(keys) do
 		if key:sub(1, 2) == "c:" then
-			count = count + 1
+			local user_id = self.dict:get(key)
+			if user_id ~= nil then
+				---@cast user_id -string
+				local ip, port = key:match("^c:(.+):(%d+)$")
+				if ip and port then
+					callback(ip, assert(tonumber(port)), user_id)
+				end
+			end
 		end
 	end
+end
+
+---@return integer
+function UserConnectionsRepo:getGlobalCount()
+	local count = 0
+	self:forEachConnection(function()
+		count = count + 1
+	end)
 	return count
 end
 
