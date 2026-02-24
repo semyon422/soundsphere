@@ -151,32 +151,57 @@ end
 
 function Select:update(_)
 	self.select_controller:update()
-	self:observeSelectModelMutations()
+	self:observeGameMutations()
 end
 
 function Select:onKeyDown(e)
 	local k = e.key
+	local modals = self:getContext().modals
+	local game = self:getGame()
 
 	if k == "j" then
 		self.select_model:scrollNoteChartSet(1)
 	elseif k == "k" then
 		self.select_model:scrollNoteChartSet(-1)
+	elseif k == "h" then
+		self.select_model:scrollNoteChart(-1)
+	elseif k == "l" then
+		self.select_model:scrollNoteChart(1)
+	elseif k == "m" then
+		modals:setImguiModal(ImGuiModifiers)
+	elseif k == "i" then
+		modals:setImguiModal(ImGuiInputs)
+	elseif k == "s" then
+		modals:setImguiModal(ImGuiSkins)
+	elseif k == "c" then
+		modals:setImguiModal(ImGuiSettings)
+	elseif k == "g" then
+		modals:setImguiModal(ImGuiGameplayConfig)
+	elseif k == "[" then
+		game.timeRateModel:increase(-1)
+		game.modifierSelectModel:change()
+		self:updateChartview()
+	elseif k == "]" then
+		game.timeRateModel:increase(1)
+		game.modifierSelectModel:change()
+		self:updateChartview()
 	elseif k == "return" then
 		self.parent:set("gameplay")
 	end
 end
 
----@param chartview {[string]: any}?
-function Select:setChartview(chartview)
+function Select:updateChartview()
+	---@type {[string]: any}?
+	local chartview = self.select_model.chartview
+
 	if not chartview then
 		return
 	end
 
-	if chartview.hash == self.prev_chart_hash then
-		return
-	end
+	local rate = self:getGame().timeRateModel:get()
 
 	self.prev_chart_hash = chartview.hash
+	self.prev_rate = rate
 
 	local is_ranked = chartview.difftable_chartmetas and #chartview.difftable_chartmetas > 0
 
@@ -194,43 +219,56 @@ function Select:setChartview(chartview)
 
 	self.title:setText(chartview.title)
 	self.artist:setText(chartview.artist)
-	self.difficilty_cell:setValueText(("%0.02f"):format(chartview.difficulty))
+	self.difficilty_cell:setValueText(("%0.02f"):format(chartview.difficulty * rate))
 
 	local input_mode = chartview.inputmode:gsub("key", "K"):gsub("scratch", "S")
 	self.mode_cell:setValueText(input_mode)
-	self.bpm_cell:setValueText(("%i"):format(chartview.tempo))
+	self.bpm_cell:setValueText(("%i"):format(chartview.tempo * rate))
 
-	local minutes = chartview.duration / 60
-	local seconds = chartview.duration % 60
+	local duration = chartview.duration * rate
+	local minutes = duration / 60
+	local seconds = duration % 60
 	self.duration_cell:setValueText(("%i:%02i"):format(minutes, seconds))
 
 	self.notes_cell:setValueText(tostring(chartview.notes_count))
 end
 
 function Select:onChartChanged()
-	self:setChartview(self.select_model.chartview)
+	print("chart changed")
+	self:updateChartview()
 end
 
 function Select:onChartSetChanged()
-	self:setChartview(self.select_model.chartview)
+	print("set changed")
 	self.chart_grid:reloadItems()
 end
 
 function Select:onLibraryReloaded()
+	print("library reloaded")
 	self.chart_set_list:reloadItems()
 end
 
-function Select:observeSelectModelMutations()
-	local chartview_i = self.select_model.chartview_index
+function Select:onRateChanged()
+	print("rate changed")
+	self:updateChartview()
+end
+
+function Select:observeGameMutations()
+	local game = self:getGame()
+	local chartview = self.select_model.chartview
+
+	local chart_hash = chartview and chartview.hash or ""
 	local chartview_set_i = self.select_model.chartview_set_index
 	local sets_count = self.select_model.noteChartSetLibrary.itemsCount
+	local rate = game.timeRateModel:get()
 
-	local chart_changed = chartview_i ~= self.prev_chart_view_index
+	local chart_hash_changed = chart_hash ~= self.prev_chart_hash
 	local chart_set_changed = chartview_set_i ~= self.prev_chart_view_set_index
 	local sets_reloaded = sets_count ~= self.prev_sets_count
+	local rate_changed = rate ~= self.prev_rate
 
-	if chart_changed then
-		self.prev_chart_view_index = chartview_i
+	if chart_hash_changed then
+		self.prev_chart_hash = chart_hash
 		self:onChartChanged()
 	end
 
@@ -242,6 +280,11 @@ function Select:observeSelectModelMutations()
 	if sets_reloaded then
 		self.prev_sets_count = sets_count
 		self:onLibraryReloaded()
+	end
+
+	if rate_changed then
+		self.prev_rate = rate
+		self:onRateChanged()
 	end
 end
 
