@@ -283,6 +283,7 @@ end
 ---@param audio_mode {primary: string, secondary: string}
 function RhythmEngine:setAudioMode(audio_mode)
 	self.audio_mode = audio_mode
+	self.audio_engine:setAudioMode(audio_mode)
 end
 
 ---@param wind_up string

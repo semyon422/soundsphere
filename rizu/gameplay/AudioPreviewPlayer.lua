@@ -79,7 +79,8 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 
 		self.buffered_decoder = buffered
 
-		self.audio_source = BassChartAudioSource(buffered)
+		local use_tempo = self.configModel.configs.settings.audio.mode.primary == "bass_fx_tempo"
+		self.audio_source = BassChartAudioSource(buffered, use_tempo)
 		self.audio_source:setVolume(self.volume)
 		self.audio_source:setRate(self.rate)
 		if self.fft_size then

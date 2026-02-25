@@ -35,6 +35,7 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:setAutoKeySound(config.gameplay.autoKeySound)
 	rhythm_engine:setAudioEnabled(self.audioEnabled)
 	rhythm_engine:load()
+	rhythm_engine:setAudioMode(config.audio.mode)
 	rhythm_engine:loadAudio(self.resources)
 
 	-- variable unranked
@@ -61,7 +62,6 @@ function RhythmEngineLoader:load(rhythm_engine)
 
 	rhythm_engine:setLongNoteShortening(config.gameplay.longNoteShortening)
 	rhythm_engine:setVisualRate(config.gameplay.speed, config.gameplay.scaleSpeed)
-	rhythm_engine:setAudioMode(config.audio.mode)
 end
 
 return RhythmEngineLoader

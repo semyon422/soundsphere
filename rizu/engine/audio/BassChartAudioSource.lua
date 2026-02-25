@@ -1,9 +1,8 @@
 local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
 local ffi = require("ffi")
-local bit = require("bit")
 local bass = require("bass")
+local bass_fx = require("bass.fx")
 local bass_assert = require("bass.assert")
-local bass_mix = require("bass.mix")
 local bass_flags = require("bass.flags")
 local bass_fft = require("bass.fft")
 
@@ -23,15 +22,36 @@ local fft_flags = {
 local BassChartAudioSource = IChartAudioSource + {}
 
 ---@param decoder rizu.ISoundDecoder
-function BassChartAudioSource:new(decoder)
+---@param use_tempo boolean?
+function BassChartAudioSource:new(decoder, use_tempo)
 	self.decoder = decoder
+	self.use_tempo = use_tempo
+
+	local flags = 0
+	if use_tempo then
+		flags = bass_flags.BASS_STREAM_DECODE
+	end
 
 	---@type integer
-	local channel = bass.BASS_StreamCreate(decoder:getSampleRate(), decoder:getChannelCount(), 0, ffi.cast("STREAMPROC*", -1), nil)
-	self.channel = channel
-	bass_assert(channel ~= 0)
+	local source_channel = bass.BASS_StreamCreate(decoder:getSampleRate(), decoder:getChannelCount(), flags, ffi.cast("STREAMPROC*", -1), nil)
+	self.source_channel = source_channel
+	bass_assert(source_channel ~= 0)
 
-	local bytes_per_second = decoder:getSampleRate() * decoder:getChannelCount() * decoder:getBytesPerSample()
+	if use_tempo then
+		self.channel = bass_fx.BASS_FX_TempoCreate(source_channel, bass_flags.BASS_FX_FREESOURCE)
+		bass_assert(self.channel ~= 0)
+	else
+		self.channel = source_channel
+	end
+
+	-- Reduce playback buffer to minimum for lowest latency
+	if use_tempo then -- Push streams (using STREAMPROC_PUSH) are also unaffected
+		bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_BUFFER, 0)
+	end
+
+	self.frame_size = decoder:getChannelCount() * decoder:getBytesPerSample()
+
+	local bytes_per_second = decoder:getSampleRate() * self.frame_size
 	self.buf_len = math.floor(bytes_per_second * 0.5)
 	self.buf = ffi.new("uint8_t[?]", self.buf_len)
 
@@ -57,12 +77,16 @@ end
 
 ---@return boolean
 function BassChartAudioSource:isPlaying()
-	return bass_mix.BASS_Mixer_ChannelIsActive(self.channel) == bass_flags.BASS_ACTIVE_PLAYING
+	return bass.BASS_ChannelIsActive(self.channel) == bass_flags.BASS_ACTIVE_PLAYING
 end
 
 ---@param rate number
 function BassChartAudioSource:setRate(rate)
-	bass.BASS_ChannelSetAttribute(self.channel, 1, self.decoder:getSampleRate() * rate)
+	if self.use_tempo then
+		bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_TEMPO, (rate - 1) * 100) == 1)
+	else
+		bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_FREQ, self.decoder:getSampleRate() * rate)
+	end
 end
 
 ---@return number
@@ -113,11 +137,35 @@ function BassChartAudioSource:getFFT()
 	return self.fft_buffer
 end
 
-function BassChartAudioSource:update()
+---@private
+function BassChartAudioSource:getNeedBytesSource()
 	---@type integer
-	local available = bass.BASS_ChannelGetData(self.channel, nil, bass_flags.BASS_DATA_AVAILABLE)
+	local available = bass.BASS_ChannelGetData(self.source_channel, nil, bass_flags.BASS_DATA_AVAILABLE)
+	return self.buf_len - available
+end
 
-	local need_bytes = self.buf_len - available
+---@private
+function BassChartAudioSource:getNeedBytesTempo()
+	---@type integer
+	local available_source = bass.BASS_StreamPutData(self.source_channel, nil, 0)
+
+	---@type integer
+	-- local available_tempo = bass.BASS_ChannelGetData(self.channel, nil, bass_flags.BASS_DATA_AVAILABLE)
+
+	--- TODO: smooth
+
+	return self.buf_len - available_source
+end
+
+function BassChartAudioSource:update()
+	local need_bytes = 0
+
+	if not self.use_tempo then
+		need_bytes = self:getNeedBytesSource()
+	else
+		need_bytes = self:getNeedBytesTempo()
+	end
+
 	if need_bytes <= 0 then
 		return
 	end
@@ -125,7 +173,7 @@ function BassChartAudioSource:update()
 	local read = self.decoder:getData(self.buf, need_bytes)
 	if read > 0 then
 		---@type integer
-		local bytes = bass.BASS_StreamPutData(self.channel, self.buf, read)
+		local bytes = bass.BASS_StreamPutData(self.source_channel, self.buf, read)
 		bass_assert(bytes ~= -1)
 	end
 end

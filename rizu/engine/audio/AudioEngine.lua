@@ -22,6 +22,12 @@ AudioEngine.keysounds_volume = 1
 function AudioEngine:new()
 	---@type {[string]: audio.Wave}
 	self.soundDataCache = {}
+	self.mode = {primary = "bass_sample", secondary = "bass_sample"}
+end
+
+---@param mode {primary: string, secondary: string}
+function AudioEngine:setAudioMode(mode)
+	self.mode = mode
 end
 
 ---@param enabled boolean
@@ -62,7 +68,8 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 
 	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
 	if not self.mixer.empty then
-		self.source = self.SourceClass(self.mixer)
+		local use_tempo = self.mode.primary == "bass_fx_tempo"
+		self.source = self.SourceClass(self.mixer, use_tempo)
 		self.source:setVolume(self.music_volume)
 	end
 end
