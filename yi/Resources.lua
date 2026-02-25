@@ -6,10 +6,10 @@ local class = require("class")
 local Resources = class()
 
 Resources.font_paths = {
-	regular = "yi/assets/MiSans-Regular.ttf",
-	bold = "yi/assets/MiSans-Bold.ttf",
-	black = "yi/assets/MiSans-Heavy.ttf",
-	icons = "yi/assets/lucide.ttf"
+	regular = "resources/fonts/MiSans-Regular.ttf",
+	bold = "resources/fonts/MiSans-Bold.ttf",
+	black = "resources/fonts/MiSans-Heavy.ttf",
+	icons = "resources/fonts/lucide.ttf"
 }
 
 ---@alias yi.FontName "regular" | "bold" | "black" | "icons"

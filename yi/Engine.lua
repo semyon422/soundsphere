@@ -99,6 +99,14 @@ end
 ---@param mouse_x number
 ---@param mouse_y number
 function Engine:update(dt, mouse_x, mouse_y)
+	local ww, wh = love.graphics.getDimensions()
+
+	if ww ~= self.prev_window_width or wh ~= self.prev_window_height then
+		self.prev_window_width = ww
+		self.prev_window_height = wh
+		self:updateRootDimensions()
+	end
+
 	self.inputs:beginFrame(mouse_x, mouse_y)
 
 	table_util.clear(self.layout_update_requesters)
@@ -154,9 +162,7 @@ local modifiers = {
 }
 
 function Engine:receive(event)
-	if event.name == "resize" then
-		self:updateRootDimensions()
-	elseif event.name ~= "framestarted" then
+	if event.name ~= "framestarted" then
 		modifiers.control = love.keyboard.isDown("lctrl", "rctrl")
 		modifiers.shift = love.keyboard.isDown("lshift", "rshift")
 		modifiers.alt = love.keyboard.isDown("lalt", "ralt")
