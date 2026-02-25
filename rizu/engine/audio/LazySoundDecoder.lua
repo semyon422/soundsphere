@@ -4,7 +4,7 @@ local ffi = require("ffi")
 ---@class rizu.LazySoundDecoder: rizu.ISoundDecoder
 ---@field private fs fs.IFilesystem
 ---@field private path string
----@field private factory fun(fs: fs.IFilesystem, path: string): rizu.ISoundDecoder
+---@field private factory fun(data: string): rizu.ISoundDecoder
 ---@field private duration number
 ---@field private sample_rate integer
 ---@field private channels integer
@@ -16,15 +16,25 @@ local LazySoundDecoder = ISoundDecoder + {}
 
 ---@param fs fs.IFilesystem
 ---@param path string
----@param factory fun(fs: fs.IFilesystem, path: string): rizu.ISoundDecoder
+---@param factory fun(data: string): rizu.ISoundDecoder
 ---@param duration number
 ---@param sample_rate integer
 ---@param channels integer
 ---@param bytes_per_sample integer
 ---@param volume number?
 function LazySoundDecoder:new(fs, path, factory, duration, sample_rate, channels, bytes_per_sample, volume)
+	self:init(factory, duration, sample_rate, channels, bytes_per_sample, volume)
 	self.fs = fs
 	self.path = path
+end
+
+---@param factory fun(data: string): rizu.ISoundDecoder
+---@param duration number
+---@param sample_rate integer
+---@param channels integer
+---@param bytes_per_sample integer
+---@param volume number?
+function LazySoundDecoder:init(factory, duration, sample_rate, channels, bytes_per_sample, volume)
 	self.factory = factory
 	self.duration = duration
 	self.sample_rate = sample_rate
@@ -35,11 +45,18 @@ function LazySoundDecoder:new(fs, path, factory, duration, sample_rate, channels
 	self.bytes_position = 0
 end
 
+---@protected
+---@return string
+function LazySoundDecoder:loadData()
+	return self.fs:read(self.path) or ""
+end
+
 ---@private
 ---@return rizu.ISoundDecoder
 function LazySoundDecoder:ensureLoaded()
 	if not self.real_decoder then
-		self.real_decoder = self.factory(self.fs, self.path)
+		local data = self:loadData()
+		self.real_decoder = self.factory(data)
 		if self.bytes_position ~= 0 then
 			self.real_decoder:setBytesPosition(self.bytes_position)
 		end
@@ -53,6 +70,7 @@ function LazySoundDecoder:getData(buf, len)
 
 	if self.volume ~= 1 and bytes > 0 then
 		local samples = bytes / self.bytes_per_sample
+		---@type {[integer]: integer}
 		local ptr = ffi.cast("int16_t*", buf)
 		local vol = self.volume
 		for i = 0, samples - 1 do

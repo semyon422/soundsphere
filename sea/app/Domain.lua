@@ -100,14 +100,14 @@ end
 
 ---@param peer sea.Peer
 function Domain:onConnect(peer)
-	self.user_connections:onConnect(peer.ip, peer.port, peer.user.id)
+	self.user_connections:onConnect(peer.peer_id, peer.user.id)
 	self.multiplayer:connected(peer)
 end
 
 ---@param peer sea.Peer
 function Domain:onDisconnect(peer)
 	self.multiplayer:disconnected(peer)
-	self.user_connections:onDisconnect(peer.ip, peer.port, peer.user.id)
+	self.user_connections:onDisconnect(peer.peer_id, peer.user.id)
 	self.multiplayer:pushUsers(peer)
 end
 
@@ -123,7 +123,7 @@ end
 ---@param msg string
 ---@param caller_peer sea.Peer
 function Domain:printAll(msg, caller_peer)
-	local peers = self.user_connections:getPeers(caller_peer.ip, caller_peer.port)
+	local peers = self.user_connections:getPeers(caller_peer.peer_id)
 	for _, peer in ipairs(peers) do
 		peer.remote_no_return:print(msg)
 	end
@@ -132,7 +132,7 @@ end
 ---@param caller_peer sea.Peer
 ---@return number[]
 function Domain:getRandomNumbersFromAllClients(caller_peer)
-	local peers = self.user_connections:getPeers(caller_peer.ip, caller_peer.port)
+	local peers = self.user_connections:getPeers(caller_peer.peer_id)
 	local numbers = {}
 	for _, peer in ipairs(peers) do
 		local ok, num = pcall(peer.remote.getRandomNumber, peer.remote)

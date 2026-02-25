@@ -19,7 +19,8 @@ end
 
 function AudioEngine:updateVolume()
 	self.backgroundContainer:setVolume(self.volume.master * self.volume.music)
-	self.foregroundContainer:setVolume(self.volume.master * self.volume.effects)
+	local keysounds_volume = self.volume.keysounds * (self.volume.keysounds_format[self.format] or 1)
+	self.foregroundContainer:setVolume(self.volume.master * keysounds_volume)
 end
 
 function AudioEngine:load()

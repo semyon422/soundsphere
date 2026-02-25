@@ -65,13 +65,13 @@ function tabs.audio(self)
 	if a.volumeType == "linear" then
 		v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master")
 		v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music")
-		v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects")
+		v.keysounds = imgui.slider1("v.keysounds", v.keysounds, "%0.2f", 0, 1, 0.01, "keysounds")
 		v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome")
 	elseif a.volumeType == "logarithmic" then
 		local logk = 20 / math.log(10)
 		v.master = imgui.logslider("v.master", v.master, "%ddB", -60, 0, 1, logk, "master")
 		v.music = imgui.logslider("v.music", v.music, "%ddB", -60, 0, 1, logk, "music")
-		v.effects = imgui.logslider("v.effects", v.effects, "%ddB", -60, 0, 1, logk, "effects")
+		v.keysounds = imgui.logslider("v.keysounds", v.keysounds, "%ddB", -60, 0, 1, logk, "keysounds")
 		v.metronome = imgui.logslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, logk, "metronome")
 	end
 

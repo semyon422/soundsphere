@@ -2,13 +2,14 @@ local class = require("class")
 local valid = require("valid")
 local table_util = require("table_util")
 local Chartplay = require("sea.chart.Chartplay")
+local ReplayFactory = require("rizu.engine.replay.ReplayFactory")
+local ChartplayComputedFactory = require("rizu.engine.ChartplayComputedFactory")
 
 ---@class rizu.ScoreSaver
 ---@operator call: rizu.ScoreSaver
 local ScoreSaver = class()
 
 ---@param fs fs.IFilesystem
----@param rhythm_engine rizu.RhythmEngine
 ---@param cacheModel sphere.CacheModel
 ---@param configModel sphere.ConfigModel
 ---@param seaClient sphere.SeaClient
@@ -16,7 +17,6 @@ local ScoreSaver = class()
 ---@param computeContext sea.ComputeContext
 function ScoreSaver:new(
 	fs,
-	rhythm_engine,
 	cacheModel,
 	configModel,
 	seaClient,
@@ -24,16 +24,18 @@ function ScoreSaver:new(
 	computeContext
 )
 	self.fs = fs
-	self.rhythm_engine = rhythm_engine
 	self.cacheModel = cacheModel
 	self.configModel = configModel
 	self.seaClient = seaClient
 	self.replayBase = replayBase
 	self.computeContext = computeContext
+
+	self.replay_factory = ReplayFactory()
 end
 
-function ScoreSaver:saveScore()
-	local rhythm_engine = self.rhythm_engine
+---@param gameplay_session rizu.GameplaySession
+function ScoreSaver:saveScore(gameplay_session)
+	local rhythm_engine = gameplay_session.rhythm_engine
 	local pause_counter = rhythm_engine.pause_counter
 	local scoreEngine = rhythm_engine.score_engine
 	local replayBase = self.replayBase
@@ -42,12 +44,15 @@ function ScoreSaver:saveScore()
 	local chartmeta = assert(computeContext.chartmeta)
 	local created_at = os.time()
 
-	local replay, replay_hash = self.replayModel:saveReplay(
+	local replay, data, replay_hash = self.replay_factory:createReplay(
 		replayBase,
 		chartmeta,
+		gameplay_session.replay_recorder:getFrames(),
 		created_at,
 		pause_counter.count
 	)
+
+	self.fs:write("userdata/replays/" .. replay_hash, data)
 
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = setmetatable(table_util.deepcopy(chartdiff), getmetatable(chartdiff))
@@ -56,7 +61,8 @@ function ScoreSaver:saveScore()
 
 	local chartplay = Chartplay()
 
-	local chartplay_computed = rhythm_engine:getChartplayComputed()
+	local cc_factory = ChartplayComputedFactory(chartdiff, computeContext.diffcalc_context, scoreEngine)
+	local chartplay_computed = cc_factory:getChartplayComputed()
 
 	chartplay:importChartplayBase(replay)
 	chartplay:importChartplayComputed(chartplay_computed)
@@ -85,7 +91,7 @@ function ScoreSaver:saveScore()
 		end
 
 		local base = scoreEngine.scores.base
-		if base.hitCount / base.notesCount < 0.5 then
+		if base.hitCount / base.notes_count < 0.5 then
 			print("not submitted")
 			return
 		end
@@ -97,7 +103,7 @@ function ScoreSaver:saveScore()
 			print(require("stbl").encode(ok))
 		else
 			print("dumping events")
-			local data = require("string.buffer").encode(self.rhythm_engine.score_engine.events)
+			local data = require("string.buffer").encode(rhythm_engine.score_engine.events)
 			self.fs:write("events.bin", data)
 		end
 	end

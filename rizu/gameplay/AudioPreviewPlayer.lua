@@ -51,8 +51,8 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		local preview = AudioPreview()
 		preview:decode(preview_data)
 
-		local decoder = PreviewSoundDecoder(fs, dir, preview, function(_, path)
-			return BassSoundDecoder(fs:read(path))
+		local decoder = PreviewSoundDecoder(fs, dir, preview, function(data)
+			return BassSoundDecoder(data)
 		end)
 
 		return decoder

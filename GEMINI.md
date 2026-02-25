@@ -68,6 +68,12 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 *   **Variable Naming (Conflicts with Globals):** Avoid using Lua global names (e.g., `type`, `table`, `string`, `pairs`) for local variables. If you must use such a name, prefix it with an underscore (e.g., `_type`).
 
+### Performance & Benchmarking
+
+The project prioritizes high-performance Lua code, especially within the gameplay engine.
+
+*   **Benchmarking:** When making core changes, use isolated benchmark scripts (running with `luajit`) to verify that optimizations are not elided by the JIT and that they provide measurable improvements.
+
 ### Testing
 
 The project uses a custom testing framework. Test files should follow these conventions:
@@ -139,8 +145,6 @@ The `.sph` format is a text-based format for rhythm game charts.
 When writing tests for gameplay logic or the rhythm engine:
 
 *   **Time Advancement**: Use `GameplaySession:update(global_time)` to advance time.
-*   **Mocking Audio**: When testing without real audio, the `TimeEngine` may attempt to sync with a non-existent or fake audio source.
-    *   **Snap-back Prevention**: Disable the time adjustment function to prevent the clock from snapping back to 0: `re.time_engine:setAdjustFunction(nil)`.
 *   **Initialization Order**: Always set the global time (`re:setGlobalTime(t)`) before calling `re:play()` or `re:update()` to ensure internal timers are correctly initialized.
 *   **TestChartFactory**: Use `sea.chart.TestChartFactory` for programmatic chart creation in tests. It produces minimal `Chart`, `Chartmeta`, and `Chartdiff` without parsing files.
     ```lua

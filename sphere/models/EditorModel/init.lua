@@ -81,6 +81,7 @@ function EditorModel:load()
 
 	local volume = self.configModel.configs.settings.audio.volume
 	self.audioManager.volume = volume
+	self.audioManager.format = self.chartmeta.format
 	self.audioManager:load()
 
 	self.mainAudio.volume = volume

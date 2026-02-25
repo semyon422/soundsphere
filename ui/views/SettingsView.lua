@@ -8,6 +8,7 @@ local version = require("version")
 local audio = require("audio")
 local utf8validate = require("utf8validate")
 local fonts = require("sphere.assets.fonts")
+local loop = require("rizu.loop.Loop")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -220,6 +221,8 @@ function drawSection:graphics()
 
 	g.fps = imgui.intButtons("fps", g.fps, 2, "FPS limit")
 	g.unlimited_fps = imgui.checkbox("unlimited_fps", g.unlimited_fps, "unlimited FPS")
+	g.busy_loop_ratio = imgui.slider1("busy_loop_ratio", g.busy_loop_ratio, "%0.2f", 0, 1, 0.01, "FPS limiter busy loop ratio")
+	g.sleep_function = imgui.combo("g.sleep_function", g.sleep_function, loop.sleep_function_factory:getAvailableTypes(), nil, "sleep function")
 
 	local flags = g.mode.flags
 	flags.fullscreen = imgui.checkbox("flags.fullscreen", flags.fullscreen, "fullscreen")
@@ -351,13 +354,20 @@ function drawSection:audio()
 	if a.volumeType == "linear" then
 		v.master = imgui.slider1("v.master", v.master, "%0.2f", 0, 1, 0.01, "master")
 		v.music = imgui.slider1("v.music", v.music, "%0.2f", 0, 1, 0.01, "music")
-		v.effects = imgui.slider1("v.effects", v.effects, "%0.2f", 0, 1, 0.01, "effects")
+		v.keysounds = imgui.slider1("v.keysounds", v.keysounds, "%0.2f", 0, 1, 0.01, "keysounds")
 		v.metronome = imgui.slider1("v.metronome", v.metronome, "%0.2f", 0, 1, 0.01, "metronome")
 	elseif a.volumeType == "logarithmic" then
 		v.master = imgui.lfslider("v.master", v.master, "%ddB", -60, 0, 1, "master")
 		v.music = imgui.lfslider("v.music", v.music, "%ddB", -60, 0, 1, "music")
-		v.effects = imgui.lfslider("v.effects", v.effects, "%ddB", -60, 0, 1, "effects")
+		v.keysounds = imgui.lfslider("v.keysounds", v.keysounds, "%ddB", -60, 0, 1, "keysounds")
 		v.metronome = imgui.lfslider("v.metronome", v.metronome, "%ddB", -60, 0, 1, "metronome")
+	end
+
+	imgui.separator()
+	imgui.text("keysounds per format")
+	local kf = v.keysounds_format
+	for _, format in ipairs({"sphere", "osu", "o2jam", "bms", "stepmania", "quaver", "midi", "ksm"}) do
+		kf[format] = imgui.lfslider("kf." .. format, kf[format], "%ddB", -60, 0, 1, format)
 	end
 
 	a.sampleGain = imgui.slider1("sampleGain", a.sampleGain, "+%0.0fdB", 0, 100, 1, "gain with clipping")

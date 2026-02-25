@@ -24,7 +24,6 @@ local whitelist = {
 		getDifftableChartmetas = true,
 	},
 	multiplayer = {
-		print = true,
 		getRooms = true,
 		getUsers = true,
 		getUser = true,

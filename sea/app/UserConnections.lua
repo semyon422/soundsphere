@@ -1,11 +1,11 @@
 local class = require("class")
-local ClientRemoteValidation = require("sea.app.remotes.ClientRemoteValidation")
-local Remote = require("icc.Remote")
 local TaskHandler = require("icc.TaskHandler")
 local RemoteHandler = require("icc.RemoteHandler")
 local Queues = require("icc.Queues")
 local User = require("sea.access.User")
-local Peer = require("sea.app.Peer")
+local InternalPeer = require("sea.app.InternalPeer")
+
+local EMPTY_USER = User()
 
 ---@class sea.UserConnections
 ---@operator call: sea.UserConnections
@@ -20,30 +20,30 @@ UserConnections.ttl = 90
 function UserConnections:new(repo, users_repo)
 	self.repo = repo
 	self.users_repo = users_repo
-	self.queues = Queues(function(id)
-		return self:getQueueFromSid(id)
+	self.queues = Queues(function(peer_id)
+		return self.repo:getQueue(peer_id)
 	end)
 end
 
 ---@param server_remote sea.ServerRemote
 ---@param whitelist icc.RemoteHandlerWhitelist
-function UserConnections:setup(server_remote, whitelist)
+---@param client_whitelist icc.RemoteHandlerWhitelist
+function UserConnections:setup(server_remote, whitelist, client_whitelist)
 	self.remote_handler = RemoteHandler(server_remote, whitelist)
 	self.task_handler = TaskHandler(self.remote_handler, "server")
+	self.client_whitelist = client_whitelist
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@param user_id? integer
-function UserConnections:onConnect(ip, port, user_id)
-	self:heartbeat(ip, port, user_id)
+function UserConnections:onConnect(peer_id, user_id)
+	self:heartbeat(peer_id, user_id)
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@param user_id? integer
-function UserConnections:onDisconnect(ip, port, user_id)
-	self.repo:removeConnection(ip, port)
+function UserConnections:onDisconnect(peer_id, user_id)
+	self.repo:removeConnection(peer_id)
 	if user_id then
 		self.repo:setUserOffline(user_id)
 	end
@@ -59,11 +59,10 @@ function UserConnections:onUserDisconnect(user_id)
 	self.repo:setUserOffline(user_id)
 end
 
----@param ip string
----@param port integer
+---@param peer_id string
 ---@param user_id? integer
-function UserConnections:heartbeat(ip, port, user_id)
-	self.repo:setConnection(ip, port, user_id, self.ttl)
+function UserConnections:heartbeat(peer_id, user_id)
+	self.repo:setConnection(peer_id, user_id, self.ttl)
 	if user_id then
 		self.repo:setUserOnline(user_id, self.ttl)
 	end
@@ -79,101 +78,82 @@ function UserConnections:isUserOnline(user_id)
 	return self.repo:isUserOnline(user_id)
 end
 
----@param ip string
----@param port integer
-function UserConnections:getId(ip, port)
-	return ip .. ":" .. port
-end
-
----@param sid string
----@return icc.SharedMemoryQueue
-function UserConnections:getQueueFromSid(sid)
-	local ip, port = sid:match("^(.+):(%d+)$")
-	port = tonumber(port)
-	---@cast port -?
-	return self.repo:getQueue(ip, port)
-end
-
 ---@private
 ---@param user_id integer|true|nil
 ---@return sea.User
 function UserConnections:_getUser(user_id)
 	if type(user_id) == "number" then
-		return self.users_repo:getUser(user_id) or User()
+		return self.users_repo:getUser(user_id) or EMPTY_USER
 	end
-	return User()
+	return EMPTY_USER
 end
 
----@param ip string
----@param port integer
----@param caller_ip string
----@param caller_port integer
----@return sea.Peer?
-function UserConnections:getPeer(ip, port, caller_ip, caller_port)
-	if not self.repo:hasConnection(ip, port) then
+---@param peer_id string
+---@param caller_peer_id string
+---@return sea.InternalPeer?
+function UserConnections:getPeer(peer_id, caller_peer_id)
+	if not self.repo:hasConnection(peer_id) then
 		return
 	end
-	local user_id = self.repo:getConnectionUser(ip, port)
+	local user_id = self.repo:getConnectionUser(peer_id)
 	local user = self:_getUser(user_id)
-	local icc_peer = self.queues:getPeer(self:getId(ip, port), self:getId(caller_ip, caller_port))
-	return Peer(self.task_handler, icc_peer, user, ip, port)
+	local icc_peer = self.queues:getPeer(peer_id, caller_peer_id)
+	return InternalPeer(self.task_handler, icc_peer, user, peer_id)
 end
 
----@param caller_ip string
----@param caller_port integer
----@return sea.Peer[]
-function UserConnections:getPeers(caller_ip, caller_port)
-	local keys = self.repo.dict:get_keys(0)
+---@param caller_peer_id string
+---@return sea.InternalPeer[]
+function UserConnections:getPeers(caller_peer_id)
 	local peers = {}
-	local sid = self:getId(caller_ip, caller_port)
-	for _, key in ipairs(keys) do
-		local ip, port = key:match("^c:(.+):(%d+)$")
-		port = tonumber(port)
-		if ip and port then
-			local user_id = self.repo:getConnectionUser(ip, port)
-			local user = self:_getUser(user_id)
-			local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-			table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
+	---@type {[integer|true]: sea.User}
+	local users_cache = {}
+	self.repo:forEachConnection(function(user_id, peer_id)
+		local user = users_cache[user_id]
+		if user == nil then
+			user = self:_getUser(user_id)
+			users_cache[user_id] = user
 		end
-	end
+		local icc_peer = self.queues:getPeer(peer_id, caller_peer_id)
+		table.insert(peers, InternalPeer(self.task_handler, icc_peer, user, peer_id))
+	end)
 	return peers
 end
 
 ---@param user_id integer
----@param caller_ip string
----@param caller_port integer
----@return sea.Peer[]
-function UserConnections:getPeersForUser(user_id, caller_ip, caller_port)
-	local keys = self.repo.dict:get_keys(0)
+---@param caller_peer_id string
+---@return sea.InternalPeer[]
+function UserConnections:getPeersForUser(user_id, caller_peer_id)
 	local peers = {}
-	local sid = self:getId(caller_ip, caller_port)
 	local user = self:_getUser(user_id)
-	for _, key in ipairs(keys) do
-		local ip, port = key:match("^c:(.+):(%d+)$")
-		port = tonumber(port)
-		if ip and port then
-			if self.repo:getConnectionUser(ip, port) == user_id then
-				local icc_peer = self.queues:getPeer(self:getId(ip, port), sid)
-				table.insert(peers, Peer(self.task_handler, icc_peer, user, ip, port))
-			end
+	self.repo:forEachConnection(function(conn_user_id, peer_id)
+		if conn_user_id == user_id then
+			local icc_peer = self.queues:getPeer(peer_id, caller_peer_id)
+			table.insert(peers, InternalPeer(self.task_handler, icc_peer, user, peer_id))
 		end
-	end
+	end)
 	return peers
 end
 
----@param sid string
 ---@param client_remote sea.ClientRemoteValidation
-function UserConnections:processQueue(sid, client_remote)
-	local msg, return_peer = self.queues:pop(sid)
-	if not msg then return end
+---@return icc.TaskHandler
+function UserConnections:createClientTaskHandler(client_remote)
+	local handler = RemoteHandler(client_remote, self.client_whitelist)
+	return TaskHandler(handler, "client-proxy")
+end
 
-	if not msg.ret then
-		assert(return_peer)
-		local handler = RemoteHandler(client_remote)
-		TaskHandler(handler, "client-proxy"):handleCall(return_peer, {}, msg)
-	else
-		assert(not return_peer)
-		self.task_handler:handleReturn(msg)
+---@param sid string
+---@param task_handler icc.TaskHandler
+function UserConnections:processQueue(sid, task_handler)
+	while true do
+		local msg, return_peer = self.queues:pop(sid)
+		if not msg then break end
+
+		if not msg.ret then
+			assert(return_peer)
+			task_handler:handleCall(return_peer, {}, msg)
+		else
+			self.task_handler:handleReturn(msg)
+		end
 	end
 end
 

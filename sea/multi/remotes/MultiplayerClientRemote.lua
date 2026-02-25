@@ -9,11 +9,6 @@ function MultiplayerClientRemote:new(client)
 	self.client = client
 end
 
----@param ... any
-function MultiplayerClientRemote:print(...)
-	print(...)
-end
-
 ---@param rooms sea.Room[]
 function MultiplayerClientRemote:setRooms(rooms)
 	self.client:setRooms(rooms)

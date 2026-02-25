@@ -45,9 +45,6 @@ function RhythmEngine:new()
 	self.audio_engine = AudioEngine()
 
 	self.time_engine = TimeEngine()
-	self.time_engine:setAdjustFunction(function()
-		return self.audio_engine:getPosition()
-	end)
 
 	self.play_progress = PlayProgress()
 	self.pause_counter = PauseCounter()
@@ -69,6 +66,10 @@ end
 function RhythmEngine:loadAudio(resources)
 	self.chart_resources = resources
 	self.audio_engine:load(self.chart, resources, self.auto_key_sound)
+
+	self.time_engine:setAdjustFunction(function()
+		return self.audio_engine:getPosition()
+	end)
 end
 
 ---@param enabled boolean
@@ -104,13 +105,17 @@ function RhythmEngine:unload()
 end
 
 function RhythmEngine:update()
-	self.logic_info.time = self.time_engine.time - self.logic_offset
-	self.visual_info.time = self.time_engine.time - self.visual_offset
+	self:syncTime()
 
 	self.input_engine:update()
 	self.logic_engine:update()
 	self.visual_engine:update()
 	self.audio_engine:update()
+end
+
+function RhythmEngine:syncTime()
+	self.logic_info.time = self.time_engine.time - self.logic_offset
+	self.visual_info.time = self.time_engine.time - self.visual_offset
 end
 
 function RhythmEngine:play()
@@ -129,6 +134,7 @@ end
 
 ---@param event rizu.VirtualInputEvent
 function RhythmEngine:receive(event)
+	self:syncTime()
 	local input_note, catched = self.input_engine:receive(event)
 
 	if not self.auto_key_sound and event.value == true and catched then
@@ -218,9 +224,9 @@ function RhythmEngine:setVisualRate(visual_rate, scale_visual_rate)
 	self.visual_info.rate = visual_rate
 end
 
----@param volume {master: number, music: number, effects: number}
+---@param volume {master: number, music: number, keysounds: number}
 function RhythmEngine:setVolume(volume)
-	self.audio_engine:setVolume(volume.master * volume.music, volume.master * volume.effects)
+	self.audio_engine:setVolume(volume.master * volume.music, volume.master * volume.keysounds)
 end
 
 ---@param time number

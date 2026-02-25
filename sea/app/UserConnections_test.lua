@@ -26,19 +26,22 @@ function test.full_call(t)
 			return 42
 		end
 	}
-	uc:setup(tbl, {getRandomNumber = true})
+	local whitelist = {getRandomNumber = true}
+	uc:setup(tbl, whitelist, whitelist)
 
 	local ip1, port1 = "1.1.1.1", 1
 	local sid1 = ip1 .. ":" .. port1
 	local ip2, port2 = "2.2.2.2", 2
 	local sid2 = ip2 .. ":" .. port2
 
-	uc:onConnect(ip1, port1, 1)
-	uc:onConnect(ip2, port2, 2)
+	uc:onConnect(sid1, 1)
+	uc:onConnect(sid2, 2)
 
 	-- Connection 1 wants to call Connection 2
-	local peer2_from_1 = uc:getPeer(ip2, port2, ip1, port1)
-	
+	local peer2_from_1 = uc:getPeer(sid2, sid1)
+	---@cast peer2_from_1 -?
+
+	---@type integer?
 	local result
 	local done = false
 	coroutine.wrap(function()
@@ -48,10 +51,12 @@ function test.full_call(t)
 
 	-- Verify and handle call in connection 2
 	-- In reality, connection 2's background loop would call processQueue
-	uc:processQueue(sid2, tbl)
+	local th2 = uc:createClientTaskHandler(tbl)
+	uc:processQueue(sid2, th2)
 
 	-- Verify and handle return in connection 1
-	uc:processQueue(sid1, tbl)
+	local th1 = uc:createClientTaskHandler(tbl)
+	uc:processQueue(sid1, th1)
 
 	t:assert(done)
 	t:eq(result, 42)

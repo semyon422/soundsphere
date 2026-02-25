@@ -179,8 +179,7 @@ local generateAudioPreviewAsync = thread.async(function(chartview_data)
 	require("love.filesystem")
 
 	local fs = LoveFilesystem()
-	local generator = AudioPreviewGenerator(fs, function(_, path)
-		local data = fs:read(path)
+	local generator = AudioPreviewGenerator(fs, function(data)
 		return BassSoundDecoder(data)
 	end)
 

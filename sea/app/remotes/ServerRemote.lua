@@ -42,7 +42,7 @@ function ServerRemote:ping(msg)
 end
 
 function ServerRemote:heartbeat()
-	self.user_connections:heartbeat(self.ip, self.port, self.user.id)
+	self.user_connections:heartbeat(self.peer_id, self.user.id)
 end
 
 ---@param msg string

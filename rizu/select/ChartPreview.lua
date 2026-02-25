@@ -98,7 +98,7 @@ function ChartPreview:setChartview(chartview)
 	end
 	self.visual_info.rate = visual_rate
 
-	self.visual_engine:load(chart)
+	self.visual_engine:load(chart, true)
 
 	self.chart = chart
 end

@@ -233,7 +233,7 @@ thread.coro(function()
 
 	game:load()
 
-	local loop = require("loop")
+	local loop = require("rizu.loop.Loop")
 	loop:init()
 	defaultLoop = loop:run()
 	loop:add(game)

@@ -20,14 +20,14 @@ local function copy_point(vp)
 end
 
 function LongVisualNote:initPoints()
-	if self.head_i then
+	if self.head_p then
 		return
 	end
 
 	local note = self.linked_note
 
-	self.head_i, self.head_p, self.head_vp = 1, copy_point(note.startNote.visualPoint)
-	self.tail_i, self.tail_p, self.tail_vp = 1, copy_point(note.endNote.visualPoint)
+	self.head_p, self.head_vp = copy_point(note.startNote.visualPoint)
+	self.tail_p, self.tail_vp = copy_point(note.endNote.visualPoint)
 end
 
 function LongVisualNote:update()
@@ -88,10 +88,10 @@ function LongVisualNote:getHeadVisualTime()
 	local points = self.visual.points
 
 	head_vp.monotonicVisualTime = cvp.monotonicVisualTime
-	self.head_i = interpolator:interpolate(points, self.head_i, head_vp, "visual")
+	interpolator:interpolate(points, head_vp, "visual")
 
 	head_p.absoluteTime = self:getLatePressTimeClamped(head_p.absoluteTime)
-	self.head_i = interpolator:interpolate(points, self.head_i, head_vp, "absolute")
+	interpolator:interpolate(points, head_vp, "absolute")
 
 	return self:getVisualTime(head_vp)
 end
@@ -107,7 +107,7 @@ function LongVisualNote:getTailVisualTime()
 		return tail_p.absoluteTime
 	end
 
-	self.tail_i = self.visual.interpolator:interpolate(self.visual.points, self.tail_i, tail_vp, "absolute")
+	self.visual.interpolator:interpolate(self.visual.points, tail_vp, "absolute")
 
 	return self:getVisualTime(tail_vp)
 end

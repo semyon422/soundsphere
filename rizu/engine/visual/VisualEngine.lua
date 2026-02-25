@@ -46,9 +46,8 @@ function VisualEngine:addNote(linked_note, visual_note)
 end
 
 ---@param chart ncdk2.Chart
-function VisualEngine:load(chart)
-	---@type {[ncdk2.Visual]: integer}
-	self.cvpi = {}
+---@param lazy_scrollers boolean?
+function VisualEngine:load(chart, lazy_scrollers)
 	---@type {[ncdk2.Visual]: ncdk2.VisualPoint}
 	self.cvp = {}
 
@@ -63,9 +62,8 @@ function VisualEngine:load(chart)
 	self.point_notes = {}
 
 	for _, visual in ipairs(chart:getVisuals()) do
-		self.cvpi[visual] = 1
 		self.cvp[visual] = VisualPoint(Point())
-		visual:generateEvents()
+		visual:generateEvents(lazy_scrollers)
 	end
 
 	local point_events = self.point_events
@@ -99,9 +97,7 @@ function VisualEngine:update()
 
 	for visual, cvp in pairs(self.cvp) do
 		cvp.point.absoluteTime = visual_info:getTime()
-		self.cvpi[visual] = visual.interpolator:interpolate(
-			visual.points, self.cvpi[visual], cvp, "absolute"
-		)
+		visual.interpolator:interpolate(visual.points, cvp, "absolute")
 
 		-- TODO: implement const for scroller
 		visual.scroller:scroll(cvp.point.absoluteTime, handle_event)

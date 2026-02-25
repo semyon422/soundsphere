@@ -47,7 +47,7 @@ function TestChartFactory:create(inputmode_str, notes_table)
 		end
 
 		if n.column then
-			local column = inputMap[n.column] or inputMap[1]
+			local column = inputMap[n.column] or n.column
 			local note_type = n.type or (n.end_time and "hold" or "tap")
 
 			if n.end_time then

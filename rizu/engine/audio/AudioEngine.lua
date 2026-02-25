@@ -17,7 +17,7 @@ AudioEngine.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
 AudioEngine.source = IChartAudioSource()
 AudioEngine.foregroundSource = IChartAudioSource()
 AudioEngine.music_volume = 1
-AudioEngine.effects_volume = 1
+AudioEngine.keysounds_volume = 1
 
 function AudioEngine:new()
 	---@type {[string]: audio.Wave}
@@ -44,7 +44,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 	self.resources = resources or {}
 
 	self.foregroundSource = self.MixerSourceClass()
-	self.foregroundSource:setVolume(self.effects_volume)
+	self.foregroundSource:setVolume(self.keysounds_volume)
 
 	local chart_audio = ChartAudio()
 	self.chart_audio = chart_audio
@@ -152,12 +152,12 @@ function AudioEngine:setRate(rate)
 end
 
 ---@param music_volume number
----@param effects_volume number
-function AudioEngine:setVolume(music_volume, effects_volume)
+---@param keysounds_volume number
+function AudioEngine:setVolume(music_volume, keysounds_volume)
 	self.music_volume = music_volume
-	self.effects_volume = effects_volume
+	self.keysounds_volume = keysounds_volume
 	self.source:setVolume(music_volume)
-	self.foregroundSource:setVolume(effects_volume)
+	self.foregroundSource:setVolume(keysounds_volume)
 end
 
 ---@param position number

@@ -1,5 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
+local OJM = require("o2jam.OJM")
 
 ---@class rizu.ResourceLoader
 ---@operator call: rizu.ResourceLoader
@@ -11,7 +12,7 @@ function ResourceLoader:new(fs, resource_finder)
 	self.fs = fs
 	self.resource_finder = resource_finder
 
-	---@type {[string]: string}
+	---@type {[string|integer]: string}
 	self.file_paths = {}
 	---@type {[string]: string}
 	self.file_contents = {}
@@ -29,6 +30,8 @@ end
 function ResourceLoader:load(resources)
 	local fs = self.fs
 	local resource_finder = self.resource_finder
+
+	self.file_paths = {}
 	local file_paths = self.file_paths
 
 	---@type string[]
@@ -41,6 +44,19 @@ function ResourceLoader:load(resources)
 			if found_path then
 				file_paths[name] = found_path
 				table.insert(new_paths, found_path)
+
+				if _type == "ojm" then
+					local data = fs:read(found_path)
+					if data then
+						local ojm = OJM(data)
+						for id, sample_data in pairs(ojm.samples) do
+							local virtual_path = found_path .. ":" .. id
+							file_paths[id] = virtual_path
+							self.file_contents[virtual_path] = sample_data
+							table.insert(new_paths, virtual_path)
+						end
+					end
+				end
 				break
 			end
 		end
@@ -67,7 +83,9 @@ function ResourceLoader:load(resources)
 	local path = next(file_pendings)
 	while path do
 		file_pendings[path] = nil
-		self.file_contents[path] = fs:read(path)
+		if not self.file_contents[path] then
+			self.file_contents[path] = fs:read(path)
+		end
 		path = next(file_pendings)
 	end
 end

@@ -121,7 +121,7 @@ function test.loader_order(t)
 		},
 		audio = {
 			adjustRate = 0.1,
-			volume = {master = 1, music = 1, effects = 1},
+			volume = {master = 1, music = 1, keysounds = 1, keysounds_format = {}},
 			mode = {primary = "a", secondary = "b"},
 		},
 	}
@@ -147,6 +147,36 @@ function test.double_unload(t)
 		re:unload()
 		re:unload()
 	end)
+end
+
+---@param t testing.T
+function test.logic_time_sync_on_receive(t)
+	local re = RhythmEngine()
+	
+	local res = tcf:create("4key", {})
+	re:setChart(res.chart, res.chartmeta, res.chartdiff)
+	re:load()
+	
+	re:setGlobalTime(0)
+	re:play() -- Start the timer
+	
+	-- logic_info.time starts at 0
+	re:syncTime()
+	t:eq(re.logic_info.time, 0)
+	
+	-- 1. Verify syncTime() works
+	re:setGlobalTime(1.5)
+	re:syncTime()
+	t:eq(re.logic_info.time, 1.5)
+	
+	-- 2. Verify receive() triggers sync
+	re:setGlobalTime(2.5)
+	-- logic_info.time should still be 1.5
+	t:eq(re.logic_info.time, 1.5)
+	
+	-- receive() should update it to 2.5
+	re:receive({id = 1, value = true})
+	t:eq(re.logic_info.time, 2.5, "logic_info.time should be synced during receive")
 end
 
 return test

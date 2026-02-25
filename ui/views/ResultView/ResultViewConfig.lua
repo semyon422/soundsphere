@@ -88,6 +88,9 @@ local function ScoreSources(self)
 	---@type sphere.GameController
 	local game = self.game
 	local scoreEngine = game.rhythm_engine.score_engine
+	if not scoreEngine then
+		return
+	end
 	local replay = game.resultController.replay
 
 	local show = showLoadedScore(self)
@@ -97,8 +100,10 @@ local function ScoreSources(self)
 		return
 	end
 
-	local timings, subtimings = replay.timings, replay.subtimings
-	if not show and scoreItem then
+	local timings, subtimings
+	if (show and replay) then
+		timings, subtimings = replay.timings, replay.subtimings
+	elseif scoreItem then
 		timings, subtimings = scoreItem.timings, scoreItem.subtimings
 	end
 
@@ -317,6 +322,9 @@ end
 local function Judgements(self)
 	local show = showLoadedScore(self)
 	local scoreEngine = self.game.rhythm_engine.score_engine
+	if not scoreEngine then
+		return
+	end
 	local scoreItem = self.game.selectModel.scoreItem
 	local judgesSource = scoreEngine.judgesSource
 
@@ -430,6 +438,9 @@ local function JudgementsAccuracy(self)
 	end
 
 	local scoreEngine = self.game.rhythm_engine.score_engine
+	if not scoreEngine then
+		return
+	end
 
 	local w, h = Layout:move("column1row1")
 	love.graphics.translate(36, 0)
@@ -449,6 +460,10 @@ local function NotechartInfo(self)
 
 	local rhythm_engine = game.rhythm_engine
 	local computeContext = game.computeContext
+
+	if not rhythm_engine.score_engine then
+		return
+	end
 
 	local normalscore = rhythm_engine.score_engine.scores.normalscore
 
@@ -475,6 +490,9 @@ local function NotechartInfo(self)
 	end
 
 	local show = showLoadedScore(self)
+	if show and (not replay or not computeContext.chartdiff or not computeContext.chart) then
+		show = false
+	end
 
 	local baseTimeRate = show and replay.rate or scoreItem.rate
 	local const = show and replay.const or scoreItem.const
@@ -742,12 +760,9 @@ local function ModifierIconGrid(self)
 
 	local selectModel = self.game.selectModel
 	local replay = self.game.resultController.replay
+	local scoreItem = selectModel.scoreItem
 
-	local modifiers = replay and replay.modifiers
-
-	if not showLoadedScore(self) and selectModel.scoreItem then
-		modifiers = selectModel.scoreItem.modifiers
-	end
+	local modifiers = (showLoadedScore(self) and replay) and replay.modifiers or (scoreItem and scoreItem.modifiers)
 
 	if not modifiers then
 		return
