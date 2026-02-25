@@ -1,6 +1,6 @@
 local class = require("class")
 local spherefonts = require("sphere.assets.fonts")
-local loop = require("loop")
+local loop = require("rizu.loop.Loop")
 local just = require("just")
 local imgui = require("imgui")
 local reqprof = require("reqprof")

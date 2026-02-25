@@ -1,6 +1,6 @@
 local class = require("class")
 local Cursor = require("sphere.app.Cursor")
-local loop = require("loop")
+local loop = require("rizu.loop.Loop")
 local brand = require("brand")
 
 ---@class sphere.WindowModel
@@ -66,10 +66,11 @@ function WindowModel:update()
 		self.cursor:setCursor(self.cursor_name)
 	end
 
-	loop.fpslimit = graphics.fps
-	loop.unlimited_fps = graphics.unlimited_fps
-	loop.asynckey = graphics.asynckey
-	loop.dwmflush = graphics.dwmflush
+	loop:setFpsLimit(graphics.fps)
+	loop:setUnlimitedFps(graphics.unlimited_fps)
+	loop:setAsynckey(graphics.asynckey)
+	loop:setDwmFlush(graphics.dwmflush)
+	loop:setBusyLoopRatio(graphics.busy_loop_ratio)
 end
 
 ---@param event table

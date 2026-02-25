@@ -2,7 +2,7 @@ local just = require("just")
 local spherefonts = require("sphere.assets.fonts")
 local icons = require("sphere.assets.icons")
 local time_util = require("time_util")
-local loop = require("loop")
+local loop = require("rizu.loop.Loop")
 local imgui = require("imgui")
 
 local BackgroundView = require("sphere.views.BackgroundView")
@@ -58,7 +58,7 @@ local function Header(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 	just.indent(10)
-	imgui.Label("SessionTime", time_util.format(loop.time - loop.startTime), h)
+	imgui.Label("SessionTime", time_util.format(loop.time - loop.start_time), h)
 end
 
 return function(self)

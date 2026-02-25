@@ -121,6 +121,7 @@ local settings = {
 		dwmflush = false,
 		fps = 240,
 		unlimited_fps = false,
+		busy_loop_ratio = 0,
 		mode = {
 			flags = {
 				borderless = false,
