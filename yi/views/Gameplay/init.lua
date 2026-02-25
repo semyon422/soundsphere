@@ -32,9 +32,18 @@ function GameplayView:enter()
 end
 
 function GameplayView:exit()
+
 	self.gameplay_interactor:unloadGameplay()
 	self.seq_view:unload()
 	self:kill()
+end
+
+function GameplayView:quit()
+	if self.gameplay_interactor:hasResult() then
+		self.parent:set("result")
+	else
+		self.parent:set("select")
+	end
 end
 
 ---@param dt number
@@ -49,7 +58,7 @@ end
 ---@param e ui.KeyDownEvent
 function GameplayView:onKeyDown(e)
 	if e.key == "escape" then
-		self.parent:set("select")
+		self:quit()
 	end
 end
 
