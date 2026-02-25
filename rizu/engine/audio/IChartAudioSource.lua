@@ -33,4 +33,10 @@ function IChartAudioSource:getDuration() return 0 end
 ---@param volume number
 function IChartAudioSource:setVolume(volume) end
 
+---@param size integer
+function IChartAudioSource:setFFTSize(size) end
+
+---@return any
+function IChartAudioSource:getFFT() return nil end
+
 return IChartAudioSource

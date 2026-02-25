@@ -5,6 +5,18 @@ local bass = require("bass")
 local bass_assert = require("bass.assert")
 local bass_mix = require("bass.mix")
 local bass_flags = require("bass.flags")
+local bass_fft = require("bass.fft")
+
+local fft_flags = {
+	[256] = bass_fft.BASS_DATA_FFT256,
+	[512] = bass_fft.BASS_DATA_FFT512,
+	[1024] = bass_fft.BASS_DATA_FFT1024,
+	[2048] = bass_fft.BASS_DATA_FFT2048,
+	[4096] = bass_fft.BASS_DATA_FFT4096,
+	[8192] = bass_fft.BASS_DATA_FFT8192,
+	[16384] = bass_fft.BASS_DATA_FFT16384,
+	[32768] = bass_fft.BASS_DATA_FFT32768,
+}
 
 ---@class rizu.BassChartAudioSource: rizu.IChartAudioSource
 ---@operator call: rizu.BassChartAudioSource
@@ -80,6 +92,25 @@ end
 ---@param volume number
 function BassChartAudioSource:setVolume(volume)
 	bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_VOL, volume) == 1)
+end
+
+---@param size integer
+function BassChartAudioSource:setFFTSize(size)
+	local flag = fft_flags[size]
+	if not flag then
+		error("Invalid FFT size: " .. tostring(size))
+	end
+	self.fft_flag = flag
+	self.fft_buffer = ffi.new("float[?]", size / 2)
+end
+
+---@return ffi.cdata*?
+function BassChartAudioSource:getFFT()
+	if not self.fft_buffer then
+		return nil
+	end
+	bass.BASS_ChannelGetData(self.channel, self.fft_buffer, self.fft_flag)
+	return self.fft_buffer
 end
 
 function BassChartAudioSource:update()

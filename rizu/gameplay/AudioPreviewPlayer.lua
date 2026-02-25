@@ -82,6 +82,9 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		self.audio_source = BassChartAudioSource(buffered)
 		self.audio_source:setVolume(self.volume)
 		self.audio_source:setRate(self.rate)
+		if self.fft_size then
+			self.audio_source:setFFTSize(self.fft_size)
+		end
 
 		if self.pending_seek then
 			self.audio_source:setPosition(self.pending_seek)
@@ -173,6 +176,22 @@ function AudioPreviewPlayer:getPosition()
 		return self.audio_source:getPosition()
 	end
 	return self.pending_seek or 0
+end
+
+---@param size integer
+function AudioPreviewPlayer:setFFTSize(size)
+	self.fft_size = size
+	if self.audio_source then
+		self.audio_source:setFFTSize(size)
+	end
+end
+
+---@return ffi.cdata*?
+function AudioPreviewPlayer:getFFT()
+	if self.audio_source then
+		return self.audio_source:getFFT()
+	end
+	return nil
 end
 
 return AudioPreviewPlayer

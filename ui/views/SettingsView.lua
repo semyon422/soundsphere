@@ -295,6 +295,8 @@ local packageManager
 local function formatThemeName(pkg_name)
 	if pkg_name == "Default" then
 		return pkg_name
+	elseif pkg_name == "New" then
+		return pkg_name
 	end
 	local pkg = packageManager:getPackage(pkg_name)
 	if not pkg or not pkg.types.ui then

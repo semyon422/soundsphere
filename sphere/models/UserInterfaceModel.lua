@@ -6,6 +6,7 @@ local thread = require("thread")
 local physfs = require("physfs")
 
 local DefaultUserInterface = require("ui.UserInterface")
+local NewDefaultUserInterface = require("yi.UserInterface")
 
 ---@class sphere.UserInterfaceMetadata
 ---@field name string
@@ -26,7 +27,7 @@ local UserInterfaceModel = class()
 function UserInterfaceModel:new(game)
 	self.game = game
 	self.loadedThemes = {}
-	self.themeNames = {"Default"}
+	self.themeNames = {"Default", "New"}
 end
 
 function UserInterfaceModel:load()
@@ -40,6 +41,9 @@ function UserInterfaceModel:load()
 	if pkg_name == "Default" then
 		self:setDefaultTheme()
 		return
+	elseif pkg_name == "New" then
+		self:setNewDefaultTheme()
+		return
 	end
 
 	self:setTheme(pkg_name)
@@ -49,6 +53,12 @@ end
 function UserInterfaceModel:setDefaultTheme()
 	self.loadedThemes["Default"] = DefaultUserInterface(self.game)
 	self.activeUI = self.loadedThemes["Default"]
+	self.activeUI:load()
+end
+
+function UserInterfaceModel:setNewDefaultTheme()
+	self.loadedThemes["New"] = NewDefaultUserInterface(self.game)
+	self.activeUI = self.loadedThemes["New"]
 	self.activeUI:load()
 end
 
