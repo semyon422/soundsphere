@@ -16,7 +16,7 @@ local SleepFunctionFactory = require("rizu.loop.sleep.SleepFunctionFactory")
 local Loop = Observable + {}
 
 function Loop:init()
-	self.limiter = LoopLimiter()
+	self.limiter = LoopLimiter(self)
 	self.events = LoopEvents(self)
 	self.quitter = LoopQuitting(self)
 	self.graphics = LoopGraphics(self)
@@ -31,6 +31,9 @@ function Loop:init()
 		event = 0,
 		update = 0,
 		draw = 0,
+		present = 0,
+		sleep = 0,
+		busy = 0,
 	}
 
 	self.quitting = false

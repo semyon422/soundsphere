@@ -33,7 +33,10 @@ local colors = {
 	white = {1, 1, 1, 1},
 	blue = {0.25, 0.25, 1, 1},
 	gray = {0.25, 0.25, 0.25, 1},
-	yellow = {1, 1, 0.25, 1}
+	orange = {1, 0.5, 0, 1},
+	yellow = {1, 1, 0.25, 1},
+	cyan = {0, 1, 1, 1},
+	red = {1, 0.25, 0.25, 1}
 }
 
 function FrameTimeView:drawSmall()
@@ -96,8 +99,20 @@ function FrameTimeView:draw()
 	love.graphics.line(0.5, y, 0.5, y - loop.timings.update * 1000 * self.scale)
 
 	y = y - loop.timings.update * 1000 * self.scale
-	love.graphics.setColor(colors.yellow)
+	love.graphics.setColor(colors.orange)
 	love.graphics.line(0.5, y, 0.5, y - loop.timings.draw * 1000 * self.scale)
+
+	y = y - loop.timings.draw * 1000 * self.scale
+	love.graphics.setColor(colors.yellow)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.present * 1000 * self.scale)
+
+	y = y - loop.timings.present * 1000 * self.scale
+	love.graphics.setColor(colors.cyan)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.sleep * 1000 * self.scale)
+
+	y = y - loop.timings.sleep * 1000 * self.scale
+	love.graphics.setColor(colors.red)
+	love.graphics.line(0.5, y, 0.5, y - loop.timings.busy * 1000 * self.scale)
 
 	love.graphics.setCanvas()
 
@@ -152,9 +167,12 @@ end
 
 local colorText = {
 	colors.white, "dt ",
-	colors.blue, "receive ",
+	colors.blue, "event ",
 	colors.gray, "update ",
-	colors.yellow, "draw "
+	colors.orange, "draw ",
+	colors.yellow, "present ",
+	colors.cyan, "sleep ",
+	colors.red, "busy "
 }
 
 function FrameTimeView:drawFPS()

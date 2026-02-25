@@ -22,22 +22,26 @@ end
 
 ---@return number
 function LoopGraphics:draw()
-	local timings_draw_start = love.timer.getTime()
 	local frame_end_time = love.timer.getTime()
 
 	if love.graphics and love.graphics.isActive() then
+		local timings_draw_start = love.timer.getTime()
 		love.graphics.origin()
 		love.graphics.clear(love.graphics.getBackgroundColor())
 		self.loop.events:dispatchEvent("draw")
 		just._end()
 		love.graphics.origin()
 		love.graphics.getStats(self.loop.stats)
+		self.loop.timings.draw = love.timer.getTime() - timings_draw_start
+
+		local timings_present_start = love.timer.getTime()
 		love.graphics.present()
 		self:onPresent()
+		self.loop.timings.present = love.timer.getTime() - timings_present_start
+
 		frame_end_time = love.timer.getTime()
 	end
 
-	self.loop.timings.draw = love.timer.getTime() - timings_draw_start
 	return frame_end_time
 end
 
