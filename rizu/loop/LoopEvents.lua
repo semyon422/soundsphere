@@ -16,7 +16,6 @@ function LoopEvents:new(loop)
 	local midi_input_factory = MidiInputFactory()
 	self.midi_input = midi_input_factory:getMidiInput()
 
-	self.frame_started = {name = "framestarted"}
 	self.event_table = {}
 	self.re = {}
 end
@@ -111,10 +110,6 @@ function LoopEvents:pollEvents(time)
 			self:dispatchEvent("midireleased", note)
 		end
 	end
-
-	self.frame_started.time = self.loop.time
-	self.frame_started.dt = self.loop.dt
-	self.loop:send(self.frame_started)
 
 	self.loop.timings.event = love.timer.getTime() - timings_event_start
 end

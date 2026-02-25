@@ -35,6 +35,8 @@ function Loop:init()
 
 	self.quitting = false
 
+	self.frame_started = {name = "framestarted"}
+
 	love.quit = function(...)
 		print("Quitting")
 		self.quitting = true
@@ -97,6 +99,10 @@ function Loop:run()
 
 		self.dt = time - self.time
 		self.prev_time, self.time = self.time, time
+
+		self.frame_started.time = self.time
+		self.frame_started.dt = self.dt
+		self:send(self.frame_started)
 
 		local quit_res = self.events:pollEvents(time)
 		if quit_res then return quit_res end
