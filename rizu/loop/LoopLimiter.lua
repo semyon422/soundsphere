@@ -1,10 +1,5 @@
 local class = require("class")
-local sleep = require("sleep")
-local jit = require("jit")
-
-if jit.os == "Windows" then
-	sleep = love.timer.sleep
-end
+local LoveSleepFunction = require("rizu.loop.sleep.LoveSleepFunction")
 
 ---@class rizu.loop.LoopLimiter
 ---@operator call: rizu.loop.LoopLimiter
@@ -15,6 +10,8 @@ function LoopLimiter:new()
 	self.unlimited_fps = false
 	self.busy_loop_ratio = 0
 	self.target_time = 0
+	---@type rizu.ISleepFunction
+	self.sleep_function = LoveSleepFunction()
 end
 
 ---@param time number
@@ -44,7 +41,7 @@ function LoopLimiter:sleep(target_time, frame_end_time)
 	local busy_time = self.busy_loop_ratio * frame_time
 	local to_sleep = target_time - frame_end_time - busy_time
 	if to_sleep > 0 then
-		sleep(to_sleep)
+		self.sleep_function:sleep(to_sleep)
 	end
 	while love.timer.getTime() < target_time do end
 end

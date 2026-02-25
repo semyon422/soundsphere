@@ -9,9 +9,10 @@ local LoopEvents = require("rizu.loop.LoopEvents")
 local LoopLimiter = require("rizu.loop.LoopLimiter")
 local LoopQuitting = require("rizu.loop.LoopQuitting")
 local LoopGraphics = require("rizu.loop.LoopGraphics")
+local SleepFunctionFactory = require("rizu.loop.sleep.SleepFunctionFactory")
 
----@class rizu.loop.Loop: util.Observable
----@operator call: rizu.loop.Loop
+---@class rizu.Loop: util.Observable
+---@operator call: rizu.Loop
 local Loop = Observable + {}
 
 function Loop:init()
@@ -19,6 +20,7 @@ function Loop:init()
 	self.events = LoopEvents(self)
 	self.quitter = LoopQuitting(self)
 	self.graphics = LoopGraphics(self)
+	self.sleep_function_factory = SleepFunctionFactory()
 
 	self.time = 0
 	self.dt = 0
@@ -46,6 +48,9 @@ function Loop:setUnlimitedFps(enabled) self.limiter.unlimited_fps = enabled end
 function Loop:setBusyLoopRatio(ratio) self.limiter.busy_loop_ratio = ratio end
 function Loop:setAsynckey(enabled) self.events.asynckey = enabled end
 function Loop:setDwmFlush(enabled) self.graphics.dwm_flush = enabled end
+function Loop:setSleepFunction(_type)
+	self.limiter.sleep_function = self.sleep_function_factory:get(_type)
+end
 
 ---@return number?
 function Loop:quittingLoop()

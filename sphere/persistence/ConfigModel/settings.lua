@@ -122,6 +122,7 @@ local settings = {
 		fps = 240,
 		unlimited_fps = false,
 		busy_loop_ratio = 0,
+		sleep_function = "love",
 		mode = {
 			flags = {
 				borderless = false,

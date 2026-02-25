@@ -8,6 +8,7 @@ local version = require("version")
 local audio = require("audio")
 local utf8validate = require("utf8validate")
 local fonts = require("sphere.assets.fonts")
+local loop = require("rizu.loop.Loop")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
@@ -221,6 +222,7 @@ function drawSection:graphics()
 	g.fps = imgui.intButtons("fps", g.fps, 2, "FPS limit")
 	g.unlimited_fps = imgui.checkbox("unlimited_fps", g.unlimited_fps, "unlimited FPS")
 	g.busy_loop_ratio = imgui.slider1("busy_loop_ratio", g.busy_loop_ratio, "%0.2f", 0, 1, 0.01, "FPS limiter busy loop ratio")
+	g.sleep_function = imgui.combo("g.sleep_function", g.sleep_function, loop.sleep_function_factory:getAvailableTypes(), nil, "sleep function")
 
 	local flags = g.mode.flags
 	flags.fullscreen = imgui.checkbox("flags.fullscreen", flags.fullscreen, "fullscreen")

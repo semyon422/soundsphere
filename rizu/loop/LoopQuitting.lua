@@ -2,8 +2,8 @@ local class = require("class")
 local thread = require("thread")
 local delay = require("delay")
 
----@class rizu.loop.LoopQuitting
----@operator call: rizu.loop.LoopQuitting
+---@class rizu.LoopQuitting
+---@operator call: rizu.LoopQuitting
 local LoopQuitting = class()
 
 function LoopQuitting:new(loop)

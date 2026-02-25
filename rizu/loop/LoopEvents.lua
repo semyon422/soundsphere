@@ -3,12 +3,12 @@ local asynckey = require("asynckey")
 local just = require("just")
 local MidiInputFactory = require("native.midi.MidiInputFactory")
 
----@class rizu.loop.LoopEvents
----@operator call: rizu.loop.LoopEvents
+---@class rizu.LoopEvents
+---@operator call: rizu.LoopEvents
 local LoopEvents = class()
 
 function LoopEvents:new(loop)
-	---@type rizu.loop.Loop
+	---@type rizu.Loop
 	self.loop = loop
 	self.asynckey = false
 	self.event_time = 0

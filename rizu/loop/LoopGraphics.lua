@@ -1,11 +1,11 @@
 local class = require("class")
 local just = require("just")
 
----@class rizu.loop.LoopGraphics
----@operator call: rizu.loop.LoopGraphics
+---@class rizu.LoopGraphics
+---@operator call: rizu.LoopGraphics
 local LoopGraphics = class()
 
----@param loop rizu.loop.Loop
+---@param loop rizu.Loop
 function LoopGraphics:new(loop)
 	self.loop = loop
 	self.dwm_flush = false

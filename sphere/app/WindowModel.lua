@@ -71,6 +71,7 @@ function WindowModel:update()
 	loop:setAsynckey(graphics.asynckey)
 	loop:setDwmFlush(graphics.dwmflush)
 	loop:setBusyLoopRatio(graphics.busy_loop_ratio)
+	loop:setSleepFunction(graphics.sleep_function)
 end
 
 ---@param event table
