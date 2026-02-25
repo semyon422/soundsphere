@@ -36,6 +36,12 @@ function Loop:init()
 		busy = 0,
 	}
 
+	self.mem_count = collectgarbage("count")
+	self.mem_delta = 0
+	self.ema_dt = 0
+	self.ema_jitter = 0
+	self.prev_frame_dt = 0
+
 	self.quitting = false
 
 	self.frame_started = {name = "framestarted"}
@@ -102,6 +108,17 @@ function Loop:run()
 
 		self.dt = time - self.time
 		self.prev_time, self.time = self.time, time
+
+		-- Metrics calculation
+		local alpha = 0.05
+		self.ema_dt = self.ema_dt == 0 and self.dt or (self.ema_dt * (1 - alpha) + self.dt * alpha)
+		self.jitter = math.abs(self.dt - self.prev_frame_dt)
+		self.ema_jitter = self.ema_jitter == 0 and self.jitter or (self.ema_jitter * (1 - alpha) + self.jitter * alpha)
+		self.prev_frame_dt = self.dt
+
+		local current_mem = collectgarbage("count")
+		self.mem_delta = current_mem - self.mem_count
+		self.mem_count = current_mem
 
 		self.frame_started.time = self.time
 		self.frame_started.dt = self.dt
