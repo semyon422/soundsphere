@@ -54,11 +54,12 @@ function Select:load()
 	self.select_controller = game.selectController
 	self.select_model = game.selectModel
 
-	self.id = "select"
-	self.handles_keyboard_input = true
-
-	self:setWidth("100%")
-	self:setHeight("100%")
+	self:setup({
+		id = "select",
+		keyboard = true,
+		w = "100%",
+		h = "100%"
+	})
 
 	local modals = self:getContext().modals
 	local function open_config() modals:setImguiModal(ImGuiSettings) end

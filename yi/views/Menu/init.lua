@@ -1,5 +1,7 @@
 local Screen = require("yi.views.Screen")
+local View = require("yi.views.View")
 local Label = require("yi.views.Label")
+local h = require("yi.h")
 
 ---@class yi.Menu : yi.Screen
 ---@operator call: yi.Result
@@ -21,8 +23,11 @@ function Menu:load()
 	})
 
 	local res = self:getResources()
-	self:add(Label(res:getFont("black", 58), "Press ENTER to continue"))
-	self:add(Label(res:getFont("regular", 24), misans))
+
+	self:addArray({
+		h(Label(res:getFont("black", 58), "Press ENTER to continue")),
+		h(Label(res:getFont("bold", 16), misans)),
+	})
 end
 
 function Menu:onKeyDown(e)

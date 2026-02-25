@@ -6,12 +6,14 @@ local Label = require("yi.views.Label")
 local Result = Screen + {}
 
 function Result:load()
-	self:setWidth("100%")
-	self:setHeight("100%")
-	self.handles_keyboard_input = true
+	self:setup({
+		id = "result",
+		w = "100%",
+		h = "100%",
+		keyboard = true
+	})
 
 	local res = self:getResources()
-
 	self:add(Label(res:getFont("black", 58), "Work In Progress."), {pivot = "center"})
 end
 

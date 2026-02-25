@@ -12,9 +12,7 @@ function Tag:load()
 	self:setPaddings({5, 20, 5, 20})
 
 	local res = self:getResources()
-	self.label = self:add(Label(res:getFont("bold", 16), "LOADING..."), {
-		pivot = "center"
-	})
+	self.label = self:add(Label(res:getFont("bold", 16), "LOADING..."))
 	self.label:setColor(Colors.text)
 end
 
