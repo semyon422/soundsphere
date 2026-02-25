@@ -14,6 +14,8 @@ local UserInterface = IUserInterface + {}
 
 UserInterface.gameView = {} -- For imgui modals
 
+local MAX_DT = 1 / 30
+
 ---@param game sphere.GameController
 function UserInterface:new(game)
 	self.game = game
@@ -43,8 +45,9 @@ end
 
 ---@param dt number
 function UserInterface:update(dt)
+	local capped_dt = math.min(dt, MAX_DT)
 	self.game.selectController:update()
-	self.engine:update(dt, love.mouse.getPosition())
+	self.engine:update(capped_dt, love.mouse.getPosition())
 end
 
 function UserInterface:draw()

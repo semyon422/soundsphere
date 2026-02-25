@@ -21,6 +21,12 @@ function GameplayView:load()
 	self.gameplay_interactor = game.gameplayInteractor
 end
 
+function GameplayView:loadComplete()
+	local config = self:getConfig()
+	local bg = self:getContext().background
+	bg:setDim(config.settings.graphics.dim.gameplay)
+end
+
 function GameplayView:enter()
 	local game = self:getGame()
 	self.game_interactor:loadGameplaySelectedChart()
@@ -32,7 +38,6 @@ function GameplayView:enter()
 end
 
 function GameplayView:exit()
-
 	self.gameplay_interactor:unloadGameplay()
 	self.seq_view:unload()
 	self:kill()

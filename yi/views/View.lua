@@ -170,6 +170,12 @@ function View:getResources()
 	return self:getContext().resources
 end
 
+---@return sphere.Configs
+function View:getConfig()
+	local game = self:getGame()
+	return game.persistence.configModel.configs
+end
+
 ---@return number
 function View:getWidth()
 	return self.layout_box.x.preferred_size

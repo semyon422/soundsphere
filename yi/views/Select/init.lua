@@ -140,6 +140,12 @@ function Select:load()
 	})
 end
 
+function Select:loadComplete()
+	local config = self:getConfig()
+	local bg = self:getContext().background
+	bg:setDim(config.settings.graphics.dim.select)
+end
+
 function Select:enter()
 	self.select_controller:load()
 	love.mouse.setVisible(true)

@@ -29,6 +29,12 @@ function Result:load()
 	self:add(Label(res:getFont("black", 58), acc_string))
 end
 
+function Result:loadComplete()
+	local config = self:getConfig()
+	local bg = self:getContext().background
+	bg:setDim(config.settings.graphics.dim.result)
+end
+
 function Result:onKeyDown(e)
 	local k = e.key
 

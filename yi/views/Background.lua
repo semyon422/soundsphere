@@ -19,6 +19,8 @@ function Background:new()
 	self.target_parallax_y = 0
 
 	self.dim = 0.5
+	self.target_dim = 0.5
+	self.dim_smoothing = 5
 end
 
 function Background:load()
@@ -28,7 +30,7 @@ end
 
 ---@param dim number
 function Background:setDim(dim)
-	self.dim = dim
+	self.target_dim = dim
 end
 
 ---@param dt number
@@ -66,12 +68,16 @@ function Background:update(dt)
 
 	if self.parallax_x ~= self.parallax_x then self.parallax_x = 0 end
 	if self.parallax_y ~= self.parallax_y then self.parallax_y = 0 end
+
+	local dim_smoothing = math.max(0, math.min(self.dim_smoothing * dt, 1))
+	if dim_smoothing ~= dim_smoothing then dim_smoothing = 0 end
+	self.dim = self.dim + (self.target_dim - self.dim) * dim_smoothing
 end
 
 function Background:draw()
 	local images = self.background_model.images
 	local alpha = self.background_model.alpha
-	local dim = self.dim
+	local dim = 1 - self.dim
 	local w, h = self:getCalculatedWidth(), self:getCalculatedHeight()
 
 	for i = 1, 3 do
