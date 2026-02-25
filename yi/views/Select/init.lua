@@ -7,7 +7,6 @@ local Image = require("yi.views.Image")
 local Cell = require("yi.views.Select.Cell")
 local Tag = require("yi.views.Select.Tag")
 local Colors = require("yi.Colors")
-local Spectrum = require("yi.views.Select.Spectrum")
 local ChartGrid = require("yi.views.Select.ChartGrid")
 local h = require("yi.h")
 
@@ -81,6 +80,7 @@ function Select:load()
 	self.notes_cell = Cell("Notes")
 	self.chart_set_list = ChartSetList()
 	self.chart_grid = ChartGrid()
+	self.tags = View()
 
 	local gradient = love.graphics.newImage("yi/assets/gradient.png")
 
@@ -92,7 +92,7 @@ function Select:load()
 					self.ranked_tag,
 					self.chart_format_tag
 				}),
-				h(View(), {arrange = "flex_col"}, {
+				h(View(), {arrange = "flex_col", width = "99999%"}, {
 					self.title,
 					h(self.artist, {y = -5, color = Colors.lines}),
 				}),
@@ -103,7 +103,8 @@ function Select:load()
 					self.duration_cell,
 					self.notes_cell
 				}),
-				h(self.chart_grid, {w = "110%", h = 70})
+				h(self.chart_grid, {w = "110%", h = 70}),
+				h(self.tags, {arrange = "flex_row", gap = 10})
 			}),
 			h(View(), {arrange = "flex_row", align_items = "stretch", gap = 10}, {
 				h(Button(open_config), small_button, {
@@ -127,7 +128,6 @@ function Select:load()
 					Label(res:getFont("bold", 16), "GAMEPLAY"),
 				}),
 				h(Button(play), {grow = 1, shrink = 10, min_w = 130}, {
-					h(Spectrum(), {width = "100%", height = "100%"}),
 					h(View(), play_button_inner, {
 						Label(res:getFont("icons", 24), ""),
 						Label(res:getFont("bold", 16), "PLAY"),
@@ -231,6 +231,13 @@ function Select:updateChartview()
 	self.duration_cell:setValueText(("%i:%02i"):format(minutes, seconds))
 
 	self.notes_cell:setValueText(tostring(chartview.notes_count))
+	
+
+	for _, v in ipairs(self.tags.children) do
+		v:kill()
+	end
+
+	self.tags:add(Tag())
 end
 
 function Select:onChartChanged()
