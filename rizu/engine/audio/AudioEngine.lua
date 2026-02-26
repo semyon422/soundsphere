@@ -14,8 +14,6 @@ AudioEngine.DecoderClass = require("rizu.engine.audio.FakeSoundDecoder")
 AudioEngine.SourceClass = require("rizu.engine.audio.FakeChartAudioSource")
 AudioEngine.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
 
-AudioEngine.source = IChartAudioSource()
-AudioEngine.foregroundSource = IChartAudioSource()
 AudioEngine.music_volume = 1
 AudioEngine.keysounds_volume = 1
 
@@ -23,6 +21,8 @@ function AudioEngine:new()
 	---@type {[string]: audio.Wave}
 	self.soundDataCache = {}
 	self.mode = {primary = "bass_sample", secondary = "bass_sample"}
+	self.source = IChartAudioSource()
+	self.foregroundSource = IChartAudioSource()
 end
 
 ---@param mode {primary: string, secondary: string}
@@ -49,7 +49,8 @@ end
 function AudioEngine:load(chart, resources, auto_key_sound)
 	self.resources = resources or {}
 
-	self.foregroundSource = self.MixerSourceClass()
+	local use_tempo_secondary = self.mode.secondary == "bass_fx_tempo"
+	self.foregroundSource = self.MixerSourceClass(use_tempo_secondary)
 	self.foregroundSource:setVolume(self.keysounds_volume)
 
 	local chart_audio = ChartAudio()

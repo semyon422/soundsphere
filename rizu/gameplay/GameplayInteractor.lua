@@ -129,6 +129,8 @@ function GameplayInteractor:unloadGameplay()
 	game.discordModel:setPresence({})
 	self:skip()
 
+	game.rhythm_engine:unloadAudio()
+
 	if self:hasResult() then
 		self:saveScore()
 	end

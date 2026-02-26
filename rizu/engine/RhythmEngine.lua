@@ -91,11 +91,15 @@ function RhythmEngine:hasResult()
 		accuracy < math.huge
 end
 
-function RhythmEngine:unload()
+function RhythmEngine:unloadAudio()
 	if self.audio_engine then
 		self.audio_engine:unload()
-		self.audio_engine = nil
 	end
+end
+
+function RhythmEngine:unload()
+	self:unloadAudio()
+	self.audio_engine = nil
 
 	self.visual_engine = nil
 	self.logic_engine = nil

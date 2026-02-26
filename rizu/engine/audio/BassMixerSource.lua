@@ -1,6 +1,7 @@
 local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
 local bass = require("bass")
 local bass_mix = require("bass.mix")
+local bass_fx = require("bass.fx")
 local bass_flags = require("bass.flags")
 local bass_assert = require("bass.assert")
 
@@ -8,11 +9,26 @@ local bass_assert = require("bass.assert")
 ---@operator call: rizu.BassMixerSource
 local BassMixerSource = IChartAudioSource + {}
 
-function BassMixerSource:new()
+---@param use_tempo boolean?
+function BassMixerSource:new(use_tempo)
+	self.use_tempo = use_tempo
 	self.sample_rate = 44100
+
+	local flags = bass_flags.BASS_MIXER_NONSTOP
+	if use_tempo then
+		flags = flags + bass_flags.BASS_STREAM_DECODE
+	end
+
 	---@type integer
-	self.channel = bass_mix.BASS_Mixer_StreamCreate(self.sample_rate, 2, bass_flags.BASS_MIXER_NONSTOP)
-	bass_assert(self.channel ~= 0)
+	self.mixer_channel = bass_mix.BASS_Mixer_StreamCreate(self.sample_rate, 2, flags)
+	bass_assert(self.mixer_channel ~= 0)
+
+	if use_tempo then
+		self.channel = bass_fx.BASS_FX_TempoCreate(self.mixer_channel, bass_flags.BASS_FX_FREESOURCE)
+		bass_assert(self.channel ~= 0)
+	else
+		self.channel = self.mixer_channel
+	end
 
 	-- Reduce playback buffer to minimum for lowest latency
 	bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_BUFFER, 0)
@@ -37,7 +53,7 @@ function BassMixerSource:release()
 	end
 	self.released = true
 
-	bass_assert(bass.BASS_StreamFree(self.channel) == 1)
+	bass_assert(bass.BASS_ChannelFree(self.channel) == 1)
 
 	for _, sound in ipairs(self.active_sounds) do
 		sound.decoder:release()
@@ -53,7 +69,7 @@ function BassMixerSource:addSound(decoder, volume)
 
 	-- BASS_MIXER_NORAMPIN ensures instant start for hitsounds
 	---@type integer
-	local ok = bass_mix.BASS_Mixer_StreamAddChannel(self.channel, source_channel, bass_flags.BASS_MIXER_NORAMPIN)
+	local ok = bass_mix.BASS_Mixer_StreamAddChannel(self.mixer_channel, source_channel, bass_flags.BASS_MIXER_NORAMPIN)
 	bass_assert(ok == 1)
 
 	if volume and volume ~= 1 then
@@ -89,7 +105,11 @@ end
 
 ---@param rate number
 function BassMixerSource:setRate(rate)
-	bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_FREQ, self.sample_rate * rate)
+	if self.use_tempo then
+		bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_TEMPO, (rate - 1) * 100) == 1)
+	else
+		bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_FREQ, self.sample_rate * rate)
+	end
 end
 
 ---@param volume number
