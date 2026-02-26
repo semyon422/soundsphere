@@ -4,6 +4,7 @@ local delay = require("delay")
 local asynckey = require("asynckey")
 local flux = require("flux")
 local reqprof = require("reqprof")
+local table_util = require("table_util")
 
 local LoopEvents = require("rizu.loop.LoopEvents")
 local LoopLimiter = require("rizu.loop.LoopLimiter")
@@ -28,16 +29,24 @@ function Loop:init()
 	self.stats = {}
 	self.dt_limit = 1 / 10
 	self.timings = {
+		dt = 0,
 		event = 0,
 		update = 0,
 		draw = 0,
 		present = 0,
+		gc = 0,
 		sleep = 0,
 		busy = 0,
 	}
+	self.timings_next = table_util.copy(self.timings)
 
 	self.mem_count = collectgarbage("count")
 	self.mem_delta = 0
+
+	collectgarbage("setpause", 100)
+	collectgarbage("setstepmul", 200)
+	self.gc_step_size = 2
+
 	self.ema_dt = 0
 	self.ema_jitter = 0
 	self.prev_frame_dt = 0
@@ -58,6 +67,7 @@ function Loop:setFpsLimit(limit) self.limiter.fps_limit = limit end
 function Loop:setUnlimitedFps(enabled) self.limiter.unlimited_fps = enabled end
 function Loop:setBusyLoopRatio(ratio) self.limiter.busy_loop_ratio = ratio end
 function Loop:setAsynckey(enabled) self.events.asynckey = enabled end
+function Loop:setGcStepSize(size) self.gc_step_size = size end
 function Loop:setDwmFlush(enabled) self.graphics.dwm_flush = enabled end
 function Loop:setSleepFunction(_type)
 	self.limiter.sleep_function = self.sleep_function_factory:get(_type)
@@ -69,14 +79,10 @@ function Loop:quittingLoop()
 end
 
 function Loop:_update(dt)
-	local timings_update_start = love.timer.getTime()
-
 	thread.update()
 	delay.update()
 	flux.update(math.min(dt, self.dt_limit))
 	self.events:dispatchEvent("update", dt)
-
-	self.timings.update = love.timer.getTime() - timings_update_start
 end
 
 ---@return function
@@ -85,16 +91,32 @@ function Loop:run()
 	math.randomseed(os.time())
 	love.timer.step()
 
-	local start_time = love.timer.getTime()
+	local get_time = love.timer.getTime
+
+	local start_time = get_time()
 	self.limiter:reset(start_time)
 	self.prev_time = start_time
 	self.time = start_time
 	self.start_time = start_time
 	self.dt = 0
 
+	local frame_start_time = get_time()
+	local time_1, time_2 = frame_start_time, frame_start_time
+
+	local function measure_time()
+		time_1, time_2 = get_time(), time_1
+		return time_1 - time_2
+	end
+
+	local t = self.timings_next
+
 	return function()
 		if self.quitting then
-			return self:quittingLoop()
+			local res = self:quittingLoop()
+			local _time = get_time()
+			t.dt = _time - frame_start_time
+			frame_start_time = _time
+			return res
 		end
 
 		reqprof.start()
@@ -104,7 +126,7 @@ function Loop:run()
 		end
 
 		love.timer.step()
-		local time = love.timer.getTime()
+		local time = get_time()
 
 		self.dt = time - self.time
 		self.prev_time, self.time = self.time, time
@@ -125,13 +147,36 @@ function Loop:run()
 		self:send(self.frame_started)
 
 		local quit_res = self.events:pollEvents(time)
+		t.event = measure_time()
 		if quit_res then return quit_res end
 
 		self:_update(self.dt)
+		t.update = measure_time()
 
-		local frame_end_time = self.graphics:draw()
+		self.graphics:draw()
+		t.draw = measure_time()
 
-		self.limiter:limit(frame_end_time)
+		self.graphics:present()
+		t.present = measure_time()
+
+		if self.gc_step_size > 0 then
+			collectgarbage("step", self.gc_step_size)
+		end
+		t.gc = measure_time()
+
+		local target_time, to_sleep = self.limiter:limit(time_1)
+
+		self.limiter:sleep(to_sleep)
+		t.sleep = measure_time()
+
+		self.limiter:busyWait(target_time)
+		t.busy = measure_time()
+
+		t.dt = time_1 - frame_start_time
+		frame_start_time = time_1
+
+		self.timings, self.timings_next = self.timings_next, self.timings
+		t = self.timings_next
 	end
 end
 

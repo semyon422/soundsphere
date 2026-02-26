@@ -12,6 +12,7 @@ function LoopLimiter:new(loop)
 	self.unlimited_fps = false
 	self.busy_loop_ratio = 0
 	self.target_time = 0
+	---@type rizu.ISleepFunction
 	self.sleep_function = LoveSleepFunction()
 end
 
@@ -26,35 +27,31 @@ function LoopLimiter:shouldSleep()
 end
 
 ---@param frame_end_time number
+---@return number, number
 function LoopLimiter:limit(frame_end_time)
 	if not self:shouldSleep() then
-		self.loop.timings.sleep = 0
-		self.loop.timings.busy = 0
-		return
+		return frame_end_time, 0
 	end
 
 	self.target_time = math.max(self.target_time + 1 / self.fps_limit, frame_end_time)
-	self:sleep(self.target_time, frame_end_time)
-end
-
----@param target_time number
----@param frame_end_time number
-function LoopLimiter:sleep(target_time, frame_end_time)
 	local frame_time = 1 / self.fps_limit
 	local busy_time = self.busy_loop_ratio * frame_time
-	local to_sleep = target_time - frame_end_time - busy_time
+	local to_sleep = self.target_time - frame_end_time - busy_time
 
-	local timings_sleep_start = love.timer.getTime()
+	return self.target_time, to_sleep
+end
+
+---@param to_sleep number
+function LoopLimiter:sleep(to_sleep)
 	if to_sleep > 0 then
 		self.sleep_function:sleep(to_sleep)
 	end
-	local timings_busy_start = love.timer.getTime()
-	self.loop.timings.sleep = timings_busy_start - timings_sleep_start
+end
 
+function LoopLimiter:busyWait(target_time)
 	if self.busy_loop_ratio > 0 then
 		while love.timer.getTime() < target_time do end
 	end
-	self.loop.timings.busy = love.timer.getTime() - timings_busy_start
 end
 
 return LoopLimiter

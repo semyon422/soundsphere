@@ -70,7 +70,6 @@ function LoopEvents:dispatchEvent(name, a, b, c, d, e, f)
 end
 
 function LoopEvents:pollEvents(time)
-	local timings_event_start = love.timer.getTime()
 	love.event.pump()
 
 	local asynckey_working = self.asynckey and asynckey.events
@@ -110,8 +109,6 @@ function LoopEvents:pollEvents(time)
 			self:dispatchEvent("midireleased", note)
 		end
 	end
-
-	self.loop.timings.event = love.timer.getTime() - timings_event_start
 end
 
 return LoopEvents

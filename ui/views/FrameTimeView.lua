@@ -13,6 +13,8 @@ FrameTimeView.visible = false
 FrameTimeView.profiler = false
 
 local colors = {
+	gray0 = {0.3, 0.3, 0.3, 0.3},
+	-- gray0 = {0.5, 0.5, 0.5, 0.5},
 	white = {1, 1, 1, 1},
 	blue = {0.25, 0.25, 1, 1},
 	gray = {0.25, 0.25, 0.25, 1},
@@ -38,7 +40,7 @@ function FrameTimeView:load()
 			scale = 1,
 			draw = function(y, h, scale)
 				love.graphics.setColor(colors.white)
-				love.graphics.line(0.5, y, 0.5, y - loop.dt * 1000 * scale)
+				love.graphics.line(0.5, y, 0.5, y - loop.timings.dt * 1000 * scale)
 
 				love.graphics.setColor(colors.blue)
 				love.graphics.line(0.5, y, 0.5, y - loop.timings.event * 1000 * scale)
@@ -56,7 +58,11 @@ function FrameTimeView:load()
 				love.graphics.line(0.5, y, 0.5, y - loop.timings.present * 1000 * scale)
 
 				y = y - loop.timings.present * 1000 * scale
-				love.graphics.setColor(colors.cyan)
+				love.graphics.setColor(colors.purple)
+				love.graphics.line(0.5, y, 0.5, y - loop.timings.gc * 1000 * scale)
+
+				y = y - loop.timings.gc * 1000 * scale
+				love.graphics.setColor(colors.gray0)
 				love.graphics.line(0.5, y, 0.5, y - loop.timings.sleep * 1000 * scale)
 
 				y = y - loop.timings.sleep * 1000 * scale
@@ -214,6 +220,7 @@ local colorText = {
 	colors.gray, "update ",
 	colors.orange, "draw ",
 	colors.yellow, "present ",
+	colors.purple, "gc ",
 	colors.cyan, "sleep ",
 	colors.red, "busy "
 }
@@ -242,6 +249,7 @@ function FrameTimeView:drawFPS()
 	just.emptyline(4)
 	just.text(("avg: %3.2fms"):format(loop.ema_dt * 1000))
 	just.text(("jitter: %3.3fms"):format(loop.ema_jitter * 1000))
+	just.text(("gc: %3.3fms"):format(loop.timings.gc * 1000))
 	just.text(("mem alloc: %d KB"):format(loop.mem_delta))
 	just.emptyline(4)
 	
