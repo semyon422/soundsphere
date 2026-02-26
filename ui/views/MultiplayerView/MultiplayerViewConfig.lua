@@ -325,7 +325,7 @@ local function RoomSettings(self)
 	end
 	if isHost or rules.modifiers then
 		if imgui.TextOnlyButton("Modifiers", "Modifiers", w - 72, 72) then
-			self.gameView:setModal(require("ui.views.ModifierView"))
+			self.gameView:setModal(require("ui.views.ModifierView.ModifierView"))
 		end
 	end
 	if isHost then

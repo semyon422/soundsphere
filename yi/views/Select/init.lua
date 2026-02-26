@@ -11,7 +11,7 @@ local ChartGrid = require("yi.views.Select.ChartGrid")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
-local ImGuiModifiers = require("ui.views.ModifierView")
+local ImGuiModifiers = require("ui.views.ModifierView.ModifierView")
 local ImGuiInputs = require("ui.views.InputView")
 local ImGuiSkins = require("ui.views.NoteSkinView")
 local ImGuiGameplayConfig = require("ui.views.SelectView.PlayConfigView")

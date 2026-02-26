@@ -468,7 +468,7 @@ local function NotechartsSubscreen(self)
 		gameView:setModal(require("ui.views.SelectView.PlayConfigView"))
 	end
 	if imgui.TextOnlyButton("modifiers", "mods", w, h) then
-		gameView:setModal(require("ui.views.ModifierView"))
+		gameView:setModal(require("ui.views.ModifierView.ModifierView"))
 	end
 	if imgui.TextOnlyButton("noteskins", "skins", w, h) then
 		gameView:setModal(require("ui.views.NoteSkinView"))

@@ -11,7 +11,7 @@ local User = require("sea.access.User")
 local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local ServerSqliteDatabase = require("sea.storage.server.ServerSqliteDatabase")
 
-local chart_samples = require("sea.chart.samples")
+local chart_samples = require("sea.chart.samples.Samples")
 
 local test = {}
 

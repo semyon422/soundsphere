@@ -56,7 +56,7 @@ function SelectView:draw()
 	local cacheModel = self.game.cacheModel
 
 	local kp = just.keypressed
-	if kp("f1") then self.gameView:setModal(require("ui.views.ModifierView"))
+	if kp("f1") then self.gameView:setModal(require("ui.views.ModifierView.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()
 	elseif kp("lctrl") then self:changeSearchMode()
 	end
