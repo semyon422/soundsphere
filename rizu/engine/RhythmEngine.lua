@@ -118,12 +118,13 @@ function RhythmEngine:syncTime()
 	self.visual_info.time = self.time_engine.time - self.visual_offset
 end
 
-function RhythmEngine:play()
+---@param pending_resync boolean?
+function RhythmEngine:play(pending_resync)
 	self.time_engine:play()
 	self.audio_engine:play()
 	self.input_engine:resume()
 	self.pause_counter:play(self.time_engine.time)
-	self.pending_resync = true
+	self.pending_resync = pending_resync
 end
 
 function RhythmEngine:pause()

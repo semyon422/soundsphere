@@ -168,7 +168,7 @@ function GameplayInteractor:saveScore()
 end
 
 function GameplayInteractor:play()
-	self.gameplay_session:play()
+	self.gameplay_session:play(true)
 	-- self:discordPlay()
 end
 

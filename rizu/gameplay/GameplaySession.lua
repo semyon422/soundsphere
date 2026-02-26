@@ -45,8 +45,9 @@ function GameplaySession:update(current_time)
 	re:update()
 end
 
-function GameplaySession:play()
-	self.rhythm_engine:play()
+---@param pending_resync boolean?
+function GameplaySession:play(pending_resync)
+	self.rhythm_engine:play(pending_resync)
 end
 
 function GameplaySession:pause()
