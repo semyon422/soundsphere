@@ -34,14 +34,21 @@ end
 ---@param mode string?
 ---@param chartview table?
 function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode, chartview)
+	local is_same_audio = self.audio_path == audio_path and (audio_path or "") ~= ""
+	local is_same_chart_file = self.chartview and chartview and self.chartview.location_path == chartview.location_path
+
 	if self.audio_path ~= audio_path or self.chartview ~= chartview then
 		self.audio_path = audio_path
 		self.preview_time = preview_time
 		self.mode = mode
 		self.chartview = chartview
-		self:loadPreviewDebounce()
-		return
+
+		if not is_same_audio and not is_same_chart_file then
+			self:loadPreviewDebounce()
+			return
+		end
 	end
+
 	if self._on_load then
 		self._on_load()
 		self._on_load = nil
