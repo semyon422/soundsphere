@@ -123,6 +123,7 @@ function RhythmEngine:play()
 	self.audio_engine:play()
 	self.input_engine:resume()
 	self.pause_counter:play(self.time_engine.time)
+	self.pending_resync = true
 end
 
 function RhythmEngine:pause()
@@ -130,6 +131,7 @@ function RhythmEngine:pause()
 	self.audio_engine:pause()
 	self.input_engine:pause()
 	self.pause_counter:pause()
+	self.pending_resync = false
 end
 
 ---@param event rizu.VirtualInputEvent
@@ -207,7 +209,15 @@ end
 
 ---@param time number
 function RhythmEngine:setGlobalTime(time)
+	if not self.pending_resync then
+		self.time_engine:setGlobalTime(time)
+		return
+	end
+
+	self.pending_resync = false
+	self.time_engine:pause()
 	self.time_engine:setGlobalTime(time)
+	self.time_engine:play()
 end
 
 ---@param adjust_factor number
