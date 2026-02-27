@@ -85,8 +85,13 @@ function BassMixerSource:update()
 	local i = 1
 	while i <= #self.active_sounds do
 		local sound = self.active_sounds[i]
+		local channel = sound.decoder.resample_channel
+
+		local pos = bass_mix.BASS_Mixer_ChannelGetPosition(channel, bass_flags.BASS_POS_BYTE)
+		local len = bass.BASS_ChannelGetLength(channel, bass_flags.BASS_POS_BYTE)
+
 		-- BASS_ACTIVE_STOPPED = 0
-		if bass_mix.BASS_Mixer_ChannelIsActive(sound.decoder.resample_channel) == 0 then
+		if (pos >= len and len > 0) or bass_mix.BASS_Mixer_ChannelIsActive(channel) == 0 then
 			sound.decoder:release()
 			table.remove(self.active_sounds, i)
 		else

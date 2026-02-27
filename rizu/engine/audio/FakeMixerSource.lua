@@ -19,7 +19,12 @@ end
 
 function FakeMixerSource:setVolume(vol) self.volume = vol end
 function FakeMixerSource:setRate(rate) self.rate = rate end
-function FakeMixerSource:update() end
+function FakeMixerSource:update()
+	for _, sound in ipairs(self.active_sounds) do
+		sound.decoder:release()
+	end
+	self.active_sounds = {}
+end
 function FakeMixerSource:play() end
 function FakeMixerSource:pause() end
 
