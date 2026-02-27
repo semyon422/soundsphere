@@ -1,9 +1,9 @@
-local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local IDecoder = require("rizu.engine.audio.IDecoder")
 local ffi = require("ffi")
 
----@class rizu.BufferedPreviewSoundDecoder: rizu.ISoundDecoder
----@operator call: rizu.BufferedPreviewSoundDecoder
----@field private decoder rizu.ISoundDecoder
+---@class rizu.audio.BufferedDecoder: rizu.audio.IDecoder
+---@operator call: rizu.audio.BufferedDecoder
+---@field private decoder rizu.audio.IDecoder
 ---@field private buffer_limit_seconds number
 ---@field private buffer_limit_bytes integer
 ---@field private chunk_size integer
@@ -17,11 +17,11 @@ local ffi = require("ffi")
 ---@field private channels integer
 ---@field private bytes_per_sample integer
 ---@field private duration number
-local BufferedPreviewSoundDecoder = ISoundDecoder + {}
+local BufferedDecoder = IDecoder + {}
 
----@param decoder rizu.ISoundDecoder
+---@param decoder rizu.audio.IDecoder
 ---@param buffer_seconds number?
-function BufferedPreviewSoundDecoder:new(decoder, buffer_seconds)
+function BufferedDecoder:new(decoder, buffer_seconds)
 	self.decoder = decoder
 	self.buffer_limit_seconds = buffer_seconds or 1
 	self.is_preloading = false
@@ -106,7 +106,7 @@ end
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
-function BufferedPreviewSoundDecoder:getData(buf, len)
+function BufferedDecoder:getData(buf, len)
 	-- Try to advance preloader. We use standard coroutine.resume to NOT
 	-- propagate yields from the underlying decoder, keeping this call non-blocking.
 	-- We must not resume if it's currently waiting for an ICC response (is_preloading = true).
@@ -143,25 +143,25 @@ function BufferedPreviewSoundDecoder:getData(buf, len)
 	return total_read
 end
 
-function BufferedPreviewSoundDecoder:getSampleRate() return self.sample_rate end
-function BufferedPreviewSoundDecoder:getChannelCount() return self.channels end
-function BufferedPreviewSoundDecoder:getBytesPerSample() return self.bytes_per_sample end
-function BufferedPreviewSoundDecoder:getDuration() return self.duration end
+function BufferedDecoder:getSampleRate() return self.sample_rate end
+function BufferedDecoder:getChannelCount() return self.channels end
+function BufferedDecoder:getBytesPerSample() return self.bytes_per_sample end
+function BufferedDecoder:getDuration() return self.duration end
 
-function BufferedPreviewSoundDecoder:getBytesDuration()
+function BufferedDecoder:getBytesDuration()
 	return self:secondsToBytes(self.duration)
 end
 
-function BufferedPreviewSoundDecoder:getPosition()
+function BufferedDecoder:getPosition()
 	return self:bytesToSeconds(self.position)
 end
 
-function BufferedPreviewSoundDecoder:getBytesPosition()
+function BufferedDecoder:getBytesPosition()
 	return self.position
 end
 
 ---@param pos integer
-function BufferedPreviewSoundDecoder:setBytesPosition(pos)
+function BufferedDecoder:setBytesPosition(pos)
 	self.pending_position = pos
 	self.chunks = {}
 	self.total_buffered_bytes = 0
@@ -181,17 +181,17 @@ end
 
 ---@param pos integer
 ---@return number
-function BufferedPreviewSoundDecoder:bytesToSeconds(pos)
+function BufferedDecoder:bytesToSeconds(pos)
 	return pos / (self.sample_rate * self.channels * self.bytes_per_sample)
 end
 
 ---@param pos number
 ---@return integer
-function BufferedPreviewSoundDecoder:secondsToBytes(pos)
+function BufferedDecoder:secondsToBytes(pos)
 	return math.floor(pos * self.sample_rate) * self.channels * self.bytes_per_sample
 end
 
-function BufferedPreviewSoundDecoder:release()
+function BufferedDecoder:release()
 	local decoder = self.decoder
 	if decoder then
 		coroutine.wrap(function()
@@ -201,4 +201,4 @@ function BufferedPreviewSoundDecoder:release()
 	self.preloader_co = nil
 end
 
-return BufferedPreviewSoundDecoder
+return BufferedDecoder

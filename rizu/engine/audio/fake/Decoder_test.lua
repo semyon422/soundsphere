@@ -1,4 +1,4 @@
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
+local Decoder = require("rizu.engine.audio.fake.Decoder")
 local ffi = require("ffi")
 
 local test = {}
@@ -6,7 +6,7 @@ local test = {}
 ---@param t testing.T
 function test.test_1(t)
 	local samples_count = 2
-	local dec = FakeSoundDecoder(samples_count)
+	local dec = Decoder(samples_count)
 	for i = 1, samples_count do
 		dec.wave:setSampleInt(i - 1, 1, i)
 		dec.wave:setSampleInt(i - 1, 2, i + 10)
@@ -37,14 +37,14 @@ function test.test_1(t)
 	t:eq(buf[1], dec.wave.data_buf[1])
 end
 
---- Same test for BassSoundDecoder
+--- Same test for Decoder
 ---@param t testing.T
 function test.test_2(t)
 	local duration = 0.1
 	local samples_count = math.floor(44100 * duration)
 	local size = samples_count * 2 * 2
 
-	local dec = FakeSoundDecoder(samples_count)
+	local dec = Decoder(samples_count)
 
 	local buf_len = 17003 -- rounds to 17000
 	local buf = ffi.new("uint8_t[?]", buf_len)

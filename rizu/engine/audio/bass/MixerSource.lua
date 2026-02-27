@@ -1,16 +1,16 @@
-local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
+local ISource = require("rizu.engine.audio.ISource")
 local bass = require("bass")
 local bass_mix = require("bass.mix")
 local bass_fx = require("bass.fx")
 local bass_flags = require("bass.flags")
 local bass_assert = require("bass.assert")
 
----@class rizu.BassMixerSource: rizu.IChartAudioSource
----@operator call: rizu.BassMixerSource
-local BassMixerSource = IChartAudioSource + {}
+---@class rizu.audio.bass.MixerSource: rizu.audio.ISource
+---@operator call: rizu.audio.bass.MixerSource
+local MixerSource = ISource + {}
 
 ---@param use_tempo boolean?
-function BassMixerSource:new(use_tempo)
+function MixerSource:new(use_tempo)
 	self.use_tempo = use_tempo
 	self.sample_rate = 44100
 
@@ -35,7 +35,7 @@ function BassMixerSource:new(use_tempo)
 
 	bass.BASS_ChannelPlay(self.channel, false)
 
-	---@type {decoder: rizu.ISoundDecoder}[]
+	---@type {decoder: rizu.audio.IDecoder}[]
 	self.active_sounds = {}
 
 	self.gc_proxy = newproxy(true)
@@ -47,7 +47,7 @@ function BassMixerSource:new(use_tempo)
 	end
 end
 
-function BassMixerSource:release()
+function MixerSource:release()
 	if self.released then
 		return
 	end
@@ -61,10 +61,10 @@ function BassMixerSource:release()
 	self.active_sounds = {}
 end
 
----@param decoder rizu.BassSoundDecoder
+---@param decoder rizu.audio.IDecoder
 ---@param volume number?
-function BassMixerSource:addSound(decoder, volume)
-	-- Use the resample_channel from BassSoundDecoder (it's a decoding mixer)
+function MixerSource:addSound(decoder, volume)
+	-- Use the resample_channel from Decoder (it's a decoding mixer)
 	local source_channel = decoder.resample_channel
 
 	-- BASS_MIXER_NORAMPIN ensures instant start for hitsounds
@@ -81,7 +81,7 @@ function BassMixerSource:addSound(decoder, volume)
 	})
 end
 
-function BassMixerSource:update()
+function MixerSource:update()
 	local i = 1
 	while i <= #self.active_sounds do
 		local sound = self.active_sounds[i]
@@ -100,16 +100,16 @@ function BassMixerSource:update()
 	end
 end
 
-function BassMixerSource:play()
+function MixerSource:play()
 	bass.BASS_ChannelPlay(self.channel, false)
 end
 
-function BassMixerSource:pause()
+function MixerSource:pause()
 	bass.BASS_ChannelPause(self.channel)
 end
 
 ---@param rate number
-function BassMixerSource:setRate(rate)
+function MixerSource:setRate(rate)
 	if self.use_tempo then
 		bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_TEMPO, (rate - 1) * 100) == 1)
 	else
@@ -118,8 +118,8 @@ function BassMixerSource:setRate(rate)
 end
 
 ---@param volume number
-function BassMixerSource:setVolume(volume)
+function MixerSource:setVolume(volume)
 	bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_VOL, volume)
 end
 
-return BassMixerSource
+return MixerSource

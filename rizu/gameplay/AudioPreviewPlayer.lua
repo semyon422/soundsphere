@@ -1,7 +1,7 @@
 local class = require("class")
 local ThreadRemote = require("threadremote.ThreadRemote")
-local BufferedPreviewSoundDecoder = require("rizu.engine.audio.BufferedPreviewSoundDecoder")
-local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
+local BufferedDecoder = require("rizu.engine.audio.BufferedDecoder")
+local Source = require("rizu.engine.audio.bass.Source")
 local thread = require("thread")
 
 ---@class rizu.gameplay.AudioPreviewPlayer
@@ -37,9 +37,9 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 	end
 
 	self.thread:start(function(remote, dir, preview_path)
-		local PreviewSoundDecoder = require("rizu.engine.audio.PreviewSoundDecoder")
+		local PreviewDecoder = require("rizu.engine.audio.PreviewDecoder")
 		local AudioPreview = require("rizu.gameplay.AudioPreview")
-		local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
+		local Decoder = require("rizu.engine.audio.bass.Decoder")
 		local LoveFilesystem = require("fs.LoveFilesystem")
 		local fs = LoveFilesystem()
 
@@ -51,18 +51,18 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		local preview = AudioPreview()
 		preview:decode(preview_data)
 
-		local decoder = PreviewSoundDecoder(fs, dir, preview, function(data)
-			return BassSoundDecoder(data)
+		local decoder = PreviewDecoder(fs, dir, preview, function(data)
+			return Decoder(data)
 		end)
 
 		return decoder
 	end, chart_dir, preview_path)
 
 	thread.coro(function()
-		-- BufferedPreviewSoundDecoder(self.thread.remote) calls metadata methods
+		-- BufferedDecoder(self.thread.remote) calls metadata methods
 		-- which will yield and wait for thread remote update.
-		---@type boolean, rizu.BufferedPreviewSoundDecoder|string
-		local ok, buffered = pcall(BufferedPreviewSoundDecoder --[[@as function]], self.thread.remote)
+		---@type boolean, rizu.audio.BufferedDecoder|string
+		local ok, buffered = pcall(BufferedDecoder --[[@as function]], self.thread.remote)
 		if generation ~= self.load_generation then
 			if ok and buffered then
 				---@cast buffered -string
@@ -80,7 +80,7 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		self.buffered_decoder = buffered
 
 		local use_tempo = self.configModel.configs.settings.audio.mode.primary == "bass_fx_tempo"
-		self.audio_source = BassChartAudioSource(buffered, use_tempo)
+		self.audio_source = Source(buffered, use_tempo)
 		self.audio_source:setVolume(self.volume)
 		self.audio_source:setRate(self.rate)
 		if self.fft_size then

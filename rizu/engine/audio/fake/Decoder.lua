@@ -1,15 +1,15 @@
-local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local IDecoder = require("rizu.engine.audio.IDecoder")
 local Wave = require("audio.Wave")
 local ffi = require("ffi")
 
----@class rizu.FakeSoundDecoder: rizu.ISoundDecoder
----@operator call: rizu.FakeSoundDecoder
-local FakeSoundDecoder = ISoundDecoder + {}
+---@class rizu.audio.fake.Decoder: rizu.audio.IDecoder
+---@operator call: rizu.audio.fake.Decoder
+local Decoder = IDecoder + {}
 
 ---@param samples_count integer
 ---@param sample_rate integer?
 ---@param channels_count integer?
-function FakeSoundDecoder:new(samples_count, sample_rate, channels_count)
+function Decoder:new(samples_count, sample_rate, channels_count)
 	local wave = Wave()
 	self.wave = wave
 
@@ -22,7 +22,7 @@ end
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
-function FakeSoundDecoder:getData(buf, len)
+function Decoder:getData(buf, len)
 	local wave = self.wave
 	len = wave:floorBytes(len)
 
@@ -39,44 +39,44 @@ end
 
 ---@param pos integer
 ---@return number
-function FakeSoundDecoder:bytesToSeconds(pos)
+function Decoder:bytesToSeconds(pos)
 	return self.wave:bytesToSeconds(pos)
 end
 
 ---@param pos number
 ---@return integer
-function FakeSoundDecoder:secondsToBytes(pos)
+function Decoder:secondsToBytes(pos)
 	return self.wave:secondsToBytes(pos)
 end
 
 ---@return integer
-function FakeSoundDecoder:getBytesPosition()
+function Decoder:getBytesPosition()
 	return self.position
 end
 
 ---@param pos integer
-function FakeSoundDecoder:setBytesPosition(pos)
+function Decoder:setBytesPosition(pos)
 	self.position = pos
 end
 
 ---@return integer
-function FakeSoundDecoder:getBytesDuration()
+function Decoder:getBytesDuration()
 	return self.wave:getDataSize()
 end
 
 ---@return integer
-function FakeSoundDecoder:getSampleRate()
+function Decoder:getSampleRate()
 	return self.wave.sample_rate
 end
 
 ---@return integer
-function FakeSoundDecoder:getChannelCount()
+function Decoder:getChannelCount()
 	return self.wave.channels_count
 end
 
 ---@return integer
-function FakeSoundDecoder:getBytesPerSample()
+function Decoder:getBytesPerSample()
 	return self.wave.bytes_per_sample
 end
 
-return FakeSoundDecoder
+return Decoder

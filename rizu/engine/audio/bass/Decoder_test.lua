@@ -1,4 +1,4 @@
-local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
+local Decoder = require("rizu.engine.audio.bass.Decoder")
 local Wave = require("audio.Wave")
 local ffi = require("ffi")
 local bass = require("bass")
@@ -33,7 +33,7 @@ function test.all(t)
 
 	local data = new_wave(duration)
 
-	local dec = BassSoundDecoder(data)
+	local dec = Decoder(data)
 
 	local buf_len = 17003 -- rounds to 17000
 	local buf = ffi.new("uint8_t[?]", buf_len)

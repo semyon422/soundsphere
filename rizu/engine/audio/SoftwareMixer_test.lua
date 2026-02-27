@@ -1,5 +1,5 @@
-local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
+local SoftwareMixer = require("rizu.engine.audio.SoftwareMixer")
+local FakeDecoder = require("rizu.engine.audio.fake.Decoder")
 local ffi = require("ffi")
 
 local test = {}
@@ -19,7 +19,7 @@ end
 
 ---@param t testing.T
 function test.empty(t)
-	local mixer = ChartAudioMixer({}, {})
+	local mixer = SoftwareMixer({}, {})
 
 	local buf_size = 20
 	local buf = ffi.new("int16_t[?]", buf_size)
@@ -36,11 +36,11 @@ function test.single(t)
 	}
 
 	local decoders = {
-		FakeSoundDecoder(4),
+		FakeDecoder(4),
 	}
 	fill_wave(decoders[1].wave, 10)
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 
 	local buf_size = 20
 	local buf = ffi.new("int16_t[?]", buf_size)
@@ -83,13 +83,13 @@ function test.multiple(t)
 	}
 
 	local decoders = {
-		FakeSoundDecoder(4, 1),
-		FakeSoundDecoder(4, 1),
+		FakeDecoder(4, 1),
+		FakeDecoder(4, 1),
 	}
 	fill_wave(decoders[1].wave, 10)
 	fill_wave(decoders[2].wave, 100)
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 
 	local buf_size = 20
 	local buf = ffi.new("int16_t[?]", buf_size)
@@ -165,9 +165,9 @@ function test.complex(t)
 		{time = 1},
 	}
 	local decoders = {
-		FakeSoundDecoder(4, 1),
-		FakeSoundDecoder(4, 1),
-		FakeSoundDecoder(4, 1),
+		FakeDecoder(4, 1),
+		FakeDecoder(4, 1),
+		FakeDecoder(4, 1),
 	}
 
 	-- Sample 0: Positive clipping (20000 + 20000 = 40000 -> 32767)
@@ -193,7 +193,7 @@ function test.complex(t)
 	decoders[3].wave:setSampleInt(1, 1, 30)
 	decoders[3].wave:setSampleInt(1, 2, 30)
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[10]")
 
 	-- 1. Test Positive Clipping
@@ -220,9 +220,9 @@ function test.no_intermediate_clipping(t)
 		{time = 0},
 	}
 	local decoders = {
-		FakeSoundDecoder(1, 1),
-		FakeSoundDecoder(1, 1),
-		FakeSoundDecoder(1, 1),
+		FakeDecoder(1, 1),
+		FakeDecoder(1, 1),
+		FakeDecoder(1, 1),
 	}
 
 	-- 20000 + 20000 - 20000 should be 20000.
@@ -234,7 +234,7 @@ function test.no_intermediate_clipping(t)
 	decoders[3].wave:setSampleInt(0, 1, -20000)
 	decoders[3].wave:setSampleInt(0, 2, -20000)
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[4]")
 
 	t:eq(mixer:getData(buf, 4), 4)
@@ -244,10 +244,10 @@ end
 
 ---@param t testing.T
 function test.dynamic(t)
-	local mixer = ChartAudioMixer({}, {})
+	local mixer = SoftwareMixer({}, {})
 	t:assert(mixer.empty)
 
-	local decoder = FakeSoundDecoder(4, 1, 1)
+	local decoder = FakeDecoder(4, 1, 1)
 	fill_wave(decoder.wave, 10)
 
 	mixer:addSound({time = 1}, decoder)
@@ -286,13 +286,13 @@ function test.seeking(t)
 		{time = 5},
 	}
 	local decoders = {
-		FakeSoundDecoder(2, 1, 1), -- duration 2, ends at 3
-		FakeSoundDecoder(2, 1, 1), -- duration 2, ends at 7
+		FakeDecoder(2, 1, 1), -- duration 2, ends at 3
+		FakeDecoder(2, 1, 1), -- duration 2, ends at 7
 	}
 	fill_wave(decoders[1].wave, 10)
 	fill_wave(decoders[2].wave, 100)
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[2]")
 
 	-- Seek to 0 (before everything)
@@ -339,13 +339,13 @@ end
 ---@param t testing.T
 function test.dynamic_playback(t)
 	-- Use a sound to initialize format to 1Hz, 1ch
-	local init_dec = FakeSoundDecoder(1, 1, 1)
-	local mixer = ChartAudioMixer({{time = -100}}, {init_dec})
+	local init_dec = FakeDecoder(1, 1, 1)
+	local mixer = SoftwareMixer({{time = -100}}, {init_dec})
 	mixer:setPosition(0)
 
 	local buf = ffi.new("int16_t[2]")
 
-	local dec1 = FakeSoundDecoder(2, 1, 1)
+	local dec1 = FakeDecoder(2, 1, 1)
 	fill_wave(dec1.wave, 10)
 
 	-- Start playing empty (except the far away init sound)
@@ -359,7 +359,7 @@ function test.dynamic_playback(t)
 	t:eq(buf[0], 11) -- second sample of dec1
 
 	-- Add another sound that starts at 3
-	local dec2 = FakeSoundDecoder(2, 1, 1)
+	local dec2 = FakeDecoder(2, 1, 1)
 	fill_wave(dec2.wave, 100)
 	mixer:addSound({time = 3}, dec2)
 
@@ -382,13 +382,13 @@ function test.overlap_seeking(t)
 		{time = 1},
 	}
 	local decoders = {
-		FakeSoundDecoder(3, 1, 1), -- 0 to 3
-		FakeSoundDecoder(3, 1, 1), -- 1 to 4
+		FakeDecoder(3, 1, 1), -- 0 to 3
+		FakeDecoder(3, 1, 1), -- 1 to 4
 	}
 	fill_wave(decoders[1].wave, 10) -- 10, 11, 12
 	fill_wave(decoders[2].wave, 100) -- 100, 101, 102
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[2]")
 
 	-- pos 0: 10
@@ -424,12 +424,12 @@ function test.many_sounds(t)
 	local decoders = {}
 	for i = 1, n do
 		table.insert(sounds, {time = i})
-		local dec = FakeSoundDecoder(1, 1, 1)
+		local dec = FakeDecoder(1, 1, 1)
 		dec.wave:setSampleInt(0, 1, i)
 		table.insert(decoders, dec)
 	end
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[2]")
 
 	for i = 1, n do
@@ -446,12 +446,12 @@ function test.simultaneous(t)
 	local decoders = {}
 	for i = 1, n do
 		table.insert(sounds, {time = 0})
-		local dec = FakeSoundDecoder(1, 1, 1)
+		local dec = FakeDecoder(1, 1, 1)
 		dec.wave:setSampleInt(0, 1, 10 ^ (i - 1))
 		table.insert(decoders, dec)
 	end
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	local buf = ffi.new("int16_t[2]")
 
 	t:eq(mixer:getData(buf, 2), 2)
@@ -468,9 +468,9 @@ end
 
 ---@param t testing.T
 function test.id_consistency(t)
-	local mixer = ChartAudioMixer({}, {})
-	local dec1 = FakeSoundDecoder(1, 1, 1)
-	local dec2 = FakeSoundDecoder(1, 1, 1)
+	local mixer = SoftwareMixer({}, {})
+	local dec1 = FakeDecoder(1, 1, 1)
+	local dec2 = FakeDecoder(1, 1, 1)
 
 	mixer:addSound({time = 0}, dec1)
 	mixer:addSound({time = 0}, dec2)
@@ -502,13 +502,13 @@ function test.negative_start(t)
 
 	-- Sound at time -5, duration 10 (ends at 5)
 	local sounds = {{time = -5}}
-	local decoders = {FakeSoundDecoder(10, sample_rate, channels)}
+	local decoders = {FakeDecoder(10, sample_rate, channels)}
 	-- Fill decoder with data 1, 2, 3, ...
 	for i = 0, 9 do
 		decoders[1].wave:setSampleInt(i, 1, i + 1)
 	end
 
-	local mixer = ChartAudioMixer(sounds, decoders)
+	local mixer = SoftwareMixer(sounds, decoders)
 	t:eq(mixer:getPosition(), -5, "Mixer should start at start_pos (-5)")
 	t:eq(mixer:getDuration(), 10, "Duration should be end_pos - start_pos (10s)")
 

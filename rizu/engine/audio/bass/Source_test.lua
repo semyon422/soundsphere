@@ -1,7 +1,7 @@
-local BassChartAudioSource = require("rizu.engine.audio.BassChartAudioSource")
+local Source = require("rizu.engine.audio.bass.Source")
 local ChartAudio = require("rizu.engine.audio.ChartAudio")
-local BassSoundDecoder = require("rizu.engine.audio.BassSoundDecoder")
-local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
+local Decoder = require("rizu.engine.audio.bass.Decoder")
+local SoftwareMixer = require("rizu.engine.audio.SoftwareMixer")
 local ChartFactory = require("notechart.ChartFactory")
 local LoveFilesystem = require("fs.LoveFilesystem")
 local ResourceLoader = require("rizu.files.ResourceLoader")
@@ -37,16 +37,16 @@ function test.bms()
 	rf:addPath(dir)
 	rl:load(chart.resources)
 
-	---@type rizu.BassSoundDecoder[]
+	---@type rizu.audio.bass.Decoder[]
 	local decoders = {}
 	for i, sound in ipairs(ca.sounds) do
 		local data = rl:getResource(sound.name)
 		if data then
-			decoders[i] = BassSoundDecoder(data)
+			decoders[i] = Decoder(data)
 		end
 	end
 
-	local mixer = ChartAudioMixer(ca.sounds, decoders)
+	local mixer = SoftwareMixer(ca.sounds, decoders)
 
 	-- local wave = Wave()
 	-- wave:initBuffer(mixer:getChannelCount(), mixer.end_pos / 4)
@@ -56,7 +56,7 @@ function test.bms()
 
 	mixer:setPosition(0)
 
-	local source = BassChartAudioSource(mixer)
+	local source = Source(mixer)
 	source:play()
 
 	local a = false

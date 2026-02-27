@@ -1,6 +1,6 @@
-local BufferedPreviewSoundDecoder = require("rizu.engine.audio.BufferedPreviewSoundDecoder")
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
-local YieldingFakeSoundDecoder = require("rizu.engine.audio.YieldingFakeSoundDecoder")
+local BufferedDecoder = require("rizu.engine.audio.BufferedDecoder")
+local FakeDecoder = require("rizu.engine.audio.fake.Decoder")
+local YieldingDecoder = require("rizu.engine.audio.fake.YieldingDecoder")
 local ffi = require("ffi")
 
 local test = {}
@@ -12,7 +12,7 @@ function test.basic_preloading(t)
 	local bytes_per_sample = 2
 	local duration = 10
 	local total_samples = duration * sample_rate
-	local underlying = FakeSoundDecoder(total_samples, sample_rate, channels)
+	local underlying = FakeDecoder(total_samples, sample_rate, channels)
 
 	-- Fill underlying with some data
 	local u_buf_len = total_samples * channels * bytes_per_sample
@@ -21,7 +21,7 @@ function test.basic_preloading(t)
 		u_buf[i] = i % 128
 	end
 
-	local buffered = BufferedPreviewSoundDecoder(underlying, 0.1) -- 0.1s buffer
+	local buffered = BufferedDecoder(underlying, 0.1) -- 0.1s buffer
 
 	-- Buffer should be filled upon construction or first resume in getData
 	local read_len = 1024
@@ -44,26 +44,22 @@ function test.non_blocking_yield(t)
 	local duration = 10
 	local total_samples = duration * sample_rate
 
-	-- Use YieldingFakeSoundDecoder to wrap FakeSoundDecoder
-	local underlying = YieldingFakeSoundDecoder(FakeSoundDecoder(total_samples, sample_rate, channels))
-	-- Accessing underlying.decoder because FakeSoundDecoder is what actually has the buffer
+	-- Use YieldingDecoder to wrap FakeDecoder
+	local underlying = YieldingDecoder(FakeDecoder(total_samples, sample_rate, channels))
+	-- Accessing underlying.decoder because FakeDecoder is what actually has the buffer
 	local u_buf = ffi.cast("int8_t*", underlying.decoder.wave.byte_ptr)
 	ffi.fill(u_buf, 10000, 7)
 
-	-- BufferedPreviewSoundDecoder will call getSampleRate, getChannelCount, etc. in new()
-	-- YieldingFakeSoundDecoder:new(decoder) is fine, but BufferedPreviewSoundDecoder constructor
+	-- BufferedDecoder will call getSampleRate, getChannelCount, etc. in new()
+	-- YieldingDecoder:new(decoder) is fine, but BufferedDecoder constructor
 	-- calls methods that YIELD.
-	-- This means BufferedPreviewSoundDecoder constructor MUST be called inside a coroutine
+	-- This means BufferedDecoder constructor MUST be called inside a coroutine
 	-- if the decoder methods yield.
 
-	-- Wait, let's re-examine BufferedPreviewSoundDecoder:new()
-	-- It calls decoder:getSampleRate(), getChannelCount(), getBytesPerSample(), getDuration()
-	-- If they yield, BufferedPreviewSoundDecoder:new() will yield.
-
-	---@type rizu.BufferedPreviewSoundDecoder
+	---@type rizu.audio.BufferedDecoder
 	local buffered
 	local co = coroutine.create(function()
-		buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+		buffered = BufferedDecoder(underlying, 1.0)
 	end)
 
 	-- Resume until coroutine is dead
@@ -78,7 +74,7 @@ function test.non_blocking_yield(t)
 
 	-- First getData will resume the preloader.
 	-- The preloader will call underlying:getData which will yield.
-	-- BufferedPreviewSoundDecoder:getData should then return 0 (stall).
+	-- BufferedDecoder:getData should then return 0 (stall).
 	local read = buffered:getData(read_buf, read_len)
 
 	t:eq(read, 0, "Should return 0 (stall)")
@@ -102,7 +98,7 @@ function test.metadata_pcall(t)
 		secondsToBytes = function(_, s) return math.floor(s * 44100) * 2 * 2 end,
 	}
 
-	local buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+	local buffered = BufferedDecoder(underlying, 1.0)
 
 	t:eq(buffered:getSampleRate(), 44100, "Should fallback to default sample rate")
 	t:eq(buffered:getDuration(), 0, "Should fallback to 0 duration")
@@ -119,7 +115,7 @@ function test.reset_signal(t)
 		getDataString = function() error("ThreadRemote reset") end,
 	}
 
-	local buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+	local buffered = BufferedDecoder(underlying, 1.0)
 
 	-- First getData resumes preloader
 	buffered:getData(ffi.new("int8_t[1024]"), 1024)
@@ -132,8 +128,8 @@ end
 function test.seek(t)
 	local sample_rate = 44100
 	local duration = 10
-	local underlying = FakeSoundDecoder(duration * sample_rate, sample_rate, 2)
-	local buffered = BufferedPreviewSoundDecoder(underlying, 1.0)
+	local underlying = FakeDecoder(duration * sample_rate, sample_rate, 2)
+	local buffered = BufferedDecoder(underlying, 1.0)
 
 	local u_buf = ffi.cast("int8_t*", underlying.wave.byte_ptr)
 	for i = 0, 100000 do u_buf[i] = i % 120 + 1 end -- Use +1 to avoid 0s
@@ -144,7 +140,7 @@ function test.seek(t)
 	local read_len = 100
 	local read_buf = ffi.new("int8_t[?]", read_len)
 
-	-- Since FakeSoundDecoder doesn't yield, setBytesPosition already triggered
+	-- Since FakeDecoder doesn't yield, setBytesPosition already triggered
 	-- the preloader to seek AND fetch one chunk (chunk_size=4096).
 	-- So the data should be available IMMEDIATELY.
 	buffered:getData(read_buf, read_len)
@@ -154,20 +150,20 @@ end
 
 ---@param t testing.T
 function test.negative_start(t)
-	local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
+	local SoftwareMixer = require("rizu.engine.audio.SoftwareMixer")
 	local sample_rate = 1
 	local channels = 1
 
 	-- Sound at time -5, duration 10 (ends at 5)
 	local sounds = {{time = -5}}
-	local decoders = {FakeSoundDecoder(10, sample_rate, channels)}
+	local decoders = {FakeDecoder(10, sample_rate, channels)}
 	-- Fill decoder with data 1, 2, 3, ...
 	for i = 0, 9 do
 		decoders[1].wave:setSampleInt(i, 1, i + 1)
 	end
 
-	local mixer = ChartAudioMixer(sounds, decoders)
-	local buffered = BufferedPreviewSoundDecoder(mixer, 100)
+	local mixer = SoftwareMixer(sounds, decoders)
+	local buffered = BufferedDecoder(mixer, 100)
 	
 	t:eq(buffered:getPosition(), -5, "Buffered should start at decoder's position (-5)")
 	t:eq(buffered:getDuration(), 10, "Duration should match underlying decoder's duration")

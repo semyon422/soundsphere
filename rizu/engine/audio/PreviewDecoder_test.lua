@@ -1,7 +1,7 @@
-local PreviewSoundDecoder = require("rizu.engine.audio.PreviewSoundDecoder")
+local PreviewDecoder = require("rizu.engine.audio.PreviewDecoder")
 local FakeFilesystem = require("fs.FakeFilesystem")
 local AudioPreview = require("rizu.gameplay.AudioPreview")
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
+local FakeDecoder = require("rizu.engine.audio.fake.Decoder")
 local ffi = require("ffi")
 
 local test = {}
@@ -25,10 +25,10 @@ function test.on_demand_loading(t)
 		loaded[data] = (loaded[data] or 0) + 1
 		local sample_rate = 44100
 		local duration = 0.1
-		return FakeSoundDecoder(math.floor(duration * sample_rate), sample_rate, 2)
+		return FakeDecoder(math.floor(duration * sample_rate), sample_rate, 2)
 	end
 
-	local decoder = PreviewSoundDecoder(fs, "", preview, factory)
+	local decoder = PreviewDecoder(fs, "", preview, factory)
 
 	-- Construction probes the first sound to get format
 	t:eq(loaded["kick_data"], 1, "Should have probed kick.wav")
@@ -65,10 +65,10 @@ function test.volume_application(t)
 	local function factory(data)
 		local sample_rate = 44100
 		local duration = 1.0
-		return FakeSoundDecoder(math.floor(duration * sample_rate), sample_rate, 2)
+		return FakeDecoder(math.floor(duration * sample_rate), sample_rate, 2)
 	end
 
-	local decoder = PreviewSoundDecoder(fs, "", preview, factory)
+	local decoder = PreviewDecoder(fs, "", preview, factory)
 
 	local buf_len = 44100 * 2 * 2
 	local buf = ffi.new("int16_t[?]", buf_len / 2)
@@ -81,7 +81,7 @@ function test.volume_application(t)
 	preview_full.events = {
 		{time = 0, sample_index = 1, duration = 1.0, volume = 1.0},
 	}
-	local decoder_full = PreviewSoundDecoder(fs, "", preview_full, factory)
+	local decoder_full = PreviewDecoder(fs, "", preview_full, factory)
 	local buf_full = ffi.new("int16_t[?]", buf_len / 2)
 	decoder_full:getData(buf_full, buf_len)
 
@@ -112,10 +112,10 @@ function test.resource_finder_integration(t)
 		found_data = data
 		local sample_rate = 44100
 		local duration = 10
-		return FakeSoundDecoder(math.floor(duration * sample_rate), sample_rate, 2)
+		return FakeDecoder(math.floor(duration * sample_rate), sample_rate, 2)
 	end
 
-	local decoder = PreviewSoundDecoder(fs, "my_chart", preview, factory)
+	local decoder = PreviewDecoder(fs, "my_chart", preview, factory)
 	t:eq(found_data, "bgm_data", "Should have loaded bgm_data")
 
 	decoder:release()

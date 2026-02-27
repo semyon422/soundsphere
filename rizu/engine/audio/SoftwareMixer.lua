@@ -1,18 +1,18 @@
 local class = require("class")
-local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
+local IDecoder = require("rizu.engine.audio.IDecoder")
+local FakeDecoder = require("rizu.engine.audio.fake.Decoder")
 local rbtree = require("rbtree")
 local ffi = require("ffi")
 
 local next_entry_id = 1
 
----@class rizu.ChartAudioMixer.NodeWrap
----@operator call: rizu.ChartAudioMixer.NodeWrap
----@field entry rizu.ChartAudioMixer.Entry
+---@class rizu.audio.SoftwareMixer.NodeWrap
+---@operator call: rizu.audio.SoftwareMixer.NodeWrap
+---@field entry rizu.audio.SoftwareMixer.Entry
 ---@field is_search_key boolean?
 local NodeWrap = class()
 
----@param entry rizu.ChartAudioMixer.Entry
+---@param entry rizu.audio.SoftwareMixer.Entry
 ---@param is_search_key boolean?
 function NodeWrap:new(entry, is_search_key)
 	self.entry = entry
@@ -34,8 +34,8 @@ function NodeWrap:tie_breaker(other)
 	return self.entry.id < other.entry.id
 end
 
----@class rizu.ChartAudioMixer.StartNodeWrap: rizu.ChartAudioMixer.NodeWrap
----@operator call: rizu.ChartAudioMixer.StartNodeWrap
+---@class rizu.audio.SoftwareMixer.StartNodeWrap: rizu.audio.SoftwareMixer.NodeWrap
+---@operator call: rizu.audio.SoftwareMixer.StartNodeWrap
 local StartNodeWrap = NodeWrap + {}
 
 function StartNodeWrap:__lt(other)
@@ -45,8 +45,8 @@ function StartNodeWrap:__lt(other)
 	return self:tie_breaker(other)
 end
 
----@class rizu.ChartAudioMixer.EndNodeWrap: rizu.ChartAudioMixer.NodeWrap
----@operator call: rizu.ChartAudioMixer.EndNodeWrap
+---@class rizu.audio.SoftwareMixer.EndNodeWrap: rizu.audio.SoftwareMixer.NodeWrap
+---@operator call: rizu.audio.SoftwareMixer.EndNodeWrap
 local EndNodeWrap = NodeWrap + {}
 
 function EndNodeWrap:__lt(other)
@@ -56,19 +56,19 @@ function EndNodeWrap:__lt(other)
 	return self:tie_breaker(other)
 end
 
----@class rizu.ChartAudioMixer.Entry
----@operator call: rizu.ChartAudioMixer.Entry
+---@class rizu.audio.SoftwareMixer.Entry
+---@operator call: rizu.audio.SoftwareMixer.Entry
 ---@field id integer
----@field decoder rizu.ISoundDecoder
+---@field decoder rizu.audio.IDecoder
 ---@field time number
 ---@field duration number
 ---@field start_pos integer
 ---@field end_pos integer
----@field start_wrap rizu.ChartAudioMixer.StartNodeWrap
----@field end_wrap rizu.ChartAudioMixer.EndNodeWrap
+---@field start_wrap rizu.audio.SoftwareMixer.StartNodeWrap
+---@field end_wrap rizu.audio.SoftwareMixer.EndNodeWrap
 local Entry = class()
 
----@param decoder rizu.ISoundDecoder
+---@param decoder rizu.audio.IDecoder
 ---@param time number
 function Entry:new(decoder, time)
 	self.decoder = decoder
@@ -84,16 +84,16 @@ function Entry:new(decoder, time)
 	self.end_wrap = EndNodeWrap(self)
 end
 
----@class rizu.ChartAudioMixer: rizu.ISoundDecoder
----@operator call: rizu.ChartAudioMixer
-local ChartAudioMixer = ISoundDecoder + {}
+---@class rizu.audio.SoftwareMixer: rizu.audio.IDecoder
+---@operator call: rizu.audio.SoftwareMixer
+local SoftwareMixer = IDecoder + {}
 
 ---@param sounds rizu.ChartAudioSound[]
----@param decoders {[integer]: rizu.ISoundDecoder}
-function ChartAudioMixer:new(sounds, decoders)
+---@param decoders {[integer]: rizu.audio.IDecoder}
+function SoftwareMixer:new(sounds, decoders)
 	self.tree_start = rbtree.new()
 	self.tree_end = rbtree.new()
-	---@type {[rizu.ISoundDecoder]: rizu.ChartAudioMixer.Entry}
+	---@type {[rizu.audio.IDecoder]: rizu.audio.SoftwareMixer.Entry}
 	self.decoder_to_entry = {}
 
 	self.start_pos = math.huge
@@ -101,7 +101,7 @@ function ChartAudioMixer:new(sounds, decoders)
 	self.max_duration_bytes = 0
 
 	self.position = 0
-	---@type {[rizu.ChartAudioMixer.Entry]: boolean}
+	---@type {[rizu.audio.SoftwareMixer.Entry]: boolean}
 	self.active_sounds = {}
 	self.next_to_add = nil
 	self.next_to_remove = nil
@@ -122,7 +122,7 @@ function ChartAudioMixer:new(sounds, decoders)
 		self.empty = true
 		self.start_pos = 0
 		self.end_pos = 0
-		self.dummy_decoder = FakeSoundDecoder(1, 44100, 2)
+		self.dummy_decoder = FakeDecoder(1, 44100, 2)
 	end
 
 	self.position = self.start_pos
@@ -147,7 +147,7 @@ local function find_lower_bound(tree, key)
 end
 
 ---@private
-function ChartAudioMixer:resetActiveSet()
+function SoftwareMixer:resetActiveSet()
 	self.active_sounds = {}
 	local pos = self.position
 
@@ -173,8 +173,8 @@ function ChartAudioMixer:resetActiveSet()
 end
 
 ---@param sound rizu.ChartAudioSound
----@param decoder rizu.ISoundDecoder?
-function ChartAudioMixer:addSound(sound, decoder)
+---@param decoder rizu.audio.IDecoder?
+function SoftwareMixer:addSound(sound, decoder)
 	if not decoder then
 		return
 	end
@@ -206,8 +206,8 @@ function ChartAudioMixer:addSound(sound, decoder)
 	self:resetActiveSet()
 end
 
----@param decoder rizu.ISoundDecoder
-function ChartAudioMixer:removeSound(decoder)
+---@param decoder rizu.audio.IDecoder
+function SoftwareMixer:removeSound(decoder)
 	local entry = self.decoder_to_entry[decoder]
 	if not entry then
 		return
@@ -227,13 +227,13 @@ function ChartAudioMixer:removeSound(decoder)
 		self.start_pos = 0
 		self.end_pos = 0
 		self.max_duration_bytes = 0
-		self.dummy_decoder = FakeSoundDecoder(1, 44100, 2)
+		self.dummy_decoder = FakeDecoder(1, 44100, 2)
 	end
 
 	self:resetActiveSet()
 end
 
-function ChartAudioMixer:recalculateBounds()
+function SoftwareMixer:recalculateBounds()
 	self.start_pos = math.huge
 	self.end_pos = -math.huge
 	self.max_duration_bytes = 0
@@ -253,11 +253,11 @@ end
 
 ---@return number
 ---@return number
-function ChartAudioMixer:getTimeBounds()
+function SoftwareMixer:getTimeBounds()
 	return self:bytesToSeconds(self.start_pos), self:bytesToSeconds(self.end_pos)
 end
 
-function ChartAudioMixer:release()
+function SoftwareMixer:release()
 	for _, entry in pairs(self.decoder_to_entry) do
 		entry.decoder:release()
 	end
@@ -300,7 +300,7 @@ end
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
-function ChartAudioMixer:getData(buf, len)
+function SoftwareMixer:getData(buf, len)
 	len = self:floorBytes(len)
 
 	if self.empty then
@@ -371,28 +371,28 @@ end
 
 ---@param bytes integer
 ---@return integer
-function ChartAudioMixer:floorBytes(bytes)
+function SoftwareMixer:floorBytes(bytes)
 	local mul = self.channels * self.bytes_per_sample
 	return math.floor(bytes / mul) * mul
 end
 
 ---@return number
-function ChartAudioMixer:getPosition()
+function SoftwareMixer:getPosition()
 	return self:bytesToSeconds(self.position)
 end
 
 ---@return integer
-function ChartAudioMixer:getBytesPosition()
+function SoftwareMixer:getBytesPosition()
 	return self.position
 end
 
 ---@param pos number
-function ChartAudioMixer:setPosition(pos)
+function SoftwareMixer:setPosition(pos)
 	self:setBytesPosition(self:secondsToBytes(pos))
 end
 
 ---@param pos integer
-function ChartAudioMixer:setBytesPosition(pos)
+function SoftwareMixer:setBytesPosition(pos)
 	if pos ~= self.position then
 		self.position = pos
 		self:resetActiveSet()
@@ -400,41 +400,41 @@ function ChartAudioMixer:setBytesPosition(pos)
 end
 
 ---@return integer
-function ChartAudioMixer:getBytesDuration()
+function SoftwareMixer:getBytesDuration()
 	return self.end_pos - self.start_pos
 end
 
 ---@return integer
-function ChartAudioMixer:getSamplesDuration()
+function SoftwareMixer:getSamplesDuration()
 	local mul = self.channels * self.bytes_per_sample
 	return self:getBytesDuration() / mul
 end
 
 ---@param pos integer
 ---@return number
-function ChartAudioMixer:bytesToSeconds(pos)
+function SoftwareMixer:bytesToSeconds(pos)
 	return pos / (self.sample_rate * self.channels * self.bytes_per_sample)
 end
 
 ---@param pos number
 ---@return integer
-function ChartAudioMixer:secondsToBytes(pos)
+function SoftwareMixer:secondsToBytes(pos)
 	return math.floor(pos * self.sample_rate) * self.channels * self.bytes_per_sample
 end
 
 ---@return integer
-function ChartAudioMixer:getSampleRate()
+function SoftwareMixer:getSampleRate()
 	return self.sample_rate
 end
 
 ---@return integer
-function ChartAudioMixer:getChannelCount()
+function SoftwareMixer:getChannelCount()
 	return self.channels
 end
 
 ---@return integer
-function ChartAudioMixer:getBytesPerSample()
+function SoftwareMixer:getBytesPerSample()
 	return self.bytes_per_sample
 end
 
-return ChartAudioMixer
+return SoftwareMixer

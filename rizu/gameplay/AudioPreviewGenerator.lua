@@ -8,7 +8,7 @@ local OJM = require("o2jam.OJM")
 local AudioPreviewGenerator = class()
 
 ---@param fs fs.IFilesystem
----@param decoder_factory fun(data: string): rizu.ISoundDecoder
+---@param decoder_factory fun(data: string): rizu.audio.IDecoder
 function AudioPreviewGenerator:new(fs, decoder_factory)
 	self.fs = assert(fs, "missing fs")
 	self.decoder_factory = assert(decoder_factory, "missing decoder_factory")

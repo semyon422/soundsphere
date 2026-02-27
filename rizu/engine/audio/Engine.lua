@@ -1,48 +1,48 @@
 local class = require("class")
 local Wave = require("audio.Wave")
 local ChartAudio = require("rizu.engine.audio.ChartAudio")
-local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
-local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
-local FakeAudioProvider = require("rizu.engine.audio.FakeAudioProvider")
-local BassAudioProvider = require("rizu.engine.audio.BassAudioProvider")
+local ISource = require("rizu.engine.audio.ISource")
+local SoftwareMixer = require("rizu.engine.audio.SoftwareMixer")
+local FakeProvider = require("rizu.engine.audio.fake.Provider")
+local BassProvider = require("rizu.engine.audio.bass.Provider")
 
----@class rizu.AudioEngine
----@operator call: rizu.AudioEngine
----@field source rizu.IChartAudioSource
----@field foregroundSource rizu.IChartAudioSource
----@field provider rizu.IAudioProvider
-local AudioEngine = class()
+---@class rizu.audio.Engine
+---@operator call: rizu.audio.Engine
+---@field source rizu.audio.ISource
+---@field foregroundSource rizu.audio.ISource
+---@field provider rizu.audio.IProvider
+local Engine = class()
 
-AudioEngine.music_volume = 1
-AudioEngine.keysounds_volume = 1
+Engine.music_volume = 1
+Engine.keysounds_volume = 1
 
-function AudioEngine:new()
+function Engine:new()
 	---@type {[string]: audio.Wave}
 	self.soundDataCache = {}
 	self.mode = {primary = "bass_sample", secondary = "bass_sample"}
-	self.source = IChartAudioSource()
-	self.foregroundSource = IChartAudioSource()
-	self.provider = FakeAudioProvider()
+	self.source = ISource()
+	self.foregroundSource = ISource()
+	self.provider = FakeProvider()
 end
 
 ---@param mode {primary: string, secondary: string}
-function AudioEngine:setAudioMode(mode)
+function Engine:setAudioMode(mode)
 	self.mode = mode
 end
 
 ---@param enabled boolean
-function AudioEngine:setEnabled(enabled)
+function Engine:setEnabled(enabled)
 	if enabled then
-		self.provider = BassAudioProvider()
+		self.provider = BassProvider()
 	else
-		self.provider = FakeAudioProvider()
+		self.provider = FakeProvider()
 	end
 end
 
 ---@param chart ncdk2.Chart
 ---@param resources {[string]: string}?
 ---@param auto_key_sound boolean?
-function AudioEngine:load(chart, resources, auto_key_sound)
+function Engine:load(chart, resources, auto_key_sound)
 	self.resources = resources or {}
 
 	local use_tempo_secondary = self.mode.secondary == "bass_fx_tempo"
@@ -54,7 +54,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 
 	chart_audio:load(chart, auto_key_sound)
 
-	---@type {[integer]: rizu.ISoundDecoder}
+	---@type {[integer]: rizu.audio.IDecoder}
 	local decoders = {}
 	for i, sound in ipairs(chart_audio.sounds) do
 		local data = self.resources[sound.name]
@@ -63,7 +63,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 		end
 	end
 
-	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
+	self.mixer = SoftwareMixer(chart_audio.sounds, decoders)
 	if not self.mixer.empty then
 		local use_tempo = self.mode.primary == "bass_fx_tempo"
 		self.source = self.provider:createChartSource(self.mixer, use_tempo)
@@ -74,7 +74,7 @@ end
 ---@param name string
 ---@param volume number?
 ---@param offset number?
-function AudioEngine:playSample(name, volume, offset)
+function Engine:playSample(name, volume, offset)
 	if not self.resources then
 		return
 	end
@@ -90,10 +90,10 @@ function AudioEngine:playSample(name, volume, offset)
 	self.foregroundSource:addSound(decoder, volume)
 end
 
-function AudioEngine:unload()
+function Engine:unload()
 	if self.source then
 		self.source:release()
-		self.source = IChartAudioSource()
+		self.source = ISource()
 	end
 
 	if self.mixer then
@@ -103,7 +103,7 @@ function AudioEngine:unload()
 
 	if self.foregroundSource then
 		self.foregroundSource:release()
-		self.foregroundSource = IChartAudioSource()
+		self.foregroundSource = ISource()
 	end
 
 	self.chart_audio = nil
@@ -112,7 +112,7 @@ function AudioEngine:unload()
 end
 
 ---@return number
-function AudioEngine:getStartTime()
+function Engine:getStartTime()
 	local chart_audio = self.chart_audio
 	if not chart_audio then
 		return 0
@@ -121,7 +121,7 @@ function AudioEngine:getStartTime()
 end
 
 ---@return audio.Wave
-function AudioEngine:renderWave()
+function Engine:renderWave()
 	local mixer = self.mixer
 	local wave = Wave()
 	wave:initBuffer(mixer:getChannelCount(), mixer:getSamplesDuration())
@@ -130,34 +130,34 @@ function AudioEngine:renderWave()
 end
 
 ---@return number?
-function AudioEngine:getPosition()
+function Engine:getPosition()
 	return self.source:getPosition()
 end
 
-function AudioEngine:update()
+function Engine:update()
 	self.source:update()
 	self.foregroundSource:update()
 end
 
-function AudioEngine:play()
+function Engine:play()
 	self.source:play()
 	self.foregroundSource:play()
 end
 
-function AudioEngine:pause()
+function Engine:pause()
 	self.source:pause()
 	self.foregroundSource:pause()
 end
 
 ---@param rate number
-function AudioEngine:setRate(rate)
+function Engine:setRate(rate)
 	self.source:setRate(rate)
 	self.foregroundSource:setRate(rate)
 end
 
 ---@param music_volume number
 ---@param keysounds_volume number
-function AudioEngine:setVolume(music_volume, keysounds_volume)
+function Engine:setVolume(music_volume, keysounds_volume)
 	self.music_volume = music_volume
 	self.keysounds_volume = keysounds_volume
 	self.source:setVolume(music_volume)
@@ -165,11 +165,11 @@ function AudioEngine:setVolume(music_volume, keysounds_volume)
 end
 
 ---@param position number
-function AudioEngine:setPosition(position)
+function Engine:setPosition(position)
 	self.source:setPosition(position)
 	-- Hitsounds usually don't seek with the song position,
 	-- but we can reset the foreground mixer if needed.
 	-- Currently we just let it be.
 end
 
-return AudioEngine
+return Engine

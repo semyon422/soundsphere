@@ -1,4 +1,4 @@
-local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
+local ISource = require("rizu.engine.audio.ISource")
 local ffi = require("ffi")
 local bass = require("bass")
 local bass_fx = require("bass.fx")
@@ -17,13 +17,13 @@ local fft_flags = {
 	[32768] = bass_fft.BASS_DATA_FFT32768,
 }
 
----@class rizu.BassChartAudioSource: rizu.IChartAudioSource
----@operator call: rizu.BassChartAudioSource
-local BassChartAudioSource = IChartAudioSource + {}
+---@class rizu.audio.bass.Source: rizu.audio.ISource
+---@operator call: rizu.audio.bass.Source
+local Source = ISource + {}
 
----@param decoder rizu.ISoundDecoder
+---@param decoder rizu.audio.IDecoder
 ---@param use_tempo boolean?
-function BassChartAudioSource:new(decoder, use_tempo)
+function Source:new(decoder, use_tempo)
 	self.decoder = decoder
 	self.use_tempo = use_tempo
 
@@ -62,26 +62,26 @@ function BassChartAudioSource:new(decoder, use_tempo)
 	self.pos_offset = 0
 end
 
-function BassChartAudioSource:release()
+function Source:release()
 	bass_assert(bass.BASS_ChannelFree(self.channel) == 1)
 	ffi.gc(self.buf, nil)
 end
 
-function BassChartAudioSource:play()
+function Source:play()
 	bass_assert(bass.BASS_ChannelPlay(self.channel, false) == 1)
 end
 
-function BassChartAudioSource:pause()
+function Source:pause()
 	bass.BASS_ChannelPause(self.channel)
 end
 
 ---@return boolean
-function BassChartAudioSource:isPlaying()
+function Source:isPlaying()
 	return bass.BASS_ChannelIsActive(self.channel) == bass_flags.BASS_ACTIVE_PLAYING
 end
 
 ---@param rate number
-function BassChartAudioSource:setRate(rate)
+function Source:setRate(rate)
 	if self.use_tempo then
 		bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_TEMPO, (rate - 1) * 100) == 1)
 	else
@@ -90,7 +90,7 @@ function BassChartAudioSource:setRate(rate)
 end
 
 ---@return number
-function BassChartAudioSource:getPosition()
+function Source:getPosition()
 	---@type integer
 	local pos = bass.BASS_ChannelGetPosition(self.channel, bass_flags.BASS_POS_BYTE)
 	bass_assert(pos >= 0)
@@ -101,7 +101,7 @@ function BassChartAudioSource:getPosition()
 end
 
 ---@param pos number
-function BassChartAudioSource:setPosition(pos)
+function Source:setPosition(pos)
 	self.pos_offset = pos
 
 	self.decoder:setPosition(pos)
@@ -114,12 +114,12 @@ function BassChartAudioSource:setPosition(pos)
 end
 
 ---@param volume number
-function BassChartAudioSource:setVolume(volume)
+function Source:setVolume(volume)
 	bass_assert(bass.BASS_ChannelSetAttribute(self.channel, bass_flags.BASS_ATTRIB_VOL, volume) == 1)
 end
 
 ---@param size integer
-function BassChartAudioSource:setFFTSize(size)
+function Source:setFFTSize(size)
 	local flag = fft_flags[size]
 	if not flag then
 		error("Invalid FFT size: " .. tostring(size))
@@ -129,7 +129,7 @@ function BassChartAudioSource:setFFTSize(size)
 end
 
 ---@return ffi.cdata*?
-function BassChartAudioSource:getFFT()
+function Source:getFFT()
 	if not self.fft_buffer then
 		return nil
 	end
@@ -138,14 +138,14 @@ function BassChartAudioSource:getFFT()
 end
 
 ---@private
-function BassChartAudioSource:getNeedBytesSource()
+function Source:getNeedBytesSource()
 	---@type integer
 	local available = bass.BASS_ChannelGetData(self.source_channel, nil, bass_flags.BASS_DATA_AVAILABLE)
 	return self.buf_len - available
 end
 
 ---@private
-function BassChartAudioSource:getNeedBytesTempo()
+function Source:getNeedBytesTempo()
 	---@type integer
 	local available_source = bass.BASS_StreamPutData(self.source_channel, nil, 0)
 
@@ -157,7 +157,7 @@ function BassChartAudioSource:getNeedBytesTempo()
 	return self.buf_len - available_source
 end
 
-function BassChartAudioSource:update()
+function Source:update()
 	local need_bytes = 0
 
 	if not self.use_tempo then
@@ -178,4 +178,4 @@ function BassChartAudioSource:update()
 	end
 end
 
-return BassChartAudioSource
+return Source

@@ -1,17 +1,17 @@
-local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local IDecoder = require("rizu.engine.audio.IDecoder")
 local bit = require("bit")
 local bass = require("bass")
 local bass_assert = require("bass.assert")
 local bass_mix = require("bass.mix")
 local bass_flags = require("bass.flags")
 
----@class rizu.BassSoundDecoder: rizu.ISoundDecoder
----@operator call: rizu.BassSoundDecoder
-local BassSoundDecoder = ISoundDecoder + {}
+---@class rizu.audio.bass.Decoder: rizu.audio.IDecoder
+---@operator call: rizu.audio.bass.Decoder
+local Decoder = IDecoder + {}
 
-BassSoundDecoder.sample_rate = 44100
-BassSoundDecoder.channels_count = 2
-BassSoundDecoder.bytes_per_sample = 2
+Decoder.sample_rate = 44100
+Decoder.channels_count = 2
+Decoder.bytes_per_sample = 2
 
 ---@param channel integer
 ---@return integer
@@ -23,7 +23,7 @@ local function get_length(channel)
 end
 
 ---@param data string
-function BassSoundDecoder:new(data)
+function Decoder:new(data)
 	self.data = data
 
 	---@type integer
@@ -51,7 +51,7 @@ function BassSoundDecoder:new(data)
 	end
 end
 
-function BassSoundDecoder:release()
+function Decoder:release()
 	if self.released then
 		return
 	end
@@ -63,7 +63,7 @@ end
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
-function BassSoundDecoder:getData(buf, len)
+function Decoder:getData(buf, len)
 	---@type integer
 	local data_bytes = bass.BASS_ChannelGetData(self.resample_channel, buf, len)
 	bass_assert(data_bytes ~= -1)
@@ -73,7 +73,7 @@ end
 
 ---@param pos integer
 ---@return number
-function BassSoundDecoder:bytesToSeconds(pos)
+function Decoder:bytesToSeconds(pos)
 	---@type number
 	pos = bass.BASS_ChannelBytes2Seconds(self.resample_channel, pos)
 	bass_assert(pos >= 0)
@@ -82,7 +82,7 @@ end
 
 ---@param pos number
 ---@return integer
-function BassSoundDecoder:secondsToBytes(pos)
+function Decoder:secondsToBytes(pos)
 	---@type integer
 	pos = bass.BASS_ChannelSeconds2Bytes(self.resample_channel, pos)
 	bass_assert(pos ~= -1)
@@ -90,12 +90,12 @@ function BassSoundDecoder:secondsToBytes(pos)
 end
 
 ---@return integer
-function BassSoundDecoder:getBytesPosition()
+function Decoder:getBytesPosition()
 	return self.position
 end
 
 ---@param pos integer
-function BassSoundDecoder:setBytesPosition(pos)
+function Decoder:setBytesPosition(pos)
 	self.position = pos
 	---@type integer
 	pos = bass_mix.BASS_Mixer_ChannelSetPosition(self.decode_channel, pos, bass_flags.BASS_POS_BYTE)
@@ -103,23 +103,23 @@ function BassSoundDecoder:setBytesPosition(pos)
 end
 
 ---@return integer
-function BassSoundDecoder:getBytesDuration()
+function Decoder:getBytesDuration()
 	return self.length
 end
 
 ---@return integer
-function BassSoundDecoder:getSampleRate()
+function Decoder:getSampleRate()
 	return self.sample_rate
 end
 
 ---@return integer
-function BassSoundDecoder:getChannelCount()
+function Decoder:getChannelCount()
 	return self.channels_count
 end
 
 ---@return integer
-function BassSoundDecoder:getBytesPerSample()
+function Decoder:getBytesPerSample()
 	return self.bytes_per_sample
 end
 
-return BassSoundDecoder
+return Decoder

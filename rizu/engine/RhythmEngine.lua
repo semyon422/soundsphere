@@ -3,7 +3,7 @@ local class = require("class")
 local InputEngine = require("rizu.engine.input.InputEngine")
 local ActiveInputNotes = require("rizu.engine.input.ActiveInputNotes")
 
-local AudioEngine = require("rizu.engine.audio.AudioEngine")
+local AudioEngine = require("rizu.engine.audio.Engine")
 local TimeEngine = require("rizu.engine.time.TimeEngine")
 
 local LogicInfo = require("rizu.engine.logic.LogicInfo")

@@ -1,20 +1,20 @@
 local class = require("class")
 local ffi = require("ffi")
 
----@class rizu.ISoundDecoder
----@operator call: rizu.ISoundDecoder
-local ISoundDecoder = class()
+---@class rizu.audio.IDecoder
+---@operator call: rizu.audio.IDecoder
+local IDecoder = class()
 
 ---@param buf ffi.cdata*
 ---@param len integer
 ---@return integer
-function ISoundDecoder:getData(buf, len)
+function IDecoder:getData(buf, len)
 	error("not implemented")
 end
 
 ---@param len integer
 ---@return string
-function ISoundDecoder:getDataString(len)
+function IDecoder:getDataString(len)
 	local buf = ffi.new("int8_t[?]", len)
 	local read = self:getData(buf, len)
 	return ffi.string(buf, read)
@@ -22,61 +22,61 @@ end
 
 ---@param pos integer
 ---@return number
-function ISoundDecoder:bytesToSeconds(pos)
+function IDecoder:bytesToSeconds(pos)
 	error("not implemented")
 end
 
 ---@param pos number
 ---@return integer
-function ISoundDecoder:secondsToBytes(pos)
+function IDecoder:secondsToBytes(pos)
 	error("not implemented")
 end
 
 ---@return number
-function ISoundDecoder:getPosition()
+function IDecoder:getPosition()
 	return self:bytesToSeconds(self:getBytesPosition())
 end
 
 ---@return integer
-function ISoundDecoder:getBytesPosition()
+function IDecoder:getBytesPosition()
 	error("not implemented")
 end
 
 ---@param pos number
-function ISoundDecoder:setPosition(pos)
+function IDecoder:setPosition(pos)
 	self:setBytesPosition(self:secondsToBytes(pos))
 end
 
 ---@param pos integer
-function ISoundDecoder:setBytesPosition(pos)
+function IDecoder:setBytesPosition(pos)
 	error("not implemented")
 end
 
 ---@return number
-function ISoundDecoder:getDuration()
+function IDecoder:getDuration()
 	return self:bytesToSeconds(self:getBytesDuration())
 end
 
 ---@return integer
-function ISoundDecoder:getBytesDuration()
+function IDecoder:getBytesDuration()
 	error("not implemented")
 end
 
 ---@return integer
-function ISoundDecoder:getSampleRate()
+function IDecoder:getSampleRate()
 	error("not implemented")
 end
 
 ---@return integer
-function ISoundDecoder:getChannelCount()
+function IDecoder:getChannelCount()
 	error("not implemented")
 end
 
 ---@return integer
-function ISoundDecoder:getBytesPerSample()
+function IDecoder:getBytesPerSample()
 	error("not implemented")
 end
 
-function ISoundDecoder:release() end
+function IDecoder:release() end
 
-return ISoundDecoder
+return IDecoder

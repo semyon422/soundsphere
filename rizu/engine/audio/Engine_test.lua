@@ -1,7 +1,4 @@
-local AudioEngine = require("rizu.engine.audio.AudioEngine")
-local FakeSoundDecoder = require("rizu.engine.audio.FakeSoundDecoder")
-local FakeChartAudioSource = require("rizu.engine.audio.FakeChartAudioSource")
-local FakeMixerSource = require("rizu.engine.audio.FakeMixerSource")
+local AudioEngine = require("rizu.engine.audio.Engine")
 
 local test = {}
 
@@ -35,10 +32,10 @@ function test.load_and_play(t)
 	t:eq(engine:getStartTime(), 1)
 
 	engine:play()
-	t:assert(engine.source.playing)
+	t:assert(engine.source:isPlaying())
 
 	engine:update()
-	t:assert(engine.source.position > 0)
+	t:assert(engine.source:getPosition() > 0)
 
 	engine:playSample("bg", 0.5)
 	t:eq(#engine.foregroundSource.active_sounds, 1)

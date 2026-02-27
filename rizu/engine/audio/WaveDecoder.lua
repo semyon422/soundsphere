@@ -1,19 +1,19 @@
-local ISoundDecoder = require("rizu.engine.audio.ISoundDecoder")
+local IDecoder = require("rizu.engine.audio.IDecoder")
 local Wave = require("audio.Wave")
 local ffi = require("ffi")
 
----@class rizu.WaveSoundDecoder: rizu.ISoundDecoder
----@operator call: rizu.WaveSoundDecoder
-local WaveSoundDecoder = ISoundDecoder + {}
+---@class rizu.audio.WaveDecoder: rizu.audio.IDecoder
+---@operator call: rizu.audio.WaveDecoder
+local WaveDecoder = IDecoder + {}
 
 ---@param data string
-function WaveSoundDecoder:new(data)
+function WaveDecoder:new(data)
 	self.wave = Wave()
 	self.wave:decode(data)
 	self.position = 0
 end
 
-function WaveSoundDecoder:getData(buf, len)
+function WaveDecoder:getData(buf, len)
 	local data_size = self.wave:getDataSize()
 	local remaining = data_size - self.position
 	local to_read = math.min(len, remaining)
@@ -26,36 +26,36 @@ function WaveSoundDecoder:getData(buf, len)
 	return to_read
 end
 
-function WaveSoundDecoder:bytesToSeconds(pos)
+function WaveDecoder:bytesToSeconds(pos)
 	return self.wave:bytesToSeconds(pos)
 end
 
-function WaveSoundDecoder:secondsToBytes(pos)
+function WaveDecoder:secondsToBytes(pos)
 	return self.wave:secondsToBytes(pos)
 end
 
-function WaveSoundDecoder:getBytesPosition()
+function WaveDecoder:getBytesPosition()
 	return self.position
 end
 
-function WaveSoundDecoder:setBytesPosition(pos)
+function WaveDecoder:setBytesPosition(pos)
 	self.position = math.min(math.max(pos, 0), self.wave:getDataSize())
 end
 
-function WaveSoundDecoder:getBytesDuration()
+function WaveDecoder:getBytesDuration()
 	return self.wave:getDataSize()
 end
 
-function WaveSoundDecoder:getSampleRate()
+function WaveDecoder:getSampleRate()
 	return self.wave.sample_rate
 end
 
-function WaveSoundDecoder:getChannelCount()
+function WaveDecoder:getChannelCount()
 	return self.wave.channels_count
 end
 
-function WaveSoundDecoder:getBytesPerSample()
+function WaveDecoder:getBytesPerSample()
 	return self.wave.bytes_per_sample
 end
 
-return WaveSoundDecoder
+return WaveDecoder
