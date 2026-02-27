@@ -3,16 +3,15 @@ local Wave = require("audio.Wave")
 local ChartAudio = require("rizu.engine.audio.ChartAudio")
 local IChartAudioSource = require("rizu.engine.audio.IChartAudioSource")
 local ChartAudioMixer = require("rizu.engine.audio.ChartAudioMixer")
+local FakeAudioProvider = require("rizu.engine.audio.FakeAudioProvider")
+local BassAudioProvider = require("rizu.engine.audio.BassAudioProvider")
 
 ---@class rizu.AudioEngine
 ---@operator call: rizu.AudioEngine
 ---@field source rizu.IChartAudioSource
 ---@field foregroundSource rizu.IChartAudioSource
+---@field provider rizu.IAudioProvider
 local AudioEngine = class()
-
-AudioEngine.DecoderClass = require("rizu.engine.audio.FakeSoundDecoder")
-AudioEngine.SourceClass = require("rizu.engine.audio.FakeChartAudioSource")
-AudioEngine.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
 
 AudioEngine.music_volume = 1
 AudioEngine.keysounds_volume = 1
@@ -23,6 +22,7 @@ function AudioEngine:new()
 	self.mode = {primary = "bass_sample", secondary = "bass_sample"}
 	self.source = IChartAudioSource()
 	self.foregroundSource = IChartAudioSource()
+	self.provider = FakeAudioProvider()
 end
 
 ---@param mode {primary: string, secondary: string}
@@ -33,13 +33,9 @@ end
 ---@param enabled boolean
 function AudioEngine:setEnabled(enabled)
 	if enabled then
-		self.DecoderClass = require("rizu.engine.audio.BassSoundDecoder")
-		self.SourceClass = require("rizu.engine.audio.BassChartAudioSource")
-		self.MixerSourceClass = require("rizu.engine.audio.BassMixerSource")
+		self.provider = BassAudioProvider()
 	else
-		self.DecoderClass = require("rizu.engine.audio.FakeSoundDecoder")
-		self.SourceClass = require("rizu.engine.audio.FakeChartAudioSource")
-		self.MixerSourceClass = require("rizu.engine.audio.FakeMixerSource")
+		self.provider = FakeAudioProvider()
 	end
 end
 
@@ -50,7 +46,7 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 	self.resources = resources or {}
 
 	local use_tempo_secondary = self.mode.secondary == "bass_fx_tempo"
-	self.foregroundSource = self.MixerSourceClass(use_tempo_secondary)
+	self.foregroundSource = self.provider:createMixerSource(use_tempo_secondary)
 	self.foregroundSource:setVolume(self.keysounds_volume)
 
 	local chart_audio = ChartAudio()
@@ -63,14 +59,14 @@ function AudioEngine:load(chart, resources, auto_key_sound)
 	for i, sound in ipairs(chart_audio.sounds) do
 		local data = self.resources[sound.name]
 		if data then
-			decoders[i] = self.DecoderClass(data)
+			decoders[i] = self.provider:createDecoder(data)
 		end
 	end
 
 	self.mixer = ChartAudioMixer(chart_audio.sounds, decoders)
 	if not self.mixer.empty then
 		local use_tempo = self.mode.primary == "bass_fx_tempo"
-		self.source = self.SourceClass(self.mixer, use_tempo)
+		self.source = self.provider:createChartSource(self.mixer, use_tempo)
 		self.source:setVolume(self.music_volume)
 	end
 end
@@ -87,7 +83,7 @@ function AudioEngine:playSample(name, volume, offset)
 		return
 	end
 
-	local decoder = self.DecoderClass(data)
+	local decoder = self.provider:createDecoder(data)
 	if offset and offset > 0 then
 		decoder:setPosition(offset)
 	end

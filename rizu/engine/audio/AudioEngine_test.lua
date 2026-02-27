@@ -8,9 +8,7 @@ local test = {}
 ---@param t testing.T
 function test.load_and_play(t)
 	local engine = AudioEngine()
-	engine.DecoderClass = FakeSoundDecoder
-	engine.SourceClass = FakeChartAudioSource
-	engine.MixerSourceClass = FakeMixerSource
+	engine:setEnabled(false) -- Ensures FakeAudioProvider is used
 
 	local chart = {
 		notes = {
