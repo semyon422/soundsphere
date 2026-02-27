@@ -10,6 +10,24 @@ local VisualEngine = class()
 
 VisualEngine.range = 1
 
+---@param notes rizu.VisualNote[]
+---@param time number
+---@return integer
+local function _findBgaIndex(notes, time)
+	local low, high = 1, #notes
+	local ans = 1
+	while low <= high do
+		local mid = math.floor((low + high) / 2)
+		if notes[mid].linked_note:getStartTime() <= time then
+			ans = mid
+			low = mid + 1
+		else
+			high = mid - 1
+		end
+	end
+	return ans
+end
+
 ---@param action -1|1
 ---@return true?
 local function true_from_action(action)
@@ -103,29 +121,50 @@ function VisualEngine:load(chart, lazy_scrollers)
 end
 
 function VisualEngine:update()
+	local time = self.visual_info:getTime()
+
+	table_util.clear(self.point_events)
+
+	self:_updateInterpolation(time)
+	self:_updateScrollers(time)
+	self:_updateBgas(time)
+	self:_updateEventProcessing()
+	self:_updateVisibleNotes()
+end
+
+---@param time number
+function VisualEngine:_updateInterpolation(time)
+	for visual, cvp in pairs(self.cvp) do
+		cvp.point.absoluteTime = time
+		visual.interpolator:interpolate(visual.points, cvp, "absolute")
+	end
+end
+
+---@param time number
+function VisualEngine:_updateScrollers(time)
 	local range = self.range
 	local visual_info = self.visual_info
-
-	local visible_notes_map = self.visible_notes_map
-
-	local point_events = self.point_events
 	local handle_event = self.handle_event
-	table_util.clear(point_events)
 
 	for visual, cvp in pairs(self.cvp) do
-		cvp.point.absoluteTime = visual_info:getTime()
-		visual.interpolator:interpolate(visual.points, cvp, "absolute")
-
 		if not visual.bga then
 			-- TODO: implement const for scroller
-			visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
+			visual.scroller:scroll(time, handle_event)
 			visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
 		end
 	end
+end
 
+---@param time number
+function VisualEngine:_updateBgas(time)
 	for column in pairs(self.bga_notes) do
-		self:updateBga(column, visual_info:getTime())
+		self:updateBga(column, time)
 	end
+end
+
+function VisualEngine:_updateEventProcessing()
+	local point_events = self.point_events
+	local visible_notes_map = self.visible_notes_map
 
 	-- TODO: fix a bug with LN disappearing
 	-- when you increase play speed and LN tail get hide event
@@ -143,11 +182,13 @@ function VisualEngine:update()
 			end
 		end
 	end
+end
 
+function VisualEngine:_updateVisibleNotes()
 	local visible_notes = self.visible_notes
 	table_util.clear(visible_notes)
 
-	for note in pairs(visible_notes_map) do
+	for note in pairs(self.visible_notes_map) do
 		note:update()
 		table.insert(visible_notes, note)
 	end
@@ -158,27 +199,29 @@ end
 ---@param column ncdk2.Column
 ---@param time number
 function VisualEngine:updateBga(column, time)
-	-- if column ~= "bmsbga4" then return end
 	local notes = self.bga_notes[column]
-	local index = 1
-	for i, note in ipairs(notes) do
-		if note.linked_note:getStartTime() <= time then
-			index = i
-		else
-			break
+	local last_index = self.last_bga_index[column]
+
+	---@type integer?
+	local index
+	if last_index and notes[last_index].linked_note:getStartTime() <= time then
+		index = last_index
+		for i = last_index + 1, #notes do
+			if notes[i].linked_note:getStartTime() <= time then
+				index = i
+			else
+				break
+			end
 		end
+	else
+		index = _findBgaIndex(notes, time)
 	end
 
-	local last_index = self.last_bga_index[column]
 	if last_index ~= index then
 		if last_index then
-			local old_note = notes[last_index]
-			pprint({"hide", self.visual_info.time, old_note.linked_note.startNote})
-			self.handle_event(old_note.linked_note.startNote.visualPoint, -1)
+			self.handle_event(notes[last_index].linked_note.startNote.visualPoint, -1)
 		end
-		local new_note = notes[index]
-		pprint({"show", self.visual_info.time, new_note.linked_note.startNote})
-		self.handle_event(new_note.linked_note.startNote.visualPoint, 1)
+		self.handle_event(notes[index].linked_note.startNote.visualPoint, 1)
 		self.last_bga_index[column] = index
 	end
 end
