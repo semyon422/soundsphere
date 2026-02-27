@@ -61,6 +61,11 @@ function VisualEngine:load(chart, lazy_scrollers)
 	---@type {[ncdk2.VisualPoint]: {linked_note: ncdk2.LinkedNote, visual_note: rizu.VisualNote}[]}
 	self.point_notes = {}
 
+	---@type {[ncdk2.Column]: rizu.VisualNote[]}
+	self.bga_notes = {}
+	---@type {[ncdk2.Column]: integer}
+	self.last_bga_index = {}
+
 	for _, visual in ipairs(chart:getVisuals()) do
 		self.cvp[visual] = VisualPoint(Point())
 		visual:generateEvents(lazy_scrollers)
@@ -81,7 +86,19 @@ function VisualEngine:load(chart, lazy_scrollers)
 			visual_note.visual = visual
 
 			self:addNote(linked_note, visual_note)
+
+			if visual.bga then
+				visual_note.is_bga = true
+				local column = linked_note:getColumn()
+
+				self.bga_notes[column] = self.bga_notes[column] or {}
+				table.insert(self.bga_notes[column], visual_note)
+			end
 		end
+	end
+
+	for _, notes in pairs(self.bga_notes) do
+		table.sort(notes)
 	end
 end
 
@@ -99,9 +116,15 @@ function VisualEngine:update()
 		cvp.point.absoluteTime = visual_info:getTime()
 		visual.interpolator:interpolate(visual.points, cvp, "absolute")
 
-		-- TODO: implement const for scroller
-		visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
-		visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
+		if not visual.bga then
+			-- TODO: implement const for scroller
+			visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
+			visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
+		end
+	end
+
+	for column in pairs(self.bga_notes) do
+		self:updateBga(column, visual_info:getTime())
 	end
 
 	-- TODO: fix a bug with LN disappearing
@@ -130,6 +153,34 @@ function VisualEngine:update()
 	end
 
 	table.sort(visible_notes)
+end
+
+---@param column ncdk2.Column
+---@param time number
+function VisualEngine:updateBga(column, time)
+	-- if column ~= "bmsbga4" then return end
+	local notes = self.bga_notes[column]
+	local index = 1
+	for i, note in ipairs(notes) do
+		if note.linked_note:getStartTime() <= time then
+			index = i
+		else
+			break
+		end
+	end
+
+	local last_index = self.last_bga_index[column]
+	if last_index ~= index then
+		if last_index then
+			local old_note = notes[last_index]
+			pprint({"hide", self.visual_info.time, old_note.linked_note.startNote})
+			self.handle_event(old_note.linked_note.startNote.visualPoint, -1)
+		end
+		local new_note = notes[index]
+		pprint({"show", self.visual_info.time, new_note.linked_note.startNote})
+		self.handle_event(new_note.linked_note.startNote.visualPoint, 1)
+		self.last_bga_index[column] = index
+	end
 end
 
 return VisualEngine

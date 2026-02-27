@@ -35,7 +35,8 @@ function VisualNoteFactory:getNote(linked_note)
 
 	local _type = types[linked_note:getType()]
 	if _type == "ImageNote" then
-		local image = linked_note.startNote.data.images[1]
+		local images = linked_note.startNote.data.images
+		local image = images and images[1]
 		if image then
 			local _, ext = path_util.name_ext(image[1])
 			if ResourceFinder:getFormat(ext) == "video" then
