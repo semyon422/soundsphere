@@ -6,6 +6,7 @@ userdata/screenshots/*
 userdata/backgrounds/*
 userdata/ui_themes/*
 userdata/audio_previews
+userdata/bga_previews
 userdata/pkg
 userdata/charts
 userdata/export
