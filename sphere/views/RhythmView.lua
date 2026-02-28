@@ -51,6 +51,8 @@ function RhythmView:drawNote(note)
 		noteView.graphicalNote = note
 		noteView.rhythmView = self
 		noteView.resource_loader = self.game.resource_loader
+		noteView.sprite_engine = self.game.rhythm_engine.sprite_engine
+		noteView.video_engine = self.game.rhythm_engine.video_engine
 		noteView:draw()
 	end
 end

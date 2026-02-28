@@ -11,6 +11,10 @@ local LogicEngine = require("rizu.engine.logic.LogicEngine")
 
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
 local VisualEngine = require("rizu.engine.visual.VisualEngine")
+local ChartVisual = require("rizu.engine.visual.ChartVisual")
+
+local SpriteEngine = require("rizu.engine.sprite.SpriteEngine")
+local VideoEngine = require("rizu.engine.sprite.VideoEngine")
 
 local PlayProgress = require("rizu.engine.PlayProgress")
 local PauseCounter = require("rizu.engine.PauseCounter")
@@ -34,6 +38,8 @@ function RhythmEngine:new()
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
+	self.sprite_engine = SpriteEngine()
+	self.video_engine = VideoEngine()
 
 	self.auto_key_sound = true
 
@@ -72,6 +78,15 @@ function RhythmEngine:loadAudio(resources)
 	end)
 end
 
+---@param resources {[string]: string}
+function RhythmEngine:loadVisuals(resources)
+	local chart_visual = ChartVisual()
+	chart_visual:load(self.chart)
+
+	self.sprite_engine:load(chart_visual.image_names, resources)
+	self.video_engine:load(chart_visual.video_names, resources)
+end
+
 ---@param enabled boolean
 function RhythmEngine:setAutoKeySound(enabled)
 	self.auto_key_sound = enabled
@@ -100,6 +115,16 @@ end
 function RhythmEngine:unload()
 	self:unloadAudio()
 	self.audio_engine = nil
+
+	if self.sprite_engine then
+		self.sprite_engine:unload()
+	end
+	self.sprite_engine = nil
+
+	if self.video_engine then
+		self.video_engine:unload()
+	end
+	self.video_engine = nil
 
 	self.visual_engine = nil
 	self.logic_engine = nil

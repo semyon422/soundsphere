@@ -7,7 +7,7 @@ local ImageNoteView = NoteView + {}
 ---@return any?
 function ImageNoteView:getDrawable()
 	local images = self.graphicalNote.linked_note.startNote.data.images
-	return self.resource_loader:getResource(images[1] and images[1][1])
+	return self.sprite_engine:get(images[1] and images[1][1])
 end
 
 function ImageNoteView:draw()

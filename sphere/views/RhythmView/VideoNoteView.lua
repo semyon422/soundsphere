@@ -7,7 +7,7 @@ local VideoNoteView = ImageNoteView + {}
 ---@return any?
 function VideoNoteView:getVideo()
 	local images = self.graphicalNote.linked_note.startNote.data.images
-	return self.resource_loader:getResource(images[1] and images[1][1])
+	return self.video_engine:get(images[1] and images[1][1])
 end
 
 ---@return love.Image?
