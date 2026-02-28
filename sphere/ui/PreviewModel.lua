@@ -2,6 +2,7 @@ local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
 local AudioPreviewPlayer = require("rizu.gameplay.AudioPreviewPlayer")
+local BgaPreviewPlayer = require("rizu.gameplay.BgaPreviewPlayer")
 
 ---@class sphere.PreviewModel
 ---@operator call: sphere.PreviewModel
@@ -16,6 +17,7 @@ PreviewModel.manual_time = 0
 function PreviewModel:new(configModel)
 	self.configModel = configModel
 	self.audioPreviewPlayer = AudioPreviewPlayer(configModel)
+	self.bgaPreviewPlayer = BgaPreviewPlayer()
 	---@type {[string]: boolean?}
 	self.generating_hashes = {}
 	---@type {[string]: boolean?}
@@ -81,6 +83,7 @@ function PreviewModel:update()
 	end
 
 	self.audioPreviewPlayer:update()
+	self.bgaPreviewPlayer:update(self:getTime())
 
 	local volumeConfig = settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
@@ -135,6 +138,7 @@ function PreviewModel:loadPreview()
 	end
 
 	self.audioPreviewPlayer:stop()
+	self.bgaPreviewPlayer:stop()
 
 	loadingPreview = false
 	if path ~= self.audio_path then
@@ -156,15 +160,28 @@ function PreviewModel:loadPreview()
 	---@type string?
 	local hash = self.chartview and self.chartview.hash
 	if hash then
-		local preview_path = "userdata/audio_previews/" .. hash .. ".audio_preview"
-		if love.filesystem.getInfo(preview_path) then
-			self.audioPreviewPlayer:load(preview_path, self.chartview.location_dir)
+		local audio_preview_path = "userdata/audio_previews/" .. hash .. ".audio_preview"
+		local bga_preview_path = "userdata/bga_previews/" .. hash .. ".bga_preview"
+
+		local audio_exists = love.filesystem.getInfo(audio_preview_path)
+		local bga_exists = love.filesystem.getInfo(bga_preview_path)
+
+		if audio_exists then
+			self.audioPreviewPlayer:load(audio_preview_path, self.chartview.location_dir)
 			self.audioPreviewPlayer:setVolume(volume)
 			self.audioPreviewPlayer:setRate(self.rate)
 			self.audioPreviewPlayer:seek(position)
-		else
+		end
+
+		if bga_exists then
+			local LoveFilesystem = require("fs.LoveFilesystem")
+			self.bgaPreviewPlayer:load(bga_preview_path, self.chartview.location_dir, LoveFilesystem())
+			self.bgaPreviewPlayer:seek(position)
+		end
+
+		if not audio_exists or not bga_exists then
 			if not self.attempted_hashes[hash] then
-				self:generateAudioPreview(self.chartview)
+				self:generatePreview(self.chartview)
 			end
 		end
 	end
@@ -176,9 +193,10 @@ function PreviewModel:loadPreview()
 	end
 end
 
-local generateAudioPreviewAsync = thread.async(function(chartview_data)
-	print("AudioPreview: generating " .. chartview_data.hash)
+local generatePreviewAsync = thread.async(function(chartview_data)
+	print("Preview: generating " .. chartview_data.hash)
 	local AudioPreviewGenerator = require("rizu.gameplay.AudioPreviewGenerator")
+	local BgaPreviewGenerator = require("rizu.gameplay.BgaPreviewGenerator")
 	local Decoder = require("rizu.engine.audio.bass.Decoder")
 	local ChartFactory = require("notechart.ChartFactory")
 	local LoveFilesystem = require("fs.LoveFilesystem")
@@ -186,35 +204,46 @@ local generateAudioPreviewAsync = thread.async(function(chartview_data)
 	require("love.filesystem")
 
 	local fs = LoveFilesystem()
-	local generator = AudioPreviewGenerator(fs, function(data)
+	local audio_generator = AudioPreviewGenerator(fs, function(data)
 		return Decoder(data)
 	end)
+	local bga_generator = BgaPreviewGenerator(fs)
 
 	local content = fs:read(chartview_data.location_path)
 	if not content then
-		print("AudioPreview: could not read " .. tostring(chartview_data.location_path))
+		print("Preview: could not read " .. tostring(chartview_data.location_path))
 		return false
 	end
 
 	local chart_chartmetas = ChartFactory:getCharts(chartview_data.chartfile_name, content)
 	if not chart_chartmetas then
-		print("AudioPreview: chart parsing failed for " .. tostring(chartview_data.chartfile_name))
+		print("Preview: chart parsing failed for " .. tostring(chartview_data.chartfile_name))
 		return false
 	end
 
 	local t = chart_chartmetas[chartview_data.index]
 	if not t then
-		print("AudioPreview: chart index " .. tostring(chartview_data.index) .. " not found")
+		print("Preview: chart index " .. tostring(chartview_data.index) .. " not found")
 		return false
 	end
 
 	t.chart.layers.main:toAbsolute()
-	generator:generate(t.chart, chartview_data.location_dir, chartview_data.hash)
+
+	local audio_preview_path = "userdata/audio_previews/" .. chartview_data.hash .. ".audio_preview"
+	if not fs:getInfo(audio_preview_path) then
+		audio_generator:generate(t.chart, chartview_data.location_dir, chartview_data.hash)
+	end
+
+	local bga_preview_path = "userdata/bga_previews/" .. chartview_data.hash .. ".bga_preview"
+	if not fs:getInfo(bga_preview_path) then
+		bga_generator:generate(t.chart, chartview_data.hash)
+	end
+
 	return true
 end)
 
 ---@param chartview table
-function PreviewModel:generateAudioPreview(chartview)
+function PreviewModel:generatePreview(chartview)
 	local hash = chartview.hash
 	if self.generating_hashes[hash] then
 		return
@@ -230,7 +259,7 @@ function PreviewModel:generateAudioPreview(chartview)
 	}
 
 	thread.coro(function()
-		local ok, result = pcall(generateAudioPreviewAsync, chartview_data)
+		local ok, result = pcall(generatePreviewAsync, chartview_data)
 		self.generating_hashes[hash] = nil
 		self.attempted_hashes[hash] = true
 		if ok and result then
@@ -238,19 +267,22 @@ function PreviewModel:generateAudioPreview(chartview)
 				self:loadPreview()
 			end
 		else
-			print("AudioPreview: generation failed for " .. hash .. " error: " .. tostring(result))
+			print("Preview: generation failed for " .. hash .. " error: " .. tostring(result))
 		end
 	end)()
 end
 
 function PreviewModel:stop()
 	self.audioPreviewPlayer:stop()
+	self.bgaPreviewPlayer:stop()
 	self.manual_time = 0
 end
 
 function PreviewModel:release()
 	self:stop()
 	self.audioPreviewPlayer:release()
+	self.bgaPreviewPlayer:release()
 end
 
 return PreviewModel
+

@@ -1,6 +1,7 @@
 local class = require("class")
 local SequenceView = require("sphere.views.SequenceView")
 local ChartPreviewRhythmView = require("sphere.views.SelectView.ChartPreviewRhythmView")
+local BgaView = require("sphere.views.BgaView")
 
 ---@class sphere.ChartPreviewView
 ---@operator call: sphere.ChartPreviewView
@@ -28,6 +29,7 @@ function ChartPreviewView:load()
 	-- sequenceView:setSequenceConfig(playfield)
 
 	sequenceView:setSequenceConfig({
+		BgaView({game = self.game}),
 		ChartPreviewRhythmView({
 			transform = transform,
 			subscreen = "preview",

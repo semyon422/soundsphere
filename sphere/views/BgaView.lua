@@ -8,12 +8,8 @@ local BgaView = class()
 
 ---@param bga_event rizu.sprite.BgaEvent
 ---@param time number
-function BgaView:drawNote(bga_event, time)
-	local rhythm_engine = self.game.rhythm_engine
-	if not rhythm_engine then return end
-	local bga_engine = rhythm_engine.bga_engine
-	if not bga_engine then return end
-
+---@param bga_engine rizu.sprite.BgaEngine|rizu.gameplay.BgaPreviewPlayer
+function BgaView:drawNote(bga_event, time, bga_engine)
 	local start_dt = time - bga_event.time
 
 	---@type love.Drawable?
@@ -38,23 +34,28 @@ function BgaView:drawNote(bga_event, time)
 end
 
 function BgaView:draw()
+	local bga_engine
+	local time
+
 	local rhythm_engine = self.game.rhythm_engine
-	if not rhythm_engine then
-		return
+	if rhythm_engine and rhythm_engine.bga_engine and #rhythm_engine.bga_engine.active_notes > 0 then
+		bga_engine = rhythm_engine.bga_engine
+		time = rhythm_engine.visual_info:getTime()
+	elseif self.game.previewModel and self.game.previewModel.bgaPreviewPlayer then
+		bga_engine = self.game.previewModel.bgaPreviewPlayer
+		time = self.game.previewModel:getTime()
 	end
 
-	local bga_engine = rhythm_engine.bga_engine
 	if not bga_engine then
 		return
 	end
 
 	love.graphics.origin()
 
-	local time = rhythm_engine.visual_info:getTime()
-
 	for _, bga_event in ipairs(bga_engine.active_notes) do
-		self:drawNote(bga_event, time)
+		self:drawNote(bga_event, time, bga_engine)
 	end
 end
 
 return BgaView
+

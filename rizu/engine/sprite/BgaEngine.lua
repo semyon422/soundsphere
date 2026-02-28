@@ -175,6 +175,7 @@ function BgaEngine:seek(time)
 		end
 	end
 	self.video_engine:rewind()
+	self:update()
 end
 
 function BgaEngine:unload()

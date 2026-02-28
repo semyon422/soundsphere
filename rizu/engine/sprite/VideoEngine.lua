@@ -11,7 +11,7 @@ function VideoEngine:new()
 end
 
 ---@param video_names string[]
----@param resources {[string|integer]: string}
+---@param resources {[string]: string}
 function VideoEngine:load(video_names, resources)
 	self:unload()
 	for _, name in ipairs(video_names) do
@@ -36,6 +36,15 @@ end
 function VideoEngine:rewind()
 	for _, video in pairs(self.videos) do
 		video:rewind()
+	end
+end
+
+---@param name string
+---@param time number
+function VideoEngine:seek(name, time)
+	local video = self.videos[name]
+	if video then
+		video:seek(time)
 	end
 end
 
