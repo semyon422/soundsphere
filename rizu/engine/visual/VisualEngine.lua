@@ -10,24 +10,6 @@ local VisualEngine = class()
 
 VisualEngine.range = 1
 
----@param notes rizu.VisualNote[]
----@param time number
----@return integer
-local function _findBgaIndex(notes, time)
-	local low, high = 1, #notes
-	local ans = 1
-	while low <= high do
-		local mid = math.floor((low + high) / 2)
-		if notes[mid].linked_note:getStartTime() <= time then
-			ans = mid
-			low = mid + 1
-		else
-			high = mid - 1
-		end
-	end
-	return ans
-end
-
 ---@param action -1|1
 ---@return true?
 local function true_from_action(action)
@@ -79,11 +61,6 @@ function VisualEngine:load(chart, lazy_scrollers)
 	---@type {[ncdk2.VisualPoint]: {linked_note: ncdk2.LinkedNote, visual_note: rizu.VisualNote}[]}
 	self.point_notes = {}
 
-	---@type {[ncdk2.Column]: rizu.VisualNote[]}
-	self.bga_notes = {}
-	---@type {[ncdk2.Column]: integer}
-	self.last_bga_index = {}
-
 	for _, visual in ipairs(chart:getVisuals()) do
 		self.cvp[visual] = VisualPoint(Point())
 		visual:generateEvents(lazy_scrollers)
@@ -95,28 +72,16 @@ function VisualEngine:load(chart, lazy_scrollers)
 	end
 
 	for _, linked_note in ipairs(chart.notes:getLinkedNotes()) do
-		local visual_note = self.visual_note_factory:getNote(linked_note)
-		if visual_note then
-			local visual = chart:getVisualByPoint(linked_note.startNote.visualPoint --[[@as ncdk2.VisualPoint]])
-			---@cast visual -?
+		local visual = chart:getVisualByPoint(linked_note.startNote.visualPoint --[[@as ncdk2.VisualPoint]])
+		if visual and not visual.bga then
+			local visual_note = self.visual_note_factory:getNote(linked_note)
+			if visual_note then
+				visual_note.cvp = self.cvp[visual]
+				visual_note.visual = visual
 
-			visual_note.cvp = self.cvp[visual]
-			visual_note.visual = visual
-
-			self:addNote(linked_note, visual_note)
-
-			if visual.bga then
-				visual_note.is_bga = true
-				local column = linked_note:getColumn()
-
-				self.bga_notes[column] = self.bga_notes[column] or {}
-				table.insert(self.bga_notes[column], visual_note)
+				self:addNote(linked_note, visual_note)
 			end
 		end
-	end
-
-	for _, notes in pairs(self.bga_notes) do
-		table.sort(notes)
 	end
 end
 
@@ -127,7 +92,6 @@ function VisualEngine:update()
 
 	self:_updateInterpolation(time)
 	self:_updateScrollers(time)
-	self:_updateBgas(time)
 	self:_updateEventProcessing()
 	self:_updateVisibleNotes()
 end
@@ -147,18 +111,9 @@ function VisualEngine:_updateScrollers(time)
 	local handle_event = self.handle_event
 
 	for visual, cvp in pairs(self.cvp) do
-		if not visual.bga then
-			-- TODO: implement const for scroller
-			visual.scroller:scroll(time, handle_event)
-			visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
-		end
-	end
-end
-
----@param time number
-function VisualEngine:_updateBgas(time)
-	for column in pairs(self.bga_notes) do
-		self:updateBga(column, time)
+		-- TODO: implement const for scroller
+		visual.scroller:scroll(time, handle_event)
+		visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
 	end
 end
 
@@ -194,36 +149,6 @@ function VisualEngine:_updateVisibleNotes()
 	end
 
 	table.sort(visible_notes)
-end
-
----@param column ncdk2.Column
----@param time number
-function VisualEngine:updateBga(column, time)
-	local notes = self.bga_notes[column]
-	local last_index = self.last_bga_index[column]
-
-	---@type integer?
-	local index
-	if last_index and notes[last_index].linked_note:getStartTime() <= time then
-		index = last_index
-		for i = last_index + 1, #notes do
-			if notes[i].linked_note:getStartTime() <= time then
-				index = i
-			else
-				break
-			end
-		end
-	else
-		index = _findBgaIndex(notes, time)
-	end
-
-	if last_index ~= index then
-		if last_index then
-			self.handle_event(notes[last_index].linked_note.startNote.visualPoint, -1)
-		end
-		self.handle_event(notes[index].linked_note.startNote.visualPoint, 1)
-		self.last_bga_index[column] = index
-	end
 end
 
 return VisualEngine

@@ -52,16 +52,6 @@ end
 ---@param a rizu.VisualNote
 ---@param b rizu.VisualNote
 function VisualNote.__lt(a, b)
-	if a.is_bga ~= b.is_bga then
-		return a.is_bga
-	end
-
-	if a.is_bga then
-		if a:getColumn() ~= b:getColumn() then
-			return a:getColumn() < b:getColumn()
-		end
-	end
-
 	return a.linked_note < b.linked_note
 end
 
