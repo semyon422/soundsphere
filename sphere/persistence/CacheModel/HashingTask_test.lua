@@ -28,13 +28,16 @@ function test.processChartfile(t)
 	locationsRepo:insertLocation({id = 1, path = "prefix", name = "test", is_relative = false, is_internal = false})
 
 	local set = chartfilesRepo:insertChartfileSet({
-		name = "set", modified_at = 0, is_file = false, location_id = 1
+		dir = "dir", name = "set", modified_at = 0, is_file = false, location_id = 1
 	})
 	local chartfile = chartfilesRepo:insertChartfile({
-		name = "chart.sph", modified_at = 0, set_id = set.id, path = "set/chart.sph"
+		name = "chart.sph", modified_at = 0, set_id = set.id
 	})
+	-- Get it back through located_chartfiles to have the 'path' field
+	chartfile = gdb.models.located_chartfiles:find({id = chartfile.id})
 
 	local fs = FakeFilesystem()
+	fs:createDirectory("dir/set")
 	local content = [[
 # metadata
 input 4key
@@ -42,7 +45,7 @@ input 4key
 1000 =0
 1000 =1
 ]]
-	fs:write("prefix/set/chart.sph", content)
+	fs:write("dir/set/chart.sph", content)
 	local expected_hash = digest.hash("md5", content, true)
 
 	-- Setup real generators
@@ -55,7 +58,7 @@ input 4key
 	local context = FakeTaskContext()
 	local task = HashingTask(fs, cmg, cdg, context)
 	
-	local ok, err = task:processChartfile(chartfile, "prefix")
+	local ok, err = task:processChartfile(chartfile, nil)
 	t:assert(ok, err)
 	
 	-- Verify results in DB
@@ -79,12 +82,55 @@ function test.read_error(t)
 	local context = FakeTaskContext()
 	-- Generators don't matter for read error
 	local task = HashingTask(fs, {}, {}, context)
-	local ok, err = task:processChartfile({path = "non-existent"}, "prefix")
+	-- Use a table that matches located_chartfiles structure
+	local chartfile = {path = "non-existent"}
+	local ok, err = task:processChartfile(chartfile, nil)
 	
 	t:ne(ok, true)
 	t:assert(err:match("read error") and true)
 	t:eq(#context.actions, 1)
 	t:eq(context.actions[1][1], "addError")
+end
+
+function test.malformed_chart(t)
+	local gdb = setup_db()
+	local chartfilesRepo = ChartfilesRepo(gdb.models)
+	local chartsRepo = ChartsRepo(gdb.models)
+	
+	local locationsRepo = LocationsRepo(gdb.models)
+	locationsRepo:insertLocation({id = 1, path = "prefix", name = "test", is_relative = false, is_internal = false})
+
+	local set = chartfilesRepo:insertChartfileSet({
+		dir = "dir", name = "set", modified_at = 0, is_file = false, location_id = 1
+	})
+	local chartfile = chartfilesRepo:insertChartfile({
+		name = "bad.sph", modified_at = 0, set_id = set.id
+	})
+	-- Get it back through located_chartfiles to have the 'path' field
+	chartfile = gdb.models.located_chartfiles:find({id = chartfile.id})
+
+	local fs = FakeFilesystem()
+	fs:createDirectory("dir/set")
+	fs:write("dir/set/bad.sph", "this is not an SPH file")
+	
+	local ChartFactory = require("notechart.ChartFactory")
+	local cmg = ChartmetaGenerator(chartsRepo, chartfilesRepo, ChartFactory)
+	local difficultyModel = DifficultyModel()
+	local cdg = ChartdiffGenerator(chartsRepo, difficultyModel)
+	
+	local context = FakeTaskContext()
+	local task = HashingTask(fs, cmg, cdg, context)
+	
+	local ok, err = task:processChartfile(chartfile, nil)
+	
+	t:eq(ok, nil)
+	t:assert(err)
+	
+	t:eq(#context.actions, 1)
+	t:eq(context.actions[1][1], "addError")
+	t:assert(context.actions[1][2]:match("chartmeta error"))
+
+	gdb:unload()
 end
 
 return test
