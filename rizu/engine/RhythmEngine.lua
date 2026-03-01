@@ -3,7 +3,7 @@ local class = require("class")
 local InputEngine = require("rizu.engine.input.InputEngine")
 local ActiveInputNotes = require("rizu.engine.input.ActiveInputNotes")
 
-local AudioEngine = require("rizu.engine.audio.AudioEngine")
+local AudioEngine = require("rizu.engine.audio.Engine")
 local TimeEngine = require("rizu.engine.time.TimeEngine")
 
 local LogicInfo = require("rizu.engine.logic.LogicInfo")
@@ -11,6 +11,8 @@ local LogicEngine = require("rizu.engine.logic.LogicEngine")
 
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
 local VisualEngine = require("rizu.engine.visual.VisualEngine")
+
+local BgaEngine = require("rizu.engine.sprite.BgaEngine")
 
 local PlayProgress = require("rizu.engine.PlayProgress")
 local PauseCounter = require("rizu.engine.PauseCounter")
@@ -34,6 +36,7 @@ function RhythmEngine:new()
 
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
+	self.bga_engine = BgaEngine(self.visual_info)
 
 	self.auto_key_sound = true
 
@@ -72,6 +75,11 @@ function RhythmEngine:loadAudio(resources)
 	end)
 end
 
+---@param resources {[string]: string}
+function RhythmEngine:loadVisuals(resources)
+	self.bga_engine:load(self.chart, resources)
+end
+
 ---@param enabled boolean
 function RhythmEngine:setAutoKeySound(enabled)
 	self.auto_key_sound = enabled
@@ -101,6 +109,11 @@ function RhythmEngine:unload()
 	self:unloadAudio()
 	self.audio_engine = nil
 
+	if self.bga_engine then
+		self.bga_engine:unload()
+	end
+	self.bga_engine = nil
+
 	self.visual_engine = nil
 	self.logic_engine = nil
 	self.input_engine = nil
@@ -114,6 +127,7 @@ function RhythmEngine:update()
 	self.input_engine:update()
 	self.logic_engine:update()
 	self.visual_engine:update()
+	self.bga_engine:update()
 	self.audio_engine:update()
 end
 
@@ -222,6 +236,7 @@ function RhythmEngine:setGlobalTime(time)
 	self.pending_resync = false
 	self.time_engine:pause()
 	self.time_engine:setGlobalTime(time)
+	self.bga_engine:seek(time)
 	self.time_engine:play()
 end
 
@@ -247,6 +262,7 @@ end
 ---@param time number
 function RhythmEngine:setTime(time)
 	self.audio_engine:setPosition(time)
+	self.bga_engine:seek(time)
 	self:setTimeNoAudio(time)
 end
 

@@ -20,9 +20,33 @@ local function ui_lock(self)
 	local cacheModel = self.game.cacheModel
 	local count = cacheModel.shared.chartfiles_count
 	local current = cacheModel.shared.chartfiles_current
+	local state = cacheModel.shared.state
+
+	local state_messages = {
+		[1] = "Searching files...",
+		[2] = "Computing difficulty...",
+		[3] = "Processing scores...",
+	}
+	local msg = state_messages[state] or "Busy..."
+
 	love.graphics.setColor(1, 1, 1, 1)
-	imgui.text(("%s/%s"):format(current, count))
-	imgui.text(("%0.2f%%"):format(current / count * 100))
+	imgui.text(msg)
+	imgui.text(("%s / %s"):format(current, count))
+	
+	if count > 0 then
+		local progress = math.min(current / count, 1)
+		imgui.text(("%0.2f%%"):format(progress * 100))
+		-- Simple progress bar using rectangles
+		local bar_w, bar_h = 400, 20
+		local bar_x = (w - bar_w) / 2
+		local bar_y = h / 2 + 100
+		
+		love.graphics.setColor(0.2, 0.2, 0.2, 1)
+		love.graphics.rectangle("fill", bar_x, bar_y, bar_w, bar_h)
+		love.graphics.setColor(0.4, 0.8, 0.4, 1)
+		love.graphics.rectangle("fill", bar_x, bar_y, bar_w * progress, bar_h)
+	end
+
 	if imgui.button("stopTask", "stop task") then
 		cacheModel:stopTask()
 	end

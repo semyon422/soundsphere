@@ -8,7 +8,7 @@ local LocationManager = class()
 
 ---@param locationsRepo sphere.LocationsRepo
 ---@param chartfilesRepo sphere.ChartfilesRepo
----@param fs love.filesystem
+---@param fs fs.IFilesystem
 ---@param root string OS dependent, absolute
 ---@param prefix string
 function LocationManager:new(locationsRepo, chartfilesRepo, fs, root, prefix)
@@ -70,7 +70,7 @@ function LocationManager:unmountLocation(location)
 	if not self.mounted[location.id] then
 		return
 	end
-	self.fs.unmount(location.path)
+	self.fs:unmount(location.path)
 	self.mounted[location.id] = nil
 end
 
@@ -86,7 +86,7 @@ function LocationManager:mountLocation(location)
 		return
 	end
 	local mp = path_util.join(self.prefix, location.id)
-	if self.fs.mount(path, mp, true) then
+	if self.fs:mount(path, mp, true) then
 		self.mounted[location.id] = true
 		location.status = "mounted"
 		return

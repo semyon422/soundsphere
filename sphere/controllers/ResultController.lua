@@ -100,7 +100,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		replay,
 		game.computeContext,
 		game.configModel.configs.settings,
-		{}
+		game.resource_loader.resources
 	):load(game.rhythm_engine)
 
 	game.computeContext:computePlay(game.rhythm_engine, replay.frames)

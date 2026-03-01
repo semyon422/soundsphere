@@ -72,37 +72,54 @@ function VisualEngine:load(chart, lazy_scrollers)
 	end
 
 	for _, linked_note in ipairs(chart.notes:getLinkedNotes()) do
-		local visual_note = self.visual_note_factory:getNote(linked_note)
-		if visual_note then
-			local visual = chart:getVisualByPoint(linked_note.startNote.visualPoint --[[@as ncdk2.VisualPoint]])
-			---@cast visual -?
+		local visual = chart:getVisualByPoint(linked_note.startNote.visualPoint --[[@as ncdk2.VisualPoint]])
+		if visual and not visual.bga then
+			local visual_note = self.visual_note_factory:getNote(linked_note)
+			if visual_note then
+				visual_note.cvp = self.cvp[visual]
+				visual_note.visual = visual
 
-			visual_note.cvp = self.cvp[visual]
-			visual_note.visual = visual
-
-			self:addNote(linked_note, visual_note)
+				self:addNote(linked_note, visual_note)
+			end
 		end
 	end
 end
 
 function VisualEngine:update()
+	local time = self.visual_info:getTime()
+
+	table_util.clear(self.point_events)
+
+	self:_updateInterpolation(time)
+	self:_updateScrollers(time)
+	self:_updateEventProcessing()
+	self:_updateVisibleNotes()
+end
+
+---@param time number
+function VisualEngine:_updateInterpolation(time)
+	for visual, cvp in pairs(self.cvp) do
+		cvp.point.absoluteTime = time
+		visual.interpolator:interpolate(visual.points, cvp, "absolute")
+	end
+end
+
+---@param time number
+function VisualEngine:_updateScrollers(time)
 	local range = self.range
 	local visual_info = self.visual_info
-
-	local visible_notes_map = self.visible_notes_map
-
-	local point_events = self.point_events
 	local handle_event = self.handle_event
-	table_util.clear(point_events)
 
 	for visual, cvp in pairs(self.cvp) do
-		cvp.point.absoluteTime = visual_info:getTime()
-		visual.interpolator:interpolate(visual.points, cvp, "absolute")
-
 		-- TODO: implement const for scroller
-		visual.scroller:scroll(cvp.point.absoluteTime, handle_event)
+		visual.scroller:scroll(time, handle_event)
 		visual.scroller:scale(range / (visual_info.rate * cvp.globalSpeed), handle_event)
 	end
+end
+
+function VisualEngine:_updateEventProcessing()
+	local point_events = self.point_events
+	local visible_notes_map = self.visible_notes_map
 
 	-- TODO: fix a bug with LN disappearing
 	-- when you increase play speed and LN tail get hide event
@@ -120,11 +137,13 @@ function VisualEngine:update()
 			end
 		end
 	end
+end
 
+function VisualEngine:_updateVisibleNotes()
 	local visible_notes = self.visible_notes
 	table_util.clear(visible_notes)
 
-	for note in pairs(visible_notes_map) do
+	for note in pairs(self.visible_notes_map) do
 		note:update()
 		table.insert(visible_notes, note)
 	end

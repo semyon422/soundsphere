@@ -51,7 +51,14 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 
 *   **Indentation:** Tabs should be used for indentation. Do not add indentation to empty lines.
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
-*   **Class Naming:** The preferred class naming convention is `prefix.ClassName`. However, in some rare cases, `prefix1.prefix2.ClassName` is allowed but not recommended. Avoid using nested class definitions like `sea.app.repos.UserConnectionsRepo`, prefer using `sea.UserConnectionsRepo`.
+*	**Class Naming & Namespacing:**
+	*	**Legacy Style:** Use `prefix.ClassName` (e.g., `sea.UserConnectionsRepo`). Avoid deep nesting like `sea.app.repos.UserConnectionsRepo`.
+	*	**Modern Style (`rizu.*`):** Follows a hierarchical, directory-based namespacing convention.
+		*	**Namespaces:** Use lowercase names derived from the directory structure (e.g., `rizu.audio.bass`).
+		*	**Classes:** Named after their PascalCase filename (e.g., `rizu.audio.Engine`, `rizu.audio.SoftwareMixer`).
+		*	**Interfaces:** Prefixed with `I` (e.g., `rizu.audio.IProvider`, `rizu.audio.IDecoder`).
+		*	**Encapsulation:** Implementations are grouped by backend/feature in subdirectories (e.g., `rizu.audio.bass.Decoder`).
+
 *   **Shared Memory:** Use the `web.SharedMemory` class (`aqua/web/nginx/SharedMemory.lua`) to access OpenResty shared dictionaries. Dictionaries must be defined in `nginx_config.lua` under the `shared_dicts` table to be automatically included in the generated `nginx.conf`.
     *   **Cross-Worker Communication:** For communication between different nginx workers/connections, use shared memory queues (e.g., `aqua/icc/SharedMemoryQueue.lua`). These queues should store messages encoded as strings (using `icc.StringBufferPeer`).
 *   **Repository Pattern for Shared Memory:** Follow the repository pattern for shared memory access. Create a dedicated repo class (e.g., `sea.UserConnectionsRepo`) that wraps the `ISharedDict` and provides semantic methods. These repos should be initialized in `sea.Repos` using the `SharedMemory` instance passed from `App`.
@@ -130,6 +137,22 @@ The gameplay logic is centered around the single-play session attempt.
 *   **Rhythm Engine States**:
     *   `RhythmEngine:hasResult()`: Determines if the current play should produce a score. It requires a minimum hit count and valid accuracy.
     *   `autoplay` and `promode` flags are managed at the session level, not inside the core engine logic (though older `sphere` code might still have legacy flags).
+
+### Audio Architecture
+
+The `rizu` audio system follows a modular, interface-based design using the Provider pattern to support multiple backends.
+
+*   **Core Interfaces**:
+    *   `rizu.audio.IProvider`: Factory for creating decoders and sources.
+    *   `rizu.audio.IDecoder`: Interface for decoding audio data into raw samples.
+    *   `rizu.audio.ISource`: Interface for audio playback (play, pause, setRate, getPosition).
+*   **Backends**:
+    *   **`bass`**: The primary backend using the BASS library. Located in `rizu/engine/audio/bass/`.
+    *   **`fake`**: A mock backend for testing or when audio is disabled. Located in `rizu/engine/audio/fake/`.
+*   **Key Components**:
+    *   `rizu.audio.Engine`: The main controller that coordinates background music (`source`) and foreground hitsounds (`foregroundSource`).
+    *   `rizu.audio.SoftwareMixer`: A custom software-level mixer used for combining multiple audio streams (e.g., for rendering waveforms or O2Jam previews).
+*   **Naming Convention**: Backend implementations are namespaced under their respective folders (e.g., `rizu.audio.bass.Decoder`, `rizu.audio.fake.Source`).
 
 ### SPH Chart Format
 

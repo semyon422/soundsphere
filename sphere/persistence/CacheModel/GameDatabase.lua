@@ -5,7 +5,24 @@ local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
 local autoload = require("autoload")
 
+---@class sphere.CacheModelModels
+---@field chartfile_sets rdb.Model
+---@field chartfiles rdb.Model
+---@field locations rdb.Model
+---@field chartviews rdb.Model
+---@field chartviews_no_preview rdb.Model
+---@field chartdiffviews rdb.Model
+---@field chartdiffviews_no_preview rdb.Model
+---@field chartplayviews rdb.Model
+---@field chartplayviews_no_preview rdb.Model
+---@field difftable_chartmetas rdb.Model
+---@field chartfile_set_dirs rdb.Model
+---@field chartplays rdb.Model
+---@field chartdiffs rdb.Model
+---@field chartmetas rdb.Model
+
 ---@class sphere.GameDatabase
+---@field models sphere.CacheModelModels
 ---@operator call: sphere.GameDatabase
 local GameDatabase = class()
 
@@ -25,10 +42,10 @@ function GameDatabase:new(migrations)
 	self.migrator = SqliteMigrator(db)
 end
 
-function GameDatabase:load()
+function GameDatabase:load(path)
 	local db = self.db
 
-	db:open("userdata/data.db")
+	db:open(path or "userdata/data.db")
 	db:exec("PRAGMA busy_timeout = 10000")
 	db:exec("PRAGMA foreign_keys = ON")
 

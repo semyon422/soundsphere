@@ -1,6 +1,7 @@
 local class = require("class")
 local table_util = require("table_util")
 local OJM = require("o2jam.OJM")
+local path_util = require("path_util")
 
 ---@class rizu.ResourceLoader
 ---@operator call: rizu.ResourceLoader

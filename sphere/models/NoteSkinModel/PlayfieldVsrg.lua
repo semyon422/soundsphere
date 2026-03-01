@@ -17,6 +17,7 @@ local InputAnimationView = require("sphere.views.GameplayView.InputAnimationView
 local JudgementView = require("sphere.views.GameplayView.JudgementView")
 local DeltaTimeJudgementView = require("sphere.views.GameplayView.DeltaTimeJudgementView")
 local MatchPlayersView = require("sphere.views.GameplayView.MatchPlayersView")
+local BgaView = require("sphere.views.BgaView")
 
 ---@class sphere.PlayfieldVsrg
 ---@operator call: sphere.PlayfieldVsrg
@@ -154,9 +155,8 @@ end
 ---@return table
 function PlayfieldVsrg:addBga(object)
 	object = object or {}
-	object.mode = "bga"
 	object.subscreen = "gameplay"
-	return self:addRhythmView(object)
+	return self:add(BgaView(object))
 end
 
 ---@param object table?

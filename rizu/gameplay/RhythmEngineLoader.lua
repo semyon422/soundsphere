@@ -37,6 +37,7 @@ function RhythmEngineLoader:load(rhythm_engine)
 	rhythm_engine:load()
 	rhythm_engine:setAudioMode(config.audio.mode)
 	rhythm_engine:loadAudio(self.resources)
+	rhythm_engine:loadVisuals(self.resources)
 
 	-- variable unranked
 	-- rhythm_engine:setWindUp(state.windUp)

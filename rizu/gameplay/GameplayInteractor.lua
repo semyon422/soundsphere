@@ -184,7 +184,7 @@ function GameplayInteractor:retry()
 	local replayBase = game.replayBase
 
 	game.pauseModel:load()
-	-- self.resourceModel:rewind()
+	game.resource_loader:rewind()
 
 	self:load(self.autoplay)
 

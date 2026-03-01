@@ -52,7 +52,7 @@ end
 ---@param a rizu.VisualNote
 ---@param b rizu.VisualNote
 function VisualNote.__lt(a, b)
-	return a.linked_note:getStartTime() < b.linked_note:getStartTime()
+	return a.linked_note < b.linked_note
 end
 
 return VisualNote

@@ -1,8 +1,6 @@
 local class = require("class")
 local ShortNoteView = require("sphere.views.RhythmView.ShortNoteView")
 local LongNoteView = require("sphere.views.RhythmView.LongNoteView")
-local ImageNoteView = require("sphere.views.RhythmView.ImageNoteView")
-local VideoNoteView = require("sphere.views.RhythmView.VideoNoteView")
 
 ---@class sphere.NoteViewFactory
 ---@operator call: sphere.NoteViewFactory
@@ -16,8 +14,6 @@ local NoteViewFactory = class()
 ---| "LongNoteAnimation"
 ---| "ShortNoteLighting"
 ---| "LongNoteLighting"
----| "ImageNote"
----| "VideoNote"
 
 ---@see sphere.GraphicalNoteFactory
 
@@ -35,10 +31,6 @@ local notes = {
 	lighting = {
 		short = {ShortNoteView, "ShortNoteLighting"},
 		long = {ShortNoteView, "LongNoteLighting"},
-	},
-	bga = {
-		ImageNote = {ImageNoteView, "ImageNote"},
-		VideoNote = {VideoNoteView, "VideoNote"},
 	},
 }
 
