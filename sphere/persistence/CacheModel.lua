@@ -84,9 +84,6 @@ function CacheModel:load()
 
 	self.locationManager:load()
 
-	-- Backward compatibility for UI
-	thread.shared.cache = self.shared
-
 	local tr = ThreadRemote(math.random(1000000), self.remote_handler)
 	self.tr = tr
 	self.worker = tr:start(function(remote)
