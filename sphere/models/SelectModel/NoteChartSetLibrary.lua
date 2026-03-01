@@ -29,7 +29,7 @@ function NoteChartSetLibrary:new(cacheModel)
 end
 
 ---@param itemIndex number
----@return table
+---@return sphere.RichChartview
 function NoteChartSetLibrary:loadObject(itemIndex)
 	local chartviewsRepo = self.cacheModel.chartviewsRepo
 	local difftablesRepo = self.cacheModel.difftablesRepo
@@ -39,6 +39,8 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 	if not chartview then
 		return {}
 	end
+
+	---@cast chartview sphere.RichChartview
 
 	chartview.lamp = _chartview.lamp
 	if chartview.hash and chartview.index then
@@ -53,7 +55,7 @@ function NoteChartSetLibrary:updateItems()
 	self.cache:new()
 end
 
----@param chartview table
+---@param chartview sphere.IChartviewIds
 ---@return number
 function NoteChartSetLibrary:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id

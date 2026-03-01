@@ -18,6 +18,10 @@ function LocationManager:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 	self.root = root
 	self.prefix = prefix
 	self.mounted = {}
+	---@type sphere.Location[]
+	self.locations = {}
+	---@type sphere.Location?
+	self.selected_loc = nil
 end
 
 function LocationManager:load()
@@ -65,7 +69,7 @@ function LocationManager:selectLocation(id)
 	}
 end
 
----@param location table
+---@param location sphere.Location
 function LocationManager:unmountLocation(location)
 	if not self.mounted[location.id] then
 		return
@@ -74,7 +78,7 @@ function LocationManager:unmountLocation(location)
 	self.mounted[location.id] = nil
 end
 
----@param location table
+---@param location sphere.Location
 function LocationManager:mountLocation(location)
 	local path = location.path
 	if location.is_relative then
@@ -94,7 +98,7 @@ function LocationManager:mountLocation(location)
 	location.status = "errored"
 end
 
----@param location table
+---@param location sphere.Location
 ---@return string
 function LocationManager:getPrefix(location)
 	if location.is_relative then

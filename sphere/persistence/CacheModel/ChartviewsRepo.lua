@@ -11,6 +11,7 @@ local ChartviewsRepo = class()
 ---@param models sphere.CacheModelModels
 function ChartviewsRepo:new(models)
 	self.chartviews_count = 0
+	---@type {[integer]: sphere.IChartviewIds}
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
 	self.chartfile_id_to_global_index = {}
@@ -161,8 +162,8 @@ function ChartviewsRepo:queryNoteChartSets()
 	self.chartviews_count = c
 end
 
----@param chartview table
----@return rdb.Row[]
+---@param chartview sphere.IChartviewIds
+---@return sphere.Chartview[]
 function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local params = self.params
 
@@ -208,6 +209,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		order = order,
 	}
 
+	---@type sphere.Chartview[]
 	local objs = model:select(where, options)
 
 	for _, obj in ipairs(objs) do
@@ -223,8 +225,8 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	return objs
 end
 
----@param _chartview table
----@return rdb.Row
+---@param _chartview sphere.IChartviewIds
+---@return sphere.Chartview?
 function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
@@ -241,6 +243,7 @@ function ChartviewsRepo:getChartview(_chartview)
 		model = self.models.chartplayviews
 	end
 
+	---@type sphere.Chartview?
 	local obj = model:find({
 		chartfile_id = chartfile_id,
 		chartplay_id = chartplay_id,

@@ -10,6 +10,7 @@ NoteChartLibrary.itemsCount = 0
 ---@param cacheModel sphere.CacheModel
 function NoteChartLibrary:new(cacheModel)
 	self.cacheModel = cacheModel
+	---@type sphere.RichChartview[]
 	self.items = {}
 end
 
@@ -17,8 +18,9 @@ function NoteChartLibrary:clear()
 	self.items = {}
 end
 
----@param chartview table
+---@param chartview sphere.IChartviewIds
 function NoteChartLibrary:setNoteChartSetId(chartview)
+	---@type sphere.RichChartview[]
 	self.items = self.cacheModel.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
 		return
@@ -34,7 +36,7 @@ function NoteChartLibrary:setNoteChartSetId(chartview)
 	end
 end
 
----@param chartview table
+---@param chartview sphere.IChartviewIds
 ---@return number
 function NoteChartLibrary:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id

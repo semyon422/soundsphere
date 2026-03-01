@@ -15,6 +15,51 @@ local ComputeDataProvider = require("sphere.persistence.CacheModel.ComputeDataPr
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 
+---@class sphere.Location
+---@field id integer
+---@field path string
+---@field name string
+---@field is_relative boolean
+---@field is_internal boolean
+
+---@class sphere.IChartviewIds
+---@field chartfile_id integer
+---@field chartfile_set_id integer
+---@field chartmeta_id integer
+---@field chartdiff_id integer
+---@field chartplay_id integer
+---@field lamp boolean
+
+---@class sphere.Chartview: sphere.IChartviewIds
+---@field hash string
+---@field index integer
+---@field title string
+---@field artist string
+---@field creator string
+---@field level number
+---@field inputmode string
+---@field format string
+---@field audio_path string
+---@field background_path string
+---@field location_id integer
+---@field set_name string
+---@field set_dir string
+---@field chartfile_name string
+---@field difficulty number
+---@field notes_count integer
+---@field duration number
+---@field msd_diff? number
+---@field accuracy? number
+---@field miss_count? integer
+---@field difftable_chartmetas? table[]
+
+---@class sphere.RichChartview: sphere.Chartview
+---@field location_prefix string
+---@field location_dir string
+---@field location_path string
+---@field real_dir string
+---@field real_path string
+
 ---@class sphere.CacheModel
 ---@operator call: sphere.CacheModel
 local CacheModel = class()
