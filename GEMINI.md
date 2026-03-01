@@ -54,10 +54,12 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *	**Class Naming & Namespacing:**
 	*	**Legacy Style:** Use `prefix.ClassName` (e.g., `sea.UserConnectionsRepo`). Avoid deep nesting like `sea.app.repos.UserConnectionsRepo`.
 	*	**Modern Style (`rizu.*`):** Follows a hierarchical, directory-based namespacing convention.
-		*	**Namespaces:** Use lowercase names derived from the directory structure (e.g., `rizu.audio.bass`).
-		*	**Classes:** Named after their PascalCase filename (e.g., `rizu.audio.Engine`, `rizu.audio.SoftwareMixer`).
-		*	**Interfaces:** Prefixed with `I` (e.g., `rizu.audio.IProvider`, `rizu.audio.IDecoder`).
-		*	**Encapsulation:** Implementations are grouped by backend/feature in subdirectories (e.g., `rizu.audio.bass.Decoder`).
+		*	**Namespaces:** Use concise lowercase names (e.g., `rizu.library`). Namespaces do not have to match the full directory path; a module-level prefix is preferred (e.g., all classes in `rizu/library/` and its subdirectories should use the `rizu.library` prefix).
+		*	**Classes:** Named after their PascalCase filename (e.g., `rizu.library.Library`, `rizu.library.LocationsRepo`).
+		*	**Suffixes:** Use semantic suffixes for component roles: `Repo` for database access, `Generator` for data transformation, `Task` for long-running operations, `Manager` for high-level coordination.
+		*	**File Alignment:** The filename MUST match the class name (e.g., `rizu.library.LocationsRepo` must be in `rizu/library/repos/LocationsRepo.lua`).
+		*	**Interfaces:** Prefixed with `I` (e.g., `rizu.library.ITaskContext`).
+		*	**Encapsulation:** Implementations are grouped by feature in subdirectories (e.g., `rizu/library/tasks/`, `rizu/library/generators/`).
 
 *   **Shared Memory:** Use the `web.SharedMemory` class (`aqua/web/nginx/SharedMemory.lua`) to access OpenResty shared dictionaries. Dictionaries must be defined in `nginx_config.lua` under the `shared_dicts` table to be automatically included in the generated `nginx.conf`.
     *   **Cross-Worker Communication:** For communication between different nginx workers/connections, use shared memory queues (e.g., `aqua/icc/SharedMemoryQueue.lua`). These queues should store messages encoded as strings (using `icc.StringBufferPeer`).
@@ -83,11 +85,13 @@ The project prioritizes high-performance Lua code, especially within the gamepla
 
 ### Testing
 
-The project uses a custom testing framework. Test files should follow these conventions:
+The project uses a custom testing framework. Test files are first-class citizens and must be maintained rigorously.
 
-1.  **File Naming:** Test files should be named with a `_test.lua` suffix (e.g., `MyModule_test.lua`).
-2.  **Structure:** A test file should return a table containing test functions. Each test function receives a `t` object of type `testing.T`.
-3.  **Assertions:** Use the methods provided by the `t` object for assertions:
+1.  **File Naming:** Test files should be named with a `_test.lua` suffix and should reside in the same directory as the source file they test (e.g., `MyRepo.lua` -> `MyRepo_test.lua`).
+2.  **Preservation:** NEVER delete test files during refactoring. If a module is moved or renamed, its corresponding tests must be moved and updated to reflect the new structure.
+3.  **Verification:** ALWAYS run project-specific tests after making changes. Fulfill the user's request thoroughly by including automated tests; a change is incomplete without verification logic.
+4.  **Structure:** A test file should return a table containing test functions. Each test function receives a `t` object of type `testing.T`.
+5.  **Assertions:** Use the methods provided by the `t` object for assertions:
     *   `t:eq(got, expected, msg?)`: Equality check (`==`).
     *   `t:ne(got, expected, msg?)`: Inequality check (`!=`).
     *   `t:tdeq(got, expected, msg?)`: Deep equality check for tables. Can be used to compare `icc.Message` objects directly.
