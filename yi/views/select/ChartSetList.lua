@@ -50,9 +50,6 @@ function ChartSetList:drawItem(index, y, is_selected)
 
 	local w = self:getCalculatedWidth()
 
-	love.graphics.setColor((index % 2) == 0 and Colors.panels or Colors.panels_alt)
-	love.graphics.rectangle("fill", 0, y, w, self.item_height)
-
 	if is_selected then
 		love.graphics.setColor(Colors.accent[1], Colors.accent[2], Colors.accent[3], 0.2)
 		love.graphics.rectangle("fill", 0, y, w, self.item_height)

@@ -153,7 +153,11 @@ function Engine:update(dt, mouse_x, mouse_y)
 		self:remove(self.removal_deferred[i], true)
 	end
 
+	local t1 = love.timer.getTime()
+
 	local updated_roots = self.layout_engine:updateLayout(self.layout_update_requesters)
+
+	local t2 = love.timer.getTime()
 
 	if updated_roots then
 		for node, _ in pairs(updated_roots) do
@@ -170,6 +174,11 @@ function Engine:update(dt, mouse_x, mouse_y)
 	if self.rebuild_command_buffer then
 		self.rebuild_command_buffer = false
 		self.command_buffer = CommandBuffer(self.root)
+	end
+
+	local lt = (t2 - t1) * 1000
+	if lt > 1 then
+		print(("Layout recalc takes too long: %0.02f MS Time: %0.01f"):format(lt, love.timer.getTime()))
 	end
 end
 

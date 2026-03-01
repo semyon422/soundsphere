@@ -535,13 +535,13 @@ View.Setters = {
 	handles_keyboard_input = true,
 	color = View.setColor,
 	background_color = View.setBackgroundColor,
+	outline = true,
 	corner_radius = true,
 	stencil = true,
 	id = true,
 	enabled = View.setEnabled,
 	mouse = function(self, v) self.handles_mouse_input = v end,
 	keyboard = function(self, v) self.handles_keyboard_input = v end,
-	align = function(self, v) if self.setAlign then self:setAlign(v) end end
 }
 
 return View

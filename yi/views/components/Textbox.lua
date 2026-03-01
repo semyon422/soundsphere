@@ -107,19 +107,29 @@ end
 
 ---@param e ui.TextInputEvent
 function Textbox:onTextInput(e)
+	if not self.is_focused then
+		return
+	end
+
 	local left = string.sub(self.text, 1, utf8.offset(self.text, self.cursor_pos + 1) - 1)
 	local right = string.sub(self.text, utf8.offset(self.text, self.cursor_pos + 1))
 	self.text = left .. e.key .. right
 	self.cursor_pos = self.cursor_pos + 1
-	
+
 	if self.on_change then
 		self.on_change(self.text)
 	end
+
+	e:stopPropagation()
 	return true
 end
 
 ---@param e ui.KeyDownEvent
 function Textbox:onKeyDown(e)
+	if not self.is_focused then
+		return
+	end
+
 	local k = e.key
 	if k == "backspace" then
 		if self.cursor_pos > 0 then
@@ -131,7 +141,6 @@ function Textbox:onKeyDown(e)
 				self.on_change(self.text)
 			end
 		end
-		return true
 	elseif k == "delete" then
 		if self.cursor_pos < utf8.len(self.text) then
 			local left = string.sub(self.text, 1, utf8.offset(self.text, self.cursor_pos + 1) - 1)
@@ -141,16 +150,12 @@ function Textbox:onKeyDown(e)
 				self.on_change(self.text)
 			end
 		end
-		return true
 	elseif k == "left" then
 		self.cursor_pos = math.max(0, self.cursor_pos - 1)
-		return true
 	elseif k == "right" then
 		self.cursor_pos = math.min(utf8.len(self.text), self.cursor_pos + 1)
-		return true
 	elseif k == "c" and e.control_pressed then
 		love.system.setClipboardText(self.text)
-		return true
 	elseif k == "v" and e.control_pressed then
 		local clip = love.system.getClipboardText()
 		if clip ~= "" then
@@ -162,11 +167,12 @@ function Textbox:onKeyDown(e)
 				self.on_change(self.text)
 			end
 		end
-		return true
-	elseif k == "return" then
+	elseif k == "return" or k == "escape" then
 		self:getInputs():setKeyboardFocus(nil, {control = false, shift = false, alt = false, super = false})
-		return true
 	end
+
+	e:stopPropagation()
+	return true
 end
 
 function Textbox:draw()
