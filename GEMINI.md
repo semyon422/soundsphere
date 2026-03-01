@@ -53,6 +53,7 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **Constructors:** Empty `:new()` methods in class definitions should be omitted.
 *	**Class Naming & Namespacing:**
 	*	**Legacy Style:** Use `prefix.ClassName` (e.g., `sea.UserConnectionsRepo`). Avoid deep nesting like `sea.app.repos.UserConnectionsRepo`.
+	*	**Mandate:** Class names (in `@class` annotations and code) CANNOT be derived solely from file paths. You MUST read the file's definition or rely on existing usage in the codebase to determine the correct namespace and class name.
 	*	**Modern Style (`rizu.*`):** Follows a hierarchical, directory-based namespacing convention.
 		*	**Namespaces:** Use concise lowercase names (e.g., `rizu.library`). Namespaces do not have to match the full directory path; a module-level prefix is preferred (e.g., all classes in `rizu/library/` and its subdirectories should use the `rizu.library` prefix).
 		*	**Classes:** Named after their PascalCase filename (e.g., `rizu.library.Library`, `rizu.library.LocationsRepo`).
