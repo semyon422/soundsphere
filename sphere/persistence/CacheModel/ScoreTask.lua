@@ -7,39 +7,44 @@ local ScoreTask = class()
 
 ---@param chartsRepo sea.ChartsRepo
 ---@param chartsComputer sea.ChartsComputer
----@param checkProgress fun(state: integer, count: integer, current: integer)
----@param shouldStop fun(): boolean
-function ScoreTask:new(chartsRepo, chartsComputer, checkProgress, shouldStop)
+---@param context sphere.ITaskContext
+function ScoreTask:new(chartsRepo, chartsComputer, context)
 	self.chartsRepo = chartsRepo
 	self.chartsComputer = chartsComputer
-	self.checkProgress = checkProgress
-	self.shouldStop = shouldStop
+	self.context = context
 end
 
 function ScoreTask:computeAll()
 	local chartsRepo = self.chartsRepo
 	local chartsComputer = self.chartsComputer
+	local context = self.context
 
 	local chartplays = chartsRepo:getChartplaysComputed(os.time(), "new", 1e6)
 	print("ScoreTask: processing chartplays", #chartplays)
 
 	local count = #chartplays
 	local current = 0
-	self.checkProgress(3, count, current)
+	context:checkProgress(3, count, current)
 
+	context:dbBegin()
 	for i, chartplay in ipairs(chartplays) do
-		if self.shouldStop() then break end
+		if context:shouldStop() then break end
 		local ret, err = chartsComputer:computeChartplay(chartplay)
 		if not ret then
-			print("ScoreTask: " .. chartplay.replay_hash .. ": " .. err)
+			context:addError("ScoreTask: " .. chartplay.replay_hash .. ": " .. tostring(err))
 		else
 			-- Optional: print some summary
 			-- print(stbl.encode(ret.chartplay_computed))
 		end
 
 		current = i
-		self.checkProgress(3, count, current)
+		context:checkProgress(3, count, current)
+		if i % 100 == 0 then
+			context:dbCommit()
+			context:dbBegin()
+		end
 	end
+	context:dbCommit()
 end
 
 return ScoreTask

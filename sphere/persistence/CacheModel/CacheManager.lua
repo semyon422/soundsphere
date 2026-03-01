@@ -14,6 +14,7 @@ local ChartsComputer = require("sea.compute.ChartsComputer")
 local HashingTask = require("sphere.persistence.CacheModel.HashingTask")
 local DifficultyTask = require("sphere.persistence.CacheModel.DifficultyTask")
 local ScoreTask = require("sphere.persistence.CacheModel.ScoreTask")
+local TaskContext = require("sphere.persistence.CacheModel.TaskContext")
 local class = require("class")
 local path_util = require("path_util")
 
@@ -36,8 +37,8 @@ function CacheManager:new(gdb, fs, workingDirectory)
 
 	self.chartsRepo = ChartsRepo(gdb.models, self.difficultyModel.registry.fields)
 
-	self.locationsRepo = LocationsRepo(gdb)
-	self.chartfilesRepo = ChartfilesRepo(gdb)
+	self.locationsRepo = LocationsRepo(gdb.models)
+	self.chartfilesRepo = ChartfilesRepo(gdb.models)
 
 	self.noteChartFinder = NoteChartFinder(self.fs)
 
@@ -47,31 +48,14 @@ function CacheManager:new(gdb, fs, workingDirectory)
 			self:checkProgress()
 		end
 	end
+
+	self.taskContext = TaskContext(self)
+
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, self.difficultyModel)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
-	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator)
-	
-	local function checkProgress(state, count, current)
-		self.state = state
-		self.chartfiles_count = count
-		self.chartfiles_current = current
-		self:checkProgress()
-	end
-
-	local function shouldStop()
-		self:checkProgress()
-		return self.needStop == true
-	end
-
-	self.difficultyTask = DifficultyTask(
-		self.difficultyModel, 
-		self.chartdiffGenerator, 
-		self.chartsRepo, 
-		function(hash) return self:getChartsByHash(hash) end,
-		checkProgress,
-		shouldStop
-	)
+	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator, self.taskContext)
+	self.difficultyTask = DifficultyTask(self.difficultyModel, self.chartdiffGenerator, self.chartsRepo, self.taskContext)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -91,7 +75,7 @@ function CacheManager:new(gdb, fs, workingDirectory)
 	self.computeDataLoader = ComputeDataLoader(self.computeDataProvider)
 
 	self.chartsComputer = ChartsComputer(self.computeDataLoader, self.chartsRepo)
-	self.scoreTask = ScoreTask(self.chartsRepo, self.chartsComputer, checkProgress, shouldStop)
+	self.scoreTask = ScoreTask(self.chartsRepo, self.chartsComputer, self.taskContext)
 end
 
 function CacheManager:begin()
@@ -108,24 +92,15 @@ function CacheManager:resetProgress()
 	self.chartfiles_count = 0
 	self.chartfiles_current = 0
 	self.state = 0
+	self.errors = {}
 end
 
-function CacheManager:checkProgress()
-	local thread = require("thread")
-	thread:update()
-
-	local cache = thread.shared.cache
-	if cache then
-		cache.chartfiles_count = self.chartfiles_count
-		cache.chartfiles_current = self.chartfiles_current
-		cache.state = self.state
-
-		if cache.stop then
-			cache.stop = false
-			self.needStop = true
-		end
-	end
+function CacheManager:addError(err)
+	table.insert(self.errors, tostring(err))
+	self:checkProgress()
 end
+
+function CacheManager:checkProgress() end
 
 ---@param path string?
 ---@param location_id number

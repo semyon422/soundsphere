@@ -11,6 +11,9 @@ function NoteChartFinder:new(fs)
 	self.fs = fs
 end
 
+---@param dir string?
+---@return string? parent
+---@return string? name
 local function get_dir_name(dir)
 	if not dir then
 		return
@@ -23,6 +26,7 @@ local function get_dir_name(dir)
 end
 NoteChartFinder.get_dir_name = get_dir_name
 
+---@private
 ---@param prefix string?
 ---@param dir string?
 function NoteChartFinder:lookupAsync(prefix, dir)
@@ -39,12 +43,14 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 
 	local all_items = {}
 
-	local chartPaths = false
+	-- Phase 1: Check for direct chart files (like .osu, .bms, .sph)
+	-- If a directory contains these, it's considered a "chart set"
+	local has_related = false
 	for _, item in ipairs(items) do
 		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and info.type == "file" and ChartLocation:isRelated(item) then
-			if not chartPaths then
-				chartPaths = true
+			if not has_related then
+				has_related = true
 				local a, b = get_dir_name(dir)
 				coroutine.yield("related_dir", a, b, dir_info.modtime)
 			end
@@ -52,17 +58,21 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 			table.insert(all_items, item)
 		end
 	end
-	if chartPaths then
+	
+	-- If we found related files, we stop here for this directory (don't treat as container)
+	if has_related then
 		coroutine.yield("related_all", dir, all_items, dir_info.modtime)
 		return
 	end
 
-	local containerPaths = false
+	-- Phase 2: Check for unrelated container files (like .ojn, .sm)
+	-- These files themselves act as chart sets
+	local has_unrelated = false
 	for _, item in ipairs(items) do
 		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and info.type == "file" and ChartLocation:isUnrelated(item) then
-			if not containerPaths then
-				containerPaths = true
+			if not has_unrelated then
+				has_unrelated = true
 				local a, b = get_dir_name(dir)
 				coroutine.yield("unrelated_dir", a, b, dir_info.modtime)
 			end
@@ -70,20 +80,24 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 			table.insert(all_items, item)
 		end
 	end
-	if containerPaths then
+	
+	if has_unrelated then
 		coroutine.yield("unrelated_all", dir, all_items, dir_info.modtime)
 		return
 	end
 
+	-- Phase 3: Pure directory scanning
+	-- If no charts were found, recurse into subdirectories
 	local a, b = get_dir_name(dir)
 	coroutine.yield("directory_dir", a, b, dir_info.modtime)
 
-	local checked_items = {}
+	local subdirs_to_scan = {}
 	for _, item in ipairs(items) do
 		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and (info.type == "directory" or info.type == "symlink") then
+			-- The consumer can return 'false' to skip scanning this subdirectory
 			if coroutine.yield("directory", dir, item, info.modtime) then
-				table.insert(checked_items, item)
+				table.insert(subdirs_to_scan, item)
 			end
 			table.insert(all_items, item)
 		end
@@ -91,14 +105,14 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 
 	coroutine.yield("directory_all", dir, all_items, dir_info.modtime)
 
-	for _, item in ipairs(checked_items) do
+	for _, item in ipairs(subdirs_to_scan) do
 		self:lookupAsync(prefix, path_util.join(dir, item))
 	end
 end
 
 ---@param prefix string?
 ---@param dir string?
----@return function
+---@return fun(): string, string, string, integer
 function NoteChartFinder:iter(prefix, dir)
 	return coroutine.wrap(function()
 		self:lookupAsync(prefix, dir)

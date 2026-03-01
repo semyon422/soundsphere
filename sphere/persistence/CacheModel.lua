@@ -22,6 +22,7 @@ local CacheModel = class()
 ---@param difficultyModel sphere.DifficultyModel
 function CacheModel:new(difficultyModel)
 	self.tasks = {}
+	self.errors = {}
 	self.shared = {
 		state = 0,
 		chartfiles_count = 0,
@@ -40,9 +41,9 @@ function CacheModel:new(difficultyModel)
 	self.chartsRepo = ChartsRepo(self.gdb.models)
 	self.difftablesRepo = DifftablesRepo(self.gdb.models)
 
-	self.chartviewsRepo = ChartviewsRepo(self.gdb)
-	self.locationsRepo = LocationsRepo(self.gdb)
-	self.chartfilesRepo = ChartfilesRepo(self.gdb)
+	self.chartviewsRepo = ChartviewsRepo(self.gdb.models)
+	self.locationsRepo = LocationsRepo(self.gdb.models)
+	self.chartfilesRepo = ChartfilesRepo(self.gdb.models)
 	self.cacheStatus = CacheStatus(self.chartfilesRepo, self.chartsRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, difficultyModel)
 	self.locationManager = LocationManager(
@@ -62,10 +63,15 @@ function CacheModel:new(difficultyModel)
 	)
 
 	self.remote_handler = {
-		updateProgress = function(state, count, current)
+		updateProgress = function(state, count, current, errors)
 			self.shared.state = state
 			self.shared.chartfiles_count = count
 			self.shared.chartfiles_current = current
+			if errors then
+				for _, err in ipairs(errors) do
+					table.insert(self.errors, err)
+				end
+			end
 		end
 	}
 	-- ThreadRemote is created but started in :load()

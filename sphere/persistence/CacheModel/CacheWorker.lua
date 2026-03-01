@@ -12,13 +12,22 @@ function CacheWorker:init()
 	self.gdb = GameDatabase()
 	self.gdb:load()
 	self.cacheManager = CacheManager(self.gdb, LoveFilesystem(), love.filesystem.getWorkingDirectory())
+	self.errors = {}
 	
 	local last_update = 0
 	-- Override checkProgress to send updates via remote
 	function self.cacheManager.checkProgress(manager)
+		if #manager.errors > 0 then
+			for _, err in ipairs(manager.errors) do
+				table.insert(self.errors, err)
+			end
+			manager.errors = {}
+		end
+
 		local time = love.timer.getTime()
-		if time - last_update > 0.05 then
-			self.remote.updateProgress(manager.state, manager.chartfiles_count, manager.chartfiles_current)
+		if time - last_update > 0.05 or #self.errors > 0 then
+			self.remote.updateProgress(manager.state, manager.chartfiles_count, manager.chartfiles_current, self.errors)
+			self.errors = {}
 			last_update = time
 		end
 		

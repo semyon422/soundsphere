@@ -8,8 +8,8 @@ local class = require("class")
 ---@operator call: sphere.ChartviewsRepo
 local ChartviewsRepo = class()
 
----@param gdb sphere.GameDatabase
-function ChartviewsRepo:new(gdb)
+---@param models sphere.CacheModelModels
+function ChartviewsRepo:new(models)
 	self.chartviews_count = 0
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
@@ -18,7 +18,7 @@ function ChartviewsRepo:new(gdb)
 	self.chartplay_id_to_global_index = {}
 	self.params = {}
 
-	self.models = gdb.models
+	self.models = models
 end
 
 ----------------------------------------------------------------
@@ -45,7 +45,7 @@ local _queryAsync = thread.async(function(params)
 	local gdb = GameDatabase()
 	gdb:load()
 
-	local self = ChartviewsRepo(gdb)
+	local self = ChartviewsRepo(gdb.models)
 	self.params = params
 	local status, err = pcall(self.queryNoteChartSets, self)
 	gdb:unload()

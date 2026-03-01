@@ -5,9 +5,9 @@ local sql_util = require("rdb.sql_util")
 ---@operator call: sphere.LocationsRepo
 local LocationsRepo = class()
 
----@param gdb sphere.GameDatabase
-function LocationsRepo:new(gdb)
-	self.models = gdb.models
+---@param models sphere.CacheModelModels
+function LocationsRepo:new(models)
+	self.models = models
 end
 
 ---@return table
