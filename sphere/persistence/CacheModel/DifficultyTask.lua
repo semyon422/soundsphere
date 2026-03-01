@@ -9,19 +9,18 @@ local ChartDecoder = require("sph.ChartDecoder")
 local DifficultyTask = class()
 
 ---@param difficultyModel sphere.DifficultyModel
+---@param chartdiffGenerator sphere.ChartdiffGenerator
 ---@param chartsRepo sea.ChartsRepo
----@param cacheManager sphere.CacheManager
-function DifficultyTask:new(difficultyModel, chartsRepo, cacheManager)
+---@param getChartsByHash fun(hash: string): ncdk2.Chart[]?, string?
+---@param checkProgress fun(state: integer, count: integer, current: integer)
+---@param shouldStop fun(): boolean
+function DifficultyTask:new(difficultyModel, chartdiffGenerator, chartsRepo, getChartsByHash, checkProgress, shouldStop)
 	self.difficultyModel = difficultyModel
+	self.chartdiffGenerator = chartdiffGenerator
 	self.chartsRepo = chartsRepo
-	self.cacheManager = cacheManager
-end
-
----@param hash string
----@return ncdk2.Chart[]?
----@return string?
-function DifficultyTask:getChartsByHash(hash)
-	return self.cacheManager:getChartsByHash(hash)
+	self.getChartsByHash = getChartsByHash
+	self.checkProgress = checkProgress
+	self.shouldStop = shouldStop
 end
 
 function DifficultyTask:computeMissing()
@@ -30,14 +29,14 @@ function DifficultyTask:computeMissing()
 	local scores = chartsRepo:getChartplaysMissingChartdiffs()
 	local chartmetas = chartsRepo:getChartmetasMissingChartdiffs()
 
-	self.cacheManager.state = 2
-	self.cacheManager.chartfiles_count = #chartmetas + #scores
-	self.cacheManager.chartfiles_current = 0
-	self.cacheManager:checkProgress()
+	local count = #chartmetas + #scores
+	local current = 0
+	self.checkProgress(2, count, current)
 
 	print("DifficultyTask: computing default chartdiffs")
 	for i, chartmeta in ipairs(chartmetas) do
-		local charts, err = self:getChartsByHash(chartmeta.hash)
+		if self.shouldStop() then break end
+		local charts, err = self.getChartsByHash(chartmeta.hash)
 		if not charts then
 			print(err)
 		else
@@ -46,7 +45,7 @@ function DifficultyTask:computeMissing()
 			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
 			if ok then
 				local time = os.time()
-				local chartdiff = self.cacheManager.chartdiffGenerator:compute(chart, 1)
+				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
 				chartdiff.hash = chartmeta.hash
 				chartdiff.index = chartmeta.index
 				chartsRepo:createUpdateChartdiff(chartdiff, time)
@@ -55,14 +54,14 @@ function DifficultyTask:computeMissing()
 			end
 		end
 
-		self.cacheManager.chartfiles_current = self.cacheManager.chartfiles_current + 1
-		self.cacheManager:checkProgress()
-		if self.cacheManager.needStop then break end
+		current = current + 1
+		self.checkProgress(2, count, current)
 	end
 
 	print("DifficultyTask: computing modified chartdiffs")
 	for i, score in ipairs(scores) do
-		local charts, err = self:getChartsByHash(score.hash)
+		if self.shouldStop() then break end
+		local charts, err = self.getChartsByHash(score.hash)
 		if not charts then
 			print(err)
 		else
@@ -72,7 +71,7 @@ function DifficultyTask:computeMissing()
 				ModifierModel:apply(score.modifiers, chart)
 
 				local time = os.time()
-				local chartdiff = self.cacheManager.chartdiffGenerator:compute(chart, score.rate)
+				local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
 				chartdiff.modifiers = score.modifiers
 				chartdiff.hash = score.hash
 				chartdiff.index = score.index
@@ -83,9 +82,8 @@ function DifficultyTask:computeMissing()
 			end
 		end
 
-		self.cacheManager.chartfiles_current = self.cacheManager.chartfiles_current + 1
-		self.cacheManager:checkProgress()
-		if self.cacheManager.needStop then break end
+		current = current + 1
+		self.checkProgress(2, count, current)
 	end
 end
 
@@ -96,11 +94,12 @@ function DifficultyTask:computeIncomplete(prefer_preview)
 	local chartdiffs = chartsRepo:getIncompleteChartdiffs()
 	print("DifficultyTask: processing incomplete", #chartdiffs)
 
-	self.cacheManager.state = 2
-	self.cacheManager.chartfiles_count = #chartdiffs
-	self.cacheManager.chartfiles_current = 0
+	local count = #chartdiffs
+	local current = 0
+	self.checkProgress(2, count, current)
 
 	for i, chartdiff in ipairs(chartdiffs) do
+		if self.shouldStop() then break end
 		---@type ncdk2.Chart
 		local chart
 
@@ -115,7 +114,7 @@ function DifficultyTask:computeIncomplete(prefer_preview)
 			local decoder = ChartDecoder()
 			chart = decoder:decodeSph(sph)
 		else
-			local charts, err = self:getChartsByHash(chartdiff.hash)
+			local charts, err = self.getChartsByHash(chartdiff.hash)
 			if not charts then
 				print(err)
 			else
@@ -135,9 +134,8 @@ function DifficultyTask:computeIncomplete(prefer_preview)
 			chartsRepo:updateChartdiff(chartdiff)
 		end
 
-		self.cacheManager.chartfiles_current = i
-		self.cacheManager:checkProgress()
-		if self.cacheManager.needStop then break end
+		current = i
+		self.checkProgress(2, count, current)
 	end
 end
 

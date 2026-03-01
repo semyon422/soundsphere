@@ -57,7 +57,8 @@ function CacheModel:new(difficultyModel)
 		self.chartfilesRepo,
 		self.chartsRepo,
 		self.locationsRepo,
-		self.locationManager
+		self.locationManager,
+		LoveFilesystem()
 	)
 
 	self.remote_handler = {

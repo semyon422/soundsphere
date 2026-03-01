@@ -7,11 +7,13 @@ local ScoreTask = class()
 
 ---@param chartsRepo sea.ChartsRepo
 ---@param chartsComputer sea.ChartsComputer
----@param cacheManager sphere.CacheManager
-function ScoreTask:new(chartsRepo, chartsComputer, cacheManager)
+---@param checkProgress fun(state: integer, count: integer, current: integer)
+---@param shouldStop fun(): boolean
+function ScoreTask:new(chartsRepo, chartsComputer, checkProgress, shouldStop)
 	self.chartsRepo = chartsRepo
 	self.chartsComputer = chartsComputer
-	self.cacheManager = cacheManager
+	self.checkProgress = checkProgress
+	self.shouldStop = shouldStop
 end
 
 function ScoreTask:computeAll()
@@ -21,12 +23,12 @@ function ScoreTask:computeAll()
 	local chartplays = chartsRepo:getChartplaysComputed(os.time(), "new", 1e6)
 	print("ScoreTask: processing chartplays", #chartplays)
 
-	self.cacheManager.chartfiles_count = #chartplays
-	self.cacheManager.chartfiles_current = 0
-	self.cacheManager.state = 1
-	self.cacheManager:checkProgress()
+	local count = #chartplays
+	local current = 0
+	self.checkProgress(3, count, current)
 
 	for i, chartplay in ipairs(chartplays) do
+		if self.shouldStop() then break end
 		local ret, err = chartsComputer:computeChartplay(chartplay)
 		if not ret then
 			print("ScoreTask: " .. chartplay.replay_hash .. ": " .. err)
@@ -35,13 +37,9 @@ function ScoreTask:computeAll()
 			-- print(stbl.encode(ret.chartplay_computed))
 		end
 
-		self.cacheManager.chartfiles_current = i
-		self.cacheManager:checkProgress()
-		if self.cacheManager.needStop then break end
+		current = i
+		self.checkProgress(3, count, current)
 	end
-
-	self.cacheManager.state = 0
-	self.cacheManager:checkProgress()
 end
 
 return ScoreTask

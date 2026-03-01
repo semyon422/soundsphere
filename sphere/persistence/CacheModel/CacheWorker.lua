@@ -13,13 +13,14 @@ function CacheWorker:init()
 	self.gdb:load()
 	self.cacheManager = CacheManager(self.gdb, LoveFilesystem(), love.filesystem.getWorkingDirectory())
 	
+	local last_update = 0
 	-- Override checkProgress to send updates via remote
 	function self.cacheManager.checkProgress(manager)
-		self.remote.updateProgress(manager.state, manager.chartfiles_count, manager.chartfiles_current)
-		
-		-- not allowed in threads
-		-- local thread = require("thread")
-		-- thread:update()
+		local time = love.timer.getTime()
+		if time - last_update > 0.05 then
+			self.remote.updateProgress(manager.state, manager.chartfiles_count, manager.chartfiles_current)
+			last_update = time
+		end
 		
 		if self.needStop then
 			manager.needStop = true

@@ -11,11 +11,13 @@ local ComputeDataProvider = IComputeDataProvider + {}
 ---@param chartsRepo sea.ChartsRepo
 ---@param locationsRepo sphere.LocationsRepo
 ---@param locationManager sphere.LocationManager
-function ComputeDataProvider:new(chartfilesRepo, chartsRepo, locationsRepo, locationManager)
+---@param fs fs.IFilesystem
+function ComputeDataProvider:new(chartfilesRepo, chartsRepo, locationsRepo, locationManager, fs)
 	self.chartfilesRepo = chartfilesRepo
 	self.chartsRepo = chartsRepo
 	self.locationsRepo = locationsRepo
 	self.locationManager = locationManager
+	self.fs = fs
 end
 
 ---@param hash string
@@ -44,7 +46,7 @@ function ComputeDataProvider:getChartData(hash)
 	local prefix = self.locationManager:getPrefix(location)
 	local path = path_util.join(prefix, chartfile_set.dir, chartfile_set.name, chartfile.name)
 
-	local data = love.filesystem.read(path)
+	local data = self.fs:read(path)
 	if not data then
 		return nil, "file not found"
 	end
@@ -72,7 +74,7 @@ function ComputeDataProvider:getReplayData(replay_hash)
 		return nil, "chartplay not found"
 	end
 
-	local data = love.filesystem.read("userdata/replays/" .. replay_hash)
+	local data = self.fs:read("userdata/replays/" .. replay_hash)
 	if not data then
 		return nil, "replay file not found"
 	end

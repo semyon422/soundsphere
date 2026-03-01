@@ -51,7 +51,27 @@ function CacheManager:new(gdb, fs, workingDirectory)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, self.difficultyModel)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
 	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator)
-	self.difficultyTask = DifficultyTask(self.difficultyModel, self.chartsRepo, self)
+	
+	local function checkProgress(state, count, current)
+		self.state = state
+		self.chartfiles_count = count
+		self.chartfiles_current = current
+		self:checkProgress()
+	end
+
+	local function shouldStop()
+		self:checkProgress()
+		return self.needStop == true
+	end
+
+	self.difficultyTask = DifficultyTask(
+		self.difficultyModel, 
+		self.chartdiffGenerator, 
+		self.chartsRepo, 
+		function(hash) return self:getChartsByHash(hash) end,
+		checkProgress,
+		shouldStop
+	)
 
 	self.locationManager = LocationManager(
 		self.locationsRepo,
@@ -65,12 +85,13 @@ function CacheManager:new(gdb, fs, workingDirectory)
 		self.chartfilesRepo,
 		self.chartsRepo,
 		self.locationsRepo,
-		self.locationManager
+		self.locationManager,
+		self.fs
 	)
 	self.computeDataLoader = ComputeDataLoader(self.computeDataProvider)
 
 	self.chartsComputer = ChartsComputer(self.computeDataLoader, self.chartsRepo)
-	self.scoreTask = ScoreTask(self.chartsRepo, self.chartsComputer, self)
+	self.scoreTask = ScoreTask(self.chartsRepo, self.chartsComputer, checkProgress, shouldStop)
 end
 
 function CacheManager:begin()

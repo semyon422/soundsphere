@@ -16,19 +16,23 @@ end
 
 ---@param chartfile sea.ClientChartfile
 ---@param location_prefix string
+---@return boolean?
+---@return string?
 function HashingTask:processChartfile(chartfile, location_prefix)
 	local full_path = path_util.join(location_prefix, chartfile.path)
-	local content = assert(self.fs:read(full_path))
+	local content, err = self.fs:read(full_path)
+	if not content then
+		return nil, "HashingTask: read error: " .. tostring(err)
+	end
 
 	local status, chart_chartmetas = self.chartmetaGenerator:generate(chartfile, content, false)
 
 	if not status then
-		print("HashingTask: chartmeta error:", chart_chartmetas)
-		return
+		return nil, "HashingTask: chartmeta error: " .. tostring(chart_chartmetas)
 	end
 
 	if not chart_chartmetas then
-		return
+		return true
 	end
 	---@cast chart_chartmetas -string
 
@@ -44,6 +48,8 @@ function HashingTask:processChartfile(chartfile, location_prefix)
 		end
 		::continue::
 	end
+	
+	return true
 end
 
 return HashingTask
