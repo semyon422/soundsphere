@@ -35,7 +35,8 @@ function test.all(t)
 	function chartfilesRepo:countChartfiles() return 0 end
 
 	local fs = {}
-	function fs.mount() return true end
+	function fs:mount() return true end
+	function fs:unmount() return true end
 
 	local lm = LocationManager(chartRepo, chartfilesRepo, fs, "/game", "prefix")
 

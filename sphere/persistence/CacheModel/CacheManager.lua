@@ -18,13 +18,18 @@ local Sph = require("sph.Sph")
 local class = require("class")
 local path_util = require("path_util")
 
+local LoveFilesystem = require("fs.LoveFilesystem")
+
 ---@class sphere.CacheManager
 ---@operator call: sphere.CacheManager
 local CacheManager = class()
 
 ---@param gdb sphere.GameDatabase
-function CacheManager:new(gdb)
+---@param fs fs.IFilesystem
+---@param workingDirectory string
+function CacheManager:new(gdb, fs, workingDirectory)
 	self.state = 0
+	self.fs = fs
 
 	self.difficultyModel = DifficultyModel()
 
@@ -35,7 +40,7 @@ function CacheManager:new(gdb)
 	self.locationsRepo = LocationsRepo(gdb)
 	self.chartfilesRepo = ChartfilesRepo(gdb)
 
-	self.noteChartFinder = NoteChartFinder(love.filesystem)
+	self.noteChartFinder = NoteChartFinder(self.fs)
 
 	local function handle_file_cache(chartfile)
 		self.chartfiles_count = self.chartfiles_count + 1
@@ -50,8 +55,8 @@ function CacheManager:new(gdb)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
 		self.chartfilesRepo,
-		nil,
-		love.filesystem.getWorkingDirectory(),
+		self.fs,
+		workingDirectory,
 		"mounted_charts"
 	)
 
@@ -103,11 +108,12 @@ function CacheManager:processChartfile(chartfile, location_prefix)
 	print(chartfile.path)
 
 	local full_path = path_util.join(location_prefix, chartfile.path)
-	local content = assert(love.filesystem.read(full_path))
+	local content = assert(self.fs:read(full_path))
 
 	local ok, chart_chartmetas = self.chartmetaGenerator:generate(chartfile, content, false)
 
 	if not ok then
+		print("chartmeta error:", chart_chartmetas)
 		return
 	end
 
@@ -153,7 +159,7 @@ function CacheManager:computeCacheLocation(path, location_id)
 		if tdir.dir then
 			local dir = path_util.join(location_prefix, tdir.dir)
 			print("check " .. dir)
-			if not love.filesystem.getInfo(dir) then
+			if not self.fs:getInfo(dir) then
 				print("deleted from cache")
 				self.chartfilesRepo:deleteChartfileSets({dir = tdir.dir})
 			end
@@ -213,7 +219,7 @@ function CacheManager:getChartsByHash(hash)
 	local prefix = self.locationManager:getPrefix(location)
 
 	local full_path = path_util.join(prefix, chartfile.path)
-	local content = assert(love.filesystem.read(full_path))
+	local content = assert(self.fs:read(full_path))
 
 	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, content)
 	if not chart_chartmetas then

@@ -30,10 +30,10 @@ local function get_files(prefix, dir)
 		},
 	}
 	local fs = {}
-	function fs.getDirectoryItems(path)
+	function fs:getDirectoryItems(path)
 		return items[path]
 	end
-	function fs.getInfo(path)
+	function fs:getInfo(path)
 		return items[path]
 	end
 

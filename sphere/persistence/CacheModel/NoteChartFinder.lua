@@ -6,7 +6,7 @@ local class = require("class")
 ---@operator call: sphere.NoteChartFinder
 local NoteChartFinder = class()
 
----@param fs love.filesystem
+---@param fs fs.IFilesystem
 function NoteChartFinder:new(fs)
 	self.fs = fs
 end
@@ -29,8 +29,8 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 	print("scan dir", prefix, dir)
 	local prefix_dir = path_util.join(prefix, dir)
 
-	local items = self.fs.getDirectoryItems(prefix_dir)
-	local dir_info = self.fs.getInfo(prefix_dir)
+	local items = self.fs:getDirectoryItems(prefix_dir)
+	local dir_info = self.fs:getInfo(prefix_dir)
 	if not dir_info then
 		local a, b = get_dir_name(dir)
 		coroutine.yield("not_found", a, b, nil)
@@ -41,7 +41,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 
 	local chartPaths = false
 	for _, item in ipairs(items) do
-		local info = self.fs.getInfo(path_util.join(prefix, dir, item))
+		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and info.type == "file" and ChartLocation:isRelated(item) then
 			if not chartPaths then
 				chartPaths = true
@@ -59,7 +59,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 
 	local containerPaths = false
 	for _, item in ipairs(items) do
-		local info = self.fs.getInfo(path_util.join(prefix, dir, item))
+		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and info.type == "file" and ChartLocation:isUnrelated(item) then
 			if not containerPaths then
 				containerPaths = true
@@ -80,7 +80,7 @@ function NoteChartFinder:lookupAsync(prefix, dir)
 
 	local checked_items = {}
 	for _, item in ipairs(items) do
-		local info = self.fs.getInfo(path_util.join(prefix, dir, item))
+		local info = self.fs:getInfo(path_util.join(prefix, dir, item))
 		if info and (info.type == "directory" or info.type == "symlink") then
 			if coroutine.yield("directory", dir, item, info.modtime) then
 				table.insert(checked_items, item)

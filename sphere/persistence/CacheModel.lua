@@ -1,7 +1,8 @@
 local thread = require("thread")
 local class = require("class")
-local physfs = require("physfs")
 local pprint = require("pprint")
+local ThreadRemote = require("threadremote.ThreadRemote")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local ChartviewsRepo = require("sphere.persistence.CacheModel.ChartviewsRepo")
 local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
 local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
@@ -21,6 +22,12 @@ local CacheModel = class()
 ---@param difficultyModel sphere.DifficultyModel
 function CacheModel:new(difficultyModel)
 	self.tasks = {}
+	self.shared = {
+		state = 0,
+		chartfiles_count = 0,
+		chartfiles_current = 0,
+		stop = false,
+	}
 
 	local migrations = {}
 	setmetatable(migrations, {__index = function(_, k)
@@ -41,7 +48,7 @@ function CacheModel:new(difficultyModel)
 	self.locationManager = LocationManager(
 		self.locationsRepo,
 		self.chartfilesRepo,
-		physfs,
+		LoveFilesystem(),
 		love.filesystem.getWorkingDirectory(),
 		"mounted_charts"
 	)
@@ -52,25 +59,49 @@ function CacheModel:new(difficultyModel)
 		self.locationsRepo,
 		self.locationManager
 	)
+
+	self.remote_handler = {
+		updateProgress = function(state, count, current)
+			self.shared.state = state
+			self.shared.chartfiles_count = count
+			self.shared.chartfiles_current = current
+		end
+	}
+	-- ThreadRemote is created but started in :load()
 end
 
 function CacheModel:load()
-	thread.shared.cache = {
-		state = 0,
-		chartfiles_count = 0,
-		chartfiles_current = 0,
-	}
-	self.shared = thread.shared.cache
-
 	self.gdb:load()
 	self.cacheStatus:update()
 
 	self.locationManager:load()
+
+	-- Backward compatibility for UI
+	thread.shared.cache = self.shared
+
+	local tr = ThreadRemote(math.random(1000000), self.remote_handler)
+	self.tr = tr
+	self.worker = tr:start(function(remote)
+		require("preload")
+		local CacheWorker = require("sphere.persistence.CacheModel.CacheWorker")
+		local worker = CacheWorker()
+		worker.remote = remote
+		worker:init()
+		return worker
+	end)
+
+	local rem = tr.remote
 end
 
 function CacheModel:unload()
+	if self.tr then
+		self.worker:unload()
+		self.tr:stop()
+	end
 	self.gdb:unload()
 end
+
+CacheModel.unload = thread.coro(CacheModel.unload)
 
 ---@param path string
 ---@param location_id number
@@ -119,36 +150,21 @@ end
 
 function CacheModel:stopTask()
 	self.shared.stop = true
+	if self.tr then
+		self.worker:stopTask()
+	end
 end
 
+CacheModel.stopTask = thread.coro(CacheModel.stopTask)
+
 function CacheModel:update()
+	if self.tr then
+		self.tr:update()
+	end
 	if not self.isProcessing and #self.tasks > 0 then
 		self:process()
 	end
 end
-
-local runTaskAsync = thread.async(function(task)
-	pprint(task)
-	local CacheManager = require("sphere.persistence.CacheModel.CacheManager")
-	local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
-
-	local gdb = GameDatabase()
-	gdb:load()
-
-	local cacheManager = CacheManager(gdb)
-
-	if task.type == "update_cache" then
-		cacheManager:computeCacheLocation(task.path, task.location_id)
-	elseif task.type == "update_chartdiffs" then
-		cacheManager:computeChartdiffs()
-	elseif task.type == "update_incomplete_chartdiffs" then
-		cacheManager:computeIncompleteChartdiffs(task.prefer_preview)
-	elseif task.type == "update_chartplays" then
-		cacheManager:computeChartplays()
-	end
-
-	gdb:unload()
-end)
 
 function CacheModel:process()
 	if self.isProcessing then
@@ -163,8 +179,21 @@ function CacheModel:process()
 		task.callback = nil
 
 		self.gdb:unload()
-		runTaskAsync(task)
+
+		if task.type == "update_cache" then
+			self.worker:computeCacheLocation(task.path, task.location_id)
+		elseif task.type == "update_chartdiffs" then
+			self.worker:computeChartdiffs()
+		elseif task.type == "update_incomplete_chartdiffs" then
+			self.worker:computeIncompleteChartdiffs(task.prefer_preview)
+		elseif task.type == "update_chartplays" then
+			self.worker:computeChartplays()
+		end
+
 		self.gdb:load()
+
+		-- Also update cache status after processing
+		self.cacheStatus:update()
 
 		if callback then
 			callback()
