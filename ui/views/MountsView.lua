@@ -67,22 +67,22 @@ end)
 
 function section_draw.locations(self, inner_w)
 	local locationsRepo = self.game.cacheModel.locationsRepo
-	local locationManager = self.game.cacheModel.locationManager
-	local locations = locationManager.locations
+	local locations = self.game.cacheModel.locations
+	local _locations = locations.locations
 
 	local list_w = inner_w / 3
 
-	local selected_loc_id = locationManager.selected_id
+	local selected_loc_id = locations.selected_id
 
 	just.push()
 	imgui.List("mount points", list_w, h - _h, _h / 2, _h, scrollYlist)
-	for i, item in ipairs(locations) do
+	for i, item in ipairs(_locations) do
 		local name = item.name
 		if selected_loc_id == item.id then
 			name = "> " .. name
 		end
 		if imgui.TextOnlyButton("mount item" .. i, name, w, _h * theme.size, "left") or not selected_loc_id then
-			locationManager:selectLocation(item.id)
+			locations:selectLocation(item.id)
 		end
 	end
 	scrollYlist = imgui.List()
@@ -93,20 +93,20 @@ function section_draw.locations(self, inner_w)
 			is_relative = false,
 			is_internal = false,
 		})
-		locationManager:selectLocations()
-		locationManager:selectLocation(location.id)
+		locations:selectLocations()
+		locations:selectLocation(location.id)
 	end
 
 	just.pop()
 
 	love.graphics.translate(list_w, 0)
 
-	local selected_loc = locationManager.selected_loc
+	local selected_loc = locations.selected_loc
 	if not selected_loc then
 		return
 	end
 
-	local location_info = locationManager.location_info
+	local location_info = locations.location_info
 
 	local path = selected_loc.path
 	if selected_loc.is_internal then
@@ -131,8 +131,8 @@ function section_draw.locations(self, inner_w)
 				id = selected_loc.id,
 				name = loc_name,
 			})
-			locationManager:selectLocations()
-			locationManager:selectLocation(selected_loc.id)
+			locations:selectLocations()
+			locations:selectLocation(selected_loc.id)
 		end
 	end
 
@@ -152,14 +152,14 @@ function section_draw.locations(self, inner_w)
 	imgui.text("Hold left shift to make buttons below active")
 
 	if imgui.button("reset dir", "delete charts cache", inactive) then
-		locationManager:deleteCharts(selected_loc.id)
+		locations:deleteCharts(selected_loc.id)
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
 
 	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
-		locationManager:deleteLocation(selected_loc.id)
-		locationManager:selectLocations()
-		locationManager:selectLocation(1)
+		locations:deleteLocation(selected_loc.id)
+		locations:selectLocations()
+		locations:selectLocation(1)
 		self.game.selectModel:noDebouncePullNoteChartSet()
 	end
 end
@@ -169,7 +169,7 @@ function section_draw.database(self)
 	---@type sphere.CacheModel
 	local cacheModel = self.game.cacheModel
 
-	local cacheStatus = cacheModel.cacheStatus
+	local cacheStatus = cacheModel.status
 	imgui.text("metas: " .. cacheStatus.chartmetas)
 	imgui.text("diffs: " .. cacheStatus.chartdiffs)
 	imgui.text("plays: " .. cacheStatus.chartplays)

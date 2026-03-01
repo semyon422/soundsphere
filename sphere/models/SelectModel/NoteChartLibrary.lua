@@ -26,7 +26,7 @@ function NoteChartLibrary:setNoteChartSetId(chartview)
 		return
 	end
 	local location = self.cacheModel.locationsRepo:selectLocationById(self.items[1].location_id)
-	local prefix = self.cacheModel.locationManager:getPrefix(location)
+	local prefix = self.cacheModel.locations:getPrefix(location)
 	for _, chart in ipairs(self.items) do
 		chart.location_prefix = prefix
 		chart.location_dir = path_util.join(prefix, chart.dir)
