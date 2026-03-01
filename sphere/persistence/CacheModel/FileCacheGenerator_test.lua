@@ -41,6 +41,18 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 	function chartRepo:deleteChartfileSets(conds)
 		table.insert(actions, {"ds", conds})
 	end
+	function chartRepo:selectChartfileSetsDirs(location_id)
+		table.insert(actions, {"ssdirs", location_id})
+		local dirs = {}
+		local seen = {}
+		for _, v in pairs(chartfile_sets) do
+			if v.location_id == location_id and v.dir and not seen[v.dir] then
+				table.insert(dirs, {dir = v.dir})
+				seen[v.dir] = true
+			end
+		end
+		return dirs
+	end
 
 	function chartRepo:selectChartfile(set_id, name)
 		table.insert(actions, {"sc", set_id, name})
@@ -65,8 +77,17 @@ local function get_fake_chartRepo(actions, chartfiles, chartfile_sets)
 	return chartRepo
 end
 
-local function get_fake_ncf(files)
-	local noteChartFinder = {}
+local function get_fake_ncf(files, existing_dirs)
+	local noteChartFinder = {
+		fs = {
+			getInfo = function(_, path)
+				if existing_dirs and existing_dirs[path] then
+					return {type = "directory"}
+				end
+				return nil
+			end
+		}
+	}
 	function noteChartFinder:iter(path)
 		local i = 0
 		return function()
@@ -95,7 +116,7 @@ function test.rel_root(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
-	fcg:lookup("chartset", 1, nil)
+	fcg:scan("chartset", 1, nil)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
@@ -142,7 +163,7 @@ function test.rel_root_noname_invalid(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
-	fcg:lookup("chartset", 1, nil)
+	fcg:scan("chartset", 1, nil)
 
 	t:tdeq(actions, {})
 end
@@ -159,10 +180,10 @@ function test.unrel_root(t)
 		{"unrelated_all", "charts", {"a", "b", "c"}, 0},
 	}
 
-	local noteChartFinder = get_fake_ncf(files)
+	local noteChartFinder = get_fake_ncf(files, {["charts/a"] = true, ["charts/b"] = true})
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
-	fcg:lookup("charts", 1, nil)
+	fcg:scan("charts", 1, nil)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
@@ -226,7 +247,7 @@ function test.root_packs(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
-	fcg:lookup("charts", 1, nil)
+	fcg:scan("charts", 1, nil)
 
 	-- print(require("inspect")(actions))
 	t:tdeq(actions, {
@@ -270,7 +291,7 @@ function test.complex(t)
 	local noteChartFinder = get_fake_ncf(files)
 
 	local fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
-	fcg:lookup("charts", 1, nil)
+	fcg:scan("charts", 1, nil)
 	-- print(require("inspect")(actions))
 
 	t:tdeq(actions, {
@@ -395,7 +416,7 @@ function test.complex(t)
 
 	fcg = FileCacheGenerator(chartRepo, noteChartFinder, function() end)
 
-	fcg:lookup("charts", 1, nil)
+	fcg:scan("charts", 1, nil)
 
 	t:assert(not fcg:shouldScan("root/osucharts", "chartset1", 0))
 	t:assert(fcg:shouldScan("root/osucharts", "chartset1", 1))

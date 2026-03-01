@@ -1,5 +1,6 @@
 local class = require("class")
 local table_util = require("table_util")
+local path_util = require("path_util")
 local sql_util = require("rdb.sql_util")
 
 ---@class sphere.FileCacheGenerator
@@ -18,7 +19,7 @@ end
 ---@param root_dir string?
 ---@param location_id number
 ---@param location_prefix string?
-function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
+function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 	local iterator = self.noteChartFinder:iter(location_prefix, root_dir)
 	local chartfile_set, chartfile
 	local handle = self.handle
@@ -88,6 +89,22 @@ function FileCacheGenerator:lookup(root_dir, location_id, location_prefix)
 			})
 		end
 		typ, dir, name, modtime = iterator(res)
+	end
+
+	-- Clean up missing directory sets
+	if not root_dir then
+		local tdirs = self.chartfilesRepo:selectChartfileSetsDirs(location_id)
+		for _, tdir in ipairs(tdirs) do
+			if tdir.dir then
+				local dir = path_util.join(location_prefix, tdir.dir)
+				if not self.noteChartFinder.fs:getInfo(dir) then
+					self.chartfilesRepo:deleteChartfileSets({
+						dir = tdir.dir,
+						location_id = location_id,
+					})
+				end
+			end
+		end
 	end
 end
 
