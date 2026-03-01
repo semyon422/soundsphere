@@ -20,86 +20,108 @@ local ImGuiSkins = require("ui.views.NoteSkinView")
 local ImGuiGameplayConfig = require("ui.views.SelectView.PlayConfigView")
 local ImGuiFilters = require("ui.views.SelectView.FiltersView")
 
+local ModifierEncoder = require("sphere.models.ModifierEncoder")
+local ModifierModel = require("sphere.models.ModifierModel")
+
 ---@class yi.Select : yi.Screen
 ---@overload fun(): yi.Select
 local Select = Screen + {}
-
-local FOOTER_HEIGHT = 50
 
 local info_side = {
 	w = "70%",
 	h = "100%",
 	arrange = "flex_col",
 	justify_content = "space_between",
+	padding = {10, 0, 10, 10},
 }
-
-local outline = {outline = {color = Colors.outline, thickness = 2}}
 
 ---@return yi.View
 function Select:newContent()
 	local res = self:getResources()
-	local modals = self:getContext().modals
-	local function open_filters() modals:setImguiModal(ImGuiFilters) end
 
 	self.ranked_tag = Tag()
 	self.chart_format_tag = Tag()
-	self.title = Label(res:getFont("black", 72), "LOADING...")
-	self.artist = Label(res:getFont("bold", 58), "LOADING...")
+	self.title = Label(res:getFont("black", 58), "LOADING...")
+	self.artist = Label(res:getFont("bold", 46), "LOADING...")
 	self.mode_cell = Cell("Mode")
 	self.bpm_cell = Cell("BPM")
 	self.duration_cell = Cell("Duration")
 	self.notes_cell = Cell("Notes")
-	self.chart_set_list = ChartSetList()
 	self.chart_grid = ChartGrid()
 	self.tags = View()
+	self.ln_percent = Label(res:getFont("bold", 24), "?% LN")
+	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
+	self.rate = Label(res:getFont("bold", 36), "1.00x")
+	self.difficulty_calc = Label(res:getFont("bold", 24), "Loading...")
+	self.difficulty = Label(res:getFont("bold", 58), "??.?")
+	self.mods = Label(res:getFont("bold", 24), "Loading...")
 
-	return h(View(), {w = "100%", h = "100%", padding = {10, 10, 10 + FOOTER_HEIGHT, 10}}, {
-		h(View(), info_side, {
-			h(View(), {arrange = "flex_col", gap = 20}, {
-				h(View(), {arrange = "flex_row", gap = 10}, {
-					self.ranked_tag,
-					self.chart_format_tag
-				}),
-				h(View(), {arrange = "flex_col", w = 999999}, {
-					h(self.title),
-					h(self.artist, {y = -5, color = Colors.lines}),
-				}),
-				h(View(), {arrange = "wrap_row", gap = 10, line_gap = 10}, {
-					self.mode_cell,
-					self.bpm_cell,
-					self.duration_cell,
-					self.notes_cell
-				}),
-				h(self.chart_grid, {w = "100%", h = 70}),
+	return h(View(), info_side, {
+		h(View(), {arrange = "flex_col", gap = 20}, {
+			h(View(), {arrange = "flex_row", gap = 10}, {
+				self.ranked_tag,
+				self.chart_format_tag
 			}),
+			h(View(), {arrange = "flex_col", w = 999999}, {
+				h(self.title),
+				h(self.artist, {y = -5, color = Colors.lines}),
+			}),
+			h(View(), {arrange = "wrap_row", gap = 10, line_gap = 10}, {
+				self.mode_cell,
+				self.bpm_cell,
+				self.duration_cell,
+				self.notes_cell
+			}),
+			h(self.chart_grid, {w = "100%", h = 70}),
+		}),
+		h(View(), {arrange = "wrap_col", gap = 10}, {
 			h(View(), {arrange = "wrap_row"}, {
-				h(View(), {arrange = "wrap_col", w = 150}, {
-					h(Label(res:getFont("bold", 24), "MSD")),
-					h(Label(res:getFont("bold", 58), "29.5"), {color = {1, 0.1, 0.1, 1}}),
-					h(Label(res:getFont("bold", 36), "1.00x")),
+				h(View(), {arrange = "wrap_col", justify_content = "end", w = 200}, {
+					self.patterns,
+					h(self.ln_percent, {color = {1, 1, 1, 1}}),
+					self.rate,
 				}),
 				h(View(), {arrange = "wrap_col", justify_content = "space_between"}, {
 					h(View(), {arrange = "wrap_col"}, {
-						h(Label(res:getFont("bold", 24), "16% LN")),
-						h(Label(res:getFont("bold", 24), "Technical\nStamina")),
+						self.difficulty_calc,
+						h(self.difficulty, {color = {1, 1, 1, 1}}),
 					}),
-					h(Label(res:getFont("bold", 24), "Const AltK AM10 BS AM14 NLN"), {y = -6}),
-				}),
-			})
-		}),
-		h(View(), {w = "30%", h = "100%", arrange = "flex_col", align_self = "end", gap = 10}, {
-			h(View(), {arrange = "flex_col", gap = 10, padding = {10, 10, 10, 10}, background_color = Colors.panels, outline}, {
-				h(Textbox("", "Search songs...", function() end), {w = "100%"}),
-				h(View(), {arrange = "flex_row", gap = 5}, {
-					h(Button("Filters", open_filters), {grow = 1}),
-					h(Button("Collections", function() end), {grow = 1}),
+					h(self.mods, {y = -6})
 				}),
 			}),
-			h(View(), {arrange = "flex_col", grow = 1, outline}, {
-				h(self.chart_set_list, {grow = 1, stencil = true, background_color = Colors.panels}),
-				h(View(), {padding = {10, 10, 10, 10}, background_color = Colors.panels, align_items = "center"}, {
-					h(Label(res:getFont("regular", 16), "Directory name")),
-				})
+			self:newButtons()
+		})
+	})
+end
+
+function Select:newRightSide()
+	local res = self:getResources()
+	local modals = self:getContext().modals
+	local function open_filters() modals:setImguiModal(ImGuiFilters) end
+
+	local avatar_frame = love.graphics.newImage("resources/yi/avatar_frame.png")
+	local player_info_h = 64
+	self.chart_set_list = ChartSetList()
+
+	return h(View(), {w = "30%", h = "100%", arrange = "flex_col", align_self = "end", background_color = Colors.panels}, {
+		h(View(), {arrange = "flex_col", gap = 10, padding = {10, 10, 10, 10}, background_color = Colors.header_footer}, {
+			h(Textbox("", "Search songs...", function() end), {w = "100%"}),
+			h(View(), {arrange = "flex_row", gap = 5}, {
+				h(Button("Filters", open_filters), {grow = 1}),
+				h(Button("Collections", function() end), {grow = 1}),
+			}),
+			h(View(), {padding = {10, 10, 10, 10}, align_items = "center"}, {
+				h(Label(res:getFont("regular", 16), "Directory name")),
+			}),
+		}),
+		h(self.chart_set_list, {grow = 1, stencil = true}),
+		h(View(), {padding = {10, 10, 10, 10}, arrange = "wrap_row", align_items = "center", gap = 10, background_color = Colors.header_footer}, {
+			h(Image(avatar_frame), {h = player_info_h, w = player_info_h, align_items = "center", justify_content = "center"}, {
+				h(Label(res:getFont("black", 24), "(^^)")),
+			}),
+			h(View(), {arrange = "wrap_col"}, {
+				h(Label(res:getFont("bold", 24), "Guest"), {color = Colors.accent}),
+				h(Label(res:getFont("bold", 16), "#5 6769PP 93.35%"))
 			}),
 		}),
 	})
@@ -109,23 +131,21 @@ local small_button = {
 	arrange = "flex_col",
 	justify_content = "center",
 	align_items = "center",
-	padding = {5, 0, 5, 0},
-	width = 110,
-	shrink = 1
+	w = 110,
+	h = 64,
 }
 
 ---@return yi.View
-function Select:newFooter()
+function Select:newButtons()
 	local res = self:getResources()
 	local modals = self:getContext().modals
 	local function open_config() modals:setImguiModal(ImGuiSettings) end
 	local function open_mods() modals:setImguiModal(ImGuiModifiers) end
 	local function open_inputs() modals:setImguiModal(ImGuiInputs) end
 	local function open_skins() modals:setImguiModal(ImGuiSkins) end
-	local function open_gameplay() modals:setImguiModal(ImGuiGameplayConfig) end
 	local function play() self.parent:set("gameplay") end
 
-	return h(View(), {h = FOOTER_HEIGHT, arrange = "wrap_row", justify_self = "end", background_color= Colors.header_footer}, {
+	return h(View(), {arrange = "wrap_row", gap = 8}, {
 		h(BottomButton(open_config), small_button, {
 			Label(res:getFont("icons", 24), ""),
 			h(Label(res:getFont("bold", 16), "CONFIG"), {align = "center"}),
@@ -141,10 +161,6 @@ function Select:newFooter()
 		h(BottomButton(open_skins), small_button, {
 			Label(res:getFont("icons", 24), ""),
 			h(Label(res:getFont("bold", 16), "SKINS"), {align = "center"}),
-		}),
-		h(BottomButton(open_gameplay), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			h(Label(res:getFont("bold", 16), "GAMEPLAY"), {align = "center"}),
 		}),
 		h(BottomButton(play), small_button, {
 			Label(res:getFont("icons", 24), ""),
@@ -172,7 +188,7 @@ function Select:load()
 		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 1}}),
 		h(View(), {w = "100%", h = "100%"}, {
 			self:newContent(),
-			self:newFooter()
+			self:newRightSide(),
 		}),
 	})
 end
@@ -246,6 +262,64 @@ function Select:onKeyDown(e)
 	end
 end
 
+local format_difficulty_calc = {
+	enps_diff = "ENPS",
+	osu_diff = "osu!SR",
+	msd_diff = "MSD",
+	user_diff = "USER"
+}
+
+
+---@param data {[string]: number}
+---@return string
+---@return string?
+local function getTopSkills(data)
+	local max_v = -math.huge
+	local max_k ---@type string
+
+	for k, v in pairs(data) do
+		if k ~= "overall" then
+			if v > max_v then
+				max_v = v
+				max_k = k
+			end
+		end
+	end
+
+	local second_v = -math.huge
+	local second_k ---@type string?
+
+	for k, v in pairs(data) do
+		if k ~= "overall" and k ~= max_k then
+			if v > max_v * 0.93 and v > second_v then
+				second_v = v
+				second_k = k
+			end
+		end
+	end
+
+	return max_k, second_k
+end
+
+---@param mods sea.Modifier[] | string
+---@return string
+local function getModifierString(mods)
+	if type(mods) == "string" then
+		mods = ModifierEncoder:decode(mods)
+	end
+	local modString = ""
+	for _, mod in pairs(mods) do
+		local modifier = ModifierModel:getModifier(mod.id)
+
+		if modifier then
+			local modifierString, modifierSubString = modifier:getString(mod)
+			modString = string.format("%s %s%s", modString, modifierString, modifierSubString or "")
+		end
+	end
+
+	return modString
+end
+
 function Select:updateChartview()
 	---@type {[string]: any}?
 	local chartview = self.select_model.chartview
@@ -286,6 +360,47 @@ function Select:updateChartview()
 	self.duration_cell:setValueText(("%i:%02i"):format(minutes, seconds))
 
 	self.notes_cell:setValueText(tostring(chartview.notes_count))
+
+	local config = self:getConfig()
+	local diff_column = config.settings.select.diff_column
+	local difficulty = 0
+	local hue = 0
+
+	if diff_column == "msd_diff" then
+		difficulty = chartview.msd_diff
+		hue = Colors.convertDiffToHue((math.min(difficulty, 40) / 40) / 1.3)
+	elseif diff_column == "osu_diff" then
+		difficulty = chartview.osu_diff
+		hue = Colors.convertDiffToHue((math.min(difficulty, 10) / 10))
+	elseif diff_column == "enps_diff" then
+		difficulty = chartview.enps_diff
+		hue = Colors.convertDiffToHue((math.min(difficulty, 30) / 30))
+	elseif diff_column == "user_diff" then
+		difficulty = chartview.user_diff
+		hue = 0
+	end
+
+	self.difficulty_calc:setText(format_difficulty_calc[diff_column])
+	self.difficulty:setText(("%0.01f"):format(difficulty))
+	self.difficulty:setColor(Colors.HSV(hue, 1, 1))
+
+	local pattern_max, pattern_second = getTopSkills(chartview.msd_diff_data)
+
+	if pattern_second then
+		self.patterns:setText(("%s\n%s"):format(pattern_max:upper(), pattern_second:upper()))
+	else
+		self.patterns:setText(("\n%s"):format(pattern_max:upper()))
+	end
+
+	local note_count = chartview.notes_count
+	local long_notes_count = (chartview.judges_count or 0) - note_count
+	local ln_percent = long_notes_count / note_count
+	self.ln_percent:setText(("%i%%"):format(ln_percent * 100))
+	self.ln_percent:setColor(Colors.HSV(Colors.convertDiffToHue(math.min(ln_percent * 1.3)), ln_percent, 1))
+
+	local game = self:getGame()
+	local mods_str = getModifierString(game.replayBase.modifiers)
+	self.mods:setText(mods_str)
 end
 
 function Select:onChartChanged()

@@ -21,12 +21,12 @@ function Label:draw()
 	love.graphics.draw(self.text_batch)
 end
 
----@param v string
+---@param v string?
 function Label:setText(v)
 	if self.text == v then
 		return
 	end
-	self.text = v
+	self.text = v or ""
 	self.text_changed = true
 	self.layout_box:markDirty(LayoutEnums.Axis.Both)
 end

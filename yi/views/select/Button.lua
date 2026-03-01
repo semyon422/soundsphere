@@ -3,6 +3,7 @@ local Colors = require("yi.Colors")
 
 ---@class yi.Button : yi.View
 ---@overload fun(callback: function): yi.Button
+---@field visual_margin number
 local Button = View + {}
 
 ---@param callback function
@@ -23,7 +24,8 @@ function Button:draw()
 	else
 		love.graphics.setColor(Colors.button)
 	end
-	love.graphics.rectangle("fill", 0, 0, self:getCalculatedWidth(), self:getCalculatedHeight())
+
+	love.graphics.rectangle("fill", 0, 0, self:getCalculatedWidth(), self:getCalculatedHeight(), 8, 8)
 end
 
 return Button
