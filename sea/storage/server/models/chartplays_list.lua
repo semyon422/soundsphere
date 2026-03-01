@@ -8,6 +8,8 @@ chartplays_list.subquery = [[
 SELECT
 	chartplays.id AS chartplay_id,
 	chartplays.*,
+	chartmetas.id AS chartmeta_id,
+	chartdiffs.id AS chartdiff_id,
 	chartdiffs.enps_diff AS difficulty,
 	chartdiffs.inputmode
 FROM chartplays

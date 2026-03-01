@@ -128,10 +128,10 @@ function ChartviewsRepo:queryNoteChartSets()
 		model = self.models.chartplayviews_no_preview
 	end
 
-	local objs = model:select(where, options)
-	print("count", #objs)
+	local count = model:count(where, options)
+	print("count", count)
 
-	local noteChartSets = ffi.new("chartview_struct[?]", #objs)
+	local noteChartSets = ffi.new("chartview_struct[?]", count)
 	local chartfile_id_to_global_index = {}
 	local chartdiff_id_to_global_index = {}
 	local chartplay_id_to_global_index = {}
@@ -143,14 +143,14 @@ function ChartviewsRepo:queryNoteChartSets()
 	self.set_id_to_global_index = set_id_to_global_index
 
 	local c = 0
-	for i, row in ipairs(objs) do
+	for i, row in model:select_iter(where, options) do
 		local entry = noteChartSets[i - 1]
 		entry.chartfile_id = row.chartfile_id
 		entry.chartfile_set_id = row.chartfile_set_id
 		entry.chartmeta_id = row.chartmeta_id or 0
 		entry.chartdiff_id = row.chartdiff_id or 0
 		entry.chartplay_id = row.chartplay_id or 0
-		entry.lamp = row.lamp or 0
+		entry.lamp = row.lamp or false
 		set_id_to_global_index[entry.chartfile_set_id] = i
 		chartfile_id_to_global_index[entry.chartfile_id] = i
 		chartdiff_id_to_global_index[entry.chartdiff_id] = i

@@ -3,6 +3,7 @@ local LjsqliteDatabase = require("rdb.db.LjsqliteDatabase")
 local SqliteMigrator = require("rdb.db.SqliteMigrator")
 local TableOrm = require("rdb.TableOrm")
 local Models = require("rdb.Models")
+local sql_util = require("rdb.sql_util")
 local autoload = require("autoload")
 
 ---@class sphere.CacheModelModels
@@ -62,18 +63,25 @@ function GameDatabase:load(path)
 		error("outdated database")
 	end
 
-	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
-	db:exec(sql)
+	self:applyViews()
 end
 
 function GameDatabase:unload()
 	self.db:close()
 end
 
+function GameDatabase:applyViews()
+	local sql = assert(love.filesystem.read("sphere/persistence/CacheModel/views.sql"))
+	for _, q in ipairs(sql_util.split_sql(sql)) do
+		self.db.c:exec(q)
+	end
+end
+
 function GameDatabase:migrate()
 	local count = self.migrator:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
+		self:applyViews()
 	end
 end
 

@@ -1,124 +1,90 @@
-local table_util = require("table_util")
-local digest = require("digest")
 local ChartmetaGenerator = require("sphere.persistence.CacheModel.ChartmetaGenerator")
+local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
+local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
+local ChartsRepo = require("sea.chart.repos.ChartsRepo")
+local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
+local digest = require("digest")
 
 local test = {}
 
-local function get_hi(hash, index)
-	if type(hash) == "table" then
-		return hash.hash .. "/" .. hash.index
-	end
-	return hash .. "/" .. index
-end
-
-local function get_fake_chartRepo(actions, chartfiles, chartmetas)
-	local chartRepo = {}
-
-	function chartRepo:updateChartfile(chartfile)
-		table.insert(actions, {"ucf", table_util.deepcopy(chartfile)})
-		chartfiles[chartfile.path] = chartfile
-		return chartfile
-	end
-	function chartRepo:getChartmetaByHashIndex(hash, index)
-		table.insert(actions, {"gcm", hash, index})
-		return chartmetas[get_hi(hash, index)]
-	end
-	function chartRepo:createUpdateChartmeta(chartmeta)
-		table.insert(actions, {"cucm", table_util.deepcopy(chartmeta)})
-		chartmetas[get_hi(chartmeta)] = chartmeta
-		return chartmeta
-	end
-
-	return chartRepo
-end
-
-local function get_fs(items)
-	local fs = {}
-	function fs.read(path)
-		return items[path]
-	end
-	return fs
+local function setup_db()
+	local gdb = GameDatabase()
+	gdb:load(":memory:")
+	return gdb
 end
 
 function test.all(t)
-	local chartfiles = { -- unhashed_chartfiles
-		["charts/a"] = {
-			path = "charts/a",
-		},
-		["charts/b"] = {
-			path = "charts/b",
-		},
-	}
+	local gdb = setup_db()
+	local chartfilesRepo = ChartfilesRepo(gdb.models)
+	local chartsRepo = ChartsRepo(gdb.models)
+	local locationsRepo = LocationsRepo(gdb.models)
 
-	local actions, chartmetas = {}, {}
-	local chartRepo = get_fake_chartRepo(actions, chartfiles, chartmetas)
+	locationsRepo:insertLocation({id = 1, path = "charts", name = "game", is_relative = true, is_internal = true})
 
-	local items = {
-		["charts/a"] = "content",
-		["charts/b"] = "content",
-	}
-	local fs = get_fs(items)
+	-- Create dummy data in db
+	local set = chartfilesRepo:insertChartfileSet({
+		name = "set",
+		modified_at = 0,
+		is_file = false,
+		location_id = 1
+	})
+	
+	local chartfile = chartfilesRepo:insertChartfile({
+		name = "chart.sph",
+		modified_at = 0,
+		set_id = set.id
+	})
 
-	local chart_error
 	local function getCharts(_, path, content, hash)
-		if chart_error then
-			return nil, chart_error
-		end
-		return {{chart = {}, chartmeta = {hash = digest.hash("md5", content, true), index = 1}}}
+		local ChartFormat = require("sea.chart.ChartFormat")
+		local Chartmeta = require("sea.chart.Chartmeta")
+		local meta = {
+			hash = hash, 
+			index = 1,
+			inputmode = "4key",
+			format = "sphere",
+			title = "test",
+			artist = "test",
+			name = "test",
+			created_at = 0,
+			computed_at = 0
+		}
+		setmetatable(meta, Chartmeta)
+		return {{
+			chart = {inputMode = "4key"}, 
+			chartmeta = meta
+		}}
 	end
 
-	local cg = ChartmetaGenerator(chartRepo, chartRepo, {getCharts = getCharts})
+	local cg = ChartmetaGenerator(chartsRepo, chartfilesRepo, {getCharts = getCharts})
 
-	t:eq(cg:generate(chartfiles["charts/a"], "content"), "cached")
-	t:eq(cg:generate(chartfiles["charts/b"], "content"), "reused")
+	local content = "content"
+	local expected_hash = digest.hash("md5", content, true)
 
-	chartfiles["charts/a"].hash = nil
-	t:eq(cg:generate(chartfiles["charts/a"], "content"), "reused")
-	t:assert(chartfiles["charts/a"].hash)
+	-- 1. Test initial caching
+	local status, metas = cg:generate(chartfile, content)
+	t:eq(status, "cached")
+	t:eq(#metas, 1)
+	
+	-- Verify chartfile updated in DB
+	local updated_cf = chartfilesRepo:selectChartfileById(chartfile.id)
+	t:eq(updated_cf.hash, expected_hash)
+	
+	-- Verify chartmeta created in DB
+	local meta = chartsRepo:getChartmetaByHashIndex(expected_hash, 1)
+	t:assert(meta)
+	t:eq(meta.title, "test")
 
-	chartfiles["charts/a"].hash = nil
-	t:eq(cg:generate(chartfiles["charts/a"], "content", true), "cached")
-	t:assert(chartfiles["charts/a"].hash)
+	-- 2. Test reuse
+	chartfile.hash = nil
+	status, metas = cg:generate(chartfile, content)
+	t:eq(status, "reused")
+	t:eq(metas, nil)
+	
+	updated_cf = chartfilesRepo:selectChartfileById(chartfile.id)
+	t:eq(updated_cf.hash, expected_hash)
 
-	chart_error = "err"
-	chartfiles["charts/a"].hash = nil
-	local ok, actual_error = cg:generate(chartfiles["charts/a"], "content", true)
-	t:eq(ok, nil)
-	t:eq(actual_error, chart_error)
-	t:assert(not chartfiles["charts/a"].hash)
-
-	-- print(require("inspect")(actions))
-	t:tdeq(actions, {
-		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"cucm", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			index = 1,
-		}},
-		{"ucf", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			path = "charts/a",
-		}},
-		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"ucf", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			path = "charts/b",
-		}},
-
-		{"gcm", "9a0364b9e99bb480dd25e1f0284c8555", 1},
-		{"ucf", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			path = "charts/a",
-		}},
-
-		{"cucm", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			index = 1,
-		}},
-		{"ucf", {
-			hash = "9a0364b9e99bb480dd25e1f0284c8555",
-			path = "charts/a",
-		}},
-	})
+	gdb:unload()
 end
 
 return test

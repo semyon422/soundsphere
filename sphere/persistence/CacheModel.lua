@@ -69,6 +69,7 @@ function CacheModel:new(difficultyModel)
 			self.shared.chartfiles_current = current
 			if errors then
 				for _, err in ipairs(errors) do
+					print("Cache Error: " .. tostring(err))
 					table.insert(self.errors, err)
 				end
 			end

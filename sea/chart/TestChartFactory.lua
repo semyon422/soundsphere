@@ -88,16 +88,22 @@ function TestChartFactory:create(inputmode_str, notes_table)
 	end
 
 	local chartmeta = Chartmeta()
+	chartmeta.hash = ""
+	chartmeta.index = 1
 	chartmeta.inputmode = inputmode_str
-	chartmeta.format = "sph"
+	chartmeta.format = "sphere"
 	chartmeta.title = "Test Title"
 	chartmeta.artist = "Test Artist"
 	chartmeta.tempo = 120
 	chartmeta.tempo_avg = 120
 	chartmeta.tempo_min = 120
 	chartmeta.tempo_max = 120
+	chartmeta.created_at = 0
+	chartmeta.computed_at = 0
 
 	local chartdiff = Chartdiff()
+	chartdiff.hash = ""
+	chartdiff.index = 1
 	chartdiff.inputmode = inputmode_str
 	chartdiff.notes_count = notes_count
 	chartdiff.judges_count = judges_count
@@ -112,6 +118,16 @@ function TestChartFactory:create(inputmode_str, notes_table)
 		stamina = 0, jackspeed = 0, chordjack = 0, technical = 0
 	}
 	chartdiff.msd_diff_rates = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	chartdiff.mode = "mania"
+	chartdiff.modifiers = {}
+	chartdiff.rate = 1000
+	chartdiff.created_at = 0
+	chartdiff.computed_at = 0
+	chartdiff.density_data = {}
+	chartdiff.sv_data = {}
+	chartdiff.user_diff = 0
+	chartdiff.user_diff_data = ""
+	chartdiff.notes_preview = ""
 
 	return {
 		chart = chart,

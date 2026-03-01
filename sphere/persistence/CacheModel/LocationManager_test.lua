@@ -1,34 +1,22 @@
 local LocationManager = require("sphere.persistence.CacheModel.LocationManager")
+local LocationsRepo = require("sphere.persistence.CacheModel.LocationsRepo")
+local ChartfilesRepo = require("sphere.persistence.CacheModel.ChartfilesRepo")
+local GameDatabase = require("sphere.persistence.CacheModel.GameDatabase")
 local FakeFilesystem = require("fs.FakeFilesystem")
 
 local test = {}
 
+local function setup_db()
+	local gdb = GameDatabase()
+	gdb:load(":memory:")
+	return gdb
+end
+
 function test.mounting(t)
-	local locations = {}
-	local chartRepo = {
-		selectLocations = function() return locations end,
-		selectLocation = function(_, path)
-			for _, l in ipairs(locations) do if l.path == path then return l end end
-		end,
-		insertLocation = function(_, l)
-			table.insert(locations, l)
-			l.id = #locations
-			return l
-		end,
-		selectLocationById = function(_, id) return locations[id] end,
-		updateLocation = function(_, l)
-			for i, loc in ipairs(locations) do
-				if loc.id == l.id then locations[i] = l break end
-			end
-		end
-	}
+	local gdb = setup_db()
+	local locationsRepo = LocationsRepo(gdb.models)
+	local chartfilesRepo = ChartfilesRepo(gdb.models)
 	
-	local chartfilesRepo = {
-		countChartfileSets = function() return 0 end,
-		countChartfiles = function() return 0 end
-	}
-	
-	local _fs = FakeFilesystem()
 	local mounts = {}
 	local fs = {
 		mount = function(_, archive, mp)
@@ -44,32 +32,41 @@ function test.mounting(t)
 			end
 			return false
 		end,
-		getWorkingDirectory = function() return "/game" end
 	}
 	
-	local lm = LocationManager(chartRepo, chartfilesRepo, fs, "/game", "prefix")
+	local lm = LocationManager(locationsRepo, chartfilesRepo, fs, "/game", "prefix")
 	
 	-- Test default location creation
 	lm:load()
+	local locations = locationsRepo:selectLocations()
 	t:eq(#locations, 1)
 	t:eq(locations[1].path, "userdata/charts")
 	t:eq(locations[1].is_relative, true)
 	
 	-- Test adding a new external location
-	local loc2 = {path = "/ext/charts", name = "ext", is_relative = false, is_internal = false}
-	chartRepo:insertLocation(loc2)
+	local loc2 = locationsRepo:insertLocation({
+		path = "/ext/charts", 
+		name = "ext", 
+		is_relative = false, 
+		is_internal = false
+	})
+	
 	lm:selectLocations()
 	lm:mountLocation(loc2)
 	
-	t:eq(mounts["prefix/2"], "/ext/charts")
-	t:eq(lm:getPrefix(loc2), "prefix/2")
+	t:eq(mounts["prefix/" .. loc2.id], "/ext/charts")
+	t:eq(lm:getPrefix(loc2), "prefix/" .. loc2.id)
 	
 	-- Test relative path conversion
-	lm:selectLocation(2)
+	lm:selectLocation(loc2.id)
 	lm:updateLocationPath("/game/my_charts")
-	t:eq(loc2.path, "my_charts")
-	t:eq(loc2.is_relative, true)
-	t:eq(lm:getPrefix(loc2), "my_charts")
+	
+	local updated_loc2 = locationsRepo:selectLocationById(loc2.id)
+	t:eq(updated_loc2.path, "my_charts")
+	t:eq(updated_loc2.is_relative, true)
+	t:eq(lm:getPrefix(updated_loc2), "my_charts")
+	
+	gdb:unload()
 end
 
 return test

@@ -51,7 +51,7 @@ function CacheManager:new(gdb, fs, workingDirectory)
 
 	self.taskContext = TaskContext(self)
 
-	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, handle_file_cache)
+	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.noteChartFinder, self.taskContext)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, self.difficultyModel)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
 	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator, self.taskContext)

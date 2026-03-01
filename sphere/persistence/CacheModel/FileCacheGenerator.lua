@@ -9,11 +9,11 @@ local FileCacheGenerator = class()
 
 ---@param chartfilesRepo sphere.ChartfilesRepo
 ---@param noteChartFinder sphere.NoteChartFinder
----@param handle function
-function FileCacheGenerator:new(chartfilesRepo, noteChartFinder, handle)
+---@param context sphere.ITaskContext
+function FileCacheGenerator:new(chartfilesRepo, noteChartFinder, context)
 	self.chartfilesRepo = chartfilesRepo
 	self.noteChartFinder = noteChartFinder
-	self.handle = handle
+	self.context = context
 end
 
 ---@param root_dir string?
@@ -22,10 +22,12 @@ end
 function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 	local iterator = self.noteChartFinder:iter(location_prefix, root_dir)
 	local chartfile_set, chartfile
-	local handle = self.handle
+	local discovered_count = 0
 
 	local typ, dir, name, modtime = iterator()
 	while typ do
+		if self.context:shouldStop() then break end
+
 		local res
 		if name and typ == "related_dir" then
 			chartfile_set = self:processChartfileSet({
@@ -37,7 +39,10 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 			})
 		elseif chartfile_set and typ == "related" then
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
-			handle(chartfile)
+			discovered_count = discovered_count + 1
+			if discovered_count % 100 == 0 then
+				self.context:checkProgress(1, discovered_count, 0)
+			end
 		elseif chartfile_set and typ == "related_all" then
 			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			chartfile_set = nil
@@ -51,7 +56,10 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 				location_id = location_id,
 			})
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
-			handle(chartfile)
+			discovered_count = discovered_count + 1
+			if discovered_count % 100 == 0 then
+				self.context:checkProgress(1, discovered_count, 0)
+			end
 		elseif typ == "unrelated_all" then
 			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			self.chartfilesRepo:deleteChartfileSets({
@@ -95,6 +103,7 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 	if not root_dir then
 		local tdirs = self.chartfilesRepo:selectChartfileSetsDirs(location_id)
 		for _, tdir in ipairs(tdirs) do
+			if self.context:shouldStop() then break end
 			if tdir.dir then
 				local dir = path_util.join(location_prefix, tdir.dir)
 				if not self.noteChartFinder.fs:getInfo(dir) then
