@@ -1,8 +1,7 @@
 local thread = require("thread")
 local erfunc = require("libchart.erfunc")
 local class = require("class")
-local ChartdiffKey = require("sea.chart.ChartdiffKey")
-local ChartmetaKey = require("sea.chart.ChartmetaKey")
+local Observable = require("aqua.Observable")
 
 ---@class sphere.ScoreLibrary
 ---@operator call: sphere.ScoreLibrary
@@ -14,23 +13,38 @@ ScoreLibrary.scoreSources = {
 }
 
 ---@param configModel sphere.ConfigModel
----@param onlineModel sphere.OnlineModel
----@param library rizu.library.Library
-function ScoreLibrary:new(configModel, onlineModel, library)
+---@param localProvider sphere.IScoreProvider
+---@param onlineProvider sphere.IScoreProvider
+function ScoreLibrary:new(configModel, localProvider, onlineProvider)
 	self.configModel = configModel
-	self.onlineModel = onlineModel
-	self.library = library
-
+	self.localProvider = localProvider
+	self.onlineProvider = onlineProvider
 	self.items = {}
+	self.onChanged = Observable()
+end
+
+function ScoreLibrary:__index(k)
+	if type(k) == "number" then
+		return self.items[k]
+	end
+	return ScoreLibrary[k]
 end
 
 function ScoreLibrary:clear()
 	self.items = {}
+	self.onChanged:send({items = self.items})
+end
+
+---@return number
+function ScoreLibrary:count()
+	return #self.items
 end
 
 ---@param scores table
 ---@return table
 function ScoreLibrary:filterScores(scores)
+	if not scores then return {} end
+
 	for _, score in ipairs(scores) do
 		local s = erfunc.erf(0.032 / (score.accuracy * math.sqrt(2)))
 		score.score = s * 10000
@@ -65,66 +79,20 @@ end
 function ScoreLibrary:updateItemsAsync(chartview, exact)
 	if not chartview.hash or not chartview.index then
 		self.items = {}
+		self.onChanged:send({items = self.items})
 		return
 	end
 
 	self.items = {}
 
 	local select = self.configModel.configs.select
-	if select.scoreSourceName == "online" then
-		self:updateItemsOnline(chartview, exact)
-	else
-		self:updateItemsLocal(chartview, exact)
-	end
+	local provider = select.scoreSourceName == "online" and self.onlineProvider or self.localProvider
 
-	-- if self.hash .. self.index ~= hash_index then
-	-- 	return self:updateItemsAsync(chartview, exact)
-	-- end
+	self.items = self:filterScores(provider:getScores(chartview, exact or false))
+	self.onChanged:send({items = self.items})
 end
 
 ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
-
----@param chartview table
----@param exact boolean?
-function ScoreLibrary:updateItemsOnline(chartview, exact)
-	local sea_client = self.onlineModel.authManager.sea_client
-	if not sea_client.connected then
-		return
-	end
-
-	local remote = sea_client.remote
-
-	---@type sea.Chartplay[]?, string?
-	local chartplays, err
-	if exact then
-		local chartdiff_key = ChartdiffKey()
-		chartdiff_key:importChartdiffKey(chartview)
-		chartplays, err = remote.submission:getBestChartplaysForChartdiff(chartdiff_key)
-	else
-		local chartmeta_key = ChartmetaKey()
-		chartmeta_key:importChartmetaKey(chartview)
-		chartplays, err = remote.submission:getBestChartplaysForChartmeta(chartmeta_key)
-	end
-	if not chartplays then
-		print(err)
-	end
-	chartplays = chartplays or {}
-
-	self.items = self:filterScores(chartplays)
-end
-
----@param chartview table
----@param exact boolean?
-function ScoreLibrary:updateItemsLocal(chartview, exact)
-	---@type sea.Chartplay[]
-	local chartplays
-	if exact then
-		chartplays = self.library.chartsRepo:getChartplaysForChartdiff(chartview)
-	else
-		chartplays = self.library.chartsRepo:getChartplaysForChartmeta(chartview)
-	end
-	self.items = self:filterScores(chartplays)
-end
 
 ---@param chartplay_id number
 ---@return number

@@ -293,7 +293,7 @@ local function ScoreList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = ScoreListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("slsb", pos, 16, h, count / list.rows)
 	if newScroll then
@@ -476,9 +476,9 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local topScoreItem = self.game.selectModel.scoreLibrary.items[1]
+	local topScoreItem = self.game.selectModel.scoreLibrary[1]
 	if topScoreItem == scoreItem then
-		topScoreItem = self.game.selectModel.scoreLibrary.items[2]
+		topScoreItem = self.game.selectModel.scoreLibrary[2]
 	end
 	if not topScoreItem then
 		topScoreItem = scoreItem

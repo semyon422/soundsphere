@@ -42,7 +42,7 @@ local function OsudirectList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = OsudirectListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("osudirect_sb", pos, 16, h, count / list.rows)
 	if newScroll then

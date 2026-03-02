@@ -1,5 +1,6 @@
 local class = require("class")
 local path_util = require("path_util")
+local Observable = require("aqua.Observable")
 
 ---@class sphere.NoteChartLibrary
 ---@operator call: sphere.NoteChartLibrary
@@ -12,10 +13,24 @@ function NoteChartLibrary:new(library)
 	self.library = library
 	---@type sphere.RichChartview[]
 	self.items = {}
+	self.onChanged = Observable()
+end
+
+function NoteChartLibrary:__index(k)
+	if type(k) == "number" then
+		return self.items[k]
+	end
+	return NoteChartLibrary[k]
 end
 
 function NoteChartLibrary:clear()
 	self.items = {}
+	self.onChanged:send({items = self.items})
+end
+
+---@return number
+function NoteChartLibrary:count()
+	return #self.items
 end
 
 ---@param chartview sphere.IChartviewIds
@@ -23,6 +38,7 @@ function NoteChartLibrary:setNoteChartSetId(chartview)
 	---@type sphere.RichChartview[]
 	self.items = self.library.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
+		self.onChanged:send({items = self.items})
 		return
 	end
 	local location = self.library.locationsRepo:selectLocationById(self.items[1].location_id)
@@ -34,6 +50,7 @@ function NoteChartLibrary:setNoteChartSetId(chartview)
 		chart.real_dir = path_util.join(location.path, chart.dir)
 		chart.real_path = path_util.join(location.path, chart.path)
 	end
+	self.onChanged:send({items = self.items})
 end
 
 ---@param chartview sphere.IChartviewIds

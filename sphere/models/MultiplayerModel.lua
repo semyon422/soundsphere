@@ -85,12 +85,11 @@ function MultiplayerModel:selectChart()
 
 	print("find", hash, index)
 	selectModel:findNotechart(hash, index)
-	local items = selectModel.noteChartSetLibrary.items
 
 	selectModel:setLock(false)
 
 	self.downloadingBeatmap = nil
-	local chartview = items[1]
+	local chartview = selectModel.noteChartSetLibrary[1]
 	if chartview then
 		self.chartview = chartview
 		selectModel:setConfig(chartview)

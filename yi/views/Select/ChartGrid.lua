@@ -20,7 +20,7 @@ end
 
 ---@return integer
 function ChartGrid:getSelectedIndex()
-	return self.select_model.chartview_index
+	return self.select_model.state.chartview_index
 end
 
 ---@param index integer

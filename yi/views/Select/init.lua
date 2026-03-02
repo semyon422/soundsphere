@@ -268,7 +268,7 @@ function Select:observeGameMutations()
 	local chartview = self.select_model.chartview
 
 	local chart_hash = chartview and chartview.hash or ""
-	local chartview_set_i = self.select_model.chartview_set_index
+	local chartview_set_i = self.select_model.state.chartview_set_index
 	local sets_count = self.select_model.noteChartSetLibrary.itemsCount
 	local rate = game.timeRateModel:get()
 

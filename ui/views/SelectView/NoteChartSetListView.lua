@@ -8,12 +8,12 @@ NoteChartSetListView.rows = 11
 
 function NoteChartSetListView:reloadItems()
 	self.stateCounter = self.game.selectModel.noteChartSetStateCounter
-	self.items = self.game.selectModel.noteChartSetLibrary.items
+	self.items = self.game.selectModel.noteChartSetLibrary
 end
 
 ---@return number
 function NoteChartSetListView:getItemIndex()
-	return self.game.selectModel.chartview_set_index
+	return self.game.selectModel.state.chartview_set_index
 end
 
 ---@param count number

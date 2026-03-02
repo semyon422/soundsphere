@@ -102,7 +102,8 @@ function GameController:new()
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
 	self.selectModel = SelectModel(
 		self.persistence.configModel,
-		self.persistence.cacheModel,
+		self.persistence.library,
+		self.fs,
 		self.onlineModel,
 		self.replayBase
 	)

@@ -1,31 +1,29 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
+local Observable = require("aqua.Observable")
 
 ---@class sphere.NoteChartSetLibrary
 ---@operator call: sphere.NoteChartSetLibrary
 local NoteChartSetLibrary = class()
 
-NoteChartSetLibrary.itemsCount = 0
-
 ---@param library rizu.library.Library
 function NoteChartSetLibrary:new(library)
 	self.library = library
+	self.itemsCount = 0
+	self.onChanged = Observable()
 
 	local cache = ExpireTable()
 	self.cache = cache
 	self.cache.load = function(_, k)
 		return self:loadObject(k)
 	end
+end
 
-	self.items = newproxy(true)
-	local mt = getmetatable(self.items)
-	function mt.__index(_, i)
-		if i < 1 or i > self.itemsCount then return end
-		return cache:get(i)
+function NoteChartSetLibrary:__index(k)
+	if type(k) == "number" then
+		return self:get(k)
 	end
-	function mt.__len()
-		return self.itemsCount
-	end
+	return NoteChartSetLibrary[k]
 end
 
 ---@param itemIndex number
@@ -53,6 +51,21 @@ end
 function NoteChartSetLibrary:updateItems()
 	self.itemsCount = self.library.chartviewsRepo.chartviews_count
 	self.cache:new()
+	self.onChanged:send({count = self.itemsCount})
+end
+
+---@return number
+function NoteChartSetLibrary:count()
+	return self.itemsCount
+end
+
+---@param i number
+---@return sphere.RichChartview?
+function NoteChartSetLibrary:get(i)
+	if i < 1 or i > self.itemsCount then
+		return nil
+	end
+	return self.cache:get(i)
 end
 
 ---@param chartview sphere.IChartviewIds

@@ -18,7 +18,7 @@ function ResultController:load()
 
 	selectModel:pullScore()
 
-	local scoreItemIndex = selectModel.scoreItemIndex
+	local scoreItemIndex = selectModel.state.scoreItemIndex
 	local scoreItem = selectModel.scoreItem
 	if not scoreItem then
 		return

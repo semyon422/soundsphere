@@ -10,12 +10,12 @@ ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
 	self.stateCounter = self.game.selectModel.scoreStateCounter
-	self.items = self.game.selectModel.scoreLibrary.items
+	self.items = self.game.selectModel.scoreLibrary
 end
 
 ---@return number
 function ScoreListView:getItemIndex()
-	return self.game.selectModel.scoreItemIndex
+	return self.game.selectModel.state.scoreItemIndex
 end
 
 ---@param delta number

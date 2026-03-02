@@ -29,7 +29,7 @@ local function CollectionList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = CollectionListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("ncs_sb", pos, 16, h, count / list.rows)
 	if newScroll then

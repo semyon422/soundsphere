@@ -58,7 +58,7 @@ local function ScoreList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = ScoreListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("score_sb", pos, 16, h, count / list.rows)
 	if newScroll then
@@ -80,7 +80,7 @@ local function NoteChartSetList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = NoteChartSetListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("ncs_sb", pos, 16, h, count / list.rows)
 	if newScroll then
@@ -380,7 +380,7 @@ local function GroupCheckbox(self)
 
 	love.graphics.translate(w - h / 6, 0)
 
-	local count = #self.game.selectModel.noteChartSetLibrary.items
+	local count = self.game.selectModel.noteChartSetLibrary:count()
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
