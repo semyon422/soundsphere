@@ -20,6 +20,12 @@ function ChartviewsRepo:new(models)
 	self.params = {}
 
 	self.models = models
+	self.is_sync = false
+end
+
+---@param is_sync boolean
+function ChartviewsRepo:setSync(is_sync)
+	self.is_sync = is_sync
 end
 
 ----------------------------------------------------------------
@@ -36,6 +42,31 @@ ffi.cdef([[
 ]])
 
 ChartviewsRepo.chartview_struct = ffi.typeof("chartview_struct")
+
+---@return table
+function ChartviewsRepo:getQueryResult()
+	return {
+		chartviews_count = self.chartviews_count,
+		set_id_to_global_index = self.set_id_to_global_index,
+		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
+		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
+		chartplay_id_to_global_index = self.chartplay_id_to_global_index,
+		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
+	}
+end
+
+---@param t table
+function ChartviewsRepo:applyQueryResult(t)
+	self.chartviews_count = t.chartviews_count
+	self.set_id_to_global_index = t.set_id_to_global_index
+	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
+	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
+	self.chartplay_id_to_global_index = t.chartplay_id_to_global_index
+
+	local size = ffi.sizeof("chartview_struct")
+	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
+	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
+end
 
 local _queryAsync = thread.async(function(params)
 	local time = love.timer.getTime()
@@ -55,14 +86,8 @@ local _queryAsync = thread.async(function(params)
 		print(err)
 		return
 	end
-	local t = {
-		chartviews_count = self.chartviews_count,
-		set_id_to_global_index = self.set_id_to_global_index,
-		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
-		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
-		chartplay_id_to_global_index = self.chartplay_id_to_global_index,
-		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
-	}
+	
+	local t = self:getQueryResult()
 
 	local dt = math.floor((love.timer.getTime() - time) * 1000)
 	print("query all: " .. dt .. "ms")
@@ -73,20 +98,18 @@ end)
 ---@param params table
 function ChartviewsRepo:queryAsync(params)
 	self.params = params
+
+	if self.is_sync then
+		self:queryNoteChartSets()
+		return
+	end
+
 	local t = _queryAsync(params)
 	if not t then
 		return
 	end
 
-	self.chartviews_count = t.chartviews_count
-	self.set_id_to_global_index = t.set_id_to_global_index
-	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
-	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
-	self.chartplay_id_to_global_index = t.chartplay_id_to_global_index
-
-	local size = ffi.sizeof("chartview_struct")
-	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
-	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
+	self:applyQueryResult(t)
 end
 
 function ChartviewsRepo:queryNoteChartSets()

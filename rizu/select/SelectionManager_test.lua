@@ -1,8 +1,11 @@
 local SelectionManager = require("rizu.select.SelectionManager")
 local SelectionState = require("rizu.select.SelectionState")
+local TestLibraryFactory = require("rizu.select.TestLibraryFactory")
 local class = require("class")
 
 local test = {}
+
+local tlf = TestLibraryFactory()
 
 local function createMockConfigModel()
 	return {
@@ -12,7 +15,7 @@ local function createMockConfigModel()
 					locations_in_collections = false,
 					collapse = true,
 					chartviews_table = "chartviews",
-					diff_column = "difficulty"
+					diff_column = "msd_diff"
 				},
 				gameplay = {
 					ratingHitTimingWindow = 0.05
@@ -40,69 +43,17 @@ local function createMockConfigModel()
 	}
 end
 
-local function createMockLibrary(charts)
-	local lib = {
-		chartviewsRepo = {
-			chartviews = {},
-			chartviews_count = charts and #charts or 0,
-			queryAsync = function(self, params) end,
-			getChartview = function(self, v) return v end,
-			getChartviewsAtSet = function(self, chartview)
-				local items = {}
-				for i = 0, self.chartviews_count - 1 do
-					local c = self.chartviews[i]
-					if c.chartfile_set_id == chartview.chartfile_set_id then
-						table.insert(items, c)
-					end
-				end
-				return items
-			end,
-			chartplay_id_to_global_index = {},
-			chartdiff_id_to_global_index = {},
-			chartfile_id_to_global_index = {},
-			set_id_to_global_index = {},
-		},
-		difftablesRepo = {
-			getDifftableChartmetasForChartmeta = function() return {} end
-		},
-		collectionLibrary = {},
-		getCollectionTree = function() 
-			return {items = {}, indexes = {}, selected = 1} 
-		end,
-		locationsRepo = {
-			selectLocationById = function() return {path = ""} end
-		},
-		locations = {
-			getPrefix = function() return "" end
-		},
-		chartsRepo = {
-			getChartplaysForChartplay = function() return {} end,
-			getChartplaysForChartmeta = function() return {} end,
-			getChartplaysForChartdiff = function() return {} end
-		},
-		getCollectionTree = function() return {items = {}, indexes = {}, selected = 1} end,
-	}
-	if charts then
-		for i, c in ipairs(charts) do
-			lib.chartviewsRepo.chartviews[i - 1] = c
-			if c.chartplay_id then lib.chartviewsRepo.chartplay_id_to_global_index[c.chartplay_id] = i end
-			if c.chartdiff_id then lib.chartviewsRepo.chartdiff_id_to_global_index[c.chartdiff_id] = i end
-			if c.chartfile_id then lib.chartviewsRepo.chartfile_id_to_global_index[c.chartfile_id] = i end
-			if c.chartfile_set_id then lib.chartviewsRepo.set_id_to_global_index[c.chartfile_set_id] = i end
-		end
-	end
-	return lib
-end
-
 ---@param t testing.T
 function test.scrolling(t)
 	local charts = {
-		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1},
-		{chartfile_set_id = 2, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2},
-		{chartfile_set_id = 3, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3}
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, set_name = "Set 1", hash = "h1"},
+		{chartfile_set_id = 2, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, set_name = "Set 2", hash = "h2"},
+		{chartfile_set_id = 3, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, set_name = "Set 3", hash = "h3"}
 	}
 	local configModel = createMockConfigModel()
-	local library = createMockLibrary(charts)
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
 	local fs = {read = function() end, getInfo = function() end}
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
@@ -131,12 +82,14 @@ end
 
 function test.chart_navigation(t)
 	local charts = {
-		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1},
-		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 1, chartdiff_id = 2},
-		{chartfile_set_id = 1, chartfile_id = 3, chartmeta_id = 1, chartdiff_id = 3}
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1},
+		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, hash = "h1", index = 2},
+		{chartfile_set_id = 1, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, hash = "h1", index = 3}
 	}
 	local configModel = createMockConfigModel()
-	local library = createMockLibrary(charts)
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
 	local fs = {read = function() end, getInfo = function() end}
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
@@ -167,16 +120,15 @@ function test.score_navigation(t)
 	local charts = {
 		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1}
 	}
-	local scores = {
-		{id = 101, accuracy = 0.9},
-		{id = 102, accuracy = 0.95},
-		{id = 103, accuracy = 1.0}
-	}
 	local configModel = createMockConfigModel()
-	local library = createMockLibrary(charts)
-	library.chartsRepo.getChartplaysForChartmeta = function() return scores end
-	library.chartsRepo.getChartplaysForChartdiff = function() return scores end
+	local library = tlf:create()
+	tlf:populate(library, charts)
 	
+	-- Insert scores
+	tlf:createScore(library, {id = 101, hash = "h1", index = 1, accuracy = 0.9, created_at = 1, rating = 300})
+	tlf:createScore(library, {id = 102, hash = "h1", index = 1, accuracy = 0.95, created_at = 2, rating = 200})
+	tlf:createScore(library, {id = 103, hash = "h1", index = 1, accuracy = 1.0, created_at = 3, rating = 100})
+
 	local fs = {read = function() end, getInfo = function() end}
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
@@ -184,21 +136,22 @@ function test.score_navigation(t)
 	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
 	model:load()
 
-	t:eq(model.state.scoreItemIndex, 1)
-	t:eq(model.state.scoreId, 101)
+	-- Default selection should be the latest score (highest ID), which is 103
+	t:eq(model.state.scoreItemIndex, 3)
+	t:eq(model.state.scoreId, 103)
 
-	model:scrollScore(1)
+	model:scrollScore(-1)
 	t:eq(model.state.scoreItemIndex, 2)
 	t:eq(model.state.scoreId, 102)
 	t:eq(model.scoreItem.id, 102)
 
-	model:scrollScore(1)
-	t:eq(model.state.scoreItemIndex, 3)
-	t:eq(model.state.scoreId, 103)
-	t:eq(model.scoreItem.id, 103)
-
-	-- Scroll back
 	model:scrollScore(-1)
+	t:eq(model.state.scoreItemIndex, 1)
+	t:eq(model.state.scoreId, 101)
+	t:eq(model.scoreItem.id, 101)
+
+	-- Scroll forward
+	model:scrollScore(1)
 	t:eq(model.state.scoreItemIndex, 2)
 	t:eq(model.state.scoreId, 102)
 end
