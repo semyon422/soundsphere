@@ -1,8 +1,8 @@
 local class = require("class")
-local IScoreProvider = require("sphere.models.SelectModel.IScoreProvider")
+local IScoreProvider = require("rizu.select.IScoreProvider")
 
----@class sphere.LocalScoreProvider: sphere.IScoreProvider
----@operator call: sphere.LocalScoreProvider
+---@class rizu.select.providers.LocalScoreProvider: sphere.IScoreProvider
+---@operator call: rizu.select.providers.LocalScoreProvider
 local LocalScoreProvider = IScoreProvider + {}
 
 ---@param library rizu.library.Library

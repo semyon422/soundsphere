@@ -3,17 +3,17 @@ local string_util = require("string_util")
 local table_util = require("table_util")
 local Observable = require("aqua.Observable")
 
----@class sphere.CollectionLibrary
----@operator call: sphere.CollectionLibrary
-local CollectionLibrary = class()
+---@class rizu.select.stores.CollectionStore
+---@operator call: rizu.select.stores.CollectionStore
+local CollectionStore = class()
 
 ---@param library rizu.library.Library
-function CollectionLibrary:new(library)
+function CollectionStore:new(library)
 	self.library = library
 	self.onChanged = Observable()
 end
 
-function CollectionLibrary:enter()
+function CollectionStore:enter()
 	local node = self.tree.items[self.tree.selected]
 	if #node.items > 1 then
 		self.tree = node
@@ -22,7 +22,7 @@ function CollectionLibrary:enter()
 end
 
 ---@param locations_in_collections boolean
-function CollectionLibrary:load(locations_in_collections)
+function CollectionStore:load(locations_in_collections)
 	local tree = self.library:getCollectionTree(locations_in_collections)
 
 	self.locations_in_collections = locations_in_collections
@@ -31,7 +31,7 @@ function CollectionLibrary:load(locations_in_collections)
 	self.onChanged:send({tree = self.tree})
 end
 
-function CollectionLibrary:setPath(path, location_id)
+function CollectionStore:setPath(path, location_id)
 	self.tree = self.root_tree
 	if self.locations_in_collections then
 		self:setPathLic(path, location_id)
@@ -41,7 +41,7 @@ function CollectionLibrary:setPath(path, location_id)
 	self.onChanged:send({tree = self.tree})
 end
 
-function CollectionLibrary:setPathLic(path, location_id)
+function CollectionStore:setPathLic(path, location_id)
 	local tree = self.tree
 
 	if not location_id then
@@ -62,7 +62,7 @@ function CollectionLibrary:setPathLic(path, location_id)
 	self:setPathP(path)
 end
 
-function CollectionLibrary:setPathP(path)
+function CollectionStore:setPathP(path)
 	if not path then
 		return
 	end
@@ -84,4 +84,4 @@ function CollectionLibrary:setPathP(path)
 	end
 end
 
-return CollectionLibrary
+return CollectionStore

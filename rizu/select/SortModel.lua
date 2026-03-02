@@ -1,7 +1,7 @@
 local class = require("class")
 
----@class sphere.SortModel
----@operator call: sphere.SortModel
+---@class rizu.select.SortModel
+---@operator call: rizu.select.SortModel
 local SortModel = class()
 
 ---@param name string

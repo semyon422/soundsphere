@@ -3,11 +3,11 @@ local erfunc = require("libchart.erfunc")
 local class = require("class")
 local Observable = require("aqua.Observable")
 
----@class sphere.ScoreLibrary
----@operator call: sphere.ScoreLibrary
-local ScoreLibrary = class()
+---@class rizu.select.stores.ScoreStore
+---@operator call: rizu.select.stores.ScoreStore
+local ScoreStore = class()
 
-ScoreLibrary.scoreSources = {
+ScoreStore.scoreSources = {
 	"local",
 	"online",
 }
@@ -15,7 +15,7 @@ ScoreLibrary.scoreSources = {
 ---@param configModel sphere.ConfigModel
 ---@param localProvider sphere.IScoreProvider
 ---@param onlineProvider sphere.IScoreProvider
-function ScoreLibrary:new(configModel, localProvider, onlineProvider)
+function ScoreStore:new(configModel, localProvider, onlineProvider)
 	self.configModel = configModel
 	self.localProvider = localProvider
 	self.onlineProvider = onlineProvider
@@ -23,26 +23,26 @@ function ScoreLibrary:new(configModel, localProvider, onlineProvider)
 	self.onChanged = Observable()
 end
 
-function ScoreLibrary:__index(k)
+function ScoreStore:__index(k)
 	if type(k) == "number" then
 		return self.items[k]
 	end
-	return ScoreLibrary[k]
+	return ScoreStore[k]
 end
 
-function ScoreLibrary:clear()
+function ScoreStore:clear()
 	self.items = {}
 	self.onChanged:send({items = self.items})
 end
 
 ---@return number
-function ScoreLibrary:count()
+function ScoreStore:count()
 	return #self.items
 end
 
 ---@param scores table
 ---@return table
-function ScoreLibrary:filterScores(scores)
+function ScoreStore:filterScores(scores)
 	if not scores then return {} end
 
 	for _, score in ipairs(scores) do
@@ -76,7 +76,7 @@ end
 ---@param chartview table
 ---@param exact boolean?
 ---@return nil?
-function ScoreLibrary:updateItemsAsync(chartview, exact)
+function ScoreStore:updateItemsAsync(chartview, exact)
 	if not chartview.hash or not chartview.index then
 		self.items = {}
 		self.onChanged:send({items = self.items})
@@ -92,11 +92,11 @@ function ScoreLibrary:updateItemsAsync(chartview, exact)
 	self.onChanged:send({items = self.items})
 end
 
-ScoreLibrary.updateItems = thread.coro(ScoreLibrary.updateItemsAsync)
+ScoreStore.updateItems = thread.coro(ScoreStore.updateItemsAsync)
 
 ---@param chartplay_id number
 ---@return number
-function ScoreLibrary:getItemIndex(chartplay_id)
+function ScoreStore:getItemIndex(chartplay_id)
 	local items = self.items
 
 	if not items then
@@ -113,4 +113,4 @@ function ScoreLibrary:getItemIndex(chartplay_id)
 	return 1
 end
 
-return ScoreLibrary
+return ScoreStore

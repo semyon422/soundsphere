@@ -2,14 +2,14 @@ local class = require("class")
 local path_util = require("path_util")
 local Observable = require("aqua.Observable")
 
----@class sphere.NoteChartLibrary
----@operator call: sphere.NoteChartLibrary
-local NoteChartLibrary = class()
+---@class rizu.select.stores.ChartStore
+---@operator call: rizu.select.stores.ChartStore
+local ChartStore = class()
 
-NoteChartLibrary.itemsCount = 0
+ChartStore.itemsCount = 0
 
 ---@param library rizu.library.Library
-function NoteChartLibrary:new(library)
+function ChartStore:new(library)
 	self.library = library
 	---@type sphere.RichChartview[]
 	self.items = {}
@@ -17,26 +17,26 @@ function NoteChartLibrary:new(library)
 	self.onChanged = Observable()
 end
 
-function NoteChartLibrary:__index(k)
+function ChartStore:__index(k)
 	if type(k) == "number" then
 		return self.items[k]
 	end
-	return NoteChartLibrary[k]
+	return ChartStore[k]
 end
 
-function NoteChartLibrary:clear()
+function ChartStore:clear()
 	self.items = {}
 	self.set_id = nil
 	self.onChanged:send({items = self.items})
 end
 
 ---@return number
-function NoteChartLibrary:count()
+function ChartStore:count()
 	return #self.items
 end
 
 ---@param chartview sphere.IChartviewIds
-function NoteChartLibrary:setNoteChartSetId(chartview)
+function ChartStore:setNoteChartSetId(chartview)
 	if self.set_id == chartview.chartfile_set_id then
 		return
 	end
@@ -62,7 +62,7 @@ end
 
 ---@param chartview sphere.IChartviewIds
 ---@return number
-function NoteChartLibrary:indexof(chartview)
+function ChartStore:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id
 	local chartmeta_id = chartview.chartmeta_id
 	local chartdiff_id = chartview.chartdiff_id
@@ -91,4 +91,4 @@ function NoteChartLibrary:indexof(chartview)
 	return 1
 end
 
-return NoteChartLibrary
+return ChartStore

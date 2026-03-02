@@ -1,10 +1,10 @@
 local class = require("class")
-local IScoreProvider = require("sphere.models.SelectModel.IScoreProvider")
+local IScoreProvider = require("rizu.select.IScoreProvider")
 local ChartdiffKey = require("sea.chart.ChartdiffKey")
 local ChartmetaKey = require("sea.chart.ChartmetaKey")
 
----@class sphere.OnlineScoreProvider: sphere.IScoreProvider
----@operator call: sphere.OnlineScoreProvider
+---@class rizu.select.providers.OnlineScoreProvider: sphere.IScoreProvider
+---@operator call: rizu.select.providers.OnlineScoreProvider
 local OnlineScoreProvider = IScoreProvider + {}
 
 ---@param onlineModel sphere.OnlineModel

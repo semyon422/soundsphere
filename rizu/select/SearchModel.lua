@@ -2,8 +2,8 @@ local class = require("class")
 local string_util = require("string_util")
 local erfunc = require("libchart.erfunc")
 
----@class sphere.SearchModel
----@operator call: sphere.SearchModel
+---@class rizu.select.SearchModel
+---@operator call: rizu.select.SearchModel
 local SearchModel = class()
 
 ---@param configModel sphere.ConfigModel

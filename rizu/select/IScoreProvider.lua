@@ -1,7 +1,7 @@
 local class = require("class")
 
----@class sphere.IScoreProvider
----@operator call: sphere.IScoreProvider
+---@class rizu.select.IScoreProvider
+---@operator call: rizu.select.IScoreProvider
 local IScoreProvider = class()
 
 ---@param chartview sphere.Chartview

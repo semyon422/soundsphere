@@ -1,8 +1,8 @@
 local class = require("class")
 local table_util = require("table_util")
 
----@class sphere.FilterModel
----@operator call: sphere.FilterModel
+---@class rizu.select.FilterModel
+---@operator call: rizu.select.FilterModel
 local FilterModel = class()
 
 ---@param configModel sphere.ConfigModel

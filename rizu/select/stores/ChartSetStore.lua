@@ -2,12 +2,12 @@ local class = require("class")
 local ExpireTable = require("ExpireTable")
 local Observable = require("aqua.Observable")
 
----@class sphere.NoteChartSetLibrary
----@operator call: sphere.NoteChartSetLibrary
-local NoteChartSetLibrary = class()
+---@class rizu.select.stores.ChartSetStore
+---@operator call: rizu.select.stores.ChartSetStore
+local ChartSetStore = class()
 
 ---@param library rizu.library.Library
-function NoteChartSetLibrary:new(library)
+function ChartSetStore:new(library)
 	self.library = library
 	self.itemsCount = 0
 	self.onChanged = Observable()
@@ -19,16 +19,16 @@ function NoteChartSetLibrary:new(library)
 	end
 end
 
-function NoteChartSetLibrary:__index(k)
+function ChartSetStore:__index(k)
 	if type(k) == "number" then
 		return self:get(k)
 	end
-	return NoteChartSetLibrary[k]
+	return ChartSetStore[k]
 end
 
 ---@param itemIndex number
 ---@return sphere.RichChartview
-function NoteChartSetLibrary:loadObject(itemIndex)
+function ChartSetStore:loadObject(itemIndex)
 	local chartviewsRepo = self.library.chartviewsRepo
 	local difftablesRepo = self.library.difftablesRepo
 
@@ -48,20 +48,20 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 	return chartview
 end
 
-function NoteChartSetLibrary:updateItems()
+function ChartSetStore:updateItems()
 	self.itemsCount = self.library.chartviewsRepo.chartviews_count
 	self.cache:new()
 	self.onChanged:send({count = self.itemsCount})
 end
 
 ---@return number
-function NoteChartSetLibrary:count()
+function ChartSetStore:count()
 	return self.itemsCount
 end
 
 ---@param i number
 ---@return sphere.RichChartview?
-function NoteChartSetLibrary:get(i)
+function ChartSetStore:get(i)
 	if i < 1 or i > self.itemsCount then
 		return nil
 	end
@@ -70,7 +70,7 @@ end
 
 ---@param chartview sphere.IChartviewIds
 ---@return number
-function NoteChartSetLibrary:indexof(chartview)
+function ChartSetStore:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id
 	local chartdiff_id = chartview.chartdiff_id
 	local set_id = chartview.chartfile_set_id
@@ -85,4 +85,4 @@ function NoteChartSetLibrary:indexof(chartview)
 		1
 end
 
-return NoteChartSetLibrary
+return ChartSetStore
