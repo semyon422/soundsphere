@@ -7,9 +7,9 @@ local NoteChartSetLibrary = class()
 
 NoteChartSetLibrary.itemsCount = 0
 
----@param cacheModel sphere.CacheModel
-function NoteChartSetLibrary:new(cacheModel)
-	self.cacheModel = cacheModel
+---@param library rizu.library.Library
+function NoteChartSetLibrary:new(library)
+	self.library = library
 
 	local cache = ExpireTable()
 	self.cache = cache
@@ -31,8 +31,8 @@ end
 ---@param itemIndex number
 ---@return sphere.RichChartview
 function NoteChartSetLibrary:loadObject(itemIndex)
-	local chartviewsRepo = self.cacheModel.chartviewsRepo
-	local difftablesRepo = self.cacheModel.difftablesRepo
+	local chartviewsRepo = self.library.chartviewsRepo
+	local difftablesRepo = self.library.difftablesRepo
 
 	local _chartview = chartviewsRepo.chartviews[itemIndex - 1]
 	local chartview = chartviewsRepo:getChartview(_chartview)
@@ -51,7 +51,7 @@ function NoteChartSetLibrary:loadObject(itemIndex)
 end
 
 function NoteChartSetLibrary:updateItems()
-	self.itemsCount = self.cacheModel.chartviewsRepo.chartviews_count
+	self.itemsCount = self.library.chartviewsRepo.chartviews_count
 	self.cache:new()
 end
 
@@ -63,7 +63,7 @@ function NoteChartSetLibrary:indexof(chartview)
 	local set_id = chartview.chartfile_set_id
 	local chartplay_id = chartview.chartplay_id
 
-	local cdb = self.cacheModel.chartviewsRepo
+	local cdb = self.library.chartviewsRepo
 	return
 		cdb.chartplay_id_to_global_index[chartplay_id] or
 		cdb.chartdiff_id_to_global_index[chartdiff_id] or

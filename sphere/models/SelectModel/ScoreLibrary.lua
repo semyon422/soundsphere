@@ -15,11 +15,11 @@ ScoreLibrary.scoreSources = {
 
 ---@param configModel sphere.ConfigModel
 ---@param onlineModel sphere.OnlineModel
----@param cacheModel sphere.CacheModel
-function ScoreLibrary:new(configModel, onlineModel, cacheModel)
+---@param library rizu.library.Library
+function ScoreLibrary:new(configModel, onlineModel, library)
 	self.configModel = configModel
 	self.onlineModel = onlineModel
-	self.cacheModel = cacheModel
+	self.library = library
 
 	self.items = {}
 end
@@ -119,9 +119,9 @@ function ScoreLibrary:updateItemsLocal(chartview, exact)
 	---@type sea.Chartplay[]
 	local chartplays
 	if exact then
-		chartplays = self.cacheModel.chartsRepo:getChartplaysForChartdiff(chartview)
+		chartplays = self.library.chartsRepo:getChartplaysForChartdiff(chartview)
 	else
-		chartplays = self.cacheModel.chartsRepo:getChartplaysForChartmeta(chartview)
+		chartplays = self.library.chartsRepo:getChartplaysForChartmeta(chartview)
 	end
 	self.items = self:filterScores(chartplays)
 end

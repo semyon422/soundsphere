@@ -8,9 +8,9 @@ local path_util = require("path_util")
 ---@operator call: sphere.CollectionLibrary
 local CollectionLibrary = class()
 
----@param cacheModel sphere.CacheModel
-function CollectionLibrary:new(cacheModel)
-	self.cacheModel = cacheModel
+---@param library rizu.library.Library
+function CollectionLibrary:new(library)
+	self.library = library
 end
 
 local function process_chartfile_set(dir, tree, location_id)
@@ -59,8 +59,8 @@ function CollectionLibrary:getTree(locations_in_collections)
 	}
 	tree.items[1] = tree
 
-	local chartfilesRepo = self.cacheModel.chartfilesRepo
-	local locationsRepo = self.cacheModel.locationsRepo
+	local chartfilesRepo = self.library.chartfilesRepo
+	local locationsRepo = self.library.locationsRepo
 	if not locations_in_collections then
 		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSets()) do
 			process_chartfile_set(chartfile_set.dir, tree)

@@ -7,9 +7,9 @@ local NoteChartLibrary = class()
 
 NoteChartLibrary.itemsCount = 0
 
----@param cacheModel sphere.CacheModel
-function NoteChartLibrary:new(cacheModel)
-	self.cacheModel = cacheModel
+---@param library rizu.library.Library
+function NoteChartLibrary:new(library)
+	self.library = library
 	---@type sphere.RichChartview[]
 	self.items = {}
 end
@@ -21,12 +21,12 @@ end
 ---@param chartview sphere.IChartviewIds
 function NoteChartLibrary:setNoteChartSetId(chartview)
 	---@type sphere.RichChartview[]
-	self.items = self.cacheModel.chartviewsRepo:getChartviewsAtSet(chartview)
+	self.items = self.library.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
 		return
 	end
-	local location = self.cacheModel.locationsRepo:selectLocationById(self.items[1].location_id)
-	local prefix = self.cacheModel.locations:getPrefix(location)
+	local location = self.library.locationsRepo:selectLocationById(self.items[1].location_id)
+	local prefix = self.library.locations:getPrefix(location)
 	for _, chart in ipairs(self.items) do
 		chart.location_prefix = prefix
 		chart.location_dir = path_util.join(prefix, chart.dir)

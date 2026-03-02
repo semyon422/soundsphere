@@ -23,17 +23,17 @@ SelectModel.pullingNoteChartSet = false
 SelectModel.debounceTime = 0.5
 
 ---@param configModel sphere.ConfigModel
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param onlineModel sphere.OnlineModel
 ---@param replayBase sea.ReplayBase
-function SelectModel:new(configModel, cacheModel, onlineModel, replayBase)
+function SelectModel:new(configModel, library, onlineModel, replayBase)
 	self.configModel = configModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.replayBase = replayBase
 
-	self.noteChartLibrary = NoteChartLibrary(cacheModel)
-	self.noteChartSetLibrary = NoteChartSetLibrary(cacheModel)
-	self.collectionLibrary = CollectionLibrary(cacheModel)
+	self.noteChartLibrary = NoteChartLibrary(library)
+	self.noteChartSetLibrary = NoteChartSetLibrary(library)
+	self.collectionLibrary = CollectionLibrary(library)
 	self.searchModel = SearchModel(configModel)
 	self.filterModel = FilterModel(configModel)
 	self.sortModel = SortModel()
@@ -41,7 +41,7 @@ function SelectModel:new(configModel, cacheModel, onlineModel, replayBase)
 	self.scoreLibrary = ScoreLibrary(
 		configModel,
 		onlineModel,
-		cacheModel
+		library
 	)
 end
 
@@ -98,7 +98,7 @@ function SelectModel:updateSetItems()
 	params.difficulty = config.diff_column
 	params.chartviews_table = config.chartviews_table
 
-	self.cacheModel.chartviewsRepo:queryAsync(params)
+	self.library.chartviewsRepo:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 end
 
@@ -110,7 +110,7 @@ function SelectModel:findNotechart(hash, index)
 		where = {hash = hash, index = index},
 		difficulty = config.diff_column,
 	}
-	self.cacheModel.chartviewsRepo:queryAsync(params)
+	self.library.chartviewsRepo:queryAsync(params)
 	self.noteChartSetLibrary:updateItems()
 	local chartview_set = self.noteChartSetLibrary.items[1]
 	if chartview_set then
