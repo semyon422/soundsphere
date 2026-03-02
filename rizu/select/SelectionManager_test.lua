@@ -156,4 +156,51 @@ function test.score_navigation(t)
 	t:eq(model.state.scoreId, 102)
 end
 
+function test.task_overriding(t)
+	local charts = {}
+	for i = 1, 10 do
+		table.insert(charts, {chartfile_set_id = i, chartfile_id = i, chartmeta_id = i, chartdiff_id = i, hash = "h" .. i})
+	end
+	
+	local configModel = createMockConfigModel()
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
+	local fs = {read = function() end, getInfo = function() end}
+	local onlineModel = {authManager = {sea_client = {connected = false}}}
+	local replayBase = {}
+
+	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
+
+	-- Mock chartStore to be "slow" by explicitly yielding
+	local original_setNoteChartSetId = model.chartStore.setNoteChartSetId
+	local calls = 0
+	local yielded_threads = {}
+	model.chartStore.setNoteChartSetId = function(self, config)
+		calls = calls + 1
+		table.insert(yielded_threads, coroutine.running())
+		coroutine.yield()
+		return original_setNoteChartSetId(self, config)
+	end
+
+	model:load()
+
+	-- Fast scroll from 1 to 5
+	model:scrollNoteChartSet(1) -- to 2
+	model:scrollNoteChartSet(1) -- to 3
+	model:scrollNoteChartSet(1) -- to 4
+	model:scrollNoteChartSet(1) -- to 5
+
+	-- Resume all yielded threads manually
+	while #yielded_threads > 0 do
+		local c = table.remove(yielded_threads, 1)
+		assert(coroutine.resume(c))
+	end
+
+	t:eq(calls, 2, "Intermediate chart loads should have been overridden")
+	t:eq(model.state.chartview_set_index, 5)
+	t:eq(model.state.chartSetId, 5)
+	t:eq(model.chartview.chartfile_id, 5)
+end
+
 return test

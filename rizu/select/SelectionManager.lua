@@ -15,6 +15,7 @@ local SortModel = require("rizu.select.SortModel")
 local FilterModel = require("rizu.select.FilterModel")
 local SelectionQueryBuilder = require("rizu.select.SelectionQueryBuilder")
 local ChartMetadataService = require("rizu.select.services.ChartMetadataService")
+local TaskRunner = require("rizu.select.tasks.TaskRunner")
 local LocalScoreProvider = require("rizu.select.providers.LocalScoreProvider")
 local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")
 
@@ -22,7 +23,6 @@ local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")
 ---@operator call: rizu.select.SelectionManager
 local SelectionManager = class()
 
-SelectionManager.pullingNoteChartSet = false
 SelectionManager.debounceTime = 0.5
 
 ---@param configModel sphere.ConfigModel
@@ -47,6 +47,7 @@ function SelectionManager:new(configModel, library, fs, onlineModel, replayBase,
 	self.sortModel = SortModel()
 	self.queryBuilder = SelectionQueryBuilder(configModel, self.sortModel, self.searchModel, self.filterModel)
 	self.metadataService = ChartMetadataService(fs)
+	self.taskRunner = TaskRunner()
 
 	local localProvider = LocalScoreProvider(library)
 	local onlineProvider = OnlineScoreProvider(onlineModel)
@@ -69,12 +70,16 @@ end
 ---@param event table
 function SelectionManager:receive(event)
 	if event.type == "set" then
-		self:pullNoteChart()
+		self.taskRunner:push(function()
+			self:pullNoteChart()
+		end, 1)
 	elseif event.type == "chart" then
-		self:pullScore()
-		local index = self.chartSetStore:indexof(self.config)
-		local chartview_set = self.chartSetStore:get(index)
-		self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
+		self.taskRunner:push(function()
+			self:pullScore()
+			local index = self.chartSetStore:indexof(self.config)
+			local chartview_set = self.chartSetStore:get(index)
+			self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
+		end, 2)
 	end
 end
 
@@ -115,13 +120,15 @@ function SelectionManager:findNotechart(hash, index)
 		where = {hash = hash, index = index},
 		difficulty = config.diff_column,
 	}
-	self.library.chartviewsRepo:queryAsync(params)
-	self.chartSetStore:updateItems()
-	local chartview_set = self.chartSetStore:get(1)
-	if chartview_set then
-		self.chartStore:setNoteChartSetId(chartview_set)
-	end
-	self.onChanged:send({type = "find_notechart", hash = hash, index = index})
+	self.taskRunner:push(function()
+		self.library.chartviewsRepo:queryAsync(params)
+		self.chartSetStore:updateItems()
+		local chartview_set = self.chartSetStore:get(1)
+		if chartview_set then
+			self.chartStore:setNoteChartSetId(chartview_set)
+		end
+		self.onChanged:send({type = "find_notechart", hash = hash, index = index})
+	end, 1)
 end
 
 ---@return string?
@@ -197,18 +204,18 @@ function SelectionManager:debouncePullNoteChartSet(...)
 	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
-SelectionManager.noDebouncePullNoteChartSet = thread.coro(function(self, ...)
-	self:pullNoteChartSet(...)
-	if self.chartview then
-		self:setConfig(self.chartview)
-	end
-end)
+function SelectionManager:noDebouncePullNoteChartSet(...)
+	local args = {...}
+	self.taskRunner:push(function()
+		self:pullNoteChartSet(unpack(args))
+		if self.chartview then
+			self:setConfig(self.chartview)
+		end
+	end, 1)
+end
 
 ---@param sortFunctionName string
 function SelectionManager:setSortFunction(sortFunctionName)
-	if self.pullingNoteChartSet then
-		return
-	end
 	self.config.sortFunction = sortFunctionName
 	self:noDebouncePullNoteChartSet()
 end
@@ -222,10 +229,6 @@ end
 ---@param destination number?
 ---@param force boolean?
 function SelectionManager:scrollCollection(direction, destination, force)
-	if self.pullingNoteChartSet then
-		return
-	end
-
 	local collectionStore = self.collectionStore
 	local items = collectionStore.tree.items
 	local selected = collectionStore.tree.selected
@@ -353,8 +356,6 @@ function SelectionManager:pullNoteChartSet(noUpdate, noPullNext)
 		return
 	end
 
-	self.pullingNoteChartSet = true
-
 	if not noUpdate then
 		self:updateSetItems()
 	end
@@ -387,11 +388,8 @@ function SelectionManager:pullNoteChartSet(noUpdate, noPullNext)
 	end
 
 	if chartview_set then
-		self.pullingNoteChartSet = false
 		return
 	end
-
-	self.pullingNoteChartSet = false
 end
 
 ---@param noUpdate boolean?
@@ -447,18 +445,6 @@ function SelectionManager:findScore()
 	self.scoreItem = scoreItem
 end
 
-function SelectionManager:updateScoresAsync()
-	local chartview = self.chartview
-	if not chartview then
-		return
-	end
-
-	local config = self.configModel.configs.settings.select
-	local exact = config.chartviews_table ~= "chartviews"
-	self.scoreStore:updateItemsAsync(chartview, exact)
-	self:findScore()
-end
-
 ---@param noUpdate boolean?
 function SelectionManager:pullScore(noUpdate)
 	local items = self.chartStore.items
@@ -478,14 +464,16 @@ function SelectionManager:pullScore(noUpdate)
 	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then
 		self.scoreStore:clear()
-		delay.debounce(self, "scoreDebounce", self.debounceTime,
-			self.updateScoresAsync, self
-		)
-		return
+		-- Handle debouncing within the serialized task runner
+		if coroutine.running() then
+			delay.sleep(self.debounceTime)
+		end
 	end
 
 	local config = self.configModel.configs.settings.select
 	local exact = config.chartviews_table ~= "chartviews"
+	
+	-- We use the coro version to ensure the task runner waits for completion
 	self.scoreStore:updateItems(chartview, exact)
 
 	self:findScore()
