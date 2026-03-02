@@ -269,7 +269,6 @@ local format_difficulty_calc = {
 	user_diff = "USER"
 }
 
-
 ---@param data {[string]: number}
 ---@return string
 ---@return string?
@@ -395,12 +394,14 @@ function Select:updateChartview()
 	local note_count = chartview.notes_count
 	local long_notes_count = (chartview.judges_count or 0) - note_count
 	local ln_percent = long_notes_count / note_count
-	self.ln_percent:setText(("%i%%"):format(ln_percent * 100))
+	self.ln_percent:setText(("%i%% LN"):format(ln_percent * 100))
 	self.ln_percent:setColor(Colors.HSV(Colors.convertDiffToHue(math.min(ln_percent * 1.3)), ln_percent, 1))
 
 	local game = self:getGame()
 	local mods_str = getModifierString(game.replayBase.modifiers)
-	self.mods:setText(mods_str)
+	self.mods:setText(mods_str == "" and "NO MODS" or mods_str)
+
+	self.rate:setText(("%0.2fx"):format(game.timeRateModel:get()))
 end
 
 function Select:onChartChanged()
