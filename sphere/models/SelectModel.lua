@@ -5,7 +5,7 @@ local path_util = require("path_util")
 local table_util = require("table_util")
 local Observable = require("aqua.Observable")
 local ChartFactory = require("notechart.ChartFactory")
-local SelectionState = require("sphere.models.SelectModel.SelectionState")
+local SelectionState = require("rizu.select.SelectionState")
 local NoteChartLibrary = require("sphere.models.SelectModel.NoteChartLibrary")
 local NoteChartSetLibrary = require("sphere.models.SelectModel.NoteChartSetLibrary")
 local CollectionLibrary = require("sphere.models.SelectModel.CollectionLibrary")
@@ -28,7 +28,7 @@ SelectModel.debounceTime = 0.5
 ---@param fs fs.IFilesystem
 ---@param onlineModel sphere.OnlineModel
 ---@param replayBase sea.ReplayBase
----@param state? sphere.SelectionState
+---@param state? rizu.select.SelectionState
 function SelectModel:new(configModel, library, fs, onlineModel, replayBase, state)
 	self.configModel = configModel
 	self.library = library
@@ -52,6 +52,19 @@ function SelectModel:new(configModel, library, fs, onlineModel, replayBase, stat
 		onlineProvider
 	)
 	self.onChanged = Observable()
+	self.state.onChanged:add(self)
+end
+
+---@param event table
+function SelectModel:receive(event)
+	if event.type == "set" then
+		self:pullNoteChart()
+	elseif event.type == "chart" then
+		self:pullScore()
+		local index = self.noteChartSetLibrary:indexof(self.config)
+		local chartview_set = self.noteChartSetLibrary:get(index)
+		self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
+	end
 end
 
 function SelectModel:load()
@@ -342,24 +355,10 @@ function SelectModel:scrollNoteChartSet(direction, destination)
 	end
 
 	local old_chartview_set = self.noteChartSetLibrary:get(self.state.chartview_set_index)
-	self.state:setSetIndex(destination)
-
 	local chartview_set = self.noteChartSetLibrary:get(destination)
 	self:setConfig(chartview_set)
 
-	if not old_chartview_set then
-		return self:pullNoteChart()
-	end
-
-	local config = self.configModel.configs.settings.select
-	if config.chartviews_table ~= "chartviews" then
-		return self:pullNoteChart(
-			old_chartview_set.chartfile_id == chartview_set.chartfile_id and
-			old_chartview_set.chartmeta_id == chartview_set.chartmeta_id
-		)
-	end
-
-	self:pullNoteChart(old_chartview_set.chartfile_set_id == chartview_set.chartfile_set_id)
+	self.state:setSet(destination, chartview_set.chartfile_set_id)
 end
 
 ---@param direction number?
@@ -373,16 +372,15 @@ function SelectModel:scrollNoteChart(direction, destination)
 	if not items[destination] or self.state.chartview_index == destination then
 		return
 	end
-	self.state:setChartIndex(destination)
 
-	local chartview = items[self.state.chartview_index]
+	local chartview = items[destination]
+	self:setConfig(chartview)
+
 	self.chartview = chartview
 	self.changed = true
 
-	self:setConfig(chartview)
+	self.state:setChart(destination, chartview.chartfile_id)
 
-	self:pullNoteChartSet(true, true)
-	self:pullScore()
 	self.onChanged:send({type = "scroll_notechart", chartview = chartview})
 end
 
@@ -395,12 +393,13 @@ function SelectModel:scrollScore(direction, destination)
 	if not items[destination] or self.state.scoreItemIndex == destination then
 		return
 	end
-	self.state:setScoreIndex(destination)
 
-	local scoreItem = items[self.state.scoreItemIndex]
-	self.scoreItem = scoreItem
-
+	local scoreItem = items[destination]
 	self.config.chartplay_id = scoreItem.id
+
+	self.state:setScore(destination, scoreItem.id)
+
+	self.scoreItem = scoreItem
 	self.onChanged:send({type = "scroll_score", scoreItem = scoreItem})
 end
 
@@ -417,35 +416,37 @@ function SelectModel:pullNoteChartSet(noUpdate, noPullNext)
 		self:updateSetItems()
 	end
 
-	self.state:setSetIndex(self.noteChartSetLibrary:indexof(self.config))
+	local index = self.noteChartSetLibrary:indexof(self.config)
+	local chartview_set = self.noteChartSetLibrary:get(index)
+
+	if chartview_set then
+		self.config.chartfile_set_id = chartview_set.chartfile_set_id
+		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required by chartviews_table
+	else
+		self.config.chartfile_set_id = nil
+		self.config.chartfile_id = nil
+		self.config.chartmeta_id = nil
+		self.config.chartdiff_id = nil
+		self.config.chartplay_id = nil
+
+		self.chartview = nil
+		self.scoreItem = nil
+		self.changed = true
+
+		self.noteChartLibrary:clear()
+		self.scoreLibrary:clear()
+	end
+
+	self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
 
 	if not noUpdate then
 		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
 	end
 
-	local chartview_set = self.noteChartSetLibrary:get(self.state.chartview_set_index)
 	if chartview_set then
-		self.config.chartfile_set_id = chartview_set.chartfile_set_id
-		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required by chartviews_table
 		self.pullingNoteChartSet = false
-		if not noPullNext then
-			self:pullNoteChart(noUpdate)
-		end
 		return
 	end
-
-	self.config.chartfile_set_id = nil
-	self.config.chartfile_id = nil
-	self.config.chartmeta_id = nil
-	self.config.chartdiff_id = nil
-	self.config.chartplay_id = nil
-
-	self.chartview = nil
-	self.scoreItem = nil
-	self.changed = true
-
-	self.noteChartLibrary:clear()
-	self.scoreLibrary:clear()
 
 	self.pullingNoteChartSet = false
 end
@@ -459,51 +460,61 @@ function SelectModel:pullNoteChart(noUpdate, noPullNext)
 		self.noteChartLibrary:setNoteChartSetId(self.config)
 	end
 
-	self.state:setChartIndex(self.noteChartLibrary:indexof(self.config))
-
-	if not noUpdate then
-		self.noteChartStateCounter = self.noteChartStateCounter + 1
-	end
-	local chartview = self.noteChartLibrary.items[self.state.chartview_index]
-	self.chartview = chartview
-	self.changed = true
+	local index = self.noteChartLibrary:indexof(self.config)
+	local chartview = self.noteChartLibrary.items[index]
 
 	if chartview then
 		self.config.chartfile_id = chartview.chartfile_id
 		self.config.chartmeta_id = chartview.chartmeta_id
 		self.config.chartdiff_id = chartview.chartdiff_id
 		self.config.chartplay_id = chartview.chartplay_id
-		if not noPullNext and old_chartview then
-			self:pullScore()
-		end
+	else
+		self.config.chartfile_id = nil
+		self.config.chartmeta_id = nil
+		self.config.chartdiff_id = nil
+		self.config.chartplay_id = nil
+	end
+
+	self.chartview = chartview
+	self.changed = true
+
+	self.state:setChart(index, chartview and chartview.chartfile_id)
+
+	if not noUpdate then
+		self.noteChartStateCounter = self.noteChartStateCounter + 1
+	end
+
+	if chartview then
 		return
 	end
 
-	self.config.chartfile_id = nil
-	self.config.chartmeta_id = nil
-	self.config.chartdiff_id = nil
-	self.config.chartplay_id = nil
-
 	self.scoreItem = nil
-
 	self.scoreLibrary:clear()
 end
 
 function SelectModel:findScore()
 	local scoreItems = self.scoreLibrary.items
-	self.state:setScoreIndex(self.scoreLibrary:getItemIndex(self.config.chartplay_id) or 1)
+	local index = self.scoreLibrary:getItemIndex(self.config.chartplay_id) or 1
+	local scoreItem = scoreItems[index]
 
-	local scoreItem = scoreItems[self.state.scoreItemIndex]
-	self.scoreItem = scoreItem
 	if scoreItem then
 		self.config.chartplay_id = scoreItem.id
 	end
+
+	self.state:setScore(index, scoreItem and scoreItem.id)
+
+	self.scoreItem = scoreItem
 end
 
 function SelectModel:updateScoresAsync()
+	local chartview = self.chartview
+	if not chartview then
+		return
+	end
+
 	local config = self.configModel.configs.settings.select
 	local exact = config.chartviews_table ~= "chartviews"
-	self.scoreLibrary:updateItemsAsync(self.chartview, exact)
+	self.scoreLibrary:updateItemsAsync(chartview, exact)
 	self:findScore()
 end
 
@@ -534,7 +545,7 @@ function SelectModel:pullScore(noUpdate)
 
 	local config = self.configModel.configs.settings.select
 	local exact = config.chartviews_table ~= "chartviews"
-	self.scoreLibrary:updateItems(self.chartview, exact)
+	self.scoreLibrary:updateItems(chartview, exact)
 
 	self:findScore()
 end

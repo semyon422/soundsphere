@@ -13,6 +13,7 @@ function NoteChartLibrary:new(library)
 	self.library = library
 	---@type sphere.RichChartview[]
 	self.items = {}
+	self.set_id = nil
 	self.onChanged = Observable()
 end
 
@@ -25,6 +26,7 @@ end
 
 function NoteChartLibrary:clear()
 	self.items = {}
+	self.set_id = nil
 	self.onChanged:send({items = self.items})
 end
 
@@ -35,6 +37,11 @@ end
 
 ---@param chartview sphere.IChartviewIds
 function NoteChartLibrary:setNoteChartSetId(chartview)
+	if self.set_id == chartview.chartfile_set_id then
+		return
+	end
+	self.set_id = chartview.chartfile_set_id
+
 	---@type sphere.RichChartview[]
 	self.items = self.library.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
