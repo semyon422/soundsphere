@@ -4,7 +4,6 @@ local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.select.ChartSetList")
 local BottomButton = require("yi.views.select.Button")
 local Image = require("yi.views.Image")
-local Cell = require("yi.views.select.Cell")
 local Tag = require("yi.views.select.Tag")
 local Colors = require("yi.Colors")
 local ChartGrid = require("yi.views.select.ChartGrid")
@@ -32,7 +31,14 @@ local info_side = {
 	h = "100%",
 	arrange = "flex_col",
 	justify_content = "space_between",
-	padding = {20, 0, 20, 20},
+	padding = {20, 20, 20, 20},
+}
+
+local cell = {
+	min_w = 180,
+	arrange = "wrap_row",
+	gap = 10,
+	align_items = "center"
 }
 
 ---@return yi.View
@@ -43,19 +49,20 @@ function Select:newContent()
 	self.chart_format_tag = Tag()
 	self.title = Label(res:getFont("black", 58), "LOADING...")
 	self.artist = Label(res:getFont("bold", 46), "LOADING...")
-	self.mode_cell = Cell("Mode")
-	self.bpm_cell = Cell("BPM")
-	self.duration_cell = Cell("Duration")
-	self.notes_cell = Cell("Notes")
 	self.chart_grid = ChartGrid()
 	self.tags = View()
-	self.ln_percent = Label(res:getFont("bold", 24), "?% LN")
 	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
 	self.rate_const = Label(res:getFont("bold", 24), "1.00x")
 	self.difficulty_calc = Label(res:getFont("bold", 16), "Loading...")
 	self.difficulty = Label(res:getFont("black", 72), "??.?")
 	self.mods = Label(res:getFont("black", 36), "Loading...")
 	self.score_system = Label(res:getFont("bold", 24), "Loading...")
+
+	self.gamemode = Label(res:getFont("bold", 24), "Loading...")
+	self.bpm = Label(res:getFont("bold", 24), "Loading...")
+	self.duration = Label(res:getFont("bold", 24), "Loading...")
+	self.notes = Label(res:getFont("bold", 24), "Loading...")
+	self.ln_percent = Label(res:getFont("bold", 24), "Loading...")
 
 	return h(View(), info_side, {
 		h(View(), {arrange = "wrap_col", gap = 20}, {
@@ -67,30 +74,49 @@ function Select:newContent()
 				h(self.title),
 				h(self.artist, {y = -5, color = Colors.lines}),
 			}),
-			h(View(), {arrange = "wrap_row", gap = 10, line_gap = 10}, {
-				self.mode_cell,
-				self.bpm_cell,
-				self.duration_cell,
-				self.notes_cell
-			}),
 			h(self.chart_grid, {w = "100%", h = 70}),
 		}),
-		h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
-			h(View(), {w = 180, arrange = "wrap_col"}, {
-				h(self.difficulty_calc, {color = Colors.lines}),
-				h(self.difficulty, {color = Colors.text}),
-			}),
-			h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
-			h(View(), {w = 2, height = 80, background_color = Colors.lines, align_self = "end", y = -12}),
-			h(View(), {arrange = "wrap_col", justify_content = "end"}, {
-				h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
-				h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
-					h(self.mods, {y = -8}),
-					h(self.rate_const, {y = -12, color = Colors.accent}),
-					h(self.score_system, {y = -12, color = Colors.lines}),
+		h(View(), {arrange = "wrap_col", gap = 20}, {
+			h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
+				h(View(), {w = 180, arrange = "wrap_col"}, {
+					h(self.difficulty_calc, {color = Colors.lines}),
+					h(self.difficulty, {color = Colors.text}),
+				}),
+				h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
+				h(View(), {w = 2, height = 80, background_color = Colors.br, align_self = "end", y = -12}),
+				h(View(), {arrange = "wrap_col", justify_content = "end"}, {
+					h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
+					h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
+						h(self.mods, {y = -8}),
+						h(self.rate_const, {y = -12, color = Colors.accent}),
+						h(self.score_system, {y = -12, color = Colors.lines}),
+					})
 				})
+			}),
+			h(View(), {w = "100%", h = 2, background_color = Colors.br}),
+			h(View(), {arrange = "wrap_row", gap = 20}, {
+				h(View(), cell, {
+					h(Label(res:getFont("bold", 16), "DURATION"), {color = Colors.lines}),
+					self.duration,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("bold", 16), "NOTES"), {color = Colors.lines}),
+					self.notes,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("bold", 16), "MODE"), {color = Colors.lines}),
+					self.gamemode,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("bold", 16), "TEMPO"), {color = Colors.lines}),
+					self.bpm,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("bold", 16), "LN%"), {color = Colors.lines}),
+					self.ln_percent,
+				}),
 			})
-		})
+		}),
 	})
 end
 
@@ -355,7 +381,7 @@ function Select:updateChartview()
 	else
 		self.ranked_tag:setText("UNRANKED")
 		self.ranked_tag:setBackgroundColor(Colors.lines)
-		self.ranked_tag:setTextColor(Colors.text)
+		self.ranked_tag:setTextColor({0, 0, 0, 1})
 	end
 
 	self.chart_format_tag:setText((chartview.format or "unknown"):upper())
@@ -364,15 +390,15 @@ function Select:updateChartview()
 	self.artist:setText(chartview.artist)
 
 	local input_mode = chartview.inputmode:gsub("key", "K"):gsub("scratch", "S")
-	self.mode_cell:setValueText(input_mode)
-	self.bpm_cell:setValueText(("%i"):format(chartview.tempo * rate))
+	self.gamemode:setText(input_mode)
+	self.bpm:setText(("%i"):format(chartview.tempo * rate))
 
 	local duration = chartview.duration * rate
 	local minutes = duration / 60
 	local seconds = duration % 60
-	self.duration_cell:setValueText(("%i:%02i"):format(minutes, seconds))
+	self.duration:setText(("%i:%02i"):format(minutes, seconds))
 
-	self.notes_cell:setValueText(tostring(chartview.notes_count))
+	self.notes:setText(tostring(chartview.notes_count))
 
 	local config = self:getConfig()
 	local diff_column = config.settings.select.diff_column
