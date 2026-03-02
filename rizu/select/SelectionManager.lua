@@ -66,8 +66,6 @@ function SelectionManager:new(configModel, library, fs, onlineModel, replayBase,
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
 end
-
----@param event table
 function SelectionManager:receive(event)
 	if event.type == "set" then
 		self.taskRunner:push(function()
@@ -89,10 +87,6 @@ function SelectionManager:load()
 	self.config = config
 
 	self.searchMode = config.searchMode
-
-	self.noteChartSetStateCounter = 1
-	self.noteChartStateCounter = 1
-	self.scoreStateCounter = 1
 
 	self.collectionStore:load(settings.select.locations_in_collections)
 	self.collectionStore:setPath(config.collection, config.location_id)
@@ -383,10 +377,6 @@ function SelectionManager:pullNoteChartSet(noUpdate, noPullNext)
 
 	self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
 
-	if not noUpdate then
-		self.noteChartSetStateCounter = self.noteChartSetStateCounter + 1
-	end
-
 	if chartview_set then
 		return
 	end
@@ -418,10 +408,6 @@ function SelectionManager:pullNoteChart(noUpdate, noPullNext)
 	self.changed = true
 
 	self.state:setChart(index, chartview and chartview.chartfile_id)
-
-	if not noUpdate then
-		self.noteChartStateCounter = self.noteChartStateCounter + 1
-	end
 
 	if chartview then
 		return
@@ -458,8 +444,6 @@ function SelectionManager:pullScore(noUpdate)
 		self:findScore()
 		return
 	end
-
-	self.scoreStateCounter = self.scoreStateCounter + 1
 
 	local select = self.configModel.configs.select
 	if select.scoreSourceName == "online" then

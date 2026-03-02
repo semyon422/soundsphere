@@ -7,8 +7,22 @@ local NoteChartSetListView = ListView()
 NoteChartSetListView.rows = 11
 
 function NoteChartSetListView:reloadItems()
-	self.stateCounter = self.game.selectModel.noteChartSetStateCounter
-	self.items = self.game.selectModel.noteChartSetLibrary
+	local chartSetStore = self.game.selectModel.chartSetStore
+	if not self.isSubscribed then
+		chartSetStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = chartSetStore
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function NoteChartSetListView:receive()
+	self.refreshNeeded = true
 end
 
 ---@return number

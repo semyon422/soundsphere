@@ -9,8 +9,22 @@ local ScoreListView = ListView()
 ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
-	self.stateCounter = self.game.selectModel.scoreStateCounter
-	self.items = self.game.selectModel.scoreLibrary
+	local scoreStore = self.game.selectModel.scoreStore
+	if not self.isSubscribed then
+		scoreStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = scoreStore
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function ScoreListView:receive()
+	self.refreshNeeded = true
 end
 
 ---@return number
