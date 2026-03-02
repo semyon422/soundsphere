@@ -29,6 +29,7 @@ function GameplayView:enter()
 	self.seq_view:setSequenceConfig(game.noteSkinModel.noteSkin.playField)
 	self.seq_view:load()
 	love.mouse.setVisible(false)
+	love.keyboard.setTextInput(false)
 
 	local config = self:getConfig()
 	local bg = self:getContext().background

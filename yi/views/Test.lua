@@ -8,6 +8,7 @@ local Textbox = require("yi.views.components.Textbox")
 local Button = require("yi.views.components.Button")
 
 ---@class yi.Test : yi.Screen
+---@operator call: yi.Test
 local Test = Screen + {}
 
 function Test:load()

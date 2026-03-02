@@ -32,7 +32,7 @@ local info_side = {
 	h = "100%",
 	arrange = "flex_col",
 	justify_content = "space_between",
-	padding = {10, 0, 10, 10},
+	padding = {20, 0, 20, 20},
 }
 
 ---@return yi.View
@@ -51,18 +51,19 @@ function Select:newContent()
 	self.tags = View()
 	self.ln_percent = Label(res:getFont("bold", 24), "?% LN")
 	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
-	self.rate = Label(res:getFont("bold", 36), "1.00x")
-	self.difficulty_calc = Label(res:getFont("bold", 24), "Loading...")
-	self.difficulty = Label(res:getFont("bold", 58), "??.?")
-	self.mods = Label(res:getFont("bold", 24), "Loading...")
+	self.rate_const = Label(res:getFont("bold", 24), "1.00x")
+	self.difficulty_calc = Label(res:getFont("bold", 16), "Loading...")
+	self.difficulty = Label(res:getFont("black", 72), "??.?")
+	self.mods = Label(res:getFont("black", 36), "Loading...")
+	self.score_system = Label(res:getFont("bold", 24), "Loading...")
 
 	return h(View(), info_side, {
-		h(View(), {arrange = "flex_col", gap = 20}, {
-			h(View(), {arrange = "flex_row", gap = 10}, {
+		h(View(), {arrange = "wrap_col", gap = 20}, {
+			h(View(), {arrange = "wrap_row", gap = 10}, {
 				self.ranked_tag,
 				self.chart_format_tag
 			}),
-			h(View(), {arrange = "flex_col", w = 999999}, {
+			h(View(), {arrange = "wrap_col", w = 999999}, {
 				h(self.title),
 				h(self.artist, {y = -5, color = Colors.lines}),
 			}),
@@ -74,25 +75,30 @@ function Select:newContent()
 			}),
 			h(self.chart_grid, {w = "100%", h = 70}),
 		}),
-		h(View(), {arrange = "wrap_col", gap = 10}, {
-			h(View(), {arrange = "wrap_row"}, {
-				h(View(), {arrange = "wrap_col", justify_content = "end", w = 200}, {
-					self.patterns,
-					h(self.ln_percent, {color = {1, 1, 1, 1}}),
-					self.rate,
-				}),
-				h(View(), {arrange = "wrap_col", justify_content = "space_between"}, {
-					h(View(), {arrange = "wrap_col"}, {
-						self.difficulty_calc,
-						h(self.difficulty, {color = {1, 1, 1, 1}}),
-					}),
-					h(self.mods, {y = -6})
-				}),
+		h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
+			h(View(), {w = 180, arrange = "wrap_col"}, {
+				h(self.difficulty_calc, {color = Colors.lines}),
+				h(self.difficulty, {color = Colors.text}),
 			}),
-			self:newButtons()
+			h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
+			h(View(), {w = 2, height = 80, background_color = Colors.lines, align_self = "end", y = -12}),
+			h(View(), {arrange = "wrap_col", justify_content = "end"}, {
+				h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
+				h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
+					h(self.mods, {y = -8}),
+					h(self.rate_const, {y = -12, color = Colors.accent}),
+					h(self.score_system, {y = -12, color = Colors.lines}),
+				})
+			})
 		})
 	})
 end
+
+local player_info = {
+	padding = {10, 10, 10, 10},
+	background_color = Colors.header_footer,
+	justify_content = "center"
+}
 
 function Select:newRightSide()
 	local res = self:getResources()
@@ -104,7 +110,7 @@ function Select:newRightSide()
 	self.chart_set_list = ChartSetList()
 
 	return h(View(), {w = "30%", h = "100%", arrange = "flex_col", align_self = "end", background_color = Colors.panels}, {
-		h(View(), {arrange = "flex_col", gap = 10, padding = {10, 10, 10, 10}, background_color = Colors.header_footer}, {
+		h(View(), {arrange = "wrap_col", gap = 10, padding = {10, 10, 10, 10}, background_color = Colors.header_footer}, {
 			h(Textbox("", "Search songs...", function() end), {w = "100%"}),
 			h(View(), {arrange = "flex_row", gap = 5}, {
 				h(Button("Filters", open_filters), {grow = 1}),
@@ -115,20 +121,23 @@ function Select:newRightSide()
 			}),
 		}),
 		h(self.chart_set_list, {grow = 1, stencil = true}),
-		h(View(), {padding = {10, 10, 10, 10}, arrange = "wrap_row", align_items = "center", gap = 10, background_color = Colors.header_footer}, {
-			h(Image(avatar_frame), {h = player_info_h, w = player_info_h, align_items = "center", justify_content = "center"}, {
-				h(Label(res:getFont("black", 24), "(^^)")),
-			}),
-			h(View(), {arrange = "wrap_col"}, {
-				h(Label(res:getFont("bold", 24), "Guest"), {color = Colors.accent}),
-				h(Label(res:getFont("bold", 16), "#5 6769PP 93.35%"))
-			}),
+		h(View(), player_info, {
+			h(Label(res:getFont("bold", 16), "6769PP / 93.35%")),
+			h(View(), {arrange = "wrap_row", gap = 10, align_self = "end"}, {
+				h(View(), {arrange = "wrap_col"}, {
+					h(Label(res:getFont("bold", 24), "Guest"), {color = Colors.accent, align = "right"}),
+					h(Label(res:getFont("bold", 16), "#5"), {align = "right"}),
+				}),
+				h(Image(avatar_frame), {h = player_info_h, w = player_info_h, align_items = "center", justify_content = "center"}, {
+					h(Label(res:getFont("black", 24), "(^^)")),
+				}),
+			})
 		}),
 	})
 end
 
 local small_button = {
-	arrange = "flex_col",
+	--arrange = "flex_col",
 	justify_content = "center",
 	align_items = "center",
 	w = 110,
@@ -256,6 +265,9 @@ function Select:onKeyDown(e)
 		game.modifierSelectModel:change()
 		self:updateChartview()
 		return true
+	elseif k == "home" then
+		self.parent:set("irizz_select")
+		return true
 	elseif k == "return" then
 		self.parent:set("gameplay")
 		return true
@@ -264,7 +276,7 @@ end
 
 local format_difficulty_calc = {
 	enps_diff = "ENPS",
-	osu_diff = "osu!SR",
+	osu_diff = "Star Rating",
 	msd_diff = "MSD",
 	user_diff = "USER"
 }
@@ -306,17 +318,19 @@ local function getModifierString(mods)
 	if type(mods) == "string" then
 		mods = ModifierEncoder:decode(mods)
 	end
-	local modString = ""
+
+	local results = {}
 	for _, mod in pairs(mods) do
 		local modifier = ModifierModel:getModifier(mod.id)
 
 		if modifier then
 			local modifierString, modifierSubString = modifier:getString(mod)
-			modString = string.format("%s %s%s", modString, modifierString, modifierSubString or "")
+			local fullMod = modifierString .. (modifierSubString or "")
+			table.insert(results, fullMod)
 		end
 	end
 
-	return modString
+	return table.concat(results, " ")
 end
 
 function Select:updateChartview()
@@ -399,9 +413,17 @@ function Select:updateChartview()
 
 	local game = self:getGame()
 	local mods_str = getModifierString(game.replayBase.modifiers)
-	self.mods:setText(mods_str == "" and "NO MODS" or mods_str)
+	self.mods:setText(mods_str == "" and "No mods" or mods_str)
 
-	self.rate:setText(("%0.2fx"):format(game.timeRateModel:get()))
+	local const = game.replayBase.const
+
+	if const then
+		self.rate_const:setText(("%0.2fx CONST"):format(game.timeRateModel:get()))
+	else
+		self.rate_const:setText(("%0.2fx"):format(game.timeRateModel:get()))
+	end
+
+	self.score_system:setText("osu!mania V1 OD9")
 end
 
 function Select:onChartChanged()

@@ -68,4 +68,8 @@ function Label:getIntrinsicSize(axis_idx, constraint)
 	end
 end
 
+Label.Setters = setmetatable({
+	align = Label.setAlign,
+}, {__index = View.Setters})
+
 return Label
