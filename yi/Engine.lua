@@ -187,8 +187,13 @@ function Engine:draw()
 end
 
 function Engine:updateRootDimensions()
-	self.root:setWidth(love.graphics.getWidth())
-	self.root:setHeight(love.graphics.getHeight())
+	local target_h = 1080
+	local ww, wh = love.graphics.getDimensions()
+	local s = wh / target_h
+	local w, h = ww * (1 / s), target_h
+	self.root.transform:setScale(s, s)
+	self.root:setWidth(w)
+	self.root:setHeight(h)
 end
 
 ---@type ui.ModifierKeys
