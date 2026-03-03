@@ -72,9 +72,9 @@ function GameController:new()
 
 	self.online_client = OnlineClient()
 	self.multiplayer_client = MultiplayerClient()
-	self.client_remote = ClientRemoteValidation(ClientRemote(self.online_client, self.persistence.cacheModel, self.multiplayer_client))
+	self.client_remote = ClientRemoteValidation(ClientRemote(self.online_client, self.persistence.library, self.multiplayer_client))
 	self.seaClient = SeaClient(self.online_client, self.client_remote)
-	self.difftables_sync = DifftablesSync(self.seaClient.remote.difftables, self.persistence.cacheModel.difftablesRepo)
+	self.difftables_sync = DifftablesSync(self.seaClient.remote.difftables, self.persistence.library.difftablesRepo)
 	self.online_wrapper = OnlineWrapper(self.online_client, self.seaClient.remote)
 
 	self.onlineModel = OnlineModel(self.persistence.configModel, self.seaClient)
@@ -111,7 +111,7 @@ function GameController:new()
 	self.multiplayer_client.chart_selector = self.selectModel
 
 	self.multiplayerModel = MultiplayerModel(
-		self.persistence.cacheModel,
+		self.persistence.library,
 		self.rhythm_engine,
 		self.persistence.configModel,
 		self.selectModel,
@@ -122,12 +122,12 @@ function GameController:new()
 	)
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
-		self.persistence.cacheModel.chartsRepo
+		self.persistence.library.chartsRepo
 	)
 
 	self.joystickModel = JoystickModel(self.persistence.configModel)
 
-	self.cacheModel = self.persistence.cacheModel
+	self.library = self.persistence.library
 	self.osudirectModel = self.persistence.osudirectModel
 	self.configModel = self.persistence.configModel
 	self.fileFinder = self.persistence.fileFinder
@@ -153,7 +153,7 @@ function GameController:new()
 		self.configModel,
 		self.multiplayerModel,
 		self.onlineModel,
-		self.cacheModel,
+		self.library,
 		self.osudirectModel,
 		self.windowModel,
 		self.replayBase,
@@ -175,13 +175,13 @@ function GameController:new()
 		self.configModel,
 		self.resourceModel,
 		self.windowModel,
-		self.cacheModel,
+		self.library,
 		self.fileFinder,
 		self.previewModel,
 		self.replayBase
 	)
 	self.offsetController = OffsetController(
-		self.cacheModel,
+		self.library,
 		self.computeContext,
 		self.offsetModel,
 		self.rhythm_engine,
@@ -248,7 +248,7 @@ function GameController:update(dt)
 	self.gameplayInteractor:update()
 	self.osudirectModel:update()
 
-	self.cacheModel:update()
+	self.library:update()
 
 	self.backgroundModel:update()
 	self.chartPreviewModel:update()

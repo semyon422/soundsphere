@@ -3,7 +3,10 @@ local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
 
 local function ui_lock(self)
-	if not self.game.cacheModel.isProcessing then
+	---@type sphere.GameController
+	local game = self.game
+
+	if not game.library.isProcessing then
 		return
 	end
 
@@ -17,10 +20,10 @@ local function ui_lock(self)
 	just.wheel_over("cache task container", true)
 	just.mouse_over("cache task container", true, "mouse")
 
-	local cacheModel = self.game.cacheModel
-	local count = cacheModel.shared.chartfiles_count
-	local current = cacheModel.shared.chartfiles_current
-	local state = cacheModel.shared.state
+	local library = game.library
+	local count = library.chartfiles_count
+	local current = library.chartfiles_current
+	local state = library.state
 
 	local state_messages = {
 		[1] = "Searching files...",
@@ -48,7 +51,7 @@ local function ui_lock(self)
 	end
 
 	if imgui.button("stopTask", "stop task") then
-		cacheModel:stopTask()
+		library:stopTask()
 	end
 
 	just.container()

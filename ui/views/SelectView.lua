@@ -53,8 +53,6 @@ function SelectView:draw()
 	self.chartPreviewView:draw()
 	SelectViewConfig(self)
 
-	local cacheModel = self.game.cacheModel
-
 	local kp = just.keypressed
 	if kp("f1") then self.gameView:setModal(require("ui.views.ModifierView.ModifierView"))
 	elseif kp("f2") then self.game.selectModel:scrollRandom()

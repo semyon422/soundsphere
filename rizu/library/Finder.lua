@@ -41,6 +41,7 @@ function Finder:lookupAsync(prefix, dir)
 		return
 	end
 
+	---@type string[]
 	local all_items = {}
 
 	-- Phase 1: Check for direct chart files (like .osu, .bms, .sph)
@@ -58,7 +59,7 @@ function Finder:lookupAsync(prefix, dir)
 			table.insert(all_items, item)
 		end
 	end
-	
+
 	-- If we found related files, we stop here for this directory (don't treat as container)
 	if has_related then
 		coroutine.yield("related_all", dir, all_items, dir_info.modtime)
@@ -80,7 +81,7 @@ function Finder:lookupAsync(prefix, dir)
 			table.insert(all_items, item)
 		end
 	end
-	
+
 	if has_unrelated then
 		coroutine.yield("unrelated_all", dir, all_items, dir_info.modtime)
 		return
@@ -91,6 +92,7 @@ function Finder:lookupAsync(prefix, dir)
 	local a, b = get_dir_name(dir)
 	coroutine.yield("directory_dir", a, b, dir_info.modtime)
 
+	---@type string[]
 	local subdirs_to_scan = {}
 	for _, item in ipairs(items) do
 		local info = self.fs:getInfo(path_util.join(prefix, dir, item))

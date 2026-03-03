@@ -27,7 +27,7 @@ function ChartSetStore:__index(k)
 end
 
 ---@param itemIndex number
----@return sphere.RichChartview
+---@return rizu.LocatedChartview
 function ChartSetStore:loadObject(itemIndex)
 	local chartviewsRepo = self.library.chartviewsRepo
 	local difftablesRepo = self.library.difftablesRepo
@@ -38,7 +38,7 @@ function ChartSetStore:loadObject(itemIndex)
 		return {}
 	end
 
-	---@cast chartview sphere.RichChartview
+	---@cast chartview rizu.LocatedChartview
 
 	chartview.lamp = _chartview.lamp
 
@@ -57,7 +57,7 @@ function ChartSetStore:count()
 end
 
 ---@param i number
----@return sphere.RichChartview?
+---@return rizu.LocatedChartview?
 function ChartSetStore:get(i)
 	if i < 1 or i > self.itemsCount then
 		return nil
@@ -65,7 +65,7 @@ function ChartSetStore:get(i)
 	return self.cache:get(i)
 end
 
----@param chartview sphere.IChartviewIds
+---@param chartview rizu.IChartviewBase
 ---@return number
 function ChartSetStore:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id

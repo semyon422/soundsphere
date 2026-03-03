@@ -1,4 +1,3 @@
-local class = require("class")
 local ITaskContext = require("rizu.library.tasks.ITaskContext")
 
 ---@class rizu.library.FakeTaskContext: rizu.library.ITaskContext
@@ -6,7 +5,9 @@ local ITaskContext = require("rizu.library.tasks.ITaskContext")
 local FakeTaskContext = ITaskContext + {}
 
 function FakeTaskContext:new()
+	---@type table[]
 	self.actions = {}
+	---@type {[string]: ncdk2.Chart[]}
 	self.charts = {}
 end
 

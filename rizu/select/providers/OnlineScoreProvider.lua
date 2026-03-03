@@ -12,7 +12,7 @@ function OnlineScoreProvider:new(onlineModel)
 	self.onlineModel = onlineModel
 end
 
----@param chartview sphere.Chartview
+---@param chartview rizu.Chartview
 ---@param exact boolean
 ---@return sea.Chartplay[]?
 ---@return string?

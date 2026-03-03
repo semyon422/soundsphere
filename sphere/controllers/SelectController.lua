@@ -19,7 +19,7 @@ local SelectController = class()
 ---@param configModel sphere.ConfigModel
 ---@param multiplayerModel sphere.MultiplayerModel
 ---@param onlineModel sphere.OnlineModel
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
 ---@param replayBase sea.ReplayBase
@@ -33,7 +33,7 @@ function SelectController:new(
 	configModel,
 	multiplayerModel,
 	onlineModel,
-	cacheModel,
+	library,
 	osudirectModel,
 	windowModel,
 	replayBase,
@@ -47,7 +47,7 @@ function SelectController:new(
 	self.configModel = configModel
 	self.multiplayerModel = multiplayerModel
 	self.onlineModel = onlineModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
 	self.replayBase = replayBase
@@ -151,7 +151,7 @@ function SelectController:openDirectory()
 	if not chartview then
 		return
 	end
-	local location = self.cacheModel.locationsRepo:selectLocationById(chartview.location_id)
+	local location = self.library.locationsRepo:selectLocationById(chartview.location_id)
 	if not location then
 		return
 	end
@@ -185,17 +185,17 @@ function SelectController:updateCache(force)
 	if not chartview then
 		return
 	end
-	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
+	self.library:computeLocation(chartview.dir, chartview.location_id)
 end
 
----@param location_id string
+---@param location_id integer
 function SelectController:updateCacheLocation(location_id)
-	local cacheModel = self.cacheModel
-	local state = cacheModel.shared.state
+	local library = self.library
+	local state = library.state
 	if state == 0 or state == 3 then
-		cacheModel:startUpdate(nil, location_id)
+		library:computeLocation(nil, location_id)
 	else
-		cacheModel:stopTask()
+		library:stopTask()
 	end
 end
 
@@ -210,7 +210,7 @@ end
 
 ---@param path string
 function SelectController:directorydropped(path)
-	self.cacheModel.locations:updateLocationPath(path)
+	-- self.library.locations:updateLocationPath(path)
 end
 
 local filedropped_handlers = {}
@@ -227,7 +227,7 @@ function filedropped_handlers.new_chart(self, path, data)
 		audio = audioName .. "." .. ext
 	})))
 
-	self.cacheModel:startUpdate(location_path, 1)
+	self.library:computeLocation(location_path, 1)
 end
 
 function filedropped_handlers.add_zip(self, path, data)
@@ -243,7 +243,7 @@ function filedropped_handlers.add_zip(self, path, data)
 	end
 	print("Extracted")
 
-	self.cacheModel:startUpdate(location_path, 1)
+	self.library:computeLocation(location_path, 1)
 end
 filedropped_handlers.add_zip = thread.coro(filedropped_handlers.add_zip)
 

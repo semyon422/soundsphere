@@ -125,7 +125,7 @@ local function OsudirectSubscreen(self)
 
 	w, h = Layout:move("column1", "footer")
 	if imgui.TextOnlyButton("recache downloads", "recache downloads", w, h) then
-		self.game.cacheModel:startUpdate("downloads", 1)
+		self.game.library:computeLocation("downloads", 1)
 	end
 
 	w, h = Layout:move("column2row2row1")

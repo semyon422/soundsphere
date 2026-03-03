@@ -20,7 +20,7 @@ function GameplayInteractor:new(game)
 
 	self.score_saver = ScoreSaver(
 		game.fs,
-		game.persistence.cacheModel,
+		game.persistence.library,
 		game.persistence.configModel,
 		game.seaClient,
 		game.replayBase,

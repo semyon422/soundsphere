@@ -27,7 +27,7 @@ local EditorController = class()
 ---@param configModel sphere.ConfigModel
 ---@param resourceModel sphere.ResourceModel
 ---@param windowModel sphere.WindowModel
----@param cacheModel sphere.CacheModel
+---@param library rizu.library
 ---@param fileFinder sphere.FileFinder
 ---@param previewModel sphere.PreviewModel
 ---@param replayBase sea.ReplayBase
@@ -38,7 +38,7 @@ function EditorController:new(
 	configModel,
 	resourceModel,
 	windowModel,
-	cacheModel,
+	library,
 	fileFinder,
 	previewModel,
 	replayBase
@@ -49,7 +49,7 @@ function EditorController:new(
 	self.configModel = configModel
 	self.resourceModel = resourceModel
 	self.windowModel = windowModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.fileFinder = fileFinder
 	self.previewModel = previewModel
 	self.replayBase = replayBase
@@ -652,7 +652,7 @@ function EditorController:save()
 
 	assert(love.filesystem.write(path, data))
 
-	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
+	self.library:computeLocation(chartview.dir, chartview.location_id)
 end
 
 function EditorController:saveToOsu()

@@ -10,7 +10,7 @@ function LocalScoreProvider:new(library)
 	self.library = library
 end
 
----@param chartview sphere.Chartview
+---@param chartview rizu.Chartview
 ---@param exact boolean
 ---@return sea.Chartplay[]
 function LocalScoreProvider:getScores(chartview, exact)

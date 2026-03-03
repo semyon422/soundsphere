@@ -1,6 +1,5 @@
 local class = require("class")
 local path_util = require("path_util")
-local table_util = require("table_util")
 
 ---@class rizu.library.Locations
 ---@operator call: rizu.library.Locations
@@ -17,11 +16,14 @@ function Locations:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 	self.fs = fs
 	self.root = root
 	self.prefix = prefix
+	---@type {[integer]: boolean}
 	self.mounted = {}
-	---@type sphere.Location[]
+	---@type {[integer]: string}
+	self.status = {}
+	---@type {[integer]: table}
+	self.info = {}
+	---@type rizu.Location[]
 	self.locations = {}
-	---@type sphere.Location?
-	self.selected_loc = nil
 end
 
 function Locations:load()
@@ -30,7 +32,6 @@ function Locations:load()
 	for _, location in ipairs(self.locations) do
 		self:mountLocation(location)
 	end
-	self:selectLocation(1)
 end
 
 function Locations:unload()
@@ -41,35 +42,24 @@ end
 
 function Locations:selectLocations()
 	self.locations = self.locationsRepo:selectLocations()
+	for _, loc in ipairs(self.locations) do
+		self:updateLocationInfo(loc.id)
+	end
 end
 
----@param id number
-function Locations:selectLocation(id)
-	self.selected_id = id
-	local index = table_util.indexof(self.locations, self.selected_id, function(loc)
-		return loc.id
-	end)
-
-	if not index then
-		self.selected_id = 1
-		index = 1
-	end
-
-	self.selected_loc = self.locations[index]
-
-	local chartfilesRepo = self.chartfilesRepo
-
-	self.location_info = {
-		chartfile_sets = chartfilesRepo:countChartfileSets({location_id = id}),
-		chartfiles = chartfilesRepo:countChartfiles({location_id = id}),
-		hashed_chartfiles = chartfilesRepo:countChartfiles({
+---@param id integer
+function Locations:updateLocationInfo(id)
+	self.info[id] = {
+		chartfile_sets = self.chartfilesRepo:countChartfileSets({location_id = id}),
+		chartfiles = self.chartfilesRepo:countChartfiles({location_id = id}),
+		hashed_chartfiles = self.chartfilesRepo:countChartfiles({
 			location_id = id,
 			hash__isnotnull = true,
 		}),
 	}
 end
 
----@param location sphere.Location
+---@param location rizu.Location
 function Locations:unmountLocation(location)
 	if not self.mounted[location.id] then
 		return
@@ -78,27 +68,27 @@ function Locations:unmountLocation(location)
 	self.mounted[location.id] = nil
 end
 
----@param location sphere.Location
+---@param location rizu.Location
 function Locations:mountLocation(location)
 	local path = location.path
 	if location.is_relative then
-		location.status = "direct access"
+		self.status[location.id] = "direct access"
 		return
 	end
 	if self.mounted[location.id] then
-		location.status = "mounted"
+		self.status[location.id] = "mounted"
 		return
 	end
 	local mp = path_util.join(self.prefix, location.id)
 	if self.fs:mount(path, mp, true) then
 		self.mounted[location.id] = true
-		location.status = "mounted"
+		self.status[location.id] = "mounted"
 		return
 	end
-	location.status = "errored"
+	self.status[location.id] = "errored"
 end
 
----@param location sphere.Location
+---@param location rizu.Location
 ---@return string
 function Locations:getPrefix(location)
 	if location.is_relative then
@@ -125,16 +115,16 @@ function Locations:createDefaultLocation()
 	locationsRepo:insertLocation(loc)
 end
 
+---@param loc rizu.Location
 ---@param path string
-function Locations:updateLocationPath(path)
-	local loc = self.selected_loc
-	if loc.is_internal then
+function Locations:updateLocationPath(loc, path)
+	if not loc or loc.is_internal then
 		return
 	end
 
 	self:unmountLocation(loc)
 
-	loc.path = path:gsub("\\", "/")
+	loc.path = path_util.fix_separators(path)
 	loc.is_relative = false
 
 	local a, b = path:find(self.root)
@@ -147,12 +137,14 @@ function Locations:updateLocationPath(path)
 	self:mountLocation(loc)
 end
 
+---@param location_id integer
 function Locations:deleteCharts(location_id)
 	self.chartfilesRepo:deleteChartfileSets({
 		location_id = assert(location_id),
 	})
 end
 
+---@param location_id integer
 function Locations:deleteLocation(location_id)
 	self.locationsRepo:deleteLocation(location_id)
 end

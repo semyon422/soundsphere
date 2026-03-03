@@ -6,19 +6,19 @@ local ChartmetaUserData = require("sea.chart.ChartmetaUserData")
 ---@operator call: sphere.OffsetController
 local OffsetController = class()
 
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param computeContext sea.ComputeContext
 ---@param offsetModel sphere.OffsetModel
 ---@param rhythm_engine rizu.RhythmEngine
 ---@param notificationModel sphere.NotificationModel
 function OffsetController:new(
-	cacheModel,
+	library,
 	computeContext,
 	offsetModel,
 	rhythm_engine,
 	notificationModel
 )
-	self.cacheModel = cacheModel
+	self.library = library
 	self.computeContext = computeContext
 	self.offsetModel = offsetModel
 	self.rhythm_engine = rhythm_engine
@@ -35,7 +35,7 @@ end
 
 ---@param delta number
 function OffsetController:increaseLocalOffset(delta)
-	local chartsRepo = self.cacheModel.chartsRepo
+	local chartsRepo = self.library.chartsRepo
 	local chartmeta = assert(self.computeContext.chartmeta)
 
 	local chartmeta_user_data = chartsRepo:getUserChartmetaUserData(chartmeta.hash, chartmeta.index, 1)
@@ -55,7 +55,7 @@ function OffsetController:increaseLocalOffset(delta)
 end
 
 function OffsetController:resetLocalOffset()
-	local chartsRepo = self.cacheModel.chartsRepo
+	local chartsRepo = self.library.chartsRepo
 	local chartmeta = assert(self.computeContext.chartmeta)
 
 	local chartmeta_user_data = chartsRepo:getUserChartmetaUserData(chartmeta.hash, chartmeta.index, 1)

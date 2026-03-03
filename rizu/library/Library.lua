@@ -1,8 +1,5 @@
 local thread = require("thread")
 local class = require("class")
-local pprint = require("pprint")
-local path_util = require("path_util")
-local string_util = require("string_util")
 local ThreadRemote = require("threadremote.ThreadRemote")
 local LoveFilesystem = require("fs.LoveFilesystem")
 local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
@@ -10,6 +7,7 @@ local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local Database = require("rizu.library.Database")
 local Status = require("rizu.library.Status")
 local ChartdiffGenerator = require("rizu.library.generators.ChartdiffGenerator")
+local Collections = require("rizu.library.Collections")
 local Locations = require("rizu.library.Locations")
 local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local ComputeDataProvider = require("rizu.library.ComputeDataProvider")
@@ -17,22 +15,27 @@ local ComputeDataProvider = require("rizu.library.ComputeDataProvider")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 
----@class sphere.Location
+---@class rizu.library.LibraryTask
+---@field f fun()
+---@field co thread?
+
+---@class rizu.Location
 ---@field id integer
 ---@field path string
 ---@field name string
 ---@field is_relative boolean
 ---@field is_internal boolean
 
----@class sphere.IChartviewIds
+---@class rizu.IChartviewBase
 ---@field chartfile_id integer
 ---@field chartfile_set_id integer
 ---@field chartmeta_id integer
 ---@field chartdiff_id integer
 ---@field chartplay_id integer
----@field lamp boolean
+---@field lamp boolean?
 
----@class sphere.Chartview: sphere.IChartviewIds
+-- TODO: better types for all chartviews in views.sql
+---@class rizu.Chartview: rizu.IChartviewBase
 ---@field hash string
 ---@field index integer
 ---@field title string
@@ -50,12 +53,13 @@ local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 ---@field difficulty number
 ---@field notes_count integer
 ---@field duration number
----@field msd_diff? number
----@field accuracy? number
----@field miss_count? integer
----@field difftable_chartmetas? table[]
+---@field msd_diff number?
+---@field accuracy number?
+---@field miss_count integer?
+---@field difftable_chartmetas table[]?
 
----@class sphere.RichChartview: sphere.Chartview
+-- TODO: check if some fields can be optional
+---@class rizu.LocatedChartview: rizu.Chartview
 ---@field location_prefix string
 ---@field location_dir string
 ---@field location_path string
@@ -68,14 +72,15 @@ local Library = class()
 
 ---@param difficultyModel sphere.DifficultyModel
 function Library:new(difficultyModel)
+	---@type rizu.library.LibraryTask[]
 	self.tasks = {}
+
+	---@type string[]
 	self.errors = {}
-	self.shared = {
-		state = 0,
-		chartfiles_count = 0,
-		chartfiles_current = 0,
-		stop = false,
-	}
+
+	self.state = 0
+	self.chartfiles_count = 0
+	self.chartfiles_current = 0
 
 	local migrations = {}
 	setmetatable(migrations, {__index = function(_, k)
@@ -93,6 +98,7 @@ function Library:new(difficultyModel)
 	self.chartfilesRepo = ChartfilesRepo(self.database.models)
 	self.status = Status(self.chartfilesRepo, self.chartsRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, difficultyModel)
+	self.collections = Collections(self.chartfilesRepo, self.locationsRepo)
 	self.locations = Locations(
 		self.locationsRepo,
 		self.chartfilesRepo,
@@ -108,20 +114,6 @@ function Library:new(difficultyModel)
 		self.locations,
 		LoveFilesystem()
 	)
-
-	self.remote_handler = {
-		updateProgress = function(state, count, current, errors)
-			self.shared.state = state
-			self.shared.chartfiles_count = count
-			self.shared.chartfiles_current = current
-			if errors then
-				for _, err in ipairs(errors) do
-					print("Library Error: " .. tostring(err))
-					table.insert(self.errors, err)
-				end
-			end
-		end
-	}
 end
 
 function Library:load()
@@ -130,16 +122,16 @@ function Library:load()
 
 	self.locations:load()
 
-	local tr = ThreadRemote(math.random(1000000), self.remote_handler)
-	self.tr = tr
-	self.worker = tr:start(function(remote)
-		require("preload")
-		local Worker = require("rizu.library.Worker")
-		local worker = Worker()
-		worker.remote = remote
-		worker:init()
-		return worker
-	end)
+	self.tr = ThreadRemote("rizu.library.Library", self)
+	self.worker = self.tr:start(self.createAndLoadWorker)
+end
+
+function Library:createAndLoadWorker()
+	require("preload")
+	local Worker = require("rizu.library.Worker")
+	local worker = Worker(self)
+	worker:load()
+	return worker
 end
 
 function Library:unload()
@@ -152,132 +144,77 @@ end
 
 Library.unload = thread.coro(Library.unload)
 
-local function process_chartfile_set(dir, tree, location_id)
-	local t = tree
-	t.count = t.count + 1
-	if dir then
-		local tpath = {}
-		local depth = tree.depth
-		for i, k in ipairs(string_util.split(dir, "/")) do
-			depth = depth + 1
-			tpath[i] = k
-			local index = t.indexes[k]
-			local item = t.items[index]
-			if not item then
-				item = {
-					count = 0,
-					selected = 2,
-					depth = depth,
-					path = path_util.join(unpack(tpath)),
-					location_id = location_id,
-					name = k,
-					indexes = {},
-					items = {t},
-				}
-				index = #t.items + 1
-				t.indexes[k] = index
-				t.items[index] = item
-			end
-			t = item
-			t.count = t.count + 1
-		end
+---@param state integer
+---@param count integer
+---@param current integer
+---@param errors string[]
+function Library:updateProgress(state, count, current, errors)
+	self.state = state
+	self.chartfiles_count = count
+	self.chartfiles_current = current
+
+	for _, err in ipairs(errors) do
+		print("Library error: " .. tostring(err))
+		table.insert(self.errors, err)
 	end
 end
 
 ---@param locations_in_collections boolean
----@return table
+---@return rizu.library.Collections.TreeNode
 function Library:getCollectionTree(locations_in_collections)
-	local tree = {
-		count = 0,
-		selected = 1,
-		depth = 0,
-		path = nil,
-		location_id = nil,
-		name = "/",
-		indexes = {},
-		items = {},
-	}
-	tree.items[1] = tree
-
-	local chartfilesRepo = self.chartfilesRepo
-	local locationsRepo = self.locationsRepo
-	if not locations_in_collections then
-		for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSets()) do
-			process_chartfile_set(chartfile_set.dir, tree, nil)
-		end
-	else
-		local locations = locationsRepo:selectLocations()
-		for _, location in ipairs(locations) do
-			local subtree = {
-				count = 0,
-				selected = 2,
-				depth = 1,
-				path = nil,
-				location_id = location.id,
-				name = location.name,
-				indexes = {},
-				items = {tree},
-			}
-			table.insert(tree.items, subtree)
-			for _, chartfile_set in ipairs(chartfilesRepo:selectChartfileSetsAtLocation(location.id)) do
-				process_chartfile_set(chartfile_set.dir, subtree, location.id)
-			end
-		end
-	end
-
-	return tree
+	return self.collections:getTree(locations_in_collections)
 end
 
----@param path string
+---@param f fun(worker: rizu.library.Library)
+---@param async boolean?
+function Library:addTask(f, async)
+	---@type rizu.library.LibraryTask
+	local task = {f = f}
+	table.insert(self.tasks, task)
+
+	if async then
+		task.co = coroutine.running()
+		coroutine.yield()
+	end
+end
+
+---@param path string?
 ---@param location_id number
-function Library:startUpdate(path, location_id)
-	table.insert(self.tasks, {
-		type = "update_cache",
-		path = path,
-		location_id = location_id,
-	})
+function Library:computeLocation(path, location_id)
+	self:addTask(function()
+		self.worker:computeLocation(path, location_id)
+	end)
+end
+
+---@param path string?
+---@param location_id integer
+function Library:computeLocationAsync(path, location_id)
+	self:addTask(function()
+		self.worker:computeLocation(path, location_id)
+	end, true)
 end
 
 function Library:computeChartdiffs()
-	table.insert(self.tasks, {
-		type = "update_chartdiffs",
-	})
+	self:addTask(function()
+		self.worker:computeChartdiffs()
+	end)
 end
 
 ---@param prefer_preview boolean
 function Library:computeIncompleteChartdiffs(prefer_preview)
-	table.insert(self.tasks, {
-		type = "update_incomplete_chartdiffs",
-		prefer_preview = prefer_preview,
-	})
+	self:addTask(function()
+		self.worker:computeIncompleteChartdiffs(prefer_preview)
+	end)
 end
 
 function Library:computeChartplays()
-	table.insert(self.tasks, {
-		type = "update_chartplays",
-	})
-end
-
----@param path string
----@param location_id number
-function Library:startUpdateAsync(path, location_id)
-	local c = coroutine.running()
-	table.insert(self.tasks, {
-		type = "update_cache",
-		path = path,
-		location_id = location_id,
-		callback = function()
-			coroutine.resume(c)
-		end
-	})
-	coroutine.yield()
+	self:addTask(function()
+		self.worker:computeChartplays()
+	end)
 end
 
 function Library:stopTask()
-	self.shared.stop = true
-	if self.tr then
-		self.worker:stopTask()
-	end
+	self.worker:stopTask()
 end
 
 Library.stopTask = thread.coro(Library.stopTask)
@@ -298,30 +235,17 @@ function Library:process()
 	self.isProcessing = true
 
 	local tasks = self.tasks
+	---@type rizu.library.LibraryTask?
 	local task = table.remove(tasks, 1)
 	while task do
-		local callback = task.callback
-		task.callback = nil
+		-- self.database:unload()
+		task.f()
+		-- self.database:load()
 
-		self.database:unload()
-
-		if task.type == "update_cache" then
-			self.worker:computeCacheLocation(task.path, task.location_id)
-		elseif task.type == "update_chartdiffs" then
-			self.worker:computeChartdiffs()
-		elseif task.type == "update_incomplete_chartdiffs" then
-			self.worker:computeIncompleteChartdiffs(task.prefer_preview)
-		elseif task.type == "update_chartplays" then
-			self.worker:computeChartplays()
-		end
-
-		self.database:load()
-
-		-- Also update library status after processing
 		self.status:update()
 
-		if callback then
-			callback()
+		if task.co then
+			assert(coroutine.resume(task.co))
 		end
 
 		task = table.remove(tasks, 1)

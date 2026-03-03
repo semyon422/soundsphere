@@ -8,10 +8,10 @@ local class = require("class")
 ---@operator call: rizu.library.ChartviewsRepo
 local ChartviewsRepo = class()
 
----@param models rizu.library.Models
+---@param models rdb.Models
 function ChartviewsRepo:new(models)
 	self.chartviews_count = 0
-	---@type {[integer]: sphere.IChartviewIds}
+	---@type {[integer]: rizu.IChartviewBase}
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
 	self.chartfile_id_to_global_index = {}
@@ -30,7 +30,7 @@ end
 
 ----------------------------------------------------------------
 
-ffi.cdef([[
+ffi.cdef [[
 	typedef struct {
 		int32_t chartfile_id;
 		int32_t chartfile_set_id;
@@ -39,7 +39,7 @@ ffi.cdef([[
 		int32_t chartplay_id;
 		bool lamp;
 	} chartview_struct
-]])
+]]
 
 ChartviewsRepo.chartview_struct = ffi.typeof("chartview_struct")
 
@@ -70,7 +70,6 @@ end
 
 local _queryAsync = thread.async(function(params)
 	local time = love.timer.getTime()
-	local ffi = require("ffi")
 	local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
 	local Database = require("rizu.library.Database")
 
@@ -86,7 +85,7 @@ local _queryAsync = thread.async(function(params)
 		print(err)
 		return
 	end
-	
+
 	local t = self:getQueryResult()
 
 	local dt = math.floor((love.timer.getTime() - time) * 1000)
@@ -185,8 +184,8 @@ function ChartviewsRepo:queryNoteChartSets()
 	self.chartviews_count = c
 end
 
----@param chartview sphere.IChartviewIds
----@return sphere.Chartview[]
+---@param chartview rizu.IChartviewBase
+---@return rizu.Chartview[]
 function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local params = self.params
 
@@ -232,7 +231,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		order = order,
 	}
 
-	---@type sphere.Chartview[]
+	---@type rizu.Chartview[]
 	local objs = model:select(where, options)
 
 	for _, obj in ipairs(objs) do
@@ -242,8 +241,8 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	return objs
 end
 
----@param obj sphere.RichChartview
----@return sphere.RichChartview
+---@param obj rizu.LocatedChartview
+---@return rizu.LocatedChartview
 function ChartviewsRepo:_fillRichData(obj)
 	local hash, index = obj.hash, obj.index
 	if hash and index then
@@ -255,8 +254,8 @@ function ChartviewsRepo:_fillRichData(obj)
 	return obj
 end
 
----@param _chartview sphere.IChartviewIds
----@return sphere.Chartview?
+---@param _chartview rizu.IChartviewBase
+---@return rizu.Chartview?
 function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
@@ -273,7 +272,7 @@ function ChartviewsRepo:getChartview(_chartview)
 		model = self.models.chartplayviews
 	end
 
-	---@type sphere.Chartview?
+	---@type rizu.Chartview?
 	local obj
 	if chartplay_id then
 		obj = model:find({

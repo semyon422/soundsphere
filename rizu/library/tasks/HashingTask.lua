@@ -52,7 +52,7 @@ function HashingTask:processChartfile(chartfile, location_prefix)
 		end
 		::continue::
 	end
-	
+
 	return true
 end
 

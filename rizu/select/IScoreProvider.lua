@@ -4,7 +4,7 @@ local class = require("class")
 ---@operator call: rizu.select.IScoreProvider
 local IScoreProvider = class()
 
----@param chartview sphere.Chartview
+---@param chartview rizu.Chartview
 ---@param exact boolean
 ---@return sea.Chartplay[]
 function IScoreProvider:getScores(chartview, exact)

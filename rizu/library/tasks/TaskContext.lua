@@ -1,4 +1,3 @@
-local class = require("class")
 local ITaskContext = require("rizu.library.tasks.ITaskContext")
 
 ---@class rizu.library.TaskContext: rizu.library.ITaskContext

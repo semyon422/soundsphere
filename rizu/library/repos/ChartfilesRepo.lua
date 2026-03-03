@@ -5,7 +5,7 @@ local sql_util = require("rdb.sql_util")
 ---@operator call: rizu.library.ChartfilesRepo
 local ChartfilesRepo = class()
 
----@param models rizu.library.Models
+---@param models rdb.Models
 function ChartfilesRepo:new(models)
 	self.models = models
 end
@@ -100,7 +100,7 @@ end
 ---@param path string?
 ---@param location_id integer
 ---@param set_id integer?
----@return table
+---@return sea.ClientChartfile[]
 function ChartfilesRepo:selectUnhashedChartfiles(path, location_id, set_id)
 	assert(not (path and set_id))
 	return self.models.located_chartfiles:select({

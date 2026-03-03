@@ -22,21 +22,21 @@ local path_util = require("path_util")
 ---@operator call: rizu.library.Processor
 local Processor = class()
 
----@param libraryDatabase rizu.library.Database
+---@param db rizu.library.Database
 ---@param fs fs.IFilesystem
 ---@param workingDirectory string
-function Processor:new(libraryDatabase, fs, workingDirectory)
+function Processor:new(db, fs, workingDirectory)
+	self.needStop = false
 	self.state = 0
 	self.fs = fs
 
 	self.difficultyModel = DifficultyModel()
 
-	self.database = libraryDatabase
+	self.db = db
 
-	self.chartsRepo = ChartsRepo(self.database.models, self.difficultyModel.registry.fields)
-
-	self.locationsRepo = LocationsRepo(self.database.models)
-	self.chartfilesRepo = ChartfilesRepo(self.database.models)
+	self.chartsRepo = ChartsRepo(self.db.models, self.difficultyModel.registry.fields)
+	self.locationsRepo = LocationsRepo(self.db.models)
+	self.chartfilesRepo = ChartfilesRepo(self.db.models)
 
 	self.finder = Finder(self.fs)
 
@@ -45,6 +45,7 @@ function Processor:new(libraryDatabase, fs, workingDirectory)
 	self.fileCacheGenerator = FileCacheGenerator(self.chartfilesRepo, self.finder, self.taskContext)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, self.difficultyModel)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
+
 	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator, self.taskContext)
 	self.difficultyTask = DifficultyTask(self.difficultyModel, self.chartdiffGenerator, self.chartsRepo, self.taskContext)
 
@@ -70,11 +71,11 @@ function Processor:new(libraryDatabase, fs, workingDirectory)
 end
 
 function Processor:begin()
-	self.database.orm:begin()
+	self.db.orm:begin()
 end
 
 function Processor:commit()
-	self.database.orm:commit()
+	self.db.orm:commit()
 end
 
 ----------------------------------------------------------------
@@ -83,6 +84,7 @@ function Processor:resetProgress()
 	self.chartfiles_count = 0
 	self.chartfiles_current = 0
 	self.state = 0
+	---@type string[]
 	self.errors = {}
 end
 
@@ -95,10 +97,15 @@ function Processor:checkProgress() end
 
 ---@param path string?
 ---@param location_id number
-function Processor:computeCacheLocation(path, location_id)
+function Processor:computeLocation(path, location_id)
 	print("start caching", path, location_id)
 
 	local location = self.locationsRepo:selectLocationById(location_id)
+	if not location then
+		self:addError("location not found")
+		return
+	end
+
 	local location_prefix = self.locations:getPrefix(location)
 
 	self:resetProgress()
@@ -114,6 +121,7 @@ function Processor:computeCacheLocation(path, location_id)
 	self.state = 2
 	self:checkProgress()
 
+	---@type sea.ClientChartfileSet?, integer?, string?
 	local chartfile_set, set_id, unhashed_path
 	local dir, name = Finder.get_dir_name(path)
 	if name then
@@ -161,12 +169,19 @@ function Processor:getChartsByHash(hash)
 	end
 
 	local location = self.locationsRepo:selectLocationById(chartfile.location_id)
+	if not location then
+		return nil, "location not found"
+	end
+
 	local prefix = self.locations:getPrefix(location)
 
 	local full_path = path_util.join(prefix, chartfile.path)
-	local content = assert(self.fs:read(full_path))
+	local data, err = self.fs:read(full_path)
+	if not data then
+		return nil, err
+	end
 
-	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, content)
+	local chart_chartmetas, err = ChartFactory:getCharts(chartfile.name, data)
 	if not chart_chartmetas then
 		return nil, err
 	end

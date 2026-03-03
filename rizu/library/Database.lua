@@ -6,24 +6,7 @@ local Models = require("rdb.Models")
 local sql_util = require("rdb.sql_util")
 local autoload = require("autoload")
 
----@class rizu.library.Models
----@field chartfile_sets rdb.Model
----@field chartfiles rdb.Model
----@field locations rdb.Model
----@field chartviews rdb.Model
----@field chartviews_no_preview rdb.Model
----@field chartdiffviews rdb.Model
----@field chartdiffviews_no_preview rdb.Model
----@field chartplayviews rdb.Model
----@field chartplayviews_no_preview rdb.Model
----@field difftable_chartmetas rdb.Model
----@field chartfile_set_dirs rdb.Model
----@field chartplays rdb.Model
----@field chartdiffs rdb.Model
----@field chartmetas rdb.Model
-
 ---@class rizu.library.Database
----@field models rizu.library.Models
 ---@operator call: rizu.library.Database
 local Database = class()
 
@@ -36,9 +19,8 @@ function Database:new(migrations)
 	local db = LjsqliteDatabase()
 	self.db = db
 
-	local _models = autoload("rizu.library.models")
 	self.orm = TableOrm(db)
-	self.models = Models(_models, self.orm)
+	self.models = Models(autoload("rizu.library.models"), self.orm)
 
 	self.migrator = SqliteMigrator(db)
 end
@@ -73,7 +55,7 @@ end
 function Database:applyViews()
 	local sql = assert(love.filesystem.read("rizu/library/sql/views.sql"))
 	for _, q in ipairs(sql_util.split_sql(sql)) do
-		self.db.c:exec(q)
+		self.db:exec(q)
 	end
 end
 

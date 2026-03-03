@@ -6,7 +6,7 @@ local icc_co = require("icc.co")
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
 
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param rhythm_engine rizu.RhythmEngine
 ---@param configModel sphere.ConfigModel
 ---@param selectModel sphere.SelectModel
@@ -14,8 +14,8 @@ local MultiplayerModel = class()
 ---@param osudirectModel sphere.OsudirectModel
 ---@param replayBase sea.ReplayBase
 ---@param multiplayer_client sea.MultiplayerClient
-function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase, multiplayer_client)
-	self.cacheModel = cacheModel
+function MultiplayerModel:new(library, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase, multiplayer_client)
+	self.library = library
 	self.rhythm_engine = rhythm_engine
 	self.configModel = configModel
 	self.selectModel = selectModel
@@ -124,7 +124,7 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 	self.downloadingBeatmap.status = "done"
 	self.remote.multiplayer:setChartFound(false)
 
-	self.cacheModel:startUpdateAsync("downloads", 1)
+	self.library:computeLocationAsync("downloads", 1)
 	self:selectChart()
 end)
 

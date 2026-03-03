@@ -29,10 +29,10 @@ for i, d in ipairs(OsudirectModel.rankedStatuses) do
 end
 
 ---@param configModel sphere.ConfigModel
----@param cacheModel sphere.CacheModel
-function OsudirectModel:new(configModel, cacheModel)
+---@param library rizu.library.Library
+function OsudirectModel:new(configModel, library)
 	self.configModel = configModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.statusBeatmap = {title = "LOADING", artist = ""}
 	self.items = {self.statusBeatmap}
 	self.processing = {}
@@ -179,7 +179,7 @@ function OsudirectModel:getExistingHashes(beatmaps)
 	for _, beatmap in ipairs(beatmaps) do
 		table.insert(hashes, beatmap.beatmaps[1].checksum)
 	end
-	local foundCharts = self.cacheModel.chartfilesRepo:getChartfilesByHashes(hashes)
+	local foundCharts = self.library.chartfilesRepo:getChartfilesByHashes(hashes)
 	local foundHashes = {}
 	for _, chart in ipairs(foundCharts) do
 		foundHashes[chart.hash] = true
@@ -246,7 +246,7 @@ function OsudirectModel:downloadAsync(beatmap)
 		return
 	end
 
-	local location = self.cacheModel.locationsRepo:selectLocationById(1)
+	local location = self.library.locationsRepo:selectLocationById(1)
 
 	table.insert(self.processing, 1, beatmap)
 

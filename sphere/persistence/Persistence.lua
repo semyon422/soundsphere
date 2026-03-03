@@ -15,7 +15,6 @@ local Persistence = class()
 function Persistence:new()
 	self.difficultyModel = DifficultyModel()
 	self.library = Library(self.difficultyModel)
-	self.cacheModel = self.library
 	self.configModel = ConfigModel()
 	self.osudirectModel = OsudirectModel(self.configModel, self.library)
 	self.fileFinder = FileFinder()
@@ -36,7 +35,7 @@ function Persistence:load()
 	configModel:open("files")
 	configModel:read()
 
-	self.cacheModel:load()
+	self.library:load()
 end
 
 ---@param name string

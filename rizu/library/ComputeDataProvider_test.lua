@@ -21,33 +21,35 @@ function test.getChartData(t)
 
 	local content = "content"
 	local valid_hash = md5.sumhexa(content)
-	
-	local loc = locationsRepo:insertLocation({
-		path = "charts", name = "game", is_relative = true, is_internal = true
-	})
-	
+
+	local loc = {
+		path = "charts", name = "game", is_relative = true, is_internal = true,
+	}
+	loc = locationsRepo:insertLocation(loc)
+
 	local set = chartfilesRepo:insertChartfileSet({
-		name = "set", dir = "dir", modified_at = 0, is_file = false, location_id = loc.id
+		name = "set", dir = "dir", modified_at = 0, is_file = false, location_id = loc.id,
 	})
-	
+
 	chartfilesRepo:insertChartfile({
-		name = "chart.sph", hash = valid_hash, set_id = set.id, path = "dir/set/chart.sph", modified_at = 0
+		name = "chart.sph", hash = valid_hash, set_id = set.id, path = "dir/set/chart.sph", modified_at = 0,
 	})
-	
+
 	local locations = {
-		getPrefix = function(_, l) return l.path end
+		getPrefix = function(_, l) return l.path end,
 	}
 
 	local fs = {
 		read = function(_, path)
 			if path == "charts/dir/set/chart.sph" then return content end
-		end
+		end,
 	}
-	
+
 	local cdp = ComputeDataProvider(chartfilesRepo, chartsRepo, locationsRepo, locations, fs)
-	
+
 	local data, err = cdp:getChartData(valid_hash)
 	t:assert(data, err)
+	---@cast data -?
 	t:eq(data.name, "chart.sph")
 	t:eq(data.data, content)
 

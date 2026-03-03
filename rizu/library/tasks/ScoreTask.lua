@@ -1,5 +1,4 @@
 local class = require("class")
-local stbl = require("stbl")
 
 ---@class rizu.library.ScoreTask
 ---@operator call: rizu.library.ScoreTask

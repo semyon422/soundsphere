@@ -4,38 +4,38 @@ local class = require("class")
 ---@operator call: rizu.library.LocationsRepo
 local LocationsRepo = class()
 
----@param models rizu.library.Models
+---@param models rdb.Models
 function LocationsRepo:new(models)
 	self.models = models
 end
 
----@return sphere.Location[]
+---@return rizu.Location[]
 function LocationsRepo:selectLocations()
 	return self.models.locations:select()
 end
 
 ---@param path string
----@return sphere.Location?
+---@return rizu.Location?
 function LocationsRepo:selectLocation(path)
 	return self.models.locations:find({path = assert(path)})
 end
 
 ---@param id integer
----@return sphere.Location?
+---@return rizu.Location?
 function LocationsRepo:selectLocationById(id)
 	return self.models.locations:find({id = assert(id)})
 end
 
----@param location sphere.Location
----@return sphere.Location
+---@param location rizu.Location
+---@return rizu.Location
 function LocationsRepo:insertLocation(location)
 	return self.models.locations:create(location)
 end
 
----@param location sphere.Location
----@return sphere.Location?
+---@param location rizu.Location
+---@return rizu.Location?
 function LocationsRepo:updateLocation(location)
-	return self.models.locations:update(location, {id = location.id})
+	return self.models.locations:update(location, {id = assert(location.id)})
 end
 
 ---@param location_id integer

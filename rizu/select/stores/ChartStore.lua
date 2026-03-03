@@ -11,7 +11,7 @@ ChartStore.itemsCount = 0
 ---@param library rizu.library.Library
 function ChartStore:new(library)
 	self.library = library
-	---@type sphere.RichChartview[]
+	---@type rizu.LocatedChartview[]
 	self.items = {}
 	self.set_id = nil
 	self.onChanged = Observable()
@@ -35,14 +35,14 @@ function ChartStore:count()
 	return #self.items
 end
 
----@param chartview sphere.IChartviewIds
+---@param chartview rizu.IChartviewBase
 function ChartStore:setNoteChartSetId(chartview)
 	if self.set_id == chartview.chartfile_set_id then
 		return
 	end
 	self.set_id = chartview.chartfile_set_id
 
-	---@type sphere.RichChartview[]
+	---@type rizu.LocatedChartview[]
 	self.items = self.library.chartviewsRepo:getChartviewsAtSet(chartview)
 	if #self.items == 0 then
 		self.onChanged:send({items = self.items})
@@ -60,7 +60,7 @@ function ChartStore:setNoteChartSetId(chartview)
 	self.onChanged:send({items = self.items})
 end
 
----@param chartview sphere.IChartviewIds
+---@param chartview rizu.IChartviewBase
 ---@return number
 function ChartStore:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id
