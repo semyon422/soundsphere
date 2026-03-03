@@ -9,7 +9,7 @@ local SortModel = class()
 ---@return boolean
 function SortModel:getOrder(name)
 	local order = self.orders[name] or self.orders.id
-	return unpack(order)
+	return order[1], order[2]
 end
 
 -- 2nd value = isCollapseAllowed (group by chartfile_set_id)

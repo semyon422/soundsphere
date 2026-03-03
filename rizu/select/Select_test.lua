@@ -1,4 +1,4 @@
-local SelectionManager = require("rizu.select.SelectionManager")
+local Select = require("rizu.select.Select")
 local SelectionState = require("rizu.select.SelectionState")
 local TestLibraryFactory = require("rizu.select.TestLibraryFactory")
 local class = require("class")
@@ -58,7 +58,7 @@ function test.scrolling(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
+	local model = Select(configModel, library, fs, onlineModel, replayBase)
 	model:load()
 
 	t:eq(model.state.chartview_set_index, 1)
@@ -94,7 +94,7 @@ function test.chart_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
+	local model = Select(configModel, library, fs, onlineModel, replayBase)
 	model:load()
 
 	t:eq(model.state.chartview_index, 1)
@@ -133,7 +133,7 @@ function test.score_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
+	local model = Select(configModel, library, fs, onlineModel, replayBase)
 	model:load()
 
 	-- Default selection should be the latest score (highest ID), which is 103
@@ -170,7 +170,7 @@ function test.task_overriding(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = SelectionManager(configModel, library, fs, onlineModel, replayBase)
+	local model = Select(configModel, library, fs, onlineModel, replayBase)
 
 	-- Mock chartStore to be "slow" by explicitly yielding
 	local original_setNoteChartSetId = model.chartStore.setNoteChartSetId

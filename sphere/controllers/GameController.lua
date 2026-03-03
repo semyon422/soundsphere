@@ -4,7 +4,7 @@ local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
-local SelectModel = require("sphere.models.SelectModel")
+local Select = require("rizu.select.Select")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
@@ -100,7 +100,7 @@ function GameController:new()
 
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
-	self.selectModel = SelectModel(
+	self.selectModel = Select(
 		self.persistence.configModel,
 		self.persistence.library,
 		self.fs,

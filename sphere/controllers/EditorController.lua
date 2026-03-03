@@ -21,7 +21,7 @@ local md5 = require("md5")
 ---@operator call: sphere.EditorController
 local EditorController = class()
 
----@param selectModel sphere.SelectModel
+---@param selectModel rizu.select.Select
 ---@param editorModel sphere.EditorModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel

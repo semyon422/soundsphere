@@ -9,7 +9,7 @@ local MultiplayerModel = class()
 ---@param library rizu.library.Library
 ---@param rhythm_engine rizu.RhythmEngine
 ---@param configModel sphere.ConfigModel
----@param selectModel sphere.SelectModel
+---@param selectModel rizu.select.Select
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param replayBase sea.ReplayBase

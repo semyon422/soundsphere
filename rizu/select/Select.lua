@@ -1,10 +1,6 @@
 local class = require("class")
 local delay = require("delay")
-local thread = require("thread")
-local path_util = require("path_util")
-local table_util = require("table_util")
-local Observable = require("aqua.Observable")
-local ChartFactory = require("notechart.ChartFactory")
+local Observable = require("Observable")
 local SelectionState = require("rizu.select.SelectionState")
 local ChartStore = require("rizu.select.stores.ChartStore")
 local ChartSetStore = require("rizu.select.stores.ChartSetStore")
@@ -19,11 +15,11 @@ local TaskRunner = require("rizu.select.tasks.TaskRunner")
 local LocalScoreProvider = require("rizu.select.providers.LocalScoreProvider")
 local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")
 
----@class rizu.select.SelectionManager
----@operator call: rizu.select.SelectionManager
-local SelectionManager = class()
+---@class rizu.select.Select
+---@operator call: rizu.select.Select
+local Select = class()
 
-SelectionManager.debounceTime = 0.5
+Select.debounceTime = 0.5
 
 ---@param configModel sphere.ConfigModel
 ---@param library rizu.library.Library
@@ -31,7 +27,7 @@ SelectionManager.debounceTime = 0.5
 ---@param onlineModel sphere.OnlineModel
 ---@param replayBase sea.ReplayBase
 ---@param state? rizu.select.SelectionState
-function SelectionManager:new(configModel, library, fs, onlineModel, replayBase, state)
+function Select:new(configModel, library, fs, onlineModel, replayBase, state)
 	self.configModel = configModel
 	self.library = library
 	self.fs = fs
@@ -66,7 +62,7 @@ function SelectionManager:new(configModel, library, fs, onlineModel, replayBase,
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
 end
-function SelectionManager:receive(event)
+function Select:receive(event)
 	if event.type == "set" then
 		self.taskRunner:push(function()
 			self:pullNoteChart()
@@ -81,7 +77,7 @@ function SelectionManager:receive(event)
 	end
 end
 
-function SelectionManager:load()
+function Select:load()
 	local settings = self.configModel.configs.settings
 	local config = self.configModel.configs.select
 	self.config = config
@@ -96,7 +92,7 @@ function SelectionManager:load()
 	self:noDebouncePullNoteChartSet()
 end
 
-function SelectionManager:updateSetItems()
+function Select:updateSetItems()
 	local collectionStore = self.collectionStore
 	local collectionItem = collectionStore.tree.items[collectionStore.tree.selected]
 	local params = self.queryBuilder:build(self.config, collectionItem)
@@ -108,7 +104,7 @@ end
 
 ---@param hash string
 ---@param index number
-function SelectionManager:findNotechart(hash, index)
+function Select:findNotechart(hash, index)
 	local config = self.configModel.configs.settings.select
 	local params = {
 		where = {hash = hash, index = index},
@@ -126,7 +122,7 @@ function SelectionManager:findNotechart(hash, index)
 end
 
 ---@return string?
-function SelectionManager:getBackgroundPath()
+function Select:getBackgroundPath()
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -137,7 +133,7 @@ end
 ---@return string?
 ---@return number?
 ---@return string?
-function SelectionManager:getAudioPathPreview()
+function Select:getAudioPathPreview()
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -148,7 +144,7 @@ end
 ---@param settings table?
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
-function SelectionManager:loadChart(settings)
+function Select:loadChart(settings)
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -159,7 +155,7 @@ end
 ---@param settings table?
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
-function SelectionManager:loadChartAbsolute(settings)
+function Select:loadChartAbsolute(settings)
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -168,19 +164,19 @@ function SelectionManager:loadChartAbsolute(settings)
 end
 
 ---@return boolean
-function SelectionManager:isChanged()
+function Select:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed == true
 end
 
-function SelectionManager:setChanged()
+function Select:setChanged()
 	self.changed = true
 	self.onChanged:send({type = "set_changed"})
 end
 
 ---@return boolean
-function SelectionManager:notechartExists()
+function Select:notechartExists()
 	local chartview = self.chartview
 	if chartview then
 		return self.fs:getInfo(chartview.location_path) ~= nil
@@ -189,16 +185,16 @@ function SelectionManager:notechartExists()
 end
 
 ---@return boolean
-function SelectionManager:isPlayed()
+function Select:isPlayed()
 	return not not (self:notechartExists() and self.scoreItem)
 end
 
 ---@param ... any?
-function SelectionManager:debouncePullNoteChartSet(...)
+function Select:debouncePullNoteChartSet(...)
 	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
-function SelectionManager:noDebouncePullNoteChartSet(...)
+function Select:noDebouncePullNoteChartSet(...)
 	local args = {...}
 	self.taskRunner:push(function()
 		self:pullNoteChartSet(unpack(args))
@@ -209,20 +205,20 @@ function SelectionManager:noDebouncePullNoteChartSet(...)
 end
 
 ---@param sortFunctionName string
-function SelectionManager:setSortFunction(sortFunctionName)
+function Select:setSortFunction(sortFunctionName)
 	self.config.sortFunction = sortFunctionName
 	self:noDebouncePullNoteChartSet()
 end
 
 ---@param locked boolean
-function SelectionManager:setLock(locked)
+function Select:setLock(locked)
 	self.locked = locked
 end
 
 ---@param direction number?
 ---@param destination number?
 ---@param force boolean?
-function SelectionManager:scrollCollection(direction, destination, force)
+function Select:scrollCollection(direction, destination, force)
 	local collectionStore = self.collectionStore
 	local items = collectionStore.tree.items
 	local selected = collectionStore.tree.selected
@@ -243,14 +239,14 @@ function SelectionManager:scrollCollection(direction, destination, force)
 	self:debouncePullNoteChartSet(old_item and old_item.path == item.path)
 end
 
-function SelectionManager:scrollRandom()
+function Select:scrollRandom()
 	local itemsCount = self.chartSetStore:count()
 	local destination = math.random(1, itemsCount)
 	self:scrollNoteChartSet(nil, destination)
 end
 
 ---@param chartview table
-function SelectionManager:setConfig(chartview)
+function Select:setConfig(chartview)
 	self.config.chartfile_set_id = chartview.chartfile_set_id
 	self.config.chartfile_id = chartview.chartfile_id
 	self.config.chartmeta_id = chartview.chartmeta_id
@@ -287,7 +283,7 @@ end
 
 ---@param direction number?
 ---@param destination number?
-function SelectionManager:scrollNoteChartSet(direction, destination)
+function Select:scrollNoteChartSet(direction, destination)
 	local itemsCount = self.chartSetStore:count()
 
 	destination = math.min(math.max(destination or self.state.chartview_set_index + direction, 1), itemsCount)
@@ -303,7 +299,7 @@ end
 
 ---@param direction number?
 ---@param destination number?
-function SelectionManager:scrollNoteChart(direction, destination)
+function Select:scrollNoteChart(direction, destination)
 	local items = self.chartStore.items
 
 	direction = direction or destination - self.state.chartview_index
@@ -326,7 +322,7 @@ end
 
 ---@param direction number?
 ---@param destination number?
-function SelectionManager:scrollScore(direction, destination)
+function Select:scrollScore(direction, destination)
 	local items = self.scoreStore.items
 
 	destination = math.min(math.max(destination or self.state.scoreItemIndex + direction, 1), #items)
@@ -345,7 +341,7 @@ end
 
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
-function SelectionManager:pullNoteChartSet(noUpdate, noPullNext)
+function Select:pullNoteChartSet(noUpdate, noPullNext)
 	if self.locked then
 		return
 	end
@@ -384,7 +380,7 @@ end
 
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
-function SelectionManager:pullNoteChart(noUpdate, noPullNext)
+function Select:pullNoteChart(noUpdate, noPullNext)
 	if not noUpdate then
 		self.chartStore:setNoteChartSetId(self.config)
 	end
@@ -417,7 +413,7 @@ function SelectionManager:pullNoteChart(noUpdate, noPullNext)
 	self.scoreStore:clear()
 end
 
-function SelectionManager:findScore()
+function Select:findScore()
 	local scoreItems = self.scoreStore.items
 	local index = self.scoreStore:getItemIndex(self.config.chartplay_id) or 1
 	local scoreItem = scoreItems[index]
@@ -432,7 +428,7 @@ function SelectionManager:findScore()
 end
 
 ---@param noUpdate boolean?
-function SelectionManager:pullScore(noUpdate)
+function Select:pullScore(noUpdate)
 	local items = self.chartStore.items
 	local chartview = items[self.state.chartview_index]
 
@@ -463,4 +459,4 @@ function SelectionManager:pullScore(noUpdate)
 	self:findScore()
 end
 
-return SelectionManager
+return Select

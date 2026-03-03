@@ -6,7 +6,7 @@ local MultiplayerController = class()
 
 ---@param multiplayerModel sphere.MultiplayerModel
 ---@param configModel sphere.ConfigModel
----@param selectModel sphere.SelectModel
+---@param selectModel rizu.select.Select
 ---@param replayBase sea.ReplayBase
 function MultiplayerController:new(
 	multiplayerModel,

@@ -13,7 +13,7 @@ local Path = require("Path")
 ---@operator call: sphere.SelectController
 local SelectController = class()
 
----@param selectModel sphere.SelectModel
+---@param selectModel rizu.select.Select
 ---@param modifierSelectModel sphere.ModifierSelectModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
