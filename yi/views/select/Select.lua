@@ -39,16 +39,15 @@ local cell = {
 	align_items = "center"
 }
 
-local button = {
-	w = 120,
+local buttons = {
+	w = 64,
 	h = "100%",
-	background_color = Colors.button,
-	corner_radius = 8,
-	arrange = "wrap_row",
+	align_self = "end",
 	align_items = "center",
-	justify_content = "center",
-	gap = 5,
-	mouse = true
+	arrange = "wrap_col",
+	padding = {15, 0, 20, 0},
+	gap = 15,
+	background_color = Colors.header_footer
 }
 
 function Select:load()
@@ -98,9 +97,25 @@ function Select:load()
 	self.chart_set_list = ChartSetList()
 
 	self:addArray({
-		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 1}}),
+		h(Image(gradient), {w = "100%", h = "100%", color = Colors.panels}),
 
-		h(self.chart_set_list, {w = "100%", h = "100%"}),
+		h(View(), buttons, {
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+
+			h(View(), {w = "60%", h = 2, background_color = Colors.br}),
+
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(SelectButton(), {w = 45, h = 45, icon = ""})
+		}),
+
+		h(View(), {w = 2, h = "100%", align_self = "end", margin = {0, 64, 0, 0}, background_color = Colors.br}),
+
+		h(self.chart_set_list, {w = "100%", h = "100%", margin = {0, 64, 0, 0}}),
+		h(Textbox("", "Search songs...", function() end), {margin = {20, 20, 0, 0}, x = -64, w = 500, align_self = "end"}),
 
 		h(View(), {w = "100%", padding = {20, 20, 20, 20}}, {
 			h(View(), {arrange = "wrap_row", gap = 10}, {
@@ -135,7 +150,7 @@ function Select:load()
 						})
 					})
 				}),
-				h(View(), {w = "100%", h = 2, background_color = Colors.br}),
+				h(View(), {w = 900, h = 2, background_color = Colors.br}),
 				h(View(), {arrange = "wrap_row", gap = 20}, {
 					h(View(), cell, {
 						h(Label(res:getFont("bold", 16), "DURATION"), {color = Colors.lines}),
@@ -161,25 +176,15 @@ function Select:load()
 			}),
 		}),
 
-		h(View(), {arrange = "wrap_col", align_self = "end", justify_self = "end", align_items = "end", gap = 10, padding = {0, 20, 20, 0}}, {
-			h(Label(res:getFont("black", 58), "6.679pp"), {color = Colors.accent, align = "right"}),
-			h(View(), {arrange = "wrap_row", gap = 10, align_items = "center"}, {
+		h(View(), {arrange = "wrap_col", align_self = "end", justify_self = "end", align_items = "end", gap = 10, padding = {0, 20, 20, 0}, x = -64}, {
+			h(View(), {arrange = "wrap_row", gap = 20, align_items = "center"}, {
 				h(View(), {arrange = "wrap_col"}, {
 					h(Label(res:getFont("black", 24), "Guest"), {align = "right"}),
 					h(Label(res:getFont("bold", 16), "#5 • 93.56%"), {align = "right"})
 				}),
+				h(Label(res:getFont("black", 46), "6.769pp"), {color = Colors.accent, align = "right"}),
 				h(Image(avatar_frame), {w = player_info_h, h = player_info_h}),
 			})
-		}),
-
-		h(View(), {arrange = "wrap_col", align_self = "end", padding = {20, 20, 0, 0}}, {
-			h(Textbox("", "Search songs...", function() end), {w = 550, margin = {0, 0, 8, 0}}),
-			h(View(), {w = 550, arrange = "flex_row", gap = 8}, {
-				h(SelectButton(), {grow = 1, h = 40, callback = open_config, icon = "", text = "CONFIG"}),
-				h(SelectButton(), {grow = 1, h = 40, callback = open_mods, icon = "", text = "MODS"}),
-				h(SelectButton(), {grow = 1, h = 40, callback = open_inputs, icon = "", text = "INPUTS"}),
-				h(SelectButton(), {grow = 1, h = 40, callback = open_skins, icon = "", text = "SKINS"})
-			}),
 		}),
 
 	})

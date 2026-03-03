@@ -47,19 +47,22 @@ function SelectButton:onMouseDown(_)
 end
 
 function SelectButton:draw()
-	local r = Colors.accent[1]
-	local g = Colors.accent[2]
-	local b = Colors.accent[3]
-	local a = 1
+	local w, h = self:getCalculatedWidth(), self:getCalculatedHeight()
 
-	if not self.mouse_over then
-		a = 0.5
+	local bg_color = self.mouse_over and Colors.button_hover or Colors.button
+	local border_color = self.mouse_over and Colors.accent or Colors.outline
+	local border_width = self.mouse_over and 2 or 1
+
+	love.graphics.setColor(bg_color)
+	love.graphics.rectangle("fill", 0, 0, w, h, 4, 4)
+
+	love.graphics.setLineWidth(border_width)
+	love.graphics.setColor(border_color)
+	if self.mouse_over then
+		love.graphics.rectangle("line", 1, 1, w - 2, h - 2, 4, 4)
 	end
 
-	love.graphics.setColor(r, g, b, a)
-	love.graphics.rectangle("fill", 0, 0, self:getCalculatedWidth(), self:getCalculatedHeight(), 8, 8)
-	love.graphics.setColor(1, 1, 1, 1)
-
+	love.graphics.setColor(Colors.text)
 	love.graphics.draw(self.icon_batch, self.icon_x, self.icon_y)
 	love.graphics.draw(self.text_batch, self.text_x, self.text_y)
 end

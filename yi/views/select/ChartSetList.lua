@@ -40,7 +40,7 @@ function ChartSetList:setSelectedIndex(index)
 	self.select_model:scrollNoteChartSet(nil, index)
 end
 
-local x_indent = 15
+local x_indent = 20
 
 function ChartSetList:drawItem(index, y, is_selected)
 	local items = self.select_model.noteChartSetLibrary.items
