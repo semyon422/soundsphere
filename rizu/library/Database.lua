@@ -29,6 +29,8 @@ function Database:load(path)
 	local db = self.db
 
 	db:open(path or "userdata/data.db")
+	db:exec("PRAGMA journal_mode = WAL")
+	db:exec("PRAGMA synchronous = NORMAL")
 	db:exec("PRAGMA busy_timeout = 10000")
 	db:exec("PRAGMA foreign_keys = ON")
 
