@@ -161,6 +161,17 @@ function Select:load()
 			}),
 		}),
 
+		h(View(), {arrange = "wrap_col", align_self = "end", justify_self = "end", align_items = "end", gap = 10, padding = {0, 20, 20, 0}}, {
+			h(Label(res:getFont("black", 58), "6.679pp"), {color = Colors.accent, align = "right"}),
+			h(View(), {arrange = "wrap_row", gap = 10, align_items = "center"}, {
+				h(View(), {arrange = "wrap_col"}, {
+					h(Label(res:getFont("black", 24), "Guest"), {align = "right"}),
+					h(Label(res:getFont("bold", 16), "#5 • 93.56%"), {align = "right"})
+				}),
+				h(Image(avatar_frame), {w = player_info_h, h = player_info_h}),
+			})
+		}),
+
 		h(View(), {arrange = "wrap_col", align_self = "end", padding = {20, 20, 0, 0}}, {
 			h(Textbox("", "Search songs...", function() end), {w = 550, margin = {0, 0, 8, 0}}),
 			h(View(), {w = 550, arrange = "flex_row", gap = 8}, {
