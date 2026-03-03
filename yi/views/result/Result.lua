@@ -10,8 +10,6 @@ function Result:load()
 		id = "result",
 		w = "100%",
 		h = "100%",
-		justify_content = "center",
-		align_items = "center",
 		keyboard = true
 	})
 

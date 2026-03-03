@@ -241,7 +241,7 @@ function test.enabled_toggling(t)
 
 	local container = engine.root:add(MockView())
 	local child = container:add(MockView())
-	
+
 	-- First update to resolve initial states
 	engine:update(0.016, 0, 0)
 	engine.rebuild_command_buffer = false -- Reset manually for testing
@@ -252,28 +252,28 @@ function test.enabled_toggling(t)
 
 	-- Disable the child
 	child:setEnabled(false)
-	
+
 	t:eq(child.enabled, false)
 	t:eq(#container.children, 0)
 	t:eq(#container.disabled_children, 1)
 	t:eq(child.just_changed_enabled, true)
-	
+
 	-- Update engine
 	engine:update(0.016, 0, 0)
-	
+
 	t:eq(child.just_changed_enabled, false)
 
 	-- Enable the child
 	child:setEnabled(true)
-	
+
 	t:eq(child.enabled, true)
 	t:eq(#container.children, 1)
 	t:eq(#container.disabled_children, 0)
 	t:eq(child.just_changed_enabled, true)
-	
+
 	-- Update engine
 	engine:update(0.016, 0, 0)
-	
+
 	t:eq(child.just_changed_enabled, false)
 end
 

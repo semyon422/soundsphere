@@ -2,7 +2,6 @@ local View = require("yi.views.View")
 local Label = require("yi.views.Label")
 local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.select.ChartSetList")
-local BottomButton = require("yi.views.select.Button")
 local Image = require("yi.views.Image")
 local Tag = require("yi.views.select.Tag")
 local Colors = require("yi.Colors")
@@ -10,6 +9,7 @@ local ChartGrid = require("yi.views.select.ChartGrid")
 local TabContainer = require("yi.views.components.TabContainer")
 local Textbox = require("yi.views.components.Textbox")
 local Button = require("yi.views.components.Button")
+local SelectButton = require("yi.views.select.SelectButton")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -27,8 +27,6 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local Select = Screen + {}
 
 local info_side = {
-	w = "70%",
-	h = "100%",
 	arrange = "flex_col",
 	justify_content = "space_between",
 	padding = {20, 20, 20, 20},
@@ -41,168 +39,17 @@ local cell = {
 	align_items = "center"
 }
 
----@return yi.View
-function Select:newContent()
-	local res = self:getResources()
-
-	self.ranked_tag = Tag()
-	self.chart_format_tag = Tag()
-	self.title = Label(res:getFont("black", 58), "LOADING...")
-	self.artist = Label(res:getFont("bold", 46), "LOADING...")
-	self.chart_grid = ChartGrid()
-	self.tags = View()
-	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
-	self.rate_const = Label(res:getFont("bold", 24), "1.00x")
-	self.difficulty_calc = Label(res:getFont("bold", 16), "Loading...")
-	self.difficulty = Label(res:getFont("black", 72), "??.?")
-	self.mods = Label(res:getFont("black", 36), "Loading...")
-	self.score_system = Label(res:getFont("bold", 24), "Loading...")
-
-	self.gamemode = Label(res:getFont("bold", 24), "Loading...")
-	self.bpm = Label(res:getFont("bold", 24), "Loading...")
-	self.duration = Label(res:getFont("bold", 24), "Loading...")
-	self.notes = Label(res:getFont("bold", 24), "Loading...")
-	self.ln_percent = Label(res:getFont("bold", 24), "Loading...")
-
-	return h(View(), info_side, {
-		h(View(), {arrange = "wrap_col", gap = 20}, {
-			h(View(), {arrange = "wrap_row", gap = 10}, {
-				self.ranked_tag,
-				self.chart_format_tag
-			}),
-			h(View(), {arrange = "wrap_col", w = 999999}, {
-				h(self.title),
-				h(self.artist, {y = -5, color = Colors.lines}),
-			}),
-			h(self.chart_grid, {w = "100%", h = 70}),
-		}),
-		h(View(), {arrange = "wrap_col", gap = 20}, {
-			h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
-				h(View(), {w = 180, arrange = "wrap_col"}, {
-					h(self.difficulty_calc, {color = Colors.lines}),
-					h(self.difficulty, {color = Colors.text}),
-				}),
-				h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
-				h(View(), {w = 2, height = 80, background_color = Colors.br, align_self = "end", y = -12}),
-				h(View(), {arrange = "wrap_col", justify_content = "end"}, {
-					h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
-					h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
-						h(self.mods, {y = -8}),
-						h(self.rate_const, {y = -12, color = Colors.accent}),
-						h(self.score_system, {y = -12, color = Colors.lines}),
-					})
-				})
-			}),
-			h(View(), {w = "100%", h = 2, background_color = Colors.br}),
-			h(View(), {arrange = "wrap_row", gap = 20}, {
-				h(View(), cell, {
-					h(Label(res:getFont("bold", 16), "DURATION"), {color = Colors.lines}),
-					self.duration,
-				}),
-				h(View(), cell, {
-					h(Label(res:getFont("bold", 16), "NOTES"), {color = Colors.lines}),
-					self.notes,
-				}),
-				h(View(), cell, {
-					h(Label(res:getFont("bold", 16), "MODE"), {color = Colors.lines}),
-					self.gamemode,
-				}),
-				h(View(), cell, {
-					h(Label(res:getFont("bold", 16), "TEMPO"), {color = Colors.lines}),
-					self.bpm,
-				}),
-				h(View(), cell, {
-					h(Label(res:getFont("bold", 16), "LN%"), {color = Colors.lines}),
-					self.ln_percent,
-				}),
-			})
-		}),
-	})
-end
-
-local player_info = {
-	padding = {10, 10, 10, 10},
-	background_color = Colors.header_footer,
-	justify_content = "center"
-}
-
-function Select:newRightSide()
-	local res = self:getResources()
-	local modals = self:getContext().modals
-	local function open_filters() modals:setImguiModal(ImGuiFilters) end
-
-	local avatar_frame = love.graphics.newImage("resources/yi/avatar_frame.png")
-	local player_info_h = 64
-	self.chart_set_list = ChartSetList()
-
-	return h(View(), {w = "30%", h = "100%", arrange = "flex_col", align_self = "end", background_color = Colors.panels}, {
-		h(View(), {arrange = "wrap_col", gap = 10, padding = {10, 10, 10, 10}, background_color = Colors.header_footer}, {
-			h(Textbox("", "Search songs...", function() end), {w = "100%"}),
-			h(View(), {arrange = "flex_row", gap = 5}, {
-				h(Button("Filters", open_filters), {grow = 1}),
-				h(Button("Collections", function() end), {grow = 1}),
-			}),
-			h(View(), {padding = {10, 10, 10, 10}, align_items = "center"}, {
-				h(Label(res:getFont("regular", 16), "Directory name")),
-			}),
-		}),
-		h(self.chart_set_list, {grow = 1, stencil = true}),
-		h(View(), player_info, {
-			h(Label(res:getFont("bold", 16), "6769PP / 93.35%")),
-			h(View(), {arrange = "wrap_row", gap = 10, align_self = "end"}, {
-				h(View(), {arrange = "wrap_col"}, {
-					h(Label(res:getFont("bold", 24), "Guest"), {color = Colors.accent, align = "right"}),
-					h(Label(res:getFont("bold", 16), "#5"), {align = "right"}),
-				}),
-				h(Image(avatar_frame), {h = player_info_h, w = player_info_h, align_items = "center", justify_content = "center"}, {
-					h(Label(res:getFont("black", 24), "(^^)")),
-				}),
-			})
-		}),
-	})
-end
-
-local small_button = {
-	--arrange = "flex_col",
-	justify_content = "center",
+local button = {
+	w = 120,
+	h = "100%",
+	background_color = Colors.button,
+	corner_radius = 8,
+	arrange = "wrap_row",
 	align_items = "center",
-	w = 110,
-	h = 64,
+	justify_content = "center",
+	gap = 5,
+	mouse = true
 }
-
----@return yi.View
-function Select:newButtons()
-	local res = self:getResources()
-	local modals = self:getContext().modals
-	local function open_config() modals:setImguiModal(ImGuiSettings) end
-	local function open_mods() modals:setImguiModal(ImGuiModifiers) end
-	local function open_inputs() modals:setImguiModal(ImGuiInputs) end
-	local function open_skins() modals:setImguiModal(ImGuiSkins) end
-	local function play() self.parent:set("gameplay") end
-
-	return h(View(), {arrange = "wrap_row", gap = 8}, {
-		h(BottomButton(open_config), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			h(Label(res:getFont("bold", 16), "CONFIG"), {align = "center"}),
-		}),
-		h(BottomButton(open_mods), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			h(Label(res:getFont("bold", 16), "MODS"), {align = "center"}),
-		}),
-		h(BottomButton(open_inputs), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			h(Label(res:getFont("bold", 16), "INPUTS"), {align = "center"}),
-		}),
-		h(BottomButton(open_skins), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			h(Label(res:getFont("bold", 16), "SKINS"), {align = "center"}),
-		}),
-		h(BottomButton(play), small_button, {
-			Label(res:getFont("icons", 24), ""),
-			Label(res:getFont("bold", 16), "PLAY"),
-		})
-	})
-end
 
 function Select:load()
 	Screen.load(self)
@@ -214,17 +61,116 @@ function Select:load()
 		id = "select",
 		keyboard = true,
 		w = "100%",
-		h = "100%"
+		h = "100%",
 	})
 
 	local gradient = love.graphics.newImage("resources/yi/select_bg_gradient.png")
+	local res = self:getResources()
+
+	local modals = self:getContext().modals
+	local function open_filters() modals:setImguiModal(ImGuiFilters) end
+	local function open_config() modals:setImguiModal(ImGuiSettings) end
+	local function open_mods() modals:setImguiModal(ImGuiModifiers) end
+	local function open_inputs() modals:setImguiModal(ImGuiInputs) end
+	local function open_skins() modals:setImguiModal(ImGuiSkins) end
+	local function play() self.parent:set("gameplay") end
+
+	self.ranked_tag = Tag()
+	self.chart_format_tag = Tag()
+	self.title = Label(res:getFont("black", 58), "LOADING...")
+	self.artist = Label(res:getFont("bold", 46), "LOADING...")
+	self.chart_grid = ChartGrid()
+
+	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
+	self.rate_const = Label(res:getFont("bold", 24), "1.00x")
+	self.difficulty_calc = Label(res:getFont("bold", 16), "Loading...")
+	self.difficulty = Label(res:getFont("black", 72), "??.?")
+	self.mods = Label(res:getFont("black", 36), "Loading...")
+	self.score_system = Label(res:getFont("bold", 24), "Loading...")
+	self.gamemode = Label(res:getFont("bold", 24), "Loading...")
+	self.bpm = Label(res:getFont("bold", 24), "Loading...")
+	self.duration = Label(res:getFont("bold", 24), "Loading...")
+	self.notes = Label(res:getFont("bold", 24), "Loading...")
+	self.ln_percent = Label(res:getFont("bold", 24), "Loading...")
+
+	local avatar_frame = love.graphics.newImage("resources/yi/avatar_frame.png")
+	local player_info_h = 64
+	self.chart_set_list = ChartSetList()
 
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = {0, 0, 0, 1}}),
-		h(View(), {w = "100%", h = "100%"}, {
-			self:newContent(),
-			self:newRightSide(),
+
+		h(self.chart_set_list, {w = "100%", h = "100%"}),
+
+		h(View(), {w = "100%", padding = {20, 20, 20, 20}}, {
+			h(View(), {arrange = "wrap_row", gap = 10}, {
+				self.ranked_tag,
+				self.chart_format_tag
+			}),
 		}),
+
+		h(View(), {w = "70%", h = "100%", padding = {20, 20, 20, 20}}, {
+			h(View(), {arrange = "wrap_col", gap = 20, y = 50}, {
+				h(View(), {arrange = "wrap_col", w = 999999}, {
+					h(self.title),
+					h(self.artist, {y = -5, color = Colors.lines}),
+				}),
+				h(self.chart_grid, {w = "100%", h = 70}),
+			}),
+
+			h(View(), {arrange = "wrap_col", gap = 20, justify_self = "end"}, {
+				h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
+					h(View(), {w = 180, arrange = "wrap_col"}, {
+						h(self.difficulty_calc, {color = Colors.lines}),
+						h(self.difficulty, {color = Colors.text}),
+					}),
+					h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
+					h(View(), {w = 2, height = 80, background_color = Colors.br, align_self = "end", y = -12}),
+					h(View(), {arrange = "wrap_col", justify_content = "end"}, {
+						h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
+						h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
+							h(self.mods, {y = -8}),
+							h(self.rate_const, {y = -12, color = Colors.accent}),
+							h(self.score_system, {y = -12, color = Colors.lines}),
+						})
+					})
+				}),
+				h(View(), {w = "100%", h = 2, background_color = Colors.br}),
+				h(View(), {arrange = "wrap_row", gap = 20}, {
+					h(View(), cell, {
+						h(Label(res:getFont("bold", 16), "DURATION"), {color = Colors.lines}),
+						self.duration,
+					}),
+					h(View(), cell, {
+						h(Label(res:getFont("bold", 16), "NOTES"), {color = Colors.lines}),
+						self.notes,
+					}),
+					h(View(), cell, {
+						h(Label(res:getFont("bold", 16), "MODE"), {color = Colors.lines}),
+						self.gamemode,
+					}),
+					h(View(), cell, {
+						h(Label(res:getFont("bold", 16), "TEMPO"), {color = Colors.lines}),
+						self.bpm,
+					}),
+					h(View(), cell, {
+						h(Label(res:getFont("bold", 16), "LN"), {color = Colors.lines}),
+						self.ln_percent,
+					}),
+				})
+			}),
+		}),
+
+		h(View(), {arrange = "wrap_col", align_self = "end", padding = {20, 20, 0, 0}}, {
+			h(Textbox("", "Search songs...", function() end), {w = 550, margin = {0, 0, 8, 0}}),
+			h(View(), {w = 550, arrange = "flex_row", gap = 8}, {
+				h(SelectButton(), {grow = 1, h = 40, callback = open_config, icon = "", text = "CONFIG"}),
+				h(SelectButton(), {grow = 1, h = 40, callback = open_mods, icon = "", text = "MODS"}),
+				h(SelectButton(), {grow = 1, h = 40, callback = open_inputs, icon = "", text = "INPUTS"}),
+				h(SelectButton(), {grow = 1, h = 40, callback = open_skins, icon = "", text = "SKINS"})
+			}),
+		}),
+
 	})
 end
 
@@ -290,9 +236,6 @@ function Select:onKeyDown(e)
 		game.timeRateModel:increase(1)
 		game.modifierSelectModel:change()
 		self:updateChartview()
-		return true
-	elseif k == "home" then
-		self.parent:set("irizz_select")
 		return true
 	elseif k == "return" then
 		self.parent:set("gameplay")
@@ -434,7 +377,7 @@ function Select:updateChartview()
 	local note_count = chartview.notes_count
 	local long_notes_count = (chartview.judges_count or 0) - note_count
 	local ln_percent = long_notes_count / note_count
-	self.ln_percent:setText(("%i%% LN"):format(ln_percent * 100))
+	self.ln_percent:setText(("%i%%"):format(ln_percent * 100))
 	self.ln_percent:setColor(Colors.HSV(Colors.convertDiffToHue(math.min(ln_percent * 1.3)), ln_percent, 1))
 
 	local game = self:getGame()

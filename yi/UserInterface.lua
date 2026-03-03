@@ -24,6 +24,7 @@ function UserInterface:new(game)
 	self.inputs = Inputs()
 	self.ctx = Context(self.game, self.inputs, self.resources)
 	self.engine = Engine(self.inputs, self.ctx)
+	self.engine.target_height = 1080
 end
 
 function UserInterface:load()

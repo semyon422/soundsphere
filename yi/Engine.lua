@@ -15,6 +15,7 @@ local table_util = require("table_util")
 ---@field layout_update_requesters yi.View[]
 ---@field transform_update_requesters yi.View[]
 ---@field removal_deferred yi.View[]
+---@field target_height number?
 local Engine = class()
 
 ---@param inputs ui.Inputs
@@ -72,7 +73,6 @@ function Engine:updateView(view, dt)
 	local state = view.state
 
 	if state == ViewState.Active then
-		self.inputs:processNode(view)
 		view:update(dt)
 
 		if not view.layout_box:isValid() then
@@ -84,12 +84,14 @@ function Engine:updateView(view, dt)
 		end
 
 		local children = view.children
-		for i = 1, #children do
+		for i = #children, 1, -1 do
 			self:updateView(children[i], dt)
 		end
 
+		self.inputs:processNode(view)
+
 		local disabled = view.disabled_children
-		for i = 1, #disabled do
+		for i = #disabled, 1, -1 do
 			self:processDisabledView(disabled[i])
 		end
 	elseif state == ViewState.Loaded then
@@ -133,14 +135,6 @@ end
 ---@param mouse_x number
 ---@param mouse_y number
 function Engine:update(dt, mouse_x, mouse_y)
-	local ww, wh = love.graphics.getDimensions()
-
-	if ww ~= self.prev_window_width or wh ~= self.prev_window_height then
-		self.prev_window_width = ww
-		self.prev_window_height = wh
-		self:updateRootDimensions()
-	end
-
 	self.inputs:beginFrame(mouse_x, mouse_y)
 
 	table_util.clear(self.layout_update_requesters)
@@ -187,11 +181,19 @@ function Engine:draw()
 end
 
 function Engine:updateRootDimensions()
-	local target_h = 1080
 	local ww, wh = love.graphics.getDimensions()
-	local s = wh / target_h
-	local w, h = ww * (1 / s), target_h
-	self.root.transform:setScale(s, s)
+	local w, h = 1, 1
+	local target_h = self.target_height
+
+	if target_h then
+		local s = wh / target_h
+		w, h = ww * (1 / s), target_h
+		self.root.transform:setScale(s, s)
+	else
+		w, h = ww, wh
+		self.root.transform:setScale(1, 1)
+	end
+
 	self.root:setWidth(w)
 	self.root:setHeight(h)
 end
@@ -210,6 +212,10 @@ function Engine:receive(event)
 		modifiers.shift = love.keyboard.isDown("lshift", "rshift")
 		modifiers.alt = love.keyboard.isDown("lalt", "ralt")
 		self.inputs:receive(event, modifiers)
+	end
+
+	if event.name == "resize" then
+		self:updateRootDimensions()
 	end
 end
 

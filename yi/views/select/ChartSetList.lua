@@ -18,6 +18,7 @@ function ChartSetList:load()
 	local gap = 2
 	local padding = 25
 	self.item_height = title_h + artist_h + gap + padding * 2
+	self.selected_item_image = love.graphics.newImage("resources/yi/set_selected.png")
 end
 
 function ChartSetList:reloadItems()
@@ -51,8 +52,9 @@ function ChartSetList:drawItem(index, y, is_selected)
 	local w = self:getCalculatedWidth()
 
 	if is_selected then
-		love.graphics.setColor(Colors.accent[1], Colors.accent[2], Colors.accent[3], 0.2)
-		love.graphics.rectangle("fill", 0, y, w, self.item_height)
+		local iw, ih = self.selected_item_image:getDimensions()
+		love.graphics.setColor(Colors.accent[1], Colors.accent[2], Colors.accent[3])
+		love.graphics.draw(self.selected_item_image, w, y, 0, 4, self.item_height / ih, self.selected_item_image:getWidth())
 	end
 
 	local title_h = self.title_font:getHeight()
@@ -61,11 +63,11 @@ function ChartSetList:drawItem(index, y, is_selected)
 
 	love.graphics.setColor(Colors.text)
 	love.graphics.setFont(self.title_font)
-	love.graphics.print(item.title or "Nil Title", x_indent, y + padding)
+	love.graphics.printf(item.title or "Nil Title", -x_indent, y + padding, w, "right")
 
 	love.graphics.setColor(Colors.lines)
 	love.graphics.setFont(self.artist_font)
-	love.graphics.print(item.artist or "Nil Artist", x_indent, y + padding + title_h + gap)
+	love.graphics.printf(item.artist or "Nil Artist", -x_indent, y + padding + title_h + gap, w, "right")
 end
 
 return ChartSetList
