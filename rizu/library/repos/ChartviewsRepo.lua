@@ -236,16 +236,23 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local objs = model:select(where, options)
 
 	for _, obj in ipairs(objs) do
-		local hash, index = obj.hash, obj.index
-		if hash and index then
-			obj.difftable_chartmetas = self.models.difftable_chartmetas:select({
-				hash = hash,
-				index = index,
-			})
-		end
+		self:_fillRichData(obj)
 	end
 
 	return objs
+end
+
+---@param obj sphere.RichChartview
+---@return sphere.RichChartview
+function ChartviewsRepo:_fillRichData(obj)
+	local hash, index = obj.hash, obj.index
+	if hash and index then
+		obj.difftable_chartmetas = self.models.difftable_chartmetas:select({
+			hash = hash,
+			index = index,
+		})
+	end
+	return obj
 end
 
 ---@param _chartview sphere.IChartviewIds
@@ -267,37 +274,34 @@ function ChartviewsRepo:getChartview(_chartview)
 	end
 
 	---@type sphere.Chartview?
-	local obj = model:find({
-		chartfile_id = chartfile_id,
-		chartplay_id = chartplay_id,
-		chartplay_id__isnull = not chartplay_id,
-	})
-	if obj then
-		return obj
+	local obj
+	if chartplay_id then
+		obj = model:find({
+			chartfile_id = chartfile_id,
+			chartplay_id = chartplay_id,
+		})
+	end
+	if not obj and chartdiff_id then
+		obj = model:find({
+			chartfile_id = chartfile_id,
+			chartdiff_id = chartdiff_id,
+		})
+	end
+	if not obj and chartmeta_id then
+		obj = model:find({
+			chartfile_id = chartfile_id,
+			chartmeta_id = chartmeta_id,
+		})
+	end
+	if not obj then
+		obj = model:find({
+			chartfile_id = chartfile_id,
+		})
 	end
 
-	obj = model:find({
-		chartfile_id = chartfile_id,
-		chartdiff_id = chartdiff_id,
-		chartdiff_id__isnull = not chartdiff_id,
-	})
 	if obj then
-		return obj
+		self:_fillRichData(obj)
 	end
-
-	obj = model:find({
-		chartfile_id = chartfile_id,
-		chartmeta_id = chartmeta_id,
-		chartmeta_id__isnull = not chartmeta_id,
-	})
-	if obj then
-		return obj
-	end
-
-	obj = model:find({
-		chartfile_id = chartfile_id,
-		chartmeta_id__isnull = true,
-	})
 
 	return obj
 end

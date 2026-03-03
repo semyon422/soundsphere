@@ -131,7 +131,7 @@ function SelectView:switchToOsudirect()
 	just.focus()
 end
 
----@param searchMode string
+---@param searchMode "filter"|"lamp"|"osudirect"
 function SelectView:setSearchMode(searchMode)
 	self.searchMode = searchMode
 end

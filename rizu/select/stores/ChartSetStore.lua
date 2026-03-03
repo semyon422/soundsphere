@@ -41,9 +41,6 @@ function ChartSetStore:loadObject(itemIndex)
 	---@cast chartview sphere.RichChartview
 
 	chartview.lamp = _chartview.lamp
-	if chartview.hash and chartview.index then
-		chartview.difftable_chartmetas = difftablesRepo:getDifftableChartmetasForChartmeta(chartview.hash, chartview.index)
-	end
 
 	return chartview
 end
