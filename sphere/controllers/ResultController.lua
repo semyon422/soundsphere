@@ -14,17 +14,14 @@ function ResultController:new(game)
 end
 
 function ResultController:load()
-	local selectModel = self.game.selectModel
+	self.game.scoreSelector:pullScore()
 
-	selectModel:pullScore()
-
-	local scoreItemIndex = selectModel.state.scoreItemIndex
-	local scoreItem = selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	if not scoreItem then
 		return
 	end
 
-	selectModel:scrollScore(nil, scoreItemIndex)
+	self.game.scoreSelector:scrollScore(nil, self.game.scoreSelector.state.scoreItemIndex)
 end
 
 function ResultController:unload()
@@ -53,7 +50,7 @@ end
 function ResultController:replayNoteChartAsync(mode, chartplay)
 	local game = self.game
 
-	if not chartplay or not game.selectModel:notechartExists() then
+	if not chartplay or not game.chartSelector:notechartExists() then
 		return
 	end
 
@@ -90,7 +87,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		return
 	end
 
-	local chartview = game.selectModel.chartview
+	local chartview = game.chartSelector.chartview
 
 	GameplayChart(game.configModel.configs.settings, game.fs, chartview):load(replayBase, game.computeContext)
 
@@ -109,7 +106,7 @@ function ResultController:replayNoteChartAsync(mode, chartplay)
 		local chart = assert(game.computeContext.chart)
 		local GifResult = require("libchart.GifResult")
 		local gif_result = GifResult()
-		local bg_path = game.selectModel:getBackgroundPath()
+		local bg_path = game.chartSelector:getBackgroundPath()
 		if bg_path then
 			local bg_data = game.fs:read(bg_path)
 			if bg_data then

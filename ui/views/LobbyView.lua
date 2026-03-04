@@ -73,7 +73,7 @@ function section_draw.rooms(self, inner_w)
 
 	local multiplayerModel = game.multiplayerModel
 	local mp_client = game.multiplayerModel.client
-	local chartview = game.selectModel.chartview
+	local chartview = game.chartSelector.chartview
 
 	local close
 	local status = tostring(multiplayerModel.status)

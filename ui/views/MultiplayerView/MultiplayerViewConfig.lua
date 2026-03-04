@@ -74,7 +74,7 @@ local function Cells(self)
 	local multiplayerModel = self.game.multiplayerModel
 
 	local baseTimeRate = self.game.replayBase.rate
-	local chartview = self.game.selectModel.chartview or multiplayerModel.notechart
+	local chartview = self.game.chartSelector.chartview or multiplayerModel.notechart
 
 	local bpm = 0
 	local length = 0
@@ -175,7 +175,7 @@ end
 local function Title(self)
 	local w, h = Layout:move("column2row2")
 	love.graphics.translate(22, 0)
-	local chartview = self.game.selectModel.chartview or self.game.multiplayerModel.notechart
+	local chartview = self.game.chartSelector.chartview or self.game.multiplayerModel.notechart
 	if not chartview or not chartview.title then
 		return
 	end

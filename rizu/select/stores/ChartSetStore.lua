@@ -30,7 +30,6 @@ end
 ---@return rizu.LocatedChartview
 function ChartSetStore:loadObject(itemIndex)
 	local chartviewsRepo = self.library.chartviewsRepo
-	local difftablesRepo = self.library.difftablesRepo
 
 	local _chartview = chartviewsRepo.chartviews[itemIndex - 1]
 	local chartview = chartviewsRepo:getChartview(_chartview)

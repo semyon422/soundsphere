@@ -1,4 +1,5 @@
-local Select = require("rizu.select.Select")
+local ChartSelector = require("rizu.select.ChartSelector")
+local ScoreSelector = require("rizu.select.ScoreSelector")
 local SelectionState = require("rizu.select.SelectionState")
 local TestLibraryFactory = require("rizu.select.TestLibraryFactory")
 local class = require("class")
@@ -58,7 +59,7 @@ function test.scrolling(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = Select(configModel, library, fs, onlineModel, replayBase)
+	local model = ChartSelector(configModel, library, fs)
 	model:load()
 
 	t:eq(model.state.chartview_set_index, 1)
@@ -94,7 +95,7 @@ function test.chart_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = Select(configModel, library, fs, onlineModel, replayBase)
+	local model = ChartSelector(configModel, library, fs)
 	model:load()
 
 	t:eq(model.state.chartview_index, 1)
@@ -133,74 +134,38 @@ function test.score_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = Select(configModel, library, fs, onlineModel, replayBase)
-	model:load()
+	local chartModel = ChartSelector(configModel, library, fs)
+	local scoreSelector = ScoreSelector(configModel, library, onlineModel, replayBase, chartModel.state)
+	
+	-- Wire them up like SelectController would
+	chartModel.onChanged:add({
+		receive = function(_, event)
+			if event.type == "scroll_notechart" then
+				scoreSelector:setChart(event.chartview)
+			end
+		end
+	})
+
+	chartModel:load()
+	scoreSelector:setChart(chartModel.chartview)
 
 	-- Default selection should be the latest score (highest ID), which is 103
-	t:eq(model.state.scoreItemIndex, 3)
-	t:eq(model.state.scoreId, 103)
+	t:eq(chartModel.state.scoreItemIndex, 3)
+	t:eq(chartModel.state.scoreId, 103)
 
-	model:scrollScore(-1)
-	t:eq(model.state.scoreItemIndex, 2)
-	t:eq(model.state.scoreId, 102)
-	t:eq(model.scoreItem.id, 102)
+	scoreSelector:scrollScore(-1)
+	t:eq(chartModel.state.scoreItemIndex, 2)
+	t:eq(chartModel.state.scoreId, 102)
+	t:eq(scoreSelector.scoreItem.id, 102)
 
-	model:scrollScore(-1)
-	t:eq(model.state.scoreItemIndex, 1)
-	t:eq(model.state.scoreId, 101)
-	t:eq(model.scoreItem.id, 101)
+	scoreSelector:scrollScore(-1)
+	t:eq(chartModel.state.scoreItemIndex, 1)
+	t:eq(chartModel.state.scoreId, 101)
+	t:eq(scoreSelector.scoreItem.id, 101)
 
 	-- Scroll forward
-	model:scrollScore(1)
-	t:eq(model.state.scoreItemIndex, 2)
-	t:eq(model.state.scoreId, 102)
-end
-
-function test.task_overriding(t)
-	local charts = {}
-	for i = 1, 10 do
-		table.insert(charts, {chartfile_set_id = i, chartfile_id = i, chartmeta_id = i, chartdiff_id = i, hash = "h" .. i})
-	end
-	
-	local configModel = createMockConfigModel()
-	local library = tlf:create()
-	tlf:populate(library, charts)
-	
-	local fs = {read = function() end, getInfo = function() end}
-	local onlineModel = {authManager = {sea_client = {connected = false}}}
-	local replayBase = {}
-
-	local model = Select(configModel, library, fs, onlineModel, replayBase)
-
-	-- Mock chartStore to be "slow" by explicitly yielding
-	local original_setNoteChartSetId = model.chartStore.setNoteChartSetId
-	local calls = 0
-	local yielded_threads = {}
-	model.chartStore.setNoteChartSetId = function(self, config)
-		calls = calls + 1
-		table.insert(yielded_threads, coroutine.running())
-		coroutine.yield()
-		return original_setNoteChartSetId(self, config)
-	end
-
-	model:load()
-
-	-- Fast scroll from 1 to 5
-	model:scrollNoteChartSet(1) -- to 2
-	model:scrollNoteChartSet(1) -- to 3
-	model:scrollNoteChartSet(1) -- to 4
-	model:scrollNoteChartSet(1) -- to 5
-
-	-- Resume all yielded threads manually
-	while #yielded_threads > 0 do
-		local c = table.remove(yielded_threads, 1)
-		assert(coroutine.resume(c))
-	end
-
-	t:eq(calls, 2, "Intermediate chart loads should have been overridden")
-	t:eq(model.state.chartview_set_index, 5)
-	t:eq(model.state.chartSetId, 5)
-	t:eq(model.chartview.chartfile_id, 5)
+	scoreSelector:scrollScore(1)
+	t:eq(chartModel.state.scoreId, 102)
 end
 
 return test

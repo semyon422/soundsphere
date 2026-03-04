@@ -18,7 +18,7 @@ ResultView.load = thread.coro(function(self)
 	loading = true
 	self.game.resultController:load()
 	if self.prevView == self.ui.selectView then
-		self.game.resultController:replayNoteChartAsync("result", self.game.selectModel.scoreItem)
+		self.game.resultController:replayNoteChartAsync("result", self.game.scoreSelector.scoreItem)
 	end
 
 	loading = false
@@ -29,9 +29,9 @@ function ResultView:draw()
 
 	local kp = just.keypressed
 	if kp("up") then
-		self.game.selectModel:scrollScore(-1)
+		self.game.scoreSelector:scrollScore(-1)
 	elseif kp("down") then
-		self.game.selectModel:scrollScore(1)
+		self.game.scoreSelector:scrollScore(1)
 	elseif kp("escape") then
 		self:quit()
 	elseif kp("return") then
@@ -58,7 +58,7 @@ ResultView.play = thread.coro(function(self, mode)
 		return
 	end
 	playing = true
-	self.game.resultController:replayNoteChartAsync(mode, self.game.selectModel.scoreItem)
+	self.game.resultController:replayNoteChartAsync(mode, self.game.scoreSelector.scoreItem)
 	if mode == "result" then
 		return self.view:reload()
 	end

@@ -4,7 +4,8 @@ local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
-local Select = require("rizu.select.Select")
+local ChartSelector = require("rizu.select.ChartSelector")
+local ScoreSelector = require("rizu.select.ScoreSelector")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
@@ -100,21 +101,26 @@ function GameController:new()
 
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
-	self.selectModel = Select(
+	self.chartSelector = ChartSelector(
 		self.persistence.configModel,
 		self.persistence.library,
-		self.fs,
+		self.fs
+	)
+	self.scoreSelector = ScoreSelector(
+		self.persistence.configModel,
+		self.persistence.library,
 		self.onlineModel,
-		self.replayBase
+		self.replayBase,
+		self.chartSelector.state
 	)
 
-	self.multiplayer_client.chart_selector = self.selectModel
+	self.multiplayer_client.chart_selector = self.chartSelector
 
 	self.multiplayerModel = MultiplayerModel(
 		self.persistence.library,
 		self.rhythm_engine,
 		self.persistence.configModel,
-		self.selectModel,
+		self.chartSelector,
 		self.onlineModel,
 		self.persistence.osudirectModel,
 		self.replayBase,
@@ -147,7 +153,8 @@ function GameController:new()
 	)
 
 	self.selectController = SelectController(
-		self.selectModel,
+		self.chartSelector,
+		self.scoreSelector,
 		self.modifierSelectModel,
 		self.noteSkinModel,
 		self.configModel,
@@ -165,11 +172,11 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
 		self.configModel,
-		self.selectModel,
+		self.chartSelector,
 		self.replayBase
 	)
 	self.editorController = EditorController(
-		self.selectModel,
+		self.chartSelector,
 		self.editorModel,
 		self.noteSkinModel,
 		self.configModel,
@@ -221,7 +228,7 @@ function GameController:load()
 
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
-	self.selectModel:load()
+	self.chartSelector:load()
 
 	self.multiplayerController:load()
 

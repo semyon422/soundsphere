@@ -9,7 +9,7 @@ local ScoreListView = ListView()
 ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
-	local scoreStore = self.game.selectModel.scoreStore
+	local scoreStore = self.game.scoreSelector.store
 	if not self.isSubscribed then
 		scoreStore.onChanged:add(self)
 		self.isSubscribed = true
@@ -29,12 +29,12 @@ end
 
 ---@return number
 function ScoreListView:getItemIndex()
-	return self.game.selectModel.state.scoreItemIndex
+	return self.game.scoreSelector.state.scoreItemIndex
 end
 
 ---@param delta number
 function ScoreListView:scroll(delta)
-	self.game.selectModel:scrollScore(delta)
+	self.game.scoreSelector:scrollScore(delta)
 end
 
 ---@param i number

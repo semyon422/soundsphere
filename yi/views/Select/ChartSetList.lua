@@ -11,7 +11,7 @@ function ChartSetList:load()
 	local game = self:getGame()
 	self.title_font = res:getFont("bold", 24)
 	self.artist_font = res:getFont("regular", 16)
-	self.select_model = game.selectModel
+	self.select_model = game.chartSelector
 
 	local title_h = self.title_font:getHeight()
 	local artist_h = self.artist_font:getHeight()

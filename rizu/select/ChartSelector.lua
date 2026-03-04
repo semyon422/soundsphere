@@ -5,34 +5,27 @@ local SelectionState = require("rizu.select.SelectionState")
 local ChartStore = require("rizu.select.stores.ChartStore")
 local ChartSetStore = require("rizu.select.stores.ChartSetStore")
 local CollectionStore = require("rizu.select.stores.CollectionStore")
-local ScoreStore = require("rizu.select.stores.ScoreStore")
 local SearchModel = require("rizu.select.SearchModel")
 local SortModel = require("rizu.select.SortModel")
 local FilterModel = require("rizu.select.FilterModel")
 local SelectionQueryBuilder = require("rizu.select.SelectionQueryBuilder")
 local ChartMetadataService = require("rizu.select.services.ChartMetadataService")
 local TaskRunner = require("rizu.select.tasks.TaskRunner")
-local LocalScoreProvider = require("rizu.select.providers.LocalScoreProvider")
-local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")
 
----@class rizu.select.Select
----@operator call: rizu.select.Select
-local Select = class()
+---@class rizu.select.ChartSelector
+---@operator call: rizu.select.ChartSelector
+local ChartSelector = class()
 
-Select.debounceTime = 0.5
+ChartSelector.debounceTime = 0.5
 
 ---@param configModel sphere.ConfigModel
 ---@param library rizu.library.Library
 ---@param fs fs.IFilesystem
----@param onlineModel sphere.OnlineModel
----@param replayBase sea.ReplayBase
 ---@param state? rizu.select.SelectionState
-function Select:new(configModel, library, fs, onlineModel, replayBase, state)
+function ChartSelector:new(configModel, library, fs, state)
 	self.configModel = configModel
 	self.library = library
 	self.fs = fs
-	self.onlineModel = onlineModel
-	self.replayBase = replayBase
 	self.state = state or SelectionState()
 
 	self.chartStore = ChartStore(library)
@@ -45,31 +38,22 @@ function Select:new(configModel, library, fs, onlineModel, replayBase, state)
 	self.metadataService = ChartMetadataService(fs)
 	self.taskRunner = TaskRunner()
 
-	local localProvider = LocalScoreProvider(library)
-	local onlineProvider = OnlineScoreProvider(onlineModel)
-	self.scoreStore = ScoreStore(
-		configModel,
-		localProvider,
-		onlineProvider
-	)
-
 	-- Backward compatibility
 	self.noteChartLibrary = self.chartStore
 	self.noteChartSetLibrary = self.chartSetStore
 	self.collectionLibrary = self.collectionStore
-	self.scoreLibrary = self.scoreStore
 
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
 end
-function Select:receive(event)
+
+function ChartSelector:receive(event)
 	if event.type == "set" then
 		self.taskRunner:push(function()
 			self:pullNoteChart()
 		end, 1)
 	elseif event.type == "chart" then
 		self.taskRunner:push(function()
-			self:pullScore()
 			local index = self.chartSetStore:indexof(self.config)
 			local chartview_set = self.chartSetStore:get(index)
 			self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
@@ -77,7 +61,7 @@ function Select:receive(event)
 	end
 end
 
-function Select:load()
+function ChartSelector:load()
 	local settings = self.configModel.configs.settings
 	local config = self.configModel.configs.select
 	self.config = config
@@ -92,7 +76,7 @@ function Select:load()
 	self:noDebouncePullNoteChartSet()
 end
 
-function Select:updateSetItems()
+function ChartSelector:updateSetItems()
 	local collectionStore = self.collectionStore
 	local collectionItem = collectionStore.tree.items[collectionStore.tree.selected]
 	local params = self.queryBuilder:build(self.config, collectionItem)
@@ -104,7 +88,7 @@ end
 
 ---@param hash string
 ---@param index number
-function Select:findNotechart(hash, index)
+function ChartSelector:findNotechart(hash, index)
 	local config = self.configModel.configs.settings.select
 	local params = {
 		where = {hash = hash, index = index},
@@ -122,7 +106,7 @@ function Select:findNotechart(hash, index)
 end
 
 ---@return string?
-function Select:getBackgroundPath()
+function ChartSelector:getBackgroundPath()
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -133,7 +117,7 @@ end
 ---@return string?
 ---@return number?
 ---@return string?
-function Select:getAudioPathPreview()
+function ChartSelector:getAudioPathPreview()
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -144,7 +128,7 @@ end
 ---@param settings table?
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
-function Select:loadChart(settings)
+function ChartSelector:loadChart(settings)
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -155,7 +139,7 @@ end
 ---@param settings table?
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
-function Select:loadChartAbsolute(settings)
+function ChartSelector:loadChartAbsolute(settings)
 	local chartview = self.chartview
 	if not chartview then
 		return
@@ -164,19 +148,19 @@ function Select:loadChartAbsolute(settings)
 end
 
 ---@return boolean
-function Select:isChanged()
+function ChartSelector:isChanged()
 	local changed = self.changed
 	self.changed = false
 	return changed == true
 end
 
-function Select:setChanged()
+function ChartSelector:setChanged()
 	self.changed = true
 	self.onChanged:send({type = "set_changed"})
 end
 
 ---@return boolean
-function Select:notechartExists()
+function ChartSelector:notechartExists()
 	local chartview = self.chartview
 	if chartview then
 		return self.fs:getInfo(chartview.location_path) ~= nil
@@ -184,17 +168,12 @@ function Select:notechartExists()
 	return false
 end
 
----@return boolean
-function Select:isPlayed()
-	return not not (self:notechartExists() and self.scoreItem)
-end
-
 ---@param ... any?
-function Select:debouncePullNoteChartSet(...)
+function ChartSelector:debouncePullNoteChartSet(...)
 	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
 end
 
-function Select:noDebouncePullNoteChartSet(...)
+function ChartSelector:noDebouncePullNoteChartSet(...)
 	local args = {...}
 	self.taskRunner:push(function()
 		self:pullNoteChartSet(unpack(args))
@@ -205,20 +184,20 @@ function Select:noDebouncePullNoteChartSet(...)
 end
 
 ---@param sortFunctionName string
-function Select:setSortFunction(sortFunctionName)
+function ChartSelector:setSortFunction(sortFunctionName)
 	self.config.sortFunction = sortFunctionName
 	self:noDebouncePullNoteChartSet()
 end
 
 ---@param locked boolean
-function Select:setLock(locked)
+function ChartSelector:setLock(locked)
 	self.locked = locked
 end
 
 ---@param direction number?
 ---@param destination number?
 ---@param force boolean?
-function Select:scrollCollection(direction, destination, force)
+function ChartSelector:scrollCollection(direction, destination, force)
 	local collectionStore = self.collectionStore
 	local items = collectionStore.tree.items
 	local selected = collectionStore.tree.selected
@@ -239,51 +218,25 @@ function Select:scrollCollection(direction, destination, force)
 	self:debouncePullNoteChartSet(old_item and old_item.path == item.path)
 end
 
-function Select:scrollRandom()
+function ChartSelector:scrollRandom()
 	local itemsCount = self.chartSetStore:count()
 	local destination = math.random(1, itemsCount)
 	self:scrollNoteChartSet(nil, destination)
 end
 
 ---@param chartview table
-function Select:setConfig(chartview)
+function ChartSelector:setConfig(chartview)
 	self.config.chartfile_set_id = chartview.chartfile_set_id
 	self.config.chartfile_id = chartview.chartfile_id
 	self.config.chartmeta_id = chartview.chartmeta_id
 	self.config.chartdiff_id = chartview.chartdiff_id
 	self.config.chartplay_id = chartview.chartplay_id
 	self.config.select_chartplay_id = chartview.chartplay_id
-
-	local config = self.configModel.configs.settings.select
-
-	local views = config.chartviews_table
-	if views == "chartviews" then
-		return
-	end
-
-	local replayBase = self.replayBase
-
-	replayBase.modifiers = chartview.modifiers or {}
-	replayBase.rate = chartview.rate or 1
-	replayBase.mode = chartview.mode or "mania"
-
-	if views == "chartdiffviews" then
-		return
-	end
-
-	replayBase.nearest = chartview.nearest or false
-	replayBase.tap_only = chartview.tap_only or false
-	replayBase.timings = chartview.timings
-	replayBase.subtimings = chartview.subtimings
-	replayBase.columns_order = chartview.columns_order
-	replayBase.custom = chartview.custom or false
-	replayBase.const = chartview.const or false
-	replayBase.rate_type = chartview.rate_type or "linear"
 end
 
 ---@param direction number?
 ---@param destination number?
-function Select:scrollNoteChartSet(direction, destination)
+function ChartSelector:scrollNoteChartSet(direction, destination)
 	local itemsCount = self.chartSetStore:count()
 
 	destination = math.min(math.max(destination or self.state.chartview_set_index + direction, 1), itemsCount)
@@ -299,7 +252,7 @@ end
 
 ---@param direction number?
 ---@param destination number?
-function Select:scrollNoteChart(direction, destination)
+function ChartSelector:scrollNoteChart(direction, destination)
 	local items = self.chartStore.items
 
 	direction = direction or destination - self.state.chartview_index
@@ -320,28 +273,9 @@ function Select:scrollNoteChart(direction, destination)
 	self.onChanged:send({type = "scroll_notechart", chartview = chartview})
 end
 
----@param direction number?
----@param destination number?
-function Select:scrollScore(direction, destination)
-	local items = self.scoreStore.items
-
-	destination = math.min(math.max(destination or self.state.scoreItemIndex + direction, 1), #items)
-	if not items[destination] or self.state.scoreItemIndex == destination then
-		return
-	end
-
-	local scoreItem = items[destination]
-	self.config.chartplay_id = scoreItem.id
-
-	self.state:setScore(destination, scoreItem.id)
-
-	self.scoreItem = scoreItem
-	self.onChanged:send({type = "scroll_score", scoreItem = scoreItem})
-end
-
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
-function Select:pullNoteChartSet(noUpdate, noPullNext)
+function ChartSelector:pullNoteChartSet(noUpdate, noPullNext)
 	if self.locked then
 		return
 	end
@@ -364,11 +298,9 @@ function Select:pullNoteChartSet(noUpdate, noPullNext)
 		self.config.chartplay_id = nil
 
 		self.chartview = nil
-		self.scoreItem = nil
 		self.changed = true
 
 		self.chartStore:clear()
-		self.scoreStore:clear()
 	end
 
 	self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
@@ -380,7 +312,7 @@ end
 
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
-function Select:pullNoteChart(noUpdate, noPullNext)
+function ChartSelector:pullNoteChart(noUpdate, noPullNext)
 	if not noUpdate then
 		self.chartStore:setNoteChartSetId(self.config)
 	end
@@ -404,59 +336,6 @@ function Select:pullNoteChart(noUpdate, noPullNext)
 	self.changed = true
 
 	self.state:setChart(index, chartview and chartview.chartfile_id)
-
-	if chartview then
-		return
-	end
-
-	self.scoreItem = nil
-	self.scoreStore:clear()
 end
 
-function Select:findScore()
-	local scoreItems = self.scoreStore.items
-	local index = self.scoreStore:getItemIndex(self.config.chartplay_id) or 1
-	local scoreItem = scoreItems[index]
-
-	if scoreItem then
-		self.config.chartplay_id = scoreItem.id
-	end
-
-	self.state:setScore(index, scoreItem and scoreItem.id)
-
-	self.scoreItem = scoreItem
-end
-
----@param noUpdate boolean?
-function Select:pullScore(noUpdate)
-	local items = self.chartStore.items
-	local chartview = items[self.state.chartview_index]
-
-	if not chartview then
-		return
-	end
-
-	if noUpdate then
-		self:findScore()
-		return
-	end
-
-	local select = self.configModel.configs.select
-	if select.scoreSourceName == "online" then
-		self.scoreStore:clear()
-		-- Handle debouncing within the serialized task runner
-		if coroutine.running() then
-			delay.sleep(self.debounceTime)
-		end
-	end
-
-	local config = self.configModel.configs.settings.select
-	local exact = config.chartviews_table ~= "chartviews"
-	
-	-- We use the coro version to ensure the task runner waits for completion
-	self.scoreStore:updateItems(chartview, exact)
-
-	self:findScore()
-end
-
-return Select
+return ChartSelector

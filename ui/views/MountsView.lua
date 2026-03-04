@@ -163,14 +163,14 @@ function section_draw.locations(self, inner_w)
 
 	if imgui.button("reset dir", "delete charts cache", inactive) then
 		locations:deleteCharts(selected_loc.id)
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 
 	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
 		locations:deleteLocation(selected_id)
 		locations:selectLocations()
 		selected_id = 1
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 end
 
@@ -236,17 +236,17 @@ function section_draw.database(self)
 	end
 
 	if imgui.button("delete selected chartdiff", "delete selected chartdiff", inactive) then
-		local chartview = self.game.selectModel.chartview
+		local chartview = self.game.chartSelector.chartview
 		library.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
 	end
 
 	if imgui.button("delete chartdiff selected", "delete chartdiff of selected chart") then
-		local chartview = self.game.selectModel.chartview
+		local chartview = self.game.chartSelector.chartview
 		library.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
 	end
 
 	if imgui.button("delete all chartdiff selected", "delete all chartdiffs of selected chart") then
-		local chartview = self.game.selectModel.chartview
+		local chartview = self.game.chartSelector.chartview
 		library.chartsRepo:deleteChartdiffsByHashIndex(chartview.hash, chartview.index)
 	end
 
@@ -274,8 +274,8 @@ function section_draw.database(self)
 
 
 	if imgui.button("compute diff", "compute diff") then
-		local chartdiff = self.game.selectModel.chartview
-		local chart = self.game.selectModel:loadChartAbsolute()
+		local chartdiff = self.game.chartSelector.chartview
+		local chart = self.game.chartSelector:loadChartAbsolute()
 		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
 	end

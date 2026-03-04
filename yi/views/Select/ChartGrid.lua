@@ -6,7 +6,7 @@ local ChartGrid = ElasticList + {}
 
 function ChartGrid:load()
 	ElasticList.load(self)
-	self.select_model = self:getGame().selectModel
+	self.select_model = self:getGame().chartSelector
 
 	local res = self:getResources()
 	self.font = res:getFont("bold", 36)

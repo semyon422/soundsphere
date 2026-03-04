@@ -13,7 +13,8 @@ local Path = require("Path")
 ---@operator call: sphere.SelectController
 local SelectController = class()
 
----@param selectModel rizu.select.Select
+---@param chartSelector rizu.select.ChartSelector
+---@param scoreSelector rizu.select.ScoreSelector
 ---@param modifierSelectModel sphere.ModifierSelectModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
@@ -27,7 +28,8 @@ local SelectController = class()
 ---@param previewModel sphere.PreviewModel
 ---@param chartPreviewModel sphere.ChartPreviewModel
 function SelectController:new(
-	selectModel,
+	chartSelector,
+	scoreSelector,
 	modifierSelectModel,
 	noteSkinModel,
 	configModel,
@@ -41,7 +43,8 @@ function SelectController:new(
 	previewModel,
 	chartPreviewModel
 )
-	self.selectModel = selectModel
+	self.chartSelector = chartSelector
+	self.scoreSelector = scoreSelector
 	self.modifierSelectModel = modifierSelectModel
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
@@ -55,18 +58,26 @@ function SelectController:new(
 	self.previewModel = previewModel
 	self.chartPreviewModel = chartPreviewModel
 	self.state = ModifiersMetaState()
+
+	self.chartSelector.state.onChanged:add({
+		receive = function(_, event)
+			if event.type == "chart" then
+				self.scoreSelector:setChart(self.chartSelector.chartview)
+			end
+		end
+	})
 end
 
 function SelectController:load()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
 	self.configModel:write()
 	self.replayBase:importReplayBase(self.configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
-	self.selectModel:setLock(false)
+	self.chartSelector:setLock(false)
 
-	selectModel:load()
+	chartSelector:load()
 	self.previewModel:load()
 
 	self:applyModifierMeta()
@@ -78,7 +89,7 @@ function SelectController:applyModifierMeta()
 
 	local replayBase = self.replayBase
 
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		replayBase.columns_order = nil
 		return
@@ -88,6 +99,8 @@ function SelectController:applyModifierMeta()
 	self.state.inputMode:set(chartview.inputmode)
 	self.state:resetOrder()
 
+	self.scoreSelector:updateReplayBase(chartview)
+
 	ModifierModel:applyMeta(replayBase.modifiers, self.state)
 
 	if replayBase.columns_order and #replayBase.columns_order ~= self.state.inputMode:getColumns() then
@@ -96,7 +109,7 @@ function SelectController:applyModifierMeta()
 end
 
 function SelectController:beginUnload()
-	self.selectModel:setLock(true)
+	self.chartSelector:setLock(true)
 end
 
 function SelectController:unload()
@@ -110,13 +123,13 @@ function SelectController:update()
 
 	self.windowModel:setVsyncOnSelect(true)
 
-	local selectModel = self.selectModel
-	if selectModel:isChanged() then
-		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
-		local audio_path, preview_time, mode = selectModel:getAudioPathPreview()
-		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, selectModel.chartview)
+	local chartSelector = self.chartSelector
+	if chartSelector:isChanged() then
+		self.backgroundModel:setBackgroundPath(chartSelector:getBackgroundPath())
+		local audio_path, preview_time, mode = chartSelector:getAudioPathPreview()
+		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
 		self.previewModel:onLoad(function()
-			self.chartPreviewModel:setChartview(selectModel.chartview)
+			self.chartPreviewModel:setChartview(chartSelector.chartview)
 		end)
 		self:applyModifierMeta()
 	end
@@ -147,7 +160,7 @@ SelectController.updateSession = thread.coro(function(self)
 end)
 
 function SelectController:openDirectory()
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
@@ -170,7 +183,7 @@ function SelectController:openDirectory()
 end
 
 function SelectController:openWebNotechart()
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
@@ -181,7 +194,7 @@ end
 
 ---@param force boolean?
 function SelectController:updateCache(force)
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
@@ -269,16 +282,16 @@ function SelectController:filedropped(file)
 end
 
 function SelectController:exportToOsu()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	if not chartview then
 		return
 	end
 
 	local encoder = ChartEncoder()
 
-	local chart, chartmeta = selectModel:loadChartAbsolute()
+	local chart, chartmeta = chartSelector:loadChartAbsolute()
 	ModifierModel:apply(self.replayBase.modifiers, chart)
 
 	local data = encoder:encode({{

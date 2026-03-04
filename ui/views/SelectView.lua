@@ -55,7 +55,7 @@ function SelectView:draw()
 
 	local kp = just.keypressed
 	if kp("f1") then self.gameView:setModal(require("ui.views.ModifierView.ModifierView"))
-	elseif kp("f2") then self.game.selectModel:scrollRandom()
+	elseif kp("f2") then self.game.chartSelector:scrollRandom()
 	elseif kp("lctrl") then self:changeSearchMode()
 	end
 	if self.subscreen == "notecharts" then
@@ -78,16 +78,16 @@ function SelectView:draw()
 end
 
 function SelectView:play()
-	local selectModel = self.game.selectModel
-	if not selectModel:notechartExists() then
+	local chartSelector = self.game.chartSelector
+	if not chartSelector:notechartExists() then
 		return
 	end
 
 	local multiplayerModel = self.game.multiplayerModel
 	if multiplayerModel.client:isInRoom() and not multiplayerModel.client.is_playing then
 		local chartmeta_key = ChartmetaKey()
-		chartmeta_key.hash = selectModel.chartview.hash
-		chartmeta_key.index = selectModel.chartview.index
+		chartmeta_key.hash = chartSelector.chartview.hash
+		chartmeta_key.index = chartSelector.chartview.index
 
 		multiplayerModel.client:updateChartmetaKey(chartmeta_key)
 		self:changeScreen("multiplayerView")
@@ -98,13 +98,13 @@ function SelectView:play()
 end
 
 function SelectView:result()
-	if self.game.selectModel:isPlayed() then
+	if self.game.chartSelector:notechartExists() and self.game.scoreSelector.scoreItem then
 		self:changeScreen("resultView")
 	end
 end
 
 function SelectView:edit()
-	if not self.game.selectModel:notechartExists() then
+	if not self.game.chartSelector:notechartExists() then
 		return
 	end
 	self:changeScreen("editorView")
@@ -113,7 +113,7 @@ end
 function SelectView:switchToNoteCharts()
 	self.subscreen = "notecharts"
 	self.searchMode = "filter"
-	self.game.selectModel:noDebouncePullNoteChartSet()
+	self.game.chartSelector:noDebouncePullNoteChartSet()
 	just.focus()
 end
 

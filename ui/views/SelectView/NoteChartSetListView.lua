@@ -7,7 +7,7 @@ local NoteChartSetListView = ListView()
 NoteChartSetListView.rows = 11
 
 function NoteChartSetListView:reloadItems()
-	local chartSetStore = self.game.selectModel.chartSetStore
+	local chartSetStore = self.game.chartSelector.chartSetStore
 	if not self.isSubscribed then
 		chartSetStore.onChanged:add(self)
 		self.isSubscribed = true
@@ -27,12 +27,12 @@ end
 
 ---@return number
 function NoteChartSetListView:getItemIndex()
-	return self.game.selectModel.state.chartview_set_index
+	return self.game.chartSelector.state.chartview_set_index
 end
 
 ---@param count number
 function NoteChartSetListView:scroll(count)
-	self.game.selectModel:scrollNoteChartSet(count)
+	self.game.chartSelector:scrollNoteChartSet(count)
 end
 
 ---@param ... any?

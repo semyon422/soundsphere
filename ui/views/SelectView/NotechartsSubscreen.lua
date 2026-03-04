@@ -132,7 +132,7 @@ local function NoteChartList(self)
 		elseif config.chartviews_table == "chartplayviews" then
 			config.chartviews_table = "chartviews"
 		end
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 end
 
@@ -140,7 +140,7 @@ end
 local function ChartCells(self)
 	local w, h = Layout:move("column2row1")
 
-	local chartview = self.game.selectModel.chartview
+	local chartview = self.game.chartSelector.chartview
 
 	if not chartview or not chartview.chartdiff_id then
 		return
@@ -203,7 +203,7 @@ local function ScoreCells(self)
 	local w, h = Layout:move("column1row2")
 	drawFrameRect(w, h)
 
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	if not scoreItem then
 		return
 	end
@@ -283,13 +283,13 @@ local function SearchField(self)
 	local delAll = love.keyboard.isDown("lctrl") and love.keyboard.isDown("backspace")
 
 	local config = self.game.configModel.configs.select
-	local selectModel = self.game.selectModel
+	local chartSelector = self.game.chartSelector
 
 	local changed, text = imgui.TextInput("SearchField", {config.filterString, "Filter..."}, nil, w / 2, h - padding * 2)
 	if changed == "text" then
 		if delAll then text = "" end
 		config.filterString = text
-		selectModel:debouncePullNoteChartSet()
+		chartSelector:debouncePullNoteChartSet()
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -299,7 +299,7 @@ local function SearchField(self)
 	if changed == "text" then
 		if delAll then text = "" end
 		config.lampString = text
-		selectModel:debouncePullNoteChartSet()
+		chartSelector:debouncePullNoteChartSet()
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -312,11 +312,11 @@ local function SortDropdown(self)
 	love.graphics.translate(w * 2 / 3, 15)
 
 	local sortFunction = self.game.configModel.configs.select.sortFunction
-	local sortModel = self.game.selectModel.sortModel
+	local sortModel = self.game.chartSelector.sortModel
 	local i = imgui.SpoilerList("SortDropdown", w / 3, h - 30, sortModel.names, sortFunction)
 	local name = sortModel.names[i]
 	if name then
-		self.game.selectModel:setSortFunction(name)
+		self.game.chartSelector:setSortFunction(name)
 	end
 end
 
@@ -352,7 +352,7 @@ local function ScoreFilterDropdown(self)
 	local i = imgui.SpoilerList("ScoreFilterDropdown", w * size, h, filters, config.scoreFilterName, filter_to_string)
 	if i then
 		config.scoreFilterName = filters[i].name
-		self.game.selectModel:pullScore()
+		self.game.scoreSelector:pullScore()
 	end
 end
 
@@ -364,12 +364,12 @@ local function ScoreSourceDropdown(self)
 	h = 60
 	love.graphics.translate(w * (3 / 4 - size) - 26, (72 - h) / 2)
 
-	local sources = self.game.selectModel.scoreLibrary.scoreSources
+	local sources = self.game.scoreSelector.store.scoreSources
 	local config = self.game.configModel.configs.select
 	local i = imgui.SpoilerList("ScoreSourceDropdown", w * size, h, sources, config.scoreSourceName)
 	if i then
 		config.scoreSourceName = sources[i]
-		self.game.selectModel:pullScore()
+		self.game.scoreSelector:pullScore()
 	end
 end
 
@@ -380,7 +380,7 @@ local function GroupCheckbox(self)
 
 	love.graphics.translate(w - h / 6, 0)
 
-	local count = self.game.selectModel.noteChartSetLibrary:count()
+	local count = self.game.chartSelector.noteChartSetLibrary:count()
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 
@@ -433,7 +433,7 @@ local function ModifierIconGrid(self)
 	w, h = Layout:move("column1row2")
 	love.graphics.translate(21, 4)
 
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	if not scoreItem then
 		return
 	end

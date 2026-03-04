@@ -52,7 +52,7 @@ function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
 	self.select_controller = game.selectController
-	self.select_model = game.selectModel
+	self.select_model = game.chartSelector
 
 	self:setup({
 		id = "select",

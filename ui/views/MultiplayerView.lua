@@ -9,7 +9,7 @@ local MultiplayerViewConfig = require("ui.views.MultiplayerView.MultiplayerViewC
 local MultiplayerView = ScreenView + {}
 
 function MultiplayerView:load()
-	self.game.selectModel:setChanged()
+	self.game.chartSelector:setChanged()
 end
 
 function MultiplayerView:draw()

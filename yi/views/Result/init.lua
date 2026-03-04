@@ -17,7 +17,7 @@ function Result:load()
 
 	local res = self:getResources()
 	local game = self:getGame()
-	local score_item = game.selectModel.scoreItem
+	local score_item = game.scoreSelector.scoreItem
 
 	if not score_item then
 		self:add(Label(res:getFont("black", 72), "No score"))
