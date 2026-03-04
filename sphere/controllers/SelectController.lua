@@ -15,6 +15,7 @@ local SelectController = class()
 
 ---@param chartSelector rizu.select.ChartSelector
 ---@param scoreSelector rizu.select.ScoreSelector
+---@param collectionSelector rizu.select.CollectionSelector
 ---@param modifierSelectModel sphere.ModifierSelectModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
@@ -30,6 +31,7 @@ local SelectController = class()
 function SelectController:new(
 	chartSelector,
 	scoreSelector,
+	collectionSelector,
 	modifierSelectModel,
 	noteSkinModel,
 	configModel,
@@ -45,6 +47,7 @@ function SelectController:new(
 )
 	self.chartSelector = chartSelector
 	self.scoreSelector = scoreSelector
+	self.collectionSelector = collectionSelector
 	self.modifierSelectModel = modifierSelectModel
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
@@ -63,6 +66,14 @@ function SelectController:new(
 		receive = function(_, event)
 			if event.type == "chart" then
 				self.scoreSelector:setChart(self.chartSelector.chartview)
+			end
+		end
+	})
+
+	self.collectionSelector.onChanged:add({
+		receive = function(_, event)
+			if event.type == "collection_changed" then
+				self.chartSelector:noDebouncePullNoteChartSet(not event.path_changed)
 			end
 		end
 	})

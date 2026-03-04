@@ -6,6 +6,7 @@ local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
 local ChartSelector = require("rizu.select.ChartSelector")
 local ScoreSelector = require("rizu.select.ScoreSelector")
+local CollectionSelector = require("rizu.select.CollectionSelector")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
@@ -101,10 +102,15 @@ function GameController:new()
 
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
+	self.collectionSelector = CollectionSelector(
+		self.persistence.configModel,
+		self.persistence.library
+	)
 	self.chartSelector = ChartSelector(
 		self.persistence.configModel,
 		self.persistence.library,
-		self.fs
+		self.fs,
+		self.collectionSelector
 	)
 	self.scoreSelector = ScoreSelector(
 		self.persistence.configModel,
@@ -155,6 +161,7 @@ function GameController:new()
 	self.selectController = SelectController(
 		self.chartSelector,
 		self.scoreSelector,
+		self.collectionSelector,
 		self.modifierSelectModel,
 		self.noteSkinModel,
 		self.configModel,
@@ -228,6 +235,7 @@ function GameController:load()
 
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
+	self.collectionSelector:load()
 	self.chartSelector:load()
 
 	self.multiplayerController:load()

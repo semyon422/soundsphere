@@ -7,7 +7,7 @@ local CollectionListView = ListView()
 CollectionListView.rows = 11
 
 function CollectionListView:reloadItems()
-	local collectionStore = self.game.chartSelector.collectionStore
+	local collectionStore = self.game.collectionSelector.store
 	if not self.isSubscribed then
 		collectionStore.onChanged:add(self)
 		self.isSubscribed = true
@@ -22,27 +22,27 @@ function CollectionListView:reloadItems()
 end
 
 function CollectionListView:receive()
-	local collectionStore = self.game.chartSelector.collectionStore
+	local collectionStore = self.game.collectionSelector.store
 	self.items = collectionStore.tree.items
 	self.refreshNeeded = true
 end
 
 ---@return number
 function CollectionListView:getItemIndex()
-	local collectionStore = self.game.chartSelector.collectionStore
+	local collectionStore = self.game.collectionSelector.store
 	return collectionStore.tree.selected
 end
 
 ---@param count number
 function CollectionListView:scroll(count)
-	self.game.chartSelector:scrollCollection(count)
+	self.game.collectionSelector:scrollCollection(count)
 end
 
 ---@param ... any?
 function CollectionListView:draw(...)
 	ListView.draw(self, ...)
 
-	local collectionStore = self.game.chartSelector.collectionStore
+	local collectionStore = self.game.collectionSelector.store
 
 	local kp = just.keypressed
 	if kp("up") or kp("left") then self:scroll(-1)
@@ -53,7 +53,7 @@ function CollectionListView:draw(...)
 	elseif kp("end") then self:scroll(math.huge)
 	elseif kp("return") then
 		collectionStore:enter()
-		self.game.chartSelector:scrollCollection(0, nil, true)
+		self.game.collectionSelector:scrollCollection(0, nil, true)
 	end
 end
 
@@ -61,7 +61,7 @@ end
 ---@param w number
 ---@param h number
 function CollectionListView:drawItem(i, w, h)
-	local collectionStore = self.game.chartSelector.collectionStore
+	local collectionStore = self.game.collectionSelector.store
 	local tree = collectionStore.tree
 	local item = self.items[i]
 

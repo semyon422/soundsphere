@@ -60,7 +60,7 @@ local function CollectionsSubscreen(self)
 	local config = self.game.configModel.configs.settings.select
 	if imgui.Checkbox("locs_in_colls cb", config.locations_in_collections, h - padding * 2) then
 		config.locations_in_collections = not config.locations_in_collections
-		self.game.chartSelector.collectionLibrary:load(config.locations_in_collections)
+		self.game.collectionSelector.store:load(config.locations_in_collections)
 	end
 	just.sameline()
 	imgui.Label("locs_in_colls cb", "show locations", h - padding * 2)

@@ -4,7 +4,6 @@ local Observable = require("Observable")
 local SelectionState = require("rizu.select.SelectionState")
 local ChartStore = require("rizu.select.stores.ChartStore")
 local ChartSetStore = require("rizu.select.stores.ChartSetStore")
-local CollectionStore = require("rizu.select.stores.CollectionStore")
 local SearchModel = require("rizu.select.SearchModel")
 local SortModel = require("rizu.select.SortModel")
 local FilterModel = require("rizu.select.FilterModel")
@@ -21,16 +20,17 @@ ChartSelector.debounceTime = 0.5
 ---@param configModel sphere.ConfigModel
 ---@param library rizu.library.Library
 ---@param fs fs.IFilesystem
+---@param collectionSelector rizu.select.CollectionSelector
 ---@param state? rizu.select.SelectionState
-function ChartSelector:new(configModel, library, fs, state)
+function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 	self.configModel = configModel
 	self.library = library
 	self.fs = fs
+	self.collectionSelector = collectionSelector
 	self.state = state or SelectionState()
 
 	self.chartStore = ChartStore(library)
 	self.chartSetStore = ChartSetStore(library)
-	self.collectionStore = CollectionStore(library)
 	self.searchModel = SearchModel(configModel)
 	self.filterModel = FilterModel(configModel)
 	self.sortModel = SortModel()
@@ -41,7 +41,6 @@ function ChartSelector:new(configModel, library, fs, state)
 	-- Backward compatibility
 	self.noteChartLibrary = self.chartStore
 	self.noteChartSetLibrary = self.chartSetStore
-	self.collectionLibrary = self.collectionStore
 
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
@@ -62,14 +61,10 @@ function ChartSelector:receive(event)
 end
 
 function ChartSelector:load()
-	local settings = self.configModel.configs.settings
 	local config = self.configModel.configs.select
 	self.config = config
 
 	self.searchMode = config.searchMode
-
-	self.collectionStore:load(settings.select.locations_in_collections)
-	self.collectionStore:setPath(config.collection, config.location_id)
 
 	self.filterModel:apply()
 
@@ -77,8 +72,7 @@ function ChartSelector:load()
 end
 
 function ChartSelector:updateSetItems()
-	local collectionStore = self.collectionStore
-	local collectionItem = collectionStore.tree.items[collectionStore.tree.selected]
+	local collectionItem = self.collectionSelector:getSelectedItem()
 	local params = self.queryBuilder:build(self.config, collectionItem)
 
 	self.library.chartviewsRepo:queryAsync(params)
@@ -192,30 +186,6 @@ end
 ---@param locked boolean
 function ChartSelector:setLock(locked)
 	self.locked = locked
-end
-
----@param direction number?
----@param destination number?
----@param force boolean?
-function ChartSelector:scrollCollection(direction, destination, force)
-	local collectionStore = self.collectionStore
-	local items = collectionStore.tree.items
-	local selected = collectionStore.tree.selected
-
-	destination = math.min(math.max(destination or selected + direction, 1), #items)
-	if not items[destination] or not force and selected == destination then
-		return
-	end
-
-	local old_item = items[collectionStore.tree.selected]
-
-	collectionStore.tree.selected = destination
-
-	local item = items[destination]
-	self.config.collection = item.path
-	self.config.location_id = item.location_id
-
-	self:debouncePullNoteChartSet(old_item and old_item.path == item.path)
 end
 
 function ChartSelector:scrollRandom()

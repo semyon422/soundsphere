@@ -59,7 +59,7 @@ function test.scrolling(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = ChartSelector(configModel, library, fs)
+	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()
 
 	t:eq(model.state.chartview_set_index, 1)
@@ -95,7 +95,7 @@ function test.chart_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local model = ChartSelector(configModel, library, fs)
+	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()
 
 	t:eq(model.state.chartview_index, 1)
@@ -134,7 +134,7 @@ function test.score_navigation(t)
 	local onlineModel = {authManager = {sea_client = {connected = false}}}
 	local replayBase = {}
 
-	local chartModel = ChartSelector(configModel, library, fs)
+	local chartModel = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	local scoreSelector = ScoreSelector(configModel, library, onlineModel, replayBase, chartModel.state)
 	
 	-- Wire them up like SelectController would
