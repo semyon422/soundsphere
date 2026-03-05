@@ -20,8 +20,24 @@ function FakeTaskContext:getChartsByHash(hash)
 	return nil, "not found"
 end
 
-function FakeTaskContext:checkProgress(state, count, current)
-	table.insert(self.actions, {"checkProgress", state, count, current})
+function FakeTaskContext:startStage(stage, total)
+	table.insert(self.actions, {"startStage", stage, total})
+end
+
+function FakeTaskContext:advance(amount, label)
+	table.insert(self.actions, {"advance", amount, label})
+end
+
+function FakeTaskContext:report(label)
+	table.insert(self.actions, {"report", label})
+end
+
+function FakeTaskContext:finish()
+	table.insert(self.actions, {"finish"})
+end
+
+function FakeTaskContext:checkProgress(stage, data)
+	table.insert(self.actions, {"checkProgress", stage, data})
 end
 
 function FakeTaskContext:shouldStop()

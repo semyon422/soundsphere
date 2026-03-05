@@ -215,8 +215,7 @@ end
 ---@param location_id integer
 function SelectController:updateCacheLocation(location_id)
 	local library = self.library
-	local state = library.state
-	if state == 0 or state == 3 then
+	if not library.isProcessing then
 		library:computeLocation(nil, location_id)
 	else
 		library:stopTask()

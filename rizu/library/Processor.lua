@@ -15,6 +15,7 @@ local HashingTask = require("rizu.library.tasks.HashingTask")
 local DifficultyTask = require("rizu.library.tasks.DifficultyTask")
 local ScoreTask = require("rizu.library.tasks.ScoreTask")
 local TaskContext = require("rizu.library.tasks.TaskContext")
+local BatchProcessor = require("rizu.library.tasks.BatchProcessor")
 local class = require("class")
 local path_util = require("path_util")
 
@@ -27,7 +28,11 @@ local Processor = class()
 ---@param workingDirectory string
 function Processor:new(db, fs, workingDirectory)
 	self.needStop = false
-	self.state = 0
+	---@type rizu.library.TaskStage
+	self.stage = "idle"
+	self.stage_label = nil
+	self.errorCount = 0
+	self.errors = {}
 	self.fs = fs
 
 	self.difficultyModel = DifficultyModel()
@@ -47,7 +52,9 @@ function Processor:new(db, fs, workingDirectory)
 	self.chartmetaGenerator = ChartmetaGenerator(self.chartsRepo, self.chartfilesRepo, ChartFactory)
 
 	self.hashingTask = HashingTask(self.fs, self.chartmetaGenerator, self.chartdiffGenerator, self.taskContext)
-	self.difficultyTask = DifficultyTask(self.difficultyModel, self.chartdiffGenerator, self.chartsRepo, self.taskContext)
+	self.difficultyTask = DifficultyTask(self.difficultyModel, self.chartdiffGenerator, self.chartsRepo, self.taskContext, function(hash)
+		return self:getChartsByHash(hash)
+	end)
 
 	self.locations = Locations(
 		self.locationsRepo,
@@ -83,7 +90,9 @@ end
 function Processor:resetProgress()
 	self.chartfiles_count = 0
 	self.chartfiles_current = 0
-	self.state = 0
+	self.stage = "idle"
+	self.stage_label = nil
+	self.errorCount = 0
 	---@type string[]
 	self.errors = {}
 end
@@ -110,15 +119,14 @@ function Processor:computeLocation(path, location_id)
 
 	self:resetProgress()
 
-	self.state = 1
-	self:checkProgress()
+	self.taskContext:startStage("scanning", 0)
 
 	self:begin()
 	print("fileCacheGenerator.scan", path, location_id, location_prefix)
 	self.fileCacheGenerator:scan(path, location_id, location_prefix)
 	self:commit()
 
-	self.state = 2
+	self.stage = "hashing"
 	self:checkProgress()
 
 	---@type sea.ClientChartfileSet?, integer?, string?
@@ -136,27 +144,14 @@ function Processor:computeLocation(path, location_id)
 
 	print("chartfilesRepo.selectUnhashedChartfiles", unhashed_path, location_id, set_id)
 	local chartfiles = self.chartfilesRepo:selectUnhashedChartfiles(unhashed_path, location_id, set_id)
-	self.chartfiles_count = #chartfiles
 
-	self:begin()
-	for i, chartfile in ipairs(chartfiles) do
-		self.chartfiles_current = i
-
+	local batchProcessor = BatchProcessor(self.taskContext, 100)
+	batchProcessor:process(chartfiles, "hashing", #chartfiles, function(chartfile)
 		self.hashingTask:processChartfile(chartfile, location_prefix)
-		self:checkProgress()
+		return chartfile.name
+	end)
 
-		if self.needStop then
-			break
-		end
-		if i % 100 == 0 then
-			self:commit()
-			self:begin()
-		end
-	end
-	self:commit()
-
-	self.state = 0
-	self:checkProgress()
+	self.taskContext:finish()
 end
 
 ---@param hash string

@@ -1,5 +1,6 @@
 local Processor = require("rizu.library.Processor")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local FakeFilesystem = require("fs.FakeFilesystem")
 
 local test = {}
@@ -22,7 +23,7 @@ input 4key
 ]]
 	fs:write("/userdata/charts/test_pack/chart.sph", sph_content)
 
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 
 	local processor = Processor(db, fs, "/fake/root")

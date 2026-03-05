@@ -8,10 +8,12 @@ local LoveFilesystem = require("fs.LoveFilesystem")
 local Worker = class()
 
 ---@param library rizu.library.Library
-function Worker:new(library)
+---@param fs fs.IFilesystem
+---@param workingDirectory string
+function Worker:new(library, fs, workingDirectory)
 	self.library = library
-	self.db = Database()
-	self.processor = Processor(self.db, LoveFilesystem(), love.filesystem.getWorkingDirectory())
+	self.db = Database(fs)
+	self.processor = Processor(self.db, fs, workingDirectory)
 	self.errors = {}
 end
 
@@ -26,7 +28,13 @@ function Worker:load()
 			processor.errors = {}
 		end
 
-		self.library:updateProgress(processor.state, processor.chartfiles_count, processor.chartfiles_current, self.errors)
+		self.library:updateProgress({
+			stage = processor.stage,
+			total = processor.chartfiles_count,
+			current = processor.chartfiles_current,
+			label = processor.stage_label,
+			errorCount = processor.errorCount
+		}, self.errors)
 		self.errors = {}
 
 		if self.needStop then

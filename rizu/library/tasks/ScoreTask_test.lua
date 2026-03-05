@@ -2,12 +2,13 @@ local ScoreTask = require("rizu.library.tasks.ScoreTask")
 local FakeTaskContext = require("rizu.library.tasks.FakeTaskContext")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local TestChartFactory = require("sea.chart.TestChartFactory")
 
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	return db
 end

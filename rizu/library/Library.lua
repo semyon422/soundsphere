@@ -1,5 +1,6 @@
 local thread = require("thread")
 local class = require("class")
+local Observable = require("aqua.Observable")
 local ThreadRemote = require("threadremote.ThreadRemote")
 local LoveFilesystem = require("fs.LoveFilesystem")
 local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
@@ -71,24 +72,42 @@ local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 local Library = class()
 
 ---@param difficultyModel sphere.DifficultyModel
-function Library:new(difficultyModel)
+---@param fs fs.IFilesystem
+---@param workingDirectory string
+---@param getTime fun(): number
+function Library:new(difficultyModel, fs, workingDirectory, getTime)
+	self.fs = fs
+	self.workingDirectory = workingDirectory
+
 	---@type rizu.library.LibraryTask[]
 	self.tasks = {}
 
 	---@type string[]
 	self.errors = {}
 
-	self.state = 0
-	self.chartfiles_count = 0
-	self.chartfiles_current = 0
+	self.getTime = getTime
+
+	self.onStatusChanged = Observable()
+
+	---@type rizu.library.TaskStatus
+	self.status = {
+		stage = "idle",
+		current = 0,
+		total = 0,
+		errorCount = 0
+	}
+	self.stageStartTime = self.getTime()
+	self.is_sync = false
 
 	local migrations = {}
 	setmetatable(migrations, {__index = function(_, k)
-		local data = love.filesystem.read(("rizu/library/sql/migrate%s.sql"):format(k))
-		return data
+		local path = ("rizu/library/sql/migrate%s.sql"):format(k)
+		if self.fs:getInfo(path) then
+			return self.fs:read(path)
+		end
 	end})
 
-	self.database = Database(migrations)
+	self.database = Database(fs, migrations)
 
 	self.chartsRepo = ChartsRepo(self.database.models)
 	self.difftablesRepo = DifftablesRepo(self.database.models)
@@ -96,14 +115,14 @@ function Library:new(difficultyModel)
 	self.chartviewsRepo = ChartviewsRepo(self.database.models)
 	self.locationsRepo = LocationsRepo(self.database.models)
 	self.chartfilesRepo = ChartfilesRepo(self.database.models)
-	self.status = Status(self.chartfilesRepo, self.chartsRepo)
+	self.statusUpdate = Status(self.chartfilesRepo, self.chartsRepo)
 	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, difficultyModel)
 	self.collections = Collections(self.chartfilesRepo, self.locationsRepo)
 	self.locations = Locations(
 		self.locationsRepo,
 		self.chartfilesRepo,
-		LoveFilesystem(),
-		love.filesystem.getWorkingDirectory(),
+		fs,
+		workingDirectory,
 		"mounted_charts"
 	)
 
@@ -112,31 +131,43 @@ function Library:new(difficultyModel)
 		self.chartsRepo,
 		self.locationsRepo,
 		self.locations,
-		LoveFilesystem()
+		fs
 	)
 end
 
-function Library:load()
-	self.database:load()
-	self.status:update()
+---@param is_sync boolean
+function Library:setSync(is_sync)
+	self.is_sync = is_sync
+end
+
+---@param dbPath string?
+function Library:load(dbPath)
+	self.database:load(dbPath)
+	self.statusUpdate:update()
 
 	self.locations:load()
 
-	self.tr = ThreadRemote("rizu.library.Library", self)
-	self.worker = self.tr:start(self.createAndLoadWorker)
+	if self.is_sync then
+		self.worker = self:createAndLoadWorker(self.workingDirectory)
+	else
+		self.tr = ThreadRemote("rizu.library.Library", self)
+		self.worker = self.tr:start(self.createAndLoadWorker, self.workingDirectory)
+	end
 end
 
-function Library:createAndLoadWorker()
+---@param workingDirectory string
+function Library:createAndLoadWorker(workingDirectory)
 	require("preload")
 	local Worker = require("rizu.library.Worker")
-	local worker = Worker(self)
+	local LoveFilesystem = require("fs.LoveFilesystem")
+	local worker = Worker(self, LoveFilesystem(), workingDirectory)
 	worker:load()
 	return worker
 end
 
 function Library:unload()
+	self.worker:unload()
 	if self.tr then
-		self.worker:unload()
 		self.tr:stop()
 	end
 	self.database:unload()
@@ -144,19 +175,30 @@ end
 
 Library.unload = thread.coro(Library.unload)
 
----@param state integer
----@param count integer
----@param current integer
+---@param status rizu.library.TaskStatus
 ---@param errors string[]
-function Library:updateProgress(state, count, current, errors)
-	self.state = state
-	self.chartfiles_count = count
-	self.chartfiles_current = current
+function Library:updateProgress(status, errors)
+	local now = self.getTime()
+	if self.status.stage ~= status.stage then
+		self.stageStartTime = now
+	end
+
+	self.status = status
+
+	local elapsed = self.stageStartTime and (now - self.stageStartTime) or 0
+	if elapsed > 0.5 and status.current > 0 then
+		status.itemsPerSecond = status.current / elapsed
+		if status.total > status.current then
+			status.eta = (status.total - status.current) / status.itemsPerSecond
+		end
+	end
 
 	for _, err in ipairs(errors) do
 		print("Library error: " .. tostring(err))
 		table.insert(self.errors, err)
 	end
+
+	self.onStatusChanged:send(self.status)
 end
 
 ---@param locations_in_collections boolean
@@ -238,14 +280,16 @@ function Library:process()
 	---@type rizu.library.LibraryTask?
 	local task = table.remove(tasks, 1)
 	while task do
-		-- self.database:unload()
-		task.f()
-		-- self.database:load()
+		local ok, err = xpcall(task.f, debug.traceback)
+		if not ok then
+			print("Library Task Error: " .. tostring(err))
+			table.insert(self.errors, tostring(err))
+		end
 
-		self.status:update()
+		self.statusUpdate:update()
 
 		if task.co then
-			assert(coroutine.resume(task.co))
+			coroutine.resume(task.co)
 		end
 
 		task = table.remove(tasks, 1)

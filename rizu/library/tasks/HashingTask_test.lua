@@ -4,6 +4,7 @@ local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local ChartmetaGenerator = require("rizu.library.generators.ChartmetaGenerator")
 local ChartdiffGenerator = require("rizu.library.generators.ChartdiffGenerator")
 local DifficultyModel = require("sphere.models.DifficultyModel")
@@ -13,7 +14,7 @@ local digest = require("digest")
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	db:applyViews()
 	return db

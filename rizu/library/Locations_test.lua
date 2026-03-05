@@ -2,12 +2,13 @@ local Locations = require("rizu.library.Locations")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local FakeFilesystem = require("fs.FakeFilesystem")
 
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	return db
 end

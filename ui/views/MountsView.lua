@@ -180,7 +180,7 @@ function section_draw.database(self)
 	local game = self.game
 	local library = game.library
 
-	local cacheStatus = library.status
+	local cacheStatus = library.statusUpdate
 	imgui.text("metas: " .. cacheStatus.chartmetas)
 	imgui.text("diffs: " .. cacheStatus.chartdiffs)
 	imgui.text("plays: " .. cacheStatus.chartplays)

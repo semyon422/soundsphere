@@ -40,9 +40,7 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 		elseif chartfile_set and typ == "related" then
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
 			discovered_count = discovered_count + 1
-			if discovered_count % 100 == 0 then
-				self.taskContext:checkProgress(1, discovered_count, 0)
-			end
+			self.taskContext:advance(1)
 		elseif chartfile_set and typ == "related_all" then
 			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			chartfile_set = nil
@@ -57,9 +55,7 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 			})
 			chartfile = self:processChartfile(chartfile_set.id, name, modtime)
 			discovered_count = discovered_count + 1
-			if discovered_count % 100 == 0 then
-				self.taskContext:checkProgress(1, discovered_count, 0)
-			end
+			self.taskContext:advance(1)
 		elseif typ == "unrelated_all" then
 			self.chartfilesRepo:deleteChartfiles({set_id = chartfile_set.id, name__notin = name})
 			self.chartfilesRepo:deleteChartfileSets({

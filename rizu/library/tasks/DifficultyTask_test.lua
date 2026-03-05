@@ -2,12 +2,13 @@ local DifficultyTask = require("rizu.library.tasks.DifficultyTask")
 local FakeTaskContext = require("rizu.library.tasks.FakeTaskContext")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local TestChartFactory = require("sea.chart.TestChartFactory")
 
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	return db
 end
@@ -50,7 +51,9 @@ function test.computeMissing(t)
 	local context = FakeTaskContext()
 	context.charts[hash] = {res.chart}
 
-	local task = DifficultyTask(difficultyModel, chartdiffGenerator, chartsRepo, context)
+	local task = DifficultyTask(difficultyModel, chartdiffGenerator, chartsRepo, context, function(hash)
+		return context:getChartsByHash(hash)
+	end)
 
 	task:computeMissing()
 
@@ -102,7 +105,9 @@ function test.cancellation(t)
 		return {{index = 1, layers = {main = {toAbsolute = function() end}}, inputMode = "4key"}}
 	end
 
-	local task = DifficultyTask(difficultyModel, chartdiffGenerator, chartsRepo, context)
+	local task = DifficultyTask(difficultyModel, chartdiffGenerator, chartsRepo, context, function(hash)
+		return context:getChartsByHash(hash)
+	end)
 	task:computeMissing()
 
 	-- Should have processed only 2 charts because check happens at start of loop

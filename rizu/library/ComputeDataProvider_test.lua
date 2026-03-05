@@ -3,12 +3,13 @@ local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local md5 = require("md5")
 
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	return db
 end

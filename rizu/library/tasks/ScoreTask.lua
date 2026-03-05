@@ -1,4 +1,5 @@
 local class = require("class")
+local BatchProcessor = require("rizu.library.tasks.BatchProcessor")
 
 ---@class rizu.library.ScoreTask
 ---@operator call: rizu.library.ScoreTask
@@ -11,39 +12,20 @@ function ScoreTask:new(chartsRepo, chartsComputer, taskContext)
 	self.chartsRepo = chartsRepo
 	self.chartsComputer = chartsComputer
 	self.taskContext = taskContext
+	self.batchProcessor = BatchProcessor(taskContext, 100)
 end
 
 function ScoreTask:computeAll()
-	local chartsRepo = self.chartsRepo
-	local chartsComputer = self.chartsComputer
-	local taskContext = self.taskContext
-
-	local chartplays = chartsRepo:getChartplaysComputed(os.time(), "new", 1e6)
+	local chartplays = self.chartsRepo:getChartplaysComputed(os.time(), "new", 1e6)
 	print("ScoreTask: processing chartplays", #chartplays)
 
-	local count = #chartplays
-	local current = 0
-	taskContext:checkProgress(3, count, current)
-
-	taskContext:dbBegin()
-	for i, chartplay in ipairs(chartplays) do
-		if taskContext:shouldStop() then break end
-		local ret, err = chartsComputer:computeChartplay(chartplay)
+	self.batchProcessor:process(chartplays, "scores", #chartplays, function(chartplay)
+		local ret, err = self.chartsComputer:computeChartplay(chartplay)
 		if not ret then
-			taskContext:addError("ScoreTask: " .. chartplay.replay_hash .. ": " .. tostring(err))
-		else
-			-- Optional: print some summary
-			-- print(stbl.encode(ret.chartplay_computed))
+			error("ScoreTask: " .. chartplay.replay_hash .. ": " .. tostring(err))
 		end
-
-		current = i
-		taskContext:checkProgress(3, count, current)
-		if i % 100 == 0 then
-			taskContext:dbCommit()
-			taskContext:dbBegin()
-		end
-	end
-	taskContext:dbCommit()
+		return chartplay.replay_hash
+	end)
 end
 
 return ScoreTask

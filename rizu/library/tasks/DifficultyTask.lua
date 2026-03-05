@@ -3,6 +3,9 @@ local ModifierModel = require("sphere.models.ModifierModel")
 local SphPreview = require("sph.SphPreview")
 local Sph = require("sph.Sph")
 local ChartDecoder = require("sph.ChartDecoder")
+local BatchProcessor = require("rizu.library.tasks.BatchProcessor")
+
+---@alias rizu.library.ChartProvider fun(hash: string): ncdk2.Chart[]?, string?
 
 ---@class rizu.library.DifficultyTask
 ---@operator call: rizu.library.DifficultyTask
@@ -12,150 +15,93 @@ local DifficultyTask = class()
 ---@param chartdiffGenerator rizu.library.ChartdiffGenerator
 ---@param chartsRepo sea.ChartsRepo
 ---@param taskContext rizu.library.ITaskContext
-function DifficultyTask:new(difficultyModel, chartdiffGenerator, chartsRepo, taskContext)
+---@param chartProvider rizu.library.ChartProvider
+function DifficultyTask:new(difficultyModel, chartdiffGenerator, chartsRepo, taskContext, chartProvider)
 	self.difficultyModel = difficultyModel
 	self.chartdiffGenerator = chartdiffGenerator
 	self.chartsRepo = chartsRepo
 	self.taskContext = taskContext
+	self.chartProvider = chartProvider
+	self.batchProcessor = BatchProcessor(taskContext, 100)
 end
 
 function DifficultyTask:computeMissing()
-	local chartsRepo = self.chartsRepo
-	local taskContext = self.taskContext
+	local scores = self.chartsRepo:getChartplaysMissingChartdiffs()
+	local chartmetas = self.chartsRepo:getChartmetasMissingChartdiffs()
 
-	local scores = chartsRepo:getChartplaysMissingChartdiffs()
-	local chartmetas = chartsRepo:getChartmetasMissingChartdiffs()
-
-	local count = #chartmetas + #scores
-	local current = 0
-	taskContext:checkProgress(2, count, current)
-
-	taskContext:dbBegin()
-	print("DifficultyTask: computing default chartdiffs")
-	for i, chartmeta in ipairs(chartmetas) do
-		if taskContext:shouldStop() then break end
-		local charts_data, err = taskContext:getChartsByHash(chartmeta.hash)
-		if not charts_data then
-			taskContext:addError("DifficultyTask: getChartsByHash error (" .. chartmeta.hash .. "): " .. tostring(err))
-		else
-			local chart = charts_data[chartmeta.index]
-
-			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
-			if ok then
-				local time = os.time()
-				local chartdiff = self.chartdiffGenerator:compute(chart, 1)
-				chartdiff.hash = chartmeta.hash
-				chartdiff.index = chartmeta.index
-				chartsRepo:createUpdateChartdiff(chartdiff, time)
-			else
-				taskContext:addError("DifficultyTask: toAbsolute error (" .. chartmeta.hash .. "): " .. tostring(err))
-			end
-		end
-
-		current = current + 1
-		taskContext:checkProgress(2, count, current)
-		if current % 100 == 0 then
-			taskContext:dbCommit()
-			taskContext:dbBegin()
+	local total = #chartmetas + #scores
+	local i = 0
+	local iterator = function()
+		i = i + 1
+		if i <= #chartmetas then
+			return {type = "default", data = chartmetas[i]}
+		elseif i <= total then
+			return {type = "modified", data = scores[i - #chartmetas]}
 		end
 	end
 
-	print("DifficultyTask: computing modified chartdiffs")
-	for i, score in ipairs(scores) do
-		if taskContext:shouldStop() then break end
-		local charts_data, err = taskContext:getChartsByHash(score.hash)
+	self.batchProcessor:process(iterator, "difficulty", total, function(item)
+		local data = item.data
+		local charts_data, err = self.chartProvider(data.hash)
 		if not charts_data then
-			taskContext:addError("DifficultyTask: getChartsByHash error (" .. score.hash .. "): " .. tostring(err))
+			error("getChartsByHash error (" .. data.hash .. "): " .. tostring(err))
+		end
+		
+		local chart = charts_data[data.index]
+		chart.layers.main:toAbsolute()
+
+		local time = os.time()
+		
+		if item.type == "default" then
+			local chartdiff = self.chartdiffGenerator:compute(chart, 1)
+			chartdiff.hash = data.hash
+			chartdiff.index = data.index
+			self.chartsRepo:createUpdateChartdiff(chartdiff, time)
 		else
-			local chart = charts_data[score.index]
-			local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
-			if ok then
-				ModifierModel:apply(score.modifiers, chart)
-
-				local time = os.time()
-				local chartdiff = self.chartdiffGenerator:compute(chart, score.rate)
-				chartdiff.modifiers = score.modifiers
-				chartdiff.hash = score.hash
-				chartdiff.index = score.index
-
-				chartsRepo:createUpdateChartdiff(chartdiff, time)
-			else
-				taskContext:addError("DifficultyTask: toAbsolute error (" .. score.hash .. "): " .. tostring(err))
-			end
+			ModifierModel:apply(data.modifiers, chart)
+			local chartdiff = self.chartdiffGenerator:compute(chart, data.rate)
+			chartdiff.modifiers = data.modifiers
+			chartdiff.hash = data.hash
+			chartdiff.index = data.index
+			self.chartsRepo:createUpdateChartdiff(chartdiff, time)
 		end
-
-		current = current + 1
-		taskContext:checkProgress(2, count, current)
-		if current % 100 == 0 then
-			taskContext:dbCommit()
-			taskContext:dbBegin()
-		end
-	end
-	taskContext:dbCommit()
+		
+		return data.hash
+	end)
 end
 
 ---@param prefer_preview boolean
 function DifficultyTask:computeIncomplete(prefer_preview)
-	local chartsRepo = self.chartsRepo
-	local taskContext = self.taskContext
-
-	local chartdiffs = chartsRepo:getIncompleteChartdiffs()
-	print("DifficultyTask: processing incomplete", #chartdiffs)
-
-	local count = #chartdiffs
-	local current = 0
-	taskContext:checkProgress(2, count, current)
-
-	taskContext:dbBegin()
-	for i, chartdiff in ipairs(chartdiffs) do
-		if taskContext:shouldStop() then break end
+	local chartdiffs = self.chartsRepo:getIncompleteChartdiffs()
+	
+	self.batchProcessor:process(chartdiffs, "difficulty", #chartdiffs, function(chartdiff)
 		---@type ncdk2.Chart
 		local chart
 
 		local preview = chartdiff.notes_preview
 		if preview and prefer_preview then
-			local ok, err = pcall(function()
-				local lines = SphPreview:decodeLines(preview)
+			local lines = SphPreview:decodeLines(preview)
+			local sph = Sph()
+			sph.metadata.input = assert(chartdiff.inputmode)
+			sph.sphLines:decode(lines)
 
-				local sph = Sph()
-				sph.metadata.input = assert(chartdiff.inputmode)
-				sph.sphLines:decode(lines)
-
-				local decoder = ChartDecoder()
-				chart = decoder:decodeSph(sph)
-			end)
-			if not ok then
-				taskContext:addError("DifficultyTask: preview decode error (" .. chartdiff.hash .. "): " .. tostring(err))
-			end
+			local decoder = ChartDecoder()
+			chart = decoder:decodeSph(sph)
 		else
-			local charts_data, err = taskContext:getChartsByHash(chartdiff.hash)
+			local charts_data, err = self.chartProvider(chartdiff.hash)
 			if not charts_data then
-				taskContext:addError("DifficultyTask: getChartsByHash error (" .. chartdiff.hash .. "): " .. tostring(err))
-			else
-				chart = charts_data[chartdiff.index]
-				local ok, err = xpcall(chart.layers.main.toAbsolute, debug.traceback, chart.layers.main)
-				if not ok then
-					chart = nil
-					taskContext:addError("DifficultyTask: toAbsolute error (" .. chartdiff.hash .. "): " .. tostring(err))
-				else
-					ModifierModel:apply(chartdiff.modifiers, chart)
-				end
+				error("getChartsByHash error (" .. chartdiff.hash .. "): " .. tostring(err))
 			end
+			chart = charts_data[chartdiff.index]
+			chart.layers.main:toAbsolute()
+			ModifierModel:apply(chartdiff.modifiers, chart)
 		end
 
-		if chart then
-			self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
-			chartsRepo:updateChartdiff(chartdiff)
-		end
-
-		current = i
-		taskContext:checkProgress(2, count, current)
-		if i % 100 == 0 then
-			taskContext:dbCommit()
-			taskContext:dbBegin()
-		end
-	end
-	taskContext:dbCommit()
+		self.difficultyModel:compute(chartdiff, chart, chartdiff.rate)
+		self.chartsRepo:updateChartdiff(chartdiff)
+		
+		return chartdiff.hash
+	end)
 end
 
 return DifficultyTask

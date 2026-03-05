@@ -14,7 +14,13 @@ local Persistence = class()
 
 function Persistence:new()
 	self.difficultyModel = DifficultyModel()
-	self.library = Library(self.difficultyModel)
+	local LoveFilesystem = require("fs.LoveFilesystem")
+	self.library = Library(
+		self.difficultyModel,
+		LoveFilesystem(),
+		love.filesystem.getWorkingDirectory(),
+		love.timer.getTime
+	)
 	self.configModel = ConfigModel()
 	self.osudirectModel = OsudirectModel(self.configModel, self.library)
 	self.fileFinder = FileFinder()

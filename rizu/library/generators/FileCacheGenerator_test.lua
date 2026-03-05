@@ -3,6 +3,7 @@ local FileCacheGenerator = require("rizu.library.generators.FileCacheGenerator")
 local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local Database = require("rizu.library.Database")
+local LoveFilesystem = require("fs.LoveFilesystem")
 local Finder = require("rizu.library.Finder")
 local FakeTaskContext = require("rizu.library.tasks.FakeTaskContext")
 local FakeFilesystem = require("fs.FakeFilesystem")
@@ -10,7 +11,7 @@ local FakeFilesystem = require("fs.FakeFilesystem")
 local test = {}
 
 local function setup_db()
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load(":memory:")
 	db:applyViews()
 	return db

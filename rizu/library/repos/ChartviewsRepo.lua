@@ -72,8 +72,9 @@ local _queryAsync = thread.async(function(params)
 	local time = love.timer.getTime()
 	local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
 	local Database = require("rizu.library.Database")
+	local LoveFilesystem = require("fs.LoveFilesystem")
 
-	local db = Database()
+	local db = Database(LoveFilesystem())
 	db:load()
 
 	local self = ChartviewsRepo(db.models)

@@ -12,8 +12,10 @@ local Database = class()
 
 local user_version = 7
 
+---@param fs fs.IFilesystem
 ---@param migrations table?
-function Database:new(migrations)
+function Database:new(fs, migrations)
+	self.fs = fs
 	self.migrations = migrations or {}
 
 	local db = LjsqliteDatabase()
@@ -37,8 +39,8 @@ function Database:load(path)
 	local ver = db:user_version()
 
 	if ver == 0 then
-		db:exec(assert(love.filesystem.read("rizu/library/sql/database.sql")))
-		db:exec(assert(love.filesystem.read("sea/storage/shared/db.sql")))
+		db:exec(assert(self.fs:read("rizu/library/sql/database.sql")))
+		db:exec(assert(self.fs:read("sea/storage/shared/db.sql")))
 		db:user_version(user_version)
 		ver = user_version
 	elseif ver >= 4 then
@@ -55,7 +57,7 @@ function Database:unload()
 end
 
 function Database:applyViews()
-	local sql = assert(love.filesystem.read("rizu/library/sql/views.sql"))
+	local sql = assert(self.fs:read("rizu/library/sql/views.sql"))
 	for _, q in ipairs(sql_util.split_sql(sql)) do
 		self.db:exec(q)
 	end
