@@ -9,31 +9,31 @@ function LocationsRepo:new(models)
 	self.models = models
 end
 
----@return rizu.Location[]
+---@return rizu.library.Location[]
 function LocationsRepo:selectLocations()
 	return self.models.locations:select()
 end
 
 ---@param path string
----@return rizu.Location?
+---@return rizu.library.Location?
 function LocationsRepo:selectLocation(path)
 	return self.models.locations:find({path = assert(path)})
 end
 
 ---@param id integer
----@return rizu.Location?
+---@return rizu.library.Location?
 function LocationsRepo:selectLocationById(id)
 	return self.models.locations:find({id = assert(id)})
 end
 
----@param location rizu.Location
----@return rizu.Location
+---@param location rizu.library.Location
+---@return rizu.library.Location
 function LocationsRepo:insertLocation(location)
 	return self.models.locations:create(location)
 end
 
----@param location rizu.Location
----@return rizu.Location?
+---@param location rizu.library.Location
+---@return rizu.library.Location?
 function LocationsRepo:updateLocation(location)
 	return self.models.locations:update(location, {id = assert(location.id)})
 end

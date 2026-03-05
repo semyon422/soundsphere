@@ -11,7 +11,7 @@ local ChartviewsRepo = class()
 ---@param models rdb.Models
 function ChartviewsRepo:new(models)
 	self.chartviews_count = 0
-	---@type {[integer]: rizu.IChartviewBase}
+	---@type {[integer]: rizu.library.IChartviewBase}
 	self.chartviews = {}
 	self.set_id_to_global_index = {}
 	self.chartfile_id_to_global_index = {}
@@ -185,8 +185,8 @@ function ChartviewsRepo:queryNoteChartSets()
 	self.chartviews_count = c
 end
 
----@param chartview rizu.IChartviewBase
----@return rizu.Chartview[]
+---@param chartview rizu.library.IChartviewBase
+---@return rizu.library.Chartview[]
 function ChartviewsRepo:getChartviewsAtSet(chartview)
 	local params = self.params
 
@@ -232,7 +232,7 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 		order = order,
 	}
 
-	---@type rizu.Chartview[]
+	---@type rizu.library.Chartview[]
 	local objs = model:select(where, options)
 
 	for _, obj in ipairs(objs) do
@@ -242,8 +242,8 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	return objs
 end
 
----@param obj rizu.LocatedChartview
----@return rizu.LocatedChartview
+---@param obj rizu.library.LocatedChartview
+---@return rizu.library.LocatedChartview
 function ChartviewsRepo:_fillRichData(obj)
 	local hash, index = obj.hash, obj.index
 	if hash and index then
@@ -255,8 +255,8 @@ function ChartviewsRepo:_fillRichData(obj)
 	return obj
 end
 
----@param _chartview rizu.IChartviewBase
----@return rizu.Chartview?
+---@param _chartview rizu.library.IChartviewBase
+---@return rizu.library.Chartview?
 function ChartviewsRepo:getChartview(_chartview)
 	local chartfile_id = _chartview.chartfile_id
 	local chartmeta_id = _chartview.chartmeta_id
@@ -273,7 +273,7 @@ function ChartviewsRepo:getChartview(_chartview)
 		model = self.models.chartplayviews
 	end
 
-	---@type rizu.Chartview?
+	---@type rizu.library.Chartview?
 	local obj
 	if chartplay_id then
 		obj = model:find({

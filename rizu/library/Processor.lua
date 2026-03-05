@@ -30,6 +30,7 @@ function Processor:new(db, fs, workingDirectory)
 	self.needStop = false
 	---@type rizu.library.TaskStage
 	self.stage = "idle"
+	---@type string?
 	self.stage_label = nil
 	self.errorCount = 0
 	self.errors = {}

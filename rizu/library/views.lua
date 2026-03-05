@@ -1,0 +1,162 @@
+---@class rizu.library.Location
+---@field id integer
+---@field path string
+---@field name string
+---@field is_relative boolean
+---@field is_internal boolean
+
+---@class rizu.library.IChartviewBase
+---@field chartfile_id integer
+---@field chartfile_set_id integer
+---@field chartmeta_id integer
+---@field chartdiff_id integer
+---@field chartplay_id integer
+---@field lamp boolean?
+
+---@class rizu.library.LocatedChartfile: sea.ClientChartfile
+---@field chartmeta_id integer?
+---@field location_id integer
+---@field set_is_file boolean
+---@field set_dir string?
+---@field set_name string
+---@field chartfile_name string
+---@field dir string -- computed
+---@field path string -- computed
+
+---@class rizu.library.ChartmetaDiffsMissing
+---@field id integer
+---@field hash string
+---@field index integer
+
+---@class rizu.library.Chartview: rizu.library.IChartviewBase
+---@field location_id integer
+---@field set_is_file boolean
+---@field set_dir string?
+---@field set_name string
+---@field dir string -- computed
+---@field path string -- computed
+---@field set_modified_at integer
+---@field chartfile_name string
+---@field modified_at integer
+---@field hash string
+---@field accuracy number?
+---@field miss_count integer?
+---@field chartplay_created_at integer?
+---@field index integer
+---@field inputmode string
+---@field format integer
+---@field chartmeta_timings integer?
+---@field chartmeta_healths integer?
+---@field title string?
+---@field title_unicode string?
+---@field artist string?
+---@field artist_unicode string?
+---@field name string?
+---@field creator string?
+---@field level number?
+---@field source string?
+---@field tags string?
+---@field audio_path string?
+---@field audio_offset number?
+---@field background_path string?
+---@field preview_time number?
+---@field osu_beatmap_id integer?
+---@field osu_beatmapset_id integer?
+---@field tempo number?
+---@field tempo_avg number?
+---@field tempo_max number?
+---@field tempo_min number?
+---@field chartmeta_local_offset number?
+---@field chartmeta_rating number?
+---@field chartmeta_comment string?
+---@field modifiers string
+---@field rate integer
+---@field mode integer
+---@field chartdiff_inputmode string
+---@field duration number
+---@field start_time number
+---@field notes_count integer
+---@field judges_count integer
+---@field long_notes_ratio number
+---@field note_types_count string
+---@field density_data string
+---@field sv_data string
+---@field enps_diff number
+---@field osu_diff number
+---@field msd_diff number
+---@field msd_diff_data string
+---@field msd_diff_rates string
+---@field user_diff number
+---@field user_diff_data string
+---@field notes_preview string
+---@field difficulty number? -- added by repo as alias
+---@field lamp boolean? -- added by repo
+---@field difftable_chartmetas sea.DifftableChartmeta[]? -- enriched by repo
+
+---@class rizu.library.LocatedChartview: rizu.library.Chartview
+---@field location_prefix string
+---@field location_dir string
+---@field location_path string
+---@field real_dir string
+---@field real_path string
+
+---@class rizu.library.Chartplayview: rizu.library.Chartview
+---@field nearest integer
+---@field tap_only integer
+---@field timings integer?
+---@field subtimings integer?
+---@field healths integer?
+---@field columns_order string?
+---@field custom integer
+---@field const integer
+---@field rate_type integer
+
+---@class rizu.library.ChartplayList: rizu.library.Chartview
+---@field chartplay_id integer
+---@field user_id integer
+---@field compute_state integer
+---@field computed_at integer
+---@field submitted_at integer
+---@field replay_hash string
+---@field pause_count integer
+---@field created_at integer
+---@field judges string
+---@field max_combo integer
+---@field not_perfect_count integer
+---@field pass boolean
+---@field rating number
+---@field rating_pp number
+---@field rating_msd number
+
+---@class rizu.library.ChartplayComputable
+---@field id integer
+---@field user_id integer
+---@field compute_state integer
+---@field computed_at integer
+---@field submitted_at integer
+---@field replay_hash string
+---@field pause_count integer
+---@field created_at integer
+---@field hash string
+---@field index integer
+---@field modifiers string
+---@field rate integer
+---@field mode integer
+---@field nearest integer
+---@field tap_only integer
+---@field timings integer?
+---@field subtimings integer?
+---@field healths integer?
+---@field columns_order string?
+---@field custom integer
+---@field const integer
+---@field rate_type integer
+---@field judges string
+---@field accuracy number
+---@field max_combo integer
+---@field miss_count integer
+---@field not_perfect_count integer
+---@field pass boolean
+---@field rating number
+---@field rating_pp number
+---@field rating_msd number

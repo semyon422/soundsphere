@@ -100,7 +100,7 @@ end
 ---@param path string?
 ---@param location_id integer
 ---@param set_id integer?
----@return sea.ClientChartfile[]
+---@return rizu.library.LocatedChartfile[]
 function ChartfilesRepo:selectUnhashedChartfiles(path, location_id, set_id)
 	assert(not (path and set_id))
 	return self.models.located_chartfiles:select({
@@ -124,7 +124,7 @@ function ChartfilesRepo:selectChartfileById(id)
 end
 
 ---@param hash string
----@return sea.ClientChartfile?
+---@return rizu.library.LocatedChartfile?
 function ChartfilesRepo:selectChartfileByHash(hash)
 	return self.models.located_chartfiles:find({hash = assert(hash)})
 end

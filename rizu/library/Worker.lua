@@ -1,7 +1,6 @@
 local class = require("class")
 local Processor = require("rizu.library.Processor")
 local Database = require("rizu.library.Database")
-local LoveFilesystem = require("fs.LoveFilesystem")
 
 ---@class rizu.library.Worker
 ---@operator call: rizu.library.Worker

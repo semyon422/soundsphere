@@ -22,7 +22,7 @@ function Locations:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 	self.status = {}
 	---@type {[integer]: table}
 	self.info = {}
-	---@type rizu.Location[]
+	---@type rizu.library.Location[]
 	self.locations = {}
 end
 
@@ -59,7 +59,7 @@ function Locations:updateLocationInfo(id)
 	}
 end
 
----@param location rizu.Location
+---@param location rizu.library.Location
 function Locations:unmountLocation(location)
 	if not self.mounted[location.id] then
 		return
@@ -68,7 +68,7 @@ function Locations:unmountLocation(location)
 	self.mounted[location.id] = nil
 end
 
----@param location rizu.Location
+---@param location rizu.library.Location
 function Locations:mountLocation(location)
 	local path = location.path
 	if location.is_relative then
@@ -88,7 +88,7 @@ function Locations:mountLocation(location)
 	self.status[location.id] = "errored"
 end
 
----@param location rizu.Location
+---@param location rizu.library.Location
 ---@return string
 function Locations:getPrefix(location)
 	if location.is_relative then
@@ -115,7 +115,7 @@ function Locations:createDefaultLocation()
 	locationsRepo:insertLocation(loc)
 end
 
----@param loc rizu.Location
+---@param loc rizu.library.Location
 ---@param path string
 function Locations:updateLocationPath(loc, path)
 	if not loc or loc.is_internal then

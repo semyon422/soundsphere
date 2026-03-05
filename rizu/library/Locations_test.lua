@@ -3,7 +3,6 @@ local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
 local Database = require("rizu.library.Database")
 local LoveFilesystem = require("fs.LoveFilesystem")
-local FakeFilesystem = require("fs.FakeFilesystem")
 
 local test = {}
 
