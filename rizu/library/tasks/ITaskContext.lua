@@ -8,6 +8,8 @@ local class = require("class")
 ---@field total integer
 ---@field label string?
 ---@field errorCount integer
+---@field itemsPerSecond number?
+---@field eta number?
 
 ---@class rizu.library.TaskFailure
 ---@field item string

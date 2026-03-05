@@ -2,12 +2,10 @@ local thread = require("thread")
 local class = require("class")
 local Observable = require("aqua.Observable")
 local ThreadRemote = require("threadremote.ThreadRemote")
-local LoveFilesystem = require("fs.LoveFilesystem")
 local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")
 local Database = require("rizu.library.Database")
 local Status = require("rizu.library.Status")
-local ChartdiffGenerator = require("rizu.library.generators.ChartdiffGenerator")
 local Collections = require("rizu.library.Collections")
 local Locations = require("rizu.library.Locations")
 local ChartfilesRepo = require("rizu.library.repos.ChartfilesRepo")
@@ -71,11 +69,10 @@ local DifftablesRepo = require("sea.difftables.repos.DifftablesRepo")
 ---@operator call: rizu.library.Library
 local Library = class()
 
----@param difficultyModel sphere.DifficultyModel
 ---@param fs fs.IFilesystem
 ---@param workingDirectory string
 ---@param getTime fun(): number
-function Library:new(difficultyModel, fs, workingDirectory, getTime)
+function Library:new(fs, workingDirectory, getTime)
 	self.fs = fs
 	self.workingDirectory = workingDirectory
 
@@ -111,12 +108,11 @@ function Library:new(difficultyModel, fs, workingDirectory, getTime)
 
 	self.chartsRepo = ChartsRepo(self.database.models)
 	self.difftablesRepo = DifftablesRepo(self.database.models)
-
 	self.chartviewsRepo = ChartviewsRepo(self.database.models)
 	self.locationsRepo = LocationsRepo(self.database.models)
 	self.chartfilesRepo = ChartfilesRepo(self.database.models)
+
 	self.statusUpdate = Status(self.chartfilesRepo, self.chartsRepo)
-	self.chartdiffGenerator = ChartdiffGenerator(self.chartsRepo, difficultyModel)
 	self.collections = Collections(self.chartfilesRepo, self.locationsRepo)
 	self.locations = Locations(
 		self.locationsRepo,
@@ -140,9 +136,9 @@ function Library:setSync(is_sync)
 	self.is_sync = is_sync
 end
 
----@param dbPath string?
-function Library:load(dbPath)
-	self.database:load(dbPath)
+---@param db_path string?
+function Library:load(db_path)
+	self.database:load(db_path)
 	self.statusUpdate:update()
 
 	self.locations:load()
@@ -280,20 +276,15 @@ function Library:process()
 	---@type rizu.library.LibraryTask?
 	local task = table.remove(tasks, 1)
 	while task do
-		local ok, err = xpcall(task.f, debug.traceback)
-		if not ok then
-			print("Library Task Error: " .. tostring(err))
-			table.insert(self.errors, tostring(err))
-		end
-
-		self.statusUpdate:update()
-
+		task.f()
 		if task.co then
-			coroutine.resume(task.co)
+			assert(coroutine.resume(task.co))
 		end
 
 		task = table.remove(tasks, 1)
 	end
+
+	self.statusUpdate:update()
 
 	self.isProcessing = false
 end

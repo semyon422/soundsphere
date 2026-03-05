@@ -16,7 +16,6 @@ function Persistence:new()
 	self.difficultyModel = DifficultyModel()
 	local LoveFilesystem = require("fs.LoveFilesystem")
 	self.library = Library(
-		self.difficultyModel,
 		LoveFilesystem(),
 		love.filesystem.getWorkingDirectory(),
 		love.timer.getTime

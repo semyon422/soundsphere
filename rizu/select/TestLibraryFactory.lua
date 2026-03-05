@@ -1,6 +1,5 @@
 local class = require("class")
 local Library = require("rizu.library.Library")
-local DifficultyModel = require("sphere.models.DifficultyModel")
 local TestChartFactory = require("sea.chart.TestChartFactory")
 
 ---@class rizu.select.TestLibraryFactory
@@ -15,7 +14,7 @@ local LoveFilesystem = require("fs.LoveFilesystem")
 
 function TestLibraryFactory:create()
 	local fs = LoveFilesystem()
-	local lib = Library(DifficultyModel(), fs, love.filesystem.getWorkingDirectory(), function() return 0 end)
+	local lib = Library(fs, love.filesystem.getWorkingDirectory(), function() return 0 end)
 	lib.database:load(":memory:")
 	lib.chartviewsRepo:setSync(true)
 	

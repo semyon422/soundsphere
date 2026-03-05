@@ -27,6 +27,7 @@ function Database:new(fs, migrations)
 	self.migrator = SqliteMigrator(db)
 end
 
+---@param path string?
 function Database:load(path)
 	local db = self.db
 

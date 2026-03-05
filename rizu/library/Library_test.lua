@@ -1,5 +1,4 @@
 local LibraryTestContext = require("rizu.library.LibraryTestContext")
-local BatchProcessor = require("rizu.library.tasks.BatchProcessor")
 
 local test = {}
 
@@ -28,6 +27,7 @@ function test.happy_path(t)
 	end
 
 	t:assert(hashingUpdate, "Should have received hashing update with current=5")
+	---@cast hashingUpdate -?
 	t:eq(hashingUpdate.itemsPerSecond, 5)
 	t:eq(hashingUpdate.eta, 1)
 	t:eq(ctx.lib.status.stage, "idle")
@@ -67,15 +67,21 @@ function test.filesystem_corrupted(t)
 
 	-- Inject a failing fs.read into the existing context
 	local original_read = ctx.fs.read
-	ctx.fs.read = function(self, path)
+	function ctx.fs:read(path)
 		if path:find("%.sql$") then return original_read(self, path) end
 		return nil, "Read permission denied"
 	end
 
+	local chartfile = {
+		path = "junk.sph",
+		name = "junk.sph",
+		hash = "junk",
+	}
+
 	-- Attempt a task that requires reading
 	ctx.lib:addTask(function()
 		local processor = ctx.lib.worker.processor
-		processor.hashingTask:processChartfile({path = "junk.sph", name = "junk.sph", hash = "junk"}, "")
+		processor.hashingTask:processChartfile(chartfile, "")
 		-- Explicitly report to sync status
 		processor.taskContext:report()
 	end)

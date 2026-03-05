@@ -1,31 +1,28 @@
 local class = require("class")
+local table_util = require("table_util")
 local Library = require("rizu.library.Library")
-local DifficultyModel = require("sphere.models.DifficultyModel")
 local LoveFilesystem = require("fs.LoveFilesystem")
 
 ---@class rizu.library.LibraryTestContext
 ---@operator call: rizu.library.LibraryTestContext
 local LibraryTestContext = class()
 
----@param dbPath string?
-function LibraryTestContext:new(dbPath)
+function LibraryTestContext:new()
 	self.currentTime = 0
-	self.getTime = function() return self.currentTime end
 
 	self.fs = LoveFilesystem()
 
-	self.lib = Library(DifficultyModel(), self.fs, "/test", self.getTime)
+	self.lib = Library(self.fs, "/test", function() return self.currentTime end)
 	self.lib:setSync(true)
 
 	self.lib:load(":memory:")
 
+	---@type rizu.library.TaskStatus[]
 	self.statusUpdates = {}
 	self.lib.onStatusChanged:add({
 		receive = function(_, status)
 			-- Deep copy status to record history correctly
-			local copy = {}
-			for k, v in pairs(status) do copy[k] = v end
-			table.insert(self.statusUpdates, copy)
+			table.insert(self.statusUpdates, table_util.deepcopy(status))
 		end,
 	})
 end
