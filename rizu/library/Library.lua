@@ -1,6 +1,6 @@
 local thread = require("thread")
 local class = require("class")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 local ThreadRemote = require("threadremote.ThreadRemote")
 local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
 local LocationsRepo = require("rizu.library.repos.LocationsRepo")

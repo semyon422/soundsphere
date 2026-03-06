@@ -1,5 +1,5 @@
 local class = require("class")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 local CollectionStore = require("rizu.select.stores.CollectionStore")
 
 ---@class rizu.select.CollectionSelector

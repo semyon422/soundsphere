@@ -1,6 +1,6 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 
 ---@class rizu.select.stores.ChartSetStore
 ---@operator call: rizu.select.stores.ChartSetStore

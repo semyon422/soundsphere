@@ -1,6 +1,6 @@
 local class = require("class")
 local path_util = require("path_util")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 
 ---@class rizu.select.stores.ChartStore
 ---@operator call: rizu.select.stores.ChartStore

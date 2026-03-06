@@ -1,7 +1,7 @@
 local class = require("class")
 local string_util = require("string_util")
 local table_util = require("table_util")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 
 ---@class rizu.select.stores.CollectionStore
 ---@operator call: rizu.select.stores.CollectionStore

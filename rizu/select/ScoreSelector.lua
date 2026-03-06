@@ -1,6 +1,6 @@
 local class = require("class")
 local delay = require("delay")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 local ScoreStore = require("rizu.select.stores.ScoreStore")
 local LocalScoreProvider = require("rizu.select.providers.LocalScoreProvider")
 local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")

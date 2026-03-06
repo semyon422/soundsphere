@@ -1,5 +1,5 @@
 local class = require("class")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 
 ---@class rizu.select.SelectionState
 ---@operator call: rizu.select.SelectionState

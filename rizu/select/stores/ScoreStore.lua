@@ -1,7 +1,7 @@
 local thread = require("thread")
 local erfunc = require("libchart.erfunc")
 local class = require("class")
-local Observable = require("aqua.Observable")
+local Observable = require("Observable")
 
 ---@class rizu.select.stores.ScoreStore
 ---@operator call: rizu.select.stores.ScoreStore
