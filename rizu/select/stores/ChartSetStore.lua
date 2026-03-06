@@ -27,7 +27,7 @@ function ChartSetStore:__index(k)
 end
 
 ---@param itemIndex number
----@return rizu.LocatedChartview
+---@return rizu.library.LocatedChartview
 function ChartSetStore:loadObject(itemIndex)
 	local chartviewsRepo = self.library.chartviewsRepo
 
@@ -37,7 +37,7 @@ function ChartSetStore:loadObject(itemIndex)
 		return {}
 	end
 
-	---@cast chartview rizu.LocatedChartview
+	---@cast chartview rizu.library.LocatedChartview
 
 	chartview.lamp = _chartview.lamp
 
@@ -56,7 +56,7 @@ function ChartSetStore:count()
 end
 
 ---@param i number
----@return rizu.LocatedChartview?
+---@return rizu.library.LocatedChartview?
 function ChartSetStore:get(i)
 	if i < 1 or i > self.itemsCount then
 		return nil
@@ -64,7 +64,7 @@ function ChartSetStore:get(i)
 	return self.cache:get(i)
 end
 
----@param chartview rizu.IChartviewBase
+---@param chartview rizu.library.IChartviewBase
 ---@return number
 function ChartSetStore:indexof(chartview)
 	local chartfile_id = chartview.chartfile_id

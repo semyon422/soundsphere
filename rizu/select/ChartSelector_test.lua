@@ -1,8 +1,6 @@
 local ChartSelector = require("rizu.select.ChartSelector")
 local ScoreSelector = require("rizu.select.ScoreSelector")
-local SelectionState = require("rizu.select.SelectionState")
 local TestLibraryFactory = require("rizu.select.TestLibraryFactory")
-local class = require("class")
 
 local test = {}
 
@@ -92,8 +90,6 @@ function test.chart_navigation(t)
 	tlf:populate(library, charts)
 	
 	local fs = {read = function() end, getInfo = function() end}
-	local onlineModel = {authManager = {sea_client = {connected = false}}}
-	local replayBase = {}
 
 	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()

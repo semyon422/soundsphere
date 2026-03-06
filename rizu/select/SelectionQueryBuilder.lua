@@ -6,9 +6,9 @@ local table_util = require("table_util")
 local SelectionQueryBuilder = class()
 
 ---@param configModel sphere.ConfigModel
----@param sortModel sphere.SortModel
----@param searchModel sphere.SearchModel
----@param filterModel sphere.FilterModel
+---@param sortModel rizu.select.SortModel
+---@param searchModel rizu.select.SearchModel
+---@param filterModel rizu.select.FilterModel
 function SelectionQueryBuilder:new(configModel, sortModel, searchModel, filterModel)
 	self.configModel = configModel
 	self.sortModel = sortModel

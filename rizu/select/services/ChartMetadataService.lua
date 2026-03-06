@@ -11,7 +11,7 @@ function ChartMetadataService:new(fs)
 	self.fs = fs
 end
 
----@param chartview rizu.LocatedChartview
+---@param chartview rizu.library.LocatedChartview
 ---@return string?
 function ChartMetadataService:getBackgroundPath(chartview)
 	local name = chartview.chartfile_name
@@ -27,7 +27,7 @@ function ChartMetadataService:getBackgroundPath(chartview)
 	return path_util.join(chartview.location_dir, background_path)
 end
 
----@param chartview rizu.LocatedChartview
+---@param chartview rizu.library.LocatedChartview
 ---@return string? full_path
 ---@return number? preview_time
 ---@return string? mode
@@ -51,7 +51,7 @@ function ChartMetadataService:getAudioPathPreview(chartview)
 	return full_path, preview_time, mode
 end
 
----@param chartview rizu.LocatedChartview
+---@param chartview rizu.library.LocatedChartview
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
 function ChartMetadataService:loadChart(chartview)
@@ -69,7 +69,7 @@ function ChartMetadataService:loadChart(chartview)
 	return t.chart, t.chartmeta
 end
 
----@param chartview rizu.LocatedChartview
+---@param chartview rizu.library.LocatedChartview
 ---@return ncdk2.Chart?
 ---@return sea.Chartmeta?
 function ChartMetadataService:loadChartAbsolute(chartview)
