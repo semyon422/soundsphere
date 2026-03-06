@@ -1,7 +1,6 @@
-local class = require("class")
 local IScoreProvider = require("rizu.select.IScoreProvider")
 
----@class rizu.select.providers.LocalScoreProvider: sphere.IScoreProvider
+---@class rizu.select.providers.LocalScoreProvider: rizu.select.IScoreProvider
 ---@operator call: rizu.select.providers.LocalScoreProvider
 local LocalScoreProvider = IScoreProvider + {}
 
@@ -10,15 +9,16 @@ function LocalScoreProvider:new(library)
 	self.library = library
 end
 
----@param chartview rizu.Chartview
----@param exact boolean
+---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]
-function LocalScoreProvider:getScores(chartview, exact)
-	if exact then
-		return self.library.chartsRepo:getChartplaysForChartdiff(chartview)
-	else
-		return self.library.chartsRepo:getChartplaysForChartmeta(chartview)
-	end
+function LocalScoreProvider:getChartplaysForChartdiff(chartdiff_key)
+	return self.library.chartsRepo:getChartplaysForChartdiff(chartdiff_key)
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]
+function LocalScoreProvider:getChartplaysForChartmeta(chartmeta_key)
+	return self.library.chartsRepo:getChartplaysForChartmeta(chartmeta_key)
 end
 
 return LocalScoreProvider

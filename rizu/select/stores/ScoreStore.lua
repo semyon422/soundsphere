@@ -13,8 +13,8 @@ ScoreStore.scoreSources = {
 }
 
 ---@param configModel sphere.ConfigModel
----@param localProvider sphere.IScoreProvider
----@param onlineProvider sphere.IScoreProvider
+---@param localProvider rizu.select.IScoreProvider
+---@param onlineProvider rizu.select.IScoreProvider
 function ScoreStore:new(configModel, localProvider, onlineProvider)
 	self.configModel = configModel
 	self.localProvider = localProvider
@@ -88,7 +88,15 @@ function ScoreStore:updateItemsAsync(chartview, exact)
 	local select = self.configModel.configs.select
 	local provider = select.scoreSourceName == "online" and self.onlineProvider or self.localProvider
 
-	self.items = self:filterScores(provider:getScores(chartview, exact or false))
+	---@type sea.Chartplay[]
+	local chartplays
+	if exact then
+		chartplays = provider:getChartplaysForChartdiff(chartview)
+	else
+		chartplays = provider:getChartplaysForChartmeta(chartview)
+	end
+
+	self.items = self:filterScores(chartplays)
 	self.onChanged:send({items = self.items})
 end
 
