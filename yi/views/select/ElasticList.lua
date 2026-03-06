@@ -5,6 +5,7 @@ local View = require("yi.views.View")
 ---@field flex_values number[]
 local ElasticList = View + {}
 
+ElasticList.id = "ElasticList"
 ElasticList.SelectedWidth = 150
 ElasticList.UnselectedWidth = 50
 ElasticList.Gap = 10

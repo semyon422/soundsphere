@@ -16,7 +16,7 @@ function Menu:load()
 		id = "menu",
 		w = "100%",
 		h = "100%",
-		arrange = "flex_col",
+		arrange = "flow_col",
 		justify_content = "center",
 		align_items = "center",
 		keyboard = true,

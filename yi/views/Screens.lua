@@ -11,6 +11,7 @@ local Screens = View + {}
 
 function Screens:new()
 	View.new(self)
+	self.id = "screens"
 	self:setWidth("100%")
 	self:setHeight("100%")
 

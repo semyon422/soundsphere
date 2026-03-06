@@ -155,7 +155,7 @@ function test.layout_update_on_removal(t)
 	engine.root.layout_box:setHeight(1000)
 
 	local container = engine.root:add(MockView())
-	container.layout_box:setArrange(LayoutBox.Arrange.FlexRow)
+	container.layout_box:setArrange(LayoutBox.Arrange.FlowRow)
 	container.layout_box:setWidth(200)
 	container.layout_box:setHeight(100)
 
@@ -219,7 +219,7 @@ function test.arranges(t)
 	engine.root.layout_box:setAlignItems(LayoutBox.AlignItems.Start)
 
 	local container = engine.root:add(MockView())
-	container.layout_box:setArrange(LayoutBox.Arrange.FlexCol)
+	container.layout_box:setArrange(LayoutBox.Arrange.FlowCol)
 
 	local n1 = container:add(MockView())
 	local n2 = container:add(MockView())

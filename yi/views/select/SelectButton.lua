@@ -5,10 +5,10 @@ local Colors = require("yi.Colors")
 ---@overload fun(): yi.Button
 ---@field callback function?
 ---@field icon string?
----@field text string?
+---@field active boolean?
 local SelectButton = View + {}
 
-local GAP = 5
+SelectButton.id = "SelectButton"
 
 function SelectButton:load()
 	View.load(self)
@@ -16,11 +16,8 @@ function SelectButton:load()
 
 	local res = self:getResources()
 	self.icon_batch = love.graphics.newText(res:getFont("icons", 24), self.icon)
-	self.text_batch = love.graphics.newText(res:getFont("bold", 16), self.text)
 	self.icon_x = 0
 	self.icon_y = 0
-	self.text_x = 0
-	self.text_y = 0
 end
 
 function SelectButton:updateTransforms()
@@ -28,15 +25,9 @@ function SelectButton:updateTransforms()
 	local w, h = self:getCalculatedWidth(), self:getCalculatedHeight()
 
 	local iw, ih = self.icon_batch:getDimensions()
-	local tw, th = self.text_batch:getDimensions()
 
-	local gap = (iw > 0 and tw > 0) and GAP or 0
-	local total_w = iw + gap + tw
-	self.icon_x = math.floor((w - total_w) / 2)
+	self.icon_x = math.floor((w - iw) / 2)
 	self.icon_y = math.floor((h - ih) / 2)
-
-	self.text_x = self.icon_x + iw + gap
-	self.text_y = math.floor((h - th) / 2)
 end
 
 function SelectButton:onMouseDown(_)
@@ -49,28 +40,28 @@ end
 function SelectButton:draw()
 	local w, h = self:getCalculatedWidth(), self:getCalculatedHeight()
 
-	local bg_color = self.mouse_over and Colors.button_hover or Colors.button
-	local border_color = self.mouse_over and Colors.accent or Colors.outline
-	local border_width = self.mouse_over and 2 or 1
+	local bg_color = self.active and Colors.accent or (self.mouse_over and Colors.button_hover or Colors.button)
+	local border_color = self.active and Colors.accent or (self.mouse_over and Colors.accent or Colors.outline)
+	local border_width = (self.active or self.mouse_over) and 2 or 1
+	local icon_color = self.active and {0, 0, 0, 1} or Colors.text
 
 	love.graphics.setColor(bg_color)
 	love.graphics.rectangle("fill", 0, 0, w, h, 4, 4)
 
 	love.graphics.setLineWidth(border_width)
 	love.graphics.setColor(border_color)
-	if self.mouse_over then
+	if self.active or self.mouse_over then
 		love.graphics.rectangle("line", 1, 1, w - 2, h - 2, 4, 4)
 	end
 
-	love.graphics.setColor(Colors.text)
+	love.graphics.setColor(icon_color)
 	love.graphics.draw(self.icon_batch, self.icon_x, self.icon_y)
-	love.graphics.draw(self.text_batch, self.text_x, self.text_y)
 end
 
 SelectButton.Setters = setmetatable({
 	callback = true,
 	icon = true,
-	text = true,
+	active = true,
 }, {__index = View.Setters})
 
 return SelectButton

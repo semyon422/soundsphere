@@ -4,6 +4,8 @@ local ElasticList = require("yi.views.select.ElasticList")
 ---@operator call: yi.ChartGrid
 local ChartGrid = ElasticList + {}
 
+ChartGrid.id = "ChartGrid"
+
 function ChartGrid:load()
 	ElasticList.load(self)
 	self.select_model = self:getGame().selectModel

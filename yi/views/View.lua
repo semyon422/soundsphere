@@ -302,20 +302,14 @@ function View:setMaxHeight(v)
 	self.layout_box:setMaxHeight(v)
 end
 
----@param v "absolute" | "flex_row" | "flex_col" | "wrap_row" | "wrap_col" | "stack"
+---@param v "flow_row" | "flow_col" | "stack"  
 function View:setArrange(v)
 	local arrange = Arrange.Stack
 
-	if v == "absolute" then
-		arrange = Arrange.Absolute
-	elseif v == "flex_row" then
-		arrange = Arrange.FlexRow
-	elseif v == "flex_col" then
-		arrange = Arrange.FlexCol
-	elseif v == "wrap_row" then
-		arrange = Arrange.WrapRow
-	elseif v == "wrap_col" then
-		arrange = Arrange.WrapCol
+	if v == "flow_row" then
+		arrange = Arrange.FlowRow
+	elseif v == "flow_col" then
+		arrange = Arrange.FlowCol
 	elseif v == "stack" then
 		arrange = Arrange.Stack
 	end
@@ -404,11 +398,6 @@ end
 ---@param v [number, number, number, number]
 function View:setMargins(v)
 	self.layout_box:setMargins(v)
-end
-
----@param v number
-function View:setGrow(v)
-	self.layout_box:setGrow(v)
 end
 
 ---@param x number
@@ -520,7 +509,7 @@ View.Setters = {
 	padding = View.setPaddings,
 	margin = View.setMargins,
 
-	-- Flex
+	-- Flow
 	reversed = View.setReversed,
 	gap = View.setChildGap,
 	line_gap = View.setLineGap,
@@ -528,7 +517,6 @@ View.Setters = {
 	align_self = View.setAlignSelf,
 	justify_content = View.setJustifyContent,
 	justify_self = View.setJustifySelf,
-	grow = View.setGrow,
 
 	-- View
 	handles_mouse_input = true,

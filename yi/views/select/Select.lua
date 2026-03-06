@@ -2,13 +2,12 @@ local View = require("yi.views.View")
 local Label = require("yi.views.Label")
 local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.select.ChartSetList")
+local ArtistTitle = require("yi.views.shared.ArtistTitle")
 local Image = require("yi.views.Image")
-local Tag = require("yi.views.select.Tag")
+local Tag = require("yi.views.shared.Tag")
 local Colors = require("yi.Colors")
 local ChartGrid = require("yi.views.select.ChartGrid")
-local TabContainer = require("yi.views.components.TabContainer")
 local Textbox = require("yi.views.components.Textbox")
-local Button = require("yi.views.components.Button")
 local SelectButton = require("yi.views.select.SelectButton")
 local h = require("yi.h")
 
@@ -21,32 +20,30 @@ local ImGuiFilters = require("ui.views.SelectView.FiltersView")
 
 local ModifierEncoder = require("sphere.models.ModifierEncoder")
 local ModifierModel = require("sphere.models.ModifierModel")
+local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
 ---@class yi.Select : yi.Screen
 ---@overload fun(): yi.Select
 local Select = Screen + {}
 
-local info_side = {
-	arrange = "flex_col",
-	justify_content = "space_between",
-	padding = {20, 20, 20, 20},
-}
+Select.id = "Select"
 
 local cell = {
 	min_w = 180,
-	arrange = "wrap_row",
+	arrange = "flow_row",
 	gap = 10,
 	align_items = "center"
 }
 
 local buttons = {
+	id = "buttons",
 	w = 64,
 	h = "100%",
 	align_self = "end",
 	align_items = "center",
-	arrange = "wrap_col",
+	justify_content = "space_between",
+	arrange = "flow_col",
 	padding = {15, 0, 20, 0},
-	gap = 15,
 	background_color = Colors.header_footer
 }
 
@@ -56,8 +53,10 @@ function Select:load()
 	self.select_controller = game.selectController
 	self.select_model = game.selectModel
 
+	self.chart_preview_view = ChartPreviewView(self:getGame())
+	self.chart_preview_view:load()
+
 	self:setup({
-		id = "select",
 		keyboard = true,
 		w = "100%",
 		h = "100%",
@@ -76,13 +75,12 @@ function Select:load()
 
 	self.ranked_tag = Tag()
 	self.chart_format_tag = Tag()
-	self.title = Label(res:getFont("black", 58), "LOADING...")
-	self.artist = Label(res:getFont("bold", 46), "LOADING...")
+	self.artist_title = ArtistTitle()
 	self.chart_grid = ChartGrid()
 
 	self.patterns = Label(res:getFont("bold", 24), "Loading...\nLoading...")
 	self.rate_const = Label(res:getFont("bold", 24), "1.00x")
-	self.difficulty_calc = Label(res:getFont("bold", 16), "Loading...")
+	self.difficulty_calc = Label(res:getFont("regular", 16), "Loading...")
 	self.difficulty = Label(res:getFont("black", 72), "??.?")
 	self.mods = Label(res:getFont("black", 36), "Loading...")
 	self.score_system = Label(res:getFont("bold", 24), "Loading...")
@@ -100,16 +98,21 @@ function Select:load()
 		h(Image(gradient), {w = "100%", h = "100%", color = Colors.panels}),
 
 		h(View(), buttons, {
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
+			h(View(), {arrange = "flow_col", align_items = "center", gap = 15}, {
+				h(SelectButton(), {w = 45, h = 45, icon = "", active = true}),
+				h(SelectButton(), {w = 45, h = 45, icon = ""}),
+				h(SelectButton(), {w = 45, h = 45, icon = ""}),
 
-			h(View(), {w = "60%", h = 2, background_color = Colors.br}),
+				h(View(), {w = "60%", h = 2, background_color = Colors.br}),
 
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
-			h(SelectButton(), {w = 45, h = 45, icon = ""}),
-			h(SelectButton(), {w = 45, h = 45, icon = ""})
+				h(SelectButton(), {w = 45, h = 45, callback = open_config, icon = ""}),
+				h(SelectButton(), {w = 45, h = 45, callback = open_mods, icon = ""}),
+				h(SelectButton(), {w = 45, h = 45, callback = open_inputs, icon = ""}),
+				h(SelectButton(), {w = 45, h = 45, callback = open_skins, icon = ""}),
+				h(SelectButton(), {w = 45, h = 45, callback = open_filters, icon = ""}),
+			}),
+
+			h(SelectButton(), {w = 45, h = 45, callback = play, icon = ""}),
 		}),
 
 		h(View(), {w = 2, h = "100%", align_self = "end", margin = {0, 64, 0, 0}, background_color = Colors.br}),
@@ -118,67 +121,66 @@ function Select:load()
 		h(Textbox("", "Search songs...", function() end), {margin = {20, 20, 0, 0}, x = -64, w = 500, align_self = "end"}),
 
 		h(View(), {w = "100%", padding = {20, 20, 20, 20}}, {
-			h(View(), {arrange = "wrap_row", gap = 10}, {
+			h(View(), {arrange = "flow_row", gap = 10}, {
 				self.ranked_tag,
 				self.chart_format_tag
 			}),
 		}),
 
-		h(View(), {w = "70%", h = "100%", padding = {20, 20, 20, 20}}, {
-			h(View(), {arrange = "wrap_col", gap = 20, y = 50}, {
-				h(View(), {arrange = "wrap_col", w = 999999}, {
-					h(self.title),
-					h(self.artist, {y = -5, color = Colors.lines}),
-				}),
+		h(View(), {id = "top_left", w = "70%", h = "100%", padding = {20, 20, 20, 20}}, {
+			h(View(), {arrange = "flow_col", gap = 20, y = 50}, {
+				h(self.artist_title, {w = "100%"}),
 				h(self.chart_grid, {w = "100%", h = 70}),
-			}),
-
-			h(View(), {arrange = "wrap_col", gap = 20, justify_self = "end"}, {
-				h(View(), {arrange = "wrap_row", gap = 20, line_gap = 20}, {
-					h(View(), {w = 180, arrange = "wrap_col"}, {
-						h(self.difficulty_calc, {color = Colors.lines}),
-						h(self.difficulty, {color = Colors.text}),
-					}),
-					h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
-					h(View(), {w = 2, height = 80, background_color = Colors.br, align_self = "end", y = -12}),
-					h(View(), {arrange = "wrap_col", justify_content = "end"}, {
-						h(Label(res:getFont("bold", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
-						h(View(), {arrange = "wrap_row", gap = 10, align_items = "end"}, {
-							h(self.mods, {y = -8}),
-							h(self.rate_const, {y = -12, color = Colors.accent}),
-							h(self.score_system, {y = -12, color = Colors.lines}),
-						})
-					})
-				}),
-				h(View(), {w = 900, h = 2, background_color = Colors.br}),
-				h(View(), {arrange = "wrap_row", gap = 20}, {
-					h(View(), cell, {
-						h(Label(res:getFont("bold", 16), "DURATION"), {color = Colors.lines}),
-						self.duration,
-					}),
-					h(View(), cell, {
-						h(Label(res:getFont("bold", 16), "NOTES"), {color = Colors.lines}),
-						self.notes,
-					}),
-					h(View(), cell, {
-						h(Label(res:getFont("bold", 16), "MODE"), {color = Colors.lines}),
-						self.gamemode,
-					}),
-					h(View(), cell, {
-						h(Label(res:getFont("bold", 16), "TEMPO"), {color = Colors.lines}),
-						self.bpm,
-					}),
-					h(View(), cell, {
-						h(Label(res:getFont("bold", 16), "LN"), {color = Colors.lines}),
-						self.ln_percent,
-					}),
-				})
 			}),
 		}),
 
-		h(View(), {arrange = "wrap_col", align_self = "end", justify_self = "end", align_items = "end", gap = 10, padding = {0, 20, 20, 0}, x = -64}, {
-			h(View(), {arrange = "wrap_row", gap = 20, align_items = "center"}, {
-				h(View(), {arrange = "wrap_col"}, {
+		h(View(), {id = "bottom_left", arrange = "flow_col", gap = 20, justify_self = "end", padding = {20, 20, 20, 20}}, {
+			h(View(), {arrange = "flow_row", gap = 20, line_gap = 20}, {
+				h(View(), {w = 180, arrange = "flow_col"}, {
+					h(self.difficulty_calc, {color = Colors.lines}),
+					h(self.difficulty, {color = Colors.text}),
+				}),
+				h(self.patterns, {w = 180, align = "right", align_self = "end", y = -12}),
+				h(View(), {w = 2, height = 80, background_color = Colors.br, align_self = "end", y = -12}),
+				h(View(), {arrange = "flow_col", justify_content = "end"}, {
+					h(Label(res:getFont("regular", 16), "MODIFIERS"), {color = Colors.lines, y = -8}),
+					h(View(), {arrange = "flow_row", gap = 10, align_items = "end"}, {
+						h(self.mods, {y = -8}),
+						h(self.rate_const, {y = -12, color = Colors.accent}),
+						h(self.score_system, {y = -12, color = Colors.lines}),
+					})
+				})
+			}),
+
+			h(View(), {w = 900, h = 2, background_color = Colors.br}),
+
+			h(View(), {arrange = "flow_row", gap = 20}, {
+				h(View(), cell, {
+					h(Label(res:getFont("regular", 16), "DURATION"), {color = Colors.lines}),
+					self.duration,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("regular", 16), "NOTES"), {color = Colors.lines}),
+					self.notes,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("regular", 16), "MODE"), {color = Colors.lines}),
+					self.gamemode,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("regular", 16), "TEMPO"), {color = Colors.lines}),
+					self.bpm,
+				}),
+				h(View(), cell, {
+					h(Label(res:getFont("regular", 16), "LN"), {color = Colors.lines}),
+					self.ln_percent,
+				}),
+			})
+		}),
+
+		h(View(), {id = "bottom_right", arrange = "flow_col", align_self = "end", justify_self = "end", align_items = "end", gap = 10, padding = {0, 20, 20, 0}, x = -64}, {
+			h(View(), {arrange = "flow_row", gap = 20, align_items = "center"}, {
+				h(View(), {arrange = "flow_col"}, {
 					h(Label(res:getFont("black", 24), "Guest"), {align = "right"}),
 					h(Label(res:getFont("bold", 16), "#5 • 93.56%"), {align = "right"})
 				}),
@@ -186,7 +188,6 @@ function Select:load()
 				h(Image(avatar_frame), {w = player_info_h, h = player_info_h}),
 			})
 		}),
-
 	})
 end
 
@@ -205,7 +206,12 @@ end
 
 function Select:update(_)
 	self.select_controller:update()
+	self.chart_preview_view:update(dt)
 	self:observeGameMutations()
+end
+
+function Select:draw()
+	self.chart_preview_view:draw()
 end
 
 function Select:onKeyDown(e)
@@ -344,9 +350,7 @@ function Select:updateChartview()
 	end
 
 	self.chart_format_tag:setText((chartview.format or "unknown"):upper())
-
-	self.title:setText(chartview.title)
-	self.artist:setText(chartview.artist)
+	self.artist_title:setChartview(chartview)
 
 	local input_mode = chartview.inputmode:gsub("key", "K"):gsub("scratch", "S")
 	self.gamemode:setText(input_mode)
@@ -464,6 +468,7 @@ end
 
 function Select:receive(event)
 	self.select_controller:receive(event)
+	self.chart_preview_view:receive(event)
 end
 
 return Select

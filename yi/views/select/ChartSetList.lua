@@ -5,6 +5,8 @@ local Colors = require("yi.Colors")
 ---@overload fun(): yi.ChartSetList
 local ChartSetList = ScrollList + {}
 
+ChartSetList.id = "ChartSetList"
+
 function ChartSetList:load()
 	ScrollList.load(self)
 	local res = self:getResources()
