@@ -23,10 +23,12 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 	local iterator = self.finder:iter(location_prefix, root_dir)
 	local chartfile_set, chartfile
 	local discovered_count = 0
+	local iterations = 0
 
 	local typ, dir, name, modtime = iterator()
 	while typ do
-		if self.taskContext:shouldStop() then break end
+		iterations = iterations + 1
+		if iterations % 1000 == 0 and self.taskContext:shouldStop() then break end
 
 		local res
 		if name and typ == "related_dir" then
@@ -99,7 +101,8 @@ function FileCacheGenerator:scan(root_dir, location_id, location_prefix)
 	if not root_dir then
 		local tdirs = self.chartfilesRepo:selectChartfileSetsDirs(location_id)
 		for _, tdir in ipairs(tdirs) do
-			if self.taskContext:shouldStop() then break end
+			iterations = iterations + 1
+			if iterations % 1000 == 0 and self.taskContext:shouldStop() then break end
 			if tdir.dir then
 				local dir = path_util.join(location_prefix, tdir.dir)
 				if not self.finder.fs:getInfo(dir) then
