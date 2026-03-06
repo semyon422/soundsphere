@@ -26,7 +26,7 @@ end
 
 ---@return number
 function ChartSetList:getItemCount()
-	return self.select_model.noteChartSetLibrary:count()
+	return self.select_model.chartSetStore:count()
 end
 
 ---@return number
@@ -42,7 +42,7 @@ end
 local x_indent = 15
 
 function ChartSetList:drawItem(index, y, is_selected)
-	local item = self.select_model.noteChartSetLibrary:get(index)
+	local item = self.select_model.chartSetStore:get(index)
 	if not item then
 		return
 	end

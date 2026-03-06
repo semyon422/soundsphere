@@ -380,7 +380,7 @@ local function GroupCheckbox(self)
 
 	love.graphics.translate(w - h / 6, 0)
 
-	local count = self.game.chartSelector.noteChartSetLibrary:count()
+	local count = self.game.chartSelector.chartSetStore:count()
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 

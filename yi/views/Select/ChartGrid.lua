@@ -15,7 +15,7 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	return self.select_model.noteChartLibrary.items
+	return self.select_model.chartStore.items
 end
 
 ---@return integer
