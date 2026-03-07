@@ -6,25 +6,22 @@ local SortModel = class()
 
 ---@param name string
 ---@return table
----@return boolean
 function SortModel:getOrder(name)
-	local order = self.orders[name] or self.orders.id
-	return order[1], order[2]
+	return self.orders[name] or self.orders.id
 end
 
--- 2nd value = isCollapseAllowed (group by chartfile_set_id)
 SortModel.orders = {
-	id = {{}, true},
-	title = {{"title", "artist"}, true},
-	artist = {{"artist", "title"}, true},
-	difficulty = {{"difficulty", "name"}, false},
-	level = {{"level"}, false},
-	["notes count"] = {{"notes_count"}, false},
-	duration = {{"duration"}, false},
-	tempo = {{"tempo"}, false},
-	modtime = {{"modified_at"}, false},
-	["set modtime"] = {{"set_modified_at"}, true},
-	["last played"] = {{"chartplay_created_at"}, false},
+	id = {},
+	title = {"title", "artist"},
+	artist = {"artist", "title"},
+	difficulty = {"difficulty", "name"},
+	level = {"level"},
+	["notes count"] = {"notes_count"},
+	duration = {"duration"},
+	tempo = {"tempo"},
+	modtime = {"modified_at"},
+	["set modtime"] = {"set_modified_at"},
+	["last played"] = {"chartplay_created_at"},
 }
 
 SortModel.name = "title"

@@ -31,6 +31,9 @@ When grouping at a coarser level, the data for finer levels must be picked accor
 - **Default Chartdiff for a Meta:** The **base** difficulty (modifiers = '', rate = 1.0).
 - **Default Chartplay for a Diff:** The **latest** play (highest `created_at` or `id`).
 
+### Aggregated Sorting
+All sort functions are supported for grouped views. When sorting a grouped list by a specific attribute (e.g., difficulty, tempo, duration), the **maximum value** within each group is used for sorting and display. For example, in `metas-diffs` mode, sorting the primary meta list by difficulty will use the highest difficulty among all diffs for each meta.
+
 #### Examples:
 | Primary Mode | Secondary Mode | Filter Level | Group Level | User Experience |
 | :--- | :--- | :--- | :--- | :--- |

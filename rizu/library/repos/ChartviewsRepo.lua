@@ -223,16 +223,34 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 	end
 
 	if level < LEVELS.chartplays then
-		table_util.append(columns, {
+		columns = {
+			level >= LEVELS.chartfiles and "chartfile_id" or "MIN(chartfile_id) AS chartfile_id",
+			"chartfile_set_id",
+			level >= LEVELS.chartmetas and "chartmeta_id" or "MIN(chartmeta_id) AS chartmeta_id",
+			level >= LEVELS.chartdiffs and "chartdiff_id" or "MIN(chartdiff_id) AS chartdiff_id",
+			level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
+			"location_id", "set_is_file", "set_dir", "set_name", "set_modified_at",
+			"chartfile_name", "MAX(modified_at) AS modified_at", "hash",
+			"`index`", "inputmode", "format", "chartmeta_timings", "chartmeta_healths",
+			"title", "title_unicode", "artist", "artist_unicode", "name", "creator",
+			"MAX(level) AS level", "source", "tags", "audio_path", "audio_offset", "background_path",
+			"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
+			"MAX(tempo) AS tempo", "tempo_avg", "tempo_max", "tempo_min",
+			"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
+			"modifiers", "rate", "mode", "chartdiff_inputmode", "MAX(duration) AS duration", "start_time",
+			"MAX(notes_count) AS notes_count", "judges_count", "long_notes_ratio", "note_types_count",
+			"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
+			"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
 			"MIN(accuracy) AS accuracy",
 			"MIN(miss_count) AS miss_count",
 			"MAX(chartplay_created_at) AS chartplay_created_at",
-			"difficulty", -- taken from row satisfying MIN(chartmeta_id) or similar
-		})
+			"MAX(difficulty) AS difficulty",
+		}
 		if params.lamp then
 			table.insert(columns, "MAX(lamp) AS lamp")
 		end
 	else
+		table_util.append(columns, base_columns)
 		table_util.append(columns, {
 			"accuracy", "miss_count", "chartplay_created_at", "difficulty"
 		})
@@ -246,11 +264,16 @@ end
 
 function ChartviewsRepo:queryNoteChartSets()
 	local params = self.params
-	local mode = params.primary_mode or "chartmetas"
-	local model = self:_getDynamicViewModel(params, mode, false)
-	local view_group = LEVEL_GROUPS[mode]
+	local primary_mode = params.primary_mode or "chartmetas"
+	local secondary_mode = params.secondary_mode or "chartmetas"
 
-	local columns = self:_getColumns(mode, params, false)
+	-- Use finer mode for subquery to allow correct aggregation of underlying items
+	local subquery_mode = LEVELS[secondary_mode] > LEVELS[primary_mode] and secondary_mode or primary_mode
+	local model = self:_getDynamicViewModel(params, subquery_mode, false)
+
+	local view_group = LEVEL_GROUPS[primary_mode]
+
+	local columns = self:_getColumns(primary_mode, params, false)
 	local where = table_util.copy(params.where)
 
 	local options = {

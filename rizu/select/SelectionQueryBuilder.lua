@@ -27,11 +27,7 @@ function SelectionQueryBuilder:build(config, collectionItem)
 	local secondary_mode = settings_select.secondary_mode or "chartmetas"
 
 	-- Sorting
-	local order, group_allowed = self.sortModel:getOrder(config.sortFunction)
-
-	if not group_allowed and primary_mode == "chartfile_sets" then
-		primary_mode = "chartmetas"
-	end
+	local order = self.sortModel:getOrder(config.sortFunction)
 
 	params.order = table_util.copy(order)
 	table.insert(params.order, "chartmeta_id")
