@@ -8,10 +8,29 @@ local Gamemode = require("sea.chart.Gamemode")
 local Modifiers = require("sea.storage.server.Modifiers")
 local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
 local MsdDiffRates = require("sphere.models.DifficultyModel.MsdDiffRates")
+local QueryFragments = require("rizu.library.sql.QueryFragments")
 
+---@type rdb.ModelOptions
 local chartviews = {}
 
-chartviews.table_name = "chartviews"
+chartviews.subquery = "SELECT "
+	.. QueryFragments.FIELDS_IDS .. ", "
+	.. QueryFragments.FIELDS_CHARTPLAY_AGGREGATED .. ", "
+	.. QueryFragments.FIELDS_CHARTFILE_SET .. ", "
+	.. QueryFragments.FIELDS_CHARTFILE .. ", "
+	.. QueryFragments.FIELDS_CHARTMETA .. ", "
+	.. QueryFragments.FIELDS_CHARTMETA_USER_DATA .. ", "
+	.. QueryFragments.FIELDS_CHARTDIFF .. ", "
+	.. QueryFragments.FIELDS_CHARTDIFF_PREVIEW
+	.. QueryFragments.JOINS_CHARTFILES_METAS_SETS
+	.. QueryFragments.JOINS_CHARTDIFF_DEFAULT
+	.. QueryFragments.JOINS_CHARTPLAY
+	.. [[
+GROUP BY
+chartfile_set_id,
+chartfile_id,
+chartmeta_id
+]]
 
 chartviews.types = {
 	lamp = "boolean",

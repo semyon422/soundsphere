@@ -11,10 +11,36 @@ local IntegerArray = require("sea.storage.server.IntegerArray")
 local IntegerArrayOptional = require("sea.storage.server.IntegerArrayOptional")
 local MsdDiffData = require("sphere.models.DifficultyModel.MsdDiffData")
 local MsdDiffRates = require("sphere.models.DifficultyModel.MsdDiffRates")
+local QueryFragments = require("rizu.library.sql.QueryFragments")
 
+---@type rdb.ModelOptions
 local chartplayviews = {}
 
-chartplayviews.table_name = "chartplayviews"
+chartplayviews.subquery = "SELECT "
+	.. QueryFragments.FIELDS_IDS .. ", "
+	.. QueryFragments.FIELDS_CHARTPLAY_STAT .. ", "
+	.. QueryFragments.FIELDS_CHARTFILE_SET .. ", "
+	.. QueryFragments.FIELDS_CHARTFILE .. ", "
+	.. QueryFragments.FIELDS_CHARTPLAY .. ", "
+	.. QueryFragments.FIELDS_CHARTMETA .. ", "
+	.. QueryFragments.FIELDS_CHARTMETA_USER_DATA .. ", "
+	.. QueryFragments.FIELDS_CHARTDIFF .. ", "
+	.. QueryFragments.FIELDS_CHARTDIFF_PREVIEW
+	.. QueryFragments.JOINS_CHARTFILES_METAS_SETS
+	.. QueryFragments.JOINS_CHARTDIFF
+	.. [[
+INNER JOIN chartplays ON
+chartmetas.hash = chartplays.hash AND
+chartmetas.`index` = chartplays.`index` AND
+chartdiffs.modifiers = chartplays.modifiers AND
+chartdiffs.rate = chartplays.rate
+GROUP BY
+chartfile_set_id,
+chartfile_id,
+chartmeta_id,
+chartdiff_id,
+chartplay_id
+]]
 
 chartplayviews.types = {
 	lamp = "boolean",

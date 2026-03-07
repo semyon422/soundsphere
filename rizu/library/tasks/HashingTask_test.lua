@@ -16,7 +16,6 @@ local test = {}
 local function setup_db()
 	local db = Database(LoveFilesystem())
 	db:load(":memory:")
-	db:applyViews()
 	return db
 end
 

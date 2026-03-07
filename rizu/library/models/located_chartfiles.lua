@@ -1,8 +1,21 @@
 local path_util = require("path_util")
+local QueryFragments = require("rizu.library.sql.QueryFragments")
 
+---@type rdb.ModelOptions
 local located_chartfiles = {}
 
-located_chartfiles.table_name = "located_chartfiles"
+located_chartfiles.subquery = "SELECT "
+	.. "chartmetas.id AS chartmeta_id, "
+	.. QueryFragments.FIELDS_CHARTFILE_SET .. ", "
+	.. "chartfiles.name AS chartfile_name, "
+	.. [[
+chartfiles.*
+FROM chartfiles
+INNER JOIN chartfile_sets ON
+chartfiles.set_id = chartfile_sets.id
+LEFT JOIN chartmetas ON
+chartfiles.hash = chartmetas.hash
+]]
 
 located_chartfiles.types = {
 	set_is_file = "boolean",

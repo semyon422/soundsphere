@@ -49,26 +49,16 @@ function Database:load(path)
 	else
 		error("outdated database")
 	end
-
-	self:applyViews()
 end
 
 function Database:unload()
 	self.db:close()
 end
 
-function Database:applyViews()
-	local sql = assert(self.fs:read("rizu/library/sql/views.sql"))
-	for _, q in ipairs(sql_util.split_sql(sql)) do
-		self.db:exec(q)
-	end
-end
-
 function Database:migrate()
 	local count = self.migrator:migrate(user_version, self.migrations)
 	if count > 0 then
 		print("migrations applied: " .. count)
-		self:applyViews()
 	end
 end
 
