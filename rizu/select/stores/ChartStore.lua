@@ -14,6 +14,10 @@ function ChartStore:new(library)
 	---@type rizu.library.LocatedChartview[]
 	self.items = {}
 	self.set_id = nil
+	self.chartfile_id = nil
+	self.chartmeta_id = nil
+	self.chartdiff_id = nil
+	self.chartplay_id = nil
 	self.onChanged = Observable()
 end
 
@@ -27,6 +31,10 @@ end
 function ChartStore:clear()
 	self.items = {}
 	self.set_id = nil
+	self.chartfile_id = nil
+	self.chartmeta_id = nil
+	self.chartdiff_id = nil
+	self.chartplay_id = nil
 	self.onChanged:send({items = self.items})
 end
 
@@ -37,13 +45,21 @@ end
 
 ---@param chartview rizu.library.IChartviewBase
 function ChartStore:setNoteChartSetId(chartview)
-	if self.set_id == chartview.chartfile_set_id then
-		return
+	if self.set_id == chartview.chartfile_set_id and
+	   self.chartfile_id == chartview.chartfile_id and
+	   self.chartmeta_id == chartview.chartmeta_id and
+	   self.chartdiff_id == chartview.chartdiff_id and
+	   self.chartplay_id == chartview.chartplay_id then
+		-- return
 	end
 	self.set_id = chartview.chartfile_set_id
+	self.chartfile_id = chartview.chartfile_id
+	self.chartmeta_id = chartview.chartmeta_id
+	self.chartdiff_id = chartview.chartdiff_id
+	self.chartplay_id = chartview.chartplay_id
 
 	---@type rizu.library.LocatedChartview[]
-	self.items = self.library.chartviewsRepo:getChartviewsAtSet(chartview)
+	self.items = self.library.chartviewsRepo:getSecondaryViews(chartview)
 	if #self.items == 0 then
 		self.onChanged:send({items = self.items})
 		return

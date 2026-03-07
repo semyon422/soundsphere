@@ -124,7 +124,8 @@ function NoteChartListView:drawItem(i, w, h)
 
 	local select = self.game.configModel.configs.settings.select
 
-	if select.chartviews_table ~= "chartviews" then
+	local secondary_mode = select.secondary_mode or "chartmetas"
+	if secondary_mode == "chartdiffs" or secondary_mode == "chartplays" then
 		baseTimeRate = 1
 	end
 

@@ -23,13 +23,16 @@ function SelectionQueryBuilder:build(config, collectionItem)
 	local settings_select = self.configModel.configs.settings.select
 	local params = {}
 
+	local primary_mode = settings_select.primary_mode or "chartmetas"
+	local secondary_mode = settings_select.secondary_mode or "chartmetas"
+
 	-- Sorting
 	local order, group_allowed = self.sortModel:getOrder(config.sortFunction)
 	params.order = table_util.copy(order)
 	table.insert(params.order, "chartmeta_id")
 
-	-- Grouping (Collapse)
-	local group = group_allowed and settings_select.collapse and settings_select.chartviews_table == "chartviews"
+	-- Grouping
+	local group = group_allowed and primary_mode == "chartfile_sets"
 	if group then
 		params.group = {"chartfile_set_id"}
 	end
@@ -50,7 +53,8 @@ function SelectionQueryBuilder:build(config, collectionItem)
 	params.where = where
 	params.lamp = lamp
 	params.difficulty = settings_select.diff_column
-	params.chartviews_table = settings_select.chartviews_table
+	params.primary_mode = primary_mode
+	params.secondary_mode = secondary_mode
 
 	return params
 end

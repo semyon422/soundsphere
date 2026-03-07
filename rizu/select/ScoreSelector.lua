@@ -81,7 +81,8 @@ function ScoreSelector:pullScore(noUpdate)
 	end
 
 	local config = self.configModel.configs.settings.select
-	local exact = config.chartviews_table ~= "chartviews"
+	local secondary_mode = config.secondary_mode or "chartmetas"
+	local exact = secondary_mode == "chartdiffs" or secondary_mode == "chartplays"
 	
 	-- We use the coro version to ensure the task runner waits for completion
 	self.store:updateItems(chartview, exact)
@@ -112,8 +113,8 @@ end
 ---@param chartview table
 function ScoreSelector:updateReplayBase(chartview)
 	local config = self.configModel.configs.settings.select
-	local views = config.chartviews_table
-	if views == "chartviews" then
+	local secondary_mode = config.secondary_mode or "chartmetas"
+	if secondary_mode == "chartfile_sets" or secondary_mode == "chartfiles" or secondary_mode == "chartmetas" then
 		return
 	end
 
@@ -123,7 +124,7 @@ function ScoreSelector:updateReplayBase(chartview)
 	replayBase.rate = chartview.rate or 1
 	replayBase.mode = chartview.mode or "mania"
 
-	if views == "chartdiffviews" then
+	if secondary_mode == "chartdiffs" then
 		return
 	end
 

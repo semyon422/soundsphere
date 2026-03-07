@@ -113,25 +113,31 @@ local function NoteChartList(self)
 
 	local config = self.game.configModel.configs.settings.select
 
-	local chartviews_table = config.chartviews_table
-	local checked = chartviews_table ~= "chartviews"
-	local text = ""
-	if chartviews_table == "chartviews" then
-		text = "charts"
-	elseif chartviews_table == "chartdiffviews" then
-		text = "diffs"
-	elseif chartviews_table == "chartplayviews" then
-		text = "plays"
+	local modes = {"chartfile_sets", "chartfiles", "chartmetas", "chartdiffs", "chartplays"}
+	local mode_names = {
+		chartfile_sets = "sets",
+		chartfiles = "files",
+		chartmetas = "charts",
+		chartdiffs = "diffs",
+		chartplays = "plays",
+	}
+
+	local function cycle_mode(current)
+		for i, mode in ipairs(modes) do
+			if mode == current then
+				return modes[i % #modes + 1]
+			end
+		end
+		return modes[1]
 	end
 
-	if imgui.TextCheckbox("chartdiffs list cb", checked, text, _w, h) then
-		if config.chartviews_table == "chartviews" then
-			config.chartviews_table = "chartdiffviews"
-		elseif config.chartviews_table == "chartdiffviews" then
-			config.chartviews_table = "chartplayviews"
-		elseif config.chartviews_table == "chartplayviews" then
-			config.chartviews_table = "chartviews"
-		end
+	if imgui.TextOnlyButton("primary mode", "P: " .. mode_names[config.primary_mode or "chartfile_sets"], _w / 2, h) then
+		config.primary_mode = cycle_mode(config.primary_mode or "chartfile_sets")
+		self.game.chartSelector:noDebouncePullNoteChartSet()
+	end
+	love.graphics.translate(_w / 2, 0)
+	if imgui.TextOnlyButton("secondary mode", "S: " .. mode_names[config.secondary_mode or "chartmetas"], _w / 2, h) then
+		config.secondary_mode = cycle_mode(config.secondary_mode or "chartmetas")
 		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 end

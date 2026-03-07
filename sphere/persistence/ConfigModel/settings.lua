@@ -193,8 +193,10 @@ local settings = {
 		generateGifResult = false,
 	},
 	select = {
-		collapse = true,
-		chartviews_table = "chartviews",  ---@type "chartviews"|"chartdiffviews"|"chartplayviews"
+		primary_mode = "chartfile_sets", ---@type "chartfile_sets"|"chartfiles"|"chartmetas"|"chartdiffs"|"chartplays"
+		secondary_mode = "chartmetas", ---@type "chartfile_sets"|"chartfiles"|"chartmetas"|"chartdiffs"|"chartplays"
+		collapse = true, -- Deprecated
+		chartviews_table = "chartviews",  -- Deprecated
 		diff_column = "enps_diff",
 		locations_in_collections = false,
 		chart_preview = true,

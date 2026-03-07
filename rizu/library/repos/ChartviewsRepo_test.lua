@@ -101,12 +101,13 @@ end
 ---@param t testing.T
 function test.chartviews_mode(t)
 	local db, repo = setup()
-	repo.params.chartviews_table = "chartviews"
+	repo.params.primary_mode = "chartmetas"
+	repo.params.secondary_mode = "chartmetas"
 	repo:queryAsync(repo.params)
 
 	t:eq(repo.chartviews_count, 1, "Should group by chartmeta")
 
-	local views = repo:getChartviewsAtSet({chartfile_set_id = 1})
+	local views = repo:getSecondaryViews({chartfile_set_id = 1})
 	t:eq(#views, 1)
 	t:eq(views[1].rate, 1, "Should return standard diff")
 	
@@ -116,12 +117,13 @@ end
 ---@param t testing.T
 function test.chartdiffviews_mode(t)
 	local db, repo = setup()
-	repo.params.chartviews_table = "chartdiffviews"
+	repo.params.primary_mode = "chartdiffs"
+	repo.params.secondary_mode = "chartdiffs"
 	repo:queryAsync(repo.params)
 
 	t:eq(repo.chartviews_count, 2, "Should have one entry per diff")
 
-	local views = repo:getChartviewsAtSet({chartfile_set_id = 1, chartmeta_id = 1})
+	local views = repo:getSecondaryViews({chartfile_set_id = 1, chartmeta_id = 1})
 	t:eq(#views, 2)
 	t:eq(views[1].rate, 1)
 	t:eq(views[2].rate, 1.1)
@@ -132,12 +134,13 @@ end
 ---@param t testing.T
 function test.chartplayviews_mode(t)
 	local db, repo = setup()
-	repo.params.chartviews_table = "chartplayviews"
+	repo.params.primary_mode = "chartplays"
+	repo.params.secondary_mode = "chartplays"
 	repo:queryAsync(repo.params)
 
 	t:eq(repo.chartviews_count, 3, "Should have one entry per play")
 
-	local views = repo:getChartviewsAtSet({chartfile_set_id = 1, chartmeta_id = 1})
+	local views = repo:getSecondaryViews({chartfile_set_id = 1, chartmeta_id = 1})
 	t:eq(#views, 3)
 	t:eq(views[1].chartplay_id, 1)
 	t:eq(views[2].chartplay_id, 2)
@@ -149,9 +152,10 @@ end
 ---@param t testing.T
 function test.rich_data_enrichment(t)
 	local db, repo = setup()
-	repo.params.chartviews_table = "chartviews"
+	repo.params.primary_mode = "chartmetas"
+	repo.params.secondary_mode = "chartmetas"
 	
-	local views = repo:getChartviewsAtSet({chartfile_set_id = 1})
+	local views = repo:getSecondaryViews({chartfile_set_id = 1})
 	t:assert(views[1].difftable_chartmetas, "Should load difftable_chartmetas in list")
 	t:eq(#views[1].difftable_chartmetas, 1)
 
@@ -164,7 +168,8 @@ end
 ---@param t testing.T
 function test.getChartview_fallbacks(t)
 	local db, repo = setup()
-	repo.params.chartviews_table = "chartplayviews"
+	repo.params.primary_mode = "chartplays"
+	repo.params.secondary_mode = "chartplays"
 
 	-- Happy path
 	local cpv = repo:getChartview({chartfile_id = 1, chartplay_id = 3})

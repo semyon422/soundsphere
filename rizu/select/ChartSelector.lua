@@ -259,7 +259,7 @@ function ChartSelector:pullNoteChartSet(noUpdate, noPullNext)
 
 	if chartview_set then
 		self.config.chartfile_set_id = chartview_set.chartfile_set_id
-		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required by chartviews_table
+		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required for chart and diff levels
 	else
 		self.config.chartfile_set_id = nil
 		self.config.chartfile_id = nil

@@ -115,15 +115,24 @@ function ChartviewsRepo:queryAsync(params)
 	self:applyQueryResult(t)
 end
 
-function ChartviewsRepo:_buildViewSubquery(params, use_preview)
-	local view_group
-	if params.chartviews_table == "chartviews" then
-		view_group = {"chartfile_set_id", "chartfile_id", "chartmeta_id"}
-	elseif params.chartviews_table == "chartdiffviews" then
-		view_group = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id"}
-	elseif params.chartviews_table == "chartplayviews" then
-		view_group = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id", "chartplay_id"}
-	end
+local LEVELS = {
+	chartfile_sets = 1,
+	chartfiles = 2,
+	chartmetas = 3,
+	chartdiffs = 4,
+	chartplays = 5,
+}
+
+local LEVEL_GROUPS = {
+	chartfile_sets = {"chartfile_set_id"},
+	chartfiles = {"chartfile_set_id", "chartfile_id"},
+	chartmetas = {"chartfile_set_id", "chartfile_id", "chartmeta_id"},
+	chartdiffs = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id"},
+	chartplays = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id", "chartplay_id"},
+}
+
+function ChartviewsRepo:_buildViewSubquery(params, mode, use_preview)
+	local view_group = LEVEL_GROUPS[mode]
 
 	local columns = {
 		QueryFragments.FIELDS_IDS,
@@ -142,15 +151,16 @@ function ChartviewsRepo:_buildViewSubquery(params, use_preview)
 		QueryFragments.JOINS_CHARTFILES_METAS_SETS,
 	}
 
-	if params.chartviews_table == "chartviews" then
+	local level = LEVELS[mode]
+	if level <= LEVELS.chartmetas then
 		table.insert(columns, QueryFragments.FIELDS_CHARTPLAY_AGGREGATED)
 		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF_DEFAULT)
 		table.insert(joins, "LEFT JOIN chartplays ON " .. QueryFragments.COND_CHARTPLAY)
-	elseif params.chartviews_table == "chartdiffviews" then
+	elseif level == LEVELS.chartdiffs then
 		table.insert(columns, QueryFragments.FIELDS_CHARTPLAY_AGGREGATED)
 		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF)
 		table.insert(joins, "LEFT JOIN chartplays ON " .. QueryFragments.COND_CHARTPLAY_BY_MODE)
-	elseif params.chartviews_table == "chartplayviews" then
+	elseif level == LEVELS.chartplays then
 		table.insert(columns, QueryFragments.FIELDS_CHARTPLAY_STAT)
 		table.insert(columns, QueryFragments.FIELDS_CHARTPLAY)
 		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF)
@@ -176,10 +186,11 @@ function ChartviewsRepo:_buildViewSubquery(params, use_preview)
 end
 
 ---@param params table
+---@param mode string
 ---@param use_preview boolean
 ---@return rdb.Model
-function ChartviewsRepo:_getDynamicViewModel(params, use_preview)
-	local subquery = self:_buildViewSubquery(params, use_preview)
+function ChartviewsRepo:_getDynamicViewModel(params, mode, use_preview)
+	local subquery = self:_buildViewSubquery(params, mode, use_preview)
 	return Model({
 		subquery = subquery,
 		types = chartview_base.types,
@@ -189,7 +200,8 @@ end
 
 function ChartviewsRepo:queryNoteChartSets()
 	local params = self.params
-	local model = self:_getDynamicViewModel(params, false)
+	local mode = params.primary_mode or "chartmetas"
+	local model = self:_getDynamicViewModel(params, mode, false)
 
 	local columns = {
 		"chartfile_id",
@@ -267,9 +279,18 @@ end
 
 ---@param chartview rizu.library.IChartviewBase
 ---@return rizu.library.Chartview[]
-function ChartviewsRepo:getChartviewsAtSet(chartview)
+function ChartviewsRepo:getSecondaryViews(chartview)
 	local params = self.params
-	local model = self:_getDynamicViewModel(params, true)
+	local primary_mode = params.primary_mode or "chartmetas"
+	local secondary_mode = params.secondary_mode or "chartmetas"
+
+	local primary_level = LEVELS[primary_mode]
+	local secondary_level = LEVELS[secondary_mode]
+
+	local filter_level = math.min(primary_level, secondary_level)
+	local group_mode = secondary_level >= primary_level and secondary_mode or primary_mode
+
+	local model = self:_getDynamicViewModel(params, group_mode, true)
 
 	local columns = {"*", "difficulty"}
 	local order = {
@@ -284,12 +305,16 @@ function ChartviewsRepo:getChartviewsAtSet(chartview)
 	}
 
 	local where = table_util.copy(params.where)
-	where.chartfile_set_id = chartview.chartfile_set_id
+	if filter_level >= LEVELS.chartfile_sets then where.chartfile_set_id = chartview.chartfile_set_id end
+	if filter_level >= LEVELS.chartfiles then where.chartfile_id = chartview.chartfile_id end
+	if filter_level >= LEVELS.chartmetas then where.chartmeta_id = chartview.chartmeta_id end
+	if filter_level >= LEVELS.chartdiffs then where.chartdiff_id = chartview.chartdiff_id end
+	if filter_level >= LEVELS.chartplays then where.chartplay_id = chartview.chartplay_id end
 
-	if params.chartviews_table == "chartdiffviews" then
-		where.chartmeta_id = chartview.chartmeta_id
-	elseif params.chartviews_table == "chartplayviews" then
-		where.chartmeta_id = chartview.chartmeta_id
+	if secondary_mode == "chartplayviews" then -- Legacy compat, but better use LEVELS
+		order = {"chartplay_id"}
+	end
+	if secondary_level == LEVELS.chartplays then
 		order = {"chartplay_id"}
 	end
 
@@ -330,7 +355,8 @@ function ChartviewsRepo:getChartview(_chartview)
 	local chartplay_id = _chartview.chartplay_id
 
 	local params = self.params
-	local model = self:_getDynamicViewModel(params, true)
+	local mode = params.secondary_mode or params.primary_mode or "chartmetas"
+	local model = self:_getDynamicViewModel(params, mode, true)
 
 	local options = {
 		columns = {"*", "difficulty"},

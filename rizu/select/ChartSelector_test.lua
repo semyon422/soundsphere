@@ -12,8 +12,8 @@ local function createMockConfigModel()
 			settings = {
 				select = {
 					locations_in_collections = false,
-					collapse = true,
-					chartviews_table = "chartviews",
+					primary_mode = "chartfile_sets",
+					secondary_mode = "chartmetas",
 					diff_column = "msd_diff"
 				},
 				gameplay = {
