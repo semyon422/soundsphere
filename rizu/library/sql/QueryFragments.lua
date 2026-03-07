@@ -7,6 +7,13 @@ chartdiffs.id AS chartdiff_id,
 chartfiles.set_id AS chartfile_set_id
 ]]
 
+QueryFragments.FIELDS_IDS_AGGREGATED = [[
+MAX(chartmetas.id) AS chartmeta_id,
+MAX(chartfiles.id) AS chartfile_id,
+MAX(chartdiffs.id) AS chartdiff_id,
+chartfiles.set_id AS chartfile_set_id
+]]
+
 QueryFragments.FIELDS_CHARTFILE_SET = [[
 chartfile_sets.location_id,
 chartfile_sets.is_file AS set_is_file,
@@ -107,7 +114,6 @@ MAX(chartplays.created_at) AS chartplay_created_at
 ]]
 
 QueryFragments.JOINS_CHARTFILES_METAS_SETS = [[
-FROM chartfiles
 LEFT JOIN chartmetas ON
 chartfiles.hash = chartmetas.hash
 LEFT JOIN chartmeta_user_datas ON
@@ -117,30 +123,42 @@ INNER JOIN chartfile_sets ON
 chartfiles.set_id = chartfile_sets.id
 ]]
 
-QueryFragments.JOINS_CHARTDIFF = [[
-LEFT JOIN chartdiffs ON
+QueryFragments.COND_CHARTDIFF = [[
 chartmetas.hash = chartdiffs.hash AND
 chartmetas.`index` = chartdiffs.`index`
 ]]
 
-QueryFragments.JOINS_CHARTDIFF_DEFAULT = QueryFragments.JOINS_CHARTDIFF .. [[
+QueryFragments.COND_CHARTDIFF_DEFAULT = QueryFragments.COND_CHARTDIFF .. [[
 AND chartdiffs.modifiers = '' AND
 chartdiffs.rate = 1000
 ]]
 
-QueryFragments.JOINS_CHARTPLAY = [[
-LEFT JOIN chartplays ON
+QueryFragments.COND_CHARTPLAY = [[
 chartmetas.hash = chartplays.hash AND
 chartmetas.`index` = chartplays.`index`
 ]]
 
-QueryFragments.JOINS_CHARTPLAY_BY_MODS = QueryFragments.JOINS_CHARTPLAY .. [[
+QueryFragments.COND_CHARTPLAY_BY_MODS = QueryFragments.COND_CHARTPLAY .. [[
 AND chartdiffs.modifiers = chartplays.modifiers AND
 chartdiffs.rate = chartplays.rate
 ]]
 
-QueryFragments.JOINS_CHARTPLAY_BY_MODE = QueryFragments.JOINS_CHARTPLAY_BY_MODS .. [[
+QueryFragments.COND_CHARTPLAY_BY_MODE = QueryFragments.COND_CHARTPLAY_BY_MODS .. [[
 AND chartdiffs.mode = chartplays.mode
 ]]
+
+---@param conditions table
+---@param aggregate boolean?
+---@return string
+function QueryFragments.getLampField(conditions, aggregate)
+	local sql_util = require("rdb.sql_util")
+	local field = ("CASE WHEN %s THEN TRUE ELSE FALSE END"):format(
+		sql_util.bind(sql_util.conditions(conditions))
+	)
+	if aggregate then
+		field = ("MAX(%s)"):format(field)
+	end
+	return field .. " AS lamp"
+end
 
 return QueryFragments
