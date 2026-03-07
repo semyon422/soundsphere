@@ -15,6 +15,17 @@ function ListView:reloadItems()
 	self.items = {}
 end
 
+---@param i number
+---@return any
+function ListView:get(i)
+	local items = self.items
+	if not items then return nil end
+	if items.get then
+		return items:get(i)
+	end
+	return items[i]
+end
+
 ---@return number
 function ListView:getItemCount()
 	local items = self.items
@@ -81,7 +92,7 @@ function ListView:draw(w, h)
 	for i = math.floor(visualItemIndex), self.rows + math.ceil(visualItemIndex) - 1 do
 		local _i = i - math.floor(self.rows / 2)
 		if _i >= 1 and _i <= count then
-			if self.items[_i] then
+			if self:get(_i) then
 				just.push()
 				self:drawItem(_i, w, _h)
 				just.pop()

@@ -29,8 +29,8 @@ end
 function AvailableModifierListView:drawItem(i, w, h)
 	local modifierSelectModel = self.game.modifierSelectModel
 
-	local item = self.items[i]
-	local prevItem = self.items[i - 1]
+	local item = self:get(i)
+	local prevItem = self:get(i - 1)
 
 	local id = "available modifier" .. i
 	local changed, active, hovered = just.button(id, just.is_over(w, h))

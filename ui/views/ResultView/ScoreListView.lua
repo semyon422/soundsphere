@@ -41,7 +41,7 @@ end
 ---@param w number
 ---@param h number
 function ScoreListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	local scoreEngine = self.game.rhythm_engine.score_engine
 	local chartplay = self.game.computeContext.chartplay

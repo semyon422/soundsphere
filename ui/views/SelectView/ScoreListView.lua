@@ -41,7 +41,7 @@ end
 ---@param w number
 ---@param h number
 function ScoreListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 	w = (w - 44) / 5
 
 	local time = item.created_at or 0

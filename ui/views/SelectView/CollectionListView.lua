@@ -63,7 +63,7 @@ end
 function CollectionListView:drawItem(i, w, h)
 	local collectionStore = self.game.collectionSelector.store
 	local tree = collectionStore.tree
-	local item = self.items[i]
+	local item = self:get(i)
 
 	local name = item.name
 	if item.depth == tree.depth and item.depth ~= 0 then

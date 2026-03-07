@@ -24,8 +24,7 @@ function RoomUsersListView:drawItem(i, w, h)
 	local game = self.game
 
 	---@type sea.RoomUser[]
-	local items = self.items
-	local room_user = items[i]
+	local room_user = self:get(i)
 
 	local client = game.multiplayerModel.client
 	local room = client:getMyRoom()

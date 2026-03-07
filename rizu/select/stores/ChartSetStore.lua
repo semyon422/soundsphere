@@ -19,13 +19,6 @@ function ChartSetStore:new(library)
 	end
 end
 
-function ChartSetStore:__index(k)
-	if type(k) == "number" then
-		return self:get(k)
-	end
-	return ChartSetStore[k]
-end
-
 ---@param itemIndex number
 ---@return rizu.library.LocatedChartview
 function ChartSetStore:loadObject(itemIndex)

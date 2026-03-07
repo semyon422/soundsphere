@@ -53,7 +53,7 @@ end
 ---@param w number
 ---@param h number
 function NoteChartSetListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
 		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)

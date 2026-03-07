@@ -111,8 +111,7 @@ end
 ---@param w number
 ---@param h number
 function NoteChartListView:drawItem(i, w, h)
-	local items = self.items
-	local item = items[i]
+	local item = self:get(i)
 
 	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
 		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)
@@ -136,10 +135,11 @@ function NoteChartListView:drawItem(i, w, h)
 	local creator = item.creator or ""
 	local name = item.name or item.chartfile_name
 
-	if items[i - 1] and items[i - 1].chartdiff_inputmode == item.chartdiff_inputmode then
+	local prevItem = self:get(i - 1)
+	if prevItem and prevItem.chartdiff_inputmode == item.chartdiff_inputmode then
 		inputmode = ""
 	end
-	if items[i - 1] and items[i - 1].creator == item.creator then
+	if prevItem and prevItem.creator == item.creator then
 		creator = ""
 	end
 

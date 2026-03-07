@@ -38,10 +38,6 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 	self.metadataService = ChartMetadataService(fs)
 	self.taskRunner = TaskRunner()
 
-	-- Backward compatibility
-	self.noteChartLibrary = self.chartStore
-	self.noteChartSetLibrary = self.chartSetStore
-
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
 end

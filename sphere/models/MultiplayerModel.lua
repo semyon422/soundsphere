@@ -89,7 +89,7 @@ function MultiplayerModel:selectChart()
 	chartSelector:setLock(false)
 
 	self.downloadingBeatmap = nil
-	local chartview = chartSelector.chartSetStore[1]
+	local chartview = chartSelector.chartSetStore:get(1)
 	if chartview then
 		self.chartview = chartview
 		chartSelector:setConfig(chartview)

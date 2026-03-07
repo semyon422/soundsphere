@@ -18,7 +18,7 @@ end
 ---@param w number
 ---@param h number
 function OsudirectDifficultiesListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	just.indent(22)
 	TextCellImView(math.huge, h, "left", item.beatmapset.creator, item.version)

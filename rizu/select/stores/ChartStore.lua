@@ -21,11 +21,10 @@ function ChartStore:new(library)
 	self.onChanged = Observable()
 end
 
-function ChartStore:__index(k)
-	if type(k) == "number" then
-		return self.items[k]
-	end
-	return ChartStore[k]
+---@param i number
+---@return rizu.library.LocatedChartview?
+function ChartStore:get(i)
+	return self.items[i]
 end
 
 function ChartStore:clear()

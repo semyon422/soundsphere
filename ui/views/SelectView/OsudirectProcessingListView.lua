@@ -14,7 +14,7 @@ end
 ---@param w number
 ---@param h number
 function OsudirectProcessingListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	just.row(true)
 	just.indent(44)

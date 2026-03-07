@@ -23,11 +23,10 @@ function ScoreStore:new(configModel, localProvider, onlineProvider)
 	self.onChanged = Observable()
 end
 
-function ScoreStore:__index(k)
-	if type(k) == "number" then
-		return self.items[k]
-	end
-	return ScoreStore[k]
+---@param i number
+---@return sea.Chartplay?
+function ScoreStore:get(i)
+	return self.items[i]
 end
 
 function ScoreStore:clear()
