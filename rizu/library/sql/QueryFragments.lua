@@ -152,9 +152,13 @@ AND chartdiffs.mode = chartplays.mode
 ---@return string
 function QueryFragments.getLampField(conditions, aggregate)
 	local sql_util = require("rdb.sql_util")
-	local field = ("CASE WHEN %s THEN TRUE ELSE FALSE END"):format(
-		sql_util.bind(sql_util.conditions(conditions))
-	)
+	local conds = { [ { "chartplays.id IS NOT NULL" } ] = true }
+	for k, v in pairs(conditions) do
+		conds[k] = v
+	end
+	local cond_str, vals = sql_util.conditions(conds)
+	local fragment = sql_util.bind(cond_str, vals)
+	local field = ("COALESCE(CASE WHEN %s THEN 1 ELSE 0 END, 0)"):format(fragment)
 	if aggregate then
 		field = ("MAX(%s)"):format(field)
 	end

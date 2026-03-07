@@ -275,8 +275,8 @@ function ChartSelector:pullNoteChartSet(noUpdate, noPullNext)
 
 	self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
 
-	if chartview_set then
-		return
+	if chartview_set and not noPullNext then
+		self:pullNoteChart()
 	end
 end
 

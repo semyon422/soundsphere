@@ -28,14 +28,13 @@ function SelectionQueryBuilder:build(config, collectionItem)
 
 	-- Sorting
 	local order, group_allowed = self.sortModel:getOrder(config.sortFunction)
+
+	if not group_allowed and primary_mode == "chartfile_sets" then
+		primary_mode = "chartmetas"
+	end
+
 	params.order = table_util.copy(order)
 	table.insert(params.order, "chartmeta_id")
-
-	-- Grouping
-	local group = group_allowed and primary_mode == "chartfile_sets"
-	if group then
-		params.group = {"chartfile_set_id"}
-	end
 
 	-- Conditions (Search & Filters)
 	local where, lamp = self.searchModel:getConditions()
