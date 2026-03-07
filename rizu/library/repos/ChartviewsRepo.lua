@@ -132,7 +132,6 @@ local LEVEL_GROUPS = {
 }
 
 function ChartviewsRepo:_buildViewSubquery(params, mode, use_preview)
-	local view_group = LEVEL_GROUPS[mode]
 	local level = LEVELS[mode]
 
 	local columns = {
@@ -192,13 +191,8 @@ function ChartviewsRepo:_getDynamicViewModel(params, mode, use_preview)
 	}, self.models)
 end
 
-function ChartviewsRepo:queryNoteChartSets()
-	local params = self.params
-	local mode = params.primary_mode or "chartmetas"
-	local model = self:_getDynamicViewModel(params, mode, false)
+function ChartviewsRepo:_getColumns(mode, params, use_preview)
 	local level = LEVELS[mode]
-	local view_group = LEVEL_GROUPS[mode]
-
 	local columns = {
 		level >= LEVELS.chartfiles and "chartfile_id" or "MAX(chartfile_id) AS chartfile_id",
 		"chartfile_set_id",
@@ -207,45 +201,65 @@ function ChartviewsRepo:queryNoteChartSets()
 		level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
 	}
 
-	if level < LEVELS.chartplays then
-		table.insert(columns, "MIN(accuracy) AS accuracy")
-		table.insert(columns, "MIN(miss_count) AS miss_count")
-		table.insert(columns, "MAX(chartplay_created_at) AS chartplay_created_at")
-	else
-		table.insert(columns, "accuracy")
-		table.insert(columns, "miss_count")
-		table.insert(columns, "chartplay_created_at")
+	local base_columns = {
+		"location_id", "set_is_file", "set_dir", "set_name", "set_modified_at",
+		"chartfile_name", "modified_at", "hash",
+		"`index`", "inputmode", "format", "chartmeta_timings", "chartmeta_healths",
+		"title", "title_unicode", "artist", "artist_unicode", "name", "creator",
+		"level", "source", "tags", "audio_path", "audio_offset", "background_path",
+		"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
+		"tempo", "tempo_avg", "tempo_max", "tempo_min",
+		"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
+		"modifiers", "rate", "mode", "chartdiff_inputmode", "duration", "start_time",
+		"notes_count", "judges_count", "long_notes_ratio", "note_types_count",
+		"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
+		"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
+	}
+	table_util.append(columns, base_columns)
+
+	if use_preview then
+		table.insert(columns, "notes_preview")
 	end
 
-	if params.lamp then
-		if level < LEVELS.chartplays then
+	if level < LEVELS.chartplays then
+		table_util.append(columns, {
+			"MIN(accuracy) AS accuracy",
+			"MIN(miss_count) AS miss_count",
+			"MAX(chartplay_created_at) AS chartplay_created_at",
+			"MAX(difficulty) AS difficulty",
+		})
+		if params.lamp then
 			table.insert(columns, "MAX(lamp) AS lamp")
-		else
+		end
+	else
+		table_util.append(columns, {
+			"accuracy", "miss_count", "chartplay_created_at", "difficulty"
+		})
+		if params.lamp then
 			table.insert(columns, "lamp")
 		end
 	end
 
-	if params.difficulty then
-		if level < LEVELS.chartplays then
-			table.insert(columns, "MAX(difficulty) AS difficulty")
-		else
-			table.insert(columns, "difficulty")
-		end
-	end
+	return columns
+end
 
+function ChartviewsRepo:queryNoteChartSets()
+	local params = self.params
+	local mode = params.primary_mode or "chartmetas"
+	local model = self:_getDynamicViewModel(params, mode, false)
+	local view_group = LEVEL_GROUPS[mode]
+
+	local columns = self:_getColumns(mode, params, false)
 	local where = table_util.copy(params.where)
-	local having
 
 	local options = {
 		columns = columns,
 		order = params.order,
-		having = having,
 		group = view_group,
 	}
 
 	local count_options = {
 		columns = {"1"},
-		having = having,
 		group = view_group,
 	}
 	local count = model:count(where, count_options)
@@ -294,53 +308,7 @@ function ChartviewsRepo:getSecondaryViews(chartview)
 	local group_mode = secondary_level >= primary_level and secondary_mode or primary_mode
 
 	local model = self:_getDynamicViewModel(params, group_mode, true)
-
-	local columns = {"*"}
-	local group_level = LEVELS[group_mode]
-
-	if group_level < LEVELS.chartplays then
-		columns = {
-			group_level >= LEVELS.chartfiles and "chartfile_id" or "MAX(chartfile_id) AS chartfile_id",
-			"chartfile_set_id",
-			group_level >= LEVELS.chartmetas and "chartmeta_id" or "MAX(chartmeta_id) AS chartmeta_id",
-			group_level >= LEVELS.chartdiffs and "chartdiff_id" or "MAX(chartdiff_id) AS chartdiff_id",
-			group_level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
-			"location_id", "set_is_file", "set_dir", "set_name", "set_modified_at",
-			"chartfile_name", "modified_at", "hash",
-			"`index`", "inputmode", "format", "chartmeta_timings", "chartmeta_healths",
-			"title", "title_unicode", "artist", "artist_unicode", "name", "creator",
-			"level", "source", "tags", "audio_path", "audio_offset", "background_path",
-			"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
-			"tempo", "tempo_avg", "tempo_max", "tempo_min",
-			"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
-			"modifiers", "rate", "mode", "chartdiff_inputmode", "duration", "start_time",
-			"notes_count", "judges_count", "long_notes_ratio", "note_types_count",
-			"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
-			"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
-			"notes_preview",
-			"MIN(accuracy) AS accuracy",
-			"MIN(miss_count) AS miss_count",
-			"MAX(chartplay_created_at) AS chartplay_created_at"
-		}
-	else
-		table.insert(columns, "accuracy")
-		table.insert(columns, "miss_count")
-		table.insert(columns, "chartplay_created_at")
-	end
-
-	if group_level < LEVELS.chartplays then
-		table.insert(columns, "MAX(difficulty) AS difficulty")
-	else
-		table.insert(columns, "difficulty")
-	end
-
-	if params.lamp then
-		if group_level < LEVELS.chartplays then
-			table.insert(columns, QueryFragments.getLampField(params.lamp, true))
-		else
-			table.insert(columns, "lamp")
-		end
-	end
+	local columns = self:_getColumns(group_mode, params, true)
 
 	local order = {
 		"length(inputmode)",
@@ -360,19 +328,13 @@ function ChartviewsRepo:getSecondaryViews(chartview)
 	if filter_level >= LEVELS.chartdiffs then where.chartdiff_id = chartview.chartdiff_id end
 	if filter_level >= LEVELS.chartplays then where.chartplay_id = chartview.chartplay_id end
 
-	local having
-
-	if secondary_mode == "chartplayviews" then -- Legacy compat, but better use LEVELS
-		order = {"chartplay_id"}
-	end
-	if secondary_level == LEVELS.chartplays then
+	if secondary_mode == "chartplayviews" or secondary_level == LEVELS.chartplays then
 		order = {"chartplay_id"}
 	end
 
 	local options = {
 		columns = columns,
 		order = order,
-		having = having,
 		group = LEVEL_GROUPS[group_mode],
 	}
 
@@ -410,63 +372,15 @@ function ChartviewsRepo:getChartview(_chartview)
 	local params = self.params
 	local mode = params.secondary_mode or params.primary_mode or "chartmetas"
 	local model = self:_getDynamicViewModel(params, mode, true)
-	local level = LEVELS[mode]
-
-	local columns = {"*"}
-	if level < LEVELS.chartplays then
-		columns = {
-			level >= LEVELS.chartfiles and "chartfile_id" or "MAX(chartfile_id) AS chartfile_id",
-			"chartfile_set_id",
-			level >= LEVELS.chartmetas and "chartmeta_id" or "MAX(chartmeta_id) AS chartmeta_id",
-			level >= LEVELS.chartdiffs and "chartdiff_id" or "MAX(chartdiff_id) AS chartdiff_id",
-			level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
-			"location_id", "set_is_file", "set_dir", "set_name", "set_modified_at",
-			"chartfile_name", "modified_at", "hash",
-			"`index`", "inputmode", "format", "chartmeta_timings", "chartmeta_healths",
-			"title", "title_unicode", "artist", "artist_unicode", "name", "creator",
-			"level", "source", "tags", "audio_path", "audio_offset", "background_path",
-			"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
-			"tempo", "tempo_avg", "tempo_max", "tempo_min",
-			"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
-			"modifiers", "rate", "mode", "chartdiff_inputmode", "duration", "start_time",
-			"notes_count", "judges_count", "long_notes_ratio", "note_types_count",
-			"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
-			"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
-			"notes_preview",
-			"MIN(accuracy) AS accuracy",
-			"MIN(miss_count) AS miss_count",
-			"MAX(chartplay_created_at) AS chartplay_created_at"
-		}
-	else
-		table.insert(columns, "accuracy")
-		table.insert(columns, "miss_count")
-		table.insert(columns, "chartplay_created_at")
-	end
-
-	if level < LEVELS.chartplays then
-		table.insert(columns, "MAX(difficulty) AS difficulty")
-	else
-		table.insert(columns, "difficulty")
-	end
-
-	if params.lamp then
-		if level < LEVELS.chartplays then
-			table.insert(columns, "MAX(lamp) AS lamp")
-		else
-			table.insert(columns, "lamp")
-		end
-	end
-
-	local having
-	local where = {}
+	local columns = self:_getColumns(mode, params, true)
 
 	local options = {
 		columns = columns,
 		limit = 1,
-		having = having,
-		group = level < LEVELS.chartplays and LEVEL_GROUPS[mode] or nil,
+		group = LEVELS[mode] < LEVELS.chartplays and LEVEL_GROUPS[mode] or nil,
 	}
 
+	local where = {}
 	---@type rizu.library.Chartview?
 	local obj
 	if chartplay_id then
