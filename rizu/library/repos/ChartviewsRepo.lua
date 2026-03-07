@@ -125,10 +125,10 @@ local LEVELS = {
 
 local LEVEL_GROUPS = {
 	chartfile_sets = {"chartfile_set_id"},
-	chartfiles = {"chartfile_set_id", "chartfile_id"},
-	chartmetas = {"chartfile_set_id", "chartfile_id", "chartmeta_id"},
-	chartdiffs = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id"},
-	chartplays = {"chartfile_set_id", "chartfile_id", "chartmeta_id", "chartdiff_id", "chartplay_id"},
+	chartfiles = {"chartfile_id"},
+	chartmetas = {"chartfile_id", "chartmeta_id"},
+	chartdiffs = {"chartfile_id", "chartmeta_id", "chartdiff_id"},
+	chartplays = {"chartplay_id"},
 }
 
 function ChartviewsRepo:_buildViewSubquery(params, mode, use_preview)
@@ -216,10 +216,9 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 		"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
 		"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
 	}
-	table_util.append(columns, base_columns)
 
 	if use_preview then
-		table.insert(columns, "notes_preview")
+		table.insert(base_columns, "notes_preview")
 	end
 
 	if level < LEVELS.chartplays then
@@ -230,22 +229,32 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 			level >= LEVELS.chartdiffs and "chartdiff_id" or "MIN(chartdiff_id) AS chartdiff_id",
 			level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
 			"location_id", "set_is_file", "set_dir", "set_name", "set_modified_at",
-			"chartfile_name", "MAX(modified_at) AS modified_at", "hash",
+			"chartfile_name",
+			level >= LEVELS.chartfiles and "modified_at" or "MAX(modified_at) AS modified_at",
+			"hash",
 			"`index`", "inputmode", "format", "chartmeta_timings", "chartmeta_healths",
 			"title", "title_unicode", "artist", "artist_unicode", "name", "creator",
-			"MAX(level) AS level", "source", "tags", "audio_path", "audio_offset", "background_path",
+			level >= LEVELS.chartmetas and "level" or "MAX(level) AS level",
+			"source", "tags", "audio_path", "audio_offset", "background_path",
 			"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
-			"MAX(tempo) AS tempo", "tempo_avg", "tempo_max", "tempo_min",
+			level >= LEVELS.chartmetas and "tempo" or "MAX(tempo) AS tempo",
+			"tempo_avg", "tempo_max", "tempo_min",
 			"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
-			"modifiers", "rate", "mode", "chartdiff_inputmode", "MAX(duration) AS duration", "start_time",
-			"MAX(notes_count) AS notes_count", "judges_count", "long_notes_ratio", "note_types_count",
+			"modifiers", "rate", "mode", "chartdiff_inputmode",
+			level >= LEVELS.chartdiffs and "duration" or "MAX(duration) AS duration",
+			"start_time",
+			level >= LEVELS.chartdiffs and "notes_count" or "MAX(notes_count) AS notes_count",
+			"judges_count", "long_notes_ratio", "note_types_count",
 			"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
 			"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",
 			"MIN(accuracy) AS accuracy",
 			"MIN(miss_count) AS miss_count",
 			"MAX(chartplay_created_at) AS chartplay_created_at",
-			"MAX(difficulty) AS difficulty",
+			level >= LEVELS.chartdiffs and "difficulty" or "MAX(difficulty) AS difficulty",
 		}
+		if use_preview then
+			table.insert(columns, "notes_preview")
+		end
 		if params.lamp then
 			table.insert(columns, "MAX(lamp) AS lamp")
 		end
@@ -262,6 +271,23 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 	return columns
 end
 
+function ChartviewsRepo:_getSlimColumns(mode, params)
+	local level = LEVELS[mode]
+	local columns = {
+		level >= LEVELS.chartfiles and "chartfile_id" or "MIN(chartfile_id) AS chartfile_id",
+		"chartfile_set_id",
+		level >= LEVELS.chartmetas and "chartmeta_id" or "MIN(chartmeta_id) AS chartmeta_id",
+		level >= LEVELS.chartdiffs and "chartdiff_id" or "MIN(chartdiff_id) AS chartdiff_id",
+		level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
+	}
+
+	if params.lamp then
+		table.insert(columns, level < LEVELS.chartplays and "MAX(lamp) AS lamp" or "lamp")
+	end
+
+	return columns
+end
+
 function ChartviewsRepo:queryNoteChartSets()
 	local params = self.params
 	local primary_mode = params.primary_mode or "chartmetas"
@@ -273,7 +299,7 @@ function ChartviewsRepo:queryNoteChartSets()
 
 	local view_group = LEVEL_GROUPS[primary_mode]
 
-	local columns = self:_getColumns(primary_mode, params, false)
+	local columns = self:_getSlimColumns(primary_mode, params)
 	local where = table_util.copy(params.where)
 
 	local options = {

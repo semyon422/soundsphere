@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS `chartmetas` (
 CREATE INDEX IF NOT EXISTS chartmetas_hash_idx ON chartmetas (`hash`);
 CREATE UNIQUE INDEX IF NOT EXISTS chartmetas_hash_index_idx ON chartmetas (`hash`, `index`);
 CREATE INDEX IF NOT EXISTS chartmetas_inputmode_idx ON chartmetas (`inputmode`);
+CREATE INDEX IF NOT EXISTS chartmetas_title_idx ON chartmetas (`title`);
+CREATE INDEX IF NOT EXISTS chartmetas_artist_idx ON chartmetas (`artist`);
+CREATE INDEX IF NOT EXISTS chartmetas_level_idx ON chartmetas (`level`);
 
 CREATE TABLE IF NOT EXISTS `chartdiffs` (
 	`id` INTEGER PRIMARY KEY,
@@ -75,6 +78,8 @@ CREATE INDEX IF NOT EXISTS chartdiffs_enps_idx ON chartdiffs (`enps_diff`);
 CREATE INDEX IF NOT EXISTS chartdiffs_osu_idx ON chartdiffs (`osu_diff`);
 CREATE INDEX IF NOT EXISTS chartdiffs_msd_idx ON chartdiffs (`msd_diff`);
 CREATE INDEX IF NOT EXISTS chartdiffs_user_idx ON chartdiffs (`user_diff`);
+CREATE INDEX IF NOT EXISTS chartdiffs_notes_count_idx ON chartdiffs (`notes_count`);
+CREATE INDEX IF NOT EXISTS chartdiffs_duration_idx ON chartdiffs (`duration`);
 
 CREATE TABLE IF NOT EXISTS `chartplays` (
 	`id` INTEGER PRIMARY KEY,
@@ -119,6 +124,7 @@ CREATE TABLE IF NOT EXISTS `chartplays` (
 CREATE INDEX IF NOT EXISTS chartplays_user_id_idx ON chartplays (`user_id`);
 CREATE INDEX IF NOT EXISTS chartplays_himr_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`);
 CREATE INDEX IF NOT EXISTS chartplays_himrm_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`, `mode`);
+CREATE INDEX IF NOT EXISTS chartplays_himrm_stat_idx ON chartplays (`hash`, `index`, `modifiers`, `rate`, `mode`, `accuracy`, `miss_count`, `created_at`);
 
 CREATE TABLE IF NOT EXISTS `user_activity_days` (
 	`id` INTEGER PRIMARY KEY,
