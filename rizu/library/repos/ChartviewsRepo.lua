@@ -154,13 +154,14 @@ function ChartviewsRepo:_buildViewSubquery(params, mode, use_preview)
 	table.insert(columns, QueryFragments.FIELDS_CHARTPLAY_STAT)
 	table.insert(columns, QueryFragments.FIELDS_CHARTPLAY)
 
-	table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF)
-
-	if level < LEVELS.chartplays then
-		table.insert(joins, "LEFT JOIN chartplays ON " .. (
-			level == LEVELS.chartdiffs and QueryFragments.COND_CHARTPLAY_BY_MODE or QueryFragments.COND_CHARTPLAY
-		))
+	if level <= LEVELS.chartmetas then
+		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF_DEFAULT)
+		table.insert(joins, "LEFT JOIN chartplays ON " .. QueryFragments.COND_CHARTPLAY)
+	elseif level == LEVELS.chartdiffs then
+		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF)
+		table.insert(joins, "LEFT JOIN chartplays ON " .. QueryFragments.COND_CHARTPLAY_BY_MODE)
 	elseif level == LEVELS.chartplays then
+		table.insert(joins, "LEFT JOIN chartdiffs ON " .. QueryFragments.COND_CHARTDIFF)
 		table.insert(joins, "INNER JOIN chartplays ON " .. QueryFragments.COND_CHARTPLAY_BY_MODS)
 	end
 
@@ -194,10 +195,10 @@ end
 function ChartviewsRepo:_getColumns(mode, params, use_preview)
 	local level = LEVELS[mode]
 	local columns = {
-		level >= LEVELS.chartfiles and "chartfile_id" or "MAX(chartfile_id) AS chartfile_id",
+		level >= LEVELS.chartfiles and "chartfile_id" or "MIN(chartfile_id) AS chartfile_id",
 		"chartfile_set_id",
-		level >= LEVELS.chartmetas and "chartmeta_id" or "MAX(chartmeta_id) AS chartmeta_id",
-		level >= LEVELS.chartdiffs and "chartdiff_id" or "MAX(chartdiff_id) AS chartdiff_id",
+		level >= LEVELS.chartmetas and "chartmeta_id" or "MIN(chartmeta_id) AS chartmeta_id",
+		level >= LEVELS.chartdiffs and "chartdiff_id" or "MIN(chartdiff_id) AS chartdiff_id",
 		level >= LEVELS.chartplays and "chartplay_id" or "MAX(chartplay_id) AS chartplay_id",
 	}
 
@@ -226,7 +227,7 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 			"MIN(accuracy) AS accuracy",
 			"MIN(miss_count) AS miss_count",
 			"MAX(chartplay_created_at) AS chartplay_created_at",
-			"MAX(difficulty) AS difficulty",
+			"difficulty", -- taken from row satisfying MIN(chartmeta_id) or similar
 		})
 		if params.lamp then
 			table.insert(columns, "MAX(lamp) AS lamp")
