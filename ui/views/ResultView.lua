@@ -18,7 +18,7 @@ ResultView.load = thread.coro(function(self)
 	loading = true
 	self.game.resultController:load()
 	if self.prevView == self.ui.selectView then
-		self.game.resultController:replayNoteChartAsync("result", self.game.scoreSelector.scoreItem)
+		self.game.resultController:replayNoteChartAsync("result", self.game.scoreSelector.chartplay)
 	end
 
 	loading = false
@@ -58,7 +58,7 @@ ResultView.play = thread.coro(function(self, mode)
 		return
 	end
 	playing = true
-	self.game.resultController:replayNoteChartAsync(mode, self.game.scoreSelector.scoreItem)
+	self.game.resultController:replayNoteChartAsync(mode, self.game.scoreSelector.chartplay)
 	if mode == "result" then
 		return self.view:reload()
 	end

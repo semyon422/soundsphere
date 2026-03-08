@@ -116,7 +116,9 @@ function Library:createAndLoadWorker(workingDirectory)
 end
 
 function Library:unload()
-	self.worker:unload()
+	if self.worker then
+		self.worker:unload()
+	end
 	if self.tr then
 		self.tr:stop()
 	end
@@ -155,6 +157,11 @@ end
 ---@return rizu.library.Collections.TreeNode
 function Library:getCollectionTree(locations_in_collections)
 	return self.collections:getTree(locations_in_collections)
+end
+
+---@param chart rizu.library.LocatedChartview
+function Library:enrichChartview(chart)
+	self.locations:enrichChartview(chart)
 end
 
 ---@param f fun(worker: rizu.library.Library)
@@ -210,6 +217,56 @@ function Library:stopTask()
 end
 
 Library.stopTask = thread.coro(Library.stopTask)
+
+---@param params table
+---@return table result
+function Library:queryAsync(params)
+	if self.is_sync or not self.worker then
+		self.chartviewsRepo.params = params
+		return self.chartviewsRepo:query()
+	end
+	return self.worker:query(params)
+end
+
+---@param params table
+---@param chartview table
+---@return table result
+function Library:getViewsAsync(params, chartview)
+	if self.is_sync or not self.worker then
+		self.chartviewsRepo.params = params
+		return self.chartviewsRepo:getViews(chartview)
+	end
+	return self.worker:getViews(params, chartview)
+end
+
+---@param params table
+---@param _chartview table
+---@return table result
+function Library:getChartviewAsync(params, _chartview)
+	if self.is_sync or not self.worker then
+		self.chartviewsRepo.params = params
+		return self.chartviewsRepo:getChartview(_chartview)
+	end
+	return self.worker:getChartview(params, _chartview)
+end
+
+---@param chartdiff_key sea.ChartdiffKey
+---@return sea.Chartplay[]
+function Library:getChartplaysForChartdiffAsync(chartdiff_key)
+	if self.is_sync or not self.worker then
+		return self.chartsRepo:getChartplaysForChartdiff(chartdiff_key)
+	end
+	return self.worker:getChartplaysForChartdiff(chartdiff_key)
+end
+
+---@param chartmeta_key sea.ChartmetaKey
+---@return sea.Chartplay[]
+function Library:getChartplaysForChartmetaAsync(chartmeta_key)
+	if self.is_sync or not self.worker then
+		return self.chartsRepo:getChartplaysForChartmeta(chartmeta_key)
+	end
+	return self.worker:getChartplaysForChartmeta(chartmeta_key)
+end
 
 function Library:update()
 	if self.tr then

@@ -1,4 +1,3 @@
-local thread = require("thread")
 local table_util = require("table_util")
 local sql_util = require("rdb.sql_util")
 local ffi = require("ffi")
@@ -7,22 +6,19 @@ local QueryFragments = require("rizu.library.sql.QueryFragments")
 local Model = require("rdb.Model")
 local chartview_base = require("rizu.library.models.chartview_base")
 
+---@class rizu.library.ChartviewsRepo.QueryResult
+---@field count integer
+---@field items cdata -- struct array
+---@field maps table -- id_to_global_index maps
+
 ---@class rizu.library.ChartviewsRepo
 ---@operator call: rizu.library.ChartviewsRepo
 local ChartviewsRepo = class()
 
 ---@param models rdb.Models
 function ChartviewsRepo:new(models)
-	self.chartviews_count = 0
-	---@type {[integer]: rizu.library.IChartviewBase}
-	self.chartviews = {}
-	self.set_id_to_global_index = {}
-	self.chartfile_id_to_global_index = {}
-	self.chartdiff_id_to_global_index = {}
-	self.chartplay_id_to_global_index = {}
-	self.params = {}
-
 	self.models = models
+	self.params = {}
 	self.is_sync = false
 end
 
@@ -46,73 +42,89 @@ ffi.cdef [[
 
 ChartviewsRepo.chartview_struct = ffi.typeof("chartview_struct")
 
+---@param struct_array cdata
+---@param count integer
+---@param maps table
 ---@return table
-function ChartviewsRepo:getQueryResult()
+function ChartviewsRepo:packResult(struct_array, count, maps)
 	return {
-		chartviews_count = self.chartviews_count,
-		set_id_to_global_index = self.set_id_to_global_index,
-		chartfile_id_to_global_index = self.chartfile_id_to_global_index,
-		chartdiff_id_to_global_index = self.chartdiff_id_to_global_index,
-		chartplay_id_to_global_index = self.chartplay_id_to_global_index,
-		chartviews = ffi.string(self.chartviews, ffi.sizeof(self.chartviews)),
+		count = count,
+		items = ffi.string(struct_array, ffi.sizeof("chartview_struct") * count),
+		maps = maps,
 	}
 end
 
 ---@param t table
-function ChartviewsRepo:applyQueryResult(t)
-	self.chartviews_count = t.chartviews_count
-	self.set_id_to_global_index = t.set_id_to_global_index
-	self.chartfile_id_to_global_index = t.chartfile_id_to_global_index
-	self.chartdiff_id_to_global_index = t.chartdiff_id_to_global_index
-	self.chartplay_id_to_global_index = t.chartplay_id_to_global_index
-
-	local size = ffi.sizeof("chartview_struct")
-	self.chartviews = ffi.new("chartview_struct[?]", #t.chartviews / size)
-	ffi.copy(self.chartviews, t.chartviews, #t.chartviews)
+---@return cdata struct_array
+---@return integer count
+---@return table maps
+function ChartviewsRepo:unpackResult(t)
+	local count = t.count
+	local items = ffi.new("chartview_struct[?]", count)
+	ffi.copy(items, t.items, #t.items)
+	return items, count, t.maps
 end
 
-local _queryAsync = thread.async(function(params)
-	local time = love.timer.getTime()
-	local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
-	local Database = require("rizu.library.Database")
-	local LoveFilesystem = require("fs.LoveFilesystem")
+---@param struct cdata
+---@return table
+function ChartviewsRepo:structToTable(struct)
+	return {
+		chartfile_id = struct.chartfile_id,
+		chartfile_set_id = struct.chartfile_set_id,
+		chartmeta_id = struct.chartmeta_id,
+		chartdiff_id = struct.chartdiff_id,
+		chartplay_id = struct.chartplay_id,
+		lamp = struct.lamp,
+	}
+end
 
-	local db = Database(LoveFilesystem())
-	db:load()
+function ChartviewsRepo:_fetchResult(model, where, options)
+	local count_options = {
+		columns = {"1"},
+		group = options.group,
+	}
+	local count = model:count(where, count_options)
 
-	local self = ChartviewsRepo(db.models)
-	self.params = params
-	local status, err = pcall(self.queryNoteChartSets, self)
-	db:unload()
+	local struct_array = ffi.new("chartview_struct[?]", count)
+	local chartfile_id_to_global_index = {}
+	local chartmeta_id_to_global_index = {}
+	local chartdiff_id_to_global_index = {}
+	local chartplay_id_to_global_index = {}
+	local set_id_to_global_index = {}
 
-	if not status then
-		print(err)
-		return
+	local c = 0
+	for i, row in model:select_iter(where, options) do
+		local entry = struct_array[c]
+		entry.chartfile_id = row.chartfile_id
+		entry.chartfile_set_id = row.chartfile_set_id
+		entry.chartmeta_id = row.chartmeta_id or 0
+		entry.chartdiff_id = row.chartdiff_id or 0
+		entry.chartplay_id = row.chartplay_id or 0
+		entry.lamp = sql_util.toboolean(row.lamp or 0)
+		c = c + 1
+		set_id_to_global_index[entry.chartfile_set_id] = c
+		chartfile_id_to_global_index[entry.chartfile_id] = c
+		chartmeta_id_to_global_index[entry.chartmeta_id] = c
+		chartdiff_id_to_global_index[entry.chartdiff_id] = c
+		chartplay_id_to_global_index[entry.chartplay_id] = c
 	end
 
-	local t = self:getQueryResult()
-
-	local dt = math.floor((love.timer.getTime() - time) * 1000)
-	print("query all: " .. dt .. "ms")
-	print(("size: %d bytes"):format(#t.chartviews))
-	return t
-end)
+	return self:packResult(struct_array, c, {
+		set_id_to_global_index = set_id_to_global_index,
+		chartfile_id_to_global_index = chartfile_id_to_global_index,
+		chartmeta_id_to_global_index = chartmeta_id_to_global_index,
+		chartdiff_id_to_global_index = chartdiff_id_to_global_index,
+		chartplay_id_to_global_index = chartplay_id_to_global_index,
+	})
+end
 
 ---@param params table
 function ChartviewsRepo:queryAsync(params)
-	self.params = params
-
 	if self.is_sync then
-		self:queryNoteChartSets()
-		return
+		self.params = params
+		return self:query()
 	end
-
-	local t = _queryAsync(params)
-	if not t then
-		return
-	end
-
-	self:applyQueryResult(t)
+	error("Use Library:queryAsync instead for threaded queries")
 end
 
 local LEVELS = {
@@ -288,7 +300,7 @@ function ChartviewsRepo:_getSlimColumns(mode, params)
 	return columns
 end
 
-function ChartviewsRepo:queryNoteChartSets()
+function ChartviewsRepo:query()
 	local params = self.params
 	local primary_mode = params.primary_mode or "chartmetas"
 	local secondary_mode = params.secondary_mode or "chartmetas"
@@ -297,56 +309,18 @@ function ChartviewsRepo:queryNoteChartSets()
 	local subquery_mode = LEVELS[secondary_mode] > LEVELS[primary_mode] and secondary_mode or primary_mode
 	local model = self:_getDynamicViewModel(params, subquery_mode, false)
 
-	local view_group = LEVEL_GROUPS[primary_mode]
-
-	local columns = self:_getSlimColumns(primary_mode, params)
-	local where = table_util.copy(params.where)
-
 	local options = {
-		columns = columns,
+		columns = self:_getSlimColumns(primary_mode, params),
 		order = params.order,
-		group = view_group,
+		group = LEVEL_GROUPS[primary_mode],
 	}
 
-	local count_options = {
-		columns = {"1"},
-		group = view_group,
-	}
-	local count = model:count(where, count_options)
-
-	local noteChartSets = ffi.new("chartview_struct[?]", count)
-	local chartfile_id_to_global_index = {}
-	local chartdiff_id_to_global_index = {}
-	local chartplay_id_to_global_index = {}
-	local set_id_to_global_index = {}
-	self.chartviews = noteChartSets
-	self.chartfile_id_to_global_index = chartfile_id_to_global_index
-	self.chartdiff_id_to_global_index = chartdiff_id_to_global_index
-	self.chartplay_id_to_global_index = chartplay_id_to_global_index
-	self.set_id_to_global_index = set_id_to_global_index
-
-	local c = 0
-	for i, row in model:select_iter(where, options) do
-		local entry = noteChartSets[i - 1]
-		entry.chartfile_id = row.chartfile_id
-		entry.chartfile_set_id = row.chartfile_set_id
-		entry.chartmeta_id = row.chartmeta_id or 0
-		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.chartplay_id = row.chartplay_id or 0
-		entry.lamp = sql_util.toboolean(row.lamp or 0)
-		set_id_to_global_index[entry.chartfile_set_id] = i
-		chartfile_id_to_global_index[entry.chartfile_id] = i
-		chartdiff_id_to_global_index[entry.chartdiff_id] = i
-		chartplay_id_to_global_index[entry.chartplay_id] = i
-		c = c + 1
-	end
-
-	self.chartviews_count = c
+	return self:_fetchResult(model, params.where, options)
 end
 
 ---@param chartview rizu.library.IChartviewBase
----@return rizu.library.Chartview[]
-function ChartviewsRepo:getSecondaryViews(chartview)
+---@return table result
+function ChartviewsRepo:getViews(chartview)
 	local params = self.params
 	local primary_mode = params.primary_mode or "chartmetas"
 	local secondary_mode = params.secondary_mode or "chartmetas"
@@ -357,8 +331,7 @@ function ChartviewsRepo:getSecondaryViews(chartview)
 	local filter_level = math.min(primary_level, secondary_level)
 	local group_mode = secondary_level >= primary_level and secondary_mode or primary_mode
 
-	local model = self:_getDynamicViewModel(params, group_mode, true)
-	local columns = self:_getColumns(group_mode, params, true)
+	local model = self:_getDynamicViewModel(params, group_mode, false)
 
 	local order = {
 		"length(inputmode)",
@@ -383,19 +356,12 @@ function ChartviewsRepo:getSecondaryViews(chartview)
 	end
 
 	local options = {
-		columns = columns,
+		columns = self:_getSlimColumns(group_mode, params),
 		order = order,
 		group = LEVEL_GROUPS[group_mode],
 	}
 
-	---@type rizu.library.Chartview[]
-	local objs = model:select(where, options)
-
-	for _, obj in ipairs(objs) do
-		self:_fillRichData(obj)
-	end
-
-	return objs
+	return self:_fetchResult(model, where, options)
 end
 
 ---@param obj rizu.library.LocatedChartview
@@ -433,18 +399,18 @@ function ChartviewsRepo:getChartview(_chartview)
 	local where = {}
 	---@type rizu.library.Chartview?
 	local obj
-	if chartplay_id then
+	if chartplay_id and chartplay_id ~= 0 then
 		where.chartfile_id = chartfile_id
 		where.chartplay_id = chartplay_id
 		obj = model:find(where, options)
 	end
-	if not obj and chartdiff_id then
+	if not obj and chartdiff_id and chartdiff_id ~= 0 then
 		where.chartfile_id = chartfile_id
 		where.chartplay_id = nil
 		where.chartdiff_id = chartdiff_id
 		obj = model:find(where, options)
 	end
-	if not obj and chartmeta_id then
+	if not obj and chartmeta_id and chartmeta_id ~= 0 then
 		where.chartfile_id = chartfile_id
 		where.chartdiff_id = nil
 		where.chartmeta_id = chartmeta_id

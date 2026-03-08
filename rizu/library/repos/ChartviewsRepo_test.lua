@@ -54,8 +54,8 @@ function test.primary_modes(t)
 
 	local function count(mode)
 		repo.params.primary_mode = mode
-		repo:queryAsync(repo.params)
-		return repo.chartviews_count
+		local res = repo:query()
+		return res.count
 	end
 
 	t:eq(count("chartfile_sets"), 2, "Sets mode: Set 1, Set 2")
@@ -74,8 +74,8 @@ function test.secondary_modes_combinations(t)
 	local function get_count(p_mode, s_mode, selection)
 		repo.params.primary_mode = p_mode
 		repo.params.secondary_mode = s_mode
-		local views = repo:getSecondaryViews(selection)
-		return #views
+		local res = repo:getViews(selection)
+		return res.count
 	end
 
 	-- Rule: Filter by coarser, group by finer
@@ -111,15 +111,16 @@ function test.aggregation_in_modes(t)
 	-- We have 3 plays for Meta 4. Accuracy values are 0.90, 1.0, 0.98.
 	repo.params.primary_mode = "chartmetas"
 	repo.params.lamp = { accuracy__gte = 0.95 } -- Play 2 and 3 match (Meta 4)
-	repo:queryAsync(repo.params)
+	local res = repo:query()
 	
 	-- Should find ALL 4 Metas because lamp doesn't filter
-	t:eq(repo.chartviews_count, 4)
+	t:eq(res.count, 4)
 	
 	-- Only Meta 4 should have lamp = true
+	local items, count = repo:unpackResult(res)
 	local found_lamp = false
-	for i = 0, repo.chartviews_count - 1 do
-		local entry = repo.chartviews[i]
+	for i = 0, count - 1 do
+		local entry = items[i]
 		if entry.chartmeta_id == 4 then
 			t:eq(entry.lamp, true, "Meta 4 should have lamp")
 			found_lamp = true

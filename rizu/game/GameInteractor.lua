@@ -18,7 +18,7 @@ end
 function GameInteractor:loadScoreAsync(itemIndex)
 	local game = self.game
 
-	local scoreEntry = game.scoreSelector.scoreItem
+	local scoreEntry = game.scoreSelector.chartplay
 	if itemIndex then
 		scoreEntry = game.scoreSelector.store.items[itemIndex]
 	end

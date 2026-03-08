@@ -93,7 +93,7 @@ function MultiplayerModel:selectChart()
 	if chartview then
 		self.chartview = chartview
 		chartSelector:setConfig(chartview)
-		chartSelector:pullNoteChartSet(true)
+		chartSelector:refresh(true)
 		self.remote.multiplayer:setChartFound(true)
 		return
 	end
@@ -103,7 +103,7 @@ function MultiplayerModel:selectChart()
 		chartmeta_id = 0,
 	})
 	self.chartview = nil
-	chartSelector:pullNoteChartSet(true)
+	chartSelector:refresh(true)
 	self.remote.multiplayer:setChartFound(false)
 end
 

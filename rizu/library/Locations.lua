@@ -24,6 +24,8 @@ function Locations:new(locationsRepo, chartfilesRepo, fs, root, prefix)
 	self.info = {}
 	---@type rizu.library.Location[]
 	self.locations = {}
+	---@type {[integer]: rizu.library.Location}
+	self.locationsById = {}
 end
 
 function Locations:load()
@@ -42,8 +44,10 @@ end
 
 function Locations:selectLocations()
 	self.locations = self.locationsRepo:selectLocations()
+	self.locationsById = {}
 	for _, loc in ipairs(self.locations) do
 		self:updateLocationInfo(loc.id)
+		self.locationsById[loc.id] = loc
 	end
 end
 
@@ -95,6 +99,27 @@ function Locations:getPrefix(location)
 		return location.path
 	end
 	return path_util.join(self.prefix, location.id)
+end
+
+---@param chart rizu.library.LocatedChartview
+function Locations:enrichChartview(chart)
+	if not chart or not chart.location_id or chart.location_path then
+		return
+	end
+	local location = self.locationsById[chart.location_id]
+	if not location then
+		location = self.locationsRepo:selectLocationById(chart.location_id)
+		if not location then
+			return
+		end
+		self.locationsById[chart.location_id] = location
+	end
+	local prefix = self:getPrefix(location)
+	chart.location_prefix = prefix
+	chart.location_dir = path_util.join(prefix, chart.dir)
+	chart.location_path = path_util.join(prefix, chart.path)
+	chart.real_dir = path_util.join(location.path, chart.dir)
+	chart.real_path = path_util.join(location.path, chart.path)
 end
 
 function Locations:createDefaultLocation()

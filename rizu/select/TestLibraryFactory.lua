@@ -28,9 +28,12 @@ end
 ---@param data table
 function TestLibraryFactory:populate(lib, data)
 	-- Insert location
-	local loc = lib.locationsRepo:insertLocation({
-		path = "charts", name = "test", is_relative = true, is_internal = true
-	})
+	local loc = lib.locationsRepo:selectLocation("charts")
+	if not loc then
+		loc = lib.locationsRepo:insertLocation({
+			path = "charts", name = "test", is_relative = true, is_internal = true
+		})
+	end
 	
 	for _, entry in ipairs(data) do
 		-- Insert chartfile_set if not exists

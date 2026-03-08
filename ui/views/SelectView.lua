@@ -98,7 +98,7 @@ function SelectView:play()
 end
 
 function SelectView:result()
-	if self.game.chartSelector:notechartExists() and self.game.scoreSelector.scoreItem then
+	if self.game.chartSelector:notechartExists() and self.game.scoreSelector.chartplay then
 		self:changeScreen("resultView")
 	end
 end
@@ -113,7 +113,7 @@ end
 function SelectView:switchToNoteCharts()
 	self.subscreen = "notecharts"
 	self.searchMode = "filter"
-	self.game.chartSelector:noDebouncePullNoteChartSet()
+	self.game.chartSelector:noDebounceRefresh()
 	just.focus()
 end
 

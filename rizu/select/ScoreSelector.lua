@@ -24,15 +24,29 @@ function ScoreSelector:new(configModel, library, onlineModel, replayBase, state)
 	local localProvider = LocalScoreProvider(library)
 	local onlineProvider = OnlineScoreProvider(onlineModel)
 	self.store = ScoreStore(configModel, localProvider, onlineProvider)
+	self.store.onChanged:add(self)
 
 	self.onChanged = Observable()
 	self.debounceTime = 0.5
 end
 
+function ScoreSelector:receive(event)
+	if event.items then
+		self:findScore()
+		return
+	end
+
+	if event.type == "selection" and event.level == 2 then
+		self:setChart(self.chartview)
+	elseif event.type == "find_notechart" or event.type == "set_changed" then
+		self:setChart(self.chartview)
+	end
+end
+
 ---@param chartview table?
 function ScoreSelector:setChart(chartview)
 	self.chartview = chartview
-	self.scoreItem = nil
+	self.chartplay = nil
 
 	if not chartview then
 		self:clear()
@@ -44,22 +58,22 @@ function ScoreSelector:setChart(chartview)
 end
 
 function ScoreSelector:clear()
-	self.scoreItem = nil
+	self.chartplay = nil
 	self.store:clear()
 end
 
 function ScoreSelector:findScore()
 	local config = self.configModel.configs.select
-	local scoreItems = self.store.items
+	local chartplays = self.store.items
 	local index = self.store:getItemIndex(config.chartplay_id) or 1
-	local scoreItem = scoreItems[index]
+	local chartplay = chartplays[index]
 
-	if scoreItem then
-		config.chartplay_id = scoreItem.id
+	if chartplay then
+		config.chartplay_id = chartplay.id
 	end
 
-	self.state:setScore(index, scoreItem and scoreItem.id)
-	self.scoreItem = scoreItem
+	self.state:setScore(index, chartplay and chartplay.id)
+	self.chartplay = chartplay
 end
 
 ---@param noUpdate boolean?
@@ -86,8 +100,6 @@ function ScoreSelector:pullScore(noUpdate)
 	
 	-- We use the coro version to ensure the task runner waits for completion
 	self.store:updateItems(chartview, exact)
-
-	self:findScore()
 end
 
 ---@param direction number?
@@ -95,19 +107,19 @@ end
 function ScoreSelector:scrollScore(direction, destination)
 	local items = self.store.items
 
-	destination = math.min(math.max(destination or self.state.scoreItemIndex + direction, 1), #items)
-	if not items[destination] or self.state.scoreItemIndex == destination then
+	destination = math.min(math.max(destination or self.state.chartplayIndex + direction, 1), #items)
+	if not items[destination] or self.state.chartplayIndex == destination then
 		return
 	end
 
-	local scoreItem = items[destination]
+	local chartplay = items[destination]
 	local config = self.configModel.configs.select
-	config.chartplay_id = scoreItem.id
+	config.chartplay_id = chartplay.id
 
-	self.state:setScore(destination, scoreItem.id)
+	self.state:setScore(destination, chartplay.id)
 
-	self.scoreItem = scoreItem
-	self.onChanged:send({type = "scroll_score", scoreItem = scoreItem})
+	self.chartplay = chartplay
+	self.onChanged:send({type = "scroll_score", chartplay = chartplay})
 end
 
 ---@param chartview table

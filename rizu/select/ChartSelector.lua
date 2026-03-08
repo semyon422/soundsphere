@@ -2,8 +2,7 @@ local class = require("class")
 local delay = require("delay")
 local Observable = require("Observable")
 local SelectionState = require("rizu.select.SelectionState")
-local ChartStore = require("rizu.select.stores.ChartStore")
-local ChartSetStore = require("rizu.select.stores.ChartSetStore")
+local ListStore = require("rizu.select.stores.ListStore")
 local SearchModel = require("rizu.select.SearchModel")
 local SortModel = require("rizu.select.SortModel")
 local FilterModel = require("rizu.select.FilterModel")
@@ -29,8 +28,12 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 	self.collectionSelector = collectionSelector
 	self.state = state or SelectionState()
 
-	self.chartStore = ChartStore(library)
-	self.chartSetStore = ChartSetStore(library)
+	---@type rizu.select.stores.ListStore[]
+	self.stores = {
+		ListStore(library), -- Primary
+		ListStore(library), -- Secondary
+	}
+
 	self.searchModel = SearchModel(configModel)
 	self.filterModel = FilterModel(configModel)
 	self.sortModel = SortModel()
@@ -40,19 +43,42 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
+
+	self.stores[1].onChanged:add({
+		receive = function(_, event)
+			if event.type == "item_loaded" then
+				local current = self.state:getSelection(1)
+				if event.index == current.index then
+					self:setChanged()
+				end
+			end
+		end
+	})
+	self.stores[2].onChanged:add({
+		receive = function(_, event)
+			if event.type == "item_loaded" then
+				local current = self.state:getSelection(2)
+				if event.index == current.index then
+					self:setChanged()
+				end
+			end
+		end
+	})
 end
 
 function ChartSelector:receive(event)
-	if event.type == "set" then
-		self.taskRunner:push(function()
-			self:pullNoteChart()
-		end, 1)
-	elseif event.type == "chart" then
-		self.taskRunner:push(function()
-			local index = self.chartSetStore:indexof(self.config)
-			local chartview_set = self.chartSetStore:get(index)
-			self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
-		end, 2)
+	if event.type == "selection" then
+		if event.level == 1 then
+			self.taskRunner:push(function()
+				self:pullLevel(2)
+			end, 1)
+		elseif event.level == 2 then
+			self.taskRunner:push(function()
+				local index = self.stores[1]:indexof(self.config)
+				local item = self.stores[1]:get(index)
+				self.state:setSelection(1, index, item and item.chartfile_set_id)
+			end, 2)
+		end
 	end
 end
 
@@ -61,19 +87,19 @@ function ChartSelector:load()
 	self.config = config
 
 	self.searchMode = config.searchMode
-
 	self.filterModel:apply()
 
-	self:noDebouncePullNoteChartSet()
+	self:noDebounceRefresh()
 end
 
-function ChartSelector:updateSetItems()
+function ChartSelector:updatePrimaryItems()
 	local collectionItem = self.collectionSelector:getSelectedItem()
 	local params = self.queryBuilder:build(self.config, collectionItem)
 
-	self.library.chartviewsRepo:queryAsync(params)
-	self.chartSetStore:updateItems()
-	self.onChanged:send({type = "update_set_items"})
+	local result = self.library:queryAsync(params)
+	self.library.chartviewsRepo.params = params -- ensure repo has current params for getChartview in ListStore
+	self.stores[1]:setResult(result)
+	self.onChanged:send({type = "update_primary_items"})
 end
 
 ---@param hash string
@@ -85,22 +111,30 @@ function ChartSelector:findNotechart(hash, index)
 		difficulty = config.diff_column,
 	}
 	self.taskRunner:push(function()
-		self.library.chartviewsRepo:queryAsync(params)
-		self.chartSetStore:updateItems()
-		local chartview_set = self.chartSetStore:get(1)
-		if chartview_set then
-			self.chartStore:setNoteChartSetId(chartview_set)
+		local result = self.library:queryAsync(params)
+		if result then
+			self.library.chartviewsRepo.params = params
+			self.stores[1]:setResult(result)
+			local item = self.stores[1]:get(1)
+			if item then
+				local result2 = self.library:getViewsAsync(params, item)
+				self.stores[2]:setResult(result2)
+
+				local chartview = self.stores[2]:get(1)
+				self.chartview = chartview
+				self:setConfig(chartview)
+				self.state:setSelection(1, 1, chartview.chartfile_set_id)
+				self.state:setSelection(2, 1, chartview.chartfile_id)
+			end
+			self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 		end
-		self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 	end, 1)
 end
 
 ---@return string?
 function ChartSelector:getBackgroundPath()
 	local chartview = self.chartview
-	if not chartview then
-		return
-	end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:getBackgroundPath(chartview)
 end
 
@@ -109,9 +143,7 @@ end
 ---@return string?
 function ChartSelector:getAudioPathPreview()
 	local chartview = self.chartview
-	if not chartview then
-		return
-	end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:getAudioPathPreview(chartview)
 end
 
@@ -120,9 +152,7 @@ end
 ---@return sea.Chartmeta?
 function ChartSelector:loadChart(settings)
 	local chartview = self.chartview
-	if not chartview then
-		return
-	end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:loadChart(chartview)
 end
 
@@ -131,9 +161,7 @@ end
 ---@return sea.Chartmeta?
 function ChartSelector:loadChartAbsolute(settings)
 	local chartview = self.chartview
-	if not chartview then
-		return
-	end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:loadChartAbsolute(chartview)
 end
 
@@ -152,21 +180,20 @@ end
 ---@return boolean
 function ChartSelector:notechartExists()
 	local chartview = self.chartview
-	if chartview then
+	if chartview and chartview.location_path then
 		return self.fs:getInfo(chartview.location_path) ~= nil
 	end
 	return false
 end
 
----@param ... any?
-function ChartSelector:debouncePullNoteChartSet(...)
-	delay.debounce(self, "pullNoteChartSetDebounce", self.debounceTime, self.pullNoteChartSet, self, ...)
+function ChartSelector:debounceRefresh(...)
+	delay.debounce(self, "refreshDebounce", self.debounceTime, self.refresh, self, ...)
 end
 
-function ChartSelector:noDebouncePullNoteChartSet(...)
+function ChartSelector:noDebounceRefresh(...)
 	local args = {...}
 	self.taskRunner:push(function()
-		self:pullNoteChartSet(unpack(args))
+		self:refresh(unpack(args))
 		if self.chartview then
 			self:setConfig(self.chartview)
 		end
@@ -176,7 +203,7 @@ end
 ---@param sortFunctionName string
 function ChartSelector:setSortFunction(sortFunctionName)
 	self.config.sortFunction = sortFunctionName
-	self:noDebouncePullNoteChartSet()
+	self:noDebounceRefresh()
 end
 
 ---@param locked boolean
@@ -185,13 +212,14 @@ function ChartSelector:setLock(locked)
 end
 
 function ChartSelector:scrollRandom()
-	local itemsCount = self.chartSetStore:count()
+	local itemsCount = self.stores[1]:count()
 	local destination = math.random(1, itemsCount)
-	self:scrollNoteChartSet(nil, destination)
+	self:scrollLevel(1, nil, destination)
 end
 
 ---@param chartview table
 function ChartSelector:setConfig(chartview)
+	if not chartview or not chartview.chartfile_id or chartview.chartfile_id == 0 then return end
 	self.config.chartfile_set_id = chartview.chartfile_set_id
 	self.config.chartfile_id = chartview.chartfile_id
 	self.config.chartmeta_id = chartview.chartmeta_id
@@ -200,62 +228,48 @@ function ChartSelector:setConfig(chartview)
 	self.config.select_chartplay_id = chartview.chartplay_id
 end
 
+---@param level number
 ---@param direction number?
 ---@param destination number?
-function ChartSelector:scrollNoteChartSet(direction, destination)
-	local itemsCount = self.chartSetStore:count()
+function ChartSelector:scrollLevel(level, direction, destination)
+	local store = self.stores[level]
+	local current = self.state:getSelection(level)
+	local itemsCount = store:count()
 
-	destination = math.min(math.max(destination or self.state.chartview_set_index + direction, 1), itemsCount)
-	if not self.chartSetStore:get(destination) or self.state.chartview_set_index == destination then
+	destination = math.min(math.max(destination or current.index + direction, 1), itemsCount)
+	if current.index == destination then
 		return
 	end
 
-	local chartview_set = self.chartSetStore:get(destination)
-	self:setConfig(chartview_set)
+	local item = store:get(destination)
+	if not item then return end
 
-	self.state:setSet(destination, chartview_set.chartfile_set_id)
-end
+	self:setConfig(item)
 
----@param direction number?
----@param destination number?
-function ChartSelector:scrollNoteChart(direction, destination)
-	local items = self.chartStore.items
-
-	direction = direction or destination - self.state.chartview_index
-
-	destination = math.min(math.max(destination or self.state.chartview_index + direction, 1), #items)
-	if not items[destination] or self.state.chartview_index == destination then
-		return
+	if level == 1 then
+		self.state:setSelection(1, destination, item.chartfile_set_id)
+	else
+		self.chartview = item
+		self.changed = true
+		self.state:setSelection(2, destination, item.chartfile_id)
+		self.onChanged:send({type = "scroll_level", level = level, chartview = item})
 	end
-
-	local chartview = items[destination]
-	self:setConfig(chartview)
-
-	self.chartview = chartview
-	self.changed = true
-
-	self.state:setChart(destination, chartview.chartfile_id)
-
-	self.onChanged:send({type = "scroll_notechart", chartview = chartview})
 end
 
 ---@param noUpdate boolean?
 ---@param noPullNext boolean?
-function ChartSelector:pullNoteChartSet(noUpdate, noPullNext)
-	if self.locked then
-		return
-	end
+function ChartSelector:refresh(noUpdate, noPullNext)
+	if self.locked then return end
 
 	if not noUpdate then
-		self:updateSetItems()
+		self:updatePrimaryItems()
 	end
 
-	local index = self.chartSetStore:indexof(self.config)
-	local chartview_set = self.chartSetStore:get(index)
+	local index = self.stores[1]:indexof(self.config)
+	local item = self.stores[1]:get(index)
 
-	if chartview_set then
-		self.config.chartfile_set_id = chartview_set.chartfile_set_id
-		self.config.chartmeta_id = chartview_set.chartmeta_id  -- required for chart and diff levels
+	if item and item.chartfile_set_id and item.chartfile_set_id ~= 0 then
+		self:setConfig(item)
 	else
 		self.config.chartfile_set_id = nil
 		self.config.chartfile_id = nil
@@ -266,31 +280,34 @@ function ChartSelector:pullNoteChartSet(noUpdate, noPullNext)
 		self.chartview = nil
 		self.changed = true
 
-		self.chartStore:clear()
+		self.stores[2]:setResult(nil)
 	end
 
-	self.state:setSet(index, chartview_set and chartview_set.chartfile_set_id)
+	self.state:setSelection(1, index, item and item.chartfile_set_id)
 
-	if chartview_set and not noPullNext then
-		self:pullNoteChart()
+	if item and not noPullNext then
+		self:pullLevel(2)
 	end
 end
 
----@param noUpdate boolean?
----@param noPullNext boolean?
-function ChartSelector:pullNoteChart(noUpdate, noPullNext)
-	if not noUpdate then
-		self.chartStore:setNoteChartSetId(self.config)
+---@param level number
+function ChartSelector:pullLevel(level)
+	if level ~= 2 then return end -- Currently only supports 2 levels
+
+	local parentItem = self.stores[1]:get(self.state:getSelection(1).index)
+	if parentItem and parentItem.chartfile_set_id and parentItem.chartfile_set_id ~= 0 then
+		local params = self.queryBuilder:build(self.config)
+		local result = self.library:getViewsAsync(params, parentItem)
+		self.stores[2]:setResult(result)
+	else
+		self.stores[2]:setResult(nil)
 	end
 
-	local index = self.chartStore:indexof(self.config)
-	local chartview = self.chartStore.items[index]
+	local index = self.stores[2]:indexof(self.config)
+	local chartview = self.stores[2]:get(index)
 
-	if chartview then
-		self.config.chartfile_id = chartview.chartfile_id
-		self.config.chartmeta_id = chartview.chartmeta_id
-		self.config.chartdiff_id = chartview.chartdiff_id
-		self.config.chartplay_id = chartview.chartplay_id
+	if chartview and chartview.chartfile_id and chartview.chartfile_id ~= 0 then
+		self:setConfig(chartview)
 	else
 		self.config.chartfile_id = nil
 		self.config.chartmeta_id = nil
@@ -301,7 +318,7 @@ function ChartSelector:pullNoteChart(noUpdate, noPullNext)
 	self.chartview = chartview
 	self.changed = true
 
-	self.state:setChart(index, chartview and chartview.chartfile_id)
+	self.state:setSelection(2, index, chartview and chartview.chartfile_id)
 end
 
 return ChartSelector

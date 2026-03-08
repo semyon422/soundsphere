@@ -12,13 +12,13 @@ end
 ---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]
 function LocalScoreProvider:getChartplaysForChartdiff(chartdiff_key)
-	return self.library.chartsRepo:getChartplaysForChartdiff(chartdiff_key)
+	return self.library:getChartplaysForChartdiffAsync(chartdiff_key)
 end
 
 ---@param chartmeta_key sea.ChartmetaKey
 ---@return sea.Chartplay[]
 function LocalScoreProvider:getChartplaysForChartmeta(chartmeta_key)
-	return self.library.chartsRepo:getChartplaysForChartmeta(chartmeta_key)
+	return self.library:getChartplaysForChartmetaAsync(chartmeta_key)
 end
 
 return LocalScoreProvider

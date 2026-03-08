@@ -1,6 +1,8 @@
 local class = require("class")
 local Processor = require("rizu.library.Processor")
 local Database = require("rizu.library.Database")
+local ChartviewsRepo = require("rizu.library.repos.ChartviewsRepo")
+local ChartsRepo = require("sea.chart.repos.ChartsRepo")
 
 ---@class rizu.library.Worker
 ---@operator call: rizu.library.Worker
@@ -65,6 +67,34 @@ end
 
 function Worker:computeChartplays()
 	self.processor:computeChartplays()
+end
+
+function Worker:query(params)
+	local repo = ChartviewsRepo(self.db.models)
+	repo.params = params
+	return repo:query()
+end
+
+function Worker:getViews(params, chartview)
+	local repo = ChartviewsRepo(self.db.models)
+	repo.params = params
+	return repo:getViews(chartview)
+end
+
+function Worker:getChartview(params, _chartview)
+	local repo = ChartviewsRepo(self.db.models)
+	repo.params = params
+	return repo:getChartview(_chartview)
+end
+
+function Worker:getChartplaysForChartdiff(chartdiff_key)
+	local repo = ChartsRepo(self.db.models)
+	return repo:getChartplaysForChartdiff(chartdiff_key)
+end
+
+function Worker:getChartplaysForChartmeta(chartmeta_key)
+	local repo = ChartsRepo(self.db.models)
+	return repo:getChartplaysForChartmeta(chartmeta_key)
 end
 
 return Worker

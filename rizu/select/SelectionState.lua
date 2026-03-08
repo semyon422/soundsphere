@@ -5,54 +5,54 @@ local Observable = require("Observable")
 ---@operator call: rizu.select.SelectionState
 local SelectionState = class()
 
-function SelectionState:new()
-	---@type number
-	self.chartview_set_index = 1
-	---@type number
-	self.chartview_index = 1
-	---@type number
-	self.scoreItemIndex = 1
+---@class rizu.select.SelectionLevel
+---@field index number
+---@field id number?
 
-	---@type number?
-	self.chartSetId = nil
-	---@type number?
-	self.chartId = nil
+function SelectionState:new()
+	---@type rizu.select.SelectionLevel[]
+	self.levels = {
+		{index = 1, id = nil}, -- Primary
+		{index = 1, id = nil}, -- Secondary
+	}
+	---@type number
+	self.chartplayIndex = 1
 	---@type number?
 	self.scoreId = nil
 
 	self.onChanged = Observable()
 end
 
+---@param level number
 ---@param index number
 ---@param id number?
-function SelectionState:setSet(index, id)
-	if self.chartview_set_index == index and self.chartSetId == id then return end
-	self.chartview_set_index = index
-	self.chartSetId = id
-	self.onChanged:send({type = "set", index = index, id = id})
-end
+function SelectionState:setSelection(level, index, id)
+	local l = self.levels[level]
+	if not l then
+		self.levels[level] = {index = index, id = id}
+		l = self.levels[level]
+	elseif l.index == index and l.id == id then
+		return
+	end
 
----@param index number
----@param id number?
-function SelectionState:setChart(index, id)
-	if self.chartview_index == index and self.chartId == id then return end
-	self.chartview_index = index
-	self.chartId = id
-	self.onChanged:send({type = "chart", index = index, id = id})
+	l.index = index
+	l.id = id
+
+	self.onChanged:send({type = "selection", level = level, index = index, id = id})
 end
 
 ---@param index number
 ---@param id number?
 function SelectionState:setScore(index, id)
-	if self.scoreItemIndex == index and self.scoreId == id then return end
-	self.scoreItemIndex = index
+	if self.chartplayIndex == index and self.scoreId == id then return end
+	self.chartplayIndex = index
 	self.scoreId = id
 	self.onChanged:send({type = "score", index = index, id = id})
 end
 
--- Backward compatibility aliases for setters if needed
-SelectionState.setSetIndex = function(self, index) self:setSet(index, self.chartSetId) end
-SelectionState.setChartIndex = function(self, index) self:setChart(index, self.chartId) end
-SelectionState.setScoreIndex = function(self, index) self:setScore(index, self.scoreId) end
+-- Getters
+function SelectionState:getSelection(level) return self.levels[level] end
+function SelectionState:getPrimary() return self.levels[1] end
+function SelectionState:getSecondary() return self.levels[2] end
 
 return SelectionState

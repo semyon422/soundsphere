@@ -16,12 +16,12 @@ end
 function ResultController:load()
 	self.game.scoreSelector:pullScore()
 
-	local scoreItem = self.game.scoreSelector.scoreItem
-	if not scoreItem then
+	local chartplay = self.game.scoreSelector.chartplay
+	if not chartplay then
 		return
 	end
 
-	self.game.scoreSelector:scrollScore(nil, self.game.scoreSelector.state.scoreItemIndex)
+	self.game.scoreSelector:scrollScore(nil, self.game.scoreSelector.state.chartplayIndex)
 end
 
 function ResultController:unload()

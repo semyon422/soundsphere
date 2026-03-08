@@ -64,16 +64,18 @@ function SelectController:new(
 
 	self.chartSelector.state.onChanged:add({
 		receive = function(_, event)
-			if event.type == "chart" then
+			if event.type == "selection" and event.level == 2 then
 				self.scoreSelector:setChart(self.chartSelector.chartview)
 			end
 		end
 	})
 
+	self.chartSelector.onChanged:add(self.scoreSelector)
+
 	self.collectionSelector.onChanged:add({
 		receive = function(_, event)
 			if event.type == "collection_changed" then
-				self.chartSelector:noDebouncePullNoteChartSet(not event.path_changed)
+				self.chartSelector:noDebounceRefresh(not event.path_changed)
 			end
 		end
 	})
@@ -138,7 +140,9 @@ function SelectController:update()
 	if chartSelector:isChanged() then
 		self.backgroundModel:setBackgroundPath(chartSelector:getBackgroundPath())
 		local audio_path, preview_time, mode = chartSelector:getAudioPathPreview()
-		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
+		if audio_path or not chartSelector.chartview then
+			self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
+		end
 		self.previewModel:onLoad(function()
 			self.chartPreviewModel:setChartview(chartSelector.chartview)
 		end)
