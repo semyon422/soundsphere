@@ -6,6 +6,7 @@ local ArtistTitle = require("yi.views.shared.ArtistTitle")
 local Tags = require("yi.views.shared.Tags")
 local Player = require("yi.views.shared.Player")
 local ChartInfo = require("yi.views.shared.ChartInfo")
+local JudgeCell = require("yi.views.result.JudgeCell")
 local Colors = require("yi.Colors")
 local h = require("yi.h")
 
@@ -41,6 +42,7 @@ function Result:load()
 	self.score_system_name = Label(res:getFont("bold", 24), "Loading...")
 	self.accuracy = Label(res:getFont("black", 128), "??.??%")
 	self.chart_info = ChartInfo()
+	self.judges = View()
 
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = Colors.panels}),
@@ -54,6 +56,8 @@ function Result:load()
 			h(View(), {arrange = "flow_col"}, {
 				h(self.score_system_name, {color = Colors.lines, y = 20}),
 				h(self.accuracy, {color = Colors.text})
+			}),
+			h(self.judges, {arrange = "flow_row", gap = 10, line_gap = 10, w = 500}, {
 			})
 		}),
 
@@ -96,6 +100,21 @@ function Result:setScoreItem(score_item)
 	end
 
 	self.score_system_name:setText("osu!mania V1 OD9")
+
+	local j = score_engine.judgesSource:getJudges()
+
+	for _, v in ipairs(self.judges.children) do
+		v:kill()
+	end
+
+	if j[1] then self.judges:add(JudgeCell({0, 0.69, 1, 1}, j[1])) end
+	if j[2] then self.judges:add(JudgeCell({0.93, 1, 0, 1}, j[2])) end
+	if j[3] then self.judges:add(JudgeCell({0.27, 0.86, 0.27, 1}, j[3])) end
+	if j[4] then self.judges:add(JudgeCell({0.29, 0.3, 1, 1}, j[4])) end
+	if j[5] then self.judges:add(JudgeCell({0.9, 0.09, 0.63, 1}, j[5])) end
+
+	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, score_engine.scores.base.missCount))
+
 end
 
 function Result:update()
