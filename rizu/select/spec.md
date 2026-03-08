@@ -1,33 +1,32 @@
 # Chart Selection System
 
-The chart selection system manages hierarchical navigation through the library using a generalized, level-based architecture. It supports dynamic grouping and drill-down across 5 granularity levels.
+The chart selection system manages hierarchical navigation through the library using a generalized, level-based architecture. It coordinates UI state with the underlying library query engine.
 
 ## Hierarchy and Levels
 
-The hierarchy is defined by `primary_mode` and `secondary_mode` (configured in `settings.select`), mapping to levels in the `SelectionState`:
+The hierarchy is determined by `primary_mode` and `secondary_mode` (configured in `settings.select`), which map to levels in the `SelectionState`:
 1. `chartfile_sets`
 2. `chartfiles`
 3. `chartmetas`
 4. `chartdiffs`
 5. `chartplays`
 
-- **Level 1 (Primary):** The root navigation level. It uses a **Global Scope**, querying the entire library asynchronously.
-- **Level 2 (Secondary):** A drill-down level. It uses a **Filtered Scope**, fetching items related to the selection of Level 1.
+- **Level 1 (Primary):** The root navigation level. It uses a **Global Scope**, querying the entire library asynchronously via the Library Worker.
+- **Level 2 (Secondary):** A drill-down level. It uses a **Filtered Scope**, fetching items related to the selection of Level 1 via the Library Worker.
 
-The system is designed to support N-levels of hierarchy if needed.
+Refer to `rizu/library/spec.md` for details on grouping and aggregation rules.
 
 ## Components
 
 ### 1. ChartSelector (The Orchestrator)
-The central controller that coordinates data fetching and selection state across levels. It handles:
+The central controller that coordinates data fetching and selection state. It handles:
 - Debounced library refreshes.
 - Propagation of selection changes from parent levels to child levels.
 - Restoration of selection based on IDs after list updates.
+- Orchestration of asynchronous tasks via `TaskRunner`.
 
-### 2. ListStore (The Data Container)
-A generalized store (`rizu.select.stores.ListStore`) that can operate in two modes:
-- **Global Mode:** Connects to the `ChartviewsRepo` FFI index for high-performance access to the full library.
-- **Filtered Mode:** Holds a local Lua table of items fetched specifically for the current drill-down context.
+### 2. ListStore (The Data Proxy)
+A generalized store (`rizu.select.stores.ListStore`) that acts as a reactive, cached proxy for list data. It utilizes the unified FFI indexing and on-demand enrichment specified in `rizu/library/spec.md`.
 
 ### 3. SelectionState (The Reactive State)
 A level-based state container that tracks the current `index` and `id` for each hierarchy level.
@@ -37,22 +36,22 @@ A level-based state container that tracks the current `index` and `id` for each 
 ## Update Lifecycle
 
 1. **Full Refresh:** Triggered by changes in filters, search, or sorting.
-   - `ChartSelector:refresh()` calls `Repo:queryAsync()`.
-   - `ListStore[1]` updates from the repo's global index.
-   - Selection is restored for Level 1.
+   - `ChartSelector:updatePrimaryItems()` calls `Library:queryAsync()`.
+   - `ListStore[1]` is updated with the new result.
+   - Selection is restored for Level 1 based on IDs.
 2. **Level Propagation:**
    - When Level 1 selection changes, `ChartSelector:pullLevel(2)` is called.
-   - `Repo:getViews(parent_item)` is called synchronously (but within a Task) to fetch child items.
-   - `ListStore[2]` is updated with the new items.
+   - `Library:getViewsAsync(parent_item)` is called to fetch child items in the worker thread.
+   - `ListStore[2]` is updated with the new result.
    - Selection is restored for Level 2.
+
+## Performance and Optimization
+
+- **Threaded Retrieval:** All database intensive operations (queries, drill-downs, score fetching) are offloaded to the `Library.Worker` thread.
+- **Virtualization Support:** The unified FFI approach for all levels allows the UI to handle thousands of secondary items without garbage collection pressure.
 
 ## Synchronization and UI
 
-- **Selected Chart:** The item at the finest active level (typically Level 2) is considered the "Selected Chart."
+- **Selected Chart:** The item at the finest active level (typically Level 2) is the "Selected Chart."
 - **ReplayBase:** Updated with settings (modifiers, rate) from the selected item if the mode is `chartdiffs` or `chartplays`.
 - **Observables:** UI components bind to `ListStore.onChanged` for item updates and `SelectionState.onChanged` for selection/scroll updates.
-
-## Performance
-- **Primary Queries:** Performed in a background thread to prevent UI freezing.
-- **Secondary Queries:** Synchronous but wrapped in a `TaskRunner` to ensure consistent frame timing.
-- **FFI Indexing:** Level 1 uses an FFI-based struct array in `ChartviewsRepo` for memory efficiency when handling tens of thousands of charts.

@@ -34,6 +34,25 @@ When grouping at a coarser level, the data for finer levels must be picked accor
 ### Aggregated Sorting
 All sort functions are supported for grouped views. When sorting a grouped list by a specific attribute (e.g., difficulty, tempo, duration), the **maximum value** within each group is used for sorting and display. For example, in `metas-diffs` mode, sorting the primary meta list by difficulty will use the highest difficulty among all diffs for each meta.
 
+## Query Engine (ChartviewsRepo)
+
+The `ChartviewsRepo` is a stateless query engine designed for high-performance data retrieval in a multi-threaded environment.
+
+### Statelessness and Thread Safety
+The repository does not maintain internal state (like result lists or ID maps). All query methods return a self-contained `QueryResult` object. This architecture allows the repository to be used safely within the `Library.Worker` thread.
+
+### Unified FFI Indexing
+To handle tens of thousands of charts with minimal memory footprint and zero-copy transfer between threads:
+- **`chartview_struct`**: An FFI C-struct containing only essential IDs and flags (lamp, etc.).
+- **QueryResult**: Contains a packed buffer of these structs and a set of ID-to-Index maps for selection restoration.
+- All selection levels (Primary, Secondary, etc.) use this unified indexing.
+
+### Data Enrichment (Lazy Loading)
+Rich metadata (titles, artists, file paths) is not returned by the main query. Instead:
+1. The UI or Store holds the slim FFI index.
+2. `getChartview(struct)` is called on-demand to fetch rich data for a single item (e.g., when it enters the viewport).
+3. `rizu.library.Locations` provides a high-speed enrichment service using an in-memory location cache to resolve absolute paths without repeated SQL queries.
+
 #### Examples:
 | Primary Mode | Secondary Mode | Filter Level | Group Level | User Experience |
 | :--- | :--- | :--- | :--- | :--- |
