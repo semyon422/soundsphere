@@ -43,6 +43,27 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
+
+	self.stores[1].onChanged:add({
+		receive = function(_, event)
+			if event.type == "item_loaded" then
+				local current = self.state:getSelection(1)
+				if event.index == current.index then
+					self:setChanged()
+				end
+			end
+		end
+	})
+	self.stores[2].onChanged:add({
+		receive = function(_, event)
+			if event.type == "item_loaded" then
+				local current = self.state:getSelection(2)
+				if event.index == current.index then
+					self:setChanged()
+				end
+			end
+		end
+	})
 end
 
 function ChartSelector:receive(event)
@@ -91,21 +112,23 @@ function ChartSelector:findNotechart(hash, index)
 	}
 	self.taskRunner:push(function()
 		local result = self.library:queryAsync(params)
-		self.library.chartviewsRepo.params = params
-		self.stores[1]:setResult(result)
-		local item = self.stores[1]:get(1)
-		if item then
-			local result2 = self.library:getViewsAsync(params, item)
-			self.stores[2]:setResult(result2)
+		if result then
+			self.library.chartviewsRepo.params = params
+			self.stores[1]:setResult(result)
+			local item = self.stores[1]:get(1)
+			if item then
+				local result2 = self.library:getViewsAsync(params, item)
+				self.stores[2]:setResult(result2)
+			end
+			self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 		end
-		self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 	end, 1)
 end
 
 ---@return string?
 function ChartSelector:getBackgroundPath()
 	local chartview = self.chartview
-	if not chartview then return end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:getBackgroundPath(chartview)
 end
 
@@ -114,7 +137,7 @@ end
 ---@return string?
 function ChartSelector:getAudioPathPreview()
 	local chartview = self.chartview
-	if not chartview then return end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:getAudioPathPreview(chartview)
 end
 
@@ -123,7 +146,7 @@ end
 ---@return sea.Chartmeta?
 function ChartSelector:loadChart(settings)
 	local chartview = self.chartview
-	if not chartview then return end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:loadChart(chartview)
 end
 
@@ -132,7 +155,7 @@ end
 ---@return sea.Chartmeta?
 function ChartSelector:loadChartAbsolute(settings)
 	local chartview = self.chartview
-	if not chartview then return end
+	if not chartview or not chartview.title then return end
 	return self.metadataService:loadChartAbsolute(chartview)
 end
 
@@ -151,7 +174,7 @@ end
 ---@return boolean
 function ChartSelector:notechartExists()
 	local chartview = self.chartview
-	if chartview then
+	if chartview and chartview.location_path then
 		return self.fs:getInfo(chartview.location_path) ~= nil
 	end
 	return false
@@ -190,6 +213,7 @@ end
 
 ---@param chartview table
 function ChartSelector:setConfig(chartview)
+	if not chartview or not chartview.chartfile_id or chartview.chartfile_id == 0 then return end
 	self.config.chartfile_set_id = chartview.chartfile_set_id
 	self.config.chartfile_id = chartview.chartfile_id
 	self.config.chartmeta_id = chartview.chartmeta_id
@@ -207,11 +231,13 @@ function ChartSelector:scrollLevel(level, direction, destination)
 	local itemsCount = store:count()
 
 	destination = math.min(math.max(destination or current.index + direction, 1), itemsCount)
-	if not store:get(destination) or current.index == destination then
+	if current.index == destination then
 		return
 	end
 
 	local item = store:get(destination)
+	if not item then return end
+
 	self:setConfig(item)
 
 	if level == 1 then
@@ -236,9 +262,8 @@ function ChartSelector:refresh(noUpdate, noPullNext)
 	local index = self.stores[1]:indexof(self.config)
 	local item = self.stores[1]:get(index)
 
-	if item then
-		self.config.chartfile_set_id = item.chartfile_set_id
-		self.config.chartmeta_id = item.chartmeta_id
+	if item and item.chartfile_set_id and item.chartfile_set_id ~= 0 then
+		self:setConfig(item)
 	else
 		self.config.chartfile_set_id = nil
 		self.config.chartfile_id = nil
@@ -264,7 +289,7 @@ function ChartSelector:pullLevel(level)
 	if level ~= 2 then return end -- Currently only supports 2 levels
 
 	local parentItem = self.stores[1]:get(self.state:getSelection(1).index)
-	if parentItem then
+	if parentItem and parentItem.chartfile_set_id and parentItem.chartfile_set_id ~= 0 then
 		local params = self.queryBuilder:build(self.config)
 		local result = self.library:getViewsAsync(params, parentItem)
 		self.stores[2]:setResult(result)
@@ -275,11 +300,8 @@ function ChartSelector:pullLevel(level)
 	local index = self.stores[2]:indexof(self.config)
 	local chartview = self.stores[2]:get(index)
 
-	if chartview then
-		self.config.chartfile_id = chartview.chartfile_id
-		self.config.chartmeta_id = chartview.chartmeta_id
-		self.config.chartdiff_id = chartview.chartdiff_id
-		self.config.chartplay_id = chartview.chartplay_id
+	if chartview and chartview.chartfile_id and chartview.chartfile_id ~= 0 then
+		self:setConfig(chartview)
 	else
 		self.config.chartfile_id = nil
 		self.config.chartmeta_id = nil

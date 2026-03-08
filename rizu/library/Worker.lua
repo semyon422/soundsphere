@@ -81,6 +81,12 @@ function Worker:getViews(params, chartview)
 	return repo:getViews(chartview)
 end
 
+function Worker:getChartview(params, _chartview)
+	local repo = ChartviewsRepo(self.db.models)
+	repo.params = params
+	return repo:getChartview(_chartview)
+end
+
 function Worker:getChartplaysForChartdiff(chartdiff_key)
 	local repo = ChartsRepo(self.db.models)
 	return repo:getChartplaysForChartdiff(chartdiff_key)

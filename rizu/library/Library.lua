@@ -239,6 +239,17 @@ function Library:getViewsAsync(params, chartview)
 	return self.worker:getViews(params, chartview)
 end
 
+---@param params table
+---@param _chartview table
+---@return table result
+function Library:getChartviewAsync(params, _chartview)
+	if self.is_sync or not self.worker then
+		self.chartviewsRepo.params = params
+		return self.chartviewsRepo:getChartview(_chartview)
+	end
+	return self.worker:getChartview(params, _chartview)
+end
+
 ---@param chartdiff_key sea.ChartdiffKey
 ---@return sea.Chartplay[]
 function Library:getChartplaysForChartdiffAsync(chartdiff_key)

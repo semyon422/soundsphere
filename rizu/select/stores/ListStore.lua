@@ -1,6 +1,7 @@
 local class = require("class")
 local ExpireTable = require("ExpireTable")
 local Observable = require("Observable")
+local table_util = require("table_util")
 
 ---@class rizu.select.stores.ListStore
 ---@operator call: rizu.select.stores.ListStore
@@ -45,16 +46,34 @@ function ListStore:_loadObject(index)
 		return nil
 	end
 
-	local _chartview = self.items[index - 1]
-	local chartview = self.library.chartviewsRepo:getChartview(_chartview)
-	if not chartview then
-		return nil
+	local struct = self.items[index - 1]
+	local item = self.library.chartviewsRepo:structToTable(struct)
+
+	if self.library.is_sync or not self.library.worker then
+		local chartview = self.library.chartviewsRepo:getChartview(item)
+		if not chartview then
+			return nil
+		end
+		---@cast chartview rizu.library.LocatedChartview
+		chartview.lamp = struct.lamp
+		self.library:enrichChartview(chartview)
+		table_util.copy(chartview, item)
+		return item
 	end
 
-	---@cast chartview rizu.library.LocatedChartview
-	chartview.lamp = _chartview.lamp
-	self.library:enrichChartview(chartview)
-	return chartview
+	coroutine.wrap(function()
+		local params = self.library.chartviewsRepo.params
+		local chartview = self.library:getChartviewAsync(params, item)
+		if chartview then
+			---@cast chartview rizu.library.LocatedChartview
+			chartview.lamp = struct.lamp
+			self.library:enrichChartview(chartview)
+			table_util.copy(chartview, item)
+			self.onChanged:send({type = "item_loaded", index = index, item = item})
+		end
+	end)()
+
+	return item
 end
 
 ---@return number

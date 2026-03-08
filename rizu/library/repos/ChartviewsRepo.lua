@@ -65,6 +65,19 @@ function ChartviewsRepo:unpackResult(t)
 	return items, count, t.maps
 end
 
+---@param struct cdata
+---@return table
+function ChartviewsRepo:structToTable(struct)
+	return {
+		chartfile_id = struct.chartfile_id,
+		chartfile_set_id = struct.chartfile_set_id,
+		chartmeta_id = struct.chartmeta_id,
+		chartdiff_id = struct.chartdiff_id,
+		chartplay_id = struct.chartplay_id,
+		lamp = struct.lamp,
+	}
+end
+
 function ChartviewsRepo:_fetchResult(model, where, options)
 	local count_options = {
 		columns = {"1"},
