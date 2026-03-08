@@ -44,7 +44,7 @@ function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
 	self.select_controller = game.selectController
-	self.select_model = game.selectModel
+	self.select_model = game.chartSelector
 
 	self.chart_preview_view = ChartPreviewView(self:getGame())
 	self.chart_preview_view:load()
@@ -112,21 +112,34 @@ end
 
 function Select:enter()
 	self.select_controller:load()
+	self:attachObservers()
 	love.mouse.setVisible(true)
 
 	local config = self:getConfig()
 	local bg = self:getContext().background
 	bg:setDim(config.settings.graphics.dim.select)
+
+	self:onLibraryReloaded()
+	self:onChartSetChanged()
+	self:onChartChanged()
+	self.prevRate = self:getGame().timeRateModel:get()
 end
 
 function Select:exit()
+	self:detachObservers()
 	self.select_controller:unload()
 end
 
 function Select:update(dt)
 	self.select_controller:update()
 	self.chart_preview_view:update(dt)
-	self:observeGameMutations()
+
+	-- Still have to observe time rate changes cuz we have old gameplay settings modal
+	local rate = self:getGame().timeRateModel:get()
+	if self.prevRate ~= rate then
+		self.prevRate = rate
+		self:onRateChanged()
+	end
 end
 
 function Select:draw()
@@ -171,12 +184,10 @@ function Select:onKeyDown(e)
 	elseif k == "[" then
 		game.timeRateModel:increase(-1)
 		game.modifierSelectModel:change()
-		self:updateChartview()
 		return true
 	elseif k == "]" then
 		game.timeRateModel:increase(1)
 		game.modifierSelectModel:change()
-		self:updateChartview()
 		return true
 	elseif k == "return" then
 		self.parent:set("gameplay")
@@ -213,39 +224,41 @@ function Select:onRateChanged()
 	self:updateChartview()
 end
 
-function Select:observeGameMutations()
-	local game = self:getGame()
-	local chartview = self.select_model.chartview
-
-	local chart_hash = chartview and chartview.hash or ""
-	local chartview_set_i = self.select_model.chartview_set_index
-	local sets_count = self.select_model.noteChartSetLibrary.itemsCount
-	local rate = game.timeRateModel:get()
-
-	local chart_hash_changed = chart_hash ~= self.prev_chart_hash
-	local chart_set_changed = chartview_set_i ~= self.prev_chart_view_set_index
-	local sets_reloaded = sets_count ~= self.prev_sets_count
-	local rate_changed = rate ~= self.prev_rate
-
-	if chart_hash_changed then
-		self.prev_chart_hash = chart_hash
-		self:onChartChanged()
+function Select:attachObservers()
+	if self.observersAttached then
+		return
 	end
 
-	if chart_set_changed then
-		self.prev_chart_view_set_index = chartview_set_i
-		self:onChartSetChanged()
+	self.chartStateObserver = self.chartStateObserver or {
+		receive = function(_, event)
+			if event.type == "chart" then
+				self:onChartChanged()
+			elseif event.type == "set" then
+				self:onChartSetChanged()
+			end
+		end
+	}
+	self.chartSetStoreObserver = self.chartSetStoreObserver or {
+		receive = function()
+			self:onLibraryReloaded()
+		end
+	}
+
+	self.select_model.state.onChanged:add(self.chartStateObserver)
+	self.select_model.chartSetStore.onChanged:add(self.chartSetStoreObserver)
+
+	self.observersAttached = true
+end
+
+function Select:detachObservers()
+	if not self.observersAttached then
+		return
 	end
 
-	if sets_reloaded then
-		self.prev_sets_count = sets_count
-		self:onLibraryReloaded()
-	end
+	self.select_model.state.onChanged:remove(self.chartStateObserver)
+	self.select_model.chartSetStore.onChanged:remove(self.chartSetStoreObserver)
 
-	if rate_changed then
-		self.prev_rate = rate
-		self:onRateChanged()
-	end
+	self.observersAttached = false
 end
 
 function Select:receive(event)

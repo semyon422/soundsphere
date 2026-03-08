@@ -40,7 +40,7 @@ function Result:load()
 	self.artist_title = ArtistTitle()
 	self.tags = Tags()
 	self.score_system_name = Label(res:getFont("bold", 24), "Loading...")
-	self.accuracy = Label(res:getFont("black", 128), "??.??%")
+	self.accuracy = Label(res:getFont("black", 128), "No score item")
 	self.chart_info = ChartInfo()
 	self.judges = View()
 
@@ -114,29 +114,21 @@ function Result:setScoreItem(score_item)
 	if j[5] then self.judges:add(JudgeCell({0.9, 0.09, 0.63, 1}, j[5])) end
 
 	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, score_engine.scores.base.missCount))
-
 end
 
 function Result:update()
 	if not self.loaded then
 		local game = self:getGame()
-		local select_model = game.selectModel
-		local score_item = game.selectModel.scoreItem
-		local chartview = select_model.chartview
+		local chart_selector = game.chartSelector
+		local score_selector = game.scoreSelector
+		local score_item = score_selector.scoreItem
+		local chartview = chart_selector.chartview
 
 		if chartview and score_item then
 			self:setChartview(chartview)
 			self:setScoreItem(score_item)
 			self.loaded = true
 			return
-		end
-
-		if not chartview then
-			print("No Chartview")
-		end
-
-		if not score_item then
-			print("No ScoreItem")
 		end
 	end
 end
