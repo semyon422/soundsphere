@@ -13,7 +13,7 @@ Resources.font_paths = {
 }
 
 ---@alias yi.FontName "regular" | "bold" | "black" | "icons"
----@alias yi.FontSize 16 | 24 | 36 | 46 | 58 | 72
+---@alias yi.FontSize 16 | 24 | 36 | 46 | 58 | 72 | 128
 
 function Resources:new()
 	self:setDpi(1)
