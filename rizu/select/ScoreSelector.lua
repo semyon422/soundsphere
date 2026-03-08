@@ -29,6 +29,14 @@ function ScoreSelector:new(configModel, library, onlineModel, replayBase, state)
 	self.debounceTime = 0.5
 end
 
+function ScoreSelector:receive(event)
+	if event.type == "selection" and event.level == 2 then
+		self:setChart(self.chartview)
+	elseif event.type == "find_notechart" then
+		self:setChart(self.chartview)
+	end
+end
+
 ---@param chartview table?
 function ScoreSelector:setChart(chartview)
 	self.chartview = chartview

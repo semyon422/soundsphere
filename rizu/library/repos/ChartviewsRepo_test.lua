@@ -74,7 +74,7 @@ function test.secondary_modes_combinations(t)
 	local function get_count(p_mode, s_mode, selection)
 		repo.params.primary_mode = p_mode
 		repo.params.secondary_mode = s_mode
-		local views = repo:getSecondaryViews(selection)
+		local views = repo:getViews(selection)
 		return #views
 	end
 

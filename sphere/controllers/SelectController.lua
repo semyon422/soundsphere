@@ -64,7 +64,7 @@ function SelectController:new(
 
 	self.chartSelector.state.onChanged:add({
 		receive = function(_, event)
-			if event.type == "chart" then
+			if event.type == "selection" and event.level == 2 then
 				self.scoreSelector:setChart(self.chartSelector.chartview)
 			end
 		end
@@ -73,7 +73,7 @@ function SelectController:new(
 	self.collectionSelector.onChanged:add({
 		receive = function(_, event)
 			if event.type == "collection_changed" then
-				self.chartSelector:noDebouncePullNoteChartSet(not event.path_changed)
+				self.chartSelector:noDebounceRefresh(not event.path_changed)
 			end
 		end
 	})

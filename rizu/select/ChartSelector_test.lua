@@ -60,23 +60,23 @@ function test.scrolling(t)
 	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()
 
-	t:eq(model.state.chartview_set_index, 1)
-	t:eq(model.state.chartSetId, 1)
+	t:eq(model.state.levels[1].index, 1)
+	t:eq(model.state.levels[1].id, 1)
 
-	model:scrollNoteChartSet(1)
-	t:eq(model.state.chartview_set_index, 2)
-	t:eq(model.state.chartSetId, 2)
+	model:scrollLevel(1, 1)
+	t:eq(model.state.levels[1].index, 2)
+	t:eq(model.state.levels[1].id, 2)
 	t:eq(model.chartview.chartfile_id, 2)
 
-	model:scrollNoteChartSet(1)
-	t:eq(model.state.chartview_set_index, 3)
-	t:eq(model.state.chartSetId, 3)
+	model:scrollLevel(1, 1)
+	t:eq(model.state.levels[1].index, 3)
+	t:eq(model.state.levels[1].id, 3)
 	t:eq(model.chartview.chartfile_id, 3)
 
 	-- Scroll back
-	model:scrollNoteChartSet(-1)
-	t:eq(model.state.chartview_set_index, 2)
-	t:eq(model.state.chartSetId, 2)
+	model:scrollLevel(1, -1)
+	t:eq(model.state.levels[1].index, 2)
+	t:eq(model.state.levels[1].id, 2)
 end
 
 function test.chart_navigation(t)
@@ -94,23 +94,23 @@ function test.chart_navigation(t)
 	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()
 
-	t:eq(model.state.chartview_index, 1)
-	t:eq(model.state.chartId, 1)
+	t:eq(model.state.levels[2].index, 1)
+	t:eq(model.state.levels[2].id, 1)
 
-	model:scrollNoteChart(1)
-	t:eq(model.state.chartview_index, 2)
-	t:eq(model.state.chartId, 2)
+	model:scrollLevel(2, 1)
+	t:eq(model.state.levels[2].index, 2)
+	t:eq(model.state.levels[2].id, 2)
 	t:eq(model.chartview.chartfile_id, 2)
 
-	model:scrollNoteChart(1)
-	t:eq(model.state.chartview_index, 3)
-	t:eq(model.state.chartId, 3)
+	model:scrollLevel(2, 1)
+	t:eq(model.state.levels[2].index, 3)
+	t:eq(model.state.levels[2].id, 3)
 	t:eq(model.chartview.chartfile_id, 3)
 
 	-- Scroll back
-	model:scrollNoteChart(-1)
-	t:eq(model.state.chartview_index, 2)
-	t:eq(model.state.chartId, 2)
+	model:scrollLevel(2, -1)
+	t:eq(model.state.levels[2].index, 2)
+	t:eq(model.state.levels[2].id, 2)
 end
 
 function test.score_navigation(t)
@@ -134,10 +134,10 @@ function test.score_navigation(t)
 	local scoreSelector = ScoreSelector(configModel, library, onlineModel, replayBase, chartModel.state)
 	
 	-- Wire them up like SelectController would
-	chartModel.onChanged:add({
+	chartModel.state.onChanged:add({
 		receive = function(_, event)
-			if event.type == "scroll_notechart" then
-				scoreSelector:setChart(event.chartview)
+			if event.type == "selection" and event.level == 2 then
+				scoreSelector:setChart(chartModel.chartview)
 			end
 		end
 	})

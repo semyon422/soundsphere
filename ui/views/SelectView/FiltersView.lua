@@ -18,7 +18,7 @@ return ModalImView(function(self, quit)
 
 	if quit then
 		filterModel:apply()
-		self.game.chartSelector:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebounceRefresh()
 		return true
 	end
 

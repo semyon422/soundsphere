@@ -133,12 +133,12 @@ local function NoteChartList(self)
 
 	if imgui.TextOnlyButton("primary mode", "P: " .. mode_names[config.primary_mode or "chartfile_sets"], _w / 2, h) then
 		config.primary_mode = cycle_mode(config.primary_mode or "chartfile_sets")
-		self.game.chartSelector:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebounceRefresh()
 	end
 	love.graphics.translate(_w / 2, 0)
 	if imgui.TextOnlyButton("secondary mode", "S: " .. mode_names[config.secondary_mode or "chartmetas"], _w / 2, h) then
 		config.secondary_mode = cycle_mode(config.secondary_mode or "chartmetas")
-		self.game.chartSelector:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebounceRefresh()
 	end
 end
 
@@ -295,7 +295,7 @@ local function SearchField(self)
 	if changed == "text" then
 		if delAll then text = "" end
 		config.filterString = text
-		chartSelector:debouncePullNoteChartSet()
+		chartSelector:debounceRefresh()
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -305,7 +305,7 @@ local function SearchField(self)
 	if changed == "text" then
 		if delAll then text = "" end
 		config.lampString = text
-		chartSelector:debouncePullNoteChartSet()
+		chartSelector:debounceRefresh()
 	end
 
 	w, h = Layout:move("column3", "header")
@@ -386,7 +386,7 @@ local function GroupCheckbox(self)
 
 	love.graphics.translate(w - h / 6, 0)
 
-	local count = self.game.chartSelector.chartSetStore:count()
+	local count = self.game.chartSelector.stores[1]:count()
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
 

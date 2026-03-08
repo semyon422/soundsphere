@@ -82,7 +82,7 @@ local _queryAsync = thread.async(function(params)
 
 	local self = ChartviewsRepo(db.models)
 	self.params = params
-	local status, err = pcall(self.queryNoteChartSets, self)
+	local status, err = pcall(self.query, self)
 	db:unload()
 
 	if not status then
@@ -103,7 +103,7 @@ function ChartviewsRepo:queryAsync(params)
 	self.params = params
 
 	if self.is_sync then
-		self:queryNoteChartSets()
+		self:query()
 		return
 	end
 
@@ -288,7 +288,7 @@ function ChartviewsRepo:_getSlimColumns(mode, params)
 	return columns
 end
 
-function ChartviewsRepo:queryNoteChartSets()
+function ChartviewsRepo:query()
 	local params = self.params
 	local primary_mode = params.primary_mode or "chartmetas"
 	local secondary_mode = params.secondary_mode or "chartmetas"
@@ -346,7 +346,7 @@ end
 
 ---@param chartview rizu.library.IChartviewBase
 ---@return rizu.library.Chartview[]
-function ChartviewsRepo:getSecondaryViews(chartview)
+function ChartviewsRepo:getViews(chartview)
 	local params = self.params
 	local primary_mode = params.primary_mode or "chartmetas"
 	local secondary_mode = params.secondary_mode or "chartmetas"

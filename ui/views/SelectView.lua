@@ -113,7 +113,7 @@ end
 function SelectView:switchToNoteCharts()
 	self.subscreen = "notecharts"
 	self.searchMode = "filter"
-	self.game.chartSelector:noDebouncePullNoteChartSet()
+	self.game.chartSelector:noDebounceRefresh()
 	just.focus()
 end
 

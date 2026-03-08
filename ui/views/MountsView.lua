@@ -163,14 +163,14 @@ function section_draw.locations(self, inner_w)
 
 	if imgui.button("reset dir", "delete charts cache", inactive) then
 		locations:deleteCharts(selected_loc.id)
-		self.game.chartSelector:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebounceRefresh()
 	end
 
 	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
 		locations:deleteLocation(selected_id)
 		locations:selectLocations()
 		selected_id = 1
-		self.game.chartSelector:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebounceRefresh()
 	end
 end
 
