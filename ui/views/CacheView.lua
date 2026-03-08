@@ -1,9 +1,13 @@
 local just = require("just")
 local imgui = require("imgui")
 local spherefonts = require("sphere.assets.fonts")
+local time_util = require("time_util")
 
 local function ui_lock(self)
-	if not self.game.cacheModel.isProcessing then
+	---@type sphere.GameController
+	local game = self.game
+
+	if not game.library.isProcessing then
 		return
 	end
 
@@ -17,24 +21,38 @@ local function ui_lock(self)
 	just.wheel_over("cache task container", true)
 	just.mouse_over("cache task container", true, "mouse")
 
-	local cacheModel = self.game.cacheModel
-	local count = cacheModel.shared.chartfiles_count
-	local current = cacheModel.shared.chartfiles_current
-	local state = cacheModel.shared.state
+	local library = game.library
+	local status = library.status
 
-	local state_messages = {
-		[1] = "Searching files...",
-		[2] = "Computing difficulty...",
-		[3] = "Processing scores...",
+	local stage_messages = {
+		scanning = "Searching files...",
+		hashing = "Hashing charts...",
+		difficulty = "Computing difficulty...",
+		scores = "Processing scores...",
 	}
-	local msg = state_messages[state] or "Busy..."
+	local msg = stage_messages[status.stage] or "Busy..."
 
 	love.graphics.setColor(1, 1, 1, 1)
 	imgui.text(msg)
-	imgui.text(("%s / %s"):format(current, count))
+	if status.label then
+		imgui.text(status.label)
+	end
+	imgui.text(("%s / %s"):format(status.current, status.total))
+
+	if status.itemsPerSecond then
+		imgui.text(("%0.1f items/sec"):format(status.itemsPerSecond))
+	end
+	if status.eta then
+		imgui.text(("ETA: %s"):format(time_util.format(status.eta)))
+	end
+	if status.errorCount > 0 then
+		love.graphics.setColor(1, 0.4, 0.4, 1)
+		imgui.text(("Errors: %d"):format(status.errorCount))
+		love.graphics.setColor(1, 1, 1, 1)
+	end
 	
-	if count > 0 then
-		local progress = math.min(current / count, 1)
+	if status.total > 0 then
+		local progress = math.min(status.current / status.total, 1)
 		imgui.text(("%0.2f%%"):format(progress * 100))
 		-- Simple progress bar using rectangles
 		local bar_w, bar_h = 400, 20
@@ -48,7 +66,7 @@ local function ui_lock(self)
 	end
 
 	if imgui.button("stopTask", "stop task") then
-		cacheModel:stopTask()
+		library:stopTask()
 	end
 
 	just.container()

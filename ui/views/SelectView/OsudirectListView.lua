@@ -42,7 +42,7 @@ end
 ---@param w number
 ---@param h number
 function OsudirectListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	just.indent(44)
 	if item.downloaded then

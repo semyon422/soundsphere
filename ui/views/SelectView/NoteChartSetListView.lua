@@ -7,18 +7,32 @@ local NoteChartSetListView = ListView()
 NoteChartSetListView.rows = 11
 
 function NoteChartSetListView:reloadItems()
-	self.stateCounter = self.game.selectModel.noteChartSetStateCounter
-	self.items = self.game.selectModel.noteChartSetLibrary.items
+	local chartSetStore = self.game.chartSelector.chartSetStore
+	if not self.isSubscribed then
+		chartSetStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = chartSetStore
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function NoteChartSetListView:receive()
+	self.refreshNeeded = true
 end
 
 ---@return number
 function NoteChartSetListView:getItemIndex()
-	return self.game.selectModel.chartview_set_index
+	return self.game.chartSelector.state.chartview_set_index
 end
 
 ---@param count number
 function NoteChartSetListView:scroll(count)
-	self.game.selectModel:scrollNoteChartSet(count)
+	self.game.chartSelector:scrollNoteChartSet(count)
 end
 
 ---@param ... any?
@@ -39,7 +53,7 @@ end
 ---@param w number
 ---@param h number
 function NoteChartSetListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 
 	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
 		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)

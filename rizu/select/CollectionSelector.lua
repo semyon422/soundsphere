@@ -1,0 +1,57 @@
+local class = require("class")
+local Observable = require("Observable")
+local CollectionStore = require("rizu.select.stores.CollectionStore")
+
+---@class rizu.select.CollectionSelector
+---@operator call: rizu.select.CollectionSelector
+local CollectionSelector = class()
+
+---@param configModel sphere.ConfigModel
+---@param library rizu.library.Library
+function CollectionSelector:new(configModel, library)
+	self.configModel = configModel
+	self.library = library
+	self.store = CollectionStore(library)
+	self.onChanged = Observable()
+end
+
+function CollectionSelector:load()
+	local settings = self.configModel.configs.settings
+	local config = self.configModel.configs.select
+	self.store:load(settings.select.locations_in_collections)
+	self.store:setPath(config.collection, config.location_id)
+end
+
+---@param direction number?
+---@param destination number?
+---@param force boolean?
+function CollectionSelector:scrollCollection(direction, destination, force)
+	local items = self.store.tree.items
+	local selected = self.store.tree.selected
+
+	destination = math.min(math.max(destination or selected + direction, 1), #items)
+	if not items[destination] or not force and selected == destination then
+		return
+	end
+
+	local old_item = items[selected]
+	self.store.tree.selected = destination
+
+	local item = items[destination]
+	local config = self.configModel.configs.select
+	config.collection = item.path
+	config.location_id = item.location_id
+
+	self.onChanged:send({
+		type = "collection_changed",
+		item = item,
+		path_changed = not old_item or old_item.path ~= item.path
+	})
+end
+
+---@return table?
+function CollectionSelector:getSelectedItem()
+	return self.store.tree.items[self.store.tree.selected]
+end
+
+return CollectionSelector

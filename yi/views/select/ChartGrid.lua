@@ -8,7 +8,7 @@ ChartGrid.id = "ChartGrid"
 
 function ChartGrid:load()
 	ElasticList.load(self)
-	self.select_model = self:getGame().selectModel
+	self.select_model = self:getGame().chartSelector
 
 	local res = self:getResources()
 	self.font = res:getFont("bold", 36)
@@ -17,12 +17,12 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	return self.select_model.noteChartLibrary.items
+	return self.select_model.chartStore.items
 end
 
 ---@return integer
 function ChartGrid:getSelectedIndex()
-	return self.select_model.chartview_index
+	return self.select_model.state.chartview_index
 end
 
 ---@param index integer

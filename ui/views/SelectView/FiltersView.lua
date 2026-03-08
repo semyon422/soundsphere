@@ -14,11 +14,11 @@ local r = 8
 local window_id = "FiltersView"
 
 return ModalImView(function(self, quit)
-	local filterModel = self.game.selectModel.filterModel
+	local filterModel = self.game.chartSelector.filterModel
 
 	if quit then
 		filterModel:apply()
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 		return true
 	end
 

@@ -30,7 +30,7 @@ end
 function ModifierListView:drawItem(i, w, h)
 	local modifierSelectModel = self.game.modifierSelectModel
 
-	local item = self.items[i]
+	local item = self:get(i)
 	local w2 = w / 2
 
 	local changed, active, hovered = just.button(tostring(item) .. "1", just.is_over(w2, h), 2)

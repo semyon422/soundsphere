@@ -1,0 +1,59 @@
+local class = require("class")
+local thread = require("thread")
+
+---@class rizu.select.tasks.TaskRunner
+---@operator call: rizu.select.tasks.TaskRunner
+local TaskRunner = class()
+
+function TaskRunner:new()
+	---@type function?
+	self.current_task_func = nil
+	---@type function?
+	self.pending_task_func = nil
+	---@type number?
+	self.pending_level = nil
+	self.is_running = false
+end
+
+---@param task_func function
+---@param level number? Lower is higher priority (e.g. 1 = Set, 2 = Chart, 3 = Score)
+function TaskRunner:push(task_func, level)
+	level = level or 1
+	if not self.is_running then
+		self:_run(task_func, level)
+	else
+		-- Override pending task only if new task has higher or equal priority (lower or equal level)
+		if not self.pending_level or level <= self.pending_level then
+			self.pending_task_func = task_func
+			self.pending_level = level
+		end
+	end
+end
+
+---@private
+---@param task_func function
+---@param level number
+TaskRunner._run = thread.coro(function(self, task_func, level)
+	self.is_running = true
+	self.current_task_func = task_func
+
+	-- Execute the task
+	local status, err = xpcall(task_func, debug.traceback)
+	if not status then
+		print("TaskRunner Error: " .. tostring(err))
+	end
+
+	self.current_task_func = nil
+	self.is_running = false
+
+	-- Check if there is a pending task to run next
+	if self.pending_task_func then
+		local next_task = self.pending_task_func
+		local next_level = self.pending_level
+		self.pending_task_func = nil
+		self.pending_level = nil
+		self:_run(next_task, next_level)
+	end
+end)
+
+return TaskRunner

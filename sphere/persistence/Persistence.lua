@@ -1,6 +1,6 @@
 local class = require("class")
 
-local CacheModel = require("sphere.persistence.CacheModel")
+local Library = require("rizu.library.Library")
 local ConfigModel = require("sphere.persistence.ConfigModel")
 local OsudirectModel = require("sphere.persistence.OsudirectModel")
 local FileFinder = require("sphere.persistence.FileFinder")
@@ -14,9 +14,14 @@ local Persistence = class()
 
 function Persistence:new()
 	self.difficultyModel = DifficultyModel()
-	self.cacheModel = CacheModel(self.difficultyModel)
+	local LoveFilesystem = require("fs.LoveFilesystem")
+	self.library = Library(
+		LoveFilesystem(),
+		love.filesystem.getWorkingDirectory(),
+		love.timer.getTime
+	)
 	self.configModel = ConfigModel()
-	self.osudirectModel = OsudirectModel(self.configModel, self.cacheModel)
+	self.osudirectModel = OsudirectModel(self.configModel, self.library)
 	self.fileFinder = FileFinder()
 end
 
@@ -35,7 +40,7 @@ function Persistence:load()
 	configModel:open("files")
 	configModel:read()
 
-	self.cacheModel:load()
+	self.library:load()
 end
 
 ---@param name string

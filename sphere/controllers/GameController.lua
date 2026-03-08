@@ -4,7 +4,9 @@ local OnlineModel = require("sphere.models.OnlineModel")
 local ModifierSelectModel = require("sphere.models.ModifierSelectModel")
 local NoteSkinModel = require("sphere.models.NoteSkinModel")
 local InputModel = require("sphere.models.InputModel")
-local SelectModel = require("sphere.models.SelectModel")
+local ChartSelector = require("rizu.select.ChartSelector")
+local ScoreSelector = require("rizu.select.ScoreSelector")
+local CollectionSelector = require("rizu.select.CollectionSelector")
 local MultiplayerModel = require("sphere.models.MultiplayerModel")
 local EditorModel = require("sphere.models.EditorModel")
 local SpeedModel = require("sphere.models.SpeedModel")
@@ -72,9 +74,9 @@ function GameController:new()
 
 	self.online_client = OnlineClient()
 	self.multiplayer_client = MultiplayerClient()
-	self.client_remote = ClientRemoteValidation(ClientRemote(self.online_client, self.persistence.cacheModel, self.multiplayer_client))
+	self.client_remote = ClientRemoteValidation(ClientRemote(self.online_client, self.persistence.library, self.multiplayer_client))
 	self.seaClient = SeaClient(self.online_client, self.client_remote)
-	self.difftables_sync = DifftablesSync(self.seaClient.remote.difftables, self.persistence.cacheModel.difftablesRepo)
+	self.difftables_sync = DifftablesSync(self.seaClient.remote.difftables, self.persistence.library.difftablesRepo)
 	self.online_wrapper = OnlineWrapper(self.online_client, self.seaClient.remote)
 
 	self.onlineModel = OnlineModel(self.persistence.configModel, self.seaClient)
@@ -100,20 +102,31 @@ function GameController:new()
 
 	self.timeRateModel = TimeRateModel(self.replayBase)
 	self.modifierSelectModel = ModifierSelectModel(self.replayBase)
-	self.selectModel = SelectModel(
+	self.collectionSelector = CollectionSelector(
 		self.persistence.configModel,
-		self.persistence.cacheModel,
+		self.persistence.library
+	)
+	self.chartSelector = ChartSelector(
+		self.persistence.configModel,
+		self.persistence.library,
+		self.fs,
+		self.collectionSelector
+	)
+	self.scoreSelector = ScoreSelector(
+		self.persistence.configModel,
+		self.persistence.library,
 		self.onlineModel,
-		self.replayBase
+		self.replayBase,
+		self.chartSelector.state
 	)
 
-	self.multiplayer_client.chart_selector = self.selectModel
+	self.multiplayer_client.chart_selector = self.chartSelector
 
 	self.multiplayerModel = MultiplayerModel(
-		self.persistence.cacheModel,
+		self.persistence.library,
 		self.rhythm_engine,
 		self.persistence.configModel,
-		self.selectModel,
+		self.chartSelector,
 		self.onlineModel,
 		self.persistence.osudirectModel,
 		self.replayBase,
@@ -121,12 +134,12 @@ function GameController:new()
 	)
 	self.offsetModel = OffsetModel(
 		self.persistence.configModel,
-		self.persistence.cacheModel.chartsRepo
+		self.persistence.library.chartsRepo
 	)
 
 	self.joystickModel = JoystickModel(self.persistence.configModel)
 
-	self.cacheModel = self.persistence.cacheModel
+	self.library = self.persistence.library
 	self.osudirectModel = self.persistence.osudirectModel
 	self.configModel = self.persistence.configModel
 	self.fileFinder = self.persistence.fileFinder
@@ -146,13 +159,15 @@ function GameController:new()
 	)
 
 	self.selectController = SelectController(
-		self.selectModel,
+		self.chartSelector,
+		self.scoreSelector,
+		self.collectionSelector,
 		self.modifierSelectModel,
 		self.noteSkinModel,
 		self.configModel,
 		self.multiplayerModel,
 		self.onlineModel,
-		self.cacheModel,
+		self.library,
 		self.osudirectModel,
 		self.windowModel,
 		self.replayBase,
@@ -164,23 +179,23 @@ function GameController:new()
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
 		self.configModel,
-		self.selectModel,
+		self.chartSelector,
 		self.replayBase
 	)
 	self.editorController = EditorController(
-		self.selectModel,
+		self.chartSelector,
 		self.editorModel,
 		self.noteSkinModel,
 		self.configModel,
 		self.resourceModel,
 		self.windowModel,
-		self.cacheModel,
+		self.library,
 		self.fileFinder,
 		self.previewModel,
 		self.replayBase
 	)
 	self.offsetController = OffsetController(
-		self.cacheModel,
+		self.library,
 		self.computeContext,
 		self.offsetModel,
 		self.rhythm_engine,
@@ -220,7 +235,8 @@ function GameController:load()
 
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
-	self.selectModel:load()
+	self.collectionSelector:load()
+	self.chartSelector:load()
 
 	self.multiplayerController:load()
 
@@ -247,7 +263,7 @@ function GameController:update(dt)
 	self.gameplayInteractor:update()
 	self.osudirectModel:update()
 
-	self.cacheModel:update()
+	self.library:update()
 
 	self.backgroundModel:update()
 	self.chartPreviewModel:update()

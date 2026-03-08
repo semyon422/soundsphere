@@ -6,19 +6,19 @@ local icc_co = require("icc.co")
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
 
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param rhythm_engine rizu.RhythmEngine
 ---@param configModel sphere.ConfigModel
----@param selectModel sphere.SelectModel
+---@param chartSelector rizu.select.ChartSelector
 ---@param onlineModel sphere.OnlineModel
 ---@param osudirectModel sphere.OsudirectModel
 ---@param replayBase sea.ReplayBase
 ---@param multiplayer_client sea.MultiplayerClient
-function MultiplayerModel:new(cacheModel, rhythm_engine, configModel, selectModel, onlineModel, osudirectModel, replayBase, multiplayer_client)
-	self.cacheModel = cacheModel
+function MultiplayerModel:new(library, rhythm_engine, configModel, chartSelector, onlineModel, osudirectModel, replayBase, multiplayer_client)
+	self.library = library
 	self.rhythm_engine = rhythm_engine
 	self.configModel = configModel
-	self.selectModel = selectModel
+	self.chartSelector = chartSelector
 	self.onlineModel = onlineModel
 	self.osudirectModel = osudirectModel
 	self.replayBase = replayBase
@@ -73,7 +73,7 @@ function MultiplayerModel:getStatus()
 end
 
 function MultiplayerModel:selectChart()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
 	local room = self.client:getMyRoom()
 	if not room then
@@ -84,27 +84,26 @@ function MultiplayerModel:selectChart()
 	local index = room.chartmeta_key.index
 
 	print("find", hash, index)
-	selectModel:findNotechart(hash, index)
-	local items = selectModel.noteChartSetLibrary.items
+	chartSelector:findNotechart(hash, index)
 
-	selectModel:setLock(false)
+	chartSelector:setLock(false)
 
 	self.downloadingBeatmap = nil
-	local chartview = items[1]
+	local chartview = chartSelector.chartSetStore:get(1)
 	if chartview then
 		self.chartview = chartview
-		selectModel:setConfig(chartview)
-		selectModel:pullNoteChartSet(true)
+		chartSelector:setConfig(chartview)
+		chartSelector:pullNoteChartSet(true)
 		self.remote.multiplayer:setChartFound(true)
 		return
 	end
-	selectModel:setConfig({
+	chartSelector:setConfig({
 		chartfile_set_id = 0,
 		chartfile_id = 0,
 		chartmeta_id = 0,
 	})
 	self.chartview = nil
-	selectModel:pullNoteChartSet(true)
+	chartSelector:pullNoteChartSet(true)
 	self.remote.multiplayer:setChartFound(false)
 end
 
@@ -125,7 +124,7 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 	self.downloadingBeatmap.status = "done"
 	self.remote.multiplayer:setChartFound(false)
 
-	self.cacheModel:startUpdateAsync("downloads", 1)
+	self.library:computeLocationAsync("downloads", 1)
 	self:selectChart()
 end)
 

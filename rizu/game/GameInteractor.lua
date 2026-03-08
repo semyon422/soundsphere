@@ -11,22 +11,22 @@ end
 
 function GameInteractor:loadGameplaySelectedChart()
 	local game = self.game
-	game.gameplayInteractor:loadGameplay(game.selectModel.chartview)
+	game.gameplayInteractor:loadGameplay(game.chartSelector.chartview)
 end
 
 ---@param itemIndex integer?
 function GameInteractor:loadScoreAsync(itemIndex)
 	local game = self.game
 
-	local scoreEntry = game.selectModel.scoreItem
+	local scoreEntry = game.scoreSelector.scoreItem
 	if itemIndex then
-		scoreEntry = game.selectModel.scoreLibrary.items[itemIndex]
+		scoreEntry = game.scoreSelector.store.items[itemIndex]
 	end
 
 	game.resultController:replayNoteChartAsync("result", scoreEntry)
 
 	if itemIndex then
-		game.selectModel:scrollScore(nil, itemIndex)
+		game.scoreSelector:scrollScore(nil, itemIndex)
 	end
 end
 

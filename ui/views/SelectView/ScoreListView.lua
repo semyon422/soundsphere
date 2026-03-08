@@ -9,25 +9,39 @@ local ScoreListView = ListView()
 ScoreListView.rows = 5
 
 function ScoreListView:reloadItems()
-	self.stateCounter = self.game.selectModel.scoreStateCounter
-	self.items = self.game.selectModel.scoreLibrary.items
+	local scoreStore = self.game.scoreSelector.store
+	if not self.isSubscribed then
+		scoreStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = scoreStore
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function ScoreListView:receive()
+	self.refreshNeeded = true
 end
 
 ---@return number
 function ScoreListView:getItemIndex()
-	return self.game.selectModel.scoreItemIndex
+	return self.game.scoreSelector.state.scoreItemIndex
 end
 
 ---@param delta number
 function ScoreListView:scroll(delta)
-	self.game.selectModel:scrollScore(delta)
+	self.game.scoreSelector:scrollScore(delta)
 end
 
 ---@param i number
 ---@param w number
 ---@param h number
 function ScoreListView:drawItem(i, w, h)
-	local item = self.items[i]
+	local item = self:get(i)
 	w = (w - 44) / 5
 
 	local time = item.created_at or 0

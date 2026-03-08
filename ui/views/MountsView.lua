@@ -5,11 +5,13 @@ local _transform = require("gfx_util").transform
 local spherefonts = require("sphere.assets.fonts")
 local theme = require("imgui.theme")
 local ModifierModel = require("sphere.models.ModifierModel")
+local table_util = require("table_util")
 
 local transform = {{1 / 2, -16 / 9 / 2}, 0, 0, {0, 1 / 1080}, {0, 1 / 1080}, 0, 0, 0, 0}
 
 local scrollY = 0
 local scrollYlist = 0
+local selected_id = 1
 
 local w, h = 1024, 1080 / 2
 local _w, _h = w / 2, 55
@@ -66,23 +68,33 @@ modal = ModalImView(function(self, quit)
 end)
 
 function section_draw.locations(self, inner_w)
-	local locationsRepo = self.game.cacheModel.locationsRepo
-	local locationManager = self.game.cacheModel.locationManager
-	local locations = locationManager.locations
+	---@type sphere.GameController
+	local game = self.game
+
+	local locationsRepo = game.library.locationsRepo
+	local locations = game.library.locations
+	local _locations = locations.locations
 
 	local list_w = inner_w / 3
 
-	local selected_loc_id = locationManager.selected_id
+	local selected_loc = table_util.find(_locations, function(loc)
+		return loc.id == selected_id
+	end)
+
+	if not selected_loc and #_locations > 0 then
+		selected_loc = _locations[1]
+		selected_id = selected_loc.id
+	end
 
 	just.push()
 	imgui.List("mount points", list_w, h - _h, _h / 2, _h, scrollYlist)
-	for i, item in ipairs(locations) do
+	for i, item in ipairs(_locations) do
 		local name = item.name
-		if selected_loc_id == item.id then
+		if selected_id == item.id then
 			name = "> " .. name
 		end
-		if imgui.TextOnlyButton("mount item" .. i, name, w, _h * theme.size, "left") or not selected_loc_id then
-			locationManager:selectLocation(item.id)
+		if imgui.TextOnlyButton("mount item" .. i, name, w, _h * theme.size, "left") then
+			selected_id = item.id
 		end
 	end
 	scrollYlist = imgui.List()
@@ -93,20 +105,19 @@ function section_draw.locations(self, inner_w)
 			is_relative = false,
 			is_internal = false,
 		})
-		locationManager:selectLocations()
-		locationManager:selectLocation(location.id)
+		locations:selectLocations()
+		selected_id = location.id
 	end
 
 	just.pop()
 
 	love.graphics.translate(list_w, 0)
 
-	local selected_loc = locationManager.selected_loc
 	if not selected_loc then
 		return
 	end
 
-	local location_info = locationManager.location_info
+	local location_info = locations.info[selected_id]
 
 	local path = selected_loc.path
 	if selected_loc.is_internal then
@@ -114,7 +125,7 @@ function section_draw.locations(self, inner_w)
 		just.text("Internal")
 	end
 	just.indent(8)
-	just.text("Status: " .. (selected_loc.status or "unknown"))
+	just.text("Status: " .. (locations.status[selected_id] or "unknown"))
 	just.indent(8)
 	just.text("Real path: ")
 	just.indent(8)
@@ -131,8 +142,7 @@ function section_draw.locations(self, inner_w)
 				id = selected_loc.id,
 				name = loc_name,
 			})
-			locationManager:selectLocations()
-			locationManager:selectLocation(selected_loc.id)
+			locations:selectLocations()
 		end
 	end
 
@@ -152,24 +162,25 @@ function section_draw.locations(self, inner_w)
 	imgui.text("Hold left shift to make buttons below active")
 
 	if imgui.button("reset dir", "delete charts cache", inactive) then
-		locationManager:deleteCharts(selected_loc.id)
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		locations:deleteCharts(selected_loc.id)
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 
 	if not selected_loc.is_internal and imgui.button("delete dir", "delete location", inactive) then
-		locationManager:deleteLocation(selected_loc.id)
-		locationManager:selectLocations()
-		locationManager:selectLocation(1)
-		self.game.selectModel:noDebouncePullNoteChartSet()
+		locations:deleteLocation(selected_id)
+		locations:selectLocations()
+		selected_id = 1
+		self.game.chartSelector:noDebouncePullNoteChartSet()
 	end
 end
 
 local formats = {"bms", "ksh", "mid", "ojn", "osu", "qua", "sph", "sm"}
 function section_draw.database(self)
-	---@type sphere.CacheModel
-	local cacheModel = self.game.cacheModel
+	---@type sphere.GameController
+	local game = self.game
+	local library = game.library
 
-	local cacheStatus = cacheModel.cacheStatus
+	local cacheStatus = library.statusUpdate
 	imgui.text("metas: " .. cacheStatus.chartmetas)
 	imgui.text("diffs: " .. cacheStatus.chartdiffs)
 	imgui.text("plays: " .. cacheStatus.chartplays)
@@ -185,23 +196,23 @@ function section_draw.database(self)
 	imgui.text("chartdiffs")
 
 	if imgui.button("compute cds", "compute missing") then
-		cacheModel:computeChartdiffs()
+		library:computeChartdiffs()
 	end
 	if imgui.button("compute incomplete cds", "compute incomplete") then
-		cacheModel:computeIncompleteChartdiffs(false)
+		library:computeIncompleteChartdiffs(false)
 	end
 	if imgui.button("compute incomplete cds pp", "compute incomplete, use preview when possible") then
-		cacheModel:computeIncompleteChartdiffs(true)
+		library:computeIncompleteChartdiffs(true)
 	end
 	if imgui.button("compute chartplays", "compute chartplays") then
-		cacheModel:computeChartplays()
+		library:computeChartplays()
 	end
 
 	imgui.separator()
 	imgui.text("reset")
 	for _, field in ipairs(self.game.difficultyModel.registry.fields) do
 		if imgui.button("reset diffcalc " .. field, field, inactive) then
-			cacheModel.chartsRepo:resetDiffcalcField(field)
+			library.chartsRepo:resetDiffcalcField(field)
 		end
 		just.sameline()
 	end
@@ -210,49 +221,49 @@ function section_draw.database(self)
 	imgui.separator()
 	imgui.text("delete")
 	if imgui.button("delete charts cache", "delete all chart-files/sets/metas/diffs", inactive) then
-		cacheModel.chartfilesRepo:deleteChartfiles()
-		cacheModel.chartfilesRepo:deleteChartfileSets()
-		cacheModel.chartsRepo:deleteChartmetas()
-		cacheModel.chartsRepo:deleteChartdiffs()
+		library.chartfilesRepo:deleteChartfiles()
+		library.chartfilesRepo:deleteChartfileSets()
+		library.chartsRepo:deleteChartmetas()
+		library.chartsRepo:deleteChartdiffs()
 	end
 
 	if imgui.button("delete chartdiffs", "delete all chartdiffs", inactive) then
-		cacheModel.chartsRepo:deleteChartdiffs()
+		library.chartsRepo:deleteChartdiffs()
 	end
 
 	if imgui.button("delete modified chartdiffs", "delete modified chartdiffs", inactive) then
-		cacheModel.chartsRepo:deleteModifiedChartdiffs()
+		library.chartsRepo:deleteModifiedChartdiffs()
 	end
 
 	if imgui.button("delete selected chartdiff", "delete selected chartdiff", inactive) then
-		local chartview = self.game.selectModel.chartview
-		cacheModel.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
+		local chartview = self.game.chartSelector.chartview
+		library.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
 	end
 
 	if imgui.button("delete chartdiff selected", "delete chartdiff of selected chart") then
-		local chartview = self.game.selectModel.chartview
-		cacheModel.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
+		local chartview = self.game.chartSelector.chartview
+		library.chartsRepo:deleteChartdiff(chartview.chartdiff_id)
 	end
 
 	if imgui.button("delete all chartdiff selected", "delete all chartdiffs of selected chart") then
-		local chartview = self.game.selectModel.chartview
-		cacheModel.chartsRepo:deleteChartdiffsByHashIndex(chartview.hash, chartview.index)
+		local chartview = self.game.chartSelector.chartview
+		library.chartsRepo:deleteChartdiffsByHashIndex(chartview.hash, chartview.index)
 	end
 
 	imgui.separator()
 
 	if imgui.button("reset chartfiles", "reset chartfiles.hash", inactive) then
-		cacheModel.chartfilesRepo:resetChartfileHash()
+		library.chartfilesRepo:resetChartfileHash()
 	end
 
 	imgui.separator()
 	imgui.text("chartmetas deletion")
 	if imgui.button("delete chartmetas", "delete all chartmetas", inactive) then
-		cacheModel.chartsRepo:deleteChartmetas()
+		library.chartsRepo:deleteChartmetas()
 	end
 	for _, format in ipairs(formats) do
 		if imgui.button("delete chartmetas " .. format, format, inactive) then
-			cacheModel.chartsRepo:deleteChartmetasByFormat(format)
+			library.chartsRepo:deleteChartmetasByFormat(format)
 		end
 		just.sameline()
 	end
@@ -263,14 +274,14 @@ function section_draw.database(self)
 
 
 	if imgui.button("compute diff", "compute diff") then
-		local chartdiff = self.game.selectModel.chartview
-		local chart = self.game.selectModel:loadChartAbsolute()
+		local chartdiff = self.game.chartSelector.chartview
+		local chart = self.game.chartSelector:loadChartAbsolute()
 		ModifierModel:apply(chartdiff.modifiers, chart)
 		self.game.difficultyModel:compute({}, chart, 1)
 	end
 
 	if imgui.button("vacuum", "vacuum") then
-		cacheModel.gdb.db:exec("VACUUM;")
+		library.gdb.db:exec("VACUUM;")
 	end
 end
 

@@ -46,6 +46,7 @@ local empty_lines = SphPreview:previewLinesToLines({
 	{offset = 1},
 })
 
+---@param chartview rizu.library.Chartview
 function ChartPreview:setChartview(chartview)
 	if not self.configModel.configs.settings.select.chart_preview then
 		self.chart = nil

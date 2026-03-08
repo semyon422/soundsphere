@@ -10,21 +10,21 @@ local ChartplayComputedFactory = require("rizu.engine.ChartplayComputedFactory")
 local ScoreSaver = class()
 
 ---@param fs fs.IFilesystem
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param configModel sphere.ConfigModel
 ---@param seaClient sphere.SeaClient
 ---@param replayBase sea.ReplayBase
 ---@param computeContext sea.ComputeContext
 function ScoreSaver:new(
 	fs,
-	cacheModel,
+	library,
 	configModel,
 	seaClient,
 	replayBase,
 	computeContext
 )
 	self.fs = fs
-	self.cacheModel = cacheModel
+	self.library = library
 	self.configModel = configModel
 	self.seaClient = seaClient
 	self.replayBase = replayBase
@@ -57,7 +57,7 @@ function ScoreSaver:saveScore(gameplay_session)
 	local chartdiff = assert(computeContext.chartdiff)
 	local chartdiff_copy = setmetatable(table_util.deepcopy(chartdiff), getmetatable(chartdiff))
 
-	chartdiff = self.cacheModel.chartsRepo:createUpdateChartdiff(chartdiff, created_at)
+	chartdiff = self.library.chartsRepo:createUpdateChartdiff(chartdiff, created_at)
 
 	local chartplay = Chartplay()
 
@@ -82,7 +82,7 @@ function ScoreSaver:saveScore(gameplay_session)
 	chartplay.computed_at = created_at
 	chartplay.submitted_at = created_at
 
-	local _chartplay = self.cacheModel.chartsRepo:createChartplay(chartplay)
+	local _chartplay = self.library.chartsRepo:createChartplay(chartplay)
 	computeContext.chartplay = _chartplay
 
 	local function submit()

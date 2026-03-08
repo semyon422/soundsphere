@@ -13,7 +13,7 @@ function ChartSetList:load()
 	local game = self:getGame()
 	self.title_font = res:getFont("bold", 24)
 	self.artist_font = res:getFont("regular", 16)
-	self.select_model = game.selectModel
+	self.select_model = game.chartSelector
 
 	local title_h = self.title_font:getHeight()
 	local artist_h = self.artist_font:getHeight()
@@ -24,17 +24,17 @@ function ChartSetList:load()
 end
 
 function ChartSetList:reloadItems()
-	self.camera.position = self.select_model.chartview_set_index
+	self.camera.position = self.select_model.state.chartview_set_index
 end
 
 ---@return number
 function ChartSetList:getItemCount()
-	return #self.select_model.noteChartSetLibrary.items
+	return self.select_model.chartSetStore:count()
 end
 
 ---@return number
 function ChartSetList:getSelectedIndex()
-	return self.select_model.chartview_set_index
+	return self.select_model.state.chartview_set_index
 end
 
 ---@param index number
@@ -45,8 +45,7 @@ end
 local x_indent = 20
 
 function ChartSetList:drawItem(index, y, is_selected)
-	local items = self.select_model.noteChartSetLibrary.items
-	local item = items[index]
+	local item = self.select_model.chartSetStore:get(index)
 	if not item then
 		return
 	end

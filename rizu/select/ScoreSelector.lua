@@ -1,0 +1,141 @@
+local class = require("class")
+local delay = require("delay")
+local Observable = require("Observable")
+local ScoreStore = require("rizu.select.stores.ScoreStore")
+local LocalScoreProvider = require("rizu.select.providers.LocalScoreProvider")
+local OnlineScoreProvider = require("rizu.select.providers.OnlineScoreProvider")
+
+---@class rizu.select.ScoreSelector
+---@operator call: rizu.select.ScoreSelector
+local ScoreSelector = class()
+
+---@param configModel sphere.ConfigModel
+---@param library rizu.library.Library
+---@param onlineModel sphere.OnlineModel
+---@param replayBase sea.ReplayBase
+---@param state rizu.select.SelectionState
+function ScoreSelector:new(configModel, library, onlineModel, replayBase, state)
+	self.configModel = configModel
+	self.library = library
+	self.onlineModel = onlineModel
+	self.replayBase = replayBase
+	self.state = state
+
+	local localProvider = LocalScoreProvider(library)
+	local onlineProvider = OnlineScoreProvider(onlineModel)
+	self.store = ScoreStore(configModel, localProvider, onlineProvider)
+
+	self.onChanged = Observable()
+	self.debounceTime = 0.5
+end
+
+---@param chartview table?
+function ScoreSelector:setChart(chartview)
+	self.chartview = chartview
+	self.scoreItem = nil
+
+	if not chartview then
+		self:clear()
+		self.state:setScore(1, nil)
+		return
+	end
+
+	self:pullScore()
+end
+
+function ScoreSelector:clear()
+	self.scoreItem = nil
+	self.store:clear()
+end
+
+function ScoreSelector:findScore()
+	local config = self.configModel.configs.select
+	local scoreItems = self.store.items
+	local index = self.store:getItemIndex(config.chartplay_id) or 1
+	local scoreItem = scoreItems[index]
+
+	if scoreItem then
+		config.chartplay_id = scoreItem.id
+	end
+
+	self.state:setScore(index, scoreItem and scoreItem.id)
+	self.scoreItem = scoreItem
+end
+
+---@param noUpdate boolean?
+function ScoreSelector:pullScore(noUpdate)
+	local chartview = self.chartview
+	if not chartview then return end
+
+	if noUpdate then
+		self:findScore()
+		return
+	end
+
+	local select = self.configModel.configs.select
+	if select.scoreSourceName == "online" then
+		self.store:clear()
+		if coroutine.running() then
+			delay.sleep(self.debounceTime)
+		end
+	end
+
+	local config = self.configModel.configs.settings.select
+	local secondary_mode = config.secondary_mode or "chartmetas"
+	local exact = secondary_mode == "chartdiffs" or secondary_mode == "chartplays"
+	
+	-- We use the coro version to ensure the task runner waits for completion
+	self.store:updateItems(chartview, exact)
+
+	self:findScore()
+end
+
+---@param direction number?
+---@param destination number?
+function ScoreSelector:scrollScore(direction, destination)
+	local items = self.store.items
+
+	destination = math.min(math.max(destination or self.state.scoreItemIndex + direction, 1), #items)
+	if not items[destination] or self.state.scoreItemIndex == destination then
+		return
+	end
+
+	local scoreItem = items[destination]
+	local config = self.configModel.configs.select
+	config.chartplay_id = scoreItem.id
+
+	self.state:setScore(destination, scoreItem.id)
+
+	self.scoreItem = scoreItem
+	self.onChanged:send({type = "scroll_score", scoreItem = scoreItem})
+end
+
+---@param chartview table
+function ScoreSelector:updateReplayBase(chartview)
+	local config = self.configModel.configs.settings.select
+	local secondary_mode = config.secondary_mode or "chartmetas"
+	if secondary_mode == "chartfile_sets" or secondary_mode == "chartfiles" or secondary_mode == "chartmetas" then
+		return
+	end
+
+	local replayBase = self.replayBase
+
+	replayBase.modifiers = chartview.modifiers or {}
+	replayBase.rate = chartview.rate or 1
+	replayBase.mode = chartview.mode or "mania"
+
+	if secondary_mode == "chartdiffs" then
+		return
+	end
+
+	replayBase.nearest = chartview.nearest or false
+	replayBase.tap_only = chartview.tap_only or false
+	replayBase.timings = chartview.timings
+	replayBase.subtimings = chartview.subtimings
+	replayBase.columns_order = chartview.columns_order
+	replayBase.custom = chartview.custom or false
+	replayBase.const = chartview.const or false
+	replayBase.rate_type = chartview.rate_type or "linear"
+end
+
+return ScoreSelector

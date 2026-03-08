@@ -68,7 +68,7 @@ function MultiplayerClient:syncChart()
 
 	-- local rules = room.rules
 	-- if not rules.chart then
-	-- 	-- self.selectModel:setConfig(mp_model.chartview)  -- mp controller
+	-- 	-- self.chartSelector:setConfig(mp_model.chartview)  -- mp controller
 	-- end
 
 	-- self.chart_selector:selectChart(hash, index)

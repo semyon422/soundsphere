@@ -8,12 +8,12 @@ local MultiplayerClientRemote = require("sea.multi.remotes.MultiplayerClientRemo
 local ClientRemote = class()
 
 ---@param client sphere.OnlineClient
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param multipalyer_client sea.MultiplayerClient
-function ClientRemote:new(client, cacheModel, multipalyer_client)
+function ClientRemote:new(client, library, multipalyer_client)
 	self.client = OnlineClientRemote(client)
 	self.multiplayer = MultiplayerClientRemote(multipalyer_client)
-	self.compute_data_provider = cacheModel.computeDataProvider
+	self.compute_data_provider = library.computeDataProvider
 end
 
 ---@param ... any

@@ -29,7 +29,7 @@ local function CollectionList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = CollectionListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("ncs_sb", pos, 16, h, count / list.rows)
 	if newScroll then
@@ -60,7 +60,7 @@ local function CollectionsSubscreen(self)
 	local config = self.game.configModel.configs.settings.select
 	if imgui.Checkbox("locs_in_colls cb", config.locations_in_collections, h - padding * 2) then
 		config.locations_in_collections = not config.locations_in_collections
-		self.game.selectModel.collectionLibrary:load(config.locations_in_collections)
+		self.game.collectionSelector.store:load(config.locations_in_collections)
 	end
 	just.sameline()
 	imgui.Label("locs_in_colls cb", "show locations", h - padding * 2)

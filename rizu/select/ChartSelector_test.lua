@@ -1,0 +1,167 @@
+local ChartSelector = require("rizu.select.ChartSelector")
+local ScoreSelector = require("rizu.select.ScoreSelector")
+local TestLibraryFactory = require("rizu.select.TestLibraryFactory")
+
+local test = {}
+
+local tlf = TestLibraryFactory()
+
+local function createMockConfigModel()
+	return {
+		configs = {
+			settings = {
+				select = {
+					locations_in_collections = false,
+					primary_mode = "chartfile_sets",
+					secondary_mode = "chartmetas",
+					diff_column = "msd_diff"
+				},
+				gameplay = {
+					ratingHitTimingWindow = 0.05
+				},
+				miscellaneous = {
+					showNonManiaCharts = true
+				}
+			},
+			select = {
+				searchMode = "title",
+				collection = "",
+				location_id = 0,
+				sortFunction = "title",
+				selected_filters = {},
+				filterString = "",
+				lampString = "",
+				scoreSourceName = "local",
+				scoreFilterName = "all"
+			},
+			filters = {
+				notechart = {},
+				score = {{name = "all"}}
+			}
+		}
+	}
+end
+
+---@param t testing.T
+function test.scrolling(t)
+	local charts = {
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, set_name = "Set 1", hash = "h1"},
+		{chartfile_set_id = 2, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, set_name = "Set 2", hash = "h2"},
+		{chartfile_set_id = 3, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, set_name = "Set 3", hash = "h3"}
+	}
+	local configModel = createMockConfigModel()
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
+	local fs = {read = function() end, getInfo = function() end}
+	local onlineModel = {authManager = {sea_client = {connected = false}}}
+	local replayBase = {}
+
+	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
+	model:load()
+
+	t:eq(model.state.chartview_set_index, 1)
+	t:eq(model.state.chartSetId, 1)
+
+	model:scrollNoteChartSet(1)
+	t:eq(model.state.chartview_set_index, 2)
+	t:eq(model.state.chartSetId, 2)
+	t:eq(model.chartview.chartfile_id, 2)
+
+	model:scrollNoteChartSet(1)
+	t:eq(model.state.chartview_set_index, 3)
+	t:eq(model.state.chartSetId, 3)
+	t:eq(model.chartview.chartfile_id, 3)
+
+	-- Scroll back
+	model:scrollNoteChartSet(-1)
+	t:eq(model.state.chartview_set_index, 2)
+	t:eq(model.state.chartSetId, 2)
+end
+
+function test.chart_navigation(t)
+	local charts = {
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1},
+		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, hash = "h1", index = 2},
+		{chartfile_set_id = 1, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, hash = "h1", index = 3}
+	}
+	local configModel = createMockConfigModel()
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
+	local fs = {read = function() end, getInfo = function() end}
+
+	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
+	model:load()
+
+	t:eq(model.state.chartview_index, 1)
+	t:eq(model.state.chartId, 1)
+
+	model:scrollNoteChart(1)
+	t:eq(model.state.chartview_index, 2)
+	t:eq(model.state.chartId, 2)
+	t:eq(model.chartview.chartfile_id, 2)
+
+	model:scrollNoteChart(1)
+	t:eq(model.state.chartview_index, 3)
+	t:eq(model.state.chartId, 3)
+	t:eq(model.chartview.chartfile_id, 3)
+
+	-- Scroll back
+	model:scrollNoteChart(-1)
+	t:eq(model.state.chartview_index, 2)
+	t:eq(model.state.chartId, 2)
+end
+
+function test.score_navigation(t)
+	local charts = {
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1}
+	}
+	local configModel = createMockConfigModel()
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
+	-- Insert scores
+	tlf:createScore(library, {id = 101, hash = "h1", index = 1, accuracy = 0.9, created_at = 1, rating = 300})
+	tlf:createScore(library, {id = 102, hash = "h1", index = 1, accuracy = 0.95, created_at = 2, rating = 200})
+	tlf:createScore(library, {id = 103, hash = "h1", index = 1, accuracy = 1.0, created_at = 3, rating = 100})
+
+	local fs = {read = function() end, getInfo = function() end}
+	local onlineModel = {authManager = {sea_client = {connected = false}}}
+	local replayBase = {}
+
+	local chartModel = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
+	local scoreSelector = ScoreSelector(configModel, library, onlineModel, replayBase, chartModel.state)
+	
+	-- Wire them up like SelectController would
+	chartModel.onChanged:add({
+		receive = function(_, event)
+			if event.type == "scroll_notechart" then
+				scoreSelector:setChart(event.chartview)
+			end
+		end
+	})
+
+	chartModel:load()
+	scoreSelector:setChart(chartModel.chartview)
+
+	-- Default selection should be the latest score (highest ID), which is 103
+	t:eq(chartModel.state.scoreItemIndex, 3)
+	t:eq(chartModel.state.scoreId, 103)
+
+	scoreSelector:scrollScore(-1)
+	t:eq(chartModel.state.scoreItemIndex, 2)
+	t:eq(chartModel.state.scoreId, 102)
+	t:eq(scoreSelector.scoreItem.id, 102)
+
+	scoreSelector:scrollScore(-1)
+	t:eq(chartModel.state.scoreItemIndex, 1)
+	t:eq(chartModel.state.scoreId, 101)
+	t:eq(scoreSelector.scoreItem.id, 101)
+
+	-- Scroll forward
+	scoreSelector:scrollScore(1)
+	t:eq(chartModel.state.scoreId, 102)
+end
+
+return test

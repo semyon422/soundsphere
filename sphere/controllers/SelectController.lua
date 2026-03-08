@@ -13,13 +13,15 @@ local Path = require("Path")
 ---@operator call: sphere.SelectController
 local SelectController = class()
 
----@param selectModel sphere.SelectModel
+---@param chartSelector rizu.select.ChartSelector
+---@param scoreSelector rizu.select.ScoreSelector
+---@param collectionSelector rizu.select.CollectionSelector
 ---@param modifierSelectModel sphere.ModifierSelectModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
 ---@param multiplayerModel sphere.MultiplayerModel
 ---@param onlineModel sphere.OnlineModel
----@param cacheModel sphere.CacheModel
+---@param library rizu.library.Library
 ---@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
 ---@param replayBase sea.ReplayBase
@@ -27,13 +29,15 @@ local SelectController = class()
 ---@param previewModel sphere.PreviewModel
 ---@param chartPreviewModel sphere.ChartPreviewModel
 function SelectController:new(
-	selectModel,
+	chartSelector,
+	scoreSelector,
+	collectionSelector,
 	modifierSelectModel,
 	noteSkinModel,
 	configModel,
 	multiplayerModel,
 	onlineModel,
-	cacheModel,
+	library,
 	osudirectModel,
 	windowModel,
 	replayBase,
@@ -41,13 +45,15 @@ function SelectController:new(
 	previewModel,
 	chartPreviewModel
 )
-	self.selectModel = selectModel
+	self.chartSelector = chartSelector
+	self.scoreSelector = scoreSelector
+	self.collectionSelector = collectionSelector
 	self.modifierSelectModel = modifierSelectModel
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
 	self.multiplayerModel = multiplayerModel
 	self.onlineModel = onlineModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
 	self.replayBase = replayBase
@@ -55,18 +61,34 @@ function SelectController:new(
 	self.previewModel = previewModel
 	self.chartPreviewModel = chartPreviewModel
 	self.state = ModifiersMetaState()
+
+	self.chartSelector.state.onChanged:add({
+		receive = function(_, event)
+			if event.type == "chart" then
+				self.scoreSelector:setChart(self.chartSelector.chartview)
+			end
+		end
+	})
+
+	self.collectionSelector.onChanged:add({
+		receive = function(_, event)
+			if event.type == "collection_changed" then
+				self.chartSelector:noDebouncePullNoteChartSet(not event.path_changed)
+			end
+		end
+	})
 end
 
 function SelectController:load()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
 	self.configModel:write()
 	self.replayBase:importReplayBase(self.configModel.configs.play)
 	self.modifierSelectModel:updateAdded()
 
-	self.selectModel:setLock(false)
+	self.chartSelector:setLock(false)
 
-	selectModel:load()
+	chartSelector:load()
 	self.previewModel:load()
 
 	self:applyModifierMeta()
@@ -78,7 +100,7 @@ function SelectController:applyModifierMeta()
 
 	local replayBase = self.replayBase
 
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		replayBase.columns_order = nil
 		return
@@ -88,6 +110,8 @@ function SelectController:applyModifierMeta()
 	self.state.inputMode:set(chartview.inputmode)
 	self.state:resetOrder()
 
+	self.scoreSelector:updateReplayBase(chartview)
+
 	ModifierModel:applyMeta(replayBase.modifiers, self.state)
 
 	if replayBase.columns_order and #replayBase.columns_order ~= self.state.inputMode:getColumns() then
@@ -96,7 +120,7 @@ function SelectController:applyModifierMeta()
 end
 
 function SelectController:beginUnload()
-	self.selectModel:setLock(true)
+	self.chartSelector:setLock(true)
 end
 
 function SelectController:unload()
@@ -110,13 +134,13 @@ function SelectController:update()
 
 	self.windowModel:setVsyncOnSelect(true)
 
-	local selectModel = self.selectModel
-	if selectModel:isChanged() then
-		self.backgroundModel:setBackgroundPath(selectModel:getBackgroundPath())
-		local audio_path, preview_time, mode = selectModel:getAudioPathPreview()
-		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, selectModel.chartview)
+	local chartSelector = self.chartSelector
+	if chartSelector:isChanged() then
+		self.backgroundModel:setBackgroundPath(chartSelector:getBackgroundPath())
+		local audio_path, preview_time, mode = chartSelector:getAudioPathPreview()
+		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
 		self.previewModel:onLoad(function()
-			self.chartPreviewModel:setChartview(selectModel.chartview)
+			self.chartPreviewModel:setChartview(chartSelector.chartview)
 		end)
 		self:applyModifierMeta()
 	end
@@ -147,11 +171,11 @@ SelectController.updateSession = thread.coro(function(self)
 end)
 
 function SelectController:openDirectory()
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
-	local location = self.cacheModel.locationsRepo:selectLocationById(chartview.location_id)
+	local location = self.library.locationsRepo:selectLocationById(chartview.location_id)
 	if not location then
 		return
 	end
@@ -170,7 +194,7 @@ function SelectController:openDirectory()
 end
 
 function SelectController:openWebNotechart()
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
@@ -181,21 +205,20 @@ end
 
 ---@param force boolean?
 function SelectController:updateCache(force)
-	local chartview = self.selectModel.chartview
+	local chartview = self.chartSelector.chartview
 	if not chartview then
 		return
 	end
-	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
+	self.library:computeLocation(chartview.dir, chartview.location_id)
 end
 
----@param location_id string
+---@param location_id integer
 function SelectController:updateCacheLocation(location_id)
-	local cacheModel = self.cacheModel
-	local state = cacheModel.shared.state
-	if state == 0 or state == 3 then
-		cacheModel:startUpdate(nil, location_id)
+	local library = self.library
+	if not library.isProcessing then
+		library:computeLocation(nil, location_id)
 	else
-		cacheModel:stopTask()
+		library:stopTask()
 	end
 end
 
@@ -210,7 +233,7 @@ end
 
 ---@param path string
 function SelectController:directorydropped(path)
-	self.cacheModel.locationManager:updateLocationPath(path)
+	-- self.library.locations:updateLocationPath(path)
 end
 
 local filedropped_handlers = {}
@@ -227,7 +250,7 @@ function filedropped_handlers.new_chart(self, path, data)
 		audio = audioName .. "." .. ext
 	})))
 
-	self.cacheModel:startUpdate(location_path, 1)
+	self.library:computeLocation(location_path, 1)
 end
 
 function filedropped_handlers.add_zip(self, path, data)
@@ -243,7 +266,7 @@ function filedropped_handlers.add_zip(self, path, data)
 	end
 	print("Extracted")
 
-	self.cacheModel:startUpdate(location_path, 1)
+	self.library:computeLocation(location_path, 1)
 end
 filedropped_handlers.add_zip = thread.coro(filedropped_handlers.add_zip)
 
@@ -269,16 +292,16 @@ function SelectController:filedropped(file)
 end
 
 function SelectController:exportToOsu()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	if not chartview then
 		return
 	end
 
 	local encoder = ChartEncoder()
 
-	local chart, chartmeta = selectModel:loadChartAbsolute()
+	local chart, chartmeta = chartSelector:loadChartAbsolute()
 	ModifierModel:apply(self.replayBase.modifiers, chart)
 
 	local data = encoder:encode({{

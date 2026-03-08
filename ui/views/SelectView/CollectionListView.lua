@@ -7,26 +7,42 @@ local CollectionListView = ListView()
 CollectionListView.rows = 11
 
 function CollectionListView:reloadItems()
-	self.stateCounter = 0
-	self.items = self.game.selectModel.collectionLibrary.tree.items
+	local collectionStore = self.game.collectionSelector.store
+	if not self.isSubscribed then
+		collectionStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = collectionStore.tree.items
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function CollectionListView:receive()
+	local collectionStore = self.game.collectionSelector.store
+	self.items = collectionStore.tree.items
+	self.refreshNeeded = true
 end
 
 ---@return number
 function CollectionListView:getItemIndex()
-	local collectionLibrary = self.game.selectModel.collectionLibrary
-	return collectionLibrary.tree.selected
+	local collectionStore = self.game.collectionSelector.store
+	return collectionStore.tree.selected
 end
 
 ---@param count number
 function CollectionListView:scroll(count)
-	self.game.selectModel:scrollCollection(count)
+	self.game.collectionSelector:scrollCollection(count)
 end
 
 ---@param ... any?
 function CollectionListView:draw(...)
 	ListView.draw(self, ...)
 
-	local collectionLibrary = self.game.selectModel.collectionLibrary
+	local collectionStore = self.game.collectionSelector.store
 
 	local kp = just.keypressed
 	if kp("up") or kp("left") then self:scroll(-1)
@@ -36,9 +52,8 @@ function CollectionListView:draw(...)
 	elseif kp("home") then self:scroll(-math.huge)
 	elseif kp("end") then self:scroll(math.huge)
 	elseif kp("return") then
-		self.stateCounter = self.stateCounter + 1
-		collectionLibrary:enter()
-		self.game.selectModel:scrollCollection(0, nil, true)
+		collectionStore:enter()
+		self.game.collectionSelector:scrollCollection(0, nil, true)
 	end
 end
 
@@ -46,8 +61,9 @@ end
 ---@param w number
 ---@param h number
 function CollectionListView:drawItem(i, w, h)
-	local tree = self.game.selectModel.collectionLibrary.tree
-	local item = self.items[i]
+	local collectionStore = self.game.collectionSelector.store
+	local tree = collectionStore.tree
+	local item = self:get(i)
 
 	local name = item.name
 	if item.depth == tree.depth and item.depth ~= 0 then

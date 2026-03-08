@@ -1,0 +1,70 @@
+local class = require("class")
+local Processor = require("rizu.library.Processor")
+local Database = require("rizu.library.Database")
+
+---@class rizu.library.Worker
+---@operator call: rizu.library.Worker
+local Worker = class()
+
+---@param library rizu.library.Library
+---@param fs fs.IFilesystem
+---@param workingDirectory string
+function Worker:new(library, fs, workingDirectory)
+	self.library = library
+	self.db = Database(fs)
+	self.processor = Processor(self.db, fs, workingDirectory)
+	self.errors = {}
+end
+
+function Worker:load()
+	self.db:load()
+
+	function self.processor.checkProgress(processor)
+		if #processor.errors > 0 then
+			for _, err in ipairs(processor.errors) do
+				table.insert(self.errors, err)
+			end
+			processor.errors = {}
+		end
+
+		self.library:updateProgress({
+			stage = processor.stage,
+			total = processor.chartfiles_count,
+			current = processor.chartfiles_current,
+			label = processor.stage_label,
+			errorCount = processor.errorCount
+		}, self.errors)
+		self.errors = {}
+
+		if self.needStop then
+			processor.needStop = true
+			self.needStop = false
+		end
+	end
+end
+
+function Worker:unload()
+	self.db:unload()
+end
+
+function Worker:stopTask()
+	self.needStop = true
+end
+
+function Worker:computeLocation(path, location_id)
+	self.processor:computeLocation(path, location_id)
+end
+
+function Worker:computeChartdiffs()
+	self.processor:computeChartdiffs()
+end
+
+function Worker:computeIncompleteChartdiffs(prefer_preview)
+	self.processor:computeIncompleteChartdiffs(prefer_preview)
+end
+
+function Worker:computeChartplays()
+	self.processor:computeChartplays()
+end
+
+return Worker

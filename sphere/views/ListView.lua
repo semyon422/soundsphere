@@ -15,9 +15,38 @@ function ListView:reloadItems()
 	self.items = {}
 end
 
+---@param i number
+---@return any
+function ListView:get(i)
+	local items = self.items
+	if not items then return nil end
+	if items.get then
+		return items:get(i)
+	end
+	return items[i]
+end
+
+---@return number
+function ListView:getItemCount()
+	local items = self.items
+	if type(items) == "table" then
+		if items.count and type(items.count) == "function" then
+			return items:count()
+		end
+		if items.itemsCount then
+			return items.itemsCount
+		end
+		return #items
+	end
+	if items.count and type(items.count) == "function" then
+		return items:count()
+	end
+	return items.itemsCount or 0
+end
+
 ---@param delta number
 function ListView:scroll(delta)
-	self.targetItemIndex = math.min(math.max(self.targetItemIndex + delta, 1), #self.items)
+	self.targetItemIndex = math.min(math.max(self.targetItemIndex + delta, 1), self:getItemCount())
 end
 
 ---@return number
@@ -59,12 +88,15 @@ function ListView:draw(w, h)
 		self:scroll(-delta)
 	end
 
+	local count = self:getItemCount()
 	for i = math.floor(visualItemIndex), self.rows + math.ceil(visualItemIndex) - 1 do
 		local _i = i - math.floor(self.rows / 2)
-		if self.items[_i] then
-			just.push()
-			self:drawItem(_i, w, _h)
-			just.pop()
+		if _i >= 1 and _i <= count then
+			if self:get(_i) then
+				just.push()
+				self:drawItem(_i, w, _h)
+				just.pop()
+			end
 		end
 		just.emptyline(_h)
 	end

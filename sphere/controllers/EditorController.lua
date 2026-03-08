@@ -21,35 +21,35 @@ local md5 = require("md5")
 ---@operator call: sphere.EditorController
 local EditorController = class()
 
----@param selectModel sphere.SelectModel
+---@param chartSelector rizu.select.ChartSelector
 ---@param editorModel sphere.EditorModel
 ---@param noteSkinModel sphere.NoteSkinModel
 ---@param configModel sphere.ConfigModel
 ---@param resourceModel sphere.ResourceModel
 ---@param windowModel sphere.WindowModel
----@param cacheModel sphere.CacheModel
+---@param library rizu.library
 ---@param fileFinder sphere.FileFinder
 ---@param previewModel sphere.PreviewModel
 ---@param replayBase sea.ReplayBase
 function EditorController:new(
-	selectModel,
+	chartSelector,
 	editorModel,
 	noteSkinModel,
 	configModel,
 	resourceModel,
 	windowModel,
-	cacheModel,
+	library,
 	fileFinder,
 	previewModel,
 	replayBase
 )
-	self.selectModel = selectModel
+	self.chartSelector = chartSelector
 	self.editorModel = editorModel
 	self.noteSkinModel = noteSkinModel
 	self.configModel = configModel
 	self.resourceModel = resourceModel
 	self.windowModel = windowModel
-	self.cacheModel = cacheModel
+	self.library = library
 	self.fileFinder = fileFinder
 	self.previewModel = previewModel
 	self.replayBase = replayBase
@@ -57,18 +57,18 @@ end
 
 function EditorController:load()
 
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 	local configModel = self.configModel
 	local fileFinder = self.fileFinder
 
-	local chart, chartmeta = selectModel:loadChart()
+	local chart, chartmeta = chartSelector:loadChart()
 
 	if love.keyboard.isDown("lshift") then
 		ModifierModel:apply(self.replayBase.modifiers, chart)
 	end
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 
 	local noteSkin = self.noteSkinModel:loadNoteSkin(tostring(chart.inputMode))
 	noteSkin:loadData()
@@ -106,7 +106,7 @@ function EditorController:unload()
 end
 
 function EditorController:sliceKeysounds()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 
 	---@type sphere.EditorModel
 	local editorModel = self.editorModel
@@ -128,7 +128,7 @@ function EditorController:sliceKeysounds()
 
 	print("volume", volume)
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	local real_dir = chartview.real_dir
 
 	local dir = path_util.join(real_dir, chartview.name)
@@ -262,10 +262,10 @@ local ubmsc_columns = {
 }
 
 function EditorController:exportUBmsC()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	local real_dir = chartview.real_dir
 
 	local ubmsc_columns_map = ubmsc_columns[chartview.inputmode]
@@ -383,10 +383,10 @@ local bms_columns = {
 }
 
 function EditorController:exportBmsTemplate(columns_out)
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	local real_dir = chartview.real_dir
 
 	---@type ncdk2.Chart[]
@@ -635,7 +635,7 @@ function EditorController:exportBmsTemplate(columns_out)
 end
 
 function EditorController:save()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 
 	self.editorModel:save()
@@ -647,16 +647,16 @@ function EditorController:save()
 		chartmeta = editorModel.chartmeta,
 	}})
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	local path = chartview.location_path:gsub(".sph$", "") .. ".sph"
 
 	assert(love.filesystem.write(path, data))
 
-	self.cacheModel:startUpdate(chartview.dir, chartview.location_id)
+	self.library:computeLocation(chartview.dir, chartview.location_id)
 end
 
 function EditorController:saveToOsu()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 
 	self.editorModel:save()
@@ -667,14 +667,14 @@ function EditorController:saveToOsu()
 		chartmeta = editorModel.chartmeta,
 	}})
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 	local path = chartview.location_path:gsub(".osu$", ""):gsub(".sph$", "") .. ".sph.osu"
 
 	assert(love.filesystem.write(path, data))
 end
 
 function EditorController:saveToNanoChart()
-	local selectModel = self.selectModel
+	local chartSelector = self.chartSelector
 	local editorModel = self.editorModel
 
 	self.editorModel:save()
@@ -699,7 +699,7 @@ function EditorController:saveToNanoChart()
 	local content = nanoChart:encode(emptyHash, editorModel.noteChart.inputMode.key, abs_notes)
 	local compressedContent = zlib.compress(content)
 
-	local chartview = selectModel.chartview
+	local chartview = chartSelector.chartview
 
 	local path = chartview.real_path
 

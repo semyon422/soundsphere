@@ -183,13 +183,28 @@ local function format_diff_columns(v)
 	return diff_columns_names[v] or ""
 end
 
+local selection_modes = {"chartfile_sets", "chartfiles", "chartmetas", "chartdiffs", "chartplays"}
+local selection_modes_names = {
+	chartfile_sets = "sets",
+	chartfiles = "files",
+	chartmetas = "charts",
+	chartdiffs = "diffs",
+	chartplays = "plays",
+}
+---@param v string?
+---@return string
+local function format_selection_mode(v)
+	return selection_modes_names[v] or tostring(v)
+end
+
 function drawSection:select()
 	local settings = self.game.configModel.configs.settings
 	local i = settings.input
 	local s = settings.select
 
 	s.diff_column = imgui.combo("diff_column", s.diff_column, diff_columns, format_diff_columns, "difficulty")
-	s.collapse = imgui.checkbox("s.collapse", s.collapse, "group charts if applicable")
+	s.primary_mode = imgui.combo("primary_mode", s.primary_mode, selection_modes, format_selection_mode, "primary mode")
+	s.secondary_mode = imgui.combo("secondary_mode", s.secondary_mode, selection_modes, format_selection_mode, "secondary mode")
 	s.chart_preview = imgui.checkbox("s.chart_preview", s.chart_preview, "chart preview")
 
 	imgui.separator()

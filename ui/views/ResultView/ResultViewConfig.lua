@@ -21,7 +21,7 @@ local Layout = require("ui.views.ResultView.Layout")
 ---@return boolean
 local function showLoadedScore(self)
 	local chartplay = self.game.computeContext.chartplay
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	if not chartplay or not scoreItem then
 		return false
 	end
@@ -94,7 +94,7 @@ local function ScoreSources(self)
 	local replay = game.resultController.replay
 
 	local show = showLoadedScore(self)
-	local scoreItem = game.selectModel.scoreItem
+	local scoreItem = game.scoreSelector.scoreItem
 
 	if not scoreEngine.accuracySource then
 		return
@@ -293,7 +293,7 @@ local function ScoreList(self)
 	love.graphics.translate(w - 16, 0)
 
 	local list = ScoreListView
-	local count = #list.items - 1
+	local count = list:getItemCount() - 1
 	local pos = (list.visualItemIndex - 1) / count
 	local newScroll = imgui.ScrollBar("slsb", pos, 16, h, count / list.rows)
 	if newScroll then
@@ -303,7 +303,7 @@ end
 
 ---@param self table
 local function Title(self)
-	local chartview = self.game.selectModel.chartview
+	local chartview = self.game.chartSelector.chartview
 
 	local w, h = Layout:move("title_middle")
 	drawFrameRect(w, h)
@@ -325,7 +325,7 @@ local function Judgements(self)
 	if not scoreEngine then
 		return
 	end
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	local judgesSource = scoreEngine.judgesSource
 
 	if not judgesSource or not scoreItem then
@@ -389,8 +389,8 @@ end
 ---@param self {game: sphere.GameController}
 local function JudgementsDropdown(self)
 	local show = showLoadedScore(self)
-	local scoreItem = self.game.selectModel.scoreItem
-	local chartview = self.game.selectModel.chartview
+	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartview = self.game.chartSelector.chartview
 
 	local w, h = Layout:move("column1row1")
 	h = 60
@@ -431,7 +431,7 @@ end
 ---@param self {game: sphere.GameController}
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 
 	if not show or not scoreItem then
 		return
@@ -467,8 +467,8 @@ local function NotechartInfo(self)
 
 	local normalscore = rhythm_engine.score_engine.scores.normalscore
 
-	local chartview = game.selectModel.chartview
-	local scoreItem = game.selectModel.scoreItem
+	local chartview = game.chartSelector.chartview
+	local scoreItem = game.scoreSelector.scoreItem
 	local scoreEngine = rhythm_engine.score_engine
 	local replay = game.resultController.replay
 
@@ -476,9 +476,9 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local topScoreItem = self.game.selectModel.scoreLibrary.items[1]
+	local topScoreItem = self.game.scoreSelector.store[1]
 	if topScoreItem == scoreItem then
-		topScoreItem = self.game.selectModel.scoreLibrary.items[2]
+		topScoreItem = self.game.scoreSelector.store[2]
 	end
 	if not topScoreItem then
 		topScoreItem = scoreItem
@@ -758,9 +758,9 @@ local function ModifierIconGrid(self)
 	-- drawFrameRect(w, h)
 	love.graphics.translate(36, 0)
 
-	local selectModel = self.game.selectModel
+	local chartSelector = self.game.chartSelector
 	local replay = self.game.resultController.replay
-	local scoreItem = selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 
 	local modifiers = (showLoadedScore(self) and replay) and replay.modifiers or (scoreItem and scoreItem.modifiers)
 
@@ -783,7 +783,7 @@ local function BottomScreenMenu(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local scoreItem = self.game.selectModel.scoreItem
+	local scoreItem = self.game.scoreSelector.scoreItem
 	local chartplay = self.game.computeContext.chartplay
 
 	w, h = Layout:move("graphs_sup_right")
@@ -801,12 +801,12 @@ local function BottomScreenMenu(self)
 	end
 	if scoreItem and chartplay and scoreItem.id == chartplay.id and not scoreItem.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
-			self.game.onlineModel.onlineScoreManager:submit(self.game.selectModel.chartview, scoreItem.replay_hash)
+			self.game.onlineModel.onlineScoreManager:submit(self.game.chartSelector.chartview, scoreItem.replay_hash)
 		end
 	end
 	if imgui.TextOnlyButton("to osr", "to osr", 72 * 1.5, h) then
 		error("fix this")
-		-- local chart, chartmeta = self.game.selectModel:loadChartAbsolute()
+		-- local chart, chartmeta = self.game.chartSelector:loadChartAbsolute()
 		-- self.game.resultController:saveOsr(chartmeta)
 	end
 	just.row()

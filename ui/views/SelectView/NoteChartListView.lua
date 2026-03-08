@@ -9,18 +9,32 @@ local NoteChartListView = ListView()
 NoteChartListView.rows = 5
 
 function NoteChartListView:reloadItems()
-	self.stateCounter = self.game.selectModel.noteChartStateCounter
-	self.items = self.game.selectModel.noteChartLibrary.items
+	local chartStore = self.game.chartSelector.chartStore
+	if not self.isSubscribed then
+		chartStore.onChanged:add(self)
+		self.isSubscribed = true
+		self.items = chartStore
+		self.refreshNeeded = true
+	end
+
+	if self.refreshNeeded then
+		self.stateCounter = (self.stateCounter or 0) + 1
+		self.refreshNeeded = false
+	end
+end
+
+function NoteChartListView:receive()
+	self.refreshNeeded = true
 end
 
 ---@return number
 function NoteChartListView:getItemIndex()
-	return self.game.selectModel.chartview_index
+	return self.game.chartSelector.state.chartview_index
 end
 
 ---@param count number
 function NoteChartListView:scroll(count)
-	self.game.selectModel:scrollNoteChart(count)
+	self.game.chartSelector:scrollNoteChart(count)
 end
 
 ---@param ... any?
@@ -97,8 +111,7 @@ end
 ---@param w number
 ---@param h number
 function NoteChartListView:drawItem(i, w, h)
-	local items = self.items
-	local item = items[i]
+	local item = self:get(i)
 
 	if item.difftable_chartmetas and #item.difftable_chartmetas > 0 then
 		love.graphics.circle("line", w - 22 * 2, 36, 5, 16)
@@ -110,7 +123,8 @@ function NoteChartListView:drawItem(i, w, h)
 
 	local select = self.game.configModel.configs.settings.select
 
-	if select.chartviews_table ~= "chartviews" then
+	local secondary_mode = select.secondary_mode or "chartmetas"
+	if secondary_mode == "chartdiffs" or secondary_mode == "chartplays" then
 		baseTimeRate = 1
 	end
 
@@ -121,10 +135,11 @@ function NoteChartListView:drawItem(i, w, h)
 	local creator = item.creator or ""
 	local name = item.name or item.chartfile_name
 
-	if items[i - 1] and items[i - 1].chartdiff_inputmode == item.chartdiff_inputmode then
+	local prevItem = self:get(i - 1)
+	if prevItem and prevItem.chartdiff_inputmode == item.chartdiff_inputmode then
 		inputmode = ""
 	end
-	if items[i - 1] and items[i - 1].creator == item.creator then
+	if prevItem and prevItem.creator == item.creator then
 		creator = ""
 	end
 
