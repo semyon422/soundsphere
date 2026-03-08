@@ -1,4 +1,5 @@
 local class = require("class")
+local delay = require("delay")
 local VisualEngine = require("rizu.engine.visual.VisualEngine")
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
 local ChartDecoder = require("sph.ChartDecoder")
@@ -48,12 +49,14 @@ local empty_lines = SphPreview:previewLinesToLines({
 
 ---@param chartview rizu.library.Chartview
 function ChartPreview:setChartview(chartview)
-	if not self.configModel.configs.settings.select.chart_preview then
-		self.chart = nil
-		return
-	end
+	self.pending_chartview = chartview
+	delay.debounce(self, "chartview_debounce", 0.1, self._setChartview, self)
+end
 
-	if not chartview or not chartview.chartdiff_inputmode then
+---@private
+function ChartPreview:_setChartview()
+	local chartview = self.pending_chartview
+	if not self.configModel.configs.settings.select.chart_preview or not chartview then
 		self.chart = nil
 		return
 	end
