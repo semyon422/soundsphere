@@ -15,7 +15,12 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	return self.select_model.chartStore.items
+	local store = self.select_model.stores[2]
+	local items = {}
+	for i = 1, store:count() do
+		table.insert(items, store:get(i))
+	end
+	return items
 end
 
 ---@return integer

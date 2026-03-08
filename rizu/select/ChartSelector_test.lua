@@ -54,8 +54,6 @@ function test.scrolling(t)
 	tlf:populate(library, charts)
 	
 	local fs = {read = function() end, getInfo = function() end}
-	local onlineModel = {authManager = {sea_client = {connected = false}}}
-	local replayBase = {}
 
 	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	model:load()
@@ -77,13 +75,15 @@ function test.scrolling(t)
 	model:scrollLevel(1, -1)
 	t:eq(model.state.levels[1].index, 2)
 	t:eq(model.state.levels[1].id, 2)
+
+	library:unload()
 end
 
 function test.chart_navigation(t)
 	local charts = {
-		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1},
-		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, hash = "h1", index = 2},
-		{chartfile_set_id = 1, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, hash = "h1", index = 3}
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h_nav_1", index = 1},
+		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, hash = "h_nav_2", index = 1},
+		{chartfile_set_id = 1, chartfile_id = 3, chartmeta_id = 3, chartdiff_id = 3, hash = "h_nav_3", index = 1}
 	}
 	local configModel = createMockConfigModel()
 	local library = tlf:create()
@@ -111,6 +111,8 @@ function test.chart_navigation(t)
 	model:scrollLevel(2, -1)
 	t:eq(model.state.levels[2].index, 2)
 	t:eq(model.state.levels[2].id, 2)
+
+	library:unload()
 end
 
 function test.score_navigation(t)
@@ -162,6 +164,8 @@ function test.score_navigation(t)
 	-- Scroll forward
 	scoreSelector:scrollScore(1)
 	t:eq(chartModel.state.scoreId, 102)
+
+	library:unload()
 end
 
 return test

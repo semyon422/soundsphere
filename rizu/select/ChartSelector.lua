@@ -75,8 +75,9 @@ function ChartSelector:updatePrimaryItems()
 	local collectionItem = self.collectionSelector:getSelectedItem()
 	local params = self.queryBuilder:build(self.config, collectionItem)
 
-	self.library.chartviewsRepo:queryAsync(params)
-	self.stores[1]:updateItems(nil)
+	local result = self.library:queryAsync(params)
+	self.library.chartviewsRepo.params = params -- ensure repo has current params for getChartview in ListStore
+	self.stores[1]:setResult(result)
 	self.onChanged:send({type = "update_primary_items"})
 end
 
@@ -89,11 +90,13 @@ function ChartSelector:findNotechart(hash, index)
 		difficulty = config.diff_column,
 	}
 	self.taskRunner:push(function()
-		self.library.chartviewsRepo:queryAsync(params)
-		self.stores[1]:updateItems(nil)
+		local result = self.library:queryAsync(params)
+		self.library.chartviewsRepo.params = params
+		self.stores[1]:setResult(result)
 		local item = self.stores[1]:get(1)
 		if item then
-			self.stores[2]:updateItems(self.library.chartviewsRepo:getViews(item))
+			local result2 = self.library:getViewsAsync(params, item)
+			self.stores[2]:setResult(result2)
 		end
 		self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 	end, 1)
@@ -246,7 +249,7 @@ function ChartSelector:refresh(noUpdate, noPullNext)
 		self.chartview = nil
 		self.changed = true
 
-		self.stores[2]:clear()
+		self.stores[2]:setResult(nil)
 	end
 
 	self.state:setSelection(1, index, item and item.chartfile_set_id)
@@ -262,9 +265,11 @@ function ChartSelector:pullLevel(level)
 
 	local parentItem = self.stores[1]:get(self.state:getSelection(1).index)
 	if parentItem then
-		self.stores[2]:updateItems(self.library.chartviewsRepo:getViews(parentItem))
+		local params = self.queryBuilder:build(self.config)
+		local result = self.library:getViewsAsync(params, parentItem)
+		self.stores[2]:setResult(result)
 	else
-		self.stores[2]:clear()
+		self.stores[2]:setResult(nil)
 	end
 
 	local index = self.stores[2]:indexof(self.config)
