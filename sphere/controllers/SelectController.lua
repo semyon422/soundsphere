@@ -140,7 +140,9 @@ function SelectController:update()
 	if chartSelector:isChanged() then
 		self.backgroundModel:setBackgroundPath(chartSelector:getBackgroundPath())
 		local audio_path, preview_time, mode = chartSelector:getAudioPathPreview()
-		self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
+		if audio_path or not chartSelector.chartview then
+			self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
+		end
 		self.previewModel:onLoad(function()
 			self.chartPreviewModel:setChartview(chartSelector.chartview)
 		end)

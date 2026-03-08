@@ -476,9 +476,9 @@ local function NotechartInfo(self)
 		return
 	end
 
-	local top_chartplay = self.game.scoreSelector.store[1]
+	local top_chartplay = self.game.scoreSelector.store:get(1)
 	if top_chartplay == chartplay then
-		top_chartplay = self.game.scoreSelector.store[2]
+		top_chartplay = self.game.scoreSelector.store:get(2)
 	end
 	if not top_chartplay then
 		top_chartplay = chartplay
