@@ -17,12 +17,28 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	return self.select_model.chartStore.items
+	local chart_store = self.select_model.chartStore
+	if chart_store and chart_store.items then
+		return chart_store.items
+	end
+
+	local store = self.select_model.stores and self.select_model.stores[2]
+	if not store then
+		return {}
+	end
+
+	local items = {}
+	for i = 1, store:count() do
+		items[i] = store:get(i)
+	end
+	return items
 end
 
 ---@return integer
 function ChartGrid:getSelectedIndex()
 	return self.select_model.state.chartview_index
+		or (self.select_model.state.levels and self.select_model.state.levels[2] and self.select_model.state.levels[2].index)
+		or 1
 end
 
 ---@param index integer

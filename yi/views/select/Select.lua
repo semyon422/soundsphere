@@ -44,7 +44,7 @@ function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
 	self.select_controller = game.selectController
-	self.select_model = game.chartSelector
+	self.chart_selector = game.chartSelector
 
 	self.chart_preview_view = ChartPreviewView(self:getGame())
 	self.chart_preview_view:load()
@@ -152,16 +152,16 @@ function Select:onKeyDown(e)
 	local game = self:getGame()
 
 	if k == "j" then
-		self.select_model:scrollNoteChartSet(1)
+		self.chart_selector:scrollNoteChartSet(1)
 		return true
 	elseif k == "k" then
-		self.select_model:scrollNoteChartSet(-1)
+		self.chart_selector:scrollNoteChartSet(-1)
 		return true
 	elseif k == "h" then
-		self.select_model:scrollNoteChart(-1)
+		self.chart_selector:scrollNoteChart(-1)
 		return true
 	elseif k == "l" then
-		self.select_model:scrollNoteChart(1)
+		self.chart_selector:scrollNoteChart(1)
 		return true
 	elseif k == "m" then
 		modals:setImguiModal(ImGuiModifiers)
@@ -197,7 +197,7 @@ end
 
 function Select:updateChartview()
 	---@type {[string]: any}?
-	local chartview = self.select_model.chartview
+	local chartview = self.chart_selector.chartview
 
 	if not chartview then
 		return
@@ -244,8 +244,13 @@ function Select:attachObservers()
 		end
 	}
 
-	self.select_model.state.onChanged:add(self.chartStateObserver)
-	self.select_model.chartSetStore.onChanged:add(self.chartSetStoreObserver)
+	local chart_set_store = self.chart_selector.chartSetStore
+		or (self.chart_selector.stores and self.chart_selector.stores[1])
+
+	self.chart_selector.state.onChanged:add(self.chartStateObserver)
+	if chart_set_store and chart_set_store.onChanged then
+		chart_set_store.onChanged:add(self.chartSetStoreObserver)
+	end
 
 	self.observersAttached = true
 end
@@ -255,8 +260,13 @@ function Select:detachObservers()
 		return
 	end
 
-	self.select_model.state.onChanged:remove(self.chartStateObserver)
-	self.select_model.chartSetStore.onChanged:remove(self.chartSetStoreObserver)
+	local chart_set_store = self.chart_selector.chartSetStore
+		or (self.chart_selector.stores and self.chart_selector.stores[1])
+
+	self.chart_selector.state.onChanged:remove(self.chartStateObserver)
+	if chart_set_store and chart_set_store.onChanged then
+		chart_set_store.onChanged:remove(self.chartSetStoreObserver)
+	end
 
 	self.observersAttached = false
 end
