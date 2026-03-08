@@ -17,17 +17,12 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	local store = self.select_model.stores[2]
-	local items = {}
-	for i = 1, store:count() do
-		table.insert(items, store:get(i))
-	end
-	return items
+	return self.select_model.chartStore.items
 end
 
 ---@return integer
 function ChartGrid:getSelectedIndex()
-	return self.select_model.state.levels[2].index
+	return self.select_model.state.chartview_index
 end
 
 ---@param index integer

@@ -24,7 +24,7 @@ function ChartSetList:load()
 end
 
 function ChartSetList:reloadItems()
-	self.camera.position = self.select_model.state.levels[1].index
+	self.camera.position = self.select_model.state.chartview_set_index
 end
 
 ---@return number
@@ -34,7 +34,7 @@ end
 
 ---@return number
 function ChartSetList:getSelectedIndex()
-	return self.select_model.state.levels[1].index
+	return self.select_model.state.chartview_set_index
 end
 
 ---@param index number
