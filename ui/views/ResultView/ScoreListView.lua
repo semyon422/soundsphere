@@ -29,7 +29,7 @@ end
 
 ---@return number
 function ScoreListView:getItemIndex()
-	return self.game.scoreSelector.state.scoreItemIndex
+	return self.game.scoreSelector.state.chartplayIndex
 end
 
 ---@param delta number

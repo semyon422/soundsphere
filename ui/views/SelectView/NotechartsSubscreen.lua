@@ -209,8 +209,8 @@ local function ScoreCells(self)
 	local w, h = Layout:move("column1row2")
 	drawFrameRect(w, h)
 
-	local scoreItem = self.game.scoreSelector.scoreItem
-	if not scoreItem then
+	local chartplay = self.game.scoreSelector.chartplay
+	if not chartplay then
 		return
 	end
 
@@ -220,13 +220,13 @@ local function ScoreCells(self)
 	local missCount = 0
 	local rate = 1
 	local const = false
-	if scoreItem then
-		score = scoreItem.score or 0
-		difficulty = scoreItem.difficulty or 0
-		accuracy = scoreItem.accuracy or 0
-		missCount = scoreItem.miss_count or 0
-		rate = scoreItem.rate or 1
-		const = scoreItem.const or false
+	if chartplay then
+		score = chartplay.score or 0
+		difficulty = chartplay.difficulty or 0
+		accuracy = chartplay.accuracy or 0
+		missCount = chartplay.miss_count or 0
+		rate = chartplay.rate or 1
+		const = chartplay.const or false
 		if score ~= score then
 			score = 0
 		end
@@ -439,11 +439,11 @@ local function ModifierIconGrid(self)
 	w, h = Layout:move("column1row2")
 	love.graphics.translate(21, 4)
 
-	local scoreItem = self.game.scoreSelector.scoreItem
-	if not scoreItem then
+	local chartplay = self.game.scoreSelector.chartplay
+	if not chartplay then
 		return
 	end
-	local configModifier = scoreItem.modifiers or (scoreItem.modifierset and scoreItem.modifierset.encoded)
+	local configModifier = chartplay.modifiers or (chartplay.modifierset and chartplay.modifierset.encoded)
 
 	ModifierIconGridView.game = self.game
 	ModifierIconGridView:draw(configModifier, w / 2 - 42, h, (h - 8) / 3, true)

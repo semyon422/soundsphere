@@ -98,7 +98,7 @@ function SelectView:play()
 end
 
 function SelectView:result()
-	if self.game.chartSelector:notechartExists() and self.game.scoreSelector.scoreItem then
+	if self.game.chartSelector:notechartExists() and self.game.scoreSelector.chartplay then
 		self:changeScreen("resultView")
 	end
 end

@@ -148,18 +148,18 @@ function test.score_navigation(t)
 	scoreSelector:setChart(chartModel.chartview)
 
 	-- Default selection should be the latest score (highest ID), which is 103
-	t:eq(chartModel.state.scoreItemIndex, 3)
+	t:eq(chartModel.state.chartplayIndex, 3)
 	t:eq(chartModel.state.scoreId, 103)
 
 	scoreSelector:scrollScore(-1)
-	t:eq(chartModel.state.scoreItemIndex, 2)
+	t:eq(chartModel.state.chartplayIndex, 2)
 	t:eq(chartModel.state.scoreId, 102)
-	t:eq(scoreSelector.scoreItem.id, 102)
+	t:eq(scoreSelector.chartplay.id, 102)
 
 	scoreSelector:scrollScore(-1)
-	t:eq(chartModel.state.scoreItemIndex, 1)
+	t:eq(chartModel.state.chartplayIndex, 1)
 	t:eq(chartModel.state.scoreId, 101)
-	t:eq(scoreSelector.scoreItem.id, 101)
+	t:eq(scoreSelector.chartplay.id, 101)
 
 	-- Scroll forward
 	scoreSelector:scrollScore(1)

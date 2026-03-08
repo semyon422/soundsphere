@@ -21,11 +21,11 @@ local Layout = require("ui.views.ResultView.Layout")
 ---@return boolean
 local function showLoadedScore(self)
 	local chartplay = self.game.computeContext.chartplay
-	local scoreItem = self.game.scoreSelector.scoreItem
-	if not chartplay or not scoreItem then
+	local chartplay = self.game.scoreSelector.chartplay
+	if not chartplay or not chartplay then
 		return false
 	end
-	return scoreItem.id == chartplay.id
+	return chartplay.id == chartplay.id
 end
 
 
@@ -94,7 +94,7 @@ local function ScoreSources(self)
 	local replay = game.resultController.replay
 
 	local show = showLoadedScore(self)
-	local scoreItem = game.scoreSelector.scoreItem
+	local chartplay = game.scoreSelector.chartplay
 
 	if not scoreEngine.accuracySource then
 		return
@@ -103,8 +103,8 @@ local function ScoreSources(self)
 	local timings, subtimings
 	if (show and replay) then
 		timings, subtimings = replay.timings, replay.subtimings
-	elseif scoreItem then
-		timings, subtimings = scoreItem.timings, scoreItem.subtimings
+	elseif chartplay then
+		timings, subtimings = chartplay.timings, chartplay.subtimings
 	end
 
 	love.graphics.setColor(0, 0, 0, 0.2)
@@ -325,10 +325,10 @@ local function Judgements(self)
 	if not scoreEngine then
 		return
 	end
-	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartplay = self.game.scoreSelector.chartplay
 	local judgesSource = scoreEngine.judgesSource
 
-	if not judgesSource or not scoreItem then
+	if not judgesSource or not chartplay then
 		return
 	end
 
@@ -350,12 +350,12 @@ local function Judgements(self)
 	local counters = judgesSource:getJudges()
 
 	if not show then
-		counters = scoreItem.judges
+		counters = chartplay.judges
 	end
 
 	counters = counters or {}
 
-	local miss = show and scoreEngine.scores.base.missCount or scoreItem.miss_count or 0
+	local miss = show and scoreEngine.scores.base.missCount or chartplay.miss_count or 0
 
 	local notes = 0
 	for _, n in ipairs(counters) do
@@ -389,7 +389,7 @@ end
 ---@param self {game: sphere.GameController}
 local function JudgementsDropdown(self)
 	local show = showLoadedScore(self)
-	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartplay = self.game.scoreSelector.chartplay
 	local chartview = self.game.chartSelector.chartview
 
 	local w, h = Layout:move("column1row1")
@@ -406,10 +406,10 @@ local function JudgementsDropdown(self)
 	local replayBase = self.game.replayBase
 
 	if not show then
-		if not scoreItem then
+		if not chartplay then
 			return
 		end
-		replayBase = scoreItem
+		replayBase = chartplay
 	end
 
 	local timings = replayBase.timings or chartview.timings
@@ -431,9 +431,9 @@ end
 ---@param self {game: sphere.GameController}
 local function JudgementsAccuracy(self)
 	local show = showLoadedScore(self)
-	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartplay = self.game.scoreSelector.chartplay
 
-	if not show or not scoreItem then
+	if not show or not chartplay then
 		return
 	end
 
@@ -468,20 +468,20 @@ local function NotechartInfo(self)
 	local normalscore = rhythm_engine.score_engine.scores.normalscore
 
 	local chartview = game.chartSelector.chartview
-	local scoreItem = game.scoreSelector.scoreItem
+	local chartplay = game.scoreSelector.chartplay
 	local scoreEngine = rhythm_engine.score_engine
 	local replay = game.resultController.replay
 
-	if not scoreItem then
+	if not chartplay then
 		return
 	end
 
-	local topScoreItem = self.game.scoreSelector.store[1]
-	if topScoreItem == scoreItem then
-		topScoreItem = self.game.scoreSelector.store[2]
+	local top_chartplay = self.game.scoreSelector.store[1]
+	if top_chartplay == chartplay then
+		top_chartplay = self.game.scoreSelector.store[2]
 	end
-	if not topScoreItem then
-		topScoreItem = scoreItem
+	if not top_chartplay then
+		top_chartplay = chartplay
 	end
 
 	local chartplay = self.game.computeContext.chartplay
@@ -494,18 +494,18 @@ local function NotechartInfo(self)
 		show = false
 	end
 
-	local baseTimeRate = show and replay.rate or scoreItem.rate
-	local const = show and replay.const or scoreItem.const
+	local baseTimeRate = show and replay.rate or chartplay.rate
+	local const = show and replay.const or chartplay.const
 
 	local baseBpm = chartview.tempo
 	local baseLength = chartview.duration or 0
 	local baseDifficulty = chartview.difficulty
 	local baseInputMode = chartview.inputmode
 
-	local bpm = baseBpm * scoreItem.rate
-	local length = baseLength / scoreItem.rate
-	local difficulty = show and computeContext.chartdiff.enps_diff or scoreItem.difficulty
-	local inputMode = show and tostring(computeContext.chart.inputMode) or scoreItem.inputmode
+	local bpm = baseBpm * chartplay.rate
+	local length = baseLength / chartplay.rate
+	local difficulty = show and computeContext.chartdiff.enps_diff or chartplay.difficulty
+	local inputMode = show and tostring(computeContext.chart.inputMode) or chartplay.inputmode
 
 	local w, h = Layout:move("title_left")
 	love.graphics.translate(22, 15)
@@ -579,28 +579,28 @@ local function NotechartInfo(self)
 	RoundedRectangle("fill", 0, 0, w, 72, 36, false, false, 2)
 	love.graphics.setColor(1, 1, 1, 1)
 
-	local score = not show and scoreItem.score
+	local score = not show and chartplay.score
 		or erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2))) * 10000
 	if score ~= score then
 		score = 0
 	end
-	local accuracyValue = show and normalscore.accuracyAdjusted or scoreItem.accuracy
+	local accuracyValue = show and normalscore.accuracyAdjusted or chartplay.accuracy
 	local accuracy = Format.accuracy(accuracyValue)
 
-	local rating = scoreItem.rating
+	local rating = chartplay.rating
 
-	if chartplay.id == scoreItem.id then
+	if chartplay.id == chartplay.id then
 		local s = erfunc.erf(ratingHitTimingWindow / (normalscore.accuracyAdjusted * math.sqrt(2)))
 		rating = s * rhythm_engine.chartdiff.enps_diff
 	end
 
-	local bestScore = ("%d"):format(topScoreItem.score)
-	local bestAccuracy = Format.accuracy(topScoreItem.accuracy)
-	local bestRating = Format.difficulty(topScoreItem.rating)
+	local bestScore = ("%d"):format(top_chartplay.score)
+	local bestAccuracy = Format.accuracy(top_chartplay.accuracy)
+	local bestRating = Format.difficulty(top_chartplay.rating)
 
-	local deltaScore = score - topScoreItem.score
-	local deltaAccuracy = accuracyValue - topScoreItem.accuracy
-	local deltaRating = rating - topScoreItem.rating
+	local deltaScore = score - top_chartplay.score
+	local deltaAccuracy = accuracyValue - top_chartplay.accuracy
+	local deltaRating = rating - top_chartplay.rating
 	if deltaScore >= 0 then
 		deltaScore = "+" .. ("%d"):format(deltaScore)
 	else
@@ -725,10 +725,10 @@ local function NotechartInfo(self)
 
 	just.row(true)
 
-	local mean = show and normalscore.normalscore.mean or scoreItem.mean or 0
+	local mean = show and normalscore.normalscore.mean or chartplay.mean or 0
 	TextCellImView(w, 55, "right", "mean", ("%0.1f"):format(mean * 1000))
 
-	-- local earlylate = show and scoreEngine.scores.misc.earlylate or scoreItem.earlylate
+	-- local earlylate = show and scoreEngine.scores.misc.earlylate or chartplay.earlylate
 	-- if earlylate == 0 or earlylate ~= earlylate then
 	-- 	earlylate = "undef"
 	-- elseif earlylate > 1 then
@@ -738,7 +738,7 @@ local function NotechartInfo(self)
 	-- end
 	-- TextCellImView(w, 55, "right", "early/late", earlylate)
 
-	TextCellImView(w, 55, "right", "pauses", scoreItem.pause_count)
+	TextCellImView(w, 55, "right", "pauses", chartplay.pause_count)
 
 	if show then
 		local adjustRatio = normalscore.adjustRatio
@@ -760,9 +760,9 @@ local function ModifierIconGrid(self)
 
 	local chartSelector = self.game.chartSelector
 	local replay = self.game.resultController.replay
-	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartplay = self.game.scoreSelector.chartplay
 
-	local modifiers = (showLoadedScore(self) and replay) and replay.modifiers or (scoreItem and scoreItem.modifiers)
+	local modifiers = (showLoadedScore(self) and replay) and replay.modifiers or (chartplay and chartplay.modifiers)
 
 	if not modifiers then
 		return
@@ -783,7 +783,7 @@ local function BottomScreenMenu(self)
 
 	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
 
-	local scoreItem = self.game.scoreSelector.scoreItem
+	local chartplay = self.game.scoreSelector.chartplay
 	local chartplay = self.game.computeContext.chartplay
 
 	w, h = Layout:move("graphs_sup_right")
@@ -799,9 +799,9 @@ local function BottomScreenMenu(self)
 	if imgui.TextOnlyButton("replay", "watch", 72 * 1.5, h) then
 		self:play("replay")
 	end
-	if scoreItem and chartplay and scoreItem.id == chartplay.id and not scoreItem.file then
+	if chartplay and chartplay and chartplay.id == chartplay.id and not chartplay.file then
 		if imgui.TextOnlyButton("submit", "resubmit", 72 * 2, h) then
-			self.game.onlineModel.onlineScoreManager:submit(self.game.chartSelector.chartview, scoreItem.replay_hash)
+			self.game.onlineModel.onlineScoreManager:submit(self.game.chartSelector.chartview, chartplay.replay_hash)
 		end
 	end
 	if imgui.TextOnlyButton("to osr", "to osr", 72 * 1.5, h) then

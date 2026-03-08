@@ -16,7 +16,7 @@ function SelectionState:new()
 		{index = 1, id = nil}, -- Secondary
 	}
 	---@type number
-	self.scoreItemIndex = 1
+	self.chartplayIndex = 1
 	---@type number?
 	self.scoreId = nil
 
@@ -44,8 +44,8 @@ end
 ---@param index number
 ---@param id number?
 function SelectionState:setScore(index, id)
-	if self.scoreItemIndex == index and self.scoreId == id then return end
-	self.scoreItemIndex = index
+	if self.chartplayIndex == index and self.scoreId == id then return end
+	self.chartplayIndex = index
 	self.scoreId = id
 	self.onChanged:send({type = "score", index = index, id = id})
 end
