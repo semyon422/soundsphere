@@ -65,6 +65,46 @@ function ChartviewsRepo:unpackResult(t)
 	return items, count, t.maps
 end
 
+function ChartviewsRepo:_fetchResult(model, where, options)
+	local count_options = {
+		columns = {"1"},
+		group = options.group,
+	}
+	local count = model:count(where, count_options)
+
+	local struct_array = ffi.new("chartview_struct[?]", count)
+	local chartfile_id_to_global_index = {}
+	local chartmeta_id_to_global_index = {}
+	local chartdiff_id_to_global_index = {}
+	local chartplay_id_to_global_index = {}
+	local set_id_to_global_index = {}
+
+	local c = 0
+	for i, row in model:select_iter(where, options) do
+		local entry = struct_array[c]
+		entry.chartfile_id = row.chartfile_id
+		entry.chartfile_set_id = row.chartfile_set_id
+		entry.chartmeta_id = row.chartmeta_id or 0
+		entry.chartdiff_id = row.chartdiff_id or 0
+		entry.chartplay_id = row.chartplay_id or 0
+		entry.lamp = sql_util.toboolean(row.lamp or 0)
+		c = c + 1
+		set_id_to_global_index[entry.chartfile_set_id] = c
+		chartfile_id_to_global_index[entry.chartfile_id] = c
+		chartmeta_id_to_global_index[entry.chartmeta_id] = c
+		chartdiff_id_to_global_index[entry.chartdiff_id] = c
+		chartplay_id_to_global_index[entry.chartplay_id] = c
+	end
+
+	return self:packResult(struct_array, c, {
+		set_id_to_global_index = set_id_to_global_index,
+		chartfile_id_to_global_index = chartfile_id_to_global_index,
+		chartmeta_id_to_global_index = chartmeta_id_to_global_index,
+		chartdiff_id_to_global_index = chartdiff_id_to_global_index,
+		chartplay_id_to_global_index = chartplay_id_to_global_index,
+	})
+end
+
 ---@param params table
 function ChartviewsRepo:queryAsync(params)
 	if self.is_sync then
@@ -256,54 +296,13 @@ function ChartviewsRepo:query()
 	local subquery_mode = LEVELS[secondary_mode] > LEVELS[primary_mode] and secondary_mode or primary_mode
 	local model = self:_getDynamicViewModel(params, subquery_mode, false)
 
-	local view_group = LEVEL_GROUPS[primary_mode]
-
-	local columns = self:_getSlimColumns(primary_mode, params)
-	local where = table_util.copy(params.where)
-
 	local options = {
-		columns = columns,
+		columns = self:_getSlimColumns(primary_mode, params),
 		order = params.order,
-		group = view_group,
+		group = LEVEL_GROUPS[primary_mode],
 	}
 
-	local count_options = {
-		columns = {"1"},
-		group = view_group,
-	}
-	local count = model:count(where, count_options)
-
-	local struct_array = ffi.new("chartview_struct[?]", count)
-	local chartfile_id_to_global_index = {}
-	local chartmeta_id_to_global_index = {}
-	local chartdiff_id_to_global_index = {}
-	local chartplay_id_to_global_index = {}
-	local set_id_to_global_index = {}
-
-	local c = 0
-	for i, row in model:select_iter(where, options) do
-		local entry = struct_array[c]
-		entry.chartfile_id = row.chartfile_id
-		entry.chartfile_set_id = row.chartfile_set_id
-		entry.chartmeta_id = row.chartmeta_id or 0
-		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.chartplay_id = row.chartplay_id or 0
-		entry.lamp = sql_util.toboolean(row.lamp or 0)
-		c = c + 1
-		set_id_to_global_index[entry.chartfile_set_id] = c
-		chartfile_id_to_global_index[entry.chartfile_id] = c
-		chartmeta_id_to_global_index[entry.chartmeta_id] = c
-		chartdiff_id_to_global_index[entry.chartdiff_id] = c
-		chartplay_id_to_global_index[entry.chartplay_id] = c
-	end
-
-	return self:packResult(struct_array, c, {
-		set_id_to_global_index = set_id_to_global_index,
-		chartfile_id_to_global_index = chartfile_id_to_global_index,
-		chartmeta_id_to_global_index = chartmeta_id_to_global_index,
-		chartdiff_id_to_global_index = chartdiff_id_to_global_index,
-		chartplay_id_to_global_index = chartplay_id_to_global_index,
-	})
+	return self:_fetchResult(model, params.where, options)
 end
 
 ---@param chartview rizu.library.IChartviewBase
@@ -320,7 +319,6 @@ function ChartviewsRepo:getViews(chartview)
 	local group_mode = secondary_level >= primary_level and secondary_mode or primary_mode
 
 	local model = self:_getDynamicViewModel(params, group_mode, false)
-	local columns = self:_getSlimColumns(group_mode, params)
 
 	local order = {
 		"length(inputmode)",
@@ -345,48 +343,12 @@ function ChartviewsRepo:getViews(chartview)
 	end
 
 	local options = {
-		columns = columns,
+		columns = self:_getSlimColumns(group_mode, params),
 		order = order,
 		group = LEVEL_GROUPS[group_mode],
 	}
 
-	local count_options = {
-		columns = {"1"},
-		group = LEVEL_GROUPS[group_mode],
-	}
-	local count = model:count(where, count_options)
-
-	local struct_array = ffi.new("chartview_struct[?]", count)
-	local chartfile_id_to_global_index = {}
-	local chartmeta_id_to_global_index = {}
-	local chartdiff_id_to_global_index = {}
-	local chartplay_id_to_global_index = {}
-	local set_id_to_global_index = {}
-
-	local c = 0
-	for i, row in model:select_iter(where, options) do
-		local entry = struct_array[c]
-		entry.chartfile_id = row.chartfile_id
-		entry.chartfile_set_id = row.chartfile_set_id
-		entry.chartmeta_id = row.chartmeta_id or 0
-		entry.chartdiff_id = row.chartdiff_id or 0
-		entry.chartplay_id = row.chartplay_id or 0
-		entry.lamp = sql_util.toboolean(row.lamp or 0)
-		c = c + 1
-		set_id_to_global_index[entry.chartfile_set_id] = c
-		chartfile_id_to_global_index[entry.chartfile_id] = c
-		chartmeta_id_to_global_index[entry.chartmeta_id] = c
-		chartdiff_id_to_global_index[entry.chartdiff_id] = c
-		chartplay_id_to_global_index[entry.chartplay_id] = c
-	end
-
-	return self:packResult(struct_array, c, {
-		set_id_to_global_index = set_id_to_global_index,
-		chartfile_id_to_global_index = chartfile_id_to_global_index,
-		chartmeta_id_to_global_index = chartmeta_id_to_global_index,
-		chartdiff_id_to_global_index = chartdiff_id_to_global_index,
-		chartplay_id_to_global_index = chartplay_id_to_global_index,
-	})
+	return self:_fetchResult(model, where, options)
 end
 
 ---@param obj rizu.library.LocatedChartview
