@@ -70,6 +70,8 @@ function SelectController:new(
 		end
 	})
 
+	self.chartSelector.onChanged:add(self.scoreSelector)
+
 	self.collectionSelector.onChanged:add({
 		receive = function(_, event)
 			if event.type == "collection_changed" then

@@ -24,15 +24,21 @@ function ScoreSelector:new(configModel, library, onlineModel, replayBase, state)
 	local localProvider = LocalScoreProvider(library)
 	local onlineProvider = OnlineScoreProvider(onlineModel)
 	self.store = ScoreStore(configModel, localProvider, onlineProvider)
+	self.store.onChanged:add(self)
 
 	self.onChanged = Observable()
 	self.debounceTime = 0.5
 end
 
 function ScoreSelector:receive(event)
+	if event.items then
+		self:findScore()
+		return
+	end
+
 	if event.type == "selection" and event.level == 2 then
 		self:setChart(self.chartview)
-	elseif event.type == "find_notechart" then
+	elseif event.type == "find_notechart" or event.type == "set_changed" then
 		self:setChart(self.chartview)
 	end
 end
@@ -94,8 +100,6 @@ function ScoreSelector:pullScore(noUpdate)
 	
 	-- We use the coro version to ensure the task runner waits for completion
 	self.store:updateItems(chartview, exact)
-
-	self:findScore()
 end
 
 ---@param direction number?

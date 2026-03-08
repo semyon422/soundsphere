@@ -119,6 +119,12 @@ function ChartSelector:findNotechart(hash, index)
 			if item then
 				local result2 = self.library:getViewsAsync(params, item)
 				self.stores[2]:setResult(result2)
+
+				local chartview = self.stores[2]:get(1)
+				self.chartview = chartview
+				self:setConfig(chartview)
+				self.state:setSelection(1, 1, chartview.chartfile_set_id)
+				self.state:setSelection(2, 1, chartview.chartfile_id)
 			end
 			self.onChanged:send({type = "find_notechart", hash = hash, index = index})
 		end
