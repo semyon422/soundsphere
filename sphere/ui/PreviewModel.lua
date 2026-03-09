@@ -34,6 +34,7 @@ function PreviewModel:new(configModel, replayBase, game)
 	self.loaded_mode = nil
 	self.loaded_hash = nil
 	self.loaded_audio_hash = nil
+	self.initial_seek_done = false
 end
 
 function PreviewModel:load()
@@ -64,16 +65,34 @@ function PreviewModel:update()
 	local hasFocus = love.window.hasFocus()
 
 	if hasFocus or not muteOnUnfocus then
-		local start_time = self.chartview and self.chartview.start_time or 0
-		local duration = self.chartview and self.chartview.duration or 0
+		local min_time, max_time = self.audioPreviewPlayer:getRange()
+		local duration = max_time - min_time
+
 		if duration > 0 then
 			self.manual_time = self.audioPreviewPlayer:getPosition()
-			if self.manual_time > start_time + duration then
-				self.manual_time = 0
-				self.audioPreviewPlayer:seek(self.manual_time)
+
+			-- Default start position to min_time if preview_time is missing
+			if not self.initial_seek_done then
+				if self.preview_time then
+					self.initial_seek_done = true
+				elseif self.manual_time < min_time then
+					self.manual_time = min_time
+					self.audioPreviewPlayer:seek(self.manual_time)
+					self.bgaPreviewPlayer:seek(self.manual_time)
+					self.initial_seek_done = true
+				end
 			end
+
+			-- Looping: Restart from audio start time (min_time)
+			if self.manual_time >= max_time then
+				self.manual_time = min_time
+				self.audioPreviewPlayer:seek(self.manual_time)
+				self.bgaPreviewPlayer:seek(self.manual_time)
+			end
+			self.audioPreviewPlayer:resume()
+		else
+			self.audioPreviewPlayer:pause()
 		end
-		self.audioPreviewPlayer:resume()
 	else
 		self.audioPreviewPlayer:pause()
 	end
@@ -151,6 +170,7 @@ function PreviewModel:loadPreview()
 		self.loaded_mode = mode
 		self.loaded_hash = nil
 		self.loaded_audio_hash = nil
+		self.initial_seek_done = false
 	end
 
 	loadingPreview = false
@@ -297,6 +317,7 @@ function PreviewModel:stop()
 	self.loaded_mode = nil
 	self.loaded_hash = nil
 	self.loaded_audio_hash = nil
+	self.initial_seek_done = false
 end
 
 function PreviewModel:release()

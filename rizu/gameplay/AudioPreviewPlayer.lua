@@ -36,7 +36,7 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		self.thread:reset()
 	end
 
-	self.thread:start(function(remote, dir, preview_path)
+	local preview_and_decoder = self.thread:start(function(remote, dir, preview_path)
 		local PreviewDecoder = require("rizu.engine.audio.PreviewDecoder")
 		local AudioPreview = require("rizu.gameplay.AudioPreview")
 		local Decoder = require("rizu.engine.audio.bass.Decoder")
@@ -55,14 +55,19 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 			return Decoder(data)
 		end)
 
-		return decoder
+		return {
+			preview = preview,
+			decoder = decoder,
+		}
 	end, chart_dir, preview_path)
 
 	thread.coro(function()
+		self.min_time, self.max_time = preview_and_decoder.preview:getRange()
+
 		-- BufferedDecoder(self.thread.remote) calls metadata methods
 		-- which will yield and wait for thread remote update.
 		---@type boolean, rizu.audio.BufferedDecoder|string
-		local ok, buffered = pcall(BufferedDecoder --[[@as function]], self.thread.remote)
+		local ok, buffered = pcall(BufferedDecoder --[[@as function]], preview_and_decoder.decoder)
 		if generation ~= self.load_generation then
 			if ok and buffered then
 				---@cast buffered -string
@@ -137,6 +142,8 @@ end
 
 function AudioPreviewPlayer:stop()
 	self.is_playing = false
+	self.min_time = nil
+	self.max_time = nil
 	if self.audio_source then
 		self.audio_source:release()
 		self.audio_source = nil
@@ -169,6 +176,11 @@ function AudioPreviewPlayer:setVolume(volume)
 	if self.audio_source then
 		self.audio_source:setVolume(volume)
 	end
+end
+
+---@return number, number
+function AudioPreviewPlayer:getRange()
+	return self.min_time or 0, self.max_time or 0
 end
 
 ---@return number
