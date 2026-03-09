@@ -50,13 +50,6 @@ local empty_lines = SphPreview:previewLinesToLines({
 
 ---@param chartview rizu.library.Chartview
 function ChartPreview:setChartview(chartview)
-	self.pending_chartview = chartview
-	delay.debounce(self, "chartview_debounce", 0.1, self._setChartview, self)
-end
-
----@private
-function ChartPreview:_setChartview()
-	local chartview = self.pending_chartview
 	if not self.configModel.configs.settings.select.chart_preview or not chartview then
 		self.chart = nil
 		return
