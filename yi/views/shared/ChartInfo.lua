@@ -141,7 +141,7 @@ local function getModifierString(mods)
 end
 
 
----@param chartview {[string]: any}
+---@param chartview rizu.library.LocatedChartview
 function ChartInfo:setChartview(chartview)
 	local rate = self:getGame().timeRateModel:get()
 	local input_mode = chartview.inputmode:gsub("key", "K"):gsub("scratch", "S")

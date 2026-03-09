@@ -20,7 +20,7 @@ function ArtistTitle:load()
 	self.name:setColor(Colors.lines)
 end
 
----@param chartview {[string]: any}
+---@param chartview rizu.library.LocatedChartview
 function ArtistTitle:setChartview(chartview)
 	self.title:setText(chartview.title or "Nil Title")
 	self.artist:setText(chartview.artist or "Nil Artist")

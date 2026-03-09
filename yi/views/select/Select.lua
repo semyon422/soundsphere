@@ -102,7 +102,7 @@ function Select:load()
 		h(View(), {w = "70%", h = "100%", arrange = "flow_col", gap = 20, padding = {20, 20, 20, 20}}, {
 			h(self.tags),
 			h(self.artist_title, {w = "999999%"}),
-			h(self.chart_grid, {w = "100%", h = 70}),
+			--h(self.chart_grid, {w = "100%", h = 70}),
 		}),
 
 		h(self.chart_info, {justify_self = "end", margin = {0, 0, 20, 20}}),
@@ -152,16 +152,16 @@ function Select:onKeyDown(e)
 	local game = self:getGame()
 
 	if k == "j" then
-		self.chart_selector:scrollNoteChartSet(1)
+		self.chart_selector:scrollLevel(1, 1)
 		return true
 	elseif k == "k" then
-		self.chart_selector:scrollNoteChartSet(-1)
+		self.chart_selector:scrollLevel(1, -1)
 		return true
 	elseif k == "h" then
-		self.chart_selector:scrollNoteChart(-1)
+		self.chart_selector:scrollLevel(2, -1)
 		return true
 	elseif k == "l" then
-		self.chart_selector:scrollNoteChart(1)
+		self.chart_selector:scrollLevel(2, 1)
 		return true
 	elseif k == "m" then
 		modals:setImguiModal(ImGuiModifiers)
@@ -196,7 +196,6 @@ function Select:onKeyDown(e)
 end
 
 function Select:updateChartview()
-	---@type {[string]: any}?
 	local chartview = self.chart_selector.chartview
 
 	if not chartview then
@@ -213,7 +212,7 @@ function Select:onChartChanged()
 end
 
 function Select:onChartSetChanged()
-	self.chart_grid:reloadItems()
+	--self.chart_grid:reloadItems()
 end
 
 function Select:onLibraryReloaded()
@@ -231,10 +230,8 @@ function Select:attachObservers()
 
 	self.chartStateObserver = self.chartStateObserver or {
 		receive = function(_, event)
-			if event.type == "chart" then
-				self:onChartChanged()
-			elseif event.type == "set" then
-				self:onChartSetChanged()
+			if event.type == "selection" then
+				self:updateChartview()
 			end
 		end
 	}
@@ -244,13 +241,10 @@ function Select:attachObservers()
 		end
 	}
 
-	local chart_set_store = self.chart_selector.chartSetStore
-		or (self.chart_selector.stores and self.chart_selector.stores[1])
+	local chart_set_store = self.chart_selector.stores[1]
 
 	self.chart_selector.state.onChanged:add(self.chartStateObserver)
-	if chart_set_store and chart_set_store.onChanged then
-		chart_set_store.onChanged:add(self.chartSetStoreObserver)
-	end
+	chart_set_store.onChanged:add(self.chartSetStoreObserver)
 
 	self.observersAttached = true
 end
@@ -260,13 +254,10 @@ function Select:detachObservers()
 		return
 	end
 
-	local chart_set_store = self.chart_selector.chartSetStore
-		or (self.chart_selector.stores and self.chart_selector.stores[1])
+	local chart_set_store = self.chart_selector.stores[1]
 
 	self.chart_selector.state.onChanged:remove(self.chartStateObserver)
-	if chart_set_store and chart_set_store.onChanged then
-		chart_set_store.onChanged:remove(self.chartSetStoreObserver)
-	end
+	chart_set_store.onChanged:remove(self.chartSetStoreObserver)
 
 	self.observersAttached = false
 end

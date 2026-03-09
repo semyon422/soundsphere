@@ -8,7 +8,7 @@ ChartGrid.id = "ChartGrid"
 
 function ChartGrid:load()
 	ElasticList.load(self)
-	self.select_model = self:getGame().chartSelector
+	self.chart_selector = self:getGame().chartSelector
 
 	local res = self:getResources()
 	self.font = res:getFont("bold", 36)
@@ -17,15 +17,7 @@ end
 
 ---@return table
 function ChartGrid:getItems()
-	local chart_store = self.select_model.chartStore
-	if chart_store and chart_store.items then
-		return chart_store.items
-	end
-
-	local store = self.select_model.stores and self.select_model.stores[2]
-	if not store then
-		return {}
-	end
+	local store = self.chart_selector.stores[2]
 
 	local items = {}
 	for i = 1, store:count() do
@@ -36,14 +28,12 @@ end
 
 ---@return integer
 function ChartGrid:getSelectedIndex()
-	return self.select_model.state.chartview_index
-		or (self.select_model.state.levels and self.select_model.state.levels[2] and self.select_model.state.levels[2].index)
-		or 1
+	return self.chart_selector.state.levels[2].index
 end
 
 ---@param index integer
 function ChartGrid:selectItem(index)
-	self.select_model:scrollNoteChart(nil, index)
+	self.chart_selector:scrollLevel(2, nil, index)
 end
 
 local NOOB = {0.78, 0.95, 1, 1}

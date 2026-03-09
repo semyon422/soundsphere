@@ -15,7 +15,7 @@ function Tags:load()
 	self.format = self:add(Tag())
 end
 
----@param chartview table
+---@param chartview rizu.library.LocatedChartview
 function Tags:setChartview(chartview)
 	local is_ranked = chartview.difftable_chartmetas and #chartview.difftable_chartmetas > 0
 

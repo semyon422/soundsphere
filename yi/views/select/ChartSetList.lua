@@ -13,7 +13,7 @@ function ChartSetList:load()
 	local game = self:getGame()
 	self.title_font = res:getFont("bold", 24)
 	self.artist_font = res:getFont("regular", 16)
-	self.select_model = game.chartSelector
+	self.chart_selector = game.chartSelector
 
 	local title_h = self.title_font:getHeight()
 	local artist_h = self.artist_font:getHeight()
@@ -29,34 +29,24 @@ end
 
 ---@return number
 function ChartSetList:getItemCount()
-	local store = self.select_model.chartSetStore
-		or (self.select_model.stores and self.select_model.stores[1])
-	if not store then
-		return 0
-	end
+	local store = self.chart_selector.stores[1]
 	return store:count()
 end
 
 ---@return number
 function ChartSetList:getSelectedIndex()
-	return self.select_model.state.chartview_set_index
-		or (self.select_model.state.levels and self.select_model.state.levels[1] and self.select_model.state.levels[1].index)
-		or 1
+	return self.chart_selector.state.levels[1].index
 end
 
 ---@param index number
 function ChartSetList:setSelectedIndex(index)
-	self.select_model:scrollNoteChartSet(nil, index)
+	self.chart_selector:scrollLevel(1, nil, index)
 end
 
 local x_indent = 20
 
 function ChartSetList:drawItem(index, y, is_selected)
-	local store = self.select_model.chartSetStore
-		or (self.select_model.stores and self.select_model.stores[1])
-	if not store then
-		return
-	end
+	local store = self.chart_selector.stores[1]
 
 	local item = store:get(index)
 	if not item then

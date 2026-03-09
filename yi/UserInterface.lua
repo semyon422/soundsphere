@@ -8,7 +8,7 @@ local Background = require("yi.views.Background")
 local Screens = require("yi.views.Screens")
 local Modals = require("yi.views.Modals")
 
----@class yi.UserInterface
+---@class yi.UserInterface : sphere.IUserInterface
 ---@overload fun(game: sphere.GameController): yi.UserInterface
 local UserInterface = IUserInterface + {}
 
