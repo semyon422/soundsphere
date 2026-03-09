@@ -97,4 +97,23 @@ function AudioPreview:decode(s)
 	end
 end
 
+---@return number, number
+function AudioPreview:getRange()
+	local min_time = 0
+	local max_time = 0
+
+	if #self.events > 0 then
+		min_time = self.events[1].time
+		max_time = self.events[1].time + self.events[1].duration
+
+		for i = 2, #self.events do
+			local event = self.events[i]
+			min_time = math.min(min_time, event.time)
+			max_time = math.max(max_time, event.time + event.duration)
+		end
+	end
+
+	return min_time, max_time
+end
+
 return AudioPreview
