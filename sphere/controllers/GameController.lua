@@ -16,7 +16,11 @@ local PauseModel = require("sphere.models.PauseModel")
 local JoystickModel = require("sphere.models.JoystickModel")
 local OffsetModel = require("sphere.models.OffsetModel")
 
-local SelectController = require("sphere.controllers.SelectController")
+local SelectionCoordinator = require("rizu.select.SelectionCoordinator")
+local ModifierCoordinator = require("rizu.select.ModifierCoordinator")
+local LibraryDropManager = require("rizu.library.LibraryDropManager")
+local ChartExporter = require("rizu.library.ChartExporter")
+local SelectionActions = require("rizu.select.SelectionActions")
 local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
@@ -155,22 +159,32 @@ function GameController:new()
 		self
 	)
 
-	self.selectController = SelectController(
+	self.selectionCoordinator = SelectionCoordinator(
 		self.chartSelector,
 		self.scoreSelector,
 		self.collectionSelector,
+		self.backgroundModel,
+		self.previewModel,
+		self.osudirectModel,
+		self.windowModel
+	)
+	self.modifierCoordinator = ModifierCoordinator(
+		self.chartSelector,
+		self.scoreSelector,
 		self.modifierSelectModel,
-		self.noteSkinModel,
 		self.configModel,
 		self.multiplayerModel,
-		self.onlineModel,
-		self.library,
-		self.osudirectModel,
-		self.windowModel,
 		self.replayBase,
-		self.backgroundModel,
 		self.previewModel
 	)
+	self.libraryDropManager = LibraryDropManager(self.library)
+	self.chartExporter = ChartExporter(self.library)
+	self.selectionActions = SelectionActions(
+		self.chartSelector,
+		self.library,
+		self.onlineModel
+	)
+
 	self.resultController = ResultController(self)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,

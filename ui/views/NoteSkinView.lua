@@ -23,7 +23,7 @@ return ModalImView(function(self, quit)
 		return true
 	end
 
-	local inputMode = tostring(self.game.selectController.state.inputMode)
+	local inputMode = tostring(self.game.modifierCoordinator.state.inputMode)
 	if inputMode == "" then
 		return true
 	end

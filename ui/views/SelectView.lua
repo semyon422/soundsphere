@@ -19,29 +19,32 @@ SelectView.subscreen = "notecharts"
 SelectView.searchMode = "filter"
 
 function SelectView:load()
-	self.game.selectController:load()
+	self.game.selectionCoordinator:load()
+	self.game.modifierCoordinator:load()
 	self.chartPreviewView = ChartPreviewView(self.game, self.ui)
 	self.chartPreviewView:load()
 end
 
 function SelectView:beginUnload()
-	self.game.selectController:beginUnload()
+	self.game.selectionCoordinator:beginUnload()
 end
 
 function SelectView:unload()
-	self.game.selectController:unload()
+	self.game.selectionCoordinator:unload()
+	self.game.modifierCoordinator:unload()
 	self.chartPreviewView:unload()
 end
 
 ---@param dt number
 function SelectView:update(dt)
-	self.game.selectController:update()
+	self.game.selectionCoordinator:update(function(...) self.game.modifierCoordinator:applyModifierMeta(...) end)
+	self.game.modifierCoordinator:update()
 	self.chartPreviewView:update(dt)
 end
 
 ---@param event table
 function SelectView:receive(event)
-	self.game.selectController:receive(event)
+	self.game.libraryDropManager:receive(event)
 	self.chartPreviewView:receive(event)
 end
 

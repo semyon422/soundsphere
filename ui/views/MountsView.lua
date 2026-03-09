@@ -153,7 +153,7 @@ function section_draw.locations(self, inner_w)
 	))
 
 	if imgui.button("cache_button", "update") then
-		self.game.selectController:updateCacheLocation(selected_loc.id)
+		self.game.selectionActions:updateCacheLocation(selected_loc.id)
 	end
 
 	imgui.separator()

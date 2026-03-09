@@ -68,7 +68,7 @@ local function Buttons(self)
 	love.graphics.translate(279 + 454 * 2, 144 + 72 * 10)
 
 	if imgui.TextButton("export to osu", "export to osu", 200, 72) then
-		self.game.selectController:exportToOsu()
+		self.game.chartExporter:exportToOsu(self.game.chartSelector, self.game.replayBase)
 	end
 end
 

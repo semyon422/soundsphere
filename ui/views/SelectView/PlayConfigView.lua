@@ -33,7 +33,7 @@ return ModalImView(function(self, quit)
 		return true
 	end
 
-	local state = game.selectController.state
+	local state = game.modifierCoordinator.state
 
 	imgui.setSize(w, h, _w, _h)
 
