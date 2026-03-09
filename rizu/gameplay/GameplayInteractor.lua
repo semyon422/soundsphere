@@ -31,6 +31,8 @@ end
 function GameplayInteractor:loadGameplay(chartview)
 	local game = self.game
 
+	game.previewModel:stop()
+
 	GameplayChart(game.configModel.configs.settings, game.fs, chartview):load(game.replayBase, game.computeContext)
 
 	local chart = assert(game.computeContext.chart)

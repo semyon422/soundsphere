@@ -246,17 +246,20 @@ function GameController:load()
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
 	self.collectionSelector:load()
-	self.chartSelector:load()
+
+	self.selectionCoordinator:load()
+	self.modifierCoordinator:load()
 
 	self.multiplayerController:load()
 
 	self.multiplayerModel:connect()
 
 	self.backgroundModel:load()
-	self.previewModel:load()
 end
 
 function GameController:unload()
+	self.selectionCoordinator:unload()
+	self.modifierCoordinator:unload()
 	self.previewModel:release()
 	self.multiplayerController:unload()
 	self.ui:unload()
@@ -266,6 +269,9 @@ end
 ---@param dt number
 function GameController:update(dt)
 	self.app:update()
+
+	self.selectionCoordinator:update(function(...) self.modifierCoordinator:applyModifierMeta(...) end)
+	self.modifierCoordinator:update()
 
 	self.joystickModel:update(dt)
 
@@ -311,6 +317,8 @@ function GameController:receive(event)
 	if event.name == "framestarted" then
 		self.global_timer:setTime(event.time)
 	end
+
+	self.libraryDropManager:receive(event)
 
 	self.ui:receive(event)
 	self.app:receive(event)

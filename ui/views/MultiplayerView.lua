@@ -21,9 +21,6 @@ end
 
 ---@param dt number
 function MultiplayerView:update(dt)
-	self.game.selectionCoordinator:update(function(...) self.game.modifierCoordinator:applyModifierMeta(...) end)
-	self.game.modifierCoordinator:update()
-
 	local mp_model = self.game.multiplayerModel
 	local mp_client = mp_model.client
 

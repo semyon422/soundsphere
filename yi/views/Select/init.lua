@@ -51,9 +51,6 @@ local play_button_inner = {
 function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
-	self.selection_coordinator = game.selectionCoordinator
-	self.modifier_coordinator = game.modifierCoordinator
-	self.library_drop_manager = game.libraryDropManager
 	self.selection_actions = game.selectionActions
 	self.select_model = game.chartSelector
 
@@ -150,20 +147,14 @@ function Select:loadComplete()
 end
 
 function Select:enter()
-	self.selection_coordinator:load()
-	self.modifier_coordinator:load()
 	love.mouse.setVisible(true)
 end
 
 function Select:exit()
-	self.selection_coordinator:unload()
-	self.modifier_coordinator:unload()
 	self:kill()
 end
 
 function Select:update(_)
-	self.selection_coordinator:update(function(...) self.modifier_coordinator:applyModifierMeta(...) end)
-	self.modifier_coordinator:update()
 	self:observeGameMutations()
 end
 
@@ -305,7 +296,6 @@ function Select:observeGameMutations()
 end
 
 function Select:receive(event)
-	self.library_drop_manager:receive(event)
 end
 
 return Select

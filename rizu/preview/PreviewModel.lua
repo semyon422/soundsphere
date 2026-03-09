@@ -318,6 +318,10 @@ function PreviewModel:stop()
 	self.loaded_hash = nil
 	self.loaded_audio_hash = nil
 	self.initial_seek_done = false
+	self.audio_path = nil
+	self.chartview = nil
+	self.preview_time = nil
+	self.mode = nil
 end
 
 function PreviewModel:release()
