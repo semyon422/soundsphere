@@ -26,6 +26,36 @@ local buttons = {
 	background_color = Colors.header_footer
 }
 
+---@param label yi.Label
+---@param acc number?
+local function setAccuracyColor(label, acc)
+	acc = acc or 0
+
+	if acc > 0.995000001 then
+		label:setColor({0.45, 0.91, 1, 1})
+	elseif acc > 0.95 then
+		label:setColor({1, 0.93, 0.21, 1})
+	elseif acc > 0.9 then
+		label:setColor({0.4, 0.96, 0.4, 1})
+	elseif acc > 0.8 then
+		label:setColor({0.88, 0.74, 1, 1})
+	elseif acc > 0.7 then
+		label:setColor({1, 0.53, 0.81, 1})
+	else
+		label:setColor({1, 0.25, 0.25, 1})
+	end
+end
+
+---@param acc number?
+---@return string
+local function formatAccuracy(acc)
+	if type(acc) ~= "number" then
+		return "??.??%"
+	end
+
+	return ("%0.02f%%"):format(acc * 100)
+end
+
 function Result:load()
 	self:setup({
 		id = "result",
@@ -40,7 +70,7 @@ function Result:load()
 	self.artist_title = ArtistTitle()
 	self.tags = Tags()
 	self.score_system_name = Label(res:getFont("bold", 24), "Loading...")
-	self.accuracy = Label(res:getFont("black", 128), "No score item")
+	self.accuracy = Label(res:getFont("black", 128), "??.??%")
 	self.chart_info = ChartInfo()
 	self.judges = View()
 
@@ -81,52 +111,46 @@ function Result:setScoreItem(score_item)
 	local game = self:getGame()
 
 	local score_engine = game.rhythm_engine.score_engine
-	local acc = score_engine.accuracySource:getAccuracy()
-	local acc_string = score_engine.accuracySource:getAccuracyString()
-	self.accuracy:setText(acc_string)
+	local acc = score_item.accuracy
+	local acc_string = formatAccuracy(acc)
+	local judges = score_item.judges or {}
+	local miss_count = score_item.miss_count or 0
 
-	if acc > 0.995000001 then
-		self.accuracy:setColor({0.45, 0.91, 1, 1})
-	elseif acc > 0.95 then
-		self.accuracy:setColor({1, 0.93, 0.21, 1})
-	elseif acc > 0.9 then
-		self.accuracy:setColor({0.4, 0.96, 0.4, 1})
-	elseif acc > 0.8 then
-		self.accuracy:setColor({0.88, 0.74, 1, 1})
-	elseif acc > 0.7 then
-		self.accuracy:setColor({1, 0.53, 0.81, 1})
-	else
-		self.accuracy:setColor({1, 0.25, 0.25, 1})
-	end
+	acc = score_engine.accuracySource:getAccuracy()
+	acc_string = score_engine.accuracySource:getAccuracyString()
+
+	judges = score_engine.judgesSource:getJudges() or judges
+
+	miss_count = score_engine.scores.base.missCount or miss_count
+
+	self.accuracy:setText(acc_string)
+	setAccuracyColor(self.accuracy, acc)
 
 	self.score_system_name:setText("osu!mania V1 OD9")
-
-	local j = score_engine.judgesSource:getJudges()
 
 	for _, v in ipairs(self.judges.children) do
 		v:kill()
 	end
 
-	if j[1] then self.judges:add(JudgeCell({0, 0.69, 1, 1}, j[1])) end
-	if j[2] then self.judges:add(JudgeCell({0.93, 1, 0, 1}, j[2])) end
-	if j[3] then self.judges:add(JudgeCell({0.27, 0.86, 0.27, 1}, j[3])) end
-	if j[4] then self.judges:add(JudgeCell({0.29, 0.3, 1, 1}, j[4])) end
-	if j[5] then self.judges:add(JudgeCell({0.9, 0.09, 0.63, 1}, j[5])) end
+	if judges[1] then self.judges:add(JudgeCell({0, 0.69, 1, 1}, judges[1])) end
+	if judges[2] then self.judges:add(JudgeCell({0.93, 1, 0, 1}, judges[2])) end
+	if judges[3] then self.judges:add(JudgeCell({0.27, 0.86, 0.27, 1}, judges[3])) end
+	if judges[4] then self.judges:add(JudgeCell({0.29, 0.3, 1, 1}, judges[4])) end
+	if judges[5] then self.judges:add(JudgeCell({0.9, 0.09, 0.63, 1}, judges[5])) end
 
-	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, score_engine.scores.base.missCount))
+	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, miss_count))
 end
 
 function Result:update()
 	if not self.loaded then
 		local game = self:getGame()
 		local chart_selector = game.chartSelector
-		local score_selector = game.scoreSelector
-		local score_item = score_selector.scoreItem
 		local chartview = chart_selector.chartview
+		local chartplay = game.computeContext.chartplay
 
-		if chartview and score_item then
+		if chartview and chartplay then
 			self:setChartview(chartview)
-			self:setScoreItem(score_item)
+			self:setScoreItem(chartplay)
 			self.loaded = true
 			return
 		end
