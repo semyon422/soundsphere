@@ -43,7 +43,6 @@ local buttons = {
 function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
-	self.select_controller = game.selectController
 	self.chart_selector = game.chartSelector
 
 	self.chart_preview_view = ChartPreviewView(self:getGame())
@@ -111,27 +110,26 @@ function Select:load()
 end
 
 function Select:enter()
-	self.select_controller:load()
 	self:attachObservers()
 	love.mouse.setVisible(true)
 
 	local config = self:getConfig()
 	local bg = self:getContext().background
 	bg:setDim(config.settings.graphics.dim.select)
-
-	self:onLibraryReloaded()
-	self:onChartSetChanged()
-	self:onChartChanged()
 	self.prevRate = self:getGame().timeRateModel:get()
+
+	local cv = self.chart_selector.chartview
+
+	if cv and cv.location_id then
+		self:updateChartview(cv)
+	end
 end
 
 function Select:exit()
 	self:detachObservers()
-	self.select_controller:unload()
 end
 
 function Select:update(dt)
-	self.select_controller:update()
 	self.chart_preview_view:update(dt)
 
 	-- Still have to observe time rate changes cuz we have old gameplay settings modal
@@ -195,32 +193,11 @@ function Select:onKeyDown(e)
 	end
 end
 
-function Select:updateChartview()
-	local chartview = self.chart_selector.chartview
-
-	if not chartview then
-		return
-	end
-
+---@param chartview rizu.library.LocatedChartview
+function Select:updateChartview(chartview)
 	self.tags:setChartview(chartview)
 	self.artist_title:setChartview(chartview)
 	self.chart_info:setChartview(chartview)
-end
-
-function Select:onChartChanged()
-	self:updateChartview()
-end
-
-function Select:onChartSetChanged()
-	--self.chart_grid:reloadItems()
-end
-
-function Select:onLibraryReloaded()
-	self.chart_set_list:reloadItems()
-end
-
-function Select:onRateChanged()
-	self:updateChartview()
 end
 
 function Select:attachObservers()
@@ -228,24 +205,18 @@ function Select:attachObservers()
 		return
 	end
 
-	self.chartStateObserver = self.chartStateObserver or {
+	self.chartviewObserver = self.chartviewObserver or {
 		receive = function(_, event)
-			if event.type == "selection" then
-				self:updateChartview()
+			if event.type == "chartview" then
+				local cv = event.chartview
+				if cv.location_id then
+					self:updateChartview(cv)
+				end
 			end
 		end
 	}
-	self.chartSetStoreObserver = self.chartSetStoreObserver or {
-		receive = function()
-			self:onLibraryReloaded()
-		end
-	}
 
-	local chart_set_store = self.chart_selector.stores[1]
-
-	self.chart_selector.state.onChanged:add(self.chartStateObserver)
-	chart_set_store.onChanged:add(self.chartSetStoreObserver)
-
+	self.chart_selector.onChanged:add(self.chartviewObserver)
 	self.observersAttached = true
 end
 
@@ -254,16 +225,11 @@ function Select:detachObservers()
 		return
 	end
 
-	local chart_set_store = self.chart_selector.stores[1]
-
-	self.chart_selector.state.onChanged:remove(self.chartStateObserver)
-	chart_set_store.onChanged:remove(self.chartSetStoreObserver)
-
+	self.chart_selector.onChanged:remove(self.chartviewObserver)
 	self.observersAttached = false
 end
 
 function Select:receive(event)
-	self.select_controller:receive(event)
 	self.chart_preview_view:receive(event)
 end
 
