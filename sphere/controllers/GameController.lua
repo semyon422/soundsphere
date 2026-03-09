@@ -25,7 +25,7 @@ local OffsetController = require("sphere.controllers.gameplay.OffsetController")
 
 local NotificationModel = require("sphere.ui.NotificationModel")
 local BackgroundModel = require("sphere.ui.BackgroundModel")
-local PreviewModel = require("sphere.ui.PreviewModel")
+local PreviewModel = require("rizu.preview.PreviewModel")
 
 local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")

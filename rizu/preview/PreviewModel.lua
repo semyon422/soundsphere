@@ -1,12 +1,12 @@
 local class = require("class")
 local delay = require("delay")
 local thread = require("thread")
-local AudioPreviewPlayer = require("rizu.gameplay.AudioPreviewPlayer")
-local BgaPreviewPlayer = require("rizu.gameplay.BgaPreviewPlayer")
-local ChartPreview = require("rizu.select.ChartPreview")
+local AudioPreviewPlayer = require("rizu.preview.AudioPreviewPlayer")
+local BgaPreviewPlayer = require("rizu.preview.BgaPreviewPlayer")
+local NotesPreviewPlayer = require("rizu.preview.NotesPreviewPlayer")
 
----@class sphere.PreviewModel
----@operator call: sphere.PreviewModel
+---@class rizu.preview.PreviewModel
+---@operator call: rizu.preview.PreviewModel
 local PreviewModel = class()
 
 PreviewModel.preview_time = 0
@@ -23,7 +23,7 @@ function PreviewModel:new(configModel, replayBase, game)
 	self.game = game
 	self.audioPreviewPlayer = AudioPreviewPlayer(configModel)
 	self.bgaPreviewPlayer = BgaPreviewPlayer()
-	self.chartPreview = ChartPreview(configModel, self, replayBase, game)
+	self.chartPreview = NotesPreviewPlayer(configModel, self, replayBase, game)
 	---@type {[string]: boolean?}
 	self.generating_hashes = {}
 	---@type {[string]: boolean?}
@@ -231,8 +231,8 @@ end
 
 local generatePreviewAsync = thread.async(function(chartview_data)
 	print("Preview: generating " .. chartview_data.hash)
-	local AudioPreviewGenerator = require("rizu.gameplay.AudioPreviewGenerator")
-	local BgaPreviewGenerator = require("rizu.gameplay.BgaPreviewGenerator")
+	local AudioPreviewGenerator = require("rizu.preview.AudioPreviewGenerator")
+	local BgaPreviewGenerator = require("rizu.preview.BgaPreviewGenerator")
 	local Decoder = require("rizu.engine.audio.bass.Decoder")
 	local ChartFactory = require("notechart.ChartFactory")
 	local LoveFilesystem = require("fs.LoveFilesystem")
@@ -327,4 +327,3 @@ function PreviewModel:release()
 end
 
 return PreviewModel
-

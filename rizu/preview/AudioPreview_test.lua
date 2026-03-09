@@ -1,4 +1,4 @@
-local AudioPreview = require("rizu.gameplay.AudioPreview")
+local AudioPreview = require("rizu.preview.AudioPreview")
 
 local test = {}
 

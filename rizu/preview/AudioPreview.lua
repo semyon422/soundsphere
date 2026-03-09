@@ -2,27 +2,28 @@ local class = require("class")
 local byte = require("byte")
 local ffi = require("ffi")
 
----@class rizu.gameplay.BgaPreviewEvent
+---@class rizu.preview.AudioPreviewEvent
 ---@field time number
 ---@field sample_index integer
----@field column integer
+---@field duration number
+---@field volume number
 
----@class rizu.gameplay.BgaPreview
----@operator call: rizu.gameplay.BgaPreview
-local BgaPreview = class()
+---@class rizu.preview.AudioPreview
+---@operator call: rizu.preview.AudioPreview
+local AudioPreview = class()
 
-function BgaPreview:new()
+function AudioPreview:new()
 	---@type string[]
 	self.samples = {}
-	---@type rizu.gameplay.BgaPreviewEvent[]
+	---@type rizu.preview.AudioPreviewEvent[]
 	self.events = {}
 end
 
 local u = byte.yield_union()
 
----@param self rizu.gameplay.BgaPreview
-function BgaPreview._encode_async(self)
-	u.char = "BGAP"
+---@param self rizu.preview.AudioPreview
+function AudioPreview._encode_async(self)
+	u.char = "AUDP"
 	u.u8 = 1 -- version
 
 	u.u16 = #self.samples
@@ -35,14 +36,15 @@ function BgaPreview._encode_async(self)
 	for _, event in ipairs(self.events) do
 		u.f32 = event.time
 		u.u16 = event.sample_index - 1
-		u.u16 = event.column
+		u.f32 = event.duration
+		u.u8 = math.floor(event.volume * 255 + 0.5)
 	end
 end
 
----@param self rizu.gameplay.BgaPreview
-function BgaPreview._decode_async(self)
+---@param self rizu.preview.AudioPreview
+function AudioPreview._decode_async(self)
 	local magic = u:string(4)
-	if magic ~= "BGAP" then
+	if magic ~= "AUDP" then
 		error("Invalid magic: " .. tostring(magic))
 	end
 
@@ -61,19 +63,17 @@ function BgaPreview._decode_async(self)
 	local event_count = u.u32
 	self.events = {}
 	for i = 1, event_count do
-		local time = u.f32
-		local sample_index = u.u16 + 1
-		local column = u.u16
 		self.events[i] = {
-			time = time,
-			sample_index = sample_index,
-			column = column,
+			time = u.f32,
+			sample_index = u.u16 + 1,
+			duration = u.f32,
+			volume = u.u8 / 255,
 		}
 	end
 end
 
 ---@return string
-function BgaPreview:encode()
+function AudioPreview:encode()
 	local buf = byte.buffer(1024)
 	local f = byte.stretchy_seeker(buf)
 
@@ -90,11 +90,30 @@ function BgaPreview:encode()
 end
 
 ---@param s string
-function BgaPreview:decode(s)
+function AudioPreview:decode(s)
 	local ok = byte.apply(byte.seeker(ffi.cast("const char*", s), #s), self._decode_async, self)
 	if not ok then
 		error("Decoding failed")
 	end
 end
 
-return BgaPreview
+---@return number, number
+function AudioPreview:getRange()
+	local min_time = 0
+	local max_time = 0
+
+	if #self.events > 0 then
+		min_time = self.events[1].time
+		max_time = self.events[1].time + self.events[1].duration
+
+		for i = 2, #self.events do
+			local event = self.events[i]
+			min_time = math.min(min_time, event.time)
+			max_time = math.max(max_time, event.time + event.duration)
+		end
+	end
+
+	return min_time, max_time
+end
+
+return AudioPreview

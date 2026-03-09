@@ -1,9 +1,9 @@
 local class = require("class")
 local table_util = require("table_util")
-local BgaPreview = require("rizu.gameplay.BgaPreview")
+local BgaPreview = require("rizu.preview.BgaPreview")
 
----@class rizu.gameplay.BgaPreviewGenerator
----@operator call: rizu.gameplay.BgaPreviewGenerator
+---@class rizu.preview.BgaPreviewGenerator
+---@operator call: rizu.preview.BgaPreviewGenerator
 local BgaPreviewGenerator = class()
 
 function BgaPreviewGenerator:new(fs)
@@ -76,7 +76,7 @@ function BgaPreviewGenerator:generate(chart, hash)
 	self:writePreview(preview, hash)
 end
 
----@param preview rizu.gameplay.BgaPreview
+---@param preview rizu.preview.BgaPreview
 ---@param hash string
 function BgaPreviewGenerator:writePreview(preview, hash)
 	table.sort(preview.events, function(a, b)

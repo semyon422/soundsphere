@@ -1,5 +1,4 @@
 local class = require("class")
-local delay = require("delay")
 local VisualEngine = require("rizu.engine.visual.VisualEngine")
 local VisualInfo = require("rizu.engine.visual.VisualInfo")
 local ChartDecoder = require("sph.ChartDecoder")
@@ -8,15 +7,15 @@ local Sph = require("sph.Sph")
 local BaseSkinInfo = require("sphere.models.NoteSkinModel.BaseSkinInfo")
 local ComputeContext = require("sea.compute.ComputeContext")
 
----@class rizu.select.ChartPreview
----@operator call: rizu.select.ChartPreview
-local ChartPreview = class()
+---@class rizu.preview.NotesPreviewPlayer
+---@operator call: rizu.preview.NotesPreviewPlayer
+local NotesPreviewPlayer = class()
 
 ---@param configModel sphere.ConfigModel
----@param previewModel sphere.PreviewModel
+---@param previewModel rizu.preview.PreviewModel
 ---@param replayBase sea.ReplayBase
 ---@param game table
-function ChartPreview:new(configModel, previewModel, replayBase, game)
+function NotesPreviewPlayer:new(configModel, previewModel, replayBase, game)
 	self.configModel = configModel
 	self.previewModel = previewModel
 	self.replayBase = replayBase
@@ -31,7 +30,7 @@ function ChartPreview:new(configModel, previewModel, replayBase, game)
 end
 
 ---@param inputMode string
-function ChartPreview:getNoteSkin(inputMode)
+function NotesPreviewPlayer:getNoteSkin(inputMode)
 	local skin_by_mode = self.skin_by_mode
 	local noteSkin = skin_by_mode[inputMode]
 	if noteSkin then
@@ -49,7 +48,7 @@ local empty_lines = SphPreview:previewLinesToLines({
 })
 
 ---@param chartview rizu.library.Chartview
-function ChartPreview:setChartview(chartview)
+function NotesPreviewPlayer:setChartview(chartview)
 	if not self.configModel.configs.settings.select.chart_preview or not chartview then
 		self.chart = nil
 		return
@@ -101,7 +100,7 @@ function ChartPreview:setChartview(chartview)
 	self.chart = chart
 end
 
-function ChartPreview:update()
+function NotesPreviewPlayer:update()
 	if not self.chart then
 		return
 	end
@@ -120,7 +119,7 @@ end
 ---@generic T
 ---@param f fun(obj: T, note: rizu.VisualNote)
 ---@param obj T
-function ChartPreview:iterNotes(f, obj)
+function NotesPreviewPlayer:iterNotes(f, obj)
 	if not self.chart then
 		return
 	end
@@ -129,4 +128,4 @@ function ChartPreview:iterNotes(f, obj)
 	end
 end
 
-return ChartPreview
+return NotesPreviewPlayer

@@ -1,12 +1,12 @@
 local class = require("class")
-local BgaPreview = require("rizu.gameplay.BgaPreview")
+local BgaPreview = require("rizu.preview.BgaPreview")
 local SpriteEngine = require("rizu.engine.sprite.SpriteEngine")
 local VideoEngine = require("rizu.engine.sprite.VideoEngine")
 local ResourceFinder = require("rizu.files.ResourceFinder")
 local path_util = require("path_util")
 
----@class rizu.gameplay.BgaPreviewPlayer
----@operator call: rizu.gameplay.BgaPreviewPlayer
+---@class rizu.preview.BgaPreviewPlayer
+---@operator call: rizu.preview.BgaPreviewPlayer
 local BgaPreviewPlayer = class()
 
 function BgaPreviewPlayer:new()
@@ -14,11 +14,11 @@ function BgaPreviewPlayer:new()
 	self.video_engine = VideoEngine()
 	---@type rizu.sprite.BgaEvent[]
 	self.active_notes = {}
-	---@type {[integer]: rizu.gameplay.BgaPreviewEvent[]}
+	---@type {[integer]: rizu.preview.BgaPreviewEvent[]}
 	self.events_by_column = {}
 end
 
----@param notes rizu.gameplay.BgaPreviewEvent[]
+---@param notes rizu.preview.BgaPreviewEvent[]
 ---@param time number
 ---@return integer?
 local function _findBgaIndex(notes, time)

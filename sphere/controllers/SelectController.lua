@@ -26,7 +26,7 @@ local SelectController = class()
 ---@param windowModel sphere.WindowModel
 ---@param replayBase sea.ReplayBase
 ---@param backgroundModel sphere.BackgroundModel
----@param previewModel sphere.PreviewModel
+---@param previewModel rizu.preview.PreviewModel
 function SelectController:new(
 	chartSelector,
 	scoreSelector,

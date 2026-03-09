@@ -1,10 +1,10 @@
 local class = require("class")
-local AudioPreview = require("rizu.gameplay.AudioPreview")
+local AudioPreview = require("rizu.preview.AudioPreview")
 local ResourceFinder = require("rizu.files.ResourceFinder")
 local OJM = require("o2jam.OJM")
 
----@class rizu.gameplay.AudioPreviewGenerator
----@operator call: rizu.gameplay.AudioPreviewGenerator
+---@class rizu.preview.AudioPreviewGenerator
+---@operator call: rizu.preview.AudioPreviewGenerator
 local AudioPreviewGenerator = class()
 
 ---@param fs fs.IFilesystem
@@ -133,7 +133,7 @@ function AudioPreviewGenerator:generateFromFiles(chart, finder, hash)
 	self:writePreview(preview, hash)
 end
 
----@param preview rizu.gameplay.AudioPreview
+---@param preview rizu.preview.AudioPreview
 ---@param hash string
 function AudioPreviewGenerator:writePreview(preview, hash)
 	if #preview.events == 0 then

@@ -12,7 +12,7 @@ local PreviewDecoder = IDecoder + {}
 
 ---@param fs fs.IFilesystem
 ---@param dir string
----@param preview rizu.gameplay.AudioPreview
+---@param preview rizu.preview.AudioPreview
 ---@param decoder_factory fun(data: string): rizu.audio.IDecoder
 function PreviewDecoder:new(fs, dir, preview, decoder_factory)
 	local rf = ResourceFinder(fs)
@@ -28,7 +28,7 @@ end
 
 ---@param fs fs.IFilesystem
 ---@param rf rizu.ResourceFinder
----@param preview rizu.gameplay.AudioPreview
+---@param preview rizu.preview.AudioPreview
 ---@param decoder_factory fun(data: string): rizu.audio.IDecoder
 function PreviewDecoder:newOjm(fs, rf, preview, decoder_factory)
 	local ojm_filename = preview.samples[1]
@@ -82,7 +82,7 @@ end
 
 ---@param fs fs.IFilesystem
 ---@param rf rizu.ResourceFinder
----@param preview rizu.gameplay.AudioPreview
+---@param preview rizu.preview.AudioPreview
 ---@param decoder_factory fun(data: string): rizu.audio.IDecoder
 function PreviewDecoder:newFiles(fs, rf, preview, decoder_factory)
 	-- Default format, will be updated if at least one sound is found

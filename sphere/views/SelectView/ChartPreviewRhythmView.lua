@@ -2,7 +2,7 @@ local RhythmView = require("sphere.views.RhythmView")
 
 ---@class sphere.ChartPreviewRhythmView: sphere.RhythmView
 ---@operator call: sphere.ChartPreviewRhythmView
----@field chartPreview rizu.select.ChartPreview
+---@field chartPreview rizu.preview.NotesPreviewPlayer
 local ChartPreviewRhythmView = RhythmView + {}
 
 ---@param f function

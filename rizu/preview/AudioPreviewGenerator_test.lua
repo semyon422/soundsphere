@@ -1,7 +1,7 @@
 local FakeFilesystem = require("fs.FakeFilesystem")
 local Wave = require("audio.Wave")
-local AudioPreviewGenerator = require("rizu.gameplay.AudioPreviewGenerator")
-local AudioPreview = require("rizu.gameplay.AudioPreview")
+local AudioPreviewGenerator = require("rizu.preview.AudioPreviewGenerator")
+local AudioPreview = require("rizu.preview.AudioPreview")
 local TestChartFactory = require("sea.chart.TestChartFactory")
 local WaveDecoder = require("rizu.engine.audio.WaveDecoder")
 

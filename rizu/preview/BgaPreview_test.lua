@@ -1,4 +1,4 @@
-local BgaPreview = require("rizu.gameplay.BgaPreview")
+local BgaPreview = require("rizu.preview.BgaPreview")
 local test = {}
 
 ---@param t testing.T

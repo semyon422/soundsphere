@@ -4,8 +4,8 @@ local BufferedDecoder = require("rizu.engine.audio.BufferedDecoder")
 local Source = require("rizu.engine.audio.bass.Source")
 local thread = require("thread")
 
----@class rizu.gameplay.AudioPreviewPlayer
----@operator call: rizu.gameplay.AudioPreviewPlayer
+---@class rizu.preview.AudioPreviewPlayer
+---@operator call: rizu.preview.AudioPreviewPlayer
 ---@field pending_seek number?
 ---@field private thread threadremote.ThreadRemote?
 local AudioPreviewPlayer = class()
@@ -38,7 +38,7 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 
 	local preview_and_decoder = self.thread:start(function(remote, dir, preview_path)
 		local PreviewDecoder = require("rizu.engine.audio.PreviewDecoder")
-		local AudioPreview = require("rizu.gameplay.AudioPreview")
+		local AudioPreview = require("rizu.preview.AudioPreview")
 		local Decoder = require("rizu.engine.audio.bass.Decoder")
 		local LoveFilesystem = require("fs.LoveFilesystem")
 		local fs = LoveFilesystem()
