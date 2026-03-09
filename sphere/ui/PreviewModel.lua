@@ -33,6 +33,7 @@ function PreviewModel:new(configModel, replayBase, game)
 	self.loaded_preview_time = nil
 	self.loaded_mode = nil
 	self.loaded_hash = nil
+	self.loaded_audio_hash = nil
 end
 
 function PreviewModel:load()
@@ -148,6 +149,8 @@ function PreviewModel:loadPreview()
 		self.loaded_audio_path = path
 		self.loaded_preview_time = preview_time
 		self.loaded_mode = mode
+		self.loaded_hash = nil
+		self.loaded_audio_hash = nil
 	end
 
 	loadingPreview = false
@@ -179,7 +182,8 @@ function PreviewModel:loadPreview()
 		local audio_exists = love.filesystem.getInfo(audio_preview_path)
 		local bga_exists = love.filesystem.getInfo(bga_preview_path)
 
-		if audio_exists and audio_needs_reload then
+		if audio_exists and self.loaded_audio_hash ~= hash then
+			self.loaded_audio_hash = hash
 			self.audioPreviewPlayer:load(audio_preview_path, self.chartview.location_dir)
 			self.audioPreviewPlayer:setVolume(volume)
 			self.audioPreviewPlayer:setRate(self.rate)
@@ -292,6 +296,7 @@ function PreviewModel:stop()
 	self.loaded_preview_time = nil
 	self.loaded_mode = nil
 	self.loaded_hash = nil
+	self.loaded_audio_hash = nil
 end
 
 function PreviewModel:release()
