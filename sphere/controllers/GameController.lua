@@ -228,7 +228,6 @@ function GameController:load()
 	self.app:load()
 
 	self.uiModel:load()
-	self.ui = self.uiModel.activeUI
 
 	local configModel = self.configModel
 
@@ -295,6 +294,17 @@ function GameController:recreateRhythmEngine()
 	end
 	self.rhythm_engine = RhythmEngine(self.fs)
 	self.pauseModel:setRhythmEngine(self.rhythm_engine)
+end
+
+---@param ui sphere.IUserInterface
+function GameController:setUI(ui)
+	if self.ui then
+		self.ui:unload()
+		self.previewModel:stop()
+	end
+
+	self.ui = ui
+	self.ui:load()
 end
 
 function GameController:draw()

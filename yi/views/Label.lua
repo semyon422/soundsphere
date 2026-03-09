@@ -11,6 +11,7 @@ function Label:new(font, text)
 	View.new(self)
 	self.text_batch = love.graphics.newText(font)
 	self.text = text
+	self.align = "left"
 	self.text_changed = false
 	self.prev_w = 0
 	self.prev_h = 0
@@ -20,11 +21,23 @@ function Label:draw()
 	love.graphics.draw(self.text_batch)
 end
 
----@param v string
+---@param v string?
 function Label:setText(v)
-	self.text = v
+	if self.text == v then
+		return
+	end
+	self.text = v or ""
 	self.text_changed = true
 	self.layout_box:markDirty(LayoutEnums.Axis.Both)
+end
+
+---@param v "left" | "center" | "right" | "justify"
+function Label:setAlign(v)
+	if self.align == v then
+		return
+	end
+	self.align = v
+	self.text_changed = true
 end
 
 function Label:updateTransforms()
@@ -36,7 +49,7 @@ function Label:updateTransforms()
 		self.text_changed = false
 		self.prev_w = w
 		self.prev_h = h
-		self.text_batch:setf(self.text, w, "left")
+		self.text_batch:setf(self.text, math.max(0, w), self.align)
 	end
 end
 
@@ -54,5 +67,9 @@ function Label:getIntrinsicSize(axis_idx, constraint)
 		return font:getHeight() * (font:getLineHeight() * (#lines - 1) + 1)
 	end
 end
+
+Label.Setters = setmetatable({
+	align = Label.setAlign,
+}, {__index = View.Setters})
 
 return Label

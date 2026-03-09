@@ -1,6 +1,7 @@
 local Node = require("ui.Node")
 local LayoutEnums = require("ui.layout.Enums")
 local Transform = require("yi.Transform")
+local table_util = require("table_util")
 local Arrange = LayoutEnums.Arrange
 local JustifyContent = LayoutEnums.JustifyContent
 local AlignItems = LayoutEnums.AlignItems
@@ -14,6 +15,7 @@ local AlignItems = LayoutEnums.AlignItems
 ---@field id string?
 ---@field parent yi.View
 ---@field children yi.View[]
+---@field disabled_children yi.View[] Disabled children excluded from rendering, updating and layout
 ---@field draw? fun(self: yi.View)
 ---@field color yi.Color?
 ---@field blend_mode yi.BlendMode?
@@ -29,15 +31,17 @@ View.State = {
 	AwaitsMount = 1,
 	Loaded = 2,
 	Active = 3,
-	Detached = 4,
-	Killed = 5,
-	Destoryed = 6
+	Killed = 4,
+	Destoryed = 5
 }
 
 local State = View.State
 
 function View:new()
 	Node.new(self)
+	self.enabled = true
+	self.just_changed_enabled = false
+	self.disabled_children = {}
 	self.state = State.AwaitsMount
 	self.transform = Transform()
 end
@@ -55,6 +59,14 @@ function View:mount(ctx)
 			v:mount(ctx)
 		end
 	end
+
+	local h = self.disabled_children
+	for i = 1, #h do
+		local v = h[i]
+		if v.state == State.AwaitsMount then
+			v:mount(ctx)
+		end
+	end
 end
 
 ---@generic T: yi.View
@@ -67,6 +79,12 @@ function View:add(view, params)
 
 	if params then
 		view:setup(params)
+	end
+
+	if not view.enabled then
+		local idx = table_util.indexof(self.children, view)
+		table.remove(self.children, idx)
+		table.insert(self.disabled_children, view)
 	end
 
 	if self.ctx and view.state == State.AwaitsMount then
@@ -104,8 +122,51 @@ function View:load() end
 function View:loadComplete() end
 
 function View:destroy()
+	if self.disabled_children then
+		for i = #self.disabled_children, 1, -1 do
+			local child = self.disabled_children[i]
+			child.parent = nil
+			child:destroy()
+		end
+		table_util.clear(self.disabled_children)
+	end
 	Node.destroy(self)
 	self.state = State.Destoryed
+end
+
+---@param v boolean
+function View:setEnabled(v)
+	if self.enabled == v then
+		return
+	end
+
+	self.enabled = v
+	local p = self.parent
+
+	if not p then
+		-- Should only happen to the root or this:
+		-- local v = View()
+		-- v:setup({enabled = false})
+		-- parent:add(v) should take care of this
+		return
+	end
+
+	if not v then
+		local idx = table_util.indexof(p.children, self)
+		if idx then
+			table.remove(p.children, idx)
+			table.insert(p.disabled_children, self)
+		end
+	else
+		local idx = table_util.indexof(p.disabled_children, self)
+		if idx then
+			table.remove(p.disabled_children, idx)
+			table.insert(p.children, self)
+		end
+	end
+
+	p.layout_box:markDirty(LayoutEnums.Axis.Both)
+	self.just_changed_enabled = true
 end
 
 ---@param dt number
@@ -132,19 +193,6 @@ end
 
 function View:kill()
 	self.state = State.Killed
-end
-
-function View:detach()
-	if self.state == State.Active then
-		self.state = State.Detached
-	else
-		error("Can't detach not active view")
-	end
-end
-
----@param view yi.View
-function View:attach(view)
-	table.insert(self.children, view)
 end
 
 ---@return yi.Context
@@ -254,18 +302,16 @@ function View:setMaxHeight(v)
 	self.layout_box:setMaxHeight(v)
 end
 
----@param v "absolute" | "flex_row" | "flex_col" | "grid"
+---@param v "flow_row" | "flow_col" | "stack"  
 function View:setArrange(v)
-	local arrange = Arrange.Absolute
+	local arrange = Arrange.Stack
 
-	if v == "absolute" then
-		arrange = Arrange.Absolute
-	elseif v == "flex_row" then
-		arrange = Arrange.FlexRow
-	elseif v == "flex_col" then
-		arrange = Arrange.FlexCol
-	elseif v == "grid" then
-		arrange = Arrange.Grid
+	if v == "flow_row" then
+		arrange = Arrange.FlowRow
+	elseif v == "flow_col" then
+		arrange = Arrange.FlowCol
+	elseif v == "stack" then
+		arrange = Arrange.Stack
 	end
 
 	self.layout_box:setArrange(arrange)
@@ -279,6 +325,11 @@ end
 ---@param v number
 function View:setChildGap(v)
 	self.layout_box:setChildGap(v)
+end
+
+---@param v number
+function View:setLineGap(v)
+	self.layout_box:setLineGap(v)
 end
 
 ---@param str string
@@ -308,6 +359,24 @@ function View:setAlignSelf(v)
 	self.layout_box:setAlignSelf(str_to_align(v))
 end
 
+---@param v ("start" | "center" | "end" | "space_between")?
+function View:setJustifySelf(v)
+	if not v then
+		self.layout_box:setJustifySelf(nil)
+		return
+	end
+
+	local j = JustifyContent.Start
+	if v == "center" then
+		j = JustifyContent.Center
+	elseif v == "end" then
+		j = JustifyContent.End
+	elseif v == "space_between" then
+		j = JustifyContent.SpaceBetween
+	end
+	self.layout_box:setJustifySelf(j)
+end
+
 ---@param v "start" | "center" | "end" | "space_between"
 function View:setJustifyContent(v)
 	local j = JustifyContent.Start
@@ -329,11 +398,6 @@ end
 ---@param v [number, number, number, number]
 function View:setMargins(v)
 	self.layout_box:setMargins(v)
-end
-
----@param v number
-function View:setGrow(v)
-	self.layout_box:setGrow(v)
 end
 
 ---@param x number
@@ -445,24 +509,27 @@ View.Setters = {
 	padding = View.setPaddings,
 	margin = View.setMargins,
 
-	-- Flex
+	-- Flow
 	reversed = View.setReversed,
 	gap = View.setChildGap,
+	line_gap = View.setLineGap,
 	align_items = View.setAlignItems,
 	align_self = View.setAlignSelf,
 	justify_content = View.setJustifyContent,
-	grow = View.setGrow,
+	justify_self = View.setJustifySelf,
 
 	-- View
 	handles_mouse_input = true,
 	handles_keyboard_input = true,
 	color = View.setColor,
 	background_color = View.setBackgroundColor,
+	outline = true,
 	corner_radius = true,
 	stencil = true,
 	id = true,
+	enabled = View.setEnabled,
 	mouse = function(self, v) self.handles_mouse_input = v end,
-	keyboard = function(self, v) self.handles_keyboard_input = v end
+	keyboard = function(self, v) self.handles_keyboard_input = v end,
 }
 
 return View

@@ -65,34 +65,27 @@ function test.states_and_updates(t)
 
 	local v_active = engine.root:add(MockView())
 	local v_killed = engine.root:add(MockView())
-	local v_detached = engine.root:add(MockView())
 
 	t:eq(v_active.state, View.State.Loaded)
 	t:eq(v_killed.state, View.State.Loaded)
-	t:eq(v_detached.state, View.State.Loaded)
 
 	-- First update to transition them to Active
 	engine:update(0.016, 0, 0)
 	t:eq(v_active.state, View.State.Active)
 	t:eq(v_killed.state, View.State.Active)
-	t:eq(v_detached.state, View.State.Active)
 
 	v_killed:kill()
-	v_detached:detach()
 
 	engine:update(0.016, 0, 0)
 
 	-- Active should be updated again
 	t:eq(v_active.update_calls, 2)
-	-- Killed and Detached should NOT be updated this frame
+	-- Killed should NOT be updated this frame
 	t:eq(v_killed.update_calls, 1)
-	t:eq(v_detached.update_calls, 1)
 
 	-- Check deferred lists
 	t:eq(#engine.removal_deferred, 1)
 	t:eq(engine.removal_deferred[1], v_killed)
-	t:eq(#engine.detach_deferred, 1)
-	t:eq(engine.detach_deferred[1], v_detached)
 
 	-- Only one will remain
 	t:eq(#engine.root.children, 1)
@@ -162,7 +155,7 @@ function test.layout_update_on_removal(t)
 	engine.root.layout_box:setHeight(1000)
 
 	local container = engine.root:add(MockView())
-	container.layout_box:setArrange(LayoutBox.Arrange.FlexRow)
+	container.layout_box:setArrange(LayoutBox.Arrange.FlowRow)
 	container.layout_box:setWidth(200)
 	container.layout_box:setHeight(100)
 
@@ -195,7 +188,7 @@ function test.layout_update_on_removal(t)
 	t:eq(x2, 0)
 	t:eq(y2, 0)
 
-	-- Add v3 and detach it
+	-- Add v3
 	local v3 = container:add(MockView())
 	v3.layout_box:setWidth(50)
 	v3.layout_box:setHeight(50)
@@ -207,7 +200,7 @@ function test.layout_update_on_removal(t)
 	local x3, y3 = v3.transform.love_transform:transformPoint(0, 0)
 	t:eq(x3, 50)
 
-	v2:detach()
+	v2:kill()
 	engine:update(0.016, 0, 0)
 
 	-- v3 should move to (0, 0)
@@ -223,9 +216,10 @@ function test.arranges(t)
 	engine:load()
 
 	engine.root.layout_box:setDimensions(1000, 1000)
+	engine.root.layout_box:setAlignItems(LayoutBox.AlignItems.Start)
 
 	local container = engine.root:add(MockView())
-	container.layout_box:setArrange(LayoutBox.Arrange.FlexCol)
+	container.layout_box:setArrange(LayoutBox.Arrange.FlowCol)
 
 	local n1 = container:add(MockView())
 	local n2 = container:add(MockView())
@@ -238,4 +232,77 @@ function test.arranges(t)
 	t:eq(container.layout_box.y.size, 64)
 end
 
+---@param t testing.T
+function test.enabled_toggling(t)
+	local inputs = Inputs()
+	local ctx = Context({}, inputs)
+	local engine = Engine(inputs, ctx)
+	engine:load()
+
+	local container = engine.root:add(MockView())
+	local child = container:add(MockView())
+
+	-- First update to resolve initial states
+	engine:update(0.016, 0, 0)
+	engine.rebuild_command_buffer = false -- Reset manually for testing
+
+	t:eq(child.enabled, true)
+	t:eq(#container.children, 1)
+	t:eq(#container.disabled_children, 0)
+
+	-- Disable the child
+	child:setEnabled(false)
+
+	t:eq(child.enabled, false)
+	t:eq(#container.children, 0)
+	t:eq(#container.disabled_children, 1)
+	t:eq(child.just_changed_enabled, true)
+
+	-- Update engine
+	engine:update(0.016, 0, 0)
+
+	t:eq(child.just_changed_enabled, false)
+
+	-- Enable the child
+	child:setEnabled(true)
+
+	t:eq(child.enabled, true)
+	t:eq(#container.children, 1)
+	t:eq(#container.disabled_children, 0)
+	t:eq(child.just_changed_enabled, true)
+
+	-- Update engine
+	engine:update(0.016, 0, 0)
+
+	t:eq(child.just_changed_enabled, false)
+end
+
+---@param t testing.T
+function test.remove_disabled_view(t)
+	local inputs = Inputs()
+	local ctx = Context({}, inputs)
+	local engine = Engine(inputs, ctx)
+	engine:load()
+
+	local container = engine.root:add(MockView())
+	local child = container:add(MockView())
+	
+	engine:update(0.016, 0, 0)
+	
+	-- Disable the child
+	child:setEnabled(false)
+	engine:update(0.016, 0, 0)
+	
+	t:eq(#container.children, 0)
+	t:eq(#container.disabled_children, 1)
+	
+	-- Kill the disabled child
+	child:kill()
+	
+	-- Update engine to process the kill
+	engine:update(0.016, 0, 0)
+	
+	t:eq(#container.disabled_children, 0, "Disabled child should be removed from disabled_children upon kill")
+	t:eq(child.children, nil, "Child should be destroyed")
+end
 return test

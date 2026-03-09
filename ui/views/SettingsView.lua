@@ -305,36 +305,32 @@ function drawSection:graphics()
 	just.text(device)
 end
 
----@type sphere.PackageManager
-local packageManager
-local function formatThemeName(pkg_name)
-	if pkg_name == "Default" then
-		return pkg_name
-	elseif pkg_name == "New" then
-		return pkg_name
-	end
-	local pkg = packageManager:getPackage(pkg_name)
-	if not pkg or not pkg.types.ui then
-		return "Unknown"
-	end
-	return pkg:getDisplayName()
+---@param v sphere.UserInterfaceModel.ItemEntry
+---@return string
+local function formatThemeName(v)
+	return v.display_name
 end
 
 function drawSection:themes()
-	packageManager = self.game.packageManager
-
 	local settings = self.game.configModel.configs.settings
 	local g = settings.graphics
 
 	local ui_model = self.game.uiModel
 
-	local previous_theme = g.userInterface
-	g.userInterface = imgui.combo("g.userInterface", g.userInterface, ui_model.themeNames, formatThemeName, "UI theme")
-	if g.userInterface ~= previous_theme then
-		self.game.previewModel:stop()
-		ui_model:switchTheme()
+	imgui.text("Click on any button to switch to a new UI theme")
+	imgui.text("Available themes:")
+	for i, v in ipairs(ui_model.items) do
+		local pressed = imgui.button(v.display_name, v.display_name)
+
+		if pressed then
+			g.userInterface = v.name
+			ui_model:loadSelected()
+		end
 	end
 
+	imgui.separator()
+
+	imgui.text("Get more themes here:")
 	local gameView = self.game.ui.gameView
 	if imgui.button("download themes", "download themes") then
 		local PackagesView = require("ui.views.PackagesView")

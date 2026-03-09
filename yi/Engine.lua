@@ -15,7 +15,7 @@ local table_util = require("table_util")
 ---@field layout_update_requesters yi.View[]
 ---@field transform_update_requesters yi.View[]
 ---@field removal_deferred yi.View[]
----@field detach_deferred yi.View[]
+---@field target_height number?
 local Engine = class()
 
 ---@param inputs ui.Inputs
@@ -31,7 +31,6 @@ function Engine:new(inputs, ctx)
 	self.layout_update_requesters = {}
 	self.transform_update_requesters = {}
 	self.removal_deferred = {}
-	self.detach_deferred = {}
 end
 
 function Engine:load()
@@ -41,12 +40,39 @@ end
 
 ---@private
 ---@param view yi.View
----@param dt number
-function Engine:updateView(view, dt)
+function Engine:processDisabledView(view)
+	if view.just_changed_enabled then
+		view.just_changed_enabled = false
+		self.rebuild_command_buffer = true
+	end
+
 	local state = view.state
 
 	if state == ViewState.Active then
-		self.inputs:processNode(view)
+		-- do nothing
+	elseif state == ViewState.Loaded then
+		view.state = ViewState.Active
+		view:loadComplete()
+		self.rebuild_command_buffer = true
+	elseif state == ViewState.Killed then
+		table.insert(self.removal_deferred, view)
+	elseif state == ViewState.Destoryed then
+		error("DO NOT CALL View:destroy() manually!!!")
+	end
+end
+
+---@private
+---@param view yi.View
+---@param dt number
+function Engine:updateView(view, dt)
+	if view.just_changed_enabled then
+		view.just_changed_enabled = false
+		self.rebuild_command_buffer = true
+	end
+
+	local state = view.state
+
+	if state == ViewState.Active then
 		view:update(dt)
 
 		if not view.layout_box:isValid() then
@@ -58,8 +84,15 @@ function Engine:updateView(view, dt)
 		end
 
 		local children = view.children
-		for i = 1, #children do
+		for i = #children, 1, -1 do
 			self:updateView(children[i], dt)
+		end
+
+		self.inputs:processNode(view)
+
+		local disabled = view.disabled_children
+		for i = #disabled, 1, -1 do
+			self:processDisabledView(disabled[i])
 		end
 	elseif state == ViewState.Loaded then
 		view.state = ViewState.Active
@@ -68,8 +101,6 @@ function Engine:updateView(view, dt)
 		self:updateView(view, dt)
 	elseif state == ViewState.Killed then
 		table.insert(self.removal_deferred, view)
-	elseif state == ViewState.Detached then
-		table.insert(self.detach_deferred, view)
 	elseif state == ViewState.Destoryed then
 		error("DO NOT CALL View:destroy() manually!!!")
 	end
@@ -87,6 +118,11 @@ function Engine:remove(view, kill)
 			self.rebuild_command_buffer = true
 			parent.layout_box:markDirty(LayoutEnums.Axis.Both)
 			table.insert(self.layout_update_requesters, parent)
+		else
+			local disabled_idx = table_util.indexof(parent.disabled_children, view)
+			if disabled_idx then
+				table.remove(parent.disabled_children, disabled_idx)
+			end
 		end
 	end
 
@@ -99,20 +135,11 @@ end
 ---@param mouse_x number
 ---@param mouse_y number
 function Engine:update(dt, mouse_x, mouse_y)
-	local ww, wh = love.graphics.getDimensions()
-
-	if ww ~= self.prev_window_width or wh ~= self.prev_window_height then
-		self.prev_window_width = ww
-		self.prev_window_height = wh
-		self:updateRootDimensions()
-	end
-
 	self.inputs:beginFrame(mouse_x, mouse_y)
 
 	table_util.clear(self.layout_update_requesters)
 	table_util.clear(self.transform_update_requesters)
 	table_util.clear(self.removal_deferred)
-	table_util.clear(self.detach_deferred)
 
 	self:updateView(self.root, dt)
 
@@ -120,11 +147,11 @@ function Engine:update(dt, mouse_x, mouse_y)
 		self:remove(self.removal_deferred[i], true)
 	end
 
-	for i = 1, #self.detach_deferred do
-		self:remove(self.detach_deferred[i], false)
-	end
+	local t1 = love.timer.getTime()
 
 	local updated_roots = self.layout_engine:updateLayout(self.layout_update_requesters)
+
+	local t2 = love.timer.getTime()
 
 	if updated_roots then
 		for node, _ in pairs(updated_roots) do
@@ -142,6 +169,11 @@ function Engine:update(dt, mouse_x, mouse_y)
 		self.rebuild_command_buffer = false
 		self.command_buffer = CommandBuffer(self.root)
 	end
+
+	local lt = (t2 - t1) * 1000
+	if lt > 1 then
+		print(("Layout recalc takes too long: %0.02f MS Time: %0.01f"):format(lt, love.timer.getTime()))
+	end
 end
 
 function Engine:draw()
@@ -149,8 +181,21 @@ function Engine:draw()
 end
 
 function Engine:updateRootDimensions()
-	self.root:setWidth(love.graphics.getWidth())
-	self.root:setHeight(love.graphics.getHeight())
+	local ww, wh = love.graphics.getDimensions()
+	local w, h = 1, 1
+	local target_h = self.target_height
+
+	if target_h then
+		local s = wh / target_h
+		w, h = ww * (1 / s), target_h
+		self.root.transform:setScale(s, s)
+	else
+		w, h = ww, wh
+		self.root.transform:setScale(1, 1)
+	end
+
+	self.root:setWidth(w)
+	self.root:setHeight(h)
 end
 
 ---@type ui.ModifierKeys
@@ -167,6 +212,10 @@ function Engine:receive(event)
 		modifiers.shift = love.keyboard.isDown("lshift", "rshift")
 		modifiers.alt = love.keyboard.isDown("lalt", "ralt")
 		self.inputs:receive(event, modifiers)
+	end
+
+	if event.name == "resize" then
+		self:updateRootDimensions()
 	end
 end
 
