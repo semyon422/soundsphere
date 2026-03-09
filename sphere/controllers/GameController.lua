@@ -16,7 +16,11 @@ local PauseModel = require("sphere.models.PauseModel")
 local JoystickModel = require("sphere.models.JoystickModel")
 local OffsetModel = require("sphere.models.OffsetModel")
 
-local SelectController = require("sphere.controllers.SelectController")
+local SelectionCoordinator = require("rizu.select.SelectionCoordinator")
+local ModifierCoordinator = require("rizu.select.ModifierCoordinator")
+local LibraryDropManager = require("rizu.library.LibraryDropManager")
+local ChartExporter = require("rizu.library.ChartExporter")
+local SelectionActions = require("rizu.select.SelectionActions")
 local ResultController = require("sphere.controllers.ResultController")
 local MultiplayerController = require("sphere.controllers.MultiplayerController")
 local EditorController = require("sphere.controllers.EditorController")
@@ -25,8 +29,7 @@ local OffsetController = require("sphere.controllers.gameplay.OffsetController")
 
 local NotificationModel = require("sphere.ui.NotificationModel")
 local BackgroundModel = require("sphere.ui.BackgroundModel")
-local PreviewModel = require("sphere.ui.PreviewModel")
-local ChartPreviewModel = require("sphere.ui.ChartPreviewModel")
+local PreviewModel = require("rizu.preview.PreviewModel")
 
 local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")
@@ -150,31 +153,38 @@ function GameController:new()
 
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
-	self.previewModel = PreviewModel(self.persistence.configModel)
-	self.chartPreviewModel = ChartPreviewModel(
+	self.previewModel = PreviewModel(
 		self.persistence.configModel,
-		self.previewModel,
 		self.replayBase,
 		self
 	)
 
-	self.selectController = SelectController(
+	self.selectionCoordinator = SelectionCoordinator(
 		self.chartSelector,
 		self.scoreSelector,
 		self.collectionSelector,
-		self.modifierSelectModel,
-		self.noteSkinModel,
-		self.configModel,
-		self.multiplayerModel,
-		self.onlineModel,
-		self.library,
-		self.osudirectModel,
-		self.windowModel,
-		self.replayBase,
 		self.backgroundModel,
 		self.previewModel,
-		self.chartPreviewModel
+		self.osudirectModel,
+		self.windowModel
 	)
+	self.modifierCoordinator = ModifierCoordinator(
+		self.chartSelector,
+		self.scoreSelector,
+		self.modifierSelectModel,
+		self.configModel,
+		self.multiplayerModel,
+		self.replayBase,
+		self.previewModel
+	)
+	self.libraryDropManager = LibraryDropManager(self.library)
+	self.chartExporter = ChartExporter(self.library)
+	self.selectionActions = SelectionActions(
+		self.chartSelector,
+		self.library,
+		self.onlineModel
+	)
+
 	self.resultController = ResultController(self)
 	self.multiplayerController = MultiplayerController(
 		self.multiplayerModel,
@@ -235,17 +245,20 @@ function GameController:load()
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
 	self.collectionSelector:load()
-	self.chartSelector:load()
+
+	self.selectionCoordinator:load()
+	self.modifierCoordinator:load()
 
 	self.multiplayerController:load()
 
 	self.multiplayerModel:connect()
 
 	self.backgroundModel:load()
-	self.previewModel:load()
 end
 
 function GameController:unload()
+	self.selectionCoordinator:unload()
+	self.modifierCoordinator:unload()
 	self.previewModel:release()
 	self.multiplayerController:unload()
 	self.ui:unload()
@@ -256,6 +269,9 @@ end
 function GameController:update(dt)
 	self.app:update()
 
+	self.selectionCoordinator:update(function(...) self.modifierCoordinator:applyModifierMeta(...) end)
+	self.modifierCoordinator:update()
+
 	self.joystickModel:update(dt)
 
 	self.multiplayerController:update()
@@ -265,7 +281,7 @@ function GameController:update(dt)
 	self.library:update()
 
 	self.backgroundModel:update()
-	self.chartPreviewModel:update()
+	self.previewModel:update()
 	self.ui:update(dt)
 	self.notificationModel:update()
 
@@ -311,6 +327,8 @@ function GameController:receive(event)
 	if event.name == "framestarted" then
 		self.global_timer:setTime(event.time)
 	end
+
+	self.libraryDropManager:receive(event)
 
 	self.ui:receive(event)
 	self.app:receive(event)

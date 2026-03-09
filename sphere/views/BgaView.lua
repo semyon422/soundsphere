@@ -8,7 +8,7 @@ local BgaView = class()
 
 ---@param bga_event rizu.sprite.BgaEvent
 ---@param time number
----@param bga_engine rizu.sprite.BgaEngine|rizu.gameplay.BgaPreviewPlayer
+---@param bga_engine rizu.sprite.BgaEngine|rizu.preview.BgaPreviewPlayer
 function BgaView:drawNote(bga_event, time, bga_engine)
 	local start_dt = time - bga_event.time
 

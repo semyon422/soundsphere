@@ -426,7 +426,7 @@ local function ModifierIconGrid(self)
 	local w, h = Layout:move("column1row3")
 	love.graphics.translate(w - 21 - right_w, 4)
 	love.graphics.translate(8, h - 42)
-	local inputMode = self.game.selectController.state.inputMode
+	local inputMode = self.game.modifierCoordinator.state.inputMode
 	local inputmode = Format.inputMode(tostring(inputMode)) or ""
 	just.text(inputmode)
 
@@ -517,10 +517,10 @@ local function NotechartsSubscreen(self)
 	just.row(true)
 	just.indent(36)
 	if imgui.IconOnlyButton("open directory", icons("folder_open"), h, 0.5) then
-		game.selectController:openDirectory()
+		game.selectionActions:openDirectory()
 	end
 	if imgui.IconOnlyButton("update cache", icons("refresh"), h, 0.5) then
-		game.selectController:updateCache(true)
+		game.selectionActions:updateCache(true)
 	end
 	just.offset(w - h * 3 - 36)
 	if imgui.IconOnlyButton("editor button", icons("create"), h, 0.5) then
@@ -537,7 +537,7 @@ local function NotechartsSubscreen(self)
 	w, h = Layout:move("column1row1row1")
 
 	-- if imgui.IconOnlyButton("open notechart page", icons("info_outline"), h, 0.5) then
-	-- 	self.game.selectController:openWebNotechart()
+	-- 	self.game.selectionActions:openWebNotechart()
 	-- end
 
 	local online_client = game.online_client

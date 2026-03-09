@@ -28,7 +28,6 @@ function UserInterface:new(game)
 end
 
 function UserInterface:load()
-	self.game.selectController:load()
 	local root = self.engine.root
 
 	local background = root:add(Background())
@@ -47,7 +46,6 @@ end
 ---@param dt number
 function UserInterface:update(dt)
 	local capped_dt = math.min(dt, MAX_DT)
-	self.game.selectController:update()
 	self.engine:update(capped_dt, love.mouse.getPosition())
 end
 

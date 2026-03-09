@@ -1,4 +1,4 @@
-local AudioPreview = require("rizu.gameplay.AudioPreview")
+local AudioPreview = require("rizu.preview.AudioPreview")
 
 local test = {}
 
@@ -46,6 +46,42 @@ function test.empty(t)
 
 	t:eq(#preview2.samples, 0)
 	t:eq(#preview2.events, 0)
+end
+
+---@param t testing.T
+function test.getRange(t)
+	local preview = AudioPreview()
+	local min_time, max_time = preview:getRange()
+	t:eq(min_time, 0)
+	t:eq(max_time, 0)
+
+	preview.events = {
+		{time = 1.0, sample_index = 1, duration = 0.5, volume = 1.0},
+		{time = 0.5, sample_index = 2, duration = 1.2, volume = 0.8},
+		{time = 2.5, sample_index = 3, duration = 0.1, volume = 0.5},
+	}
+
+	min_time, max_time = preview:getRange()
+	t:eq(min_time, 0.5)
+	t:eq(max_time, 2.6)
+
+	-- Sample at negative time
+	preview.events = {
+		{time = -1.0, sample_index = 1, duration = 0.5, volume = 1.0},
+		{time = 1.0, sample_index = 2, duration = 0.5, volume = 1.0},
+	}
+	min_time, max_time = preview:getRange()
+	t:eq(min_time, -1.0)
+	t:eq(max_time, 1.5)
+
+	-- All audio < 0
+	preview.events = {
+		{time = -5.0, sample_index = 1, duration = 1.0, volume = 1.0},
+		{time = -2.0, sample_index = 2, duration = 0.5, volume = 1.0},
+	}
+	min_time, max_time = preview:getRange()
+	t:eq(min_time, -5.0)
+	t:eq(max_time, -1.5)
 end
 
 return test

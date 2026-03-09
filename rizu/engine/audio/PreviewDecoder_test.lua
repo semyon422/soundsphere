@@ -1,6 +1,6 @@
 local PreviewDecoder = require("rizu.engine.audio.PreviewDecoder")
 local FakeFilesystem = require("fs.FakeFilesystem")
-local AudioPreview = require("rizu.gameplay.AudioPreview")
+local AudioPreview = require("rizu.preview.AudioPreview")
 local FakeDecoder = require("rizu.engine.audio.fake.Decoder")
 local ffi = require("ffi")
 

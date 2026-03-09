@@ -21,8 +21,6 @@ end
 
 ---@param dt number
 function MultiplayerView:update(dt)
-	self.game.selectController:update()
-
 	local mp_model = self.game.multiplayerModel
 	local mp_client = mp_model.client
 

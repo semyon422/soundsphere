@@ -2,18 +2,18 @@ local RhythmView = require("sphere.views.RhythmView")
 
 ---@class sphere.ChartPreviewRhythmView: sphere.RhythmView
 ---@operator call: sphere.ChartPreviewRhythmView
----@field chartPreviewModel sphere.ChartPreviewModel
+---@field chartPreview rizu.preview.NotesPreviewPlayer
 local ChartPreviewRhythmView = RhythmView + {}
 
 ---@param f function
 function ChartPreviewRhythmView:processNotes(f)
-	local graphicEngine = self.chartPreviewModel.graphicEngine
+	local graphicEngine = self.chartPreview.graphicEngine
 	graphicEngine:iterNotes(f, self)
 end
 
 ---@return sphere.NoteSkin
 function ChartPreviewRhythmView:getNoteSkin()
-	return self.chartPreviewModel.noteSkin
+	return self.chartPreview.noteSkin
 end
 
 return ChartPreviewRhythmView

@@ -29,7 +29,7 @@ local EditorController = class()
 ---@param windowModel sphere.WindowModel
 ---@param library rizu.library
 ---@param fileFinder sphere.FileFinder
----@param previewModel sphere.PreviewModel
+---@param previewModel rizu.preview.PreviewModel
 ---@param replayBase sea.ReplayBase
 function EditorController:new(
 	chartSelector,

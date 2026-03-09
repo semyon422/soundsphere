@@ -223,7 +223,7 @@ function ChartviewsRepo:_getColumns(mode, params, use_preview)
 		"preview_time", "osu_beatmap_id", "osu_beatmapset_id",
 		"tempo", "tempo_avg", "tempo_max", "tempo_min",
 		"chartmeta_local_offset", "chartmeta_rating", "chartmeta_comment",
-		"modifiers", "rate", "mode", "chartdiff_inputmode", "duration", "start_time",
+		"modifiers", "rate", "rate_type", "mode", "chartdiff_inputmode", "duration", "start_time",
 		"notes_count", "judges_count", "long_notes_ratio", "note_types_count",
 		"density_data", "sv_data", "enps_diff", "osu_diff", "msd_diff",
 		"msd_diff_data", "msd_diff_rates", "user_diff", "user_diff_data",

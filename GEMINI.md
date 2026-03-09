@@ -78,6 +78,30 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 *   **Variable Naming (Conflicts with Globals):** Avoid using Lua global names (e.g., `type`, `table`, `string`, `pairs`) for local variables. If you must use such a name, prefix it with an underscore (e.g., `_type`).
 
+## Rizu Module Overview
+
+The `rizu/` directory contains the modern, modular implementation of the game's core systems. It is organized into several key sub-modules:
+
+*   **`rizu.engine`**: Low-level game logic and engine components.
+    *   `RhythmEngine`: The core logic for processing notes and timing.
+    *   `audio`: Modular audio system with backends (e.g., BASS).
+    *   `visual`: Visual components like sprites and playfield rendering logic.
+    *   `input`: Low-level input event handling (Physic and Virtual events).
+*   **`rizu.gameplay`**: High-level management of gameplay sessions.
+    *   `GameplaySession`: Coordinates the engine, players (manual/auto/replay), and recorders.
+    *   `GameplayInteractor`: Bridges the game session with the UI and external services.
+*   **`rizu.library`**: Manages the local chart database and collections.
+    *   `Library`: Main entry point for chart discovery and management.
+    *   `repos`: Database access layer (e.g., `ChartsRepo`, `CollectionsRepo`).
+*   **`rizu.select`**: Logic for song and score selection.
+    *   `ChartSelector`: Handles filtering, searching, and sorting of charts.
+    *   `SelectionState`: Maintains the current user selection and navigation state.
+*   **`rizu.preview`**: Handles audio, BGA, and note chart previews.
+    *   `PreviewModel`: Coordinated preview system with master clock synchronization.
+*   **`rizu.loop`**: The main game loop, update/draw cycles, and state management.
+*   **`rizu.files`**: Resource loading, discovery, and file system abstractions.
+*   **`rizu.game`**: Top-level game coordination and global timers.
+
 ### Performance & Benchmarking
 
 The project prioritizes high-performance Lua code, especially within the gameplay engine.

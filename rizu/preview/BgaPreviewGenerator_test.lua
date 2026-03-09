@@ -1,4 +1,4 @@
-local BgaPreviewGenerator = require("rizu.gameplay.BgaPreviewGenerator")
+local BgaPreviewGenerator = require("rizu.preview.BgaPreviewGenerator")
 local TestChartFactory = require("sea.chart.TestChartFactory")
 local Note = require("notechart.Note")
 local FakeFilesystem = require("fs.FakeFilesystem")
@@ -35,7 +35,7 @@ function test.generate_basic(t)
 	local encoded, err = fs:read("userdata/bga_previews/test_hash.bga_preview")
 	t:assert(encoded ~= nil, err)
 
-	local BgaPreview = require("rizu.gameplay.BgaPreview")
+	local BgaPreview = require("rizu.preview.BgaPreview")
 	local preview = BgaPreview()
 	preview:decode(encoded)
 

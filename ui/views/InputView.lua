@@ -20,7 +20,7 @@ return ModalImView(function(self, quit)
 
 	imgui.setSize(w, h, _w, _h)
 
-	local inputMode = tostring(self.game.selectController.state.inputMode)
+	local inputMode = tostring(self.game.modifierCoordinator.state.inputMode)
 	local inputs = self.game.inputModel:getInputs(inputMode)
 
 	if #inputs == 0 then

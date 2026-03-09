@@ -135,7 +135,7 @@ function test.score_navigation(t)
 	local chartModel = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
 	local scoreSelector = ScoreSelector(configModel, library, onlineModel, replayBase, chartModel.state)
 	
-	-- Wire them up like SelectController would
+	-- Wire them up like SelectionCoordinator would
 	chartModel.state.onChanged:add({
 		receive = function(_, event)
 			if event.type == "selection" and event.level == 2 then
