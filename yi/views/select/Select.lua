@@ -101,7 +101,7 @@ function Select:load()
 		h(View(), {w = "70%", h = "100%", arrange = "flow_col", gap = 20, padding = {20, 20, 20, 20}}, {
 			h(self.tags),
 			h(self.artist_title, {w = "999999%"}),
-			--h(self.chart_grid, {w = "100%", h = 70}),
+			h(self.chart_grid, {w = "100%", h = 70}),
 		}),
 
 		h(self.chart_info, {justify_self = "end", margin = {0, 0, 20, 20}}),
@@ -131,13 +131,6 @@ end
 
 function Select:update(dt)
 	self.chart_preview_view:update(dt)
-
-	-- Still have to observe time rate changes cuz we have old gameplay settings modal
-	local rate = self:getGame().timeRateModel:get()
-	if self.prevRate ~= rate then
-		self.prevRate = rate
-		self:onRateChanged()
-	end
 end
 
 function Select:draw()
@@ -208,7 +201,7 @@ function Select:attachObservers()
 	self.chartviewObserver = self.chartviewObserver or {
 		receive = function(_, event)
 			if event.type == "chartview" then
-				local cv = event.chartview
+				local cv = event.chartview ---@type rizu.library.LocatedChartview
 				if cv.location_id then
 					self:updateChartview(cv)
 				end
