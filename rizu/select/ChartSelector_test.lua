@@ -115,6 +115,42 @@ function test.chart_navigation(t)
 	library:unload()
 end
 
+function test.chartview_event(t)
+	local charts = {
+		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1},
+		{chartfile_set_id = 1, chartfile_id = 2, chartmeta_id = 2, chartdiff_id = 2, hash = "h2", index = 1}
+	}
+	local configModel = createMockConfigModel()
+	local library = tlf:create()
+	tlf:populate(library, charts)
+	
+	local fs = {read = function() end, getInfo = function() end}
+
+	local model = ChartSelector(configModel, library, fs, {getSelectedItem = function() end})
+	
+	local chartviewEvents = 0
+	model.onChanged:add({
+		receive = function(_, event)
+			if event.type == "chartview" then
+				chartviewEvents = chartviewEvents + 1
+			end
+		end
+	})
+
+	model:load()
+	-- load calls refresh, which calls pullLevel, which also triggers selection event -> pullLevel again
+	t:eq(chartviewEvents, 2)
+
+	model:scrollLevel(2, 1)
+	-- scrollLevel calls setChartview
+	-- it also calls setSelection(2, ...) which triggers receive -> push setSelection(1, ...)
+	-- setSelection(1, ...) if it triggers, might trigger pullLevel again.
+	-- But in this test, level 1 index remains same, so no extra pullLevel.
+	t:eq(chartviewEvents, 3)
+
+	library:unload()
+end
+
 function test.score_navigation(t)
 	local charts = {
 		{chartfile_set_id = 1, chartfile_id = 1, chartmeta_id = 1, chartdiff_id = 1, hash = "h1", index = 1}
