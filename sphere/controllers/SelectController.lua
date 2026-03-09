@@ -90,10 +90,11 @@ function SelectController:load()
 	chartSelector:load()
 	self.previewModel:load()
 
-	self:applyModifierMeta()
+	self:applyModifierMeta(true)
 end
 
-function SelectController:applyModifierMeta()
+---@param fromSelection boolean?
+function SelectController:applyModifierMeta(fromSelection)
 	self.state.inputMode = InputMode()
 	self.state.custom = false
 
@@ -105,11 +106,13 @@ function SelectController:applyModifierMeta()
 		return
 	end
 
+	if fromSelection then
+		self.scoreSelector:updateReplayBase(chartview)
+	end
+
 	self.previewModel:setRate(replayBase.rate)
 	self.state.inputMode:set(chartview.inputmode)
 	self.state:resetOrder()
-
-	self.scoreSelector:updateReplayBase(chartview)
 
 	ModifierModel:applyMeta(replayBase.modifiers, self.state)
 
@@ -138,7 +141,7 @@ function SelectController:update()
 		if audio_path or not chartSelector.chartview then
 			self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
 		end
-		self:applyModifierMeta()
+		self:applyModifierMeta(true)
 	end
 
 	local osudirectModel = self.osudirectModel
@@ -151,7 +154,7 @@ function SelectController:update()
 
 	if self.modifierSelectModel:isChanged() then
 		self.multiplayerModel.client:updateReplayBase()
-		self:applyModifierMeta()
+		self:applyModifierMeta(false)
 	end
 
 	-- local time = love.timer.getTime()
