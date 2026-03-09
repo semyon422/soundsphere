@@ -44,6 +44,14 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 	self.onChanged = Observable()
 	self.state.onChanged:add(self)
 
+	self.onChanged:add({
+		receive = function(_, event)
+			if event.type == "chartview" then
+				print(event.chartview.chartfile_id, event.chartview.title)
+			end
+		end
+	})
+
 	self.stores[1].onChanged:add({
 		receive = function(_, event)
 			if event.type == "item_loaded" then
@@ -59,11 +67,18 @@ function ChartSelector:new(configModel, library, fs, collectionSelector, state)
 			if event.type == "item_loaded" then
 				local current = self.state:getSelection(2)
 				if event.index == current.index then
+					self.onChanged:send({type = "chartview", chartview = self.chartview})
 					self:setChanged()
 				end
 			end
 		end
 	})
+end
+
+function ChartSelector:setChartview(chartview)
+	self.chartview = chartview
+	self.changed = true
+	self.onChanged:send({type = "chartview", chartview = chartview})
 end
 
 function ChartSelector:receive(event)
@@ -121,7 +136,7 @@ function ChartSelector:findNotechart(hash, index)
 				self.stores[2]:setResult(result2)
 
 				local chartview = self.stores[2]:get(1)
-				self.chartview = chartview
+				self:setChartview(chartview)
 				self:setConfig(chartview)
 				self.state:setSelection(1, 1, chartview.chartfile_set_id)
 				self.state:setSelection(2, 1, chartview.chartfile_id)
@@ -249,8 +264,7 @@ function ChartSelector:scrollLevel(level, direction, destination)
 	if level == 1 then
 		self.state:setSelection(1, destination, item.chartfile_set_id)
 	else
-		self.chartview = item
-		self.changed = true
+		self:setChartview(item)
 		self.state:setSelection(2, destination, item.chartfile_id)
 		self.onChanged:send({type = "scroll_level", level = level, chartview = item})
 	end
@@ -277,8 +291,7 @@ function ChartSelector:refresh(noUpdate, noPullNext)
 		self.config.chartdiff_id = nil
 		self.config.chartplay_id = nil
 
-		self.chartview = nil
-		self.changed = true
+		self:setChartview(nil)
 
 		self.stores[2]:setResult(nil)
 	end
@@ -315,8 +328,7 @@ function ChartSelector:pullLevel(level)
 		self.config.chartplay_id = nil
 	end
 
-	self.chartview = chartview
-	self.changed = true
+	self:setChartview(chartview)
 
 	self.state:setSelection(2, index, chartview and chartview.chartfile_id)
 end
