@@ -27,7 +27,6 @@ local SelectController = class()
 ---@param replayBase sea.ReplayBase
 ---@param backgroundModel sphere.BackgroundModel
 ---@param previewModel sphere.PreviewModel
----@param chartPreviewModel sphere.ChartPreviewModel
 function SelectController:new(
 	chartSelector,
 	scoreSelector,
@@ -42,8 +41,7 @@ function SelectController:new(
 	windowModel,
 	replayBase,
 	backgroundModel,
-	previewModel,
-	chartPreviewModel
+	previewModel
 )
 	self.chartSelector = chartSelector
 	self.scoreSelector = scoreSelector
@@ -59,7 +57,6 @@ function SelectController:new(
 	self.replayBase = replayBase
 	self.backgroundModel = backgroundModel
 	self.previewModel = previewModel
-	self.chartPreviewModel = chartPreviewModel
 	self.state = ModifiersMetaState()
 
 	self.chartSelector.state.onChanged:add({
@@ -132,8 +129,6 @@ function SelectController:unload()
 end
 
 function SelectController:update()
-	self.previewModel:update()
-
 	self.windowModel:setVsyncOnSelect(true)
 
 	local chartSelector = self.chartSelector
@@ -143,9 +138,6 @@ function SelectController:update()
 		if audio_path or not chartSelector.chartview then
 			self.previewModel:setAudioPathPreview(audio_path, preview_time, mode, chartSelector.chartview)
 		end
-		self.previewModel:onLoad(function()
-			self.chartPreviewModel:setChartview(chartSelector.chartview)
-		end)
 		self:applyModifierMeta()
 	end
 

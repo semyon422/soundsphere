@@ -79,10 +79,6 @@ end
 ---@param preview rizu.gameplay.BgaPreview
 ---@param hash string
 function BgaPreviewGenerator:writePreview(preview, hash)
-	if #preview.events == 0 then
-		return
-	end
-
 	table.sort(preview.events, function(a, b)
 		return a.time < b.time
 	end)

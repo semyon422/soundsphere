@@ -24,6 +24,7 @@ function ChartPreview:new(configModel, previewModel, replayBase, game)
 	self.visual_info = VisualInfo()
 	self.visual_engine = VisualEngine(self.visual_info)
 	self.skin_info = BaseSkinInfo()
+	self.graphicEngine = self
 
 	---@type {[string]: sphere.BaseNoteSkin}
 	self.skin_by_mode = {}

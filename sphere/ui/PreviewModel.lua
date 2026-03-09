@@ -3,6 +3,7 @@ local delay = require("delay")
 local thread = require("thread")
 local AudioPreviewPlayer = require("rizu.gameplay.AudioPreviewPlayer")
 local BgaPreviewPlayer = require("rizu.gameplay.BgaPreviewPlayer")
+local ChartPreview = require("rizu.select.ChartPreview")
 
 ---@class sphere.PreviewModel
 ---@operator call: sphere.PreviewModel
@@ -14,14 +15,24 @@ PreviewModel.mode = "absolute"
 PreviewModel.manual_time = 0
 
 ---@param configModel sphere.ConfigModel
-function PreviewModel:new(configModel)
+---@param replayBase sea.ReplayBase
+---@param game table
+function PreviewModel:new(configModel, replayBase, game)
 	self.configModel = configModel
+	self.replayBase = replayBase
+	self.game = game
 	self.audioPreviewPlayer = AudioPreviewPlayer(configModel)
 	self.bgaPreviewPlayer = BgaPreviewPlayer()
+	self.chartPreview = ChartPreview(configModel, self, replayBase, game)
 	---@type {[string]: boolean?}
 	self.generating_hashes = {}
 	---@type {[string]: boolean?}
 	self.attempted_hashes = {}
+
+	self.loaded_audio_path = nil
+	self.loaded_preview_time = nil
+	self.loaded_mode = nil
+	self.loaded_hash = nil
 end
 
 function PreviewModel:load()
@@ -36,30 +47,14 @@ end
 ---@param mode string?
 ---@param chartview table?
 function PreviewModel:setAudioPathPreview(audio_path, preview_time, mode, chartview)
-	local is_same_audio = self.audio_path == audio_path and (audio_path or "") ~= ""
-	local is_same_chart_file = self.chartview and chartview and self.chartview.location_path == chartview.location_path
-
-	if self.audio_path ~= audio_path or self.chartview ~= chartview then
+	if self.audio_path ~= audio_path or self.chartview ~= chartview or self.preview_time ~= preview_time or self.mode ~= mode then
 		self.audio_path = audio_path
 		self.preview_time = preview_time
 		self.mode = mode
 		self.chartview = chartview
 
-		if not is_same_audio and not is_same_chart_file then
-			self:loadPreviewDebounce()
-			return
-		end
+		self:loadPreviewDebounce()
 	end
-
-	if self._on_load then
-		self._on_load()
-		self._on_load = nil
-	end
-end
-
----@param f function?
-function PreviewModel:onLoad(f)
-	self._on_load = f
 end
 
 function PreviewModel:update()
@@ -84,6 +79,7 @@ function PreviewModel:update()
 
 	self.audioPreviewPlayer:update()
 	self.bgaPreviewPlayer:update(self:getTime())
+	self.chartPreview:update()
 
 	local volumeConfig = settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
@@ -130,6 +126,8 @@ function PreviewModel:loadPreview()
 	loadingPreview = true
 
 	local path = self.audio_path
+	local preview_time = self.preview_time
+	local mode = self.mode
 
 	if not path then
 		loadingPreview = false
@@ -137,8 +135,20 @@ function PreviewModel:loadPreview()
 		return
 	end
 
-	self.audioPreviewPlayer:stop()
-	self.bgaPreviewPlayer:stop()
+	self.chartPreview:setChartview(self.chartview)
+
+	local audio_needs_reload = (self.loaded_audio_path ~= path)
+		or (self.loaded_preview_time ~= preview_time)
+		or (self.loaded_mode ~= mode)
+		or (path == "")
+
+	if audio_needs_reload then
+		self.audioPreviewPlayer:stop()
+		self.bgaPreviewPlayer:stop()
+		self.loaded_audio_path = path
+		self.loaded_preview_time = preview_time
+		self.loaded_mode = mode
+	end
 
 	loadingPreview = false
 	if path ~= self.audio_path then
@@ -149,13 +159,16 @@ function PreviewModel:loadPreview()
 	local volumeConfig = self.configModel.configs.settings.audio.volume
 	local volume = volumeConfig.master * volumeConfig.music
 
-	local position = self.preview_time or 0
-	if self.mode == "relative" then
+	local position = preview_time or 0
+	if mode == "relative" then
 		position = (self.chartview and self.chartview.duration or 0) * position
 	end
 	position = math.max(position, 0)
-	self.position = position
-	self.manual_time = position
+
+	if audio_needs_reload then
+		self.position = position
+		self.manual_time = position
+	end
 
 	---@type string?
 	local hash = self.chartview and self.chartview.hash
@@ -166,17 +179,18 @@ function PreviewModel:loadPreview()
 		local audio_exists = love.filesystem.getInfo(audio_preview_path)
 		local bga_exists = love.filesystem.getInfo(bga_preview_path)
 
-		if audio_exists then
+		if audio_exists and audio_needs_reload then
 			self.audioPreviewPlayer:load(audio_preview_path, self.chartview.location_dir)
 			self.audioPreviewPlayer:setVolume(volume)
 			self.audioPreviewPlayer:setRate(self.rate)
 			self.audioPreviewPlayer:seek(position)
 		end
 
-		if bga_exists then
+		if bga_exists and self.loaded_hash ~= hash then
+			self.loaded_hash = hash
 			local LoveFilesystem = require("fs.LoveFilesystem")
 			self.bgaPreviewPlayer:load(bga_preview_path, self.chartview.location_dir, LoveFilesystem())
-			self.bgaPreviewPlayer:seek(position)
+			self.bgaPreviewPlayer:seek(self:getTime())
 		end
 
 		if not audio_exists or not bga_exists then
@@ -187,10 +201,8 @@ function PreviewModel:loadPreview()
 	end
 
 	self.volume = volume
-	if self._on_load then
-		self._on_load()
-		self._on_load = nil
-	end
+
+	self:update()
 end
 
 local generatePreviewAsync = thread.async(function(chartview_data)
@@ -276,6 +288,10 @@ function PreviewModel:stop()
 	self.audioPreviewPlayer:stop()
 	self.bgaPreviewPlayer:stop()
 	self.manual_time = 0
+	self.loaded_audio_path = nil
+	self.loaded_preview_time = nil
+	self.loaded_mode = nil
+	self.loaded_hash = nil
 end
 
 function PreviewModel:release()

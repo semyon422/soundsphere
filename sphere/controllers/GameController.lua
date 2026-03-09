@@ -26,7 +26,6 @@ local OffsetController = require("sphere.controllers.gameplay.OffsetController")
 local NotificationModel = require("sphere.ui.NotificationModel")
 local BackgroundModel = require("sphere.ui.BackgroundModel")
 local PreviewModel = require("sphere.ui.PreviewModel")
-local ChartPreviewModel = require("sphere.ui.ChartPreviewModel")
 
 local Persistence = require("sphere.persistence.Persistence")
 local App = require("sphere.app.App")
@@ -150,10 +149,8 @@ function GameController:new()
 
 	self.backgroundModel = BackgroundModel()
 	self.notificationModel = NotificationModel()
-	self.previewModel = PreviewModel(self.persistence.configModel)
-	self.chartPreviewModel = ChartPreviewModel(
+	self.previewModel = PreviewModel(
 		self.persistence.configModel,
-		self.previewModel,
 		self.replayBase,
 		self
 	)
@@ -172,8 +169,7 @@ function GameController:new()
 		self.windowModel,
 		self.replayBase,
 		self.backgroundModel,
-		self.previewModel,
-		self.chartPreviewModel
+		self.previewModel
 	)
 	self.resultController = ResultController(self)
 	self.multiplayerController = MultiplayerController(
@@ -266,7 +262,7 @@ function GameController:update(dt)
 	self.library:update()
 
 	self.backgroundModel:update()
-	self.chartPreviewModel:update()
+	self.previewModel:update()
 	self.ui:update(dt)
 	self.notificationModel:update()
 

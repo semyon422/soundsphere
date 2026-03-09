@@ -15,12 +15,12 @@ function ChartPreviewView:new(game)
 end
 
 function ChartPreviewView:load()
-	local noteSkin = self.game.chartPreviewModel.noteSkin
+	local noteSkin = self.game.previewModel.chartPreview.noteSkin
 	if not noteSkin then
 		return
 	end
 
-	local playfield = self.game.chartPreviewModel.playField
+	local playfield = self.game.previewModel.chartPreview.playField
 	local transform = playfield:newNoteskinTransform()
 
 	local sequenceView = self.sequenceView
@@ -33,7 +33,7 @@ function ChartPreviewView:load()
 		ChartPreviewRhythmView({
 			transform = transform,
 			subscreen = "preview",
-			chartPreviewModel = self.game.chartPreviewModel
+			chartPreview = self.game.previewModel.chartPreview
 		}),
 	})
 	sequenceView:load()
