@@ -1,120 +1,95 @@
 local class = require("class")
-local path_util = require("path_util")
-local http_util = require("http_util")
-local fs_util = require("fs_util")
-local thread = require("thread")
-local physfs = require("physfs")
+local table_util = require("table_util")
 
-local DefaultUserInterface = require("ui.UserInterface")
-local NewDefaultUserInterface = require("yi.UserInterface")
+local FallbackUserInterface = require("sphere.FallbackUserInterface")
+local OldUserInterface = require("ui.UserInterface")
+local NewUserInterface = require("yi.UserInterface")
 
----@class sphere.UserInterfaceMetadata
+---@class sphere.UserInterfaceModel.ItemEntry
 ---@field name string
----@field version number
----@field module string
----@field config string
+---@field display_name string 
+---@field object sphere.IUserInterface
+---@field mount_path string?
 
 ---@class sphere.UserInterfaceModel
 ---@operator call: sphere.UserInterfaceModel
----@field activeUI sphere.IUserInterface
----@field private loadedThemes {[string]: sphere.IUserInterface}
----@field private installedThemes {[string]: sphere.UserInterfaceMetadata}
----@field private themeNames string[]
+---@field items sphere.UserInterfaceModel.ItemEntry[]
 ---@field private game sphere.GameController
 local UserInterfaceModel = class()
 
 ---@param game sphere.GameController
 function UserInterfaceModel:new(game)
 	self.game = game
-	self.loadedThemes = {}
-	self.themeNames = {"Default", "New"}
+	self.items = {}
+
+	self:add("old", "2022 UI", OldUserInterface, "")
+	self:add("new", "2026 UI", NewUserInterface, "")
+end
+
+---@param name string
+---@param display_name string
+---@param object sphere.IUserInterface
+---@param mount_path string
+function UserInterfaceModel:add(name, display_name, object, mount_path)
+	table.insert(self.items, {
+		name = name,
+		display_name = display_name,
+		object = object,
+		mount_path = mount_path
+	})
 end
 
 function UserInterfaceModel:load()
+	local package_manager = self.game.packageManager
 	local pkgs = self.game.packageManager:getPackagesByType("ui")
 
 	for _, pkg in ipairs(pkgs) do
-		table.insert(self.themeNames, pkg.name)
+		---@type boolean, string | sphere.IUserInterface
+		local ok, res = xpcall(require, debug.traceback, pkg.types.ui)
+
+		if ok then
+			---@cast res sphere.IUserInterface
+			local root_dir = package_manager:getPackageDir(pkg.name) or ""
+			self:add(pkg.name, pkg.display_name, res, root_dir)
+		else
+			print(("[UserInterfaceModel] Failed to require external UI:"):format(res))
+		end
 	end
 
-	local pkg_name = self.game.persistence.configModel.configs.settings.graphics.userInterface
-	if pkg_name == "Default" then
-		self:setDefaultTheme()
-		return
-	elseif pkg_name == "New" then
-		self:setNewDefaultTheme()
-		return
-	end
-
-	self:setTheme(pkg_name)
+	self:loadSelected()
 end
 
----@private
-function UserInterfaceModel:setDefaultTheme()
-	self.loadedThemes["Default"] = DefaultUserInterface(self.game)
-	self.activeUI = self.loadedThemes["Default"]
-	self.activeUI:load()
+---@param name string
+function UserInterfaceModel:setUserInterface(name)
+	local cfg = self.game.persistence.configModel.configs.settings.graphics
+	cfg.userInterface = name
 end
 
-function UserInterfaceModel:setNewDefaultTheme()
-	self.loadedThemes["New"] = NewDefaultUserInterface(self.game)
-	self.activeUI = self.loadedThemes["New"]
-	self.activeUI:load()
-end
+function UserInterfaceModel:loadSelected()
+	local name = self.game.persistence.configModel.configs.settings.graphics.userInterface
 
----@param pkg_name string
----@private
-function UserInterfaceModel:setTheme(pkg_name)
-	if self.loadedThemes[pkg_name] then
-		self.activeUI = self.loadedThemes[pkg_name]
-		self.activeUI:load()
-		return
-	end
-
-	local packageManager = self.game.packageManager
-
-	local pkg = packageManager:getPackage(pkg_name)
-	if not pkg or not pkg.types.ui then
-		self:setDefaultTheme()
-		return
-	end
-
-	local ok, err = xpcall(require, debug.traceback, pkg.types.ui)
-
-    if not ok then
-		print("Failed to require external UI: " .. err)
-		self:setDefaultTheme()
-		return
-	end
-
-	local rootDir = packageManager:getPackageDir(pkg_name)
-
-	ok, err = pcall(function()
-		self.loadedThemes[pkg_name] = err(self.game, rootDir)
+	local item = table_util.find(self.items, function(v)
+		return v.name == name
 	end)
-    if not ok then
-		print("Failed to create external UI: " .. err)
-		self:setDefaultTheme()
+
+	if not item then
+		self.game:setUI(FallbackUserInterface(self.game, "", ("%s not found in UserInterfaceModel.items"):format(name)))
 		return
 	end
 
-	self.activeUI = self.loadedThemes[pkg_name]
-
-	ok, err = pcall(function()
-		self.activeUI:load()
+	---@type boolean, sphere.IUserInterface | string
+	local ok, res = pcall(function()
+		return item.object(self.game, item.mount_path)
 	end)
-    if not ok then
-		print("Failed to load external UI: " .. err)
-		self:setDefaultTheme()
+
+	if not ok then
+		---@cast res string
+		self.game:setUI(FallbackUserInterface(self.game, "", res))
 		return
 	end
-end
 
-function UserInterfaceModel:switchTheme()
-	local pkg_name = self.game.persistence.configModel.configs.settings.graphics.userInterface
-	self.activeUI:unload()
-	self:setTheme(pkg_name)
-	self.game.ui = self.activeUI
+	---@cast res -string
+	self.game:setUI(res)
 end
 
 return UserInterfaceModel
