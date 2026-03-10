@@ -286,23 +286,24 @@ function test.remove_disabled_view(t)
 
 	local container = engine.root:add(MockView())
 	local child = container:add(MockView())
-	
+
 	engine:update(0.016, 0, 0)
-	
+
 	-- Disable the child
 	child:setEnabled(false)
 	engine:update(0.016, 0, 0)
-	
+
 	t:eq(#container.children, 0)
 	t:eq(#container.disabled_children, 1)
-	
+
 	-- Kill the disabled child
 	child:kill()
-	
+
 	-- Update engine to process the kill
 	engine:update(0.016, 0, 0)
-	
+
 	t:eq(#container.disabled_children, 0, "Disabled child should be removed from disabled_children upon kill")
 	t:eq(child.children, nil, "Child should be destroyed")
 end
+
 return test

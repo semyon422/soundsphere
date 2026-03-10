@@ -16,6 +16,7 @@ local table_util = require("table_util")
 ---@field transform_update_requesters yi.View[]
 ---@field removal_deferred yi.View[]
 ---@field target_height number?
+---@field check_dimensions_during_update boolean
 local Engine = class()
 
 ---@param inputs ui.Inputs
@@ -31,6 +32,9 @@ function Engine:new(inputs, ctx)
 	self.layout_update_requesters = {}
 	self.transform_update_requesters = {}
 	self.removal_deferred = {}
+	self.check_dimensions_during_update = false
+	self.last_window_width = nil
+	self.last_window_height = nil
 end
 
 function Engine:load()
@@ -137,6 +141,10 @@ end
 function Engine:update(dt, mouse_x, mouse_y)
 	self.inputs:beginFrame(mouse_x, mouse_y)
 
+	if self.check_dimensions_during_update then
+		self:checkRootDimensions()
+	end
+
 	table_util.clear(self.layout_update_requesters)
 	table_util.clear(self.transform_update_requesters)
 	table_util.clear(self.removal_deferred)
@@ -182,6 +190,8 @@ end
 
 function Engine:updateRootDimensions()
 	local ww, wh = love.graphics.getDimensions()
+	self.last_window_width = ww
+	self.last_window_height = wh
 	local w, h = 1, 1
 	local target_h = self.target_height
 
@@ -198,6 +208,13 @@ function Engine:updateRootDimensions()
 	self.root:setHeight(h)
 end
 
+function Engine:checkRootDimensions()
+	local ww, wh = love.graphics.getDimensions()
+	if ww ~= self.last_window_width or wh ~= self.last_window_height then
+		self:updateRootDimensions()
+	end
+end
+
 ---@type ui.ModifierKeys
 local modifiers = {
 	control = false,
@@ -212,10 +229,6 @@ function Engine:receive(event)
 		modifiers.shift = love.keyboard.isDown("lshift", "rshift")
 		modifiers.alt = love.keyboard.isDown("lalt", "ralt")
 		self.inputs:receive(event, modifiers)
-	end
-
-	if event.name == "resize" then
-		self:updateRootDimensions()
 	end
 end
 
