@@ -12,6 +12,7 @@ HitGraph.ReverseY = false -- `true` is stepmania/etterna/upscroll behavior
 function HitGraph:load()
 	local res = self:getResources()
 	self.hit = res.quads["result_hit"]
+	self.pixel = res.quads["pixel"]
 	self.sprite_batch = love.graphics.newSpriteBatch(res.atlas)
 
 	self:setPaddings({5, 5, 5, 5})
@@ -60,15 +61,22 @@ local JudgeColors = {
 	},
 }
 
+local HpColor = {0.3, 0.95, 0.45, 0.36}
+local HpSamplesTarget = 400
+
+function HitGraph:reset()
+	self.sprite_batch:clear()
+end
+
 ---@param timings sea.Timings
 ---@param subtimings sea.Subtimings
----@param judges_source sphere.ScoreSystem + sphere.IJudgesSource
----@param sequence {misc: sphere.MiscScore, base: sphere.BaseScore}[]
-function HitGraph:setHits(timings, subtimings, judges_source, sequence)
+---@param judges_source sphere.IJudgesSource
+---@param sequence {misc: sphere.MiscScore, base: sphere.BaseScore, hp: sphere.HpScore}[]
+function HitGraph:addHits(timings, subtimings, judges_source, sequence)
+	---@cast judges_source +sphere.ScoreSystem
 	local sb = self.sprite_batch
 	local hit = self.hit
 	local _, _, hit_w, hit_h = hit:getViewport()
-	sb:clear()
 
 	local timing_values, err = TimingValuesFactory():get(timings, subtimings)
 
@@ -114,6 +122,72 @@ function HitGraph:setHits(timings, subtimings, judges_source, sequence)
 		end
 
 		sb:add(hit, x, y, 0, s, s)
+	end
+end
+
+---@param sequence {base: sphere.BaseScore, hp: {healths: number}}[]
+---@param max_time number
+---@param max_hp number
+---@return number[]
+local function reduceHpSequence(sequence, max_time, max_hp)
+	local count = #sequence
+	if count == 0 or max_time <= 0 or max_hp <= 0 then
+		return {}
+	end
+
+	local points = {} ---@type number[]
+	local step = max_time / HpSamplesTarget
+	local seq_i = 1
+	local current_hp = sequence[1].hp.healths
+
+	for i = 1, HpSamplesTarget do
+		local time_to = i * step
+		local bucket_hp = current_hp
+
+		while seq_i <= count and sequence[seq_i].base.currentTime <= time_to do
+			local hp = sequence[seq_i].hp.healths
+			if hp < bucket_hp then
+				bucket_hp = hp
+			end
+			current_hp = hp
+			seq_i = seq_i + 1
+		end
+
+		if seq_i > 1 and bucket_hp == current_hp then
+			bucket_hp = current_hp
+		end
+
+		points[i] = math.min(math.max(bucket_hp / max_hp, 0), 1)
+	end
+
+	return points
+end
+
+---@param sequence {hp: {healths: number}, base: {currentTime: number}}[]
+function HitGraph:addHp(sequence, max_hp)
+	local sb = self.sprite_batch
+	local pixel = self.pixel
+	local _, _, pixel_w, pixel_h = pixel:getViewport()
+	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
+	local max_time = sequence[#sequence] and sequence[#sequence].base.currentTime or 0
+
+	if max_hp <= 0 or max_time <= 0 then
+		return
+	end
+
+	local points = reduceHpSequence(sequence, max_time, max_hp)
+	local line_w = cw / HpSamplesTarget
+
+	sb:setColor(HpColor[1], HpColor[2], HpColor[3], HpColor[4])
+
+	for i, hp in ipairs(points) do
+		local line_h = hp * ch
+
+		if line_h > 0 then
+			local x = (i - 1) * line_w
+			local y = ch - line_h
+			sb:add(pixel, x, y, 0, line_w / pixel_w, line_h / pixel_h)
+		end
 	end
 end
 

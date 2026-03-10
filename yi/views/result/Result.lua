@@ -154,8 +154,10 @@ function Result:updateInformation()
 	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, miss_count))
 
 	local judges_source = score_engine.judgesSource
-	---@cast judges_source +sphere.ScoreSystem
-	self.hit_graph:setHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
+	local hp_source = score_engine.healthsSource
+	self.hit_graph:reset()
+	self.hit_graph:addHp(score_engine.sequence, hp_source:getMaxHealths())
+	self.hit_graph:addHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
 end
 
 function Result:update()

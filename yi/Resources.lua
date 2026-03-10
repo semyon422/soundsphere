@@ -40,6 +40,10 @@ function Resources:load()
 	local atlas_image_data, quads = packer:pack(t)
 	self.atlas = love.graphics.newImage(atlas_image_data)
 	self.quads = quads
+
+	-- Hack to get the crisp scaling
+	local x, y = self.quads.pixel:getViewport()
+	self.quads.pixel:setViewport(x + 1, y + 1, 1, 1, self.atlas:getDimensions())
 end
 
 ---@param dpi number
