@@ -7,6 +7,7 @@ local Tags = require("yi.views.shared.Tags")
 local Player = require("yi.views.shared.Player")
 local ChartInfo = require("yi.views.shared.ChartInfo")
 local JudgeCell = require("yi.views.result.JudgeCell")
+local HitGraph = require("yi.views.result.HitGraph")
 local Colors = require("yi.Colors")
 local h = require("yi.h")
 
@@ -24,6 +25,13 @@ local buttons = {
 	arrange = "flow_col",
 	padding = {15, 0, 20, 0},
 	background_color = Colors.header_footer
+}
+
+local hit_graph = {
+	w = 900,
+	h = 260,
+	background_color = Colors.panels,
+	outline = {color = Colors.outline, thickness = 2}
 }
 
 ---@param label yi.Label
@@ -73,6 +81,7 @@ function Result:load()
 	self.accuracy = Label(res:getFont("black", 128), "??.??%")
 	self.chart_info = ChartInfo()
 	self.judges = View()
+	self.hit_graph = HitGraph()
 
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = Colors.panels}),
@@ -87,8 +96,8 @@ function Result:load()
 				h(self.score_system_name, {color = Colors.lines, y = 20}),
 				h(self.accuracy, {color = Colors.text})
 			}),
-			h(self.judges, {arrange = "flow_row", gap = 10, line_gap = 10, w = 500}, {
-			})
+			h(self.judges, {arrange = "flow_row", gap = 10, line_gap = 10, w = 500}),
+			h(self.hit_graph, hit_graph)
 		}),
 
 		h(self.chart_info, {justify_self = "end", margin = {0, 0, 20, 20}}),
@@ -106,15 +115,19 @@ function Result:setChartview(chartview)
 	self.chart_info:setChartview(chartview)
 end
 
----@param score_item {[string]: any}
-function Result:setScoreItem(score_item)
+function Result:updateInformation()
 	local game = self:getGame()
+	local chartplay = game.computeContext.chartplay
+
+	if not chartplay then
+		return
+	end
 
 	local score_engine = game.rhythm_engine.score_engine
-	local acc = score_item.accuracy
+	local acc = chartplay.accuracy
 	local acc_string = formatAccuracy(acc)
-	local judges = score_item.judges or {}
-	local miss_count = score_item.miss_count or 0
+	local judges = chartplay.judges or {}
+	local miss_count = chartplay.miss_count or 0
 
 	acc = score_engine.accuracySource:getAccuracy()
 	acc_string = score_engine.accuracySource:getAccuracyString()
@@ -139,6 +152,10 @@ function Result:setScoreItem(score_item)
 	if judges[5] then self.judges:add(JudgeCell({0.9, 0.09, 0.63, 1}, judges[5])) end
 
 	self.judges:add(JudgeCell({0.9, 0.09, 0.1, 1}, miss_count))
+
+	local judges_source = score_engine.judgesSource
+	---@cast judges_source +sphere.ScoreSystem
+	self.hit_graph:setHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
 end
 
 function Result:update()
@@ -150,7 +167,7 @@ function Result:update()
 
 		if chartview and chartplay then
 			self:setChartview(chartview)
-			self:setScoreItem(chartplay)
+			self:updateInformation()
 			self.loaded = true
 			return
 		end
