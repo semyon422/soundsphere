@@ -156,7 +156,7 @@ local settings = {
 			z = -0.71407400337105997
 		},
 		vsyncOnSelect = true,
-		userInterface = "Default",
+		userInterface = "old",
 		fonts_dpi = 1,
 	},
 	input = {
