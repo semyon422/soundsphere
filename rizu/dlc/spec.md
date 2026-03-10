@@ -28,7 +28,7 @@ The system will adopt a Provider-based architecture with a dedicated background 
 5. **`rizu.dlc.DlcTask`**: 
    - A unit of work representing a download and its subsequent processing (extraction, validation).
 6. **Content Integration**:
-   - Once a task is complete, the `DlcManager` delegates the final "ingestion" to the appropriate system (e.g., `rizu.library:importDirectory()` for charts).
+   - Once a task is complete, the `DlcManager` delegates the final "ingestion" to the appropriate system (e.g., `rizu.library.Library:computeLocation(path, location_id)` for charts).
 
 ## Implementation Details
 
@@ -40,7 +40,7 @@ The system will adopt a Provider-based architecture with a dedicated background 
 - **Archive Extraction:** The extraction logic previously found in `fs_util.extractAsync` (using `physfs` and `rcopy`) will be moved directly into the `rizu.dlc` module (e.g., as a `DlcExtractor` utility). This logic remains sound but should not depend on the deprecated `fs_util` module.
 
 ### User Interface (Temporary ImGui Modal)
-- **`ui.dlc.DlcModalView`**: A new temporary modal view built using `ui.imviews.ModalImView`.
+- **`ui.views.dlc.DlcModalView`**: A new temporary modal view built using `ui.imviews.ModalImView`.
 - **Features**:
   - Search bar with debounced input.
   - Result list showing items from active `IDlcProvider`.
@@ -55,12 +55,14 @@ The system will adopt a Provider-based architecture with a dedicated background 
 - Define the communication protocol (methods for progress reporting and task completion).
 
 ### Phase 2: Provider Implementation
-- Implement initial providers (e.g., `MinoProvider` for charts).
+- Implement initial providers (e.g., `MinoProvider` for charts). 
+  - **Note:** The Mino API logic can be ported from the legacy `sphere.persistence.OsudirectModel`.
 - Ensure the provider interface supports filtering by `DlcType`.
 
 ### Phase 3: Extraction and System Integration
 - Implement `DlcExtractor` (ported from `fs_util.extractAsync`).
 - Implement hooks to notify relevant game systems (Library, Skin Manager, etc.) after a successful DLC installation.
+  - For charts: `library:computeLocation(extractPath, defaultLocationId)`.
 
 ### Phase 4: UI Development and Integration
 - Implement `ui.dlc.DlcModalView` (temporary ImGui modal).
