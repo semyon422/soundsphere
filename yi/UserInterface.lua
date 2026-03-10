@@ -29,6 +29,8 @@ function UserInterface:new(game)
 end
 
 function UserInterface:load()
+	self.resources:load()
+
 	local root = self.engine.root
 
 	local background = root:add(Background())

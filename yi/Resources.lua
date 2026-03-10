@@ -1,4 +1,6 @@
 local class = require("class")
+local ImageAtlasPacker = require("yi.packer.ImageAtlasPacker")
+local Path = require("aqua.Path")
 
 ---@class yi.Resources
 ---@overload fun(): yi.Resources
@@ -12,11 +14,32 @@ Resources.font_paths = {
 	icons = "resources/fonts/lucide.ttf"
 }
 
+Resources.images_dir = "resources/yi"
+
 ---@alias yi.FontName "regular" | "bold" | "black" | "icons"
 ---@alias yi.FontSize 16 | 24 | 36 | 46 | 58 | 72 | 128
 
 function Resources:new()
 	self:setDpi(1)
+end
+
+function Resources:load()
+	local t = {} ---@type {[string]: love.ImageData}
+	local getDirItems = love.filesystem.getDirectoryItems
+
+	for _, item in ipairs(getDirItems(Resources.images_dir)) do ---@diagnostic disable-line
+		---@cast item string
+		local path = Path(Resources.images_dir) .. item
+		if path:getExtension() == "png" then
+			local name = assert(path:getName(true))
+			t[name] = love.image.newImageData(tostring(path))
+		end
+	end
+
+	local packer = ImageAtlasPacker()
+	local atlas_image_data, quads = packer:pack(t)
+	self.atlas = love.graphics.newImage(atlas_image_data)
+	self.quads = quads
 end
 
 ---@param dpi number

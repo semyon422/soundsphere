@@ -10,12 +10,12 @@ HitGraph.TickScale = 0.6
 HitGraph.ReverseY = false -- `true` is stepmania/etterna/upscroll behavior
 
 function HitGraph:load()
-	self.img = love.graphics.newImage("resources/yi/result_hit.png")
-	self.sprite_batch = love.graphics.newSpriteBatch(self.img)
+	local res = self:getResources()
+	self.hit = res.quads["result_hit"]
+	self.sprite_batch = love.graphics.newSpriteBatch(res.atlas)
 
 	self:setPaddings({5, 5, 5, 5})
 
-	local res = self:getResources()
 	self.early_label = self:add(Label(res:getFont("bold", 16), ""))
 	self.late_label = self:add(Label(res:getFont("bold", 16), ""))
 	self.late_label:setJustifySelf("end")
@@ -66,6 +66,8 @@ local JudgeColors = {
 ---@param sequence {misc: sphere.MiscScore, base: sphere.BaseScore}[]
 function HitGraph:setHits(timings, subtimings, judges_source, sequence)
 	local sb = self.sprite_batch
+	local hit = self.hit
+	local _, _, hit_w, hit_h = hit:getViewport()
 	sb:clear()
 
 	local timing_values, err = TimingValuesFactory():get(timings, subtimings)
@@ -85,8 +87,8 @@ function HitGraph:setHits(timings, subtimings, judges_source, sequence)
 	local max_time = sequence[#sequence].base.currentTime
 	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
 
-	local w = (cw - self.img:getWidth())
-	local h = (ch - self.img:getHeight())
+	local w = (cw - hit_w)
+	local h = (ch - hit_h)
 	local s = HitGraph.TickScale
 	local reverse = HitGraph.ReverseY
 
@@ -111,7 +113,7 @@ function HitGraph:setHits(timings, subtimings, judges_source, sequence)
 			sb:setColor(color[1], color[2], color[3], color[4])
 		end
 
-		sb:add(x, y, 0, s, s)
+		sb:add(hit, x, y, 0, s, s)
 	end
 end
 
