@@ -31,7 +31,8 @@ local hit_graph = {
 	w = 900,
 	h = 260,
 	background_color = Colors.panels,
-	outline = {color = Colors.outline, thickness = 2}
+	outline = {color = Colors.outline, thickness = 2},
+	stencil = true
 }
 
 ---@param label yi.Label
@@ -158,9 +159,10 @@ function Result:updateInformation()
 	self.hit_graph:reset()
 
 	if #score_engine.sequence > 0 then
-		self.hit_graph:addHp(score_engine.sequence, hp_source:getMaxHealths())
-		self.hit_graph:addMisses(score_engine.sequence)
-		self.hit_graph:addHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
+		self.hit_graph:setSequence(score_engine.sequence)
+		self.hit_graph:addHp(hp_source:getMaxHealths())
+		self.hit_graph:addMisses()
+		self.hit_graph:addHits(chartplay.timings, chartplay.subtimings, judges_source)
 	end
 end
 

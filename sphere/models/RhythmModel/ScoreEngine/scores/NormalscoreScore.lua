@@ -65,6 +65,13 @@ function NormalscoreScore:miss(range_name)
 	self.normalscore:miss(range_name)
 end
 
+function NormalscoreScore:getSlice()
+	return {
+		accuracyAdjusted = self.accuracyAdjusted,
+		mean = self.normalscore.mean
+	}
+end
+
 NormalscoreScore.events = {
 	tap = {
 		clear = {

@@ -1,10 +1,34 @@
 local View = require("yi.views.View")
 local Label = require("yi.views.Label")
+local HitGraphTooltip = require("yi.views.result.HitGraphTooltip")
 local TimingValuesFactory = require("sea.chart.TimingValuesFactory")
+
+local math_util = require("math_util")
 
 ---@class yi.HitGraph : yi.View
 ---@operator call: yi.HitGraph
 local HitGraph = View + {}
+
+---@class yi.HitGraph.BaseSlice
+---@field currentTime number
+---@field isMiss boolean 
+---@field isEarlyHit boolean
+
+---@class yi.HitGraph.MiscSlice
+---@field deltaTime number
+
+---@class yi.HitGraph.HpSlice
+---@field healths number
+
+---@class yi.HitGraph.Normalscore
+---@field mean number
+---@field accuracyAdjusted number
+
+---@class yi.HitGraph.Slice 
+---@field base yi.HitGraph.BaseSlice
+---@field misc yi.HitGraph.MiscSlice
+---@field hp yi.HitGraph.HpSlice
+---@field normalscore yi.HitGraph.Normalscore
 
 HitGraph.TickScale = 0.6
 HitGraph.ReverseY = false -- `true` is stepmania/etterna/upscroll behavior
@@ -15,16 +39,25 @@ function HitGraph:load()
 	self.pixel = res.quads["pixel"]
 	self.sprite_batch = love.graphics.newSpriteBatch(res.atlas)
 
-	self:setPaddings({5, 5, 5, 5})
-
 	self.early_label = self:add(Label(res:getFont("bold", 16), ""))
 	self.late_label = self:add(Label(res:getFont("bold", 16), ""))
+	self.early_label:setMargins({5, 5, 5, 5})
 	self.late_label:setJustifySelf("end")
+	self.late_label:setMargins({5, 5, 5, 5})
 
 	self.err_label = self:add(Label(res:getFont("bold", 24), ""))
 	self.err_label:setAlignSelf("center")
 	self.err_label:setJustifySelf("center")
 	self.err_label:setEnabled(false)
+
+	self.tooltip = self:add(HitGraphTooltip())
+	self.hover_line = self:add(View())
+	self.hover_line:setBackgroundColor({1, 1, 1, 1})
+	self.hover_line:setWidth(2)
+	self.hover_line:setHeight("100%")
+	self.hover_line:setEnabled(false)
+
+	self.handles_mouse_input = true
 end
 
 local JudgeColors = {
@@ -68,13 +101,20 @@ function HitGraph:reset()
 	self.sprite_batch:clear()
 end
 
+---@param sequence yi.HitGraph.Slice[]
+function HitGraph:setSequence(sequence)
+	assert(#sequence > 0)
+	self.sequence = sequence
+	self.max_time = sequence[#sequence].base.currentTime
+end
+
 ---@param timings sea.Timings
 ---@param subtimings sea.Subtimings
 ---@param judges_source sphere.IJudgesSource
----@param sequence {misc: sphere.MiscScore, base: sphere.BaseScore, hp: sphere.HpScore}[]
-function HitGraph:addHits(timings, subtimings, judges_source, sequence)
+function HitGraph:addHits(timings, subtimings, judges_source)
 	---@cast judges_source +sphere.ScoreSystem
 	local sb = self.sprite_batch
+	local sequence = self.sequence
 	local hit = self.hit
 	local _, _, hit_w, hit_h = hit:getViewport()
 
@@ -126,9 +166,9 @@ function HitGraph:addHits(timings, subtimings, judges_source, sequence)
 	end
 end
 
----@param sequence {base: sphere.BaseScore}[]
-function HitGraph:addMisses(sequence)
+function HitGraph:addMisses()
 	local sb = self.sprite_batch
+	local sequence = self.sequence
 	local pixel = self.pixel
 	local _, _, pixel_w, pixel_h = pixel:getViewport()
 	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
@@ -157,7 +197,7 @@ function HitGraph:addMisses(sequence)
 	end
 end
 
----@param sequence {base: sphere.BaseScore, hp: {healths: number}}[]
+---@param sequence yi.HitGraph.Slice[]
 ---@param max_time number
 ---@param max_hp number
 ---@return number[]
@@ -195,9 +235,9 @@ local function reduceHpSequence(sequence, max_time, max_hp)
 	return points
 end
 
----@param sequence {hp: {healths: number}, base: {currentTime: number}}[]
-function HitGraph:addHp(sequence, max_hp)
+function HitGraph:addHp(max_hp)
 	local sb = self.sprite_batch
+	local sequence = self.sequence
 	local pixel = self.pixel
 	local _, _, pixel_w, pixel_h = pixel:getViewport()
 	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
@@ -220,6 +260,64 @@ function HitGraph:addHp(sequence, max_hp)
 			local y = ch - line_h
 			sb:add(pixel, x, y, 0, line_w / pixel_w, line_h / pixel_h)
 		end
+	end
+end
+
+function HitGraph:onHover(_)
+	self.tooltip:setEnabled(true)
+	self.hover_line:setEnabled(true)
+end
+
+function HitGraph:onHoverLost(_)
+	self.tooltip:setEnabled(false)
+	self.hover_line:setEnabled(false)
+end
+
+---@param sequence yi.HitGraph.Slice[]
+---@param time number
+---@return integer
+local function findSequenceIndexByTime(sequence, time)
+	local low = 1
+	local high = #sequence
+
+	while low < high do
+		local mid = math.floor((low + high) / 2)
+		if sequence[mid].base.currentTime < time then
+			low = mid + 1
+		else
+			high = mid
+		end
+	end
+
+	if low > 1 then
+		local prev = sequence[low - 1]
+		local curr = sequence[low]
+		if math.abs(prev.base.currentTime - time) <= math.abs(curr.base.currentTime - time) then
+			return low - 1
+		end
+	end
+
+	return low
+end
+
+function HitGraph:update(_)
+	if self.mouse_over then
+		local imx = self.transform:inverseTransformPoint(love.mouse.getPosition())
+		local cw = self:getCalculatedWidth()
+		if cw <= 0 then
+			return
+		end
+
+		local xn = math_util.clamp(imx / cw, 0, 1)
+		local time = xn * self.max_time
+		local index = findSequenceIndexByTime(self.sequence, time)
+		local slice = self.sequence[index]
+		local text = ("NS: %0.02f\nMean: %0.02f"):format(
+			slice.normalscore.accuracyAdjusted * 1000,
+			slice.normalscore.mean * 1000
+		)
+		self.tooltip:setText(text)
+		self.hover_line:setX(imx)
 	end
 end
 
