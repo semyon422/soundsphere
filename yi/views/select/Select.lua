@@ -11,6 +11,7 @@ local Textbox = require("yi.views.components.Textbox")
 local SelectButton = require("yi.views.select.SelectButton")
 local Player = require("yi.views.shared.Player")
 local ChartInfo = require("yi.views.shared.ChartInfo")
+local PreviewSeekBar = require("yi.views.select.PreviewSeekBar")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -71,6 +72,7 @@ function Select:load()
 	self.chart_set_list = ChartSetList()
 	self.player = Player()
 	self.chart_info = ChartInfo()
+	self.preview_seek_bar = PreviewSeekBar(game.previewModel)
 
 	self:addArray({
 		h(Image(gradient), {w = "100%", h = "100%", color = Colors.panels}),
@@ -105,7 +107,8 @@ function Select:load()
 		}),
 
 		h(self.chart_info, {justify_self = "end", margin = {0, 0, 20, 20}}),
-		h(Player(), {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 20, 0}})
+		h(self.preview_seek_bar, {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 100, 0}}),
+		h(self.player, {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 20, 0}})
 	})
 end
 
