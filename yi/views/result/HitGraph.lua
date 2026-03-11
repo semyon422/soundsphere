@@ -104,6 +104,10 @@ function HitGraph:addHits(timings, subtimings, judges_source, sequence)
 	self.late_label:setText(("Late: %ims"):format(delta_max * 1000))
 
 	for _, v in ipairs(sequence) do
+		if v.base.isEarlyHit or v.base.isMiss then
+			goto continue
+		end
+
 		local delta = v.misc.deltaTime
 		local time = v.base.currentTime
 		local judge = judges_source.judge_windows:get(delta)
@@ -115,13 +119,41 @@ function HitGraph:addHits(timings, subtimings, judges_source, sequence)
 			y = h - y
 		end
 
-		if v.base.isEarlyHit or v.base.isMiss then
-			sb:setColor(1, 0, 0, 1)
-		else
-			sb:setColor(color[1], color[2], color[3], color[4])
+		sb:setColor(color[1], color[2], color[3], color[4])
+		sb:add(hit, x, y, 0, s, s)
+
+		::continue::
+	end
+end
+
+---@param sequence {base: sphere.BaseScore}[]
+function HitGraph:addMisses(sequence)
+	local sb = self.sprite_batch
+	local pixel = self.pixel
+	local _, _, pixel_w, pixel_h = pixel:getViewport()
+	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
+	local max_time = sequence[#sequence].base.currentTime or 0
+
+	if max_time <= 0 then
+		return
+	end
+
+	for _, v in ipairs(sequence) do
+		if not v.base.isEarlyHit and not v.base.isMiss then
+			goto continue
 		end
 
-		sb:add(hit, x, y, 0, s, s)
+		local x = (v.base.currentTime / max_time) * cw
+
+		if v.base.isEarlyHit then
+			sb:setColor(1, 0.5, 0, 1)
+		else
+			sb:setColor(1, 0, 0, 1)
+		end
+
+		sb:add(pixel, x, 0, 0, 1 / pixel_w, ch / pixel_h)
+
+		::continue::
 	end
 end
 
@@ -169,7 +201,7 @@ function HitGraph:addHp(sequence, max_hp)
 	local pixel = self.pixel
 	local _, _, pixel_w, pixel_h = pixel:getViewport()
 	local cw, ch = self:getCalculatedWidth(), self:getCalculatedHeight()
-	local max_time = sequence[#sequence] and sequence[#sequence].base.currentTime or 0
+	local max_time = sequence[#sequence].base.currentTime or 0
 
 	if max_hp <= 0 or max_time <= 0 then
 		return

@@ -156,8 +156,12 @@ function Result:updateInformation()
 	local judges_source = score_engine.judgesSource
 	local hp_source = score_engine.healthsSource
 	self.hit_graph:reset()
-	self.hit_graph:addHp(score_engine.sequence, hp_source:getMaxHealths())
-	self.hit_graph:addHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
+
+	if #score_engine.sequence > 0 then
+		self.hit_graph:addHp(score_engine.sequence, hp_source:getMaxHealths())
+		self.hit_graph:addMisses(score_engine.sequence)
+		self.hit_graph:addHits(chartplay.timings, chartplay.subtimings, judges_source, score_engine.sequence)
+	end
 end
 
 function Result:update()
