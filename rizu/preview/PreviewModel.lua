@@ -124,6 +124,45 @@ function PreviewModel:getTime()
 	return self.manual_time
 end
 
+---@param time number
+function PreviewModel:setPosition(time)
+	time = math.max(time or 0, 0)
+	self.position = time
+	self.manual_time = time
+	self.initial_seek_done = true
+	self.audioPreviewPlayer:seek(time)
+	self.bgaPreviewPlayer:seek(time)
+end
+
+---@param progress number
+function PreviewModel:setRelativePosition(progress)
+	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	local duration = math.max(max_time - min_time, 0)
+	progress = math.max(progress or 0, 0)
+	if duration <= 0 then
+		self:setPosition(min_time)
+		return
+	end
+
+	self:setPosition(min_time + math.min(progress, 1) * duration)
+end
+
+---@return number
+function PreviewModel:getDuration()
+	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	return math.max(max_time - min_time, 0)
+end
+
+---@return number
+function PreviewModel:getRelativePosition()
+	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	local duration = math.max(max_time - min_time, 0)
+	if duration <= 0 then
+		return 0
+	end
+	return math.min(math.max((self.manual_time - min_time) / duration, 0), 1)
+end
+
 ---@param size integer
 function PreviewModel:setFFTSize(size)
 	self.audioPreviewPlayer:setFFTSize(size)
