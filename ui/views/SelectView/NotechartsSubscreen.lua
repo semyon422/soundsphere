@@ -494,10 +494,13 @@ local function NotechartsSubscreen(self)
 	if imgui.TextOnlyButton("pause music", "pause", h, h) then
 		game.previewModel:stop()
 	end
-	if imgui.TextOnlyButton("collections", "collections", w / 2, h) then
+	if imgui.TextOnlyButton("collections", "collections", w / 3, h) then
 		self:switchToCollections()
 	end
-	if imgui.TextOnlyButton("direct", "direct", w / 2, h) then
+	if imgui.TextOnlyButton("dlc", "dlc", w / 3, h) then
+		gameView:setModal(require("ui.views.DlcModalView"))
+	end
+	if imgui.TextOnlyButton("direct", "direct", w / 3, h) then
 		self:switchToOsudirect()
 	end
 	just.row()

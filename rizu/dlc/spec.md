@@ -23,7 +23,8 @@ The system will adopt a Provider-based architecture with a dedicated background 
    - Implements `setSync(boolean)` to toggle between direct execution and threaded execution.
 4. **`rizu.dlc.DlcWorker`**:
    - Runs in a background thread (in async mode).
-   - Performs HTTP requests using the modern `aqua/web` module.
+   - Performs HTTP requests using the modern `web` module.
+
    - Reports progress back to the `DlcManager` via remote calls.
 5. **`rizu.dlc.DlcTask`**: 
    - A unit of work representing a download and its subsequent processing (extraction, validation).
@@ -33,7 +34,7 @@ The system will adopt a Provider-based architecture with a dedicated background 
 ## Implementation Details
 
 ### Modern Networking
-- **Download Execution:** Instead of `fs_util.downloadAsync`, the `DlcWorker` will use `aqua.web.http.util` (or directly `HttpClient`) to perform downloads. This allows for better header handling, redirect following (if needed), and cleaner integration with the project's modern web stack.
+- **Download Execution:** Instead of `fs_util.downloadAsync`, the `DlcWorker` will use `web.http.util` (or directly `HttpClient`) to perform downloads. This allows for better header handling, redirect following (if needed), and cleaner integration with the project's modern web stack.
 - **Progress Tracking:** The `DlcWorker` will use a custom sink/receive loop to report download progress (bytes received, total size, speed) back to the `DlcManager` via `ThreadRemote` calls.
 
 ### Extraction Logic

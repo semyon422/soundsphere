@@ -60,6 +60,8 @@ local GlobalTimer = require("rizu.game.GlobalTimer")
 
 local MultiplayerClient = require("sea.multi.MultiplayerClient")
 
+local DlcManager = require("rizu.dlc.DlcManager")
+
 ---@class sphere.GameController
 ---@operator call: sphere.GameController
 local GameController = class()
@@ -74,6 +76,9 @@ function GameController:new()
 	self.persistence = Persistence()
 	self.app = App(self.persistence)
 	self.uiModel = UserInterfaceModel(self)
+
+	self.library = self.persistence.library
+	self.dlcManager = DlcManager(self.library, self.persistence.configModel)
 
 	self.online_client = OnlineClient()
 	self.multiplayer_client = MultiplayerClient()
@@ -244,6 +249,7 @@ function GameController:load()
 
 	self.noteSkinModel:load()
 	self.osudirectModel:load()
+	self.dlcManager:load()
 	self.collectionSelector:load()
 
 	self.selectionCoordinator:load()
@@ -277,6 +283,7 @@ function GameController:update(dt)
 	self.multiplayerController:update()
 	self.gameplayInteractor:update()
 	self.osudirectModel:update()
+	self.dlcManager:update()
 
 	self.library:update()
 
