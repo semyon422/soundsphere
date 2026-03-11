@@ -44,11 +44,8 @@ local function CollectionsSubscreen(self)
 	local w, h = Layout:move("column3", "footer")
 
 	just.row(true)
-	if imgui.TextOnlyButton("notecharts", "notecharts", w / 2, h) then
+	if imgui.TextOnlyButton("notecharts", "notecharts", w, h) then
 		self:switchToNoteCharts()
-	end
-	if imgui.TextOnlyButton("direct", "direct", w / 2, h) then
-		self:switchToOsudirect()
 	end
 	just.row()
 

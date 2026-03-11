@@ -87,7 +87,7 @@ end
 ---@return table? metadata, string? error
 function MinoProvider:getMetadata(id)
 	-- Mino doesn't seem to have a direct metadata endpoint in the legacy code, 
-	-- but search can be used if needed. For now, we'll return nil as it's not strictly required by OsudirectModel logic.
+	-- but search can be used if needed. For now, we'll return nil as it's not strictly required.
 	return nil, "Not implemented"
 end
 

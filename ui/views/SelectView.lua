@@ -5,7 +5,6 @@ local Layout = require("ui.views.SelectView.Layout")
 local SelectViewConfig = require("ui.views.SelectView.SelectViewConfig")
 local NotechartsSubscreen = require("ui.views.SelectView.NotechartsSubscreen")
 local CollectionsSubscreen = require("ui.views.SelectView.CollectionsSubscreen")
-local OsudirectSubscreen = require("ui.views.SelectView.OsudirectSubscreen")
 local Background = require("ui.views.SelectView.Background")
 local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
@@ -63,11 +62,6 @@ function SelectView:draw()
 		if kp("tab") then self:switchToNoteCharts()
 		end
 		CollectionsSubscreen(self)
-	elseif self.subscreen == "osudirect" then
-		if kp("escape") or kp("tab") then
-			self:switchToCollections()
-		end
-		OsudirectSubscreen(self)
 	end
 
 	just.container()
@@ -118,23 +112,11 @@ function SelectView:switchToCollections()
 	just.focus()
 end
 
-function SelectView:switchToOsudirect()
-	self.searchMode = "osudirect"
-	self.subscreen = "osudirect"
-	self.game.osudirectModel:searchNoDebounce()
-	just.focus()
-end
-
----@param searchMode "filter"|"lamp"|"osudirect"
-function SelectView:setSearchMode(searchMode)
-	self.searchMode = searchMode
-end
-
 function SelectView:changeSearchMode()
 	if self.searchMode == "filter" then
-		self:setSearchMode("lamp")
+		self.searchMode = "lamp"
 	else
-		self:setSearchMode("filter")
+		self.searchMode = "filter"
 	end
 end
 

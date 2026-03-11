@@ -2,6 +2,8 @@ local class = require("class")
 local delay = require("delay")
 local icc_co = require("icc.co")
 
+local DlcType = require("rizu.dlc.DlcType")
+
 ---@class sphere.MultiplayerModel
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
@@ -11,16 +13,16 @@ local MultiplayerModel = class()
 ---@param configModel sphere.ConfigModel
 ---@param chartSelector rizu.select.ChartSelector
 ---@param onlineModel sphere.OnlineModel
----@param osudirectModel sphere.OsudirectModel
+---@param dlcManager rizu.dlc.DlcManager
 ---@param replayBase sea.ReplayBase
 ---@param multiplayer_client sea.MultiplayerClient
-function MultiplayerModel:new(library, rhythm_engine, configModel, chartSelector, onlineModel, osudirectModel, replayBase, multiplayer_client)
+function MultiplayerModel:new(library, rhythm_engine, configModel, chartSelector, onlineModel, dlcManager, replayBase, multiplayer_client)
 	self.library = library
 	self.rhythm_engine = rhythm_engine
 	self.configModel = configModel
 	self.chartSelector = chartSelector
 	self.onlineModel = onlineModel
-	self.osudirectModel = osudirectModel
+	self.dlcManager = dlcManager
 	self.replayBase = replayBase
 
 	self.sea_client = onlineModel.sea_client
@@ -120,7 +122,7 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 		id = setId,
 		status = "",
 	}
-	self.osudirectModel:downloadAsync(self.downloadingBeatmap)
+	self.dlcManager:download(setId, DlcType.CHART)
 	self.downloadingBeatmap.status = "done"
 	self.remote.multiplayer:setChartFound(false)
 

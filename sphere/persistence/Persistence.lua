@@ -2,7 +2,6 @@ local class = require("class")
 
 local Library = require("rizu.library.Library")
 local ConfigModel = require("sphere.persistence.ConfigModel")
-local OsudirectModel = require("sphere.persistence.OsudirectModel")
 local FileFinder = require("sphere.persistence.FileFinder")
 local DifficultyModel = require("sphere.models.DifficultyModel")
 
@@ -21,7 +20,6 @@ function Persistence:new()
 		love.timer.getTime
 	)
 	self.configModel = ConfigModel()
-	self.osudirectModel = OsudirectModel(self.configModel, self.library)
 	self.fileFinder = FileFinder()
 end
 

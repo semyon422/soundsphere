@@ -1,7 +1,7 @@
 # DLC System Specification (rizu.dlc)
 
 ## Background & Motivation
-The current chart downloading system relies on the legacy `OsudirectModel` class, which is tightly coupled with legacy coroutine logic, UI state, and a single provider (osu!/Mino). To support future external sources and allow for different types of content (Charts, Skins, Hitsounds) to be seamlessly integrated into the modern `rizu` architecture, a new, modular DLC system is required. This system will leverage `ThreadRemote` for robust background execution and state synchronization.
+The current chart downloading system used to rely on the legacy `OsudirectModel` class, which was tightly coupled with legacy coroutine logic, UI state, and a single provider (osu!/Mino). To support future external sources and allow for different types of content (Charts, Skins, Hitsounds) to be seamlessly integrated into the modern `rizu` architecture, a new, modular DLC system has been implemented. This system leverages `ThreadRemote` for robust background execution and state synchronization.
 
 ## Scope & Impact
 - Create a new `rizu.dlc` namespace.
@@ -9,7 +9,7 @@ The current chart downloading system relies on the legacy `OsudirectModel` class
 - Implement a central `DlcManager` that coordinates with a background `DlcWorker` via `ThreadRemote`.
 - Support both **Asynchronous** (production) and **Synchronous** (testing/debugging) modes.
 - Seamlessly trigger imports for the corresponding systems (e.g., `rizu.library` for charts) upon successful download and extraction.
-- **Impacts:** Legacy `OsudirectModel`, `fs_util`, and `OsudirectSubscreen.lua` UI are deprecated.
+- **Impacts:** Legacy `OsudirectModel`, `fs_util`, and `OsudirectSubscreen.lua` UI are removed.
 
 ## Proposed Solution
 The system will adopt a Provider-based architecture with a dedicated background worker:
@@ -56,12 +56,11 @@ The system will adopt a Provider-based architecture with a dedicated background 
 - Define the communication protocol (methods for progress reporting and task completion).
 
 ### Phase 2: Provider Implementation
-- Implement initial providers (e.g., `MinoProvider` for charts). 
-  - **Note:** The Mino API logic can be ported from the legacy `sphere.persistence.OsudirectModel`.
+- Implement initial providers (e.g., `MinoProvider` for charts).
 - Ensure the provider interface supports filtering by `DlcType`.
 
 ### Phase 3: Extraction and System Integration
-- Implement `DlcExtractor` (ported from `fs_util.extractAsync`).
+- Implement `DlcExtractor`.
 - Implement hooks to notify relevant game systems (Library, Skin Manager, etc.) after a successful DLC installation.
   - For charts: `library:computeLocation(extractPath, defaultLocationId)`.
 
@@ -79,5 +78,4 @@ The system will adopt a Provider-based architecture with a dedicated background 
 - Integration tests simulating a complete "Download-to-System" flow.
 
 ## Migration & Rollback
-- The `rizu.dlc` system will coexist with `OsudirectModel` during the transition.
-- Legacy code will be removed once the `DlcManager` is fully operational and the UI is migrated.
+- Legacy code has been removed.

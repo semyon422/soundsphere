@@ -9,7 +9,6 @@ local SelectionCoordinator = class()
 ---@param collectionSelector rizu.select.CollectionSelector
 ---@param backgroundModel sphere.BackgroundModel
 ---@param previewModel rizu.preview.PreviewModel
----@param osudirectModel sphere.OsudirectModel
 ---@param windowModel sphere.WindowModel
 function SelectionCoordinator:new(
 	chartSelector,
@@ -17,7 +16,6 @@ function SelectionCoordinator:new(
 	collectionSelector,
 	backgroundModel,
 	previewModel,
-	osudirectModel,
 	windowModel
 )
 	self.chartSelector = chartSelector
@@ -25,7 +23,6 @@ function SelectionCoordinator:new(
 	self.collectionSelector = collectionSelector
 	self.backgroundModel = backgroundModel
 	self.previewModel = previewModel
-	self.osudirectModel = osudirectModel
 	self.windowModel = windowModel
 
 	self.chartSelector.state.onChanged:add({
@@ -75,14 +72,6 @@ function SelectionCoordinator:update(applyModifierMeta)
 		if applyModifierMeta then
 			applyModifierMeta(true)
 		end
-	end
-
-	local osudirectModel = self.osudirectModel
-	if osudirectModel:isChanged() then
-		local backgroundUrl = osudirectModel:getBackgroundUrl()
-		local previewUrl = osudirectModel:getPreviewUrl()
-		self.backgroundModel:setBackgroundPath(backgroundUrl)
-		self.previewModel:setAudioPathPreview(previewUrl)
 	end
 end
 

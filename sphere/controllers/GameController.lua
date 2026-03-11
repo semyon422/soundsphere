@@ -136,7 +136,7 @@ function GameController:new()
 		self.persistence.configModel,
 		self.chartSelector,
 		self.onlineModel,
-		self.persistence.osudirectModel,
+		self.dlcManager,
 		self.replayBase,
 		self.multiplayer_client
 	)
@@ -148,7 +148,6 @@ function GameController:new()
 	self.joystickModel = JoystickModel(self.persistence.configModel)
 
 	self.library = self.persistence.library
-	self.osudirectModel = self.persistence.osudirectModel
 	self.configModel = self.persistence.configModel
 	self.fileFinder = self.persistence.fileFinder
 	self.difficultyModel = self.persistence.difficultyModel
@@ -170,7 +169,6 @@ function GameController:new()
 		self.collectionSelector,
 		self.backgroundModel,
 		self.previewModel,
-		self.osudirectModel,
 		self.windowModel
 	)
 	self.modifierCoordinator = ModifierCoordinator(
@@ -248,10 +246,8 @@ function GameController:load()
 	end)
 
 	self.noteSkinModel:load()
-	self.osudirectModel:load()
 	self.dlcManager:load()
 	self.collectionSelector:load()
-
 	self.selectionCoordinator:load()
 	self.modifierCoordinator:load()
 
@@ -282,7 +278,6 @@ function GameController:update(dt)
 
 	self.multiplayerController:update()
 	self.gameplayInteractor:update()
-	self.osudirectModel:update()
 	self.dlcManager:update()
 
 	self.library:update()
