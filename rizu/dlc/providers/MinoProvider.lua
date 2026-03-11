@@ -1,5 +1,5 @@
 local class = require("class")
-local http_util = require("http_util")
+local http_util = require("web.http.util")
 local json = require("json")
 local DlcType = require("rizu.dlc.DlcType")
 
@@ -51,7 +51,6 @@ function MinoProvider:search(query, type, filters)
 		amount = 100,
 	})
 
-	local http_util = require("web.http.util")
 	local res, err = http_util.request(url)
 
 	if not res then

@@ -1,7 +1,7 @@
 local class = require("class")
 local MinoProvider = require("rizu.dlc.providers.MinoProvider")
 local path_util = require("path_util")
-local http_util = require("http_util")
+local http_util = require("web.http.util")
 local DlcType = require("rizu.dlc.DlcType")
 
 ---@class rizu.dlc.DlcWorker
@@ -48,7 +48,6 @@ function DlcWorker:download(id, type, provider_name, metadata)
 
 	self.manager:updateTask(id, {status = "connecting", progress = 0})
 
-	local http_util = require("web.http.util")
 	local client = http_util.client()
 	local req, res, err = client:connect(url)
 	if not req then
@@ -129,7 +128,7 @@ function DlcWorker:download(id, type, provider_name, metadata)
 	local filename = url:match("^.+/(.-)$")
 	local cd_header = res.headers:get("Content-Disposition")
 	if cd_header then
-		local cd = require("http_util").parse_content_disposition(cd_header)
+		local cd = http_util.parse_content_disposition(cd_header)
 		filename = cd.filename or filename
 	end
 	filename = path_util.fix_illegal(filename)

@@ -1,7 +1,7 @@
 local class = require("class")
 local thread = require("thread")
 local path_util = require("path_util")
-local http_util = require("http_util")
+local http_util = require("web.http.util")
 local fs_util = require("fs_util")
 local pprint = require("pprint")
 
