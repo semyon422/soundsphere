@@ -20,24 +20,36 @@ function DlcModalViewInstance:new(game)
 	self.searching = false
 	self.error = nil
 	self.selectedType = "chart"
+	self.selectedStatus = "ranked"
 	self.scrollY = 0
 	self.taskScrollY = 0
+	self.page = 1
 	
 	self.dlcManager.onTaskUpdated:add({
 		receive = function()
 			-- Progress update redraw
 		end
 	})
+
+	self:search(1)
 end
 
-function DlcModalViewInstance:search()
-	if self.searching or self.query == "" then return end
+function DlcModalViewInstance:search(page)
+	if self.searching then return end
+	self.page = page or 1
 	self.searching = true
 	self.error = nil
 	self.results = {}
 	
 	coroutine.wrap(function()
-		local results, err = self.dlcManager:search(self.query, self.selectedType)
+		pprint({
+			page = self.page,
+			status = self.selectedStatus
+		})
+		local results, err = self.dlcManager:search(self.query, self.selectedType, {
+			page = self.page,
+			status = self.selectedStatus
+		})
 		self.searching = false
 		if results then
 			self.results = results
@@ -64,28 +76,53 @@ function DlcModalViewInstance:draw(quit)
 	just.push()
 	
 	-- Header / Search
-	local search_w = w * 0.6
 	just.indent(20)
 	just.next(0, 20)
-	
+
+	local search_w = w * 0.4
 	local changed, new_query = imgui.TextInput("dlc_search", {self.query, "Search DLC..."}, nil, search_w, _h)
 	if changed == "text" then
 		self.query = new_query
 	end
 	
 	just.sameline()
-	if imgui.TextButton("dlc_search_btn", "Search", 120, _h) or (just.focused_id == "dlc_search" and just.keypressed("return")) then
-		self:search()
+	if imgui.TextButton("dlc_search_btn", "Search", 100, _h) or (just.focused_id == "dlc_search" and just.keypressed("return")) then
+		self:search(1)
 	end
 	
 	just.sameline()
-	local type_w = 150
-	imgui.setSize(w, h, type_w, _h)
-	local new_type = imgui.combo("dlc_type", self.selectedType, {"chart", "skin", "hitsound"})
-	imgui.setSize(w, h, w / 4, _h)
-	if new_type ~= self.selectedType then
-		self.selectedType = new_type
-		self:search()
+	local type_w = 120
+	local i_type = imgui.SpoilerList("dlc_type", type_w, _h, {"chart", "skin", "hitsound"}, self.selectedType)
+	if i_type then
+		self.selectedType = ({"chart", "skin", "hitsound"})[i_type]
+		self:search(1)
+	end
+
+	just.sameline()
+	local status_w = 150
+	local statuses = {"any", "ranked", "qualified", "loved", "pending", "wip", "graveyard"}
+	local i_status = imgui.SpoilerList("dlc_status", status_w, _h, statuses, self.selectedStatus)
+	if i_status then
+		self.selectedStatus = statuses[i_status]
+		self:search(1)
+	end
+
+	just.sameline()
+	-- Pagination buttons
+	if imgui.TextButton("dlc_prev_page", "<", 40, _h) then
+		if self.page > 1 then
+			self:search(self.page - 1)
+		end
+	end
+	
+	just.sameline()
+	love.graphics.setFont(spherefonts.get("Noto Sans", 20))
+	just.text(tostring(self.page))
+	love.graphics.setFont(spherefonts.get("Noto Sans", 24))
+
+	just.sameline()
+	if imgui.TextButton("dlc_next_page", ">", 40, _h) then
+		self:search(self.page + 1)
 	end
 
 	just.next(0, 20)

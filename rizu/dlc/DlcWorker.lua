@@ -156,13 +156,7 @@ end
 ---@return boolean? success, string? error
 function DlcWorker:processDlc(id, _type, data, filename, metadata)
 	local fs = love.filesystem
-	
-	-- We'll try to get the first location path from the library if possible,
-	-- otherwise fallback to userdata/downloads
-	local location_path = "userdata/downloads"
-	-- In the worker we don't have easy access to library.locationsRepo unless we pass it,
-	-- but we know from Locations:createDefaultLocation it's "userdata/charts"
-	-- Let's use "userdata/charts/downloads" to be safe and compatible with legacy
+
 	local downloads_dir = "userdata/charts/downloads"
 	
 	if not fs.getInfo(downloads_dir) then
@@ -185,7 +179,6 @@ function DlcWorker:processDlc(id, _type, data, filename, metadata)
 		return true
 	end
 
-	-- For other types or when extraction isn't applicable, we just saved it.
 	return true
 end
 
