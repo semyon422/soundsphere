@@ -2,7 +2,6 @@ local class = require("class")
 local imgui = require("imgui")
 local just = require("just")
 local ModalImView = require("ui.imviews.ModalImView")
-local DlcType = require("rizu.dlc.DlcType")
 local spherefonts = require("sphere.assets.fonts")
 local _transform = require("gfx_util").transform
 
@@ -20,7 +19,7 @@ function DlcModalViewInstance:new(game)
 	self.results = {}
 	self.searching = false
 	self.error = nil
-	self.selectedType = DlcType.CHART
+	self.selectedType = "chart"
 	self.scrollY = 0
 	self.taskScrollY = 0
 	
@@ -82,7 +81,7 @@ function DlcModalViewInstance:draw(quit)
 	just.sameline()
 	local type_w = 150
 	imgui.setSize(w, h, type_w, _h)
-	local new_type = imgui.combo("dlc_type", self.selectedType, {DlcType.CHART, DlcType.SKIN, DlcType.HITSOUND})
+	local new_type = imgui.combo("dlc_type", self.selectedType, {"chart", "skin", "hitsound"})
 	imgui.setSize(w, h, w / 4, _h)
 	if new_type ~= self.selectedType then
 		self.selectedType = new_type

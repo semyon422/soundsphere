@@ -50,28 +50,28 @@ function DlcManager:update()
 end
 
 ---@param query string
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@param provider_name string?
 ---@return table[]? results, string? error
-function DlcManager:search(query, type, filters, provider_name)
-	return self.worker:search(query, type, filters, provider_name)
+function DlcManager:search(query, _type, filters, provider_name)
+	return self.worker:search(query, _type, filters, provider_name)
 end
 
 ---@param id string|number
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param provider_name string?
 ---@param metadata table?
-function DlcManager:download(id, type, provider_name, metadata)
+function DlcManager:download(id, _type, provider_name, metadata)
 	provider_name = provider_name or "mino"
 	if self.tasks[id] then return end
 
-	local task = DlcTask(id, provider_name, type, metadata)
+	local task = DlcTask(id, provider_name, _type, metadata)
 	self.tasks[id] = task
 	self.onTaskUpdated:send({task = task})
 
 	coroutine.wrap(function()
-		local ok, err = self.worker:download(id, type, provider_name, metadata)
+		local ok, err = self.worker:download(id, _type, provider_name, metadata)
 		if not ok then
 			task.status = "error"
 			task.error = err
@@ -95,12 +95,12 @@ end
 
 --- Internal method called by worker via ThreadRemote
 ---@param id string|number
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param metadata table?
-function DlcManager:onDlcCompleted(id, type, metadata)
-	self.onDlcCompletedSignal:send({id = id, type = type, metadata = metadata})
+function DlcManager:onDlcCompleted(id, _type, metadata)
+	self.onDlcCompletedSignal:send({id = id, type = _type, metadata = metadata})
 	
-	if type == "chart" then
+	if _type == "chart" then
 		-- Trigger library import
 		self.library:computeLocation("downloads", 1)
 	end

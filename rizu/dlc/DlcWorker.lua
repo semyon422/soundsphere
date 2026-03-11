@@ -2,7 +2,6 @@ local class = require("class")
 local MinoProvider = require("rizu.dlc.providers.MinoProvider")
 local path_util = require("path_util")
 local http_util = require("web.http.util")
-local DlcType = require("rizu.dlc.DlcType")
 
 ---@class rizu.dlc.DlcWorker
 ---@operator call: rizu.dlc.DlcWorker
@@ -20,23 +19,23 @@ function DlcWorker:new(manager, workingDirectory, osuConfig)
 end
 
 ---@param query string
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@param provider_name string?
 ---@return table[]? results, string? error
-function DlcWorker:search(query, type, filters, provider_name)
+function DlcWorker:search(query, _type, filters, provider_name)
 	provider_name = provider_name or "mino"
 	local provider = self.providers[provider_name]
 	if not provider then return nil, "Provider not found" end
-	return provider:search(query, type, filters)
+	return provider:search(query, _type, filters)
 end
 
 ---@param id string|number
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param provider_name string?
 ---@param metadata table?
 ---@return boolean? success, string? error
-function DlcWorker:download(id, type, provider_name, metadata)
+function DlcWorker:download(id, _type, provider_name, metadata)
 	provider_name = provider_name or "mino"
 	local provider = self.providers[provider_name]
 	if not provider then return nil, "Provider not found" end
@@ -136,7 +135,7 @@ function DlcWorker:download(id, type, provider_name, metadata)
 	-- Save and extract
 	self.manager:updateTask(id, {status = "extracting"})
 	
-	local success, extract_err = self:processDlc(id, type, body, filename, metadata)
+	local success, extract_err = self:processDlc(id, _type, body, filename, metadata)
 	if not success then
 		print("[DlcWorker] Processing error for " .. tostring(id) .. ": " .. tostring(extract_err))
 		self.manager:updateTask(id, {status = "error", error = extract_err})
@@ -144,18 +143,18 @@ function DlcWorker:download(id, type, provider_name, metadata)
 	end
 
 	self.manager:updateTask(id, {status = "completed", progress = 1})
-	self.manager:onDlcCompleted(id, type, metadata)
+	self.manager:onDlcCompleted(id, _type, metadata)
 
 	return true
 end
 
 ---@param id string|number
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param data string
 ---@param filename string
 ---@param metadata table?
 ---@return boolean? success, string? error
-function DlcWorker:processDlc(id, type, data, filename, metadata)
+function DlcWorker:processDlc(id, _type, data, filename, metadata)
 	local fs = love.filesystem
 	
 	-- We'll try to get the first location path from the library if possible,
@@ -173,7 +172,7 @@ function DlcWorker:processDlc(id, type, data, filename, metadata)
 	local filepath = path_util.join(downloads_dir, filename)
 	fs.write(filepath, data)
 
-	if type == DlcType.CHART and filename:match("%.osz$") then
+	if _type == "chart" and filename:match("%.osz$") then
 		local extract_dir = filename:match("^(.+)%.osz$")
 		local extract_path = path_util.join(downloads_dir, extract_dir)
 		

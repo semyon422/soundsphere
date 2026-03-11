@@ -2,10 +2,10 @@
 local IDlcProvider = {}
 
 ---@param query string
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@return table[]? results, string? error
-function IDlcProvider:search(query, type, filters) end
+function IDlcProvider:search(query, _type, filters) end
 
 ---@param id string|number
 ---@return table? metadata, string? error

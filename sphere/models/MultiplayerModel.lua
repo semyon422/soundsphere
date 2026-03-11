@@ -2,8 +2,6 @@ local class = require("class")
 local delay = require("delay")
 local icc_co = require("icc.co")
 
-local DlcType = require("rizu.dlc.DlcType")
-
 ---@class sphere.MultiplayerModel
 ---@operator call: sphere.MultiplayerModel
 local MultiplayerModel = class()
@@ -122,7 +120,7 @@ MultiplayerModel.downloadNoteChart = icc_co.callwrap(function(self)
 		id = setId,
 		status = "",
 	}
-	self.dlcManager:download(setId, DlcType.CHART)
+	self.dlcManager:download(setId, "chart")
 	self.downloadingBeatmap.status = "done"
 	self.remote.multiplayer:setChartFound(false)
 

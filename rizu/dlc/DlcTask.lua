@@ -6,12 +6,12 @@ local DlcTask = class()
 
 ---@param id string|number
 ---@param provider string
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param metadata table
-function DlcTask:new(id, provider, type, metadata)
+function DlcTask:new(id, provider, _type, metadata)
 	self.id = id
 	self.provider = provider
-	self.type = type
+	self.type = _type
 	self.metadata = metadata
 	self.status = "queued"
 	self.progress = 0

@@ -1,7 +1,6 @@
 local class = require("class")
 local http_util = require("web.http.util")
 local json = require("json")
-local DlcType = require("rizu.dlc.DlcType")
 
 ---@class rizu.dlc.providers.MinoProvider: rizu.dlc.IDlcProvider
 ---@operator call: rizu.dlc.providers.MinoProvider
@@ -31,11 +30,11 @@ function MinoProvider:new(config)
 end
 
 ---@param query string
----@param type rizu.dlc.DlcType
+---@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@return table[]? results, string? error
-function MinoProvider:search(query, type, filters)
-	if type ~= DlcType.CHART then
+function MinoProvider:search(query, _type, filters)
+	if _type ~= "chart" then
 		return {}
 	end
 

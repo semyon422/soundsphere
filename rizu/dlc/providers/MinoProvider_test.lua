@@ -1,5 +1,4 @@
 local MinoProvider = require("rizu.dlc.providers.MinoProvider")
-local DlcType = require("rizu.dlc.DlcType")
 
 local test = {}
 
@@ -9,7 +8,7 @@ function test.search(t)
 	
 	-- We can't easily test real HTTP in a unit test without mocks, 
 	-- but we can at least check if it handles non-chart types correctly.
-	local results, err = provider:search("test", DlcType.SKIN)
+	local results, err = provider:search("test", "skin")
 	t:eq(err, nil)
 	t:tdeq(results, {})
 end

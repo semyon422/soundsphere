@@ -15,7 +15,7 @@ The current chart downloading system used to rely on the legacy `OsudirectModel`
 The system will adopt a Provider-based architecture with a dedicated background worker:
 
 1. **`rizu.dlc.IDlcProvider`**: An interface defining operations like `search(query, type, filters)`, `getMetadata(id)`, and `getDownloadUrl(id)`.
-2. **`rizu.dlc.DlcType`**: Constants representing content types (e.g., `CHART`, `SKIN`, `HITSOUND`).
+2. **`rizu.dlc.DlcType`**: A type alias for `"chart" | "skin" | "hitsound"`.
 3. **`rizu.dlc.DlcManager`**: 
    - The primary interface for the UI.
    - Manages the lifecycle of the `DlcWorker` via `ThreadRemote`.
