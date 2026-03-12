@@ -44,9 +44,11 @@ The system will adopt a Provider-based architecture with a dedicated background 
   - `https://beatconnect.io/b/BEATMAP_SET_ID`
   - `https://catboy.best/d/BEATMAP_SET_ID`
 - **Searching**: Supported via multiple APIs:
-  - `https://catboy.best/api/v2/search` (Mino API).
   - `https://osu.ppy.sb/web/osu-search.php?r=4&m=3&p=0&q=` (Free osu!direct protocol search).
-  - `https://osu.ppy.sh/beatmapsets/search` (Official, unauthorized search endpoint, e.g., with query parameters `?e=&c=&g=&l=&m=&nsfw=&played=&q=&r=&sort=&s=&cursor_string=...`).
+    - **osu!direct Search Format**: This protocol returns a pipe-separated textual response. Difficulties are provided as a comma-separated list of tooltips in the format `Tooltip@Mode`. 
+    - **Difficulty Display**: Difficulty tooltips are treated as opaque strings and displayed "as-is" because different osu!direct providers use different sub-formats for embedding star ratings, BPM, and other metadata within the tooltip.
+  - `https://catboy.best/api/v2/search` (Mino API - returns JSON).
+  - `https://osu.ppy.sh/beatmapsets/search` (Official, unauthorized search endpoint).
 - **Assets**:
   - Thumbnails: 
     - 400x140: `https://assets.ppy.sh/beatmaps/{id}/covers/card.jpg`

@@ -96,24 +96,9 @@ local function parseBeatmap(line)
 		for i, subline in ipairs(difficulties) do
 			local tooltip, mode = subline:match("^(.+)@(.-)$")
 			if tooltip and tonumber(mode) == 3 then
-				local name, sr, bpm, cs, length = tooltip:match("^(.+) %((.+)★~(.+)♫~.+~.+~CS(.+)~.+~(.+)%)$")
-				if not name then
-					name, sr = tooltip:match("^(.+) %?(.+)$")
-					bpm, cs, length = 0, "_", 0
-				end
-				table.insert(beatmap.difficulties, {
-					name = name or tooltip,
-					sr = tonumber(sr) or 0,
-					bpm = tonumber(bpm) or 0,
-					cs = cs or "_",
-					length = length or 0,
-					beatmap = beatmap,
-				})
+				table.insert(beatmap.difficulties, tooltip)
 			end
 		end
-		table.sort(beatmap.difficulties, function(a, b)
-			return a.sr < b.sr
-		end)
 	end
 
 	return beatmap
