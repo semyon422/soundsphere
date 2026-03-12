@@ -19,6 +19,7 @@ function MinoProvider:new(config)
 		self.config.download = self.config.download .. "%s"
 	end
 	self.rankedStatusesMap = {
+		all = -3,
 		any = -3,
 		graveyard = -2,
 		wip = -1,

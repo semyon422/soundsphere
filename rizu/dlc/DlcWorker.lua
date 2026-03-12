@@ -3,6 +3,7 @@ local MinoProvider = require("rizu.dlc.providers.MinoProvider")
 local OsuFileProvider = require("rizu.dlc.providers.OsuFileProvider")
 local EtternaPackProvider = require("rizu.dlc.providers.EtternaPackProvider")
 local OsuDirectProvider = require("rizu.dlc.providers.OsuDirectProvider")
+local BeatconnectProvider = require("rizu.dlc.providers.BeatconnectProvider")
 local path_util = require("path_util")
 local http_util = require("web.http.util")
 local socket_url = require("socket.url")
@@ -21,6 +22,7 @@ function DlcWorker:new(manager, workingDirectory, osuConfig)
 		mino = MinoProvider(osuConfig),
 		osu_file = OsuFileProvider(),
 		etterna = EtternaPackProvider(),
+		beatconnect = BeatconnectProvider(),
 		akatsuki = OsuDirectProvider({
 			baseUrl = "https://osu.ppy.sb",
 			downloadUrl = "https://osu.ppy.sb/d/%s",
@@ -74,7 +76,17 @@ function DlcWorker:download(id, _type, provider_name, metadata)
 		return nil, "Provider not found"
 	end
 
-	local url, err = provider:getDownloadUrl(id)
+	local url, err
+	local mirror = metadata and metadata.mirror
+	
+	if mirror == "beatconnect" then
+		url = "https://beatconnect.io/b/" .. id
+	elseif mirror == "mino" then
+		url = "https://catboy.best/d/" .. id
+	else
+		url, err = provider:getDownloadUrl(id)
+	end
+
 	if not url then
 		self.manager:updateTask(id, {status = "error", error = err or "Failed to get download URL"})
 		return nil, err

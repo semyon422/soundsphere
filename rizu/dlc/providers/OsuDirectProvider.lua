@@ -6,6 +6,14 @@ local osudirect = require("libchart.osudirect")
 ---@operator call: rizu.dlc.providers.OsuDirectProvider
 local OsuDirectProvider = class()
 
+local statusMap = {
+	all = 4,
+	ranked = 0,
+	qualified = 3,
+	pending = 2,
+	graveyard = 5,
+}
+
 ---@param config {baseUrl: string, downloadUrl: string}
 function OsuDirectProvider:new(config)
 	self.baseUrl = config.baseUrl
@@ -18,7 +26,7 @@ end
 function OsuDirectProvider:search(query, filters)
 	filters = filters or {}
 	local page = filters.page or 0
-	local status = filters.status or 4 -- Default to "All" in osudirect terms
+	local status = statusMap[filters.status] or filters.status or 4 -- Default to "All"
 
 	local searchPath = osudirect.search(query, status, page)
 	local url = self.baseUrl .. searchPath

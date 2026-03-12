@@ -193,10 +193,12 @@ function DlcScreen:new()
 	Screen.new(self)
 	self.results = {}
 	self.selected_index = 1
-	self.current_tab = "mino" -- "mino", "etterna", "direct"
+	self.current_tab = "mino" -- "mino", "beatconnect", "etterna", "direct"
 	self.current_provider = "mino"
 	self.current_type = "set"
 	self.current_page = 1
+	self.current_status = "ranked"
+	self.current_mirror = "provider" -- "provider", "mino", "beatconnect"
 	self.search_timer = 0
 	self.search_delay = 0.5
 	self.pending_query = nil
@@ -242,9 +244,12 @@ function DlcScreen:rebuild()
 	self.task_list = DlcTaskList(self)
 	self.loading_label = Label(res:getFont("regular", 16), "Loading...")
 
+	local is_osu = (self.current_tab == "mino" or self.current_tab == "beatconnect" or self.current_tab == "direct")
+	local header_h = is_osu and 240 or 140
+
 	self:addArray({
 		-- Content Area
-		h(View(), {w = "100%", h = "100%", margin = {140, 0, 0, 0}, arrange = "flow_row"}, {
+		h(View(), {w = "100%", h = "100%", margin = {header_h, 0, 0, 0}, arrange = "flow_row"}, {
 			-- Results (Left)
 			h(View(), {w = "70%", h = "100%", padding = {0, 20, 0, 20}}, {
 				h(self.result_list, {w = "100%", h = "100%", stencil = true})
@@ -259,40 +264,61 @@ function DlcScreen:rebuild()
 		}),
 
 		-- Header
-		h(View(), {w = "100%", h = 140, background_color = Colors.header_footer, arrange = "flow_col", padding = {10, 20, 10, 20}}, {
-			-- Top Row: Title, Tabs, Exit
-			h(View(), {w = "100%", h = 60, arrange = "flow_row", align_items = "center", justify_content = "space_between"}, {
-				h(View(), {arrange = "flow_row", align_items = "center", gap = 30}, {
+		h(View(), {w = "100%", h = header_h, background_color = Colors.header_footer, arrange = "flow_col", padding = {10, 20, 10, 20}}, {
+			-- Row 1: Title, Tabs, Exit
+			h(View(), {w = "100%", h = 55, arrange = "flow_row", align_items = "center", justify_content = "space_between"}, {
+				h(View(), {arrange = "flow_row", align_items = "center", gap = 20}, {
 					h(Label(self.title_font, "DLC")),
 					h(View(), {arrange = "flow_row", gap = 5}, {
-						h(Button("Mino", function() self:setTab("mino") end), {w = 100, h = 40, active = self.current_tab == "mino"}),
-						h(Button("Etterna", function() self:setTab("etterna") end), {w = 100, h = 40, active = self.current_tab == "etterna"}),
+						h(Button("Mino", function() self:setTab("mino") end), {w = 80, h = 40, active = self.current_tab == "mino"}),
+						h(Button("Beatconnect", function() self:setTab("beatconnect") end), {w = 120, h = 40, active = self.current_tab == "beatconnect"}),
 						h(Button("osu!direct", function() self:setTab("direct") end), {w = 100, h = 40, active = self.current_tab == "direct"}),
+						h(Button("Etterna", function() self:setTab("etterna") end), {w = 100, h = 40, active = self.current_tab == "etterna"}),
 					})
 				}),
 				h(SelectButton(), {w = 45, h = 45, icon = "", callback = function() self.parent:set("select") end})
 			}),
 			
-			-- Bottom Row: Search, Provider Select (direct only), Pagination
-			h(View(), {w = "100%", h = 60, arrange = "flow_row", align_items = "center", gap = 20}, {
-				h(Textbox(self.query or "", "Search...", function(text) self:onSearch(text) end), {w = 300}),
-				h(self.loading_label, {enabled = false}),
-				
-				-- osu!direct Provider Select
-				h(View(), {arrange = "flow_row", gap = 10, enabled = self.current_tab == "direct"}, {
-					h(Button("Akatsuki", function() self:setProvider("akatsuki") end), {w = 100, h = 32, active = self.current_provider == "akatsuki"}),
-					h(Button("Ripple", function() self:setProvider("ripple") end), {w = 100, h = 32, active = self.current_provider == "ripple"}),
+			-- Row 2: Search, Mirror Select, Pagination
+			h(View(), {w = "100%", h = 55, arrange = "flow_row", align_items = "center", justify_content = "space_between"}, {
+				h(View(), {arrange = "flow_row", align_items = "center", gap = 20}, {
+					h(Textbox(self.query or "", "Search...", function(text) self:onSearch(text) end), {w = 300}),
+					h(self.loading_label, {enabled = false}),
+					
+					-- Mirror Select (osu only)
+					h(View(), {arrange = "flow_row", align_items = "center", gap = 10, enabled = is_osu}, {
+						h(Label(res:getFont("regular", 14), "Mirror:")),
+						h(Button("Provider", function() self:setMirror("provider") end), {w = 100, h = 32, active = self.current_mirror == "provider"}),
+						h(Button("Mino", function() self:setMirror("mino") end), {w = 100, h = 32, active = self.current_mirror == "mino"}),
+						h(Button("Beatconnect", function() self:setMirror("beatconnect") end), {w = 110, h = 32, active = self.current_mirror == "beatconnect"}),
+					}),
 				}),
-				
-				h(View(), {w = "fill"}), -- Spacer
-				
+
 				-- Pagination
-				h(View(), {arrange = "flow_row", gap = 10}, {
+				h(View(), {arrange = "flow_row", align_items = "center", gap = 10}, {
 					h(Label(res:getFont("regular", 16), "Page " .. self.current_page)),
 					h(Button("<", function() self:setPage(self.current_page - 1) end), {w = 40, h = 32}),
 					h(Button(">", function() self:setPage(self.current_page + 1) end), {w = 40, h = 32}),
 				})
-			})
+			}),
+
+			-- Row 3: Status Select (osu only)
+			h(View(), {w = "100%", h = 50, arrange = "flow_row", align_items = "center", gap = 10, enabled = is_osu}, {
+				h(Label(res:getFont("regular", 14), "Status:")),
+				h(Button("All", function() self:setStatus("all") end), {w = 60, h = 32, active = self.current_status == "all"}),
+				h(Button("Ranked", function() self:setStatus("ranked") end), {w = 80, h = 32, active = self.current_status == "ranked"}),
+				h(Button("Qualified", function() self:setStatus("qualified") end), {w = 90, h = 32, active = self.current_status == "qualified"}),
+				h(Button("Loved", function() self:setStatus("loved") end), {w = 70, h = 32, active = self.current_status == "loved"}),
+				h(Button("Pending", function() self:setStatus("pending") end), {w = 80, h = 32, active = self.current_status == "pending"}),
+				h(Button("Graveyard", function() self:setStatus("graveyard") end), {w = 100, h = 32, active = self.current_status == "graveyard"}),
+			}),
+
+			-- Row 4: Server Select (direct only)
+			h(View(), {w = "100%", h = 50, arrange = "flow_row", align_items = "center", gap = 10, enabled = self.current_tab == "direct"}, {
+				h(Label(res:getFont("regular", 14), "Server:")),
+				h(Button("Akatsuki", function() self:setProvider("akatsuki") end), {w = 100, h = 32, active = self.current_provider == "akatsuki"}),
+				h(Button("Ripple", function() self:setProvider("ripple") end), {w = 100, h = 32, active = self.current_provider == "ripple"}),
+			}),
 		}),
 	})
 end
@@ -302,6 +328,9 @@ function DlcScreen:setTab(tab)
 	self.current_page = 1
 	if tab == "mino" then
 		self.current_provider = "mino"
+		self.current_type = "set"
+	elseif tab == "beatconnect" then
+		self.current_provider = "beatconnect"
 		self.current_type = "set"
 	elseif tab == "etterna" then
 		self.current_provider = "etterna"
@@ -318,6 +347,18 @@ function DlcScreen:setProvider(name)
 	self.current_provider = name
 	self.current_page = 1
 	self:triggerSearch(self.query or "")
+	self:rebuild()
+end
+
+function DlcScreen:setStatus(status)
+	self.current_status = status
+	self.current_page = 1
+	self:triggerSearch(self.query or "")
+	self:rebuild()
+end
+
+function DlcScreen:setMirror(mirror)
+	self.current_mirror = mirror
 	self:rebuild()
 end
 
@@ -377,7 +418,10 @@ function DlcScreen:triggerSearch(text)
 	if self.loading_label then self.loading_label:setEnabled(true) end
 
 	coroutine.wrap(function()
-		local filters = { page = self.current_page }
+		local filters = { 
+			page = self.current_page,
+			status = self.current_status,
+		}
 		local results, err = self.dlc_manager:search(text, filters, self.current_provider)
 		if self.loading_label then self.loading_label:setEnabled(false) end
 
@@ -394,8 +438,12 @@ function DlcScreen:downloadResult(index)
 	local result = self.results[index]
 	if not result then return end
 	
-	print("Downloading:", result.title or result.name)
-	self.dlc_manager:download(result.id, self.current_type, self.current_provider, result)
+	print("Downloading:", result.title or result.name, "via", self.current_mirror)
+	
+	local metadata = table_util.copy(result)
+	metadata.mirror = self.current_mirror
+	
+	self.dlc_manager:download(result.id, self.current_type, self.current_provider, metadata)
 end
 
 function DlcScreen:onKeyDown(e)
