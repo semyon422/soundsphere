@@ -50,12 +50,11 @@ function DlcManager:update()
 end
 
 ---@param query string
----@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@param provider_name string?
 ---@return table[]? results, string? error
-function DlcManager:search(query, _type, filters, provider_name)
-	return self.worker:search(query, _type, filters, provider_name)
+function DlcManager:search(query, filters, provider_name)
+	return self.worker:search(query, filters, provider_name)
 end
 
 ---@param id string|number
@@ -100,8 +99,11 @@ end
 function DlcManager:onDlcCompleted(id, _type, metadata)
 	self.onDlcCompletedSignal:send({id = id, type = _type, metadata = metadata})
 	
-	if _type == "chart" then
-		-- Trigger library import
+	if _type == "pack" then
+		-- Trigger library import for packs
+		self.library:computeLocation("packs", 1)
+	elseif _type == "set" or _type == "file" then
+		-- Trigger library import for other charts
 		self.library:computeLocation("downloads", 1)
 	end
 end

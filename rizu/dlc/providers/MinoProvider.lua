@@ -30,14 +30,9 @@ function MinoProvider:new(config)
 end
 
 ---@param query string
----@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@return table[]? results, string? error
-function MinoProvider:search(query, _type, filters)
-	if _type ~= "chart" then
-		return {}
-	end
-
+function MinoProvider:search(query, filters)
 	filters = filters or {}
 	local page = filters.page or 1
 	local status = filters.status or "ranked"
@@ -79,14 +74,6 @@ function MinoProvider:search(query, _type, filters)
 	end
 
 	return results
-end
-
----@param id string|number
----@return table? metadata, string? error
-function MinoProvider:getMetadata(id)
-	-- Mino doesn't seem to have a direct metadata endpoint in the legacy code, 
-	-- but search can be used if needed. For now, we'll return nil as it's not strictly required.
-	return nil, "Not implemented"
 end
 
 ---@param id string|number

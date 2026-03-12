@@ -19,15 +19,14 @@ function DlcWorker:new(manager, workingDirectory, osuConfig)
 end
 
 ---@param query string
----@param _type rizu.dlc.DlcType
 ---@param filters table?
 ---@param provider_name string?
 ---@return table[]? results, string? error
-function DlcWorker:search(query, _type, filters, provider_name)
+function DlcWorker:search(query, filters, provider_name)
 	provider_name = provider_name or "mino"
 	local provider = self.providers[provider_name]
 	if not provider then return nil, "Provider not found" end
-	return provider:search(query, _type, filters)
+	return provider:search(query, filters)
 end
 
 ---@param id string|number
@@ -157,18 +156,34 @@ end
 function DlcWorker:processDlc(id, _type, data, filename, metadata)
 	local fs = love.filesystem
 
-	local downloads_dir = "userdata/charts/downloads"
+	local base_dir = "userdata/charts/downloads"
+	if _type == "pack" then
+		base_dir = "userdata/charts/packs"
+	elseif _type == "file" and metadata and metadata.dest_dir then
+		base_dir = metadata.dest_dir
+	end
 	
-	if not fs.getInfo(downloads_dir) then
-		fs.createDirectory(downloads_dir)
+	if not fs.getInfo(base_dir) then
+		fs.createDirectory(base_dir)
 	end
 
-	local filepath = path_util.join(downloads_dir, filename)
+	local filepath = path_util.join(base_dir, filename)
 	fs.write(filepath, data)
 
-	if _type == "chart" and filename:match("%.osz$") then
+	if _type == "set" and filename:match("%.osz$") then
 		local extract_dir = filename:match("^(.+)%.osz$")
-		local extract_path = path_util.join(downloads_dir, extract_dir)
+		local extract_path = path_util.join(base_dir, extract_dir)
+		
+		local DlcExtractor = require("rizu.dlc.DlcExtractor")
+		local ok, err = DlcExtractor.extract(filepath, extract_path)
+		if not ok then
+			return nil, "Extraction failed: " .. (err or "unknown error")
+		end
+		
+		return true
+	elseif _type == "pack" and filename:match("%.zip$") then
+		local extract_dir = filename:match("^(.+)%.zip$")
+		local extract_path = path_util.join(base_dir, extract_dir)
 		
 		local DlcExtractor = require("rizu.dlc.DlcExtractor")
 		local ok, err = DlcExtractor.extract(filepath, extract_path)
