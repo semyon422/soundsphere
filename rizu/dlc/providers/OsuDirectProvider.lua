@@ -45,6 +45,7 @@ function OsuDirectProvider:search(query, filters)
 			difficulties = b.difficulties,
 			has_video = b.hasVideo,
 			has_storyboard = b.hasStoryboard,
+			thumbnail_url = self:getThumbnailUrl(b.setId),
 		})
 	end
 
@@ -55,6 +56,12 @@ end
 ---@return string? url, string? error
 function OsuDirectProvider:getDownloadUrl(id)
 	return self.downloadUrl:format(id)
+end
+
+---@param id string|number
+---@return string? url, string? error
+function OsuDirectProvider:getThumbnailUrl(id)
+	return "https://assets.ppy.sh" .. osudirect.card(id)
 end
 
 return OsuDirectProvider

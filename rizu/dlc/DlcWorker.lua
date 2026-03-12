@@ -5,6 +5,7 @@ local EtternaPackProvider = require("rizu.dlc.providers.EtternaPackProvider")
 local OsuDirectProvider = require("rizu.dlc.providers.OsuDirectProvider")
 local path_util = require("path_util")
 local http_util = require("web.http.util")
+local socket_url = require("socket.url")
 
 ---@class rizu.dlc.DlcWorker
 ---@operator call: rizu.dlc.DlcWorker
@@ -43,6 +44,23 @@ function DlcWorker:search(query, filters, provider_name)
 	return provider:search(query, filters)
 end
 
+---@param url string
+---@return love.ImageData? data, string? error
+function DlcWorker:fetchThumbnail(url)
+	local res, err = http_util.request(url)
+	if not res then return nil, err end
+	if res.status >= 400 then return nil, "HTTP " .. res.status end
+	
+	require("love.image")
+	local ok, fileData = pcall(love.filesystem.newFileData, res.body, "thumb.jpg")
+	if not ok then return nil, "FileData creation failed" end
+	
+	local ok2, imageData = pcall(love.image.newImageData, fileData)
+	if not ok2 then return nil, "ImageData creation failed" end
+	
+	return imageData
+end
+
 ---@param id string|number
 ---@param _type rizu.dlc.DlcType
 ---@param provider_name string?
@@ -51,10 +69,16 @@ end
 function DlcWorker:download(id, _type, provider_name, metadata)
 	provider_name = provider_name or "mino"
 	local provider = self.providers[provider_name]
-	if not provider then return nil, "Provider not found" end
+	if not provider then
+		self.manager:updateTask(id, {status = "error", error = "Provider not found"})
+		return nil, "Provider not found"
+	end
 
 	local url, err = provider:getDownloadUrl(id)
-	if not url then return nil, err end
+	if not url then
+		self.manager:updateTask(id, {status = "error", error = err or "Failed to get download URL"})
+		return nil, err
+	end
 
 	print("[DlcWorker] Downloading:", url)
 
@@ -143,6 +167,7 @@ function DlcWorker:download(id, _type, provider_name, metadata)
 		local cd = http_util.parse_content_disposition(cd_header)
 		filename = cd.filename or filename
 	end
+	filename = socket_url.unescape(filename)
 	filename = path_util.fix_illegal(filename)
 
 	-- Save and extract

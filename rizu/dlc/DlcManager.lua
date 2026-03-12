@@ -30,6 +30,7 @@ function DlcManager:load()
 		self.worker = self:createAndLoadWorker(self.workingDirectory, osuConfig)
 	else
 		self.tr = ThreadRemote("rizu.dlc.DlcManager", self)
+		self.tr.task_handler.timeout = 3600 -- 1 hour
 		self.worker = self.tr:start(self.createAndLoadWorker, self.workingDirectory, osuConfig)
 	end
 end
@@ -57,6 +58,12 @@ function DlcManager:search(query, filters, provider_name)
 	return self.worker:search(query, filters, provider_name)
 end
 
+---@param url string
+---@return string? data, string? error
+function DlcManager:fetchThumbnail(url)
+	return self.worker:fetchThumbnail(url)
+end
+
 ---@param id string|number
 ---@param _type rizu.dlc.DlcType
 ---@param provider_name string?
@@ -70,12 +77,8 @@ function DlcManager:download(id, _type, provider_name, metadata)
 	self.onTaskUpdated:send({task = task})
 
 	coroutine.wrap(function()
-		local ok, err = self.worker:download(id, _type, provider_name, metadata)
-		if not ok then
-			task.status = "error"
-			task.error = err
-			self.onTaskUpdated:send({task = task})
-		end
+		-- Use no-return call (- prefix) because progress is reported via updateTask
+		(-self.worker):download(id, _type, provider_name, metadata)
 	end)()
 end
 

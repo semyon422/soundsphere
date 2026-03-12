@@ -71,6 +71,7 @@ function MinoProvider:search(query, filters)
 			difficulties = set.beatmaps,
 			has_video = set.video,
 			has_storyboard = set.storyboard,
+			thumbnail_url = self:getThumbnailUrl(set.id),
 		})
 	end
 
@@ -81,6 +82,12 @@ end
 ---@return string? url, string? error
 function MinoProvider:getDownloadUrl(id)
 	return self.config.download:format(id)
+end
+
+---@param id string|number
+---@return string? url, string? error
+function MinoProvider:getThumbnailUrl(id)
+	return ("https://assets.ppy.sh/beatmaps/%s/covers/card.jpg"):format(id)
 end
 
 return MinoProvider
