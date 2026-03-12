@@ -45,6 +45,7 @@ function MinoProvider:search(query, filters)
 		amount = 100,
 	})
 
+	print("[MinoProvider] Requesting URL:", url)
 	local res, err = http_util.request(url)
 
 	if not res then

@@ -102,9 +102,20 @@ function DlcManager:onDlcCompleted(id, _type, metadata)
 	if _type == "pack" then
 		-- Trigger library import for packs
 		self.library:computeLocation("packs", 1)
-	elseif _type == "set" or _type == "file" then
-		-- Trigger library import for other charts
+	elseif _type == "set" then
+		-- Trigger library import for set (e.g., .osz)
 		self.library:computeLocation("downloads", 1)
+	elseif _type == "file" then
+		-- For single files, we might have a specific destination directory
+		local path = "downloads"
+		if metadata and metadata.dest_dir then
+			-- Extract relative path from userdata/charts if possible
+			-- For now, just scan the whole downloads if it starts with it
+			if metadata.dest_dir:find("userdata/charts/downloads") then
+				path = metadata.dest_dir:gsub("userdata/charts/", "")
+			end
+		end
+		self.library:computeLocation(path, 1)
 	end
 end
 

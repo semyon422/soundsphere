@@ -1,0 +1,60 @@
+local class = require("class")
+local http_util = require("web.http.util")
+local osudirect = require("libchart.osudirect")
+
+---@class rizu.dlc.providers.OsuDirectProvider : rizu.dlc.IDlcProvider
+---@operator call: rizu.dlc.providers.OsuDirectProvider
+local OsuDirectProvider = class()
+
+---@param config {baseUrl: string, downloadUrl: string}
+function OsuDirectProvider:new(config)
+	self.baseUrl = config.baseUrl
+	self.downloadUrl = config.downloadUrl
+end
+
+---@param query string
+---@param filters table?
+---@return table[]? results, string? error
+function OsuDirectProvider:search(query, filters)
+	filters = filters or {}
+	local page = filters.page or 0
+	local status = filters.status or 4 -- Default to "All" in osudirect terms
+
+	local searchPath = osudirect.search(query, status, page)
+	local url = self.baseUrl .. searchPath
+	
+	print("[OsuDirectProvider] Requesting URL:", url)
+	local res, err = http_util.request(url)
+	if not res then
+		return nil, err or "HTTP request failed"
+	end
+
+	local beatmaps, parse_err = osudirect.parse(res.body)
+	if not beatmaps then
+		return nil, parse_err or "Failed to parse osudirect response"
+	end
+
+	local results = {}
+	for _, b in ipairs(beatmaps) do
+		table.insert(results, {
+			id = b.setId,
+			title = b.title,
+			artist = b.artist,
+			creator = b.creator,
+			status = b.submissionStatus,
+			difficulties = b.difficulties,
+			has_video = b.hasVideo,
+			has_storyboard = b.hasStoryboard,
+		})
+	end
+
+	return results
+end
+
+---@param id string|number
+---@return string? url, string? error
+function OsuDirectProvider:getDownloadUrl(id)
+	return self.downloadUrl:format(id)
+end
+
+return OsuDirectProvider

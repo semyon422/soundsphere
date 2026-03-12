@@ -20,7 +20,6 @@ local ImGuiInputs = require("ui.views.InputView")
 local ImGuiSkins = require("ui.views.NoteSkinView")
 local ImGuiGameplayConfig = require("ui.views.SelectView.PlayConfigView")
 local ImGuiFilters = require("ui.views.SelectView.FiltersView")
-local ImGuiDlc = require("ui.views.DlcModalView")
 
 local ChartPreviewView = require("sphere.views.SelectView.ChartPreviewView")
 
@@ -64,7 +63,7 @@ function Select:load()
 	local function open_mods() modals:setImguiModal(ImGuiModifiers) end
 	local function open_inputs() modals:setImguiModal(ImGuiInputs) end
 	local function open_skins() modals:setImguiModal(ImGuiSkins) end
-	local function open_dlc() modals:setImguiModal(ImGuiDlc) end
+	local function open_dlc() self.parent:set("dlc") end
 	local function play() self.parent:set("gameplay") end
 
 	self.tags = Tags()

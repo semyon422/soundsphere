@@ -44,10 +44,11 @@ The system will adopt a Provider-based architecture with a dedicated background 
   - `https://beatconnect.io/b/BEATMAP_SET_ID`
   - `https://catboy.best/d/BEATMAP_SET_ID`
 - **Searching**: Supported via multiple APIs:
-  - `https://osu.ppy.sb/web/osu-search.php?r=4&m=3&p=0&q=` (Free osu!direct protocol search).
+  - `https://catboy.best/api/v2/search` (Mino API - returns JSON).
+  - `https://osu.ppy.sb/web/osu-search.php?r=4&m=3&p=0&q=` (Akatsuki - osu!direct protocol).
+  - `https://ripple.moe/web/osu-search.php?r=4&m=3&p=0&q=` (Ripple - osu!direct protocol).
     - **osu!direct Search Format**: This protocol returns a pipe-separated textual response. Difficulties are provided as a comma-separated list of tooltips in the format `Tooltip@Mode`. 
     - **Difficulty Display**: Difficulty tooltips are treated as opaque strings and displayed "as-is" because different osu!direct providers use different sub-formats for embedding star ratings, BPM, and other metadata within the tooltip.
-  - `https://catboy.best/api/v2/search` (Mino API - returns JSON).
   - `https://osu.ppy.sh/beatmapsets/search` (Official, unauthorized search endpoint).
 - **Assets**:
   - Thumbnails: 
@@ -71,6 +72,12 @@ The system will adopt a Provider-based architecture with a dedicated background 
   - **Key Count**: `4k`, `5k`, `6k`, `7k`, `8k`, `9k`, `10k`.
   - **Tags**: `x-mod`, `modfiles`, `index`, `hybrid`, `keyboard`, `meme`, `pad`, `anime`.
 
+### 4. Rizu Official Repository (Planned)
+- **Status**: 📅 Future Development
+- **Goal**: A dedicated, authenticated repository for high-quality, curated Rizu content.
+- **Content**: Will support all DLC types: `pack`, `set`, `file`, and `skin`.
+- **Features**: Authentication, user ratings, detailed metadata, and integrated versioning for seamless updates.
+
 ## Implementation Details
 
 ### Modern Networking
@@ -85,7 +92,7 @@ The system will adopt a Provider-based architecture with a dedicated background 
   - `file` types are stored in the directory specified in the metadata (e.g., an existing set folder). Defaults to `userdata/charts/downloads` if unspecified.
 
 ### User Interface (Modern Screen)
-- **`rizu.select.DlcScreen`**: A new modern screen integrated into the `yi/` UI system.
+- **`yi.views.dlc.DlcScreen`**: A new modern screen integrated into the `yi/` UI system.
 - **Features**:
   - Search bar with debounced input and provider-specific filters.
   - Rich result list with thumbnails, audio previews, and metadata.
@@ -103,17 +110,17 @@ The system will adopt a Provider-based architecture with a dedicated background 
 
 ### Phase 2: Provider Development (In Progress)
 - [x] **osu! Beatmapsets (`MinoProvider`)**: Basic search and download implementation using 3rd-party APIs.
-- [ ] **osu! Individual Files (`OsuFileProvider`)**: Direct `.osu` download to specified set folders (using `metadata.dest_dir`).
-- [ ] **Etterna Packs (`EtternaPackProvider`)**: Implementation of the `pack` type, including search API integration and Zip download.
+- [x] **osu! Individual Files (`OsuFileProvider`)**: Direct `.osu` download to specified set folders (using `metadata.dest_dir`).
+- [x] **Etterna Packs (`EtternaPackProvider`)**: Implementation of the `pack` type, including search API integration and Zip download.
 
 ### Phase 3: Extraction and Ingestion Refinement
 - [x] **Core Extraction**: Basic `.osz` and `.zip` extraction using `DlcExtractor`.
-- [ ] **Ingestion Logic**: Refine `DlcManager:onDlcCompleted` to better coordinate with the `rizu.library` for different content types (e.g., specific refresh triggers for `packs` vs. `downloads`).
+- [x] **Ingestion Logic**: Refine `DlcManager:onDlcCompleted` to better coordinate with the `rizu.library` for different content types (e.g., specific refresh triggers for `packs` vs. `downloads`).
 
 ### Phase 4: UI Implementation (Modernization)
-- [ ] **Modern Screen (`rizu.select.DlcScreen`)**: Implement the new screen using the `yi/` UI system.
-- [ ] **Sidebar Integration**: Update `yi/views/select/Select.lua` to include a navigation button for the `DlcScreen`.
-- [ ] **Legacy Removal**: Remove the old `ui/views/DlcModalView.lua` and its hooks from `SelectView` and `yi/views/select/Select.lua`.
+- [x] **Modern Screen (`yi.views.dlc.DlcScreen`)**: Implement the new screen using the `yi/` UI system.
+- [x] **Sidebar Integration**: Update `yi/views/select/Select.lua` to include a navigation button for the `DlcScreen`.
+- [x] **Legacy Removal**: Remove the old `ui/views/DlcModalView.lua` and its hooks from `SelectView` and `yi/views/select/Select.lua`.
 
 ## Verification & Testing
 - **Synchronous Testing**: Use `manager:setSync(true)` in unit tests to verify logic without the complexity of multi-threading.

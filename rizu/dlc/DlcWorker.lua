@@ -1,5 +1,8 @@
 local class = require("class")
 local MinoProvider = require("rizu.dlc.providers.MinoProvider")
+local OsuFileProvider = require("rizu.dlc.providers.OsuFileProvider")
+local EtternaPackProvider = require("rizu.dlc.providers.EtternaPackProvider")
+local OsuDirectProvider = require("rizu.dlc.providers.OsuDirectProvider")
 local path_util = require("path_util")
 local http_util = require("web.http.util")
 
@@ -15,6 +18,16 @@ function DlcWorker:new(manager, workingDirectory, osuConfig)
 	self.workingDirectory = workingDirectory
 	self.providers = {
 		mino = MinoProvider(osuConfig),
+		osu_file = OsuFileProvider(),
+		etterna = EtternaPackProvider(),
+		akatsuki = OsuDirectProvider({
+			baseUrl = "https://osu.ppy.sb",
+			downloadUrl = "https://osu.ppy.sb/d/%s",
+		}),
+		ripple = OsuDirectProvider({
+			baseUrl = "https://ripple.moe",
+			downloadUrl = "https://ripple.moe/d/%s",
+		}),
 	}
 end
 
@@ -24,6 +37,7 @@ end
 ---@return table[]? results, string? error
 function DlcWorker:search(query, filters, provider_name)
 	provider_name = provider_name or "mino"
+	print("[DlcWorker] Search:", query, "Provider:", provider_name)
 	local provider = self.providers[provider_name]
 	if not provider then return nil, "Provider not found" end
 	return provider:search(query, filters)

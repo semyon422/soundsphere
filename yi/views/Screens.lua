@@ -4,6 +4,7 @@ local Select = require("yi.views.select.Select")
 local Gameplay = require("yi.views.gameplay.Gameplay")
 local Result = require("yi.views.result.Result")
 local Test = require("yi.views.Test")
+local Dlc = require("yi.views.dlc.DlcScreen")
 
 ---@class yi.Screens : yi.View
 ---@overload fun(): yi.Screens
@@ -20,15 +21,17 @@ function Screens:new()
 	self.gameplay = self:add(Gameplay())
 	self.result = self:add(Result())
 	self.test = self:add(Test())
+	self.dlc = self:add(Dlc())
 
 	self.menu:setEnabled(false)
 	self.select:setEnabled(false)
 	self.gameplay:setEnabled(false)
 	self.result:setEnabled(false)
 	self.test:setEnabled(false)
+	self.dlc:setEnabled(false)
 end
 
----@param screen_name "menu" | "select" | "gameplay" | "result" | "test"
+---@param screen_name "menu" | "select" | "gameplay" | "result" | "test" | "dlc"
 function Screens:set(screen_name)
 	if self.screen then
 		self.screen:setEnabled(false)
@@ -45,6 +48,8 @@ function Screens:set(screen_name)
 		self.screen = self.result
 	elseif screen_name == "test" then
 		self.screen = self.test
+	elseif screen_name == "dlc" then
+		self.screen = self.dlc
 	else
 		error("Unknown screen")
 	end
