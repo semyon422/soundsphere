@@ -136,7 +136,7 @@ end
 
 ---@param progress number
 function PreviewModel:setRelativePosition(progress)
-	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	local min_time, max_time = self:getRange()
 	local duration = math.max(max_time - min_time, 0)
 	progress = math.max(progress or 0, 0)
 	if duration <= 0 then
@@ -147,15 +147,20 @@ function PreviewModel:setRelativePosition(progress)
 	self:setPosition(min_time + math.min(progress, 1) * duration)
 end
 
+---@return number, number
+function PreviewModel:getRange()
+	return self.audioPreviewPlayer:getRange()
+end
+
 ---@return number
 function PreviewModel:getDuration()
-	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	local min_time, max_time = self:getRange()
 	return math.max(max_time - min_time, 0)
 end
 
 ---@return number
 function PreviewModel:getRelativePosition()
-	local min_time, max_time = self.audioPreviewPlayer:getRange()
+	local min_time, max_time = self:getRange()
 	local duration = math.max(max_time - min_time, 0)
 	if duration <= 0 then
 		return 0
@@ -350,6 +355,7 @@ end
 function PreviewModel:stop()
 	self.audioPreviewPlayer:stop()
 	self.bgaPreviewPlayer:stop()
+	self.chartPreview:setChartview(nil)
 	self.manual_time = 0
 	self.loaded_audio_path = nil
 	self.loaded_preview_time = nil

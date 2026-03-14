@@ -1,5 +1,4 @@
 local View = require("yi.views.View")
-local Label = require("yi.views.Label")
 local Screen = require("yi.views.Screen")
 local ChartSetList = require("yi.views.select.ChartSetList")
 local ArtistTitle = require("yi.views.shared.ArtistTitle")
@@ -12,6 +11,7 @@ local SelectButton = require("yi.views.select.SelectButton")
 local Player = require("yi.views.shared.Player")
 local ChartInfo = require("yi.views.shared.ChartInfo")
 local PreviewSeekBar = require("yi.views.select.PreviewSeekBar")
+local PreviewNpsGraph = require("yi.views.select.PreviewNpsGraph")
 local h = require("yi.h")
 
 local ImGuiSettings = require("ui.views.SettingsView")
@@ -45,6 +45,7 @@ function Select:load()
 	Screen.load(self)
 	local game = self:getGame()
 	self.chart_selector = game.chartSelector
+	self.audio_preview_player = game.previewModel.audioPreviewPlayer
 
 	self.chart_preview_view = ChartPreviewView(self:getGame())
 	self.chart_preview_view:load()
@@ -73,6 +74,7 @@ function Select:load()
 	self.chart_set_list = ChartSetList()
 	self.player = Player()
 	self.chart_info = ChartInfo()
+	self.preview_nps_graph = PreviewNpsGraph(game.previewModel)
 	self.preview_seek_bar = PreviewSeekBar(game.previewModel)
 
 	self:addArray({
@@ -108,6 +110,7 @@ function Select:load()
 		}),
 
 		h(self.chart_info, {justify_self = "end", margin = {0, 0, 20, 20}}),
+		h(self.preview_nps_graph, {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 124, 0}}),
 		h(self.preview_seek_bar, {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 100, 0}}),
 		h(self.player, {align_self = "end", justify_self = "end", margin = {0, 64 + 20, 20, 0}})
 	})
@@ -202,18 +205,8 @@ function Select:attachObservers()
 		return
 	end
 
-	self.chartviewObserver = self.chartviewObserver or {
-		receive = function(_, event)
-			if event.type == "chartview" then
-				local cv = event.chartview ---@type rizu.library.LocatedChartview
-				if cv.location_id then
-					self:updateChartview(cv)
-				end
-			end
-		end
-	}
-
-	self.chart_selector.onChanged:add(self.chartviewObserver)
+	self.chart_selector.onChanged:add(self)
+	self.audio_preview_player.onChanged:add(self.preview_nps_graph)
 	self.observersAttached = true
 end
 
@@ -222,12 +215,20 @@ function Select:detachObservers()
 		return
 	end
 
-	self.chart_selector.onChanged:remove(self.chartviewObserver)
+	self.chart_selector.onChanged:remove(self)
+	self.audio_preview_player.onChanged:remove(self.preview_nps_graph)
 	self.observersAttached = false
 end
 
 function Select:receive(event)
-	self.chart_preview_view:receive(event)
+	if event.type == "chartview" then
+		local cv = event.chartview ---@type rizu.library.LocatedChartview
+		if cv.location_id then
+			self:updateChartview(cv)
+		end
+	else
+		self.chart_preview_view:receive(event)
+	end
 end
 
 return Select
