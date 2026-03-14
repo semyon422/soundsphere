@@ -1,4 +1,5 @@
 local class = require("class")
+local Observable = require("Observable")
 local ThreadRemote = require("threadremote.ThreadRemote")
 local BufferedDecoder = require("rizu.engine.audio.BufferedDecoder")
 local Source = require("rizu.engine.audio.bass.Source")
@@ -17,6 +18,7 @@ AudioPreviewPlayer.load_generation = 0
 
 function AudioPreviewPlayer:new(configModel)
 	self.configModel = configModel
+	self.onChanged = Observable()
 end
 
 ---@param preview_path string
@@ -62,7 +64,12 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 	end, chart_dir, preview_path)
 
 	thread.coro(function()
-		self.min_time, self.max_time = preview_and_decoder.preview:getRange()
+		local min_time, max_time = preview_and_decoder.preview:getRange()
+		if generation ~= self.load_generation then
+			return
+		end
+		self.min_time = min_time
+		self.max_time = max_time
 
 		-- BufferedDecoder(self.thread.remote) calls metadata methods
 		-- which will yield and wait for thread remote update.
@@ -100,6 +107,14 @@ function AudioPreviewPlayer:load(preview_path, chart_dir)
 		if self.is_playing then
 			self.audio_source:play()
 		end
+
+		---@class rizu.AudioPreviewPlayer.RangeEvent
+		local e = {
+			type = "range",
+			min_time = min_time,
+			max_time = max_time,
+		}
+		self.onChanged:send(e)
 	end)()
 end
 
@@ -144,6 +159,7 @@ function AudioPreviewPlayer:stop()
 	self.is_playing = false
 	self.min_time = nil
 	self.max_time = nil
+
 	if self.audio_source then
 		self.audio_source:release()
 		self.audio_source = nil
@@ -152,6 +168,10 @@ function AudioPreviewPlayer:stop()
 		self.buffered_decoder:release()
 		self.buffered_decoder = nil
 	end
+
+	---@class rizu.AudioPreviewPlayer.StopEvent
+	local e = {type = "stop"}
+	self.onChanged:send(e)
 end
 
 function AudioPreviewPlayer:release()
