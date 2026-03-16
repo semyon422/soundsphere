@@ -2,62 +2,55 @@ local class = require("class")
 local http_util = require("web.http.util")
 local json = require("json")
 
----@class rizu.dlc.providers.MinoProvider: rizu.dlc.IDlcProvider
----@operator call: rizu.dlc.providers.MinoProvider
+---@class rizu.dlc.MinoProvider: rizu.dlc.IDlcProvider
+---@operator call: rizu.dlc.MinoProvider
 local MinoProvider = class()
 
-function MinoProvider:new(config)
-	self.config = config or {
-		search = "https://catboy.best/api/v2/search",
-		download = "https://catboy.best/d/%s",
-	}
-	if self.config.download and self.config.download:find("%%s") == nil then
-		-- Ensure download URL has %s
-		if self.config.download:sub(-1) ~= "/" then
-			self.config.download = self.config.download .. "/"
-		end
-		self.config.download = self.config.download .. "%s"
-	end
-	self.rankedStatusesMap = {
-		all = -3,
-		any = -3,
-		graveyard = -2,
-		wip = -1,
-		pending = 0,
-		ranked = 1,
-		qualified = 3,
-		loved = 4,
-	}
-end
+-- TODO: rate limits, bg and audio preview
+
+MinoProvider.search_url = "https://catboy.best/api/v2/search"
+MinoProvider.download_url = "https://catboy.best/d/"
+
+---@enum (key) rizu.dlc.MinoRankedStatus
+local MinoRankedStatus = {
+	any = -3,
+	graveyard = -2,
+	wip = -1,
+	pending = 0,
+	ranked = 1,
+	qualified = 3,
+	loved = 4,
+}
 
 ---@param query string
----@param filters table?
----@return table[]? results, string? error
+---@param filters {page: integer, status: rizu.dlc.MinoRankedStatus}?
+---@return table[]? results
+---@return string? error
 function MinoProvider:search(query, filters)
-	filters = filters or {}
-	local page = filters.page or 1
-	local status = filters.status or "ranked"
+	local page = filters and filters.page or 1
+	local status = filters and filters.status or "ranked"
 
-	local url = self.config.search .. "?" .. http_util.encode_query_string({
+	local url = self.search_url .. "?" .. http_util.encode_query_string({
 		query = query,
 		mode = 3,
 		offset = (page - 1) * 100,
-		status = self.rankedStatusesMap[status] or 1,
+		status = MinoRankedStatus[status] or 1,
 		amount = 100,
 	})
 
 	print("[MinoProvider] Requesting URL:", url)
 	local res, err = http_util.request(url)
-
 	if not res then
 		return nil, err or "HTTP request failed"
 	end
 
-	local body = res.body
-	local ok, data = pcall(json.decode, body)
+	---@type boolean, any
+	local ok, data = pcall(json.decode, res.body)
 	if not ok then
 		return nil, "Failed to decode JSON response"
 	end
+
+	---@cast data table[]
 
 	local results = {}
 	for _, set in ipairs(data) do
@@ -72,23 +65,17 @@ function MinoProvider:search(query, filters)
 			difficulties = set.beatmaps,
 			has_video = set.video,
 			has_storyboard = set.storyboard,
-			thumbnail_url = self:getThumbnailUrl(set.id),
+			thumbnail_url = ("https://assets.ppy.sh/beatmaps/%s/covers/card.jpg"):format(set.id),
 		})
 	end
 
 	return results
 end
 
----@param id string|number
----@return string? url, string? error
+---@param id integer
+---@return string url
 function MinoProvider:getDownloadUrl(id)
-	return self.config.download:format(id)
-end
-
----@param id string|number
----@return string? url, string? error
-function MinoProvider:getThumbnailUrl(id)
-	return ("https://assets.ppy.sh/beatmaps/%s/covers/card.jpg"):format(id)
+	return self.download_url .. id
 end
 
 return MinoProvider

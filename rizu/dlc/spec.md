@@ -3,7 +3,7 @@
 ## Background & Motivation
 To support external sources and allow for different types of content (Charts, Skins) to be seamlessly integrated into the modern `rizu` architecture, a modular DLC system has been implemented. This system leverages `ThreadRemote` for robust background execution and state synchronization.
 
-Hitsounds have been removed from the scope, and skin downloading is not currently supported but is planned for the future. An official Rizu chart and skin repository is also planned.
+Skin downloading is not currently supported but is planned for the future. An official Rizu chart and skin repository is also planned.
 
 ## Scope & Impact
 - Create a new `rizu.dlc` namespace.

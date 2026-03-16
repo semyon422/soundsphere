@@ -14,8 +14,7 @@ local DlcWorker = class()
 
 ---@param manager rizu.dlc.DlcManager
 ---@param workingDirectory string
----@param osuConfig table?
-function DlcWorker:new(manager, workingDirectory, osuConfig)
+function DlcWorker:new(manager, workingDirectory)
 	self.manager = manager
 	self.workingDirectory = workingDirectory
 	self.providers = {

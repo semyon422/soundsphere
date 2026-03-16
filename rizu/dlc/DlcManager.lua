@@ -8,10 +8,8 @@ local Observable = require("Observable")
 local DlcManager = class()
 
 ---@param library rizu.library.Library
----@param configModel sphere.ConfigModel
-function DlcManager:new(library, configModel)
+function DlcManager:new(library)
 	self.library = library
-	self.configModel = configModel
 	self.tasks = {} ---@type {[string|number]: rizu.dlc.DlcTask}
 	self.is_sync = false
 	self.onTaskUpdated = Observable()
@@ -25,22 +23,20 @@ function DlcManager:setSync(is_sync)
 end
 
 function DlcManager:load()
-	local osuConfig = self.configModel.configs.urls.osu
 	if self.is_sync then
-		self.worker = self:createAndLoadWorker(self.workingDirectory, osuConfig)
+		self.worker = self:createAndLoadWorker(self.workingDirectory)
 	else
 		self.tr = ThreadRemote("rizu.dlc.DlcManager", self)
 		self.tr.task_handler.timeout = 3600 -- 1 hour
-		self.worker = self.tr:start(self.createAndLoadWorker, self.workingDirectory, osuConfig)
+		self.worker = self.tr:start(self.createAndLoadWorker, self.workingDirectory)
 	end
 end
 
 ---@param workingDirectory string
----@param osuConfig table?
-function DlcManager:createAndLoadWorker(workingDirectory, osuConfig)
+function DlcManager:createAndLoadWorker(workingDirectory)
 	require("preload")
 	local DlcWorker = require("rizu.dlc.DlcWorker")
-	local worker = DlcWorker(self, workingDirectory, osuConfig)
+	local worker = DlcWorker(self, workingDirectory)
 	return worker
 end
 
