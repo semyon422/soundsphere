@@ -1,5 +1,6 @@
 local erfunc = require("libchart.erfunc")
 
+---@class normalscore
 local normalscore = {}
 
 normalscore.samples_count = 0
@@ -16,7 +17,7 @@ normalscore.miss_addition = 0
 
 local mt = {__index = normalscore}
 
----@return table
+---@return normalscore
 function normalscore:new()
 	local ns = {
 		ranges = {},

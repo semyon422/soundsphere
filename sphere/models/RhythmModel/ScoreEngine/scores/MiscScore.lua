@@ -45,11 +45,14 @@ function MiscScore:early(event)
 	self.deltaTime = -math.huge
 end
 
+---@return sphere.MiscScore.Slice
 function MiscScore:getSlice()
-	return {
+	---@class sphere.MiscScore.Slice
+	local t = {
 		maxDeltaTime = self.maxDeltaTime,
 		deltaTime = self.deltaTime,
 	}
+	return t
 end
 
 MiscScore.events = {

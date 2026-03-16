@@ -65,11 +65,14 @@ function NormalscoreScore:miss(range_name)
 	self.normalscore:miss(range_name)
 end
 
+---@return sphere.NormalscoreScore.Slice
 function NormalscoreScore:getSlice()
-	return {
+	---@class sphere.NormalscoreScore.Slice
+	local t = {
 		accuracyAdjusted = self.accuracyAdjusted,
 		mean = self.normalscore.mean
 	}
+	return t
 end
 
 NormalscoreScore.events = {

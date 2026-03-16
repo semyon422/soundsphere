@@ -89,8 +89,10 @@ function BaseScore:countLastMean(event)
 	self.lastMean = sum / rb.size
 end
 
+---@return sphere.BaseScore.Slice
 function BaseScore:getSlice()
-	return {
+	---@class sphere.BaseScore.Slice
+	local t = {
 		hitCount = self.hitCount,
 		missCount = self.missCount,
 		earlyHitCount = self.earlyHitCount,
@@ -102,6 +104,7 @@ function BaseScore:getSlice()
 		isEarlyHit = self.isEarlyHit,
 		isLongNoteComboBreak = self.isLongNoteComboBreak,
 	}
+	return t
 end
 
 BaseScore.events = {

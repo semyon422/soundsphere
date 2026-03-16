@@ -9,26 +9,11 @@ local math_util = require("math_util")
 ---@operator call: yi.HitGraph
 local HitGraph = View + {}
 
----@class yi.HitGraph.BaseSlice
----@field currentTime number
----@field isMiss boolean 
----@field isEarlyHit boolean
-
----@class yi.HitGraph.MiscSlice
----@field deltaTime number
-
----@class yi.HitGraph.HpSlice
----@field healths number
-
----@class yi.HitGraph.Normalscore
----@field mean number
----@field accuracyAdjusted number
-
 ---@class yi.HitGraph.Slice 
----@field base yi.HitGraph.BaseSlice
----@field misc yi.HitGraph.MiscSlice
----@field hp yi.HitGraph.HpSlice
----@field normalscore yi.HitGraph.Normalscore
+---@field base sphere.BaseScore.Slice
+---@field misc sphere.MiscScore.Slice
+---@field hp sphere.HpScore.Slice
+---@field normalscore sphere.NormalscoreScore.Slice
 
 HitGraph.TickScale = 0.6
 HitGraph.ReverseY = false -- `true` is stepmania/etterna/upscroll behavior

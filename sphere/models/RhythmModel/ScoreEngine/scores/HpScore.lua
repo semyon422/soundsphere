@@ -43,7 +43,7 @@ function HpScore:new()
 	end
 end
 
----@return table
+---@return sphere.HpScore.Slice
 function HpScore:getSlice()
 	-- local slice = {}
 	-- for _, v in ipairs(self) do
@@ -53,10 +53,12 @@ function HpScore:getSlice()
 	-- 	})
 	-- end
 	-- return slice
-	return {
+	---@class sphere.HpScore.Slice
+	local t = {
 		healths = self:getHealths(),
 		max_healths = self:getMaxHealths(),
 	}
+	return t
 end
 
 ---@return number
