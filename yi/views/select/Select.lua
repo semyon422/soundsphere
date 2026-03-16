@@ -148,49 +148,46 @@ function Select:onKeyDown(e)
 	local k = e.key
 	local modals = self:getContext().modals
 	local game = self:getGame()
+	local score_store = game.scoreSelector.store
 
 	if k == "j" then
 		self.chart_selector:scrollLevel(1, 1)
-		return true
 	elseif k == "k" then
 		self.chart_selector:scrollLevel(1, -1)
-		return true
 	elseif k == "h" then
 		self.chart_selector:scrollLevel(2, -1)
-		return true
 	elseif k == "l" then
 		self.chart_selector:scrollLevel(2, 1)
-		return true
 	elseif k == "m" then
 		modals:setImguiModal(ImGuiModifiers)
-		return true
 	elseif k == "i" then
 		modals:setImguiModal(ImGuiInputs)
-		return true
 	elseif k == "s" then
 		modals:setImguiModal(ImGuiSkins)
-		return true
 	elseif k == "c" then
 		modals:setImguiModal(ImGuiSettings)
-		return true
 	elseif k == "g" then
 		modals:setImguiModal(ImGuiGameplayConfig)
-		return true
 	elseif k == "f" then
 		modals:setImguiModal(ImGuiFilters)
-		return true
+	elseif k == "o" then
+		if score_store:count() > 0 then
+			game.resultController:replayNoteChartAsync("result", game.scoreSelector.chartplay)
+			self.parent:set("result")
+		end
 	elseif k == "[" then
 		game.timeRateModel:increase(-1)
 		game.modifierSelectModel:change()
-		return true
 	elseif k == "]" then
 		game.timeRateModel:increase(1)
 		game.modifierSelectModel:change()
-		return true
 	elseif k == "return" then
 		self.parent:set("gameplay")
-		return true
+	else
+		return false
 	end
+
+	return true
 end
 
 ---@param chartview rizu.library.LocatedChartview
