@@ -26,7 +26,7 @@ function StepperButton:load()
 		w = 32,
 		h = 32,
 		mouse = true,
-		arrange = "flex_row",
+		arrange = "flow_row",
 		justify_content = "center",
 		align_items = "center",
 	})
@@ -72,7 +72,7 @@ function NumericStepper:load()
 	local font = res:getFont("bold", 24)
 
 	self:setup({
-		arrange = "flex_row",
+		arrange = "flow_row",
 		align_items = "center",
 		gap = 12,
 	})

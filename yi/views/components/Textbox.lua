@@ -71,14 +71,14 @@ function Textbox:new(text, placeholder, on_change)
 	self.is_focused = false
 	self.cursor_pos = utf8.len(self.text)
 	self.scroll_offset = 0
-	
+
 	self:setup({
 		w = 200,
 		h = 36,
 		mouse = true,
 		handles_keyboard_input = true,
 		padding = {0, 8, 0, 8},
-		arrange = "flex_row",
+		arrange = "flow_row",
 	})
 end
 

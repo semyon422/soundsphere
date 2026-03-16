@@ -17,7 +17,7 @@ end
 
 function TabButton:load()
 	self:setup({
-		arrange = "flex_row",
+		arrange = "flow_row",
 		align_items = "center",
 		padding = {10, 10, 10, 10},
 		gap = 5

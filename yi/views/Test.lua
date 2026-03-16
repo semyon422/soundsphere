@@ -18,7 +18,7 @@ function Test:load()
 		id = "test_screen",
 		w = "100%",
 		h = "100%",
-		arrange = "flex_col",
+		arrange = "flow_col",
 		justify_content = "center",
 		align_items = "start",
 		padding = {40, 40, 40, 40},
@@ -34,39 +34,39 @@ function Test:load()
 	self:add(Label(font, "UI Components Test Screen"))
 
 	-- Checkbox Row
-	self:add(h(require("yi.views.View")(), {arrange = "flex_row", align_items = "center", gap = 10}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_row", align_items = "center", gap = 10}, {
 		Label(label_font, "Checkbox:"),
 		Checkbox(true, function(v) print("Checkbox changed:", v) end)
 	}))
 
 	-- Slider Row
-	self:add(h(require("yi.views.View")(), {arrange = "flex_col", align_items = "start", gap = 5}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_col", align_items = "start", gap = 5}, {
 		Label(label_font, "Slider (0-100, step 5):"),
 		Slider(50, 0, 100, 5, function(v) print("Slider changed:", v) end)
 	}))
 
 	-- Numeric Stepper Row
-	self:add(h(require("yi.views.View")(), {arrange = "flex_row", align_items = "center", gap = 10}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_row", align_items = "center", gap = 10}, {
 		Label(label_font, "Numeric Stepper:"),
 		NumericStepper(10, 0, 100, 1, function(v) print("Stepper changed:", v) end)
 	}))
 
 	-- Textbox Row
-	self:add(h(require("yi.views.View")(), {arrange = "flex_col", align_items = "start", gap = 5}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_col", align_items = "start", gap = 5}, {
 		Label(label_font, "Textbox:"),
 		Textbox("", "Type something here...", function(v) print("Textbox changed:", v) end)
 	}))
 
 	-- Button Row
-	self:add(h(require("yi.views.View")(), {arrange = "flex_row", align_items = "center", gap = 10}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_row", align_items = "center", gap = 10}, {
 		Label(label_font, "Button:"),
 		Button("Click Me!", function() print("Button clicked!") end)
 	}))
 
 	-- Wrap Layout Showcase
-	self:add(h(require("yi.views.View")(), {arrange = "flex_col", align_items = "start", gap = 5, w = "100%"}, {
+	self:add(h(require("yi.views.View")(), {arrange = "flow_col", align_items = "start", gap = 5, w = "100%"}, {
 		Label(label_font, "Wrap Layout (resize window to see):"),
-		h(require("yi.views.View")(), {arrange = "wrap_row", w = "100%", gap = 10, line_gap = 10}, {
+		h(require("yi.views.View")(), {arrange = "flow_row", w = "100%", gap = 10, line_gap = 10}, {
 			Button("Item 1", function() end),
 			Button("Item 2", function() end),
 			Button("Item 3", function() end),

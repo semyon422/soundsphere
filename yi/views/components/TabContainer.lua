@@ -22,13 +22,13 @@ end
 
 function TabContainer:load()
 	self:setup({
-		arrange = "flex_row",
+		arrange = "flow_row",
 		background_color = Colors.panels
 	})
 
 	self.button_container = View()
 	self.button_container:setup({
-		arrange = "flex_col",
+		arrange = "flow_col",
 		width = 200,
 		height = "100%",
 		gap = 4,
