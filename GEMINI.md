@@ -78,6 +78,20 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 *   **EmmyLua Table Notation:** Prefer `{[KeyType]: ValueType}` notation for tables instead of `table<KeyType, ValueType>`.
 *   **Variable Naming (Conflicts with Globals):** Avoid using Lua global names (e.g., `type`, `table`, `string`, `pairs`) for local variables. If you must use such a name, prefix it with an underscore (e.g., `_type`).
 
+## Standards & Traceability
+
+To ensure long-term maintainability and alignment between design and implementation, the following standards are MANDATORY:
+
+*   **Living Specifications (Traceability):**
+    *   All new features or major changes MUST be documented in a `spec.md` file within the relevant module directory.
+    *   Implementation tests (`_test.lua`) MUST include a `@spec` tag in the test function's comments, mapping it back to the specific requirement in the `spec.md`.
+    *   **Format:** `--- @spec: [path/to/spec.md]#[Heading Name]`
+    *   **Verification:** Run `scripts/check_spec_coverage.lua` as part of the Validation phase to ensure 100% coverage of specified requirements.
+*   **Architecture Decision Records (ADR):**
+    *   Any significant architectural change, new library dependency, or shift in coding patterns MUST be recorded as an ADR in `docs/adr/`.
+    *   Use `docs/adr/0000-template.md` for new records.
+    *   Agents MUST check existing ADRs before proposing architectural changes to ensure consistency with past decisions.
+
 ## Rizu Module Overview
 
 The `rizu/` directory contains the modern, modular implementation of the game's core systems. It is organized into several key sub-modules:
