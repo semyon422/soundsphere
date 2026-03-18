@@ -80,17 +80,17 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 
 ## Standards & Traceability
 
-To ensure long-term maintainability and alignment between design and implementation, the following standards are MANDATORY:
+To ensure long-term maintainability and alignment between design and implementation, the following standards are established:
 
-*   **Living Specifications (Traceability):**
-    *   All new features or major changes MUST be documented in a `spec.md` file within the relevant module directory.
-    *   Implementation tests (`_test.lua`) MUST include a `@spec` tag in the test function's comments, mapping it back to the specific requirement in the `spec.md`.
-    *   **Format:** `--- @spec: [path/to/spec.md]#[Heading Name]`
-    *   **Verification:** Run `scripts/check_spec_coverage.lua` as part of the Validation phase to ensure 100% coverage of specified requirements.
-*   **Architecture Decision Records (ADR):**
-    *   Any significant architectural change, new library dependency, or shift in coding patterns MUST be recorded as an ADR in `docs/adr/`.
+*   **Living Specifications (Traceability) [OPTIONAL]:**
+    *   New features or major changes should ideally be documented in a `spec.md` file within the relevant module directory.
+    *   Implementation tests (`_test.lua`) may include a `@spec` tag in the test function's comments, mapping it back to the specific requirement in the `spec.md`.
+    *   **Format:** `---@spec [path/to/spec.md]#[REQ-*]`
+    *   **Verification:** `scripts/check_spec_coverage.lua` can be used to check coverage of specified requirements.
+*   **Architecture Decision Records (ADR) [OPTIONAL]:**
+    *   Significant architectural changes, new library dependencies, or shifts in coding patterns should be recorded as an ADR in `docs/adr/`.
     *   Use `docs/adr/0000-template.md` for new records.
-    *   Agents MUST check existing ADRs before proposing architectural changes to ensure consistency with past decisions.
+    *   Agents are encouraged to check existing ADRs before proposing architectural changes to ensure consistency with past decisions.
 
 ## Rizu Module Overview
 
