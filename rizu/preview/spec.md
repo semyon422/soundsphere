@@ -1,53 +1,41 @@
+# Preview System (`rizu.preview`)
 
-# Preview System Specification
+## Goal
+The preview system provides players with an immediate sensory snapshot of a song before they commit to playing it. By synchronizing simplified note visuals, full audio playback, and background animations (BGA), it creates an "alive" selection experience that helps players identify songs and evaluate their difficulty.
 
-The preview system provides a synchronized preview of a chart, including notes, audio, and BGA. It is primarily used in the selection screen.
+## User Experience
+- **Instant Feedback**: Selecting a song in the menu immediately triggers its preview. The playback starts at the song's most representative section (defined by metadata) and loops according to the audio content's duration.
+- **Visual Context**: A simplified "mini-playfield" renders the chart's notes, while any background images or videos are displayed in the preview area.
+- **Dynamic Response**: If the player changes the playback rate (e.g., to 1.5x) in the selection screen, the preview audio and visuals speed up accordingly to match the intended gameplay experience.
+- **Seamless Loading**: Previews are generated and cached in the background. If a preview isn't ready, the system stays silent and waits without blocking menu navigation or causing micro-stutters.
 
-## Components
+## Architecture Decisions (ADR)
 
-- **Notes Preview**: A simplified representation of the chart notes, stored as an encoded string in the database (`chartview.notes_preview`).
-- **Audio Preview**: A collection of audio events (sample index, time, duration, volume) stored in a `.audio_preview` file in `userdata/audio_previews/`.
-- **BGA Preview**: A collection of BGA events (sample index, time, column) stored in a `.bga_preview` file in `userdata/bga_previews/`.
+### ADR: Model-Player Pattern
+- **Context**: The preview involves multiple independent systems (Audio, Video, Sprite, Visual) that must stay perfectly synchronized to a single master clock.
+- **Decision**: We use a central `PreviewModel` to manage the master clock and playback state, which then drives specialized "Player" components (`NotesPreviewPlayer`, `AudioPreviewPlayer`, `BgaPreviewPlayer`).
+- **Consequence**: This separation ensures that logic for time management is decoupled from specific rendering or audio backends, making the system easier to test and extend.
 
-## Architecture
+### ADR: Off-Thread Preview Generation
+- **Context**: Generating preview files requires parsing full chart files and scanning for thousands of audio/visual events, which can take several hundred milliseconds.
+- **Decision**: All preview generation is performed as an asynchronous task in a separate thread. Results are cached in `userdata/` using the chart's content hash.
+- **Consequence**: The main UI thread remains completely unblocked, ensuring the library browsing experience remains fluid even for new or un-cached content.
 
-The system follows a Model-Player pattern:
+## Implementation Details
 
-- `rizu.preview.PreviewModel`: The central state container. It manages the current time, playback state, and coordinates the loading/generation of previews.
-- `rizu.preview.NotesPreviewPlayer`: Renders notes using the `VisualEngine`.
-- `rizu.preview.AudioPreviewPlayer`: Plays audio events using a pool of decoders/sources.
-- `rizu.preview.BgaPreviewPlayer`: Renders BGA events (images/videos) using `SpriteEngine` and `VideoEngine`.
+### Components
+- **PreviewModel**: The central coordinator. Manages the master clock, looping range, and loading states.
+- **Notes Preview**: A high-performance string representation of notes stored in the database for instant retrieval.
+- **Audio/BGA Previews**: Dedicated event collections stored in `.audio_preview` and `.bga_preview` files within `userdata/`.
+  - **Unified Audio**: The system does not distinguish between single-file audio (osu!) and multi-sample backgrounds (BMS). All audio is treated as a sequence of events (sample index, time, duration, volume).
 
-## Behavior
+### Looping Algorithm
+- **Start Position**: Defined by `preview_time` metadata. If missing, it defaults to the absolute start time of the audio events (which may be non-zero).
+- **Looping Range**: The loop is determined by the **Audio Start Time** and **Audio End Time**. This range is distinct from the chart's `duration` field, which only tracks note data.
+- **End Behavior**: When the master clock reaches the audio end time, it restarts exactly from the audio start time.
+- **Audio Constraints**: If the audio preview is missing or its total duration is 0, the preview playback is automatically paused to prevent invalid state.
 
-### Selection and Loading
-
-1. When a chart is selected, the `PreviewModel` is updated with the chart's metadata (hash, location, preview position).
-2. The system checks if `.audio_preview` and `.bga_preview` files exist for the given hash.
-3. If files are missing, the system initiates an **Asynchronous Generation Task**.
-
-### Generation
-
-- Previews are generated by parsing the full chart file.
-- Generation is cached in the `userdata/` directory, keyed by the chart hash.
-- **Audio Generation**: Scans for all audio notes and creates a sequence of events.
-- **BGA Generation**: Scans for BGA-specific notes (layers) and creates a sequence of events.
-
-### Playback and Looping
-
-- **Clock**: All players (Notes, Audio, BGA) MUST share the same master clock provided by `PreviewModel`.
-- **Start Position**: Defined in the chart metadata (`preview_time`). If missing, it defaults to the start time of the audio (which may be non-zero).
-- **Looping Range**: The preview loops based on the audio start time and audio end time. This is distinct from the chart's `duration` field, which only covers note data.
-- **End Behavior**: When the clock reaches the audio end time, it restarts from the audio start time.
-- **Audio Constraints**: If the audio preview is missing or its total duration is 0, the preview playback MUST be paused.
-
-### Interactivity
-
-- **Rate Changes**: Preview playback rate must match the selected play rate (e.g., 1.5x). Audio should use time-stretching if supported by the engine.
-- **State Transition**: Playback is paused until the required preview files are ready. No explicit "loading" indication is required in the UI.
-
-## Constraints
-
-- Previews must be low-overhead to allow rapid scrolling through the song list.
-- Generation should be performed in a separate thread to avoid blocking the main UI thread.
-- If a chart has no BGA, the preview should still function with notes and audio.
+### Preview Types
+- **Audio**: Scans for all hitsounds and background music events across all formats to create a flattened event sequence.
+- **BGA**: Scans for layer changes and video triggers.
+- **Notes**: Encodes a simplified bitmask of column activity over time.

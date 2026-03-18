@@ -1,55 +1,52 @@
-# DLC System Specification (rizu.dlc)
+# DLC System (`rizu.dlc`)
 
-## Background & Motivation
-To support external sources and allow for different types of content (Charts, Skins) to be seamlessly integrated into the modern `rizu` architecture, a modular DLC system has been implemented. This system leverages `ThreadRemote` for robust background execution and state synchronization.
+## Goal
+The DLC system enables players to expand their music library directly from within the game. It provides a modular framework for discovering, downloading, and installing content from external platforms like osu! and Etterna without requiring manual file management.
 
-Skin downloading is not currently supported but is planned for the future. An official Rizu chart and skin repository is also planned.
+## User Experience
+Players access the **DLC Screen** from the sidebar to browse and search for new content.
+- **Discovery**: A unified search interface allows players to select a specific platform (provider) and search for content within it.
+- **Filtering**: Results can be narrowed down using platform-specific criteria, such as key counts for Etterna or difficulty ratings for osu!.
+- **Previewing**: For supported content types (currently only osu! beatmapsets), players can see thumbnails and listen to 10-second audio previews to evaluate a chart before downloading.
+- **Background Downloads**: Clicking "Download" triggers a background process. Players can continue browsing or playing other songs while a progress bar shows real-time speed and completion status.
+- **Auto-Installation**: Once a download completes, the content is automatically extracted and indexed. The library is refreshed, and the new charts appear immediately in the song selection screen.
 
-## Scope & Impact
-- Create a new `rizu.dlc` namespace.
-- Introduce provider interfaces (`ISearchProvider`, `IDownloadProvider`) for discovering, searching, and fetching metadata for various content types (primarily Charts right now, and Skins in the future).
-- Implement a central `DlcManager` that coordinates with a background `DlcWorker` via `ThreadRemote`.
-- Support both **Asynchronous** (production) and **Synchronous** (testing/debugging) modes.
-- Seamlessly trigger imports for the corresponding systems (e.g., `rizu.library` for charts) upon successful download and extraction.
+## Architecture Decisions (ADR)
 
-## Proposed Solution
-The system will adopt a Provider-based architecture with a dedicated background worker. Each provider is specialized for a specific content type (e.g., Charts) to avoid complexity in multi-content management. Different providers or content types may have entirely different UIs tailored to their specific metadata and search requirements.
+### ADR: Background Worker (`ThreadRemote`)
+- **Context**: Downloading and unzipping large archives (especially Etterna packs which can exceed 300MB) causes significant frame drops and UI freezes in the main Lua thread.
+- **Decision**: We use `ThreadRemote` to delegate all network and I/O heavy operations to a dedicated `DlcWorker`.
+- **Consequence**: The UI remains responsive. Communication between the UI and the worker is handled via asynchronous message passing.
 
-1. **`rizu.dlc.ISearchProvider`**: An interface defining the `search(query, filters)` operation.
-2. **`rizu.dlc.IDownloadProvider`**: An interface defining the `getDownloadUrl(id)` operation.
-3. **`rizu.dlc.DlcType`**: A type alias for `"pack" | "set" | "file" | "skin"`.
-   - `"pack"`: A collection of multiple chart sets (e.g., Etterna packs).
-   - `"set"`: A single chart set containing multiple difficulties and assets (e.g., osu! beatmapsets).
-   - `"file"`: A single chart file, downloaded to a specific set folder (e.g., for updating or adding difficulties).
-   - `"skin"`: A visual skin (not yet supported).
-4. **`rizu.dlc.DlcManager`**:
-   - Manages active downloads and search states.
-   - Holds references to registered `IDlcProvider` instances.
-   - Dispatches download requests and receives progress updates.
-   - Implements `setSync(boolean)` to toggle between direct execution and threaded execution.
-5. **`rizu.dlc.DlcWorker`**:
-   - Runs in a background thread (in async mode).
-   - Performs HTTP requests using the modern `web` module.
-   - Reports progress back to the `DlcManager` via remote calls.
-6. **`rizu.dlc.DlcTask`**: 
-   - A unit of work representing a download and its subsequent processing (extraction, validation).
-7. **Content Integration**:
-   - Once a task is complete, the `DlcManager` delegates the final "ingestion" to the appropriate system (e.g., `rizu.library.Library:computeLocation(path, location_id)` for chart types: `pack`, `set`, `file`).
+### ADR: Third-Party Mirrors for osu!
+- **Context**: The official osu! beatmap API requires OAuth authentication for downloads, which would require players to log in to download charts.
+- **Decision**: We route osu! downloads through public mirrors (e.g., BeatConnect, Mino).
+- **Consequence**: Players can download content without authentication, though we are dependent on the availability and uptime of these third-party services.
 
-## Supported Data Sources & Providers
+## Implementation Details
 
-### 1. osu! Beatmapsets
-- **Type**: `set`
-- **Downloads**: `.osz` archives. Since official osu! beatmap storage requires authentication (planned for the future), downloads are currently routed through 3rd-party services without authentication:
+### Download Types
+The system handles three primary content types, which determine the extraction destination:
+- **`pack`**: Large archives containing multiple song folders (e.g., Etterna packs). Extracted to `userdata/charts/packs/`.
+- **`set`**: Archives for a single song grouping (e.g., osu! beatmapsets). Extracted to `userdata/charts/downloads/`.
+- **`file`**: Individual chart files. Downloaded to a specific destination folder or `userdata/charts/downloads/`.
+
+### Archive Extraction
+The `DlcExtractor` utility handles `.zip` and `.osz` formats.
+- **Flattening**: Many archives (like Etterna packs) wrap their contents in a redundant top-level folder. The extractor automatically flattens these structures during extraction to ensure the `dir` field in the library remains clean (e.g., `PackName/Song/` becomes `Song/`).
+
+### Provider Reference (Technical)
+
+#### 1. osu! Beatmapsets (Type: `set`)
+- **Download URLs**: 
   - `https://beatconnect.io/b/BEATMAP_SET_ID`
   - `https://catboy.best/d/BEATMAP_SET_ID`
-- **Searching**: Supported via multiple APIs:
-  - `https://catboy.best/api/v2/search` (Mino API - returns JSON).
-  - `https://osu.ppy.sb/web/osu-search.php?r=4&m=3&p=0&q=` (Akatsuki - osu!direct protocol).
-  - `https://ripple.moe/web/osu-search.php?r=4&m=3&p=0&q=` (Ripple - osu!direct protocol).
-    - **osu!direct Search Format**: This protocol returns a pipe-separated textual response. Difficulties are provided as a comma-separated list of tooltips in the format `Tooltip@Mode`. 
-    - **Difficulty Display**: Difficulty tooltips are treated as opaque strings and displayed "as-is" because different osu!direct providers use different sub-formats for embedding star ratings, BPM, and other metadata within the tooltip.
-  - `https://osu.ppy.sh/beatmapsets/search` (Official, unauthorized search endpoint).
+- **Search APIs**:
+  - **Mino (JSON)**: `https://catboy.best/api/v2/search`
+  - **osu!direct (Text)**: 
+    - Akatsuki: `https://osu.ppy.sb/web/osu-search.php?r=4&m=3&p=0&q=`
+    - Ripple: `https://ripple.moe/web/osu-search.php?r=4&m=3&p=0&q=`
+  - **Official (Unauthorized)**: `https://osu.ppy.sh/beatmapsets/search`
 - **Assets**:
   - Thumbnails: 
     - 400x140: `https://assets.ppy.sh/beatmaps/{id}/covers/card.jpg`
@@ -57,73 +54,10 @@ The system will adopt a Provider-based architecture with a dedicated background 
     - 900x250: `https://assets.ppy.sh/beatmaps/{id}/covers/cover.jpg`
   - Audio Preview (10s): `https://b.ppy.sh/preview/{id}.mp3`
 
-### 2. osu! Individual Charts (Files)
-- **Type**: `file`
-- **Downloads**: Raw `.osu` files directly from `https://osu.ppy.sh/osu/BEATMAP_ID` (Official, no auth required).
-- **Use Case**: Required specifically for updating existing individual osu! charts within the user's library without downloading the entire beatmapset.
+#### 2. osu! Individual Charts (Type: `file`)
+- **Download**: `https://osu.ppy.sh/osu/BEATMAP_ID` (Direct `.osu` file download, no auth required).
 
-### 3. Etterna Packs
-- **Type**: `pack`
-- **Downloads**: `.zip` archives. Download links follow the format: `https://downloads.etternaonline.com/ranked/PackName.zip`.
-- **Structure**: Etterna packs have a nested structure that the extractor must handle: `PackName/song1/chart1.sm`.
-- **Searching**: Pack searches use the API endpoint: `https://api.etternaonline.com/api/packs?page=1&limit=36&sort=name&filter[search]=SEARCH_QUERY`.
-- **Filters**:
-  - **Sort By**: `name`, `popularity`, `date`, `overall`, `stream`, `jumpstream`, `handstream`, `jacks`, `chordjacks`, `stamina`, `technical`.
-  - **Key Count**: `4k`, `5k`, `6k`, `7k`, `8k`, `9k`, `10k`.
-  - **Tags**: `x-mod`, `modfiles`, `index`, `hybrid`, `keyboard`, `meme`, `pad`, `anime`.
-
-### 4. Rizu Official Repository (Planned)
-- **Status**: 📅 Future Development
-- **Goal**: A dedicated, authenticated repository for high-quality, curated Rizu content.
-- **Content**: Will support all DLC types: `pack`, `set`, `file`, and `skin`.
-- **Features**: Authentication, user ratings, detailed metadata, and integrated versioning for seamless updates.
-
-## Implementation Details
-
-### Modern Networking
-- **Download Execution:** The `DlcWorker` will use `web.http.util` (or directly `HttpClient`) to perform downloads. This allows for better header handling, redirect following (if needed), and cleaner integration with the project's modern web stack.
-- **Progress Tracking:** The `DlcWorker` will use a custom sink/receive loop to report download progress (bytes received, total size, speed) back to the `DlcManager` via `ThreadRemote` calls.
-
-### Extraction Logic
-- **Archive Extraction:** The extraction logic is implemented directly in the `rizu.dlc` module (e.g., as a `DlcExtractor` utility). It must be able to handle both standard ZIP (`.zip`, used by Etterna packs) and osu! specific formats (`.osz`, which are also zip archives) seamlessly. 
-- **Destinations:**
-  - `pack` types are extracted to `userdata/charts/packs`.
-  - `set` types are stored in `userdata/charts/downloads`.
-  - `file` types are stored in the directory specified in the metadata (e.g., an existing set folder). Defaults to `userdata/charts/downloads` if unspecified.
-
-### User Interface (Modern Screen)
-- **`yi.views.dlc.DlcScreen`**: A new modern screen integrated into the `yi/` UI system.
-- **Features**:
-  - Search bar with debounced input and provider-specific filters.
-  - Rich result list with thumbnails, audio previews, and metadata.
-  - Dedicated views for different `DlcType` (Packs, Sets, Files, Skins).
-  - Background download management with progress bars.
-  - Sidebar integration for quick access.
-
-## Implementation Plan
-### Phase 1: Core Infrastructure (Completed)
-- **Status**: ✅
-- Defined `rizu.dlc.IDlcProvider` (Search, Download).
-- Created `rizu.dlc.DlcManager` with synchronous and asynchronous (`ThreadRemote`) modes.
-- Implemented `rizu.dlc.DlcWorker` for background HTTP downloads and extraction coordination.
-- Implemented `rizu.dlc.DlcTask` for progress reporting and state synchronization.
-
-### Phase 2: Provider Development (In Progress)
-- [x] **osu! Beatmapsets (`MinoProvider`)**: Basic search and download implementation using 3rd-party APIs.
-- [x] **osu! Individual Files (`OsuFileProvider`)**: Direct `.osu` download to specified set folders (using `metadata.dest_dir`).
-- [x] **Etterna Packs (`EtternaPackProvider`)**: Implementation of the `pack` type, including search API integration and Zip download.
-
-### Phase 3: Extraction and Ingestion Refinement
-- [x] **Core Extraction**: Basic `.osz` and `.zip` extraction using `DlcExtractor`.
-- [x] **Ingestion Logic**: Refine `DlcManager:onDlcCompleted` to better coordinate with the `rizu.library` for different content types (e.g., specific refresh triggers for `packs` vs. `downloads`).
-
-### Phase 4: UI Implementation (Modernization)
-- [x] **Modern Screen (`yi.views.dlc.DlcScreen`)**: Implement the new screen using the `yi/` UI system.
-- [x] **Sidebar Integration**: Update `yi/views/select/Select.lua` to include a navigation button for the `DlcScreen`.
-- [x] **Legacy Removal**: Remove the old `ui/views/DlcModalView.lua` and its hooks from `SelectView` and `yi/views/select/Select.lua`.
-
-## Verification & Testing
-- **Synchronous Testing**: Use `manager:setSync(true)` in unit tests to verify logic without the complexity of multi-threading.
-- **Asynchronous Validation**: Verify that the UI remains responsive (no micro-stutters) during heavy downloads and extractions.
-- Unit tests for `IDlcProvider` implementations using mock HTTP responses.
-- Integration tests simulating a complete "Download-to-System" flow.
+#### 3. Etterna Packs (Type: `pack`)
+- **Download**: `https://downloads.etternaonline.com/ranked/PackName.zip`
+- **Search**: `https://api.etternaonline.com/api/packs?page=1&limit=36&sort=name&filter[search]=SEARCH_QUERY`
+- **Filters**: Supports sorting by popularity/difficulty and filtering by key count (`4k`-`10k`) or tags (stamina, technical, etc.).

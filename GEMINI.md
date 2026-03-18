@@ -82,15 +82,18 @@ The `.editorconfig` file in the root of the repository specifies the coding styl
 
 To ensure long-term maintainability and alignment between design and implementation, the following standards are established:
 
-*   **Living Specifications (Traceability) [OPTIONAL]:**
-    *   New features or major changes should ideally be documented in a `spec.md` file within the relevant module directory.
-    *   Implementation tests (`_test.lua`) may include a `@spec` tag in the test function's comments, mapping it back to the specific requirement in the `spec.md`.
-    *   **Format:** `---@spec [path/to/spec.md]#[REQ-*]`
-    *   **Verification:** `scripts/check_spec_coverage.lua` can be used to check coverage of specified requirements.
-*   **Architecture Decision Records (ADR) [OPTIONAL]:**
-    *   Significant architectural changes, new library dependencies, or shifts in coding patterns should be recorded as an ADR in `docs/adr/`.
-    *   Use `docs/adr/0000-template.md` for new records.
-    *   Agents are encouraged to check existing ADRs before proposing architectural changes to ensure consistency with past decisions.
+*   **Living Specifications:**
+    *   New features or major changes MUST be documented in a `spec.md` file within the relevant module directory.
+    *   **Structure**: A `spec.md` should lead with the **Goal** and **User Experience**, providing high-level context before diving into implementation details.
+    *   **Architecture Decisions (ADR)**: Significant architectural choices should be documented directly within the `spec.md` in an `## Architecture Decisions` or `## ADR` section to keep context together.
+    *   **Precise Terminology**: Avoid ambiguous terms. For example, do not use "difficulty" when referring to a chart variation or file; reserve it strictly for complexity metrics (star ratings, MSD, etc.).
+*   **Traceability:**
+    *   Specifications and code are linked using inlined tags (e.g., `[SPEC-MOD-01]`) within the documentation and as comments in the source code or tests.
+    *   **Verification**: `scripts/check_spec_coverage.lua` is used to check coverage of specified requirements by searching for `[SPEC-*]` tags in both spec and code/test files.
+*   **Documentation Locality:**
+    *   Keep documentation as close to the code as possible.
+    *   Use EmmyLua for API-level documentation.
+    *   Use `spec.md` for behavioral and architectural documentation.
 
 ## Rizu Module Overview
 
