@@ -12,6 +12,9 @@
 !userdata/filters.lua
 !userdata/play.lua
 
+!lua-dev-env
+!build/downloads
+!build/deps
 !reqprof
 !typecheck
 !tree
