@@ -17,6 +17,10 @@ return {
 		url = "https://www.7-zip.org/a/7z2409-src.7z",
 		archive = "7z-src.7z",
 		dir = "7zsdk"
+	},
+	love_macos = {
+		url = "https://github.com/love2d/love/releases/download/11.5/love-11.5-macos.zip",
+		archive = "love-macos.zip"
 	}
 	-- Placeholder for future deps like BASS, SQLite, etc.
 }

@@ -1,5 +1,8 @@
 #!/usr/bin/env luajit
--- Simple dependency fetcher for Rizu
+-- Simple dependency fetcher for Rizu (Run from project root)
+
+-- Add build/ to path to find deps.lua
+package.path = package.path .. ";./build/?.lua"
 
 local deps = require("deps")
 local args = {...}
@@ -22,11 +25,10 @@ local function execute(cmd)
 	return true
 end
 
--- We are now inside build/
-local build_dir = "."
+local build_dir = "build"
 local downloads_dir = build_dir .. "/downloads"
 local deps_dir = build_dir .. "/deps"
-local bin_dir = "../bin"
+local bin_dir = "bin"
 
 execute("mkdir -p " .. downloads_dir .. " " .. deps_dir)
 
@@ -77,26 +79,12 @@ local function download_ffmpeg(t)
 	execute("mkdir -p " .. platform_bin)
 	
 	if t:lower() == "linux" then
-		-- We want to bundle ONLY the files that satisfy the SONAME dependencies.
-		-- In FFmpeg, these are typically libav*.so.NN
-		-- We use find to locate symlinks that point to the actual library and have the major version.
-		local lib_src = extract_to .. "/lib"
-		execute("mkdir -p " .. platform_bin)
-		
-		-- Copy major versioned files (dereferenced)
-		-- We look for files matching lib*.so.[0-9]* but NOT having more than one dot after .so
-		-- This matches .so.62 but not .so.62.29.101
-		execute("find " .. lib_src .. " -maxdepth 1 -name \"*.so.[0-9]*\" ! -name \"*.so.[0-9]*.*[0-9]*\" -exec cp -L {} " .. platform_bin .. " \\;")
-		
-		-- Also copy the base .so dereferenced (useful for build time if needed, though redundant for runtime)
-		-- execute("find " .. lib_src .. " -maxdepth 1 -name \"*.so\" -exec cp -L {} " .. platform_bin .. " \\;")
-		
-		print("Bundled major-versioned FFmpeg .so files to " .. platform_bin)
+		execute("find " .. extract_to .. "/lib -maxdepth 1 -name \"*.so.[0-9]*\" ! -name \"*.so.[0-9]*.*[0-9]*\" -exec cp -L {} " .. platform_bin .. " \\;")
+		execute("find " .. extract_to .. "/lib -maxdepth 1 -name \"*.so\" -exec cp -L {} " .. platform_bin .. " \\;")
+		print("Bundled FFmpeg .so files to " .. platform_bin)
 	else
 		execute("cp -r " .. extract_to .. "/bin/*.dll " .. platform_bin .. "/")
 	end
-	
-	print("FFmpeg for " .. t .. " extracted to " .. extract_to .. " and binaries copied to " .. platform_bin)
 end
 
 local function download_7zsdk()
@@ -108,12 +96,22 @@ local function download_7zsdk()
 	
 	execute("mkdir -p " .. extract_to)
 	
-	-- Extraction needs 7zip installed on host (setup_host.sh should handle this)
 	if not execute("7z x -y " .. dest .. " -o" .. extract_to) then
-		-- fallback to 7zr if 7z is not found
 		execute("7zr x -y " .. dest .. " -o" .. extract_to)
 	end
 	print("7z SDK extracted to " .. extract_to)
+end
+
+local function download_love_macos()
+	local config = deps.love_macos
+	local dest = downloads_dir .. "/" .. config.archive
+	
+	if not download_if_missing(config.url, dest) then return end
+	
+	-- No extraction needed here, RepoBuilder will extract it
+	-- Just copy to build/package/ for RepoBuilder
+	execute("cp " .. dest .. " build/package/love-macos.zip")
+	print("love-macos.zip ready in build/package/")
 end
 
 if target:lower() == "linux" or target:lower() == "windows" or target:lower() == "win64" then
@@ -122,6 +120,7 @@ if target:lower() == "linux" or target:lower() == "windows" or target:lower() ==
 elseif target:lower() == "macos" then
 	print("MacOS target selected.")
 	download_7zsdk()
+	download_love_macos()
 else
 	print("Unsupported target: " .. target)
 	os.exit(1)

@@ -1,5 +1,5 @@
 #!/usr/bin/env luajit
--- Rizu Lua Build Script
+-- Rizu Lua Build Script (Run from project root)
 -- Reference: @lua-dev-env scripts
 
 local args = {...}
@@ -30,10 +30,9 @@ local function execute(cmd)
 	end
 end
 
--- Absolute paths are safer
-local build_dir = os.getenv("PWD")
-local project_root = build_dir .. "/.."
-local tree = os.getenv("TREE") or (project_root .. "/tree")
+-- Absolute paths are safer but we can use relative if we are in root
+local build_dir = "build"
+local tree = os.getenv("TREE") or "./tree"
 local build_deps = build_dir .. "/deps"
 
 local function get_ffmpeg_paths(t)
@@ -41,7 +40,7 @@ local function get_ffmpeg_paths(t)
 	local base = build_deps .. "/ffmpeg-" .. suffix
 	
 	local inc = base .. "/include"
-	local lib = base .. (suffix == "win" and "/lib" or "/lib")
+	local lib = base .. "/lib"
 	
 	-- Verification
 	if not os.execute("ls " .. inc .. "/libavcodec/avcodec.h 2>/dev/null") then
@@ -58,7 +57,7 @@ local function get_7z_inc()
 		return base
 	end
 	print("Warning: 7z SDK headers not found in " .. base .. ", falling back to aqua/")
-	return project_root .. "/aqua"
+	return "./aqua"
 end
 
 local function get_compiler(t)
@@ -74,19 +73,19 @@ end
 
 local function build_7z(t)
 	print("Building 7z for " .. t .. "...")
-	local src = project_root .. "/aqua/7z.c"
+	local src = "aqua/7z.c"
 	local cc = get_compiler(t)
 	local inc = "-I" .. get_7z_inc()
 	local out, flags
 	
 	if t:lower() == "windows" or t:lower() == "win64" then
-		out = project_root .. "/bin/win64/7z.dll"
+		out = "bin/win64/7z.dll"
 		flags = "-shared -fPIC"
 	elseif t:lower() == "macos" then
-		out = project_root .. "/bin/macos/lib7z.dylib"
+		out = "bin/macos/lib7z.dylib"
 		flags = "-shared -fPIC"
 	else
-		out = project_root .. "/bin/linux64/lib7z.so"
+		out = "bin/linux64/lib7z.so"
 		flags = "-D_GNU_SOURCE -shared -fPIC"
 	end
 	
@@ -95,7 +94,7 @@ end
 
 local function build_video(t)
 	print("Building Video for " .. t .. "...")
-	local src = project_root .. "/aqua/video.c"
+	local src = "aqua/video.c"
 	local cc = get_compiler(t)
 	local out, flags, libs
 	
@@ -105,15 +104,15 @@ local function build_video(t)
 	local inc = string.format("-I%s -I%s", luajit_inc, ffmpeg_inc)
 	
 	if t:lower() == "windows" or t:lower() == "win64" then
-		out = project_root .. "/bin/win64/video.dll"
-		libs = string.format("-L%s -L%s -lavformat -lavcodec -lswresample -lswscale -lavutil -lm -l:libluajit-5.1.dll.a", tree .. "/lib", ffmpeg_lib_dir)
+		out = "bin/win64/video.dll"
+		libs = string.format("-L%s/lib -L%s -lavformat -lavcodec -lswresample -lswscale -lavutil -lm -l:libluajit-5.1.dll.a", tree, ffmpeg_lib_dir)
 		flags = "-shared -fPIC"
 	elseif t:lower() == "macos" then
-		out = project_root .. "/bin/macos/video.so"
+		out = "bin/macos/video.so"
 		libs = "-lavformat -lavcodec -lswresample -lswscale -lavutil -lm"
 		flags = "-shared -fPIC -undefined dynamic_lookup"
 	else
-		out = project_root .. "/bin/linux64/video.so"
+		out = "bin/linux64/video.so"
 		libs = string.format("-L%s -lavformat -lavcodec -lswresample -lswscale -lavutil -lm", ffmpeg_lib_dir)
 		flags = "-shared -fPIC -Wl,-rpath,'$ORIGIN'"
 	end
@@ -121,7 +120,7 @@ local function build_video(t)
 	execute(string.format("%s %s %s -o %s %s %s", cc, inc, flags, out, src, libs))
 end
 
-execute(string.format("mkdir -p %s/bin/linux64 %s/bin/win64 %s/bin/macos", project_root, project_root, project_root))
+execute("mkdir -p bin/linux64 bin/win64 bin/macos")
 build_7z(target)
 build_video(target)
 

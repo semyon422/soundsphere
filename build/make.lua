@@ -1,5 +1,8 @@
 #!/usr/bin/env luajit
--- Rizu Unified Task Runner
+-- Rizu Unified Task Runner (Run from project root)
+
+-- Initialize package paths
+require("pkg_config")
 
 local args = {...}
 local command = args[1]
@@ -16,23 +19,40 @@ end
 local tasks = {}
 
 function tasks.deps()
-	execute("./fetch_deps.lua " .. (target or ""))
+	execute("luajit build/fetch_deps.lua " .. (target or ""))
 end
 
 function tasks.build()
-	execute("./build.lua " .. (target or ""))
+	execute("luajit build/build.lua " .. (target or ""))
 end
 
 function tasks.setup()
 	if target == "macos" then
-		execute("./setup_cross_macos.sh")
+		execute("./build/setup_cross_macos.sh")
 	elseif target == "luajit" then
-		execute("./setup_luajit.sh")
+		execute("./build/setup_luajit.sh")
 	elseif target == "luajit_win" then
-		execute("./setup_luajit_win.sh")
+		execute("./build/setup_luajit_win.sh")
 	else
-		execute("./setup_host.sh")
+		execute("./build/setup_host.sh")
 	end
+end
+
+local function get_repo_builder()
+	local CurrentRepo = require("build.package.CurrentRepo")
+	local RepoBuilder = require("build.package.RepoBuilder")
+	return RepoBuilder(CurrentRepo())
+end
+
+function tasks.package()
+	local builder = get_repo_builder()
+	builder:build_zip()
+	builder:buildMacos()
+end
+
+function tasks.repo()
+	local builder = get_repo_builder()
+	builder:build()
 end
 
 function tasks.all()
@@ -42,19 +62,21 @@ end
 
 function tasks.clean()
 	print("Cleaning build/deps and bin/...")
-	execute("rm -rf deps bin")
-	execute("mkdir -p deps bin")
+	execute("rm -rf build/deps bin repo")
+	execute("mkdir -p build/deps bin")
 end
 
 function tasks.help()
 	print([[
-Rizu Build System
-Usage: ./make.lua <command> [target]
+Rizu Build System (Execute from root)
+Usage: ./build/make.lua <command> [target]
 
 Commands:
   setup [target]    Install dependencies (target: host, luajit, luajit_win, macos)
-  deps [target]     Fetch binary dependencies (target: linux, windows)
+  deps [target]     Fetch binary dependencies (target: linux, windows, macos)
   build [target]    Compile C modules (target: linux, windows, macos)
+  package           Bundle game into zip/app
+  repo              Build update repository
   all [target]      Run deps + build
   clean             Remove build artifacts
   help              Show this help

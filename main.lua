@@ -14,22 +14,7 @@ if arg[2] == "debug" then
     require("lldebugger").start()
 end
 
-local pkg = require("aqua.pkg")
-
-pkg.addc()
-pkg.addc("3rd-deps/lib")
-pkg.addc("bin/lib")
-pkg.addc("tree/lib/lua/5.1")
-pkg.add()
-pkg.add("3rd-deps/lua")
-pkg.add("aqua")
-pkg.add("ncdk")
-pkg.add("chartbase")
-pkg.add("libchart")
-pkg.add("tree/share/lua/5.1")
-
-pkg.export_lua()
-pkg.export_love()
+require("pkg_config")
 
 require("pprint").export()
 require("coext").export()
@@ -87,7 +72,6 @@ if jit.os == "Windows" then
 	local winapi = require("winapi")
 	winapi.putenv("PATH", ("%s;%s"):format(winapi.getenv("PATH"), root .. "/bin/win64"))
 	winapi.chdir(root)
-	pkg.addc("bin/win64")
 elseif jit.os == "Linux" then
 	local ldlp = os.getenv("LD_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/linux64") then
@@ -98,7 +82,6 @@ elseif jit.os == "Linux" then
 	end
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
-	pkg.addc("bin/linux64")
 elseif jit.os == "OSX" then
 	local ldlp = os.getenv("DYLD_FALLBACK_LIBRARY_PATH")
 	if not ldlp or not ldlp:find("bin/mac64") then
@@ -109,11 +92,7 @@ elseif jit.os == "OSX" then
 	end
 	ffi.cdef("int chdir(const char *path);")
 	ffi.C.chdir(root)
-	pkg.addc("bin/mac64")
 end
-
-pkg.export_lua()
-pkg.export_love()
 
 love.errhand = require("errhand")
 
